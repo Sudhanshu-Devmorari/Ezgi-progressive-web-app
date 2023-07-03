@@ -1,0 +1,49 @@
+input{
+    background-color: #F6F6F6!important;
+    border: #F6F6F6!important;
+}
+.continuebtn{
+    border: 1px solid #00659D;
+    color: #00659D;
+    background-color: #FFFFFF;
+}
+.closeBtn{
+    position: absolute;
+    right: 38px;
+}
+.customDropdown{
+    background-color: #F6F6F6!important;
+    border: 1px solid #F6F6F6!important;
+    color: #0D2A53;
+    font-weight:600;
+    /* -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none; */
+}
+.dpcontent{
+    background-color: #F6F6F6!important;
+    border: 1px solid #F6F6F6!important;
+    color: #0D2A53;
+    font-weight:600;
+}
+.customDropdown-content{
+    overflow-y: scroll;
+    height: 10%!important;
+}
+.customDropdown:focus{
+    outline: none;
+}
+/* .dpcontent{
+    background-color: #F6F6F6!important;
+} */
+/* option{
+    position: absolute;
+    background-color: #F6F6F6!important;
+    border: 1px solid #F6F6F6!important;
+    border-radius: 12px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+    margin: 50px!important
+} */
