@@ -7,11 +7,15 @@ import google from "../../assets/googleLogo.png";
 import { Link } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import Dropdown from "react-bootstrap/Dropdown";
 
 const SignUpModal = (props) => {
   const [continueShow, setContinueShow] = useState(false);
+  const [termsOfUse, setTermsOfUse] = useState(false);
+
   const [countryDropDown, setCountryDropDown] = useState(false);
+  const [cityDropDown, setCityDropDown] = useState(false);
+  const [genderDropDown, setGenderDropDown] = useState(false);
+  const [ageDropDown, setAgeDropDown] = useState(false);
 
   return (
     <>
@@ -139,62 +143,197 @@ const SignUpModal = (props) => {
                 </span>
               </div>
               <div className="position-relative">
-                <span>Country</span>
-                <div
-                  className="customDropdown p-2 text-center"
-                  onClick={() => setCountryDropDown(!countryDropDown)}
-                >
+                {/* Country Dropdown */}
+                <div className="">
                   <span>Country</span>
+                  <div
+                    className="customDropdown p-2 text-center"
+                    onClick={() => setCountryDropDown(!countryDropDown)}
+                  >
+                    <span>Select</span>
+                  </div>
+                  <div
+                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
+                      countryDropDown ? "d-block" : "d-none"
+                    } `}
+                  >
+                    <span className="dpcontent my-1 p-2">India</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                  </div>
                 </div>
-                <div
-                  className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 position-absolute ${
-                    countryDropDown ? "d-block" : "d-none"
-                  } `}
-                >
-                  <span className="dpcontent my-1 p-2">India</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                </div>
+                {/* End Country Dropdown */}
 
-                {/* <span>State</span>
-                <div className="customDropdown p-2 text-center">
-                  <span>Country</span>
+                {/* City Dropdown */}
+                <div className="">
+                  <span>City</span>
+                  <div
+                    className="customDropdown p-2 text-center"
+                    onClick={() => setCityDropDown(!cityDropDown)}
+                  >
+                    <span>Select</span>
+                  </div>
+                  <div
+                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
+                      cityDropDown ? "d-block" : "d-none"
+                    } `}
+                  >
+                    <span className="dpcontent my-1 p-2">Surat</span>
+                    <span className="dpcontent my-1 p-2">Baroda</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                    <span className="dpcontent my-1 p-2">Turkey</span>
+                  </div>
                 </div>
-                <div className="customDropdown-content p-2 flex-column d-flex text-center h-25">
-                  <span className="dpcontent m-1 p-2">India</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                  <span className="dpcontent m-1 p-2">Turkey</span>
-                </div> */}
+                {/* End City Dropdown */}
 
-                {/* <div className="d-flex flex-column m-2">
-                  <label htmlFor="Country">Country</label>
-                  <select name="" id="Country" className="customDropdown p-2 text-center">
-                    <option className="dpcontent" selected value="">Select</option>
-                    <option className="dpcontent" value="">India</option>
-                    <option className="dpcontent" value="">Turkey</option>
-                  </select>
+                {/* Gender Dropdown */}
+                <div className="">
+                  <span>Gender</span>
+                  <div
+                    className="customDropdown p-2 text-center"
+                    onClick={() => setGenderDropDown(!genderDropDown)}
+                  >
+                    <span>Select</span>
+                  </div>
+                  <div
+                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
+                      genderDropDown ? "d-block" : "d-none"
+                    } `}
+                  >
+                    <span className="dpcontent my-1 p-2">Male</span>
+                    <span className="dpcontent my-1 p-2">Female</span>
+                    <span className="dpcontent my-1 p-2">
+                      I don't want to specify
+                    </span>
+                  </div>
                 </div>
-                <div className="d-flex flex-column m-2">
-                  <label htmlFor="Gender">Gender</label>
-                  <select name="" id="Gender" className="customDropdown p-2 text-center">
-                    <option className="dpcontent" selected value="">Select</option>
-                    <option className="dpcontent" value="">India</option>
-                    <option className="dpcontent" value="">Turkey</option>
-                  </select>
-                </div> */}
+                {/* End Gender Dropdown */}
+
+                {/* Age Dropdown */}
+                <div className="">
+                  <span>Age</span>
+                  <div
+                    className="customDropdown p-2 text-center"
+                    onClick={() => setAgeDropDown(!ageDropDown)}
+                  >
+                    <span>Select</span>
+                  </div>
+                  <div
+                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
+                      ageDropDown ? "d-block" : "d-none"
+                    } `}
+                  >
+                    <span className="dpcontent my-1 p-2">18 - 24</span>
+                    <span className="dpcontent my-1 p-2">25 - 34</span>
+                    <span className="dpcontent my-1 p-2">35 - 44</span>
+                    <span className="dpcontent my-1 p-2">44 +</span>
+                  </div>
+                </div>
+                {/* End State Dropdown */}
               </div>
+              <div className="text-center">
+                <div className="my-3">
+                  <input type="checkbox" name="" id="" className="me-2" />I have
+                  read and agree to the{" "}
+                  <span style={{ color: "#00659D" }}>Terms of use</span>
+                </div>
+                <div className="d-flex flex-column align-items-center my-3">
+                  <button
+                    className="continuebtn px-3 py-1"
+                    onClick={() => {
+                      setTermsOfUse(true);
+                    }}
+                  >
+                    Continue
+                  </button>
+                  <div className="mt-3">
+                    Already Account?{" "}
+                    <Link style={{ textDecoration: "none", color: "#00659D" }}>
+                      Sign In
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Terms of use */}
+      <Modal
+        show={termsOfUse}
+        onHide={() => setTermsOfUse(false)}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Body>
+          <div
+            className="m-4"
+            style={{ fontFamily: "none", color: "#0D2A53", fontWeight: "600" }}
+          >
+            <div
+              className="d-flex justify-content-between m-2"
+              style={{ fontWeight: "500", color: "#0D2A53" }}
+            >
+              <span>
+                <i
+                  onClick={() => setContinueShow(false)}
+                  className="fa-solid fa-arrow-left-long"
+                  style={{ fontSize: "18px" }}
+                ></i>
+              </span>
+              <span className="">
+                <RxCross2
+                  fontSize={"1.4rem"}
+                  onClick={() => {
+                    props.onHide();
+                  }}
+                />
+              </span>
+            </div>
+            <h4 style={{ color: "#00659D" }}>Terms of Use</h4>
+            <p>
+              Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+              dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
+              ac consectetur ac, vestibulum at eros. dapibus ac facilisis in,
+              egestas eget quam. Morbi leo risus, porta ac consectetur ac,
+              vestibulum at eros.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Exercitationem, excepturi odit, sint dolor est consequuntur harum
+              inventore, quas nesciunt aspernatur expedita. Sint qui voluptatum
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Exercitationem, excepturi odit, sint dolor est consequuntur harum
+              inventore, quas nesciunt aspernatur expedita. Sint qui voluptatum
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Exercitationem, excepturi odit, sint dolor est consequuntur harum
+              inventore, quas nesciunt aspernatur expedita. Sint qui voluptatum
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Exercitationem, excepturi odit, sint dolor est consequuntur harum
+              inventore, quas nesciunt aspernatur expedita. Sint qui voluptatum
+              exercitationem eum sit impedit eligendi modi veniam rerum ipsam
+              sapiente, dolore recusandae nesciunt sunt doloremque!
+            </p>
+            <div className="d-flex justify-content-center mb-4">
+              <button
+                className="continuebtn px-3 py-1"
+              >
+                Approve
+              </button>
             </div>
           </div>
         </Modal.Body>
