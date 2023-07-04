@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./SignUpModal.css";
 import facebook from "../../assets/FacebookLogo.png";
 import google from "../../assets/googleLogo.png";
 import { Link } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
-import { AiOutlineArrowLeft } from "react-icons/ai";
 
 const SignUpModal = (props) => {
   const [continueShow, setContinueShow] = useState(false);
@@ -24,6 +22,7 @@ const SignUpModal = (props) => {
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        scrollable
       >
         <Modal.Body closeButton>
           <div
@@ -34,12 +33,15 @@ const SignUpModal = (props) => {
               <div className="d-flex justify-content-center">
                 <span>LOGIN</span>
                 <span>
-                  <button
-                    onClick={props.onHide}
-                    type="button"
-                    className="btn-close closeBtn"
-                    aria-label="Close"
-                  ></button>
+                  <RxCross2
+                    fontSize={"1.8rem"}
+                    style={{
+                      position: "absolute",
+                      right: "17px",
+                      top: "10px",
+                      color: "#0D2A53",
+                    }}
+                  />
                 </span>
               </div>
               <div className="">
@@ -135,9 +137,12 @@ const SignUpModal = (props) => {
                 </span>
                 <span className="">
                   <RxCross2
-                    fontSize={"1.4rem"}
-                    onClick={() => {
-                      props.onHide();
+                    fontSize={"1.8rem"}
+                    style={{
+                      position: "absolute",
+                      right: "17px",
+                      top: "10px",
+                      color: "#0D2A53",
                     }}
                   />
                 </span>
@@ -291,9 +296,12 @@ const SignUpModal = (props) => {
               </span>
               <span className="">
                 <RxCross2
-                  fontSize={"1.4rem"}
-                  onClick={() => {
-                    props.onHide();
+                  fontSize={"1.8rem"}
+                  style={{
+                    position: "absolute",
+                    right: "17px",
+                    top: "10px",
+                    color: "#0D2A53",
                   }}
                 />
               </span>
@@ -329,11 +337,7 @@ const SignUpModal = (props) => {
               sapiente, dolore recusandae nesciunt sunt doloremque!
             </p>
             <div className="d-flex justify-content-center mb-4">
-              <button
-                className="continuebtn px-3 py-1"
-              >
-                Approve
-              </button>
+              <button className="continuebtn px-3 py-1">Approve</button>
             </div>
           </div>
         </Modal.Body>

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Modal from "react-bootstrap/Modal";
-import "./ForgotPasswordModal.css";
+import "./OtpModal.css";
 import { RxCross2 } from "react-icons/rx";
-import OtpModal from "../OtpModal/OtpModal";
+import OtpInput from "react-otp-input";
+import { PasswordReset } from "../PasswordReset/PasswordReset";
 
-const ForgotPasswordModal = (props) => {
-  const [otpModalShow, setOtpModalShow] = useState(false);
-
+const OtpModal = (props) => {
+  const [otp, setOtp] = useState("");
+  const [passwordResetModalShow, setPasswordResetModalShow] = useState(false);
   return (
     <>
       <Modal
@@ -37,25 +38,34 @@ const ForgotPasswordModal = (props) => {
                 </span>
               </div>
               <div className="">
-                We will send an SMS verification code to your phone.
+                We sent a SMS verification code to your phone.
               </div>
-              <div className="">
-                <div className="d-flex flex-column my-2">
-                  <label htmlFor="phone">Phone</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    name=""
-                    id="phone"
+              <div className="my-1">
+                <div className="d-flex justify-content-between">
+                  <span>Enter 6 digit code</span>
+                  <span style={{ color: "#00659D" }}>1:45</span>
+                </div>
+                <div className="otp-container">
+                  <OtpInput
+                    inputStyle="otpinputdesign"
+                    value={otp}
+                    onChange={setOtp}
+                    numInputs={6}
+                    renderSeparator={<span> </span>}
+                    renderInput={(props) => <input {...props} />}
                   />
+                </div>
+                <div className="text-end">
+                  <small>Didn't get the code? </small>
+                  <span style={{ color: "#00659D" }}>Send Again</span>
                 </div>
               </div>
               <div className="d-flex flex-column align-items-center my-4">
                 <button
                   className="continuebtn px-3 py-1"
-                  onClick={() => setOtpModalShow(true)}
+                  onClick={() => setPasswordResetModalShow(true)}
                 >
-                  Send
+                  Verify
                 </button>
               </div>
             </div>
@@ -63,9 +73,12 @@ const ForgotPasswordModal = (props) => {
         </Modal.Body>
       </Modal>
 
-      <OtpModal show={otpModalShow} onHide={() => setOtpModalShow(false)} />
+      <PasswordReset
+        show={passwordResetModalShow}
+        onHide={() => setPasswordResetModalShow(false)}
+      />
     </>
   );
 };
 
-export default ForgotPasswordModal;
+export default OtpModal;

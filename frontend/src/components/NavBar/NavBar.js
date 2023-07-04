@@ -7,11 +7,13 @@ import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import SignInModal from "../SignInModal/SignInModal";
 import ForgotPasswordModal from "../ForgotPasswordModal/ForgotPasswordModal";
+import AddCommentModal from "../AddCommentModal/AddCommentModal";
 
 const NavBar = (props) => {
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
   const [signInModalShow, setSignInModalShow] = React.useState(false);
   const [forgotPasswordShow, setForgotPasswordShow] = React.useState(false);
+  const [addCommentShow, setAddCommentShow] = React.useState(false);
 
   return (
     <>
@@ -43,10 +45,14 @@ const NavBar = (props) => {
           </div>
         </div>
       </nav>
+        <button onClick={() => setAddCommentShow(true)}>
+          add comment
+        </button>
 
       <SignUpModal show={signUpModalShow} onHide={() => setSignUpModalShow(false)} />
       <SignInModal show={signInModalShow} onHide={() => setSignInModalShow(false)} />
       <ForgotPasswordModal show={forgotPasswordShow} onHide={() => setForgotPasswordShow(false)} />
+      <AddCommentModal show={addCommentShow} onHide={()=>{setAddCommentShow(false)}}/>
     </>
   );
 };

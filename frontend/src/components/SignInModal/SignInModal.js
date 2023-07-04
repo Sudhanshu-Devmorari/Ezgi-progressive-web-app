@@ -4,6 +4,7 @@ import "./SignInModal.css";
 import facebook from "../../assets/FacebookLogo.png";
 import google from "../../assets/googleLogo.png";
 import { Link } from "react-router-dom";
+import {RxCross2} from "react-icons/rx";
 
 const SignInModal = (props) => {
   return (
@@ -23,12 +24,7 @@ const SignInModal = (props) => {
               <div className="d-flex justify-content-center">
                 <span>LOGIN</span>
                 <span>
-                  <button
-                    onClick={props.onHide}
-                    type="button"
-                    className="btn-close closeBtn"
-                    aria-label="Close"
-                  ></button>
+                <RxCross2 fontSize={"1.8rem"} style={{position:"absolute", right:"17px", top:"10px",color: "#0D2A53"}}/>
                 </span>
               </div>
               <div className="">

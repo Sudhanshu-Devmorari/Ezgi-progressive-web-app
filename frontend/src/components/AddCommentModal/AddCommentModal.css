@@ -1,0 +1,8 @@
+textArea{
+    background-color: #F6F6F6!important;
+    border: #F6F6F6!important;
+    height: 138px;
+}
+textArea:focus{
+    box-shadow: none!important;
+}
