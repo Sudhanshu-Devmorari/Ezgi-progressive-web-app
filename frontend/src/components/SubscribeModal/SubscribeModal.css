@@ -1,11 +1,23 @@
-.BlankCircle{
+.BlankCircle-light-mode{
     border: 2px solid #00659D;
     border-radius: 50%;
     width: 2.2rem;
     height: 2rem;
 }
-.FilledCircle{
+.BlankCircle-dark-mode{
+    border: 2px solid #D2DB08;
+    border-radius: 50%;
+    width: 2.2rem;
+    height: 2rem;
+}
+.FilledCircle-light-mode{
     background-color: #00659D;
+    border-radius: 50%;
+    width: 2.2rem;
+    height: 2rem;
+}
+.FilledCircle-dark-mode{
+    background-color: #D2DB08;
     border-radius: 50%;
     width: 2.2rem;
     height: 2rem;

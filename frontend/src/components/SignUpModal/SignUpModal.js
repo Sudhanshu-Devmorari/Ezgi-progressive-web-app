@@ -7,8 +7,14 @@ import { Link } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import OtpInput from "react-otp-input";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
+import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
+import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 const SignUpModal = (props) => {
+  // THEME
+  const currentTheme = localStorage.getItem("CurrentTheme");
+
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,10 +23,61 @@ const SignUpModal = (props) => {
     setShowPassword(!showPassword);
   };
 
+  const [selectCheckBox, setSelectCheckBox] = useState(false);
+
   const [countryDropDown, setCountryDropDown] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("Select");
   const [cityDropDown, setCityDropDown] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("Select");
   const [genderDropDown, setGenderDropDown] = useState(false);
+  const [selectedGender, setSelectedGender] = useState("Select");
   const [ageDropDown, setAgeDropDown] = useState(false);
+  const [selectedAge, setSelectedAge] = useState("Select");
+
+  const handleCountrySelection = (country) => {
+    setSelectedCountry(country);
+  };
+
+  const toggleCountryDropdown = () => {
+    setCountryDropDown(!countryDropDown);
+  };
+
+  const handleCitySelection = (city) => {
+    setSelectedCity(city);
+  };
+
+  const toggleCityDropdown = () => {
+    setCityDropDown(!cityDropDown);
+  };
+
+  const handleGenderSelection = (gender) => {
+    setSelectedGender(gender);
+  };
+
+  const toggleGenderDropdown = () => {
+    setGenderDropDown(!genderDropDown);
+  };
+
+  const handleAgeSelection = (age) => {
+    setSelectedAge(age);
+  };
+
+  const toggleAgeDropdown = () => {
+    setAgeDropDown(!ageDropDown);
+  };
+
+  const countryOptions = [
+    "India",
+    "Turkey",
+    "Paris",
+    "Japan",
+    "Germany",
+    "USA",
+    "UK",
+  ];
+  const cityOptions = ["Surat", "Baroda"];
+  const genderOptions = ["Male", "Female", "I don't want to specify"];
+  const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
   return (
     <>
@@ -31,17 +88,12 @@ const SignUpModal = (props) => {
         centered
         scrollable
       >
-        <Modal.Body>
+        <Modal.Body
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+        >
           {/* Signup modal 1 */}
           {props.ShowModal === 1 && (
-            <div
-              className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
-            >
+            <div>
               <div className="m-2">
                 <div className="d-flex justify-content-center">
                   <span>SIGN UP</span>
@@ -51,12 +103,11 @@ const SignUpModal = (props) => {
                         props.onHide();
                       }}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
@@ -64,7 +115,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="name">Name Surname</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="text"
                       name=""
                       id="name"
@@ -73,7 +128,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="username">Username</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="text"
                       name=""
                       id="username"
@@ -82,7 +141,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="text"
                       name=""
                       id="phone"
@@ -91,7 +154,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="password">Password</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="password"
                       name=""
                       id="password"
@@ -100,7 +167,9 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="d-flex flex-column align-items-center my-3">
                   <button
-                    className="continuebtn px-3 py-1"
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
                     onClick={() => {
                       props.setShowModal(2);
                     }}
@@ -117,7 +186,9 @@ const SignUpModal = (props) => {
                   <div className="mt-3">
                     Already Account?{" "}
                     <span
-                      style={{ color: "#00659D" }}
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      }}
                       onClick={() => {
                         props.setShowModal(4);
                       }}
@@ -134,12 +205,9 @@ const SignUpModal = (props) => {
           {/* Signup model 2 (dropdown) */}
           {props.ShowModal === 2 && (
             <div
-              className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
+              className={`${
+                currentTheme === "dark" ? "darkMode" : "lightMode"
+              }`}
             >
               <div className="m-4">
                 <div
@@ -149,14 +217,13 @@ const SignUpModal = (props) => {
                   <span>
                     <i
                       onClick={() => props.setShowModal(1)}
-                      // onClick={() => setContinueShow(false)}
                       className="fa-solid fa-arrow-left-long"
                       style={{
                         fontSize: "21px",
                         position: "absolute",
                         left: "17px",
                         top: "10px",
-                        color: "#0D2A53",
+                        color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                       }}
                     ></i>
                   </span>
@@ -166,118 +233,75 @@ const SignUpModal = (props) => {
                         props.onHide();
                       }}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
                 <div className="position-relative">
-                  {/* Country Dropdown */}
                   <div className="my-2">
-                    <span>Country</span>
-                    <div
-                      className="customDropdown p-2 text-center"
-                      onClick={() => setCountryDropDown(!countryDropDown)}
-                    >
-                      <span>Select</span>
-                    </div>
-                    <div
-                      className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                        countryDropDown ? "d-block" : "d-none"
-                      } `}
-                    >
-                      <span className="dpcontent my-1 p-2">India</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                    </div>
+                    <CustomDropdown
+                      label="Country"
+                      options={countryOptions}
+                      selectedOption={selectedCountry}
+                      onSelectOption={handleCountrySelection}
+                      isOpen={countryDropDown}
+                      toggleDropdown={toggleCountryDropdown}
+                    />
                   </div>
-                  {/* End Country Dropdown */}
 
-                  {/* City Dropdown */}
                   <div className="my-2">
-                    <span>City</span>
-                    <div
-                      className="customDropdown p-2 text-center"
-                      onClick={() => setCityDropDown(!cityDropDown)}
-                    >
-                      <span>Select</span>
-                    </div>
-                    <div
-                      className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                        cityDropDown ? "d-block" : "d-none"
-                      } `}
-                    >
-                      <span className="dpcontent my-1 p-2">Surat</span>
-                      <span className="dpcontent my-1 p-2">Baroda</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                      <span className="dpcontent my-1 p-2">Turkey</span>
-                    </div>
+                    <CustomDropdown
+                      label="City"
+                      options={cityOptions}
+                      selectedOption={selectedCity}
+                      onSelectOption={handleCitySelection}
+                      isOpen={cityDropDown}
+                      toggleDropdown={toggleCityDropdown}
+                    />
                   </div>
-                  {/* End City Dropdown */}
 
-                  {/* Gender Dropdown */}
                   <div className="my-2">
-                    <span>Gender</span>
-                    <div
-                      className="customDropdown p-2 text-center"
-                      onClick={() => setGenderDropDown(!genderDropDown)}
-                    >
-                      <span>Select</span>
-                    </div>
-                    <div
-                      className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                        genderDropDown ? "d-block" : "d-none"
-                      } `}
-                    >
-                      <span className="dpcontent my-1 p-2">Male</span>
-                      <span className="dpcontent my-1 p-2">Female</span>
-                      <span className="dpcontent my-1 p-2">
-                        I don't want to specify
-                      </span>
-                    </div>
+                    <CustomDropdown
+                      label="Gender"
+                      options={genderOptions}
+                      selectedOption={selectedGender}
+                      onSelectOption={handleGenderSelection}
+                      isOpen={genderDropDown}
+                      toggleDropdown={toggleGenderDropdown}
+                    />
                   </div>
-                  {/* End Gender Dropdown */}
-
-                  {/* Age Dropdown */}
                   <div className="my-2">
-                    <span>Age</span>
-                    <div
-                      className="customDropdown p-2 text-center"
-                      onClick={() => setAgeDropDown(!ageDropDown)}
-                    >
-                      <span>Select</span>
-                    </div>
-                    <div
-                      className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                        ageDropDown ? "d-block" : "d-none"
-                      } `}
-                    >
-                      <span className="dpcontent my-1 p-2">18 - 24</span>
-                      <span className="dpcontent my-1 p-2">25 - 34</span>
-                      <span className="dpcontent my-1 p-2">35 - 44</span>
-                      <span className="dpcontent my-1 p-2">44 +</span>
-                    </div>
+                    <CustomDropdown
+                      label="Age"
+                      options={ageOptions}
+                      selectedOption={selectedAge}
+                      onSelectOption={handleAgeSelection}
+                      isOpen={ageDropDown}
+                      toggleDropdown={toggleAgeDropdown}
+                    />
                   </div>
-                  {/* End State Dropdown */}
                 </div>
                 <div className="text-center">
                   <div className="my-3">
-                    <input type="checkbox" name="" id="" className="me-2" />I
-                    have read and agree to the{" "}
+                    <img
+                      src={
+                        !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
+                      }
+                      style={{ width: "25px", cursor: "pointer" }}
+                      className="me-2"
+                      onClick={() => setSelectCheckBox(!selectCheckBox)}
+                      alt=""
+                    />
+                    I have read and agree to the{" "}
                     <span
-                      style={{ color: "#00659D", cursor: "pointer" }}
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      }}
                       onClick={() => {
-                        // setTermsOfUse(true);
                         props.setShowModal(3);
                       }}
                     >
@@ -286,23 +310,27 @@ const SignUpModal = (props) => {
                   </div>
                   <div className="d-flex flex-column align-items-center my-4">
                     <button
-                      className="continuebtn px-3 py-1"
-                      // onClick={() => {
-                      //   setTermsOfUse(true);
-                      // }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-btn"
+                          : "lightMode-btn"
+                      } px-3 py-1`}
                     >
                       Continue
                     </button>
                     <div className="mt-4">
                       Already Account?{" "}
-                      <Link
-                        style={{ textDecoration: "none", color: "#00659D" }}
+                      <sapn
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                        }}
                         onClick={() => {
                           props.setShowModal(4);
                         }}
                       >
                         Sign In
-                      </Link>
+                      </sapn>
                     </div>
                   </div>
                 </div>
@@ -334,7 +362,7 @@ const SignUpModal = (props) => {
                       position: "absolute",
                       left: "17px",
                       top: "10px",
-                      color: "#0D2A53",
+                      color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                     }}
                   ></i>
                 </span>
@@ -342,56 +370,67 @@ const SignUpModal = (props) => {
                   <RxCross2
                     onClick={() => {
                       props.onHide();
-                      // setContinueShow(false);
-                      // setTermsOfUse(false);
                     }}
                     fontSize={"1.8rem"}
-                    style={{
-                      position: "absolute",
-                      right: "17px",
-                      top: "10px",
-                      color: "#0D2A53",
-                    }}
+                    className={`${
+                      currentTheme === "dark"
+                        ? "closeBtn-dark"
+                        : "closeBtn-light"
+                    }`}
                   />
                 </span>
               </div>
-              <h4 style={{ color: "#00659D" }}>Terms of Use</h4>
-              <p>
-                Cras mattis consectetur purus sit amet fermentum. Cras justo
-                odio, dapibus ac facilisis in, egestas eget quam. Morbi leo
-                risus, porta ac consectetur ac, vestibulum at eros. dapibus ac
-                facilisis in, egestas eget quam. Morbi leo risus, porta ac
-                consectetur ac, vestibulum at eros.
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Exercitationem, excepturi odit, sint dolor est consequuntur
-                harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                voluptatum
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Exercitationem, excepturi odit, sint dolor est consequuntur
-                harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                voluptatum
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Exercitationem, excepturi odit, sint dolor est consequuntur
-                harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                voluptatum
-              </p>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Exercitationem, excepturi odit, sint dolor est consequuntur
-                harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                voluptatum exercitationem eum sit impedit eligendi modi veniam
-                rerum ipsam sapiente, dolore recusandae nesciunt sunt
-                doloremque!
-              </p>
+              <h4
+                style={{
+                  color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                }}
+              >
+                Terms of Use
+              </h4>
+              <div
+                style={{
+                  color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                }}
+              >
+                <p>
+                  Cras mattis consectetur purus sit amet fermentum. Cras justo
+                  odio, dapibus ac facilisis in, egestas eget quam. Morbi leo
+                  risus, porta ac consectetur ac, vestibulum at eros. dapibus ac
+                  facilisis in, egestas eget quam. Morbi leo risus, porta ac
+                  consectetur ac, vestibulum at eros.
+                </p>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Exercitationem, excepturi odit, sint dolor est consequuntur
+                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
+                  voluptatum
+                </p>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Exercitationem, excepturi odit, sint dolor est consequuntur
+                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
+                  voluptatum
+                </p>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Exercitationem, excepturi odit, sint dolor est consequuntur
+                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
+                  voluptatum
+                </p>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Exercitationem, excepturi odit, sint dolor est consequuntur
+                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
+                  voluptatum exercitationem eum sit impedit eligendi modi veniam
+                  rerum ipsam sapiente, dolore recusandae nesciunt sunt
+                  doloremque!
+                </p>
+              </div>
               <div className="d-flex justify-content-center mb-4">
                 <button
-                  className="continuebtn px-3 py-1"
+                  className={`${
+                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                  } px-3 py-1`}
                   onClick={() => {
                     props.setShowModal(2);
                   }}
@@ -407,11 +446,6 @@ const SignUpModal = (props) => {
           {props.ShowModal === 4 && (
             <div
               className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
             >
               <div className="m-2">
                 <div className="d-flex justify-content-center">
@@ -420,12 +454,11 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={props.onHide}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
@@ -433,7 +466,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="text"
                       name=""
                       id="phone"
@@ -451,7 +488,11 @@ const SignUpModal = (props) => {
                       </span>
                     </div>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="password"
                       name=""
                       id="password"
@@ -459,7 +500,13 @@ const SignUpModal = (props) => {
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-3">
-                  <button className="continuebtn px-3 py-1">Continue</button>
+                  <button
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
+                  >
+                    Continue
+                  </button>
                   <div className="text-center my-3">
                     --------------------- or ---------------------{" "}
                   </div>
@@ -469,14 +516,16 @@ const SignUpModal = (props) => {
                   </div>
                   <div className="mt-3">
                     You don't have Account?{" "}
-                    <Link
-                      style={{ textDecoration: "none", color: "#00659D" }}
+                    <span
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      }}
                       onClick={() => {
                         props.setShowModal(1);
                       }}
                     >
                       Sign Up
-                    </Link>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -486,26 +535,18 @@ const SignUpModal = (props) => {
 
           {/* Forgot Password */}
           {props.ShowModal === 5 && (
-            <div
-              className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
-            >
+            <div>
               <div className="m-3 mt-4">
                 <div className="d-flex justify-content-center">
                   <span>
                     <RxCross2
                       onClick={props.onHide}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
@@ -516,7 +557,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column my-2">
                     <label htmlFor="phone">Phone</label>
                     <input
-                      className="form-control"
+                       className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type="text"
                       name=""
                       id="phone"
@@ -528,7 +573,9 @@ const SignUpModal = (props) => {
                     onClick={() => {
                       props.setShowModal(6);
                     }}
-                    className="continuebtn px-3 py-1"
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
                   >
                     Send
                   </button>
@@ -542,11 +589,6 @@ const SignUpModal = (props) => {
           {props.ShowModal === 6 && (
             <div
               className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
             >
               <div className="m-3 mt-4">
                 <div className="d-flex justify-content-center">
@@ -554,12 +596,11 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={props.onHide}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
@@ -569,11 +610,13 @@ const SignUpModal = (props) => {
                 <div className="my-1">
                   <div className="d-flex justify-content-between">
                     <span>Enter 6 digit code</span>
-                    <span style={{ color: "#00659D" }}>1:45</span>
+                    <span style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      }}>1:45</span>
                   </div>
                   <div className="otp-container">
                     <OtpInput
-                      inputStyle="otpinputdesign"
+                      inputStyle={`${currentTheme === "dark" ? "otpinputdesign-dark-mode" : "otpinputdesign-light-mode"}`}
                       value={otp}
                       onChange={setOtp}
                       numInputs={6}
@@ -583,7 +626,9 @@ const SignUpModal = (props) => {
                   </div>
                   <div className="text-end">
                     <small>Didn't get the code? </small>
-                    <span style={{ color: "#00659D" }}>Send Again</span>
+                    <span style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      }}>Send Again</span>
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
@@ -591,7 +636,9 @@ const SignUpModal = (props) => {
                     onClick={() => {
                       props.setShowModal(7);
                     }}
-                    className="continuebtn px-3 py-1"
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
                   >
                     Verify
                   </button>
@@ -605,11 +652,6 @@ const SignUpModal = (props) => {
           {props.ShowModal === 7 && (
             <div
               className=""
-              style={{
-                fontFamily: "none",
-                color: "#0D2A53",
-                fontWeight: "600",
-              }}
             >
               <div className="m-3 mt-4">
                 <div className="d-flex justify-content-center">
@@ -617,12 +659,11 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={props.onHide}
                       fontSize={"1.8rem"}
-                      style={{
-                        position: "absolute",
-                        right: "17px",
-                        top: "10px",
-                        color: "#0D2A53",
-                      }}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
                     />
                   </span>
                 </div>
@@ -631,7 +672,11 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column my-2">
                     <label htmlFor="Password">Password</label>
                     <input
-                      className="form-control"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control`}
                       type={showPassword ? "text" : "password"}
                       name=""
                       id="Password"
@@ -659,7 +704,13 @@ const SignUpModal = (props) => {
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
-                  <button className="continuebtn px-3 py-1">Create</button>
+                  <button
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
+                  >
+                    Create
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,115 +1,109 @@
-import React, {useState} from 'react'
+import React, { useState } from "react";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 export const CommentFilter = () => {
-    const [categoryDropDown, setCategoryDropDown] = useState(false);
-    const [CountryDropdown, setCountryDropdown] = useState(false);
-    const [leagueDropDown, setLeagueDropDown] = useState(false);
-    const [DateDropDown, setDateDropDown] = useState(false);
+  // const [categoryDropDown, setCategoryDropDown] = useState(false);
+  // const [CountryDropdown, setCountryDropdown] = useState(false);
+  // const [leagueDropDown, setLeagueDropDown] = useState(false);
+  // const [DateDropDown, setDateDropDown] = useState(false);
+
+  const [countryDropDown, setCountryDropDown] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("Select");
+
+  const handleCountrySelection = (country) => {
+    setSelectedCountry(country);
+  };
+
+  const [CategoryDropDown, setCategoryDropDown] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("Select");
+
+  const togglCategoryDropdown = () => {
+    setCategoryDropDown(!CategoryDropDown);
+  };
+  const toggleCountryDropdown = () => {
+    setCountryDropDown(!countryDropDown);
+  };
+  const handleCategorySelection = (country) => {
+    setCategoryDropDown(country);
+  };
+  const CategoryOptions = [
+    "India",
+    "Turkey",
+    "Paris",
+    "Japan",
+    "Germany",
+    "USA",
+    "UK",
+  ];
+  const countryOptions = [
+    "India",
+    "Turkey",
+    "Paris",
+    "Japan",
+    "Germany",
+    "USA",
+    "UK",
+  ];
   return (
     <>
-    <div className="row my-3">
-              <div className="col">
-                {/* <Select closeMenuOnSelect={false} isMulti options={options} /> */}
+      <div className="row my-3">
+        <div className="col">
+          {/* <Select closeMenuOnSelect={false} isMulti options={options} /> */}
 
-                {/* Category DROPDOWN */}
-                <div className="">
-                  <span>Category</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setCategoryDropDown(!categoryDropDown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      categoryDropDown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                </div>
-                {/* End Category DROPDOWN */}
-              </div>
-              <div className="col">
-                {/* Country DROPDOWN */}
-                <div className="">
-                  <span>Country</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setCountryDropdown(!CountryDropdown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      CountryDropdown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                </div>
-                {/* End Country DROPDOWN */}
-              </div>
-              {/* League DROPDOWN */}
-            </div>
-            <div className="row my-3">
-              <div className="col">
-                <div className="">
-                  <span>League</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setLeagueDropDown(!leagueDropDown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      leagueDropDown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                </div>
-              </div>
-              {/* End League DROPDOWN */}
-              <div className="col">
-                {/* Date DropDown */}
-                <div className="">
-                  <span>Date</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setDateDropDown(!DateDropDown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      DateDropDown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                </div>
-                {/* End date Dropdown*/}
-              </div>
-            </div>
+          {/* Category DROPDOWN */}
+          <CustomDropdown
+            label="Category"
+            options={CategoryOptions}
+            selectedOption={selectedCategory}
+            onSelectOption={handleCategorySelection}
+            isOpen={CategoryDropDown}
+            toggleDropdown={togglCategoryDropdown}
+          />
+          {/* End Category DROPDOWN */}
+        </div>
+        <div className="col">
+          {/* Country DROPDOWN */}
+          <div className="">
+            <CustomDropdown
+              label="Country"
+              options={countryOptions}
+              selectedOption={selectedCountry}
+              onSelectOption={handleCountrySelection}
+              isOpen={countryDropDown}
+              toggleDropdown={toggleCountryDropdown}
+            />
+          </div>
+          {/* End Country DROPDOWN */}
+        </div>
+        {/* League DROPDOWN */}
+      </div>
+      <div className="row my-3">
+        <div className="col">
+          <CustomDropdown
+            label="League"
+            options={countryOptions}
+            selectedOption={selectedCountry}
+            onSelectOption={handleCountrySelection}
+            isOpen={countryDropDown}
+            toggleDropdown={toggleCountryDropdown}
+          />
+        </div>
+        {/* End League DROPDOWN */}
+        <div className="col">
+          {/* Date DropDown */}
+          <div className="">
+            <CustomDropdown
+              label="Date"
+              options={countryOptions}
+              selectedOption={selectedCountry}
+              onSelectOption={handleCountrySelection}
+              isOpen={countryDropDown}
+              toggleDropdown={toggleCountryDropdown}
+            />
+          </div>
+          {/* End date Dropdown*/}
+        </div>
+      </div>
     </>
-  )
-}
+  );
+};

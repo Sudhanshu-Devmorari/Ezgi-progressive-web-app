@@ -1,42 +1,56 @@
-input{
+.darkMode-input{
+    background-color: #0B2447!important;
+    border: #0B2447!important;
+}
+.lightMode-input{
     background-color: #F6F6F6!important;
     border: #F6F6F6!important;
 }
 input:focus{
     box-shadow: none!important;
 }
-.continuebtn{
-    border: 1px solid #00659D;
-    color: #00659D;
-    background-color: #FFFFFF;
-}
 .closeBtn{
     position: absolute;
     right: 38px;
 }
-.customDropdown{
-    background-color: #F6F6F6!important;
-    border: 1px solid #F6F6F6!important;
-    color: #0D2A53;
-    font-weight:600;
-    /* -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none; */
-}
-.dpcontent{
+.customDropdown-light-mode{
     background-color: #F6F6F6!important;
     border: 1px solid #F6F6F6!important;
     color: #0D2A53;
     font-weight:600;
 }
-.customDropdown-content{
-    overflow-y: scroll;
-    height: 10%!important;
+.customDropdown-dark-mode{
+    background-color: #0B2447!important;
+    border: 1px solid #0B2447!important;
+    color: #E6E6E6;
+    font-weight:600;
 }
-.customDropdown:focus{
-    outline: none;
+.dpcontent-light-mode{
+    background-color: #F6F6F6!important;
+    border: 1px solid #F6F6F6!important;
+    color: #0D2A53;
+    font-weight:600;
 }
-
+.dpcontent-dark-mode{
+    background-color: #0D2A53!important;
+    border: 1px solid #0B2447!important;
+    color: #E6E6E6;
+    font-weight:600;
+}
+.customDropdown-content-light-mode{
+    position: absolute;
+    z-index: 1;
+    overflow-y: auto;
+    max-height: 150px;
+    background-color: #FFFFFF;
+}
+.customDropdown-content-dark-mode{
+    position: absolute;
+    z-index: 1;
+    overflow-y: auto;
+    max-height: 150px;
+    background-color: #0B2447;
+}
 .otpinputdesign{
     width: 2.4rem !important;
     height: 3.2rem;
@@ -51,7 +65,7 @@ input:focus{
     color:#0D2A53;
 }
 @media only screen and (min-width: 768px) {
-    .otpinputdesign{
+    .otpinputdesign-light-mode{
         width: 3.8rem !important;
         height: 4rem;
         margin: 0.5rem 0.4rem;
@@ -60,9 +74,18 @@ input:focus{
         border: 1px solid #0D2A53 !important;
         background-color: transparent !important;
     }
+    .otpinputdesign-dark-mode{
+        width: 3.8rem !important;
+        height: 4rem;
+        margin: 0.5rem 0.4rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #E6E6E6 !important;
+        background-color: transparent !important;
+    }
 }  
 @media only screen and (max-width: 320px) {
-    .otpinputdesign{
+    .otpinputdesign-light-mode{
         width: 2.1rem !important;
         height: 2.6rem;
         margin: 0.5rem 0.2rem;
@@ -71,9 +94,18 @@ input:focus{
         border: 1px solid #0D2A53 !important;
         background-color: transparent !important;
     }
+    .otpinputdesign-dark-mode{
+        width: 2.1rem !important;
+        height: 2.6rem;
+        margin: 0.5rem 0.2rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #E6E6E6 !important;
+        background-color: transparent !important;
+    }
 }  
 @media only screen and (width: 425px) {
-    .otpinputdesign{
+    .otpinputdesign-light-mode{
         width: 2.9rem !important;
         height: 3rem;
         margin: 0.5rem 0.4rem;
@@ -82,5 +114,47 @@ input:focus{
         border: 1px solid #0D2A53 !important;
         background-color: transparent !important;
     }
+    .otpinputdesign-dark-mode{
+        width: 2.9rem !important;
+        height: 3rem;
+        margin: 0.5rem 0.4rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #E6E6E6 !important;
+        background-color: transparent !important;
+    }
 }  
-
+.darkMode{
+    color: #E6E6E6!important; 
+    background-color: #0D2A53!important;
+    font-weight: 600!important;
+    font-family: Roboto!important;
+}
+.lightMode{
+    font-family: Roboto!important;
+    color: #0D2A53!important;
+    font-weight: 600!important;
+}
+.closeBtn-light{
+    position: absolute;
+    right: 17px;
+    top: 10px;
+    color: #0B2447,
+}
+.closeBtn-dark{
+    position: absolute;
+    right: 17px;
+    top: 10px;
+    color: #E6E6E6;
+}
+.lightMode-btn{
+    border: 1px solid #00659D;
+    color: #00659D;
+    background-color: #FFFFFF;
+}
+.darkMode-btn{
+    border: 1px solid #D2DB08;
+    color: #D2DB08;
+    background-color: transparent;
+    border-radius: 2px;
+}

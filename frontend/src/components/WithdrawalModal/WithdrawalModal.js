@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
+import { currentTheme } from "../GetCurrentTheme";
 
 const WithdrawalModal = (props) => {
-    const [showBankDetail, setShowBankDetail] = useState(false);
+  const [showBankDetail, setShowBankDetail] = useState(false);
   return (
     <>
       <Modal
@@ -14,23 +15,23 @@ const WithdrawalModal = (props) => {
         centered
         scrollable
       >
-        <Modal.Body closeButton>
-          <div
-            className=""
-            style={{ fontFamily: "none", color: "#0D2A53", fontWeight: "500" }}
-          >
+        <Modal.Body
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+        >
+          <div>
             <div className="m-3 mt-4">
               <div className="d-flex justify-content-center">
                 <span>
                   <RxCross2
-                    onClick={props.onHide}
-                    fontSize={"1.8rem"}
-                    style={{
-                      position: "absolute",
-                      right: "17px",
-                      top: "10px",
-                      color: "#0D2A53",
+                    onClick={() => {
+                      props.onHide();
                     }}
+                    fontSize={"1.8rem"}
+                    className={`${
+                      currentTheme === "dark"
+                        ? "closeBtn-dark"
+                        : "closeBtn-light"
+                    }`}
                   />
                 </span>
               </div>
@@ -39,7 +40,7 @@ const WithdrawalModal = (props) => {
                   <span>Total Balance</span>
                   <span
                     className="p-2 my-1 text-center"
-                    style={{ backgroundColor: "#F6F6F6" }}
+                    style={{ backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6" }}
                   >
                     12.650
                   </span>
@@ -48,7 +49,7 @@ const WithdrawalModal = (props) => {
                   <span>Pending Balance</span>
                   <span
                     className="p-2 my-1 text-center"
-                    style={{ backgroundColor: "#F6F6F6" }}
+                     style={{ backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6" }}
                   >
                     12.650
                   </span>
@@ -58,7 +59,7 @@ const WithdrawalModal = (props) => {
                 <span>Bank Iban Details</span>
                 <span
                   className="p-2 my-1 text-center"
-                  style={{ backgroundColor: "#F6F6F6" }}
+                   style={{ backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6" }}
                 >
                   TR 0987 6544 12650
                 </span>
@@ -68,7 +69,16 @@ const WithdrawalModal = (props) => {
                 <div className="h3">8.000</div>
               </div>
               <div className="d-flex justify-content-center my-4">
-                <button className="continuebtn px-3 py-1" onClick={()=>{setShowBankDetail(true)}}>Withdrawal</button>
+                <button
+                  className={`${
+                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                  } px-3 py-1`}
+                  onClick={() => {
+                    setShowBankDetail(true);
+                  }}
+                >
+                  Withdrawal
+                </button>
               </div>
               <div className="mb-4 text-center">
                 <div className="">
@@ -85,7 +95,12 @@ const WithdrawalModal = (props) => {
         </Modal.Body>
       </Modal>
 
-      <BankUpdateModal show={showBankDetail} onHide={()=>{setShowBankDetail(false)}}/>
+      <BankUpdateModal
+        show={showBankDetail}
+        onHide={() => {
+          setShowBankDetail(false);
+        }}
+      />
     </>
   );
 };

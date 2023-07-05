@@ -1,12 +1,35 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import { currentTheme } from "../GetCurrentTheme";
 
 const EditorFilter = (props) => {
-    const [categoryDropDown, setCategoryDropDown] = useState(false);
-    const [levelDropdown, setLevelDropdown] = useState(false);
-    const [WithdrawalModalShow, setWithdrawalModalShow] = useState(false);
+  const [categoryDropDown, setCategoryDropDown] = useState(false);
+  const [levelDropdown, setLevelDropdown] = useState(false);
+  const [WithdrawalModalShow, setWithdrawalModalShow] = useState(false);
+
+  const [countryDropDown, setCountryDropDown] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("Select");
+
+  const handleCountrySelection = (country) => {
+    setSelectedCountry(country);
+  };
+
+  const toggleCountryDropdown = () => {
+    setCountryDropDown(!countryDropDown);
+  };
+
+  const countryOptions = [
+    "India",
+    "Turkey",
+    "Paris",
+    "Japan",
+    "Germany",
+    "USA",
+    "UK",
+  ];
   return (
     <>
       <Modal
@@ -16,135 +39,97 @@ const EditorFilter = (props) => {
         centered
         scrollable
       >
-        <Modal.Body closeButton>
-          <div
-            className=""
-            style={{ fontFamily: "none", color: "#0D2A53", fontWeight: "600" }}
-          >
+        <Modal.Body
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+        >
+          <div>
             <div className="m-3 mt-4">
               <div className="d-flex justify-content-center">
                 <span>
                   <RxCross2
-                    onClick={props.onHide}
-                    fontSize={"1.8rem"}
-                    style={{
-                      position: "absolute",
-                      right: "17px",
-                      top: "10px",
-                      color: "#0D2A53",
+                    onClick={() => {
+                      props.onHide();
                     }}
+                    fontSize={"1.8rem"}
+                    className={`${
+                      currentTheme === "dark"
+                        ? "closeBtn-dark"
+                        : "closeBtn-light"
+                    }`}
                   />
                 </span>
               </div>
               <div className="row">
-              <div className="col">
-
-                {/* Category DROPDOWN */}
-                  <span>Category</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setCategoryDropDown(!categoryDropDown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      categoryDropDown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                {/* End Category DROPDOWN */}
-              </div>
-              <div className="col">
-                {/* Level DROPDOWN */}
-                  <span>Level</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setLevelDropdown(!levelDropdown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      levelDropdown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                {/* End Level DROPDOWN */}
-              </div>
+                <div className="col">
+                  {/* Category DROPDOWN */}
+                  <CustomDropdown
+                    label="Category"
+                    options={countryOptions}
+                    selectedOption={selectedCountry}
+                    onSelectOption={handleCountrySelection}
+                    isOpen={countryDropDown}
+                    toggleDropdown={toggleCountryDropdown}
+                  />
+                  {/* End Category DROPDOWN */}
+                </div>
+                <div className="col">
+                  {/* Level DROPDOWN */}
+                  <CustomDropdown
+                    label="Level"
+                    options={countryOptions}
+                    selectedOption={selectedCountry}
+                    onSelectOption={handleCountrySelection}
+                    isOpen={countryDropDown}
+                    toggleDropdown={toggleCountryDropdown}
+                  />
+                  {/* End Level DROPDOWN */}
+                </div>
               </div>
               <div className="row my-3">
-              <div className="col">
-
-                {/* Category DROPDOWN */}
-                  <span>Score Point</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setCategoryDropDown(!categoryDropDown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      categoryDropDown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                {/* End Category DROPDOWN */}
-              </div>
-              <div className="col">
-                {/* Level DROPDOWN */}
-                  <span>Success Rate</span>
-                  <div
-                    className="customDropdown p-2 text-center"
-                    onClick={() => setLevelDropdown(!levelDropdown)}
-                  >
-                    <span>Select</span>
-                  </div>
-                  <div
-                    className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                      levelDropdown ? "d-block" : "d-none"
-                    } `}
-                  >
-                    <span className="dpcontent my-1 p-2">India</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                    <span className="dpcontent my-1 p-2">Turkey</span>
-                  </div>
-                {/* End Level DROPDOWN */}
-              </div>
+                <div className="col">
+                  {/* Category DROPDOWN */}
+                  <CustomDropdown
+                    label="Score Point"
+                    options={countryOptions}
+                    selectedOption={selectedCountry}
+                    onSelectOption={handleCountrySelection}
+                    isOpen={countryDropDown}
+                    toggleDropdown={toggleCountryDropdown}
+                  />
+                  {/* End Category DROPDOWN */}
+                </div>
+                <div className="col">
+                  {/* Level DROPDOWN */}
+                  <CustomDropdown
+                    label="Success Rate"
+                    options={countryOptions}
+                    selectedOption={selectedCountry}
+                    onSelectOption={handleCountrySelection}
+                    isOpen={countryDropDown}
+                    toggleDropdown={toggleCountryDropdown}
+                  />
+                  {/* End Level DROPDOWN */}
+                </div>
               </div>
               <div className="d-flex justify-content-center my-4">
-                <button className="continuebtn px-3 py-1" onClick={()=>setWithdrawalModalShow(true)}>Show</button>
-            </div>
+                <button
+                  className={`${
+                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                  } px-3 py-1`}
+                  onClick={() => setWithdrawalModalShow(true)}
+                >
+                  Show
+                </button>
+              </div>
             </div>
           </div>
         </Modal.Body>
       </Modal>
 
-    <WithdrawalModal show={WithdrawalModalShow} onHide={() => setWithdrawalModalShow(false)}/>
+      <WithdrawalModal
+        show={WithdrawalModalShow}
+        onHide={() => setWithdrawalModalShow(false)}
+      />
     </>
   );
 };

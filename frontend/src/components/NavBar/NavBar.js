@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { CiDark } from "react-icons/ci";
-import { MdDarkMode } from "react-icons/md";
+import { CiDark, CiLight } from "react-icons/ci";
 import { PiBellRingingBold } from "react-icons/pi";
 import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
@@ -12,25 +11,36 @@ const NavBar = (props) => {
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
   const [addCommentShow, setAddCommentShow] = React.useState(false);
 
+  const [currentTheme, setCurrentTheme] = useState("light");
+  const handleTheme = (e) => {
+    console.log("e", e);
+    if (e === "dark") {
+      localStorage.setItem("CurrentTheme", "dark")
+      setCurrentTheme("dark");
+    } else {
+      localStorage.setItem("CurrentTheme", "light")
+      setCurrentTheme("light");
+    }
+  };
+  
   return (
     <>
       <nav
         className={`navbar navbar-expand-lg bg-body-tertiary border ${
-          props.DarkMode ? "dark-mode" : "light-mode"
+          currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
-        style={{ backgroundColor: "#FFFFFF" }}
       >
         <div className="container-fluid justify-content-end">
           <div className="">
-            <span className="p-2">
-              <CiDark
-                fontSize={"2rem"}
-                onClick={() => {
-                  props.setDarkMode(true);
-                }}
-              />
-            </span>
-            {/* <span className='px-0 py-2'> <MdDarkMode fontSize={"2rem"} /> </span> */}
+            {currentTheme === "light" ? (
+              <span className="p-2">
+                <CiDark fontSize={"2rem"} onClick={() => handleTheme("dark")} />
+              </span>
+            ) : (
+              <span className="p-2">
+                <CiLight onClick={() => handleTheme("light")} fontSize={"2rem"}/>
+              </span>
+            )}
             <span className="px-0 py-2">
               <PiBellRingingBold fontSize={"2rem"} />
             </span>
@@ -55,7 +65,7 @@ const NavBar = (props) => {
           </div>
         </div>
       </nav>
-      <button onClick={() => setAddCommentShow(true)}>add comment</button>
+      {/* <button onClick={() => setAddCommentShow(true)}>add comment</button> */}
 
       <SignUpModal
         show={signUpModalShow}
