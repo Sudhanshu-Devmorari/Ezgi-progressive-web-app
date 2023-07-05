@@ -1,18 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { CiDark } from "react-icons/ci";
 import { MdDarkMode } from "react-icons/md";
 import { PiBellRingingBold } from "react-icons/pi";
 import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
-import SignInModal from "../SignInModal/SignInModal";
-import ForgotPasswordModal from "../ForgotPasswordModal/ForgotPasswordModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 
 const NavBar = (props) => {
+  const [ShowModal, setShowModal] = useState(1);
+
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
-  const [signInModalShow, setSignInModalShow] = React.useState(false);
-  const [forgotPasswordShow, setForgotPasswordShow] = React.useState(false);
   const [addCommentShow, setAddCommentShow] = React.useState(false);
 
   return (
@@ -21,7 +18,7 @@ const NavBar = (props) => {
         className={`navbar navbar-expand-lg bg-body-tertiary border ${
           props.DarkMode ? "dark-mode" : "light-mode"
         }`}
-        style={{ backgroundColor: "#FFFFFF"}}
+        style={{ backgroundColor: "#FFFFFF" }}
       >
         <div className="container-fluid justify-content-end">
           <div className="">
@@ -37,22 +34,41 @@ const NavBar = (props) => {
             <span className="px-0 py-2">
               <PiBellRingingBold fontSize={"2rem"} />
             </span>
-            <span className="p-2 cursor" onClick={() => setSignUpModalShow(true)}>Sign Up</span>
-            <span className="px-0 py-2 cursor" onClick={() => setSignInModalShow(true)}>
+            <span
+              className="p-2 cursor"
+              onClick={() => {
+                setSignUpModalShow(true);
+                setShowModal(1);
+              }}
+            >
+              Sign Up
+            </span>
+            <span
+              className="px-0 py-2 cursor"
+              onClick={() => {
+                setSignUpModalShow(true);
+                setShowModal(4);
+              }}
+            >
               Sign In
             </span>
-           <span onClick={() => setForgotPasswordShow(true)}>FS</span>
           </div>
         </div>
       </nav>
-        <button onClick={() => setAddCommentShow(true)}>
-          add comment
-        </button>
+      <button onClick={() => setAddCommentShow(true)}>add comment</button>
 
-      <SignUpModal show={signUpModalShow} onHide={() => setSignUpModalShow(false)} />
-      <SignInModal show={signInModalShow} onHide={() => setSignInModalShow(false)} />
-      <ForgotPasswordModal show={forgotPasswordShow} onHide={() => setForgotPasswordShow(false)} />
-      <AddCommentModal show={addCommentShow} onHide={()=>{setAddCommentShow(false)}}/>
+      <SignUpModal
+        show={signUpModalShow}
+        onHide={() => setSignUpModalShow(false)}
+        ShowModal={ShowModal}
+        setShowModal={setShowModal}
+      />
+      <AddCommentModal
+        show={addCommentShow}
+        onHide={() => {
+          setAddCommentShow(false);
+        }}
+      />
     </>
   );
 };

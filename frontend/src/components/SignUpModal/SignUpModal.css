@@ -36,3 +36,51 @@ input:focus{
 .customDropdown:focus{
     outline: none;
 }
+
+.otpinputdesign{
+    width: 2.4rem !important;
+    height: 3.2rem;
+    margin: 0.5rem 0.4rem;
+    font-size: 2rem;
+    border-radius: 2px;
+    border: 1px solid #0D2A53 !important;
+    background-color: transparent !important;
+}
+.otpinputdesign:focus{
+    outline: none !important;
+    color:#0D2A53;
+}
+@media only screen and (min-width: 768px) {
+    .otpinputdesign{
+        width: 3.8rem !important;
+        height: 4rem;
+        margin: 0.5rem 0.4rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #0D2A53 !important;
+        background-color: transparent !important;
+    }
+}  
+@media only screen and (max-width: 320px) {
+    .otpinputdesign{
+        width: 2.1rem !important;
+        height: 2.6rem;
+        margin: 0.5rem 0.2rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #0D2A53 !important;
+        background-color: transparent !important;
+    }
+}  
+@media only screen and (width: 425px) {
+    .otpinputdesign{
+        width: 2.9rem !important;
+        height: 3rem;
+        margin: 0.5rem 0.4rem;
+        font-size: 2rem;
+        border-radius: 2px;
+        border: 1px solid #0D2A53 !important;
+        background-color: transparent !important;
+    }
+}  
+
