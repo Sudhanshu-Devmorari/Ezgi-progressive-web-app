@@ -4,11 +4,53 @@ import Modal from "react-bootstrap/Modal";
 import { RxCross2 } from "react-icons/rx";
 import "./AddCommentModal.css";
 import Form from "react-bootstrap/Form";
+import { currentTheme } from "../GetCurrentTheme";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
+import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 
 const AddCommentModal = (props) => {
-  const [MatchDropDown, setMatchDropDown] = useState(false);
-  const [LevelDropdown, setLevelDropdown] = useState(false);
-  const [PredictionType, setPredictionType] = useState(false);
+  const [selectCheckBox, setSelectCheckBox] = useState(false);
+  const matchDetailsOptions = [
+    "Match Details 1",
+    "Match Details 2",
+    "Match Details 3",
+  ];
+  const predictionTypeOptions = [
+    "Prediction Type 1",
+    "Prediction Type 2",
+    "Prediction Type 3",
+  ];
+  const predictionOptions = ["Prediction 1", "Prediction 2", "Prediction 3"];
+
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
+  const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
+  const [selectedPredictionType, setSelectedPredictionType] =
+    useState("Select");
+  const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
+  const [selectedPrediction, setSelectedPrediction] = useState("Select");
+  const [predictionDropdown, setPredictionDropdown] = useState(false);
+
+  const handleMatchDetailsSelection = (matchDetails) => {
+    setSelectedMatchDetails(matchDetails);
+  };
+  const toggleMatchDetailsDropdown = () => {
+    setMatchDetailsDropdown(!matchDetailsDropdown);
+  };
+  const handlePredictionTypeSelection = (predictionType) => {
+    setSelectedPredictionType(predictionType);
+  };
+  const togglePredictionTypeDropdown = () => {
+    setPredictionTypeDropdown(!predictionTypeDropdown);
+  };
+
+  const handlePredictionSelection = (prediction) => {
+    setSelectedPrediction(prediction);
+  };
+  const togglePredictionDropdown = () => {
+    setPredictionDropdown(!predictionDropdown);
+  };
+
   return (
     <>
       <Modal
@@ -18,84 +60,54 @@ const AddCommentModal = (props) => {
         centered
         scrollable
       >
-        <Modal.Body closeButton>
-          <div
-            className="m-3"
-            style={{ fontFamily: "none", color: "#0D2A53", fontWeight: "500" }}
-          >
+        <Modal.Body
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+        >
+          <div>
             <div className="">
               <span className="mb-2">
                 <RxCross2
-                  fontSize={"1.8rem"}
-                  style={{
-                    position: "absolute",
-                    right: "9px",
-                    top: "4px",
-                    color: "#0D2A53",
+                  onClick={() => {
+                    props.onHide();
                   }}
+                  fontSize={"1.8rem"}
+                  className={`${
+                    currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
+                  }`}
                 />
               </span>
             </div>
             <CommentFilter />
             <div className="my-3">
-              <div className="">
-                <span>Match Details</span>
-                <div
-                  className="customDropdown p-2 text-center"
-                  onClick={() => setMatchDropDown(!MatchDropDown)}
-                >
-                  <span>Select</span>
-                </div>
-                <div
-                  className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                    MatchDropDown ? "d-block" : "d-none"
-                  } `}
-                >
-                  <span className="dpcontent my-1 p-2">India</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                </div>
-              </div>
+              <CustomDropdown
+                label="Match Details"
+                options={matchDetailsOptions}
+                selectedOption={selectedMatchDetails}
+                onSelectOption={handleMatchDetailsSelection}
+                isOpen={matchDetailsDropdown}
+                toggleDropdown={toggleMatchDetailsDropdown}
+              />
             </div>
             <div className="row my-3">
               <div className="col">
-                <span>Predicticon Type</span>
-                <div
-                  className="customDropdown p-2 text-center"
-                  onClick={() => setLevelDropdown(!LevelDropdown)}
-                >
-                  <span>Select</span>
-                </div>
-                <div
-                  className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                    LevelDropdown ? "d-block" : "d-none"
-                  } `}
-                >
-                  <span className="dpcontent my-1 p-2">India</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                </div>
+                <CustomDropdown
+                  label="Prediction Type"
+                  options={predictionTypeOptions}
+                  selectedOption={selectedPredictionType}
+                  onSelectOption={handlePredictionTypeSelection}
+                  isOpen={predictionTypeDropdown}
+                  toggleDropdown={togglePredictionTypeDropdown}
+                />
               </div>
               <div className="col">
-                <span>Prediction</span>
-                <div
-                  className="customDropdown p-2 text-center"
-                  onClick={() => setPredictionType(!PredictionType)}
-                >
-                  <span>Select</span>
-                </div>
-                <div
-                  className={`customDropdown-content pt-2 w-100 flex-column d-flex text-center h-50 ${
-                    PredictionType ? "d-block" : "d-none"
-                  } `}
-                >
-                  <span className="dpcontent my-1 p-2">India</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                  <span className="dpcontent my-1 p-2">Turkey</span>
-                </div>
+                <CustomDropdown
+                  label="Prediction"
+                  options={predictionOptions}
+                  selectedOption={selectedPrediction}
+                  onSelectOption={handlePredictionSelection}
+                  isOpen={predictionDropdown}
+                  toggleDropdown={togglePredictionDropdown}
+                />
               </div>
             </div>
             <div className="">
@@ -124,19 +136,37 @@ const AddCommentModal = (props) => {
               <Form.Control
                 as="textarea"
                 maxLength={250}
-                className="textArea"
+                className={`${currentTheme === "dark" ? "textArea-dark-mode" : "textArea-light-mode"}`}
               />
               <small>Max. 250 character</small>
             </div>
             <div className="text-center">
-            <div className="my-3">
-                  <input type="checkbox" name="" id="" className="me-2" />I have
-                  read and agree to the{" "}
-                  <span style={{ color: "#00659D" }}>Terms of use</span>
-                </div>
-            <div className="d-flex justify-content-center my-3">
-              <button className="continuebtn px-3 py-1">Publish</button>
-            </div>
+              <div className="my-3">
+                <img
+                  src={!selectCheckBox ? CheckBoxLight : CheckBoxSelectLight}
+                  style={{ width: "25px", cursor: "pointer" }}
+                  className="me-2"
+                  onClick={() => setSelectCheckBox(!selectCheckBox)}
+                  alt=""
+                />
+                I have read and agree to the{" "}
+                <span
+                  style={{
+                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                  }}
+                >
+                  Terms of use
+                </span>
+              </div>
+              <div className="d-flex justify-content-center my-3">
+                <button
+                  className={`${
+                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                  } px-3 py-1`}
+                >
+                  Publish
+                </button>
+              </div>
               <div className="my-3">
                 "The published predictions can be edited withis 5 minutes."
               </div>

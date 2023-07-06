@@ -1,32 +1,51 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CiDark, CiLight } from "react-icons/ci";
 import { PiBellRingingBold } from "react-icons/pi";
 import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);
+  const {currentTheme, setCurrentTheme} = useContext(CurrentTheme);
 
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
   const [addCommentShow, setAddCommentShow] = React.useState(false);
 
-  const [currentTheme, setCurrentTheme] = useState("light");
+  const [currentThemeMode, setCurrentThemeMode] = useState("light");
+
   const handleTheme = (e) => {
-    console.log("e", e);
     if (e === "dark") {
       localStorage.setItem("CurrentTheme", "dark")
+      // document.body.style.backgroundColor = "#0B2447";
+      document.body.classList.remove("body-light-mode")
+      document.body.classList.add("body-dark-mode")
+      setCurrentThemeMode("dark");
       setCurrentTheme("dark");
     } else {
       localStorage.setItem("CurrentTheme", "light")
+      document.body.classList.remove("body-dark-mode")
+      document.body.classList.add("body-light-mode")
+      // document.body.style.backgroundColor = "#F6F6F6";
+      setCurrentThemeMode("light");
       setCurrentTheme("light");
     }
   };
+
+  //   useEffect(() => {
+  //   if (currentTheme === "light") {
+  //     document.body.style.backgroundColor = "#F6F6F6";
+  //   } else {
+  //     document.body.style.backgroundColor = "#0B2447";
+  //   }
+  // }, [currentTheme]);
+
   
   return (
     <>
       <nav
-        className={`navbar navbar-expand-lg bg-body-tertiary border ${
+        className={`navbar navbar-expand-lg border ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
       >

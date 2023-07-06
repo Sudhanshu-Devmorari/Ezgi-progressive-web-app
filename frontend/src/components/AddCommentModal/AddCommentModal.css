@@ -1,7 +1,13 @@
-textArea{
+.textArea-light-mode{
     background-color: #F6F6F6!important;
     border: #F6F6F6!important;
     height: 138px;
+}
+.textArea-dark-mode{
+    background-color: #0B2447!important;
+    border: #0B2447!important;
+    height: 138px;
+    color: #F6F6F6!important;
 }
 textArea:focus{
     box-shadow: none!important;

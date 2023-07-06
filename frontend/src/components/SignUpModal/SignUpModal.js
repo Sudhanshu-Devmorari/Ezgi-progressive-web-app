@@ -3,7 +3,6 @@ import Modal from "react-bootstrap/Modal";
 import "./SignUpModal.css";
 import facebook from "../../assets/FacebookLogo.png";
 import google from "../../assets/googleLogo.png";
-import { Link } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import OtpInput from "react-otp-input";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";

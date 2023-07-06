@@ -3,9 +3,15 @@
 }
 .light-mode{
     color: #0D2A53;
-    background-color: #F6F6F6;
+    background-color: #FFFFFF;
 }
 .dark-mode{
    color: #E6E6E6; 
    background-color: #0D2A53;
+}
+.body-dark-mode{
+    background-color: #0B2447;
+}
+.body-light-mode{
+    background-color: #F6F6F6;
 }
