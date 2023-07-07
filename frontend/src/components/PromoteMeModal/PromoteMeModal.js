@@ -3,7 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import "./PromoteMeModal.css";
 import { RxCross2 } from "react-icons/rx";
 import { BsStar } from "react-icons/bs";
-import CommentsPage from "../CommentsPage/CommentsPage";
+import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
 import { currentTheme } from "../GetCurrentTheme";
 import CheckBoxDark from "../../assets/CheckBoxDark.svg";
 import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
@@ -48,7 +48,12 @@ const PromoteMeModal = (props) => {
                       <BsStar fontSize={"1.7rem"} />
                     </span>
                   </div>
-                  <div className="" style={{ color: currentTheme === "dark" ? "#E6E6E6" : "#00659D" }}>
+                  <div
+                    className=""
+                    style={{
+                      color: currentTheme === "dark" ? "#E6E6E6" : "#00659D",
+                    }}
+                  >
                     <h1>Highlights</h1>
                     <h2>
                       Stand out among the best increase your interactions!
@@ -59,11 +64,13 @@ const PromoteMeModal = (props) => {
               <div className="my-2">
                 <div className="fs-4 my-2">Subscription Plans</div>
                 <div className="d-flex mb-2">
-                  <div className={`${
+                  <div
+                    className={`${
                       currentTheme === "dark"
                         ? "BlankCircle-dark-mode"
                         : "BlankCircle-light-mode"
-                    } me-2`}></div>
+                    } me-2`}
+                  ></div>
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -78,11 +85,13 @@ const PromoteMeModal = (props) => {
                   </div>
                 </div>
                 <div className="d-flex mb-2">
-                  <div className={`${
+                  <div
+                    className={`${
                       currentTheme === "dark"
                         ? "BlankCircle-dark-mode"
                         : "BlankCircle-light-mode"
-                    } me-2`}></div>
+                    } me-2`}
+                  ></div>
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -98,11 +107,13 @@ const PromoteMeModal = (props) => {
                 </div>
                 <div className="d-flex mb-2">
                   <div className="FilledCircle me-2"></div>
-                  <div className={`${
+                  <div
+                    className={`${
                       currentTheme === "dark"
                         ? "FilledCircle-dark-mode"
                         : "FilledCircle-light-mode"
-                    } me-2`}></div>
+                    } me-2`}
+                  ></div>
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -128,7 +139,7 @@ const PromoteMeModal = (props) => {
                   </div>
                 </div>
                 <div className="text-center">
-                <div className="my-3">
+                  <div className="my-3">
                     <img
                       src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
                       style={{ width: "25px", cursor: "pointer" }}
@@ -174,7 +185,7 @@ const PromoteMeModal = (props) => {
         </Modal.Body>
       </Modal>
 
-      <CommentsPage
+      <CommentsPageModal
         show={commentsModalShow}
         onHide={() => setCommentsModalShow(false)}
       />

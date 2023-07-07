@@ -32,15 +32,6 @@ const NavBar = (props) => {
       setCurrentTheme("light");
     }
   };
-
-  //   useEffect(() => {
-  //   if (currentTheme === "light") {
-  //     document.body.style.backgroundColor = "#F6F6F6";
-  //   } else {
-  //     document.body.style.backgroundColor = "#0B2447";
-  //   }
-  // }, [currentTheme]);
-
   
   return (
     <>

@@ -1,0 +1,38 @@
+.input-field-light {
+    width: 100%;
+    border: 1px solid #0D2A53;
+    background-color: transparent;
+    border-left: none;
+    color: #0D2A53;
+}
+.input-field-dark {
+    width: 100%;
+    border: 1px solid #E6E6E6;
+    background-color: transparent;
+    border-left: none;
+    color: #E6E6E6;
+}
+.icon-light {
+    padding: 8px 6px 8px 8px;
+    color: #0D2A53;
+    min-width: 50px;
+    text-align: center;
+    border: 1px solid #0D2A53;
+    border-right: none;
+}
+.icon-dark {
+    padding: 8px 6px 8px 8px;
+    color: #E6E6E6;
+    min-width: 50px;
+    border: 1px solid #E6E6E6;
+    border-right: none;
+}
+.input-field-light:focus{
+    outline: none;
+}
+.input-field-dark:focus{
+    outline: none;
+}
+  
+  
+  
