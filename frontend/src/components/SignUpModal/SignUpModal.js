@@ -21,6 +21,8 @@ const SignUpModal = (props) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [userPhone, setuserPhone] = useState("");
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -517,6 +519,7 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
                     <input
+                      onChange={(e) => setuserPhone(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
@@ -553,6 +556,7 @@ const SignUpModal = (props) => {
                 <div className="d-flex flex-column align-items-center my-3">
                   <button
                     onClick={() => {
+                      localStorage.setItem("userPhone", userPhone);
                       props.onHide();
                     }}
                     className={`${

@@ -7,6 +7,9 @@ import blueTick from "../../assets/blueTick.png";
 import { CiBasketball } from "react-icons/ci";
 import { RiFootballLine } from "react-icons/ri";
 import "./SharedProfile.css";
+import football from "../../assets/football.png";
+import basketball from "../../assets/basketball.png";
+import startDarkIcon from "../../assets/startFooter.svg";
 
 const SharedProfile = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -18,16 +21,22 @@ const SharedProfile = () => {
         }`}
       >
         <div className="text-end mt-1">
-          <span>
+          <span className="pe-3">
             <span
               className="pe-2"
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
             >
               2.658
             </span>
-            sdhfg jhsdf jsduyf
+            Kisi abnone oldu
           </span>
-          <img className="ps-2" src={starIcon} alt="" height={20} width={27} />
+          <img
+            className=""
+            src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
+            alt=""
+            height={24}
+            width={24}
+          />
         </div>
         <div className="row">
           <div className="col d-flex position-relative">
@@ -57,12 +66,12 @@ const SharedProfile = () => {
                     borderRadius: "18px",
                   }}
                 >
-                  Follow
+                  Expert
                 </button>
               </div>
-              <div className="blueTick-responsive">
+              <div className="blueTick-responsive align-items-center">
                 melihaskar
-                <img src={blueTick} alt="" width={17} height={17} />
+                <img src={blueTick} alt="" width={16} height={16} />
               </div>
               <div
                 style={{
@@ -76,11 +85,20 @@ const SharedProfile = () => {
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
             <div className="mt-2">
-              <RiFootballLine
+              <img
+                src={football}
+                alt=""
+                height={50}
+                width={50}
                 style={{ color: "#00C936" }}
-                fontSize={"2.1rem"}
               />
-              <CiBasketball style={{ color: "#FF9100" }} fontSize={"2.1rem"} />
+              <img
+                src={basketball}
+                alt=""
+                height={50}
+                width={50}
+                style={{ color: "#FF9100" }}
+              />
             </div>
             <div className="mt-1">
               <button
@@ -100,23 +118,29 @@ const SharedProfile = () => {
           </div>
         </div>
       </div>
-
+      
       <div
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
       >
         <div className="text-end mt-1">
-          <span>
+          <span className="pe-3">
             <span
               className="pe-2"
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
             >
               2.658
             </span>
-            sdhfg jhsdf jsduyf
+            Kisi abnone oldu
           </span>
-          <img className="ps-2" src={starIcon} alt="" height={20} width={27} />
+          <img
+            className=""
+            src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
+            alt=""
+            height={24}
+            width={24}
+          />
         </div>
         <div className="row">
           <div className="col d-flex position-relative">
@@ -146,12 +170,12 @@ const SharedProfile = () => {
                     borderRadius: "18px",
                   }}
                 >
-                  Follow
+                  Expert
                 </button>
               </div>
-              <div className="blueTick-responsive">
+              <div className="blueTick-responsive align-items-center">
                 melihaskar
-                <img src={blueTick} alt="" width={17} height={17} />
+                <img src={blueTick} alt="" width={16} height={16} />
               </div>
               <div
                 style={{
@@ -165,11 +189,20 @@ const SharedProfile = () => {
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
             <div className="mt-2">
-              <RiFootballLine
+              <img
+                src={football}
+                alt=""
+                height={50}
+                width={50}
                 style={{ color: "#00C936" }}
-                fontSize={"2.1rem"}
               />
-              <CiBasketball style={{ color: "#FF9100" }} fontSize={"2.1rem"} />
+              <img
+                src={basketball}
+                alt=""
+                height={50}
+                width={50}
+                style={{ color: "#FF9100" }}
+              />
             </div>
             <div className="mt-1">
               <button

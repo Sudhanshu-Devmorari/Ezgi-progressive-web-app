@@ -10,10 +10,14 @@ import starIcondark from "../../assets/StarDark.png";
 import clapIcon from "../../assets/clap.png";
 import publicIcon from "../../assets/publicIcon.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
+import lock from "../../assets/lock.svg";
+import darklock from "../../assets/darklock.svg";
 import "./ContentSection.css";
+import { Link } from "react-router-dom";
 
 const ContentSection = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const userPhone = localStorage.getItem("userPhone");
   return (
     <>
       <div
@@ -22,7 +26,7 @@ const ContentSection = (props) => {
         }`}
       >
         <div className="row m-2">
-          <div className="position-relative">
+          <div className="position-relative col">
             <img
               src={crown}
               alt=""
@@ -48,7 +52,6 @@ const ContentSection = (props) => {
             >
               {props.selectContent === "for you" && (
                 <button
-                  className="px-3"
                   style={{
                     border:
                       currentTheme === "dark"
@@ -57,6 +60,7 @@ const ContentSection = (props) => {
                     color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
                     backgroundColor: "transparent",
                     borderRadius: "18px",
+                    padding: "0.2rem 2.2rem",
                   }}
                 >
                   Follow
@@ -66,27 +70,49 @@ const ContentSection = (props) => {
             <div className="d-flex justify-content-between text-center mt-1">
               <div className="">
                 <div>Success Rate</div>
-                <div style={{ fontSize: "1.2rem", color: "#00659D" }}>
+                <div
+                  style={{
+                    fontSize: "1.2rem",
+                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                  }}
+                >
                   %67.6
                 </div>
               </div>
               <div className="">
                 <div>Success Rate</div>
-                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>275</div>
+                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>256</div>
               </div>
             </div>
           </div>
-          <div
-            className="p-1 my-2"
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            }}
-          >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Error quas
-            eligendi cupiditate voluptates minima consequatur. Lorem ipsum dolor
-            sit amet consectetur adipisicing elit. Error quas eligendi
-            cupiditate voluptates minima consequatur.
-          </div>
+          {userPhone === null ? (
+            <>
+              <div
+                className="px-2 py-3 my-2 d-flex justify-content-center"
+                style={{
+                  backgroundColor:
+                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                }}
+              >
+                <img src={`${currentTheme === "dark" ? lock : darklock}`} alt="" height={50} width={50} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div
+                className="p-1 my-2"
+                style={{
+                  backgroundColor:
+                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                }}
+              >
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Error
+                quas eligendi cupiditate voluptates minima consequatur. Lorem
+                ipsum dolor sit amet consectetur adipisicing elit. Error quas
+                eligendi cupiditate voluptates minima consequatur.
+              </div>
+            </>
+          )}
           <div
             className="p-1"
             style={{
@@ -106,11 +132,13 @@ const ContentSection = (props) => {
               </span>
               <span className="pe-5">07.05.2023</span>
               <span>
-                <img src={publicIcon} alt="" height={35} width={35} />
+                {userPhone === null ? null :(
+                  <img src={publicIcon} alt="" height={40} width={40} />
+                )}
               </span>
             </div>
             <div className="d-flex justify-content-center align-items-center">
-              <span>Anajdshfuki</span>
+              <span>Antalyaspor</span>
               <div
                 className="border-bottom-0"
                 style={{
@@ -128,15 +156,28 @@ const ContentSection = (props) => {
               >
                 14:30
               </div>
-              <span>Anajdshfuki</span>
+              <span>Basaksehir</span>
             </div>
             <div className="text-end mt-3 mb-2">
-              <span
-                className="p-1"
-                style={{ backgroundColor: "#00659D", color: "#FFFFFF" }}
-              >
-                FT - Home & 2.5 Over 2.40
-              </span>
+              {userPhone === null ? (
+                <>
+                  <span
+                    className="py-2 px-3"
+                    style={{ backgroundColor: "#00659D", color: "#FFFFFF" }}
+                  >
+                    Subscribers Only
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span
+                    className="py-2 px-3"
+                    style={{ backgroundColor: "#00659D", color: "#FFFFFF" }}
+                  >
+                    FT - Home & 2.5 Over 2.40
+                  </span>
+                </>
+              )}
             </div>
           </div>
           <div className="d-flex justify-content-between mt-2 align-items-center">
@@ -151,12 +192,12 @@ const ContentSection = (props) => {
                 </span>
               )}
               {currentTheme === "dark" && (
-                <span className="px-2">
+                <span className="px-3">
                   <img src={starIcondark} alt="" height={20} width={20} /> 258
                 </span>
               )}
               {currentTheme === "light" && (
-                <span className="px-2">
+                <span className="px-3">
                   <img src={starIcon} alt="" height={20} width={20} /> 258
                 </span>
               )}
@@ -180,181 +221,12 @@ const ContentSection = (props) => {
                   Subscribe
                 </button>
               )}
-              <small className="ps-1">10k sub</small>
+              <small className="ps-1">10 dk once</small>
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        className={`card border-0 rounded-0 mb-2 ${
-          currentTheme === "dark" ? "dark-mode" : "light-mode"
-        }`}
-      >
-        <div className="row m-2">
-          <div className="position-relative">
-            <img
-              src={crown}
-              alt=""
-              height={19}
-              width={19}
-              style={{
-                background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                borderRadius: "50%",
-                left: "4rem",
-                position: "absolute",
-              }}
-            />
-            <div className="col">
-              <img src={profile} width={75} height={75} alt="" />
-              <span className="p-1">melihaskar</span>
-              <img src={blueTick} alt="" width={15} height={15} />
-            </div>
-          </div>
-          <div className="col">
-            <div
-              className="d-flex justify-content-end"
-              style={{ minHeight: "28px" }}
-            >
-              {props.selectContent === "for you" && (
-                <button
-                  className="px-3"
-                  style={{
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #4DD5FF"
-                        : "1px solid #007BF6",
-                    color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                    backgroundColor: "transparent",
-                    borderRadius: "18px",
-                  }}
-                >
-                  Follow
-                </button>
-              )}
-            </div>
-            <div className="d-flex justify-content-between text-center mt-1">
-              <div className="">
-                <div>Success Rate</div>
-                <div style={{ fontSize: "1.2rem", color: "#00659D" }}>
-                  %67.6
-                </div>
-              </div>
-              <div className="">
-                <div>Success Rate</div>
-                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>275</div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="p-1 my-2"
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            }}
-          >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Error quas
-            eligendi cupiditate voluptates minima consequatur. Lorem ipsum dolor
-            sit amet consectetur adipisicing elit. Error quas eligendi
-            cupiditate voluptates minima consequatur.
-          </div>
-          <div
-            className="p-1"
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <span>
-                <img
-                  className="pe-1"
-                  src={TurkeyFalg}
-                  alt=""
-                  height={25}
-                  width={27}
-                />
-                Super Lig
-              </span>
-              <span className="pe-5">07.05.2023</span>
-              <span>
-                <img src={publicIcon} alt="" height={35} width={35} />
-              </span>
-            </div>
-            <div className="d-flex justify-content-center align-items-center">
-              <span>Anajdshfuki</span>
-              <div
-                className="border-bottom-0"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  width: "91px",
-                  height: "47px",
-                  borderRadius: " 50% / 100% 100% 0 0",
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #FFFFFF"
-                      : "1px solid #0D2A53",
-                }}
-              >
-                14:30
-              </div>
-              <span>Anajdshfuki</span>
-            </div>
-            <div className="text-end mt-3 mb-2">
-              <span
-                className="p-1"
-                style={{ backgroundColor: "#00659D", color: "#FFFFFF" }}
-              >
-                FT - Home & 2.5 Over 2.40
-              </span>
-            </div>
-          </div>
-          <div className="d-flex justify-content-between mt-2 align-items-center">
-            <div className="">
-              {currentTheme === "dark" ? (
-                <span>
-                  <img src={likeIcondark} alt="" height={20} width={20} /> 258
-                </span>
-              ) : (
-                <span>
-                  <img src={likeIcon} alt="" height={20} width={20} /> 258
-                </span>
-              )}
-              {currentTheme === "dark" && (
-                <span className="px-2">
-                  <img src={starIcondark} alt="" height={20} width={20} /> 258
-                </span>
-              )}
-              {currentTheme === "light" && (
-                <span className="px-2">
-                  <img src={starIcon} alt="" height={20} width={20} /> 258
-                </span>
-              )}
-              <span>
-                <img src={clapIcon} alt="" height={20} width={20} /> 258
-              </span>
-            </div>
-            <div className="">
-              {props.selectContent === "for you" && (
-                <button
-                  className="my-2 px-2 py-1"
-                  style={{
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #37FF80"
-                        : "1px solid #00659D",
-                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                    backgroundColor: "transparent",
-                  }}
-                >
-                  Subscribe
-                </button>
-              )}
-              <small className="ps-1">10k sub</small>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 };

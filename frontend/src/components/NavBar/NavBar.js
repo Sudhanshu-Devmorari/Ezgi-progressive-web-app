@@ -1,36 +1,33 @@
 import React, { useContext, useEffect, useState } from "react";
 import { CiDark, CiLight } from "react-icons/ci";
-import { PiBellRingingBold } from "react-icons/pi";
+import { PiBellSimpleRingingLight } from "react-icons/pi";
 import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
+import profile from "../../assets/profile.png";
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);
-  const {currentTheme, setCurrentTheme} = useContext(CurrentTheme);
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
   const [addCommentShow, setAddCommentShow] = React.useState(false);
 
-  const [currentThemeMode, setCurrentThemeMode] = useState("light");
-
   const handleTheme = (e) => {
     if (e === "dark") {
-      localStorage.setItem("CurrentTheme", "dark")
-      document.body.classList.remove("body-light-mode")
-      document.body.classList.add("body-dark-mode")
-      setCurrentThemeMode("dark");
+      localStorage.setItem("CurrentTheme", "dark");
+      document.body.classList.remove("body-light-mode");
+      document.body.classList.add("body-dark-mode");
       setCurrentTheme("dark");
     } else {
-      localStorage.setItem("CurrentTheme", "light")
-      document.body.classList.remove("body-dark-mode")
-      document.body.classList.add("body-light-mode")
-      setCurrentThemeMode("light");
+      localStorage.setItem("CurrentTheme", "light");
+      document.body.classList.remove("body-dark-mode");
+      document.body.classList.add("body-light-mode");
       setCurrentTheme("light");
     }
   };
-  
+  const userPhone = localStorage.getItem("userPhone");
   return (
     <>
       <nav
@@ -46,30 +43,58 @@ const NavBar = (props) => {
               </span>
             ) : (
               <span className="p-2">
-                <CiLight onClick={() => handleTheme("light")} fontSize={"2rem"}/>
+                <CiLight
+                  onClick={() => handleTheme("light")}
+                  fontSize={"2rem"}
+                />
               </span>
             )}
-            <span className="px-0 py-2">
-              <PiBellRingingBold fontSize={"2rem"} />
+            <span className="pe-2 ps-0 py-2">
+              <PiBellSimpleRingingLight fontSize={"2rem"} />
             </span>
-            <span
-              className="p-2 cursor"
-              onClick={() => {
-                setSignUpModalShow(true);
-                setShowModal(1);
-              }}
-            >
-              Sign Up
-            </span>
-            <span
-              className="px-0 py-2 cursor"
-              onClick={() => {
-                setSignUpModalShow(true);
-                setShowModal(4);
-              }}
-            >
-              Sign In
-            </span>
+            {userPhone ? (
+              <>
+                <span
+                  className="py-2 px-3"
+                  style={{
+                    backgroundColor:
+                      currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                  }}
+                >
+                  Dashboard
+                </span>
+                <span className="ps-2">
+                  <img
+                    src={profile}
+                    alt=""
+                    height={45}
+                    width={45}
+                    style={{ borderRadius: "50%" }}
+                  />
+                </span>
+              </>
+            ) : (
+              <>
+                <span
+                  className="p-2 cursor"
+                  onClick={() => {
+                    setSignUpModalShow(true);
+                    setShowModal(1);
+                  }}
+                >
+                  Sign Up
+                </span>
+                <span
+                  className="px-0 py-2 cursor"
+                  onClick={() => {
+                    setSignUpModalShow(true);
+                    setShowModal(4);
+                  }}
+                >
+                  Sign In
+                </span>
+              </>
+            )}
           </div>
         </div>
       </nav>

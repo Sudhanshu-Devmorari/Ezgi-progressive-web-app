@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import { CiBasketball } from "react-icons/ci";
-import { RiFootballLine } from "react-icons/ri";
 import "./EditorBanner.css"
+import football from '../../assets/football.png'
+import basketball from '../../assets/basketball.png'
 
 export const EditorBanner = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -13,12 +13,9 @@ export const EditorBanner = () => {
           className={`col-3`}
         >
           <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex py-3 flex-column`}>
-            <div className=" d-flex justify-content-center">FootBall</div>
+            <div className=" d-flex justify-content-center">Futtbol</div>
             <div className="p-2 d-flex justify-content-center">
-              <RiFootballLine
-                style={{ color: "#00C936" }}
-                fontSize={"1.8rem"}
-              />
+              <img src={football} alt="" height={50} width={50}/>
             </div>
             <div className="d-flex justify-content-center">
               <span>
@@ -31,9 +28,9 @@ export const EditorBanner = () => {
           className={`col-3`}
         >
           <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex mx-2 py-3 flex-column`}>
-            <div className="d-flex justify-content-center">Basketball</div>
+            <div className="d-flex justify-content-center">Basketbol</div>
             <div className="p-2 d-flex justify-content-center">
-              <CiBasketball style={{ color: "#FF9100" }} fontSize={"1.8rem"} />
+            <img src={basketball} alt="" height={50} width={50}/>
             </div>
             <div className="d-flex justify-content-center">
               <span>

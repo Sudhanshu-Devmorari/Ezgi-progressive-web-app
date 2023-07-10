@@ -1,12 +1,12 @@
 .input-field-light {
-    width: 100%;
+    width: 50%;
     border: 1px solid #0D2A53;
     background-color: transparent;
     border-left: none;
     color: #0D2A53;
 }
 .input-field-dark {
-    width: 100%;
+    width: 50%;
     border: 1px solid #E6E6E6;
     background-color: transparent;
     border-left: none;

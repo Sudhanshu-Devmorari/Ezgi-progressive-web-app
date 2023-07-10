@@ -103,76 +103,14 @@ input:focus{
         gap: 0.4rem;
     }
 }
-/* @media only screen and (min-width: 768px) {
-    .otpinputdesign-light-mode{
-        width: 3.8rem !important;
-        height: 4rem;
-        margin: 0.5rem 0.4rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #0D2A53 !important;
-        background-color: transparent !important;
-    }
-    .otpinputdesign-dark-mode{
-        width: 3.8rem !important;
-        height: 4rem;
-        margin: 0.5rem 0.4rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #E6E6E6 !important;
-        background-color: transparent !important;
-    }
-}  
-@media only screen and (max-width: 320px) {
-    .otpinputdesign-light-mode{
-        width: 2.1rem !important;
-        height: 2.6rem;
-        margin: 0.5rem 0.2rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #0D2A53 !important;
-        background-color: transparent !important;
-    }
-    .otpinputdesign-dark-mode{
-        width: 2.1rem !important;
-        height: 2.6rem;
-        margin: 0.5rem 0.2rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #E6E6E6 !important;
-        background-color: transparent !important;
-    }
-}  
-@media only screen and (width: 425px) {
-    .otpinputdesign-light-mode{
-        width: 2.9rem !important;
-        height: 3rem;
-        margin: 0.5rem 0.4rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #0D2A53 !important;
-        background-color: transparent !important;
-    }
-    .otpinputdesign-dark-mode{
-        width: 2.9rem !important;
-        height: 3rem;
-        margin: 0.5rem 0.4rem;
-        font-size: 2rem;
-        border-radius: 2px;
-        border: 1px solid #E6E6E6 !important;
-        background-color: transparent !important;
-    }
-}   */
 .darkMode{
     color: #E6E6E6!important; 
     background-color: #0D2A53!important;
-    font-weight: 600!important;
-    font-family: Roboto!important;
+    font-family: 'Roboto'!important;
 }
 .lightMode{
-    font-family: Roboto!important;
+    font-family: 'Roboto'!important;
     color: #0D2A53!important;
-    font-weight: 600!important;
 }
 .closeBtn-light{
     position: absolute;

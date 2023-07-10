@@ -39,7 +39,7 @@ const SelectContentForEditorPage = (props) => {
               backgroundColor: "transparent",
             }}
           >
-            Filter
+            Filtre
           </button>
         </div>
         {props.comments && (
