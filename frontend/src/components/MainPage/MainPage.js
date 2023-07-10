@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import NavBar from "../NavBar/NavBar";
 import "./MainPage.css";
-import SubscribeModal from "../SubscribeModal/SubscribeModal";
-import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import Banner from "../Banner/Banner";
 import CurrentTheme from "../../context/CurrentTheme";
 import ContentSection from "../ContentSection/ContentSection";
@@ -17,9 +15,6 @@ import CommentsPage from "../CommentsPage/CommentsPage";
 
 const MainPage = () => {
   // CHANGE THEME
-  const [subscribeModalShow, setSubscribeModalShow] = useState(false);
-  const [AddCommentModalShow, setAddCommentModalShow] = useState(false);
-
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   // Select Content
@@ -37,7 +32,7 @@ const MainPage = () => {
       setCurrentTheme("light");
     }
   }, [themeMode]);
-  
+
   return (
     <>
       <div
@@ -64,10 +59,6 @@ const MainPage = () => {
         {selectContent === "editor" && <EditorsPage />}
         {selectContent === "comments" && <CommentsPage />}
 
-        {/* <button onClick={() => setSubscribeModalShow(true)}>Subscribe</button>
-          <button onClick={() => setAddCommentModalShow(true)}>Add Comment</button>
-        <SubscribeModal show={subscribeModalShow} onHide={() => setSubscribeModalShow(false)}/>
-          <AddCommentModal show={AddCommentModalShow} onHide={() => setAddCommentModalShow(false)}/> */}
       </div>
       <Footer
         setSelectContent={setSelectContent}

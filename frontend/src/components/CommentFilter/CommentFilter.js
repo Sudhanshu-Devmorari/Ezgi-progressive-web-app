@@ -72,7 +72,6 @@ export const CommentFilter = () => {
     <>
       <div className="row my-3">
         <div className="col">
-          {/* <Select closeMenuOnSelect={false} isMulti options={options} /> */}
 
           {/* Category DROPDOWN */}
           <div className="">
