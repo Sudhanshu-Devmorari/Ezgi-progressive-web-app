@@ -746,24 +746,27 @@ const SignUpModal = (props) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <AiOutlineEyeInvisible
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "4rem",
-                        top: "6.4rem",
-                      }}
-                      onClick={togglePasswordVisibility}
-                    />
-                    <AiOutlineEye
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "2.5rem",
-                        top: "6.4rem",
-                      }}
-                      onClick={togglePasswordVisibility}
-                    />
+                    {showPassword ? (
+                      <AiOutlineEyeInvisible
+                        fontSize={"1.5rem"}
+                        style={{
+                          position: "absolute",
+                          right: "2.5rem",
+                          top: "6.4rem",
+                        }}
+                        onClick={togglePasswordVisibility}
+                      />
+                    ) : (
+                      <AiOutlineEye
+                        fontSize={"1.5rem"}
+                        style={{
+                          position: "absolute",
+                          right: "2.5rem",
+                          top: "6.4rem",
+                        }}
+                        onClick={togglePasswordVisibility}
+                      />
+                    )}
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
