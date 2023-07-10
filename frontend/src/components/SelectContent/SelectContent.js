@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import publicIcon from "../../assets/publicIcon.svg";
 import CurrentTheme from "../../context/CurrentTheme";
-import "./SelectContent.css"
+import "./SelectContent.css";
 
 export const SelectContent = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -21,7 +21,9 @@ export const SelectContent = (props) => {
         </div>
         <div
           className="p-2"
-          style={{ color: props.selectContent === "subscription" ? "#D2DB08" : "" }}
+          style={{
+            color: props.selectContent === "subscription" ? "#D2DB08" : "",
+          }}
           onClick={() => props.setSelectContent("subscription")}
         >
           My Subscriptions
@@ -37,11 +39,15 @@ export const SelectContent = (props) => {
             />
             <span className="px-2">Only Public</span>
             <div
-              className={`${
-                currentTheme === "dark"
-                  ? "BlankCircle-dark-mode"
-                  : "BlankCircle-light-mode"
-              }`}
+              style={{
+                border:
+                  currentTheme === "dark"
+                    ? "2px solid #D2DB08"
+                    : "2px solid #00659D",
+                borderRadius: "50%",
+                width: "2.2rem",
+                height: "2.1rem",
+              }}
             ></div>
           </div>
         </div>

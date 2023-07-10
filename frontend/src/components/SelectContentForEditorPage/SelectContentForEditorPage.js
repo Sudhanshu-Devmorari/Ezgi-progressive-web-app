@@ -14,8 +14,17 @@ const SelectContentForEditorPage = (props) => {
         } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
       >
         <div className="d-flex">
-          <i className={`fa-solid fa-magnifying-glass ${currentTheme === "dark" ? "icon-dark" : "icon-light"}`}></i>
-          <input className={`${currentTheme === "dark" ? "input-field-dark" : "input-field-light"}`} type="text"/>
+          <i
+            className={`fa-solid fa-magnifying-glass ${
+              currentTheme === "dark" ? "icon-dark" : "icon-light"
+            }`}
+          ></i>
+          <input
+            className={`${
+              currentTheme === "dark" ? "input-field-dark" : "input-field-light"
+            }`}
+            type="text"
+          />
         </div>
 
         <div className={`${props.editor && "ms-auto"} p-2`}>
@@ -44,16 +53,14 @@ const SelectContentForEditorPage = (props) => {
             />
             <span className="pe-1">Only Public</span>
             <div
-              className={`${
-                currentTheme === "dark"
-                  ? "BlankCircle-dark-mode"
-                  : "BlankCircle-light-mode"
-              }`}
               style={{
                 border:
                   currentTheme === "dark"
                     ? "2px solid #E6E6E6"
                     : "2px solid #0D2A53",
+                borderRadius: "50%",
+                width: "2.2rem",
+                height: "2.1rem",
               }}
             ></div>
           </div>
