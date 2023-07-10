@@ -41,7 +41,9 @@ const ContentSection = (props) => {
             />
             <div className="col">
               <img src={profile} width={75} height={75} alt="" />
-              <span className="p-1">melihaskar</span>
+              <span className="p-1" style={{ fontSize: "18px" }}>
+                melihaskar
+              </span>
               <img src={blueTick} alt="" width={15} height={15} />
             </div>
           </div>
@@ -94,7 +96,12 @@ const ContentSection = (props) => {
                     currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                 }}
               >
-                <img src={`${currentTheme === "dark" ? lock : darklock}`} alt="" height={50} width={50} />
+                <img
+                  src={`${currentTheme === "dark" ? lock : darklock}`}
+                  alt=""
+                  height={50}
+                  width={50}
+                />
               </div>
             </>
           ) : (
@@ -132,7 +139,7 @@ const ContentSection = (props) => {
               </span>
               <span className="pe-5">07.05.2023</span>
               <span>
-                {userPhone === null ? null :(
+                {userPhone === null ? null : (
                   <img src={publicIcon} alt="" height={40} width={40} />
                 )}
               </span>
@@ -226,7 +233,6 @@ const ContentSection = (props) => {
           </div>
         </div>
       </div>
-
     </>
   );
 };
