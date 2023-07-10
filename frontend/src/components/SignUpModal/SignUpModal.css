@@ -1,10 +1,12 @@
 .darkMode-input{
     background-color: #0B2447!important;
     border: #0B2447!important;
+    color: #F6F6F6!important;
 }
 .lightMode-input{
     background-color: #F6F6F6!important;
     border: #F6F6F6!important;
+    color: #0B2447!important;
 }
 input:focus{
     box-shadow: none!important;
@@ -51,20 +53,57 @@ input:focus{
     max-height: 150px;
     background-color: #0B2447;
 }
-.otpinputdesign{
-    width: 2.4rem !important;
-    height: 3.2rem;
-    margin: 0.5rem 0.4rem;
+.otpinputdesign-dark-mode{
+    width: 3rem !important;
+    height: 3rem;
+    margin: 0 0.2rem;
     font-size: 2rem;
-    border-radius: 2px;
-    border: 1px solid #0D2A53 !important;
     background-color: transparent !important;
+    border: 1px solid #E6E6E6 !important;
+    color: #E6E6E6;
 }
-.otpinputdesign:focus{
+.otpinputdesign-light-mode{
+    width: 3rem !important;
+    height: 3rem;
+    margin: 0 0.2rem;
+    font-size: 2rem;
+    background-color: transparent !important;
+    border: 1px solid #0B2447 !important;
+    color: #0B2447;
+}
+.otpinputdesign-dark-mode:focus{
     outline: none !important;
-    color:#0D2A53;
 }
-@media only screen and (min-width: 768px) {
+.otpinputdesign-light-mode:focus{
+    outline: none !important;
+}
+.otpbox{
+    gap: 0.7rem;
+}
+@media (min-width: 360px) and (max-width: 410px) {
+    .otpbox{
+        gap: 0.1rem;
+    }
+    .otpinputdesign-dark-mode{
+        width: 2.3rem !important;
+        height: 2.3rem;
+    }
+    .otpinputdesign-light-mode{
+        width: 2.3rem !important;
+        height: 2.3rem;
+    }
+}
+@media (min-width: 411px) and (max-width: 452px){
+    .otpbox{
+        gap: 0.3rem;
+    }
+}
+@media (min-width: 453px) and (max-width: 500px){
+    .otpbox{
+        gap: 0.4rem;
+    }
+}
+/* @media only screen and (min-width: 768px) {
     .otpinputdesign-light-mode{
         width: 3.8rem !important;
         height: 4rem;
@@ -123,7 +162,7 @@ input:focus{
         border: 1px solid #E6E6E6 !important;
         background-color: transparent !important;
     }
-}  
+}   */
 .darkMode{
     color: #E6E6E6!important; 
     background-color: #0D2A53!important;

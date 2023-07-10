@@ -11,7 +11,7 @@ const SelectContentForEditorPage = (props) => {
       <div
         className={`${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
-        } d-flex g-0 my-2 align-items-center p-1`}
+        } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
       >
         <div className="d-flex">
           <i className={`fa-solid fa-magnifying-glass ${currentTheme === "dark" ? "icon-dark" : "icon-light"}`}></i>

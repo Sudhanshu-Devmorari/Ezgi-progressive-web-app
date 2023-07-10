@@ -26,20 +26,35 @@ const MainPage = () => {
   const [selectContent, setSelectContent] = useState("home");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
 
-  console.log("SelectContent: ", selectContent);
-  console.log("selectPublicorForYou: ", selectPublicorForYou);
+  const themeMode = localStorage.getItem("CurrentTheme");
 
+  useEffect(() => {
+    if (themeMode === "dark") {
+      document.body.classList.add("body-dark-mode");
+      setCurrentTheme("dark");
+    } else {
+      document.body.classList.add("body-light-mode");
+      setCurrentTheme("light");
+    }
+  }, [themeMode]);
+  
   return (
     <>
-      <div className={`container-fluid mt-3`} style={{ fontFamily: "none" }}>
+      <div
+        className={`container-fluid mt-3`}
+        style={{ fontFamily: "none", marginBottom: "66px" }}
+      >
         <NavBar />
         <Banner />
         <EditorBanner />
 
         {selectContent === "home" && (
           <>
-            <SelectContent selectContent={selectPublicorForYou} setSelectContent={setSelectPublicorForYou}/>
-            <ContentSection selectContent={selectPublicorForYou}/>
+            <SelectContent
+              selectContent={selectPublicorForYou}
+              setSelectContent={setSelectPublicorForYou}
+            />
+            <ContentSection selectContent={selectPublicorForYou} />
             <HighlightMainPage />
             <SharedProfile />
             <AdvertisementBanner />
@@ -49,13 +64,15 @@ const MainPage = () => {
         {selectContent === "editor" && <EditorsPage />}
         {selectContent === "comments" && <CommentsPage />}
 
-        <Footer setSelectContent={setSelectContent} selectContent={selectContent}/>
-
         {/* <button onClick={() => setSubscribeModalShow(true)}>Subscribe</button>
-          <button onClick={() => setAddCommentModalShow(true)}>Add Comment</button> */}
-        {/* <SubscribeModal show={subscribeModalShow} onHide={() => setSubscribeModalShow(false)}/>
+          <button onClick={() => setAddCommentModalShow(true)}>Add Comment</button>
+        <SubscribeModal show={subscribeModalShow} onHide={() => setSubscribeModalShow(false)}/>
           <AddCommentModal show={AddCommentModalShow} onHide={() => setAddCommentModalShow(false)}/> */}
       </div>
+      <Footer
+        setSelectContent={setSelectContent}
+        selectContent={selectContent}
+      />
     </>
   );
 };

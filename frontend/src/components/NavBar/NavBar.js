@@ -18,7 +18,6 @@ const NavBar = (props) => {
   const handleTheme = (e) => {
     if (e === "dark") {
       localStorage.setItem("CurrentTheme", "dark")
-      // document.body.style.backgroundColor = "#0B2447";
       document.body.classList.remove("body-light-mode")
       document.body.classList.add("body-dark-mode")
       setCurrentThemeMode("dark");
@@ -27,7 +26,6 @@ const NavBar = (props) => {
       localStorage.setItem("CurrentTheme", "light")
       document.body.classList.remove("body-dark-mode")
       document.body.classList.add("body-light-mode")
-      // document.body.style.backgroundColor = "#F6F6F6";
       setCurrentThemeMode("light");
       setCurrentTheme("light");
     }
@@ -36,7 +34,7 @@ const NavBar = (props) => {
   return (
     <>
       <nav
-        className={`navbar navbar-expand-lg border ${
+        className={`navbar navbar-expand-lg ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
       >

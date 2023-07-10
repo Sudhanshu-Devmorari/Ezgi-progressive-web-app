@@ -22,20 +22,24 @@ const ContentSection = (props) => {
         }`}
       >
         <div className="row m-2">
-          <div className="col">
+          <div className="position-relative">
             <img
-              src={profile}
-              width={75}
-              height={75}
+              src={crown}
               alt=""
+              height={19}
+              width={19}
+              style={{
+                background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                borderRadius: "50%",
+                left: "4rem",
+                position: "absolute",
+              }}
             />
-            <span className="p-1">melihaskar</span>
-            <img
-              src={blueTick}
-              alt=""
-              width={15}
-              height={15}
-            />
+            <div className="col">
+              <img src={profile} width={75} height={75} alt="" />
+              <span className="p-1">melihaskar</span>
+              <img src={blueTick} alt="" width={15} height={15} />
+            </div>
           </div>
           <div className="col">
             <div
@@ -188,20 +192,24 @@ const ContentSection = (props) => {
         }`}
       >
         <div className="row m-2">
-          <div className="col">
+          <div className="position-relative">
             <img
-              src={profile}
-              width={75}
-              height={75}
+              src={crown}
               alt=""
+              height={19}
+              width={19}
+              style={{
+                background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                borderRadius: "50%",
+                left: "4rem",
+                position: "absolute",
+              }}
             />
-            <span className="p-1">melihaskar</span>
-            <img
-              src={blueTick}
-              alt=""
-              width={15}
-              height={15}
-            />
+            <div className="col">
+              <img src={profile} width={75} height={75} alt="" />
+              <span className="p-1">melihaskar</span>
+              <img src={blueTick} alt="" width={15} height={15} />
+            </div>
           </div>
           <div className="col">
             <div

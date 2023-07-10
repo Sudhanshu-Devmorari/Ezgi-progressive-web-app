@@ -22,39 +22,18 @@
     width: 2.2rem;
     height: 2rem;
 }
-@media (width: 320px) {
+@media (min-width: 360px) and (max-width: 395px) {
     .crown-img {
-        position: absolute;
-        right: 6.5rem;
-        top: 3.4rem;
-        background-color: #FFFFFF;
-        border-radius: 50%;
+        right: 0.8rem!important;
     }
 }
-@media (width: 375px) {
+@media (min-width: 396px) and (max-width: 421px) {
     .crown-img {
-        position: absolute;
-        right: 8.2rem;
-        top: 3.4rem;
-        background-color: #FFFFFF;
-        border-radius: 50%;
+        right: 1.2rem!important;
     }
 }
-@media (width: 425px) {
+@media (min-width: 422px) and (max-width: 490px) {
     .crown-img {
-        position: absolute;
-        right: 9.8rem;
-        top: 3.4rem;
-        background-color: #FFFFFF;
-        border-radius: 50%;
-    }
-}
-@media (width: 768px) {
-    .crown-img {
-        position: absolute;
-        right: 12.5rem;
-        top: 3.4rem;
-        background-color: #FFFFFF;
-        border-radius: 50%;
+        right: 1.5rem!important;
     }
 }

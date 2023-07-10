@@ -84,15 +84,23 @@ const SubscribeModal = (props) => {
                   </div>
                 </div>
                 <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">
-                  <div className="">
-                    <img src={profile} width={75} height={75} alt="" />
+                  <div className="position-relative">
                     <img
                       src={crown}
-                      width={25}
-                      height={25}
-                      className="crown-img"
                       alt=""
+                      height={25}
+                      width={25}
+                      className="crown-img"
+                      style={{
+                        backgroundColor:
+                          currentTheme === "drak" ? "#FFFFFF" : "",
+                        borderRadius: "50%",
+                        top: "1.4rem",
+                        right:"2.4rem",
+                        position: "absolute",
+                      }}
                     />
+                    <img src={profile} width={75} height={75} alt="" />
                   </div>
                   <div className="">
                     <div className="fs-5">johndoe</div>

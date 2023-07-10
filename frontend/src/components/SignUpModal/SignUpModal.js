@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import "./SignUpModal.css";
 import facebook from "../../assets/FacebookLogo.png";
@@ -8,11 +8,14 @@ import OtpInput from "react-otp-input";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
+import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
+import CheckBoxDark from "../../assets/CheckBoxDark.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const SignUpModal = (props) => {
   // THEME
-  const currentTheme = localStorage.getItem("CurrentTheme");
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +41,15 @@ const SignUpModal = (props) => {
   };
 
   const toggleCountryDropdown = () => {
+    if (cityDropDown) {
+      setCityDropDown(false);
+    }
+    if (genderDropDown) {
+      setGenderDropDown(false);
+    }
+    if (ageDropDown) {
+      setAgeDropDown(false);
+    }
     setCountryDropDown(!countryDropDown);
   };
 
@@ -46,6 +58,15 @@ const SignUpModal = (props) => {
   };
 
   const toggleCityDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (genderDropDown) {
+      setGenderDropDown(false);
+    }
+    if (ageDropDown) {
+      setAgeDropDown(false);
+    }
     setCityDropDown(!cityDropDown);
   };
 
@@ -54,6 +75,15 @@ const SignUpModal = (props) => {
   };
 
   const toggleGenderDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (ageDropDown) {
+      setAgeDropDown(false);
+    }
+    if (cityDropDown) {
+      setCityDropDown(false);
+    }
     setGenderDropDown(!genderDropDown);
   };
 
@@ -62,6 +92,15 @@ const SignUpModal = (props) => {
   };
 
   const toggleAgeDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (genderDropDown) {
+      setGenderDropDown(false);
+    }
+    if (cityDropDown) {
+      setCityDropDown(false);
+    }
     setAgeDropDown(!ageDropDown);
   };
 
@@ -286,15 +325,27 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="text-center">
                   <div className="my-3">
-                    <img
-                      src={
-                        !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
-                      }
-                      style={{ width: "25px", cursor: "pointer" }}
-                      className="me-2"
-                      onClick={() => setSelectCheckBox(!selectCheckBox)}
-                      alt=""
-                    />
+                    {currentTheme === "dark" ? (
+                      <img
+                        alt=""
+                        src={
+                          !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
+                        }
+                        style={{ width: "25px", cursor: "pointer" }}
+                        className="me-2"
+                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                      />
+                    ) : (
+                      <img
+                        src={
+                          !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
+                        }
+                        style={{ width: "25px", cursor: "pointer" }}
+                        className="me-2"
+                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                        alt=""
+                      />
+                    )}
                     I have read and agree to the{" "}
                     <span
                       style={{
@@ -309,6 +360,9 @@ const SignUpModal = (props) => {
                   </div>
                   <div className="d-flex flex-column align-items-center my-4">
                     <button
+                      onClick={() => {
+                        props.onHide();
+                      }}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-btn"
@@ -443,9 +497,7 @@ const SignUpModal = (props) => {
 
           {/* Sign In  */}
           {props.ShowModal === 4 && (
-            <div
-              className=""
-            >
+            <div className="">
               <div className="m-2">
                 <div className="d-flex justify-content-center">
                   <span>LOGIN</span>
@@ -500,6 +552,9 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="d-flex flex-column align-items-center my-3">
                   <button
+                    onClick={() => {
+                      props.onHide();
+                    }}
                     className={`${
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
@@ -556,7 +611,7 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column my-2">
                     <label htmlFor="phone">Phone</label>
                     <input
-                       className={`${
+                      className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
                           : "lightMode-input"
@@ -586,9 +641,7 @@ const SignUpModal = (props) => {
 
           {/* OTP */}
           {props.ShowModal === 6 && (
-            <div
-              className=""
-            >
+            <div className="">
               <div className="m-3 mt-4">
                 <div className="d-flex justify-content-center">
                   <span>
@@ -609,25 +662,38 @@ const SignUpModal = (props) => {
                 <div className="my-1">
                   <div className="d-flex justify-content-between">
                     <span>Enter 6 digit code</span>
-                    <span style={{
+                    <span
+                      style={{
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}>1:45</span>
+                      }}
+                    >
+                      1:45
+                    </span>
                   </div>
-                  <div className="otp-container">
+                  <div className="w-100 d-flex justify-content-center">
                     <OtpInput
-                      inputStyle={`${currentTheme === "dark" ? "otpinputdesign-dark-mode" : "otpinputdesign-light-mode"}`}
+                      inputStyle={`${
+                        currentTheme === "dark"
+                          ? "otpinputdesign-dark-mode"
+                          : "otpinputdesign-light-mode"
+                      } `}
                       value={otp}
                       onChange={setOtp}
                       numInputs={6}
                       renderSeparator={<span> </span>}
                       renderInput={(props) => <input {...props} />}
+                      containerStyle={"otpbox my-2"}
                     />
                   </div>
                   <div className="text-end">
                     <small>Didn't get the code? </small>
-                    <span style={{
+                    <span
+                      style={{
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}>Send Again</span>
+                      }}
+                    >
+                      Send Again
+                    </span>
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
@@ -649,9 +715,7 @@ const SignUpModal = (props) => {
 
           {/* Password Reset */}
           {props.ShowModal === 7 && (
-            <div
-              className=""
-            >
+            <div className="">
               <div className="m-3 mt-4">
                 <div className="d-flex justify-content-center">
                   <span>
@@ -704,6 +768,9 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
                   <button
+                    onClick={() => {
+                      props.onHide();
+                    }}
                     className={`${
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}

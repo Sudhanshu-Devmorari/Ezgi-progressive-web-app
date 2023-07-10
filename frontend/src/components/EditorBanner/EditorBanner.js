@@ -10,11 +10,9 @@ export const EditorBanner = () => {
     <>
       <div className={`row g-0 bannerText font-responsive`}>
         <div
-          className={`col-3 ${
-            currentTheme === "dark" ? "dark-mode" : "light-mode"
-          }`}
+          className={`col-3`}
         >
-          <div className="d-flex flex-column my-2 mt-3">
+          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex py-3 flex-column`}>
             <div className=" d-flex justify-content-center">FootBall</div>
             <div className="p-2 d-flex justify-content-center">
               <RiFootballLine
@@ -30,11 +28,9 @@ export const EditorBanner = () => {
           </div>
         </div>
         <div
-          className={`col-3 mx-2 ${
-            currentTheme === "dark" ? "dark-mode" : "light-mode"
-          }`}
+          className={`col-3`}
         >
-          <div className="d-flex g-0 flex-column my-2 mt-3">
+          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex mx-2 py-3 flex-column`}>
             <div className="d-flex justify-content-center">Basketball</div>
             <div className="p-2 d-flex justify-content-center">
               <CiBasketball style={{ color: "#FF9100" }} fontSize={"1.8rem"} />
@@ -47,7 +43,7 @@ export const EditorBanner = () => {
           </div>
         </div>
         <div
-          className={`col-5 d-flex align-items-center justify-content-center ${
+          className={`col-6 d-flex align-items-center justify-content-center ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}
           style={{ color: "#D2DB08" }}

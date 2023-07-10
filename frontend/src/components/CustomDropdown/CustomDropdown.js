@@ -1,6 +1,10 @@
-import { currentTheme } from "../GetCurrentTheme";
+import { useContext } from "react";
+import CurrentTheme from "../../context/CurrentTheme";
 
-export const CustomDropdown = ({ label, options, selectedOption, onSelectOption, isOpen, toggleDropdown }) => (
+export const CustomDropdown = ({ label, options, selectedOption, onSelectOption, isOpen, toggleDropdown }) => {
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  return (
+
     <div className="my-2">
       <span>{label}</span>
       <div className={`${currentTheme === "dark" ? "customDropdown-dark-mode" : "customDropdown-light-mode"} p-2 text-center`} onClick={toggleDropdown}>
@@ -25,4 +29,5 @@ export const CustomDropdown = ({ label, options, selectedOption, onSelectOption,
         ))}
       </div>
     </div>
-);
+  )
+};

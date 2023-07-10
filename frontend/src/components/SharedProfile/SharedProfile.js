@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import profile from "../../assets/profile.png";
+import crown from "../../assets/crown.png";
 import starIcon from "../../assets/star.png";
 import CurrentTheme from "../../context/CurrentTheme";
 import blueTick from "../../assets/blueTick.png";
@@ -29,7 +30,21 @@ const SharedProfile = () => {
           <img className="ps-2" src={starIcon} alt="" height={20} width={27} />
         </div>
         <div className="row">
-          <div className="col d-flex">
+          <div className="col d-flex position-relative">
+            <div className="position-absolute">
+              <img
+                src={crown}
+                alt=""
+                height={19}
+                width={19}
+                style={{
+                  background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                  borderRadius: "50%",
+                  left: "3.2rem",
+                  position: "absolute",
+                }}
+              />
+            </div>
             <img src={profile} width={75} height={75} alt="" />
             <div className="d-flex flex-column ps-1">
               <div>
@@ -85,7 +100,7 @@ const SharedProfile = () => {
           </div>
         </div>
       </div>
-      
+
       <div
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -104,7 +119,21 @@ const SharedProfile = () => {
           <img className="ps-2" src={starIcon} alt="" height={20} width={27} />
         </div>
         <div className="row">
-          <div className="col d-flex">
+          <div className="col d-flex position-relative">
+            <div className="position-absolute">
+              <img
+                src={crown}
+                alt=""
+                height={19}
+                width={19}
+                style={{
+                  background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                  borderRadius: "50%",
+                  left: "3.2rem",
+                  position: "absolute",
+                }}
+              />
+            </div>
             <img src={profile} width={75} height={75} alt="" />
             <div className="d-flex flex-column ps-1">
               <div>
