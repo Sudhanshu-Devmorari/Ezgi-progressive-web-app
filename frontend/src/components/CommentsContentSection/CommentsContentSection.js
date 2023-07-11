@@ -94,9 +94,9 @@ const CommentsContentSection = (props) => {
                 />
                 <span className="ps-1">Super Lig</span>
               </span>
-              <span className="pe-5">07.05.2023</span>
+              <span className="pe-2">07.05.2023</span>
               <span>
-                <img src={publicIcon} alt="" height={40} width={40} />
+                <img src={publicIcon} alt="" height={35} width={35} />
                 {props.SelectComment === "resolvedComments" && (
                   <img src={publicIcon} alt="" height={35} width={35} />
                 )}
@@ -134,7 +134,7 @@ const CommentsContentSection = (props) => {
                     props.SelectComment === "resolvedComments"
                       ? "#00DE51"
                       : "#00659D",
-                  color: "#FFFFFF",
+                  color: props.SelectComment === "resolvedComments" ? "#0D2A53" : "#FFFFFF",
                   fontSize: "12px",
                 }}
               >
@@ -173,6 +173,305 @@ const CommentsContentSection = (props) => {
         </div>
       </div>
 
+      {props.SelectComment === "resolvedComments" && (
+        <>
+        <div
+        className={`card border-0 rounded-0 mb-2 ${
+          currentTheme === "dark" ? "dark-mode" : "light-mode"
+        }`}
+      >
+        <div className="row m-2">
+          <div className="position-relative col p-0">
+            <img
+              src={crown}
+              alt=""
+              height={19}
+              width={19}
+              style={{
+                background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                borderRadius: "50%",
+                left: "3.3rem",
+                position: "absolute",
+              }}
+            />
+            <div className="col">
+              <img src={profile} width={75} height={75} alt="" />
+              <span className="p-1 autorname-responsive">melihaskar</span>
+              <img src={blueTick} alt="" width={14} height={14} />
+            </div>
+          </div>
+          <div className="col p-0">
+            <div className="row gap-1 g-0 text-center mt-5">
+              <div className="col">
+                <div className="rate-fonts">Success Rate</div>
+                <div
+                  style={{
+                    fontSize: "1.2rem",
+                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                  }}
+                >
+                  %67.6
+                </div>
+              </div>
+              <div className="col">
+                <div className="rate-fonts">Score Points</div>
+                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>256</div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="p-1 my-2"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "14px",
+            }}
+          >
+            2012 yılından beri profesyonel olarak maçları takip ediyorum.
+            Premier lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için
+            teşekkürler. 2012 yılından beri profesyonel olarak maçları takip
+            ediyorum. Premier lig konusunda uzmanım. Yorumlarımı takip ettiğiniz
+            için teşekkürler.
+          </div>
+          <div
+            className="p-1"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "14px",
+            }}
+          >
+            <div className="d-flex justify-content-between align-items-center gap-1">
+              <span>
+                <img
+                  className="pe-1"
+                  src={TurkeyFalg}
+                  alt=""
+                  height={25}
+                  width={27}
+                />
+                <span className="ps-1">Super Lig</span>
+              </span>
+              <span className="pe-2">07.05.2023</span>
+              <span>
+                <img src={publicIcon} alt="" height={35} width={35} />
+                {props.SelectComment === "resolvedComments" && (
+                  <img src={publicIcon} alt="" height={35} width={35} />
+                )}
+              </span>
+            </div>
+            <div className="d-flex justify-content-center align-items-center">
+              <span>Antalyaspor</span>
+              <div
+                className="border-bottom-0"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "91px",
+                  height: "47px",
+                  borderRadius: " 50% / 100% 100% 0 0",
+                  border: "1px solid #FFCC00"
+                }}
+              >
+                {props.SelectComment === "resolvedComments" && "1 - 1"}
+              </div>
+              <span>Başakşehir</span>
+            </div>
+            <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
+              <span className="ps-1" style={{color: "#FF3030", fontSize:"12px"}}>The match has been stopped</span>
+              <span
+                className="p-2"
+                style={{
+                  backgroundColor:
+                    props.SelectComment === "resolvedComments"
+                      ? "#FFCC00"
+                      : "#00659D",
+                  color: props.SelectComment === "resolvedComments" ? "#0D2A53" : "#FFFFFF",
+                  fontSize: "12px",
+                }}
+              >
+                FT - Home & 2.5 Over 2.40
+              </span>
+            </div>
+          </div>
+          <div className="d-flex mt-2 align-items-center">
+            <div className="gap-2 d-flex">
+              <div>
+                <img
+                  src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
+                  alt=""
+                  height={20}
+                  width={20}
+                />{" "}
+                258
+              </div>
+              <div>
+                <img
+                  src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
+                  alt=""
+                  height={20}
+                  width={20}
+                />{" "}
+                258
+              </div>
+              <div>
+                <img src={clapIcon} alt="" height={20} width={20} /> 258
+              </div>
+            </div>
+            <div className="ms-auto" style={{ fontSize: "12px" }}>
+              10 dk önce
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={`card border-0 rounded-0 mb-2 ${
+          currentTheme === "dark" ? "dark-mode" : "light-mode"
+        }`}
+      >
+        <div className="row m-2">
+          <div className="position-relative col p-0">
+            <img
+              src={crown}
+              alt=""
+              height={19}
+              width={19}
+              style={{
+                background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                borderRadius: "50%",
+                left: "3.3rem",
+                position: "absolute",
+              }}
+            />
+            <div className="col">
+              <img src={profile} width={75} height={75} alt="" />
+              <span className="p-1 autorname-responsive">melihaskar</span>
+              <img src={blueTick} alt="" width={14} height={14} />
+            </div>
+          </div>
+          <div className="col p-0">
+            <div className="row gap-1 g-0 text-center mt-5">
+              <div className="col">
+                <div className="rate-fonts">Success Rate</div>
+                <div
+                  style={{
+                    fontSize: "1.2rem",
+                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                  }}
+                >
+                  %67.6
+                </div>
+              </div>
+              <div className="col">
+                <div className="rate-fonts">Score Points</div>
+                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>256</div>
+              </div>
+            </div>
+          </div>
+          <div
+            className="p-1 my-2"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "14px",
+            }}
+          >
+            2012 yılından beri profesyonel olarak maçları takip ediyorum.
+            Premier lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için
+            teşekkürler. 2012 yılından beri profesyonel olarak maçları takip
+            ediyorum. Premier lig konusunda uzmanım. Yorumlarımı takip ettiğiniz
+            için teşekkürler.
+          </div>
+          <div
+            className="p-1"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "14px",
+            }}
+          >
+            <div className="d-flex justify-content-between align-items-center gap-1">
+              <span>
+                <img
+                  className="pe-1"
+                  src={TurkeyFalg}
+                  alt=""
+                  height={25}
+                  width={27}
+                />
+                <span className="ps-1">Super Lig</span>
+              </span>
+              <span className="pe-2">07.05.2023</span>
+              <span>
+                <img src={publicIcon} alt="" height={35} width={35} />
+                {props.SelectComment === "resolvedComments" && (
+                  <img src={publicIcon} alt="" height={35} width={35} />
+                )}
+              </span>
+            </div>
+            <div className="d-flex justify-content-center align-items-center">
+              <span>Antalyaspor</span>
+              <div
+                className="border-bottom-0"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "91px",
+                  height: "47px",
+                  borderRadius: " 50% / 100% 100% 0 0",
+                  border: "1px solid #FF5757"
+                }}
+              >
+                {props.SelectComment === "resolvedComments" && "1 - 1"}
+              </div>
+              <span>Başakşehir</span>
+            </div>
+            <div className="text-end mt-3 mb-2">
+              <span
+                className="p-2"
+                style={{
+                  backgroundColor: "#FF5757",
+                  color: props.SelectComment === "resolvedComments" ? "#0D2A53" : "#FFFFFF",
+                  fontSize: "12px",
+                }}
+              >
+                FT - Home & 2.5 Over 2.40
+              </span>
+            </div>
+          </div>
+          <div className="d-flex mt-2 align-items-center">
+            <div className="gap-2 d-flex">
+              <div>
+                <img
+                  src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
+                  alt=""
+                  height={20}
+                  width={20}
+                />{" "}
+                258
+              </div>
+              <div>
+                <img
+                  src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
+                  alt=""
+                  height={20}
+                  width={20}
+                />{" "}
+                258
+              </div>
+              <div>
+                <img src={clapIcon} alt="" height={20} width={20} /> 258
+              </div>
+            </div>
+            <div className="ms-auto" style={{ fontSize: "12px" }}>
+              10 dk önce
+            </div>
+          </div>
+        </div>
+      </div>
+        </>
+      )}
+
+      {props.SelectComment === "activeComments" && (
       <div
         className={`card border-0 rounded-0 mb-2 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -284,7 +583,7 @@ const CommentsContentSection = (props) => {
                     props.SelectComment === "resolvedComments"
                       ? "#00DE51"
                       : "#00659D",
-                  color: "#FFFFFF",
+                      color: props.SelectComment === "resolvedComments" ? "#0D2A53" : "#FFFFFF",
                   fontSize: "12px",
                 }}
               >
@@ -323,6 +622,7 @@ const CommentsContentSection = (props) => {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 };
