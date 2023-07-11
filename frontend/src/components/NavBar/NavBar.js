@@ -6,6 +6,7 @@ import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
+import Notification from "../../assets/Notification.svg"
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);

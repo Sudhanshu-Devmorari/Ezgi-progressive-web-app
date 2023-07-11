@@ -12,6 +12,7 @@ import { SelectContent } from "../SelectContent/SelectContent";
 import HighlightMainPage from "../HighlightMainPage/HighlightMainPage";
 import EditorsPage from "../EditorsPage/EditorsPage";
 import CommentsPage from "../CommentsPage/CommentsPage";
+import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -40,8 +41,14 @@ const MainPage = () => {
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
         <NavBar />
-        <Banner />
-        <EditorBanner />
+        {(selectContent === "home" ||
+          selectContent === "editor" ||
+          selectContent === "comments") && (
+          <>
+            <Banner />
+            <EditorBanner />
+          </>
+        )}
 
         {selectContent === "home" && (
           <>
@@ -49,7 +56,7 @@ const MainPage = () => {
               selectContent={selectPublicorForYou}
               setSelectContent={setSelectPublicorForYou}
             />
-            <ContentSection selectContent={selectPublicorForYou} />
+            <ContentSection selectContent={selectPublicorForYou} setSelectContent={setSelectContent}/>
             <HighlightMainPage />
             <SharedProfile />
             <AdvertisementBanner />
@@ -58,7 +65,7 @@ const MainPage = () => {
 
         {selectContent === "editor" && <EditorsPage />}
         {selectContent === "comments" && <CommentsPage />}
-
+        {selectContent === "active-comments" && <EditorProfileActiveComments setSelectContent={setSelectContent}/>}
       </div>
       <Footer
         setSelectContent={setSelectContent}

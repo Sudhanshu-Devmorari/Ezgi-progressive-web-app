@@ -1,15 +1,18 @@
-import React from "react";
-import NavBar from "../NavBar/NavBar";
+import React, { useState } from "react";
+import ActiveComments from "../ActiveComments/ActiveComments";
+import SelectComments from "../SelectComments/SelectComments";
+import ContentSection from "../ContentSection/ContentSection";
+import CommentsContentSection from "../CommentsContentSection/CommentsContentSection";
 
-const EditorProfileActiveComments = () => {
+
+const EditorProfileActiveComments = (props) => {
+  const [SelectComment, setSelectComment] = useState("activeComments");
+  
   return (
     <>
-      <div
-        className={`container-fluid mt-3`}
-        style={{ fontFamily: "none", marginBottom: "66px" }}
-      >
-        <NavBar />
-      </div>
+    <ActiveComments setSelectContent={props.setSelectContent}/>
+    <SelectComments setSelectComment={setSelectComment} SelectComment={SelectComment}/>
+    <CommentsContentSection SelectComment={SelectComment}/>
     </>
   );
 };

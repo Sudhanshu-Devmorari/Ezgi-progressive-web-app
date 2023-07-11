@@ -82,7 +82,7 @@ const ContentSection = (props) => {
                 </div>
               </div>
               <div className="">
-                <div>Success Rate</div>
+                <div>Score Points</div>
                 <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>256</div>
               </div>
             </div>
@@ -107,16 +107,19 @@ const ContentSection = (props) => {
           ) : (
             <>
               <div
+                onClick={() => props.setSelectContent("active-comments")}
                 className="p-1 my-2"
                 style={{
                   backgroundColor:
                     currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                  fontSize: "14px",
                 }}
               >
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Error
-                quas eligendi cupiditate voluptates minima consequatur. Lorem
-                ipsum dolor sit amet consectetur adipisicing elit. Error quas
-                eligendi cupiditate voluptates minima consequatur.
+                2012 yılından beri profesyonel olarak maçları takip ediyorum.
+                Premier lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için
+                teşekkürler. 2012 yılından beri profesyonel olarak maçları takip
+                ediyorum. Premier lig konusunda uzmanım. Yorumlarımı takip
+                ettiğiniz için teşekkürler.
               </div>
             </>
           )}
@@ -163,7 +166,7 @@ const ContentSection = (props) => {
               >
                 14:30
               </div>
-              <span>Basaksehir</span>
+              <span>Başakşehir</span>
             </div>
             <div className="text-end mt-3 mb-2">
               {userPhone === null ? (

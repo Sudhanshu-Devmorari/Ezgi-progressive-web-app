@@ -1,0 +1,17 @@
+@media (min-width: 360px) and (max-width:447px){
+    .responsive-username{
+        font-size: 14px;
+    }
+    .responsive-blue-tick{
+        height: 14px;
+        width: 14px;
+    }
+}
+@media (min-width: 360px) and (max-width:404px) {
+    .success-rate-font{
+        font-size: 10px!important;
+    }
+}
+.success-rate-font{
+    font-size: 12px;
+}

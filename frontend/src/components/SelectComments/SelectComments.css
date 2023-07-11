@@ -1,0 +1,5 @@
+@media (min-width: 360px) and (max-width:408px) {
+    .select-comment{
+        font-size: 14px!important;
+    }
+}

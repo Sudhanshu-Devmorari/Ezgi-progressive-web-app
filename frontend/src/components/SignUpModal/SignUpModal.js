@@ -558,6 +558,7 @@ const SignUpModal = (props) => {
                     onClick={() => {
                       localStorage.setItem("userPhone", userPhone);
                       props.onHide();
+                      window.location.reload();
                     }}
                     className={`${
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
