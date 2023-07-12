@@ -19,25 +19,21 @@ input:focus{
     background-color: #F6F6F6!important;
     border: 1px solid #F6F6F6!important;
     color: #0D2A53;
-    font-weight:600;
 }
 .customDropdown-dark-mode{
     background-color: #0B2447!important;
     border: 1px solid #0B2447!important;
     color: #E6E6E6;
-    font-weight:600;
 }
 .dpcontent-light-mode{
     background-color: #F6F6F6!important;
     border: 1px solid #F6F6F6!important;
     color: #0D2A53;
-    font-weight:600;
 }
 .dpcontent-dark-mode{
     background-color: #0D2A53!important;
     border: 1px solid #0B2447!important;
     color: #E6E6E6;
-    font-weight:600;
 }
 .customDropdown-content-light-mode{
     position: absolute;
@@ -128,10 +124,11 @@ input:focus{
     border: 1px solid #00659D;
     color: #00659D;
     background-color: #FFFFFF;
+    border-radius: 3px;
 }
 .darkMode-btn{
     border: 1px solid #D2DB08;
     color: #D2DB08;
     background-color: transparent;
-    border-radius: 2px;
+    border-radius: 3px;
 }

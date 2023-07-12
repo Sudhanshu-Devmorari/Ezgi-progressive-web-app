@@ -24,12 +24,22 @@
 }
 @media (min-width: 360px) and (max-width: 395px) {
     .crown-img {
-        right: 0.8rem!important;
+        right: 0.7rem!important;
+        top: 1.3rem!important;
+        height: 20px;
+        width: 20px;
+    }
+    .responsive-profile{
+        height: 81px;
+        width: 81px;
     }
 }
 @media (min-width: 396px) and (max-width: 421px) {
     .crown-img {
-        right: 1.2rem!important;
+        right: 0.45rem!important;
+        top: 2rem!important;
+        height:  23px;
+        width: 23px;
     }
 }
 @media (min-width: 422px) and (max-width: 490px) {

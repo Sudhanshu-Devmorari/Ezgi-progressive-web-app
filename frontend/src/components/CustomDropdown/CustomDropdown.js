@@ -7,7 +7,7 @@ export const CustomDropdown = ({ label, options, selectedOption, onSelectOption,
 
     <div className="my-2">
       <span>{label}</span>
-      <div className={`${currentTheme === "dark" ? "customDropdown-dark-mode" : "customDropdown-light-mode"} p-2 text-center`} onClick={toggleDropdown}>
+      <div className={`${currentTheme === "dark" ? "customDropdown-dark-mode" : "customDropdown-light-mode"} p-1 text-center`} onClick={toggleDropdown}>
         <span>{selectedOption}</span>
       </div>
       <div

@@ -1,17 +1,21 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import "./PromoteMeModal.css";
 import { RxCross2 } from "react-icons/rx";
 import { BsStar } from "react-icons/bs";
 import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
-import { currentTheme } from "../GetCurrentTheme";
 import CheckBoxDark from "../../assets/CheckBoxDark.svg";
 import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
+import currentyIcondark from "../../assets/₺ (1).svg";
+import currentyIcon from "../../assets/₺.svg";
+import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
+import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
-
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>
       <Modal
@@ -22,7 +26,7 @@ const PromoteMeModal = (props) => {
         scrollable
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"}`}
         >
           <div>
             <div className="">
@@ -62,7 +66,7 @@ const PromoteMeModal = (props) => {
                 </div>
               </div>
               <div className="my-2">
-                <div className="fs-4 my-2">Subscription Plans</div>
+                <div className="my-2">Subscription Plans</div>
                 <div className="d-flex mb-2">
                   <div
                     className={`${
@@ -78,9 +82,19 @@ const PromoteMeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span>1 Month</span>
-                    <span className="fs-5" style={{ fontWeight: "600" }}>
+                    <span style={{ fontSize: "14px" }}>1 Month</span>
+                    <span style={{ fontSize: "19px" }}>
                       69.90
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? currentyIcondark
+                            : currentyIcon
+                        }
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
                     </span>
                   </div>
                 </div>
@@ -99,14 +113,23 @@ const PromoteMeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span>1 Month</span>
-                    <span className="fs-5" style={{ fontWeight: "600" }}>
+                    <span style={{ fontSize: "14px" }}>1 Month</span>
+                    <span style={{ fontSize: "19px" }}>
                       69.90
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? currentyIcondark
+                            : currentyIcon
+                        }
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
                     </span>
                   </div>
                 </div>
                 <div className="d-flex mb-2">
-                  <div className="FilledCircle me-2"></div>
                   <div
                     className={`${
                       currentTheme === "dark"
@@ -121,32 +144,66 @@ const PromoteMeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span>1 Month</span>
-                    <span className="fs-5" style={{ fontWeight: "600" }}>
+                    <span style={{ fontSize: "14px" }}>1 Month</span>
+                    <span style={{ fontSize: "19px" }}>
                       <span className="pe-2" style={{ color: "#7BFFAB" }}>
                         %20 Save!
                       </span>
                       69.00
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? currentyIcondark
+                            : currentyIcon
+                        }
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
                     </span>
                   </div>
                 </div>
               </div>
               <div className="">
                 <div className="text-center my-2">
-                  <div className="fs-5">Total Amount</div>
-                  <div className="fs-5" style={{ fontWeight: "600" }}>
+                  <div>Total Amount</div>
+                  <div style={{ fontSize: "19px" }}>
                     329.90
+                    <img
+                      src={
+                        currentTheme === "dark"
+                          ? currentyIcondark
+                          : currentyIcon
+                      }
+                      alt=""
+                      height={25}
+                      width={25}
+                    />
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="my-3">
-                    <img
-                      src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
-                      style={{ width: "25px", cursor: "pointer" }}
-                      className="me-2"
-                      onClick={() => setSelectCheckBox(!selectCheckBox)}
-                      alt=""
-                    />
+                  <div className="my-3" style={{ fontSize: "13px" }}>
+                    {currentTheme === "dark" ? (
+                      <img
+                        alt=""
+                        src={
+                          !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
+                        }
+                        style={{ width: "25px", cursor: "pointer" }}
+                        className="me-2"
+                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                      />
+                    ) : (
+                      <img
+                        src={
+                          !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
+                        }
+                        style={{ width: "25px", cursor: "pointer" }}
+                        className="me-2"
+                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                        alt=""
+                      />
+                    )}
                     I have read and agree to the{" "}
                     <span
                       style={{
@@ -161,22 +218,24 @@ const PromoteMeModal = (props) => {
                   </div>
                   <div className="d-flex justify-content-center my-3">
                     <button
+                      style={{ fontSize: "14px" }}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-btn"
                           : "lightMode-btn"
                       } px-3 py-1`}
-                      onClick={() => setCommentsModalShow(true)}
                     >
                       Checkout
                     </button>
                   </div>
-                  <div className="">
+                  <div className="text-center" style={{ fontSize: "11px" }}>
+                    <div className="">
                     <p>
                       With Highlights, your profile and contents will be
                       prominently displayed at the top of the lists for the
                       duration of the plan you purchased.
                     </p>
+                  </div>
                   </div>
                 </div>
               </div>

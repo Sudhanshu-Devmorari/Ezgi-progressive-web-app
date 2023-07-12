@@ -13,6 +13,7 @@ import HighlightMainPage from "../HighlightMainPage/HighlightMainPage";
 import EditorsPage from "../EditorsPage/EditorsPage";
 import CommentsPage from "../CommentsPage/CommentsPage";
 import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
+import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCommentsPage";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -42,33 +43,46 @@ const MainPage = () => {
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
         <NavBar />
-        {user !== "commentator" && (
+        {user !== "abccommentator" && (
           <>
-          {(selectContent === "home" ||
-            selectContent === "editor" ||
-            selectContent === "comments") && (
-            <>
-              <Banner />
-              <EditorBanner />
-            </>
-          )}
+            {(selectContent === "home" ||
+              selectContent === "editor" ||
+              selectContent === "comments") && (
+              <>
+                <Banner />
+                <EditorBanner />
+              </>
+            )}
 
-          {selectContent === "home" && (
-            <>
-              <SelectContent
-                selectContent={selectPublicorForYou}
-                setSelectContent={setSelectPublicorForYou}
+            {selectContent === "home" && (
+              <>
+                <SelectContent
+                  selectContent={selectPublicorForYou}
+                  setSelectContent={setSelectPublicorForYou}
+                />
+                <ContentSection
+                  selectContent={selectPublicorForYou}
+                  setSelectContent={setSelectContent}
+                />
+                <HighlightMainPage />
+                <SharedProfile />
+                <AdvertisementBanner />
+              </>
+            )}
+
+            {selectContent === "editor" && <EditorsPage />}
+            {selectContent === "comments" && <CommentsPage />}
+            {selectContent === "active-comments" && (
+              <EditorProfileActiveComments
+                setSelectContent={setSelectContent}
               />
-              <ContentSection selectContent={selectPublicorForYou} setSelectContent={setSelectContent}/>
-              <HighlightMainPage />
-              <SharedProfile />
-              <AdvertisementBanner />
-            </>
-          )}
+            )}
+          </>
+        )}
 
-          {selectContent === "editor" && <EditorsPage />}
-          {selectContent === "comments" && <CommentsPage />}
-          {selectContent === "active-comments" && <EditorProfileActiveComments setSelectContent={setSelectContent}/>}
+        {user === "abccommentator" && (
+          <>
+            <CommentatorsCommentsPage user={user} />
           </>
         )}
       </div>

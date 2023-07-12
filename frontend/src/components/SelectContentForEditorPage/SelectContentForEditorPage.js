@@ -1,11 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import publicIcon from "../../assets/publicIcon.svg";
 import CurrentTheme from "../../context/CurrentTheme";
-import { CiSearch } from "react-icons/ci";
 import "./SelectContentForEditorPage.css";
+import { CommentFilter } from "../CommentFilter/CommentFilter";
+import world_check from "../../assets/world-check.svg";
 
 const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [FilterModalShow, setFilterModalShow] = useState(false);
   return (
     <>
       <div
@@ -29,6 +31,7 @@ const SelectContentForEditorPage = (props) => {
 
         <div className={`${props.editor && "ms-auto"} p-2`}>
           <button
+          onClick={()=>setFilterModalShow(true)}
             className="px-2 py-1"
             style={{
               border:
@@ -66,6 +69,11 @@ const SelectContentForEditorPage = (props) => {
           </div>
         )}
       </div>
+
+      {/* <CommentFilter
+        show={FilterModalShow}
+        onHide={() => setFilterModalShow(false)}
+      /> */}
     </>
   );
 };

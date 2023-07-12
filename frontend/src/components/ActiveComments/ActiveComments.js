@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
@@ -11,10 +11,16 @@ import basketball from "../../assets/basketball.png";
 import football from "../../assets/football.png";
 import icon from "../../assets/₺.svg";
 import icon_1 from "../../assets/₺ (1).svg";
-import "./ActiveComments.css"
+import "./ActiveComments.css";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import PromoteMeModal from "../PromoteMeModal/PromoteMeModal";
+import AddCommentModal from "../AddCommentModal/AddCommentModal";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
+  const [PromoteModalShow, setPromoteModalShow] = useState(false);
+  const [AddCommentModalModalShow, setAddCommentModalModalShow] = useState(false);
   return (
     <>
       <div
@@ -27,7 +33,12 @@ const ActiveComments = (props) => {
             onClick={() => props.setSelectContent("home")}
             fontSize={"1.6rem"}
           />
-          <img src={`${currentTheme === "dark" ? starDark : starIcon}`} alt="" height={25} width={25} />
+          <img
+            src={`${currentTheme === "dark" ? starDark : starIcon}`}
+            alt=""
+            height={25}
+            width={25}
+          />
         </div>
         <div className="row">
           <div className="col pe-0 d-flex position-relative">
@@ -71,10 +82,20 @@ const ActiveComments = (props) => {
                   height={19}
                 />
               </div>
-              <div style={{ fontSize: "12px", color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                }}
+              >
                 Ankara/Turkiye
               </div>
-              <div style={{ fontSize: "12px", color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                }}
+              >
                 22.05.2022
               </div>
             </div>
@@ -83,21 +104,36 @@ const ActiveComments = (props) => {
             <div className="d-flex justify-content-end gap-2">
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                  }}
+                >
                   Abone
                 </span>
               </div>
 
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                  }}
+                >
                   Takipci
                 </span>
               </div>
 
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                  }}
+                >
                   Yorum
                 </span>
               </div>
@@ -216,28 +252,81 @@ const ActiveComments = (props) => {
           <div className="py-1">Leagues</div>
           <div className="py-1">UK Premier League + 3</div>
         </div>
-        <div className="d-flex justify-content-center align-items-center my-3">
-          Month/29.90{" "}
-          <LiaLiraSignSolid
-            fontSize={"1.2rem"}
-            color={`${currentTheme === "dark" ? "E6E6E6" : "#0D2A53"}`}
-            style={{marginBottom:"4px"}}
-          />
-          <button
-            className="ms-1 px-3 py-1"
-            style={{
-              border:
-                currentTheme === "dark"
-                  ? "1px solid #37FF80"
-                  : "1px solid #00659D",
-              color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-              backgroundColor: "transparent",
-            }}
-          >
-            Subscribe
-          </button>
-        </div>
+        {props.user !== "commentator" && (
+          <div className="d-flex justify-content-center align-items-center my-3">
+            Month/29.90{" "}
+            <LiaLiraSignSolid
+              fontSize={"1.2rem"}
+              color={`${currentTheme === "dark" ? "E6E6E6" : "#0D2A53"}`}
+              style={{ marginBottom: "4px" }}
+            />
+            <button
+              onClick={() => setSubscribeModalShow(true)}
+              className="ms-1 px-3 py-1"
+              style={{
+                border:
+                  currentTheme === "dark"
+                    ? "1px solid #37FF80"
+                    : "1px solid #00659D",
+                color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                backgroundColor: "transparent",
+                borderRadius: "3px",
+              }}
+            >
+              Subscribe
+            </button>
+          </div>
+        )}
+        {props.user === "commentator" && (
+          <div className="d-flex justify-content-center my-3 gap-2">
+            <button
+            onClick={() => setAddCommentModalModalShow(true)}
+              className="p-1 px-2"
+              style={{
+                color: currentTheme === "dark" ? "#4DD5FF" : "#00659D",
+                border:
+                  currentTheme === "dark"
+                    ? "1px solid #4DD5FF"
+                    : "1px solid #00659D",
+                backgroundColor: "transparent",
+                borderRadius: "4px",
+                fontSize: "15px",
+              }}
+            >
+              Add Comment
+            </button>
+            <button
+            onClick={() => setPromoteModalShow(true)}
+              className="p-1 px-2"
+              style={{
+                color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
+                border:
+                  currentTheme === "dark"
+                    ? "1px solid #6BFFC4"
+                    : "1px solid #C66EF8",
+                backgroundColor: "transparent",
+                borderRadius: "4px",
+                fontSize: "14px",
+              }}
+            >
+              Promote Me
+            </button>
+          </div>
+        )}
       </div>
+
+      <SubscribeModal
+        show={SubscribeModalShow}
+        onHide={() => setSubscribeModalShow(false)}
+      />
+      <PromoteMeModal
+        show={PromoteModalShow}
+        onHide={() => setPromoteModalShow(false)}
+      />
+      <AddCommentModal
+        show={AddCommentModalModalShow}
+        onHide={() => setAddCommentModalModalShow(false)}
+      />
     </>
   );
 };

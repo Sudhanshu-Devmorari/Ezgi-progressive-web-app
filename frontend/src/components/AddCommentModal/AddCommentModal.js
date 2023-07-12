@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { CommentFilter } from "../CommentFilter/CommentFilter";
 import Modal from "react-bootstrap/Modal";
 import { RxCross2 } from "react-icons/rx";
 import "./AddCommentModal.css";
 import Form from "react-bootstrap/Form";
-import { currentTheme } from "../GetCurrentTheme";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
+import CurrentTheme from "../../context/CurrentTheme";
+import CheckBoxDark from "../../assets/CheckBoxDark.svg";
+import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
 
 const AddCommentModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const matchDetailsOptions = [
     "Match Details 1",
     "Match Details 2",
@@ -61,87 +64,98 @@ const AddCommentModal = (props) => {
         scrollable
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "dark-mode" : "ligh-mode"}`}
         >
-          <div>
-            <div className="">
-              <span className="mb-2">
-                <RxCross2
-                  onClick={() => {
-                    props.onHide();
-                  }}
-                  fontSize={"1.8rem"}
-                  className={`${
-                    currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
-                  }`}
-                />
-              </span>
-            </div>
-            <CommentFilter />
-            <div className="my-3">
+          <div className="">
+            <span className="mb-2">
+              <RxCross2
+                onClick={() => {
+                  props.onHide();
+                }}
+                fontSize={"1.8rem"}
+                className={`${
+                  currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
+                }`}
+              />
+            </span>
+          </div>
+          <CommentFilter />
+          <div className="my-3 position-relative" style={{fontSize:"14px"}}>
+            <CustomDropdown
+              label="Match Details"
+              options={matchDetailsOptions}
+              selectedOption={selectedMatchDetails}
+              onSelectOption={handleMatchDetailsSelection}
+              isOpen={matchDetailsDropdown}
+              toggleDropdown={toggleMatchDetailsDropdown}
+            />
+          </div>
+          <div className="row g-0 my-3 gap-3 position-relative" style={{fontSize:"14px"}}>
+            <div className="col">
               <CustomDropdown
-                label="Match Details"
-                options={matchDetailsOptions}
-                selectedOption={selectedMatchDetails}
-                onSelectOption={handleMatchDetailsSelection}
-                isOpen={matchDetailsDropdown}
-                toggleDropdown={toggleMatchDetailsDropdown}
+                label="Prediction Type"
+                options={predictionTypeOptions}
+                selectedOption={selectedPredictionType}
+                onSelectOption={handlePredictionTypeSelection}
+                isOpen={predictionTypeDropdown}
+                toggleDropdown={togglePredictionTypeDropdown}
               />
             </div>
-            <div className="row my-3">
-              <div className="col">
-                <CustomDropdown
-                  label="Prediction Type"
-                  options={predictionTypeOptions}
-                  selectedOption={selectedPredictionType}
-                  onSelectOption={handlePredictionTypeSelection}
-                  isOpen={predictionTypeDropdown}
-                  toggleDropdown={togglePredictionTypeDropdown}
-                />
-              </div>
-              <div className="col">
-                <CustomDropdown
-                  label="Prediction"
-                  options={predictionOptions}
-                  selectedOption={selectedPrediction}
-                  onSelectOption={handlePredictionSelection}
-                  isOpen={predictionDropdown}
-                  toggleDropdown={togglePredictionDropdown}
-                />
-              </div>
-            </div>
-            <div className="">
-              {/* <Form.Check
-                type="switch"
-                id="custom-switch"
-                label="Public Content"
-              /> */}
-              <div class="form-check form-switch">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  role="switch"
-                  id="flexSwitchCheckDefault"
-                />
-                <label class="form-check-label" for="flexSwitchCheckDefault">
-                  Public Content
-                </label>
-              </div>
-            </div>
-            <div className="">
-                <div style={{fontWeight:"600"}}>
-                    Comment 
-                <small style={{color:"#FF5757"}}> ( If illegal content is detected, the membership will be terminated. )</small>
-                </div>
-              <Form.Control
-                as="textarea"
-                maxLength={250}
-                className={`${currentTheme === "dark" ? "textArea-dark-mode" : "textArea-light-mode"}`}
+            <div className="col">
+              <CustomDropdown
+                label="Prediction"
+                options={predictionOptions}
+                selectedOption={selectedPrediction}
+                onSelectOption={handlePredictionSelection}
+                isOpen={predictionDropdown}
+                toggleDropdown={togglePredictionDropdown}
               />
-              <small>Max. 250 character</small>
             </div>
-            <div className="text-center">
-              <div className="my-3">
+          </div>
+          <div className="">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckDefault"
+              />
+              <label class="form-check-label" for="flexSwitchCheckDefault">
+                Public Content
+              </label>
+            </div>
+          </div>
+          <div className="">
+            <span style={{fontSize:"14px"}}>
+              Comment
+              <span style={{ color: "#FF5757",fontSize:"10px" }}>
+                {" "}
+                ( If illegal content is detected, the membership will be
+                terminated. )
+              </span>
+            </span>
+            <Form.Control
+              as="textarea"
+              maxLength={250}
+              className={`${
+                currentTheme === "dark"
+                  ? "textArea-dark-mode"
+                  : "textArea-light-mode"
+              }`}
+            />
+            <span style={{fontSize:"10px"}}>Max. 250 character</span>
+          </div>
+          <div className="text-center">
+            <div className="my-3" style={{ fontSize: "13px" }}>
+              {currentTheme === "dark" ? (
+                <img
+                  alt=""
+                  src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
+                  style={{ width: "25px", cursor: "pointer" }}
+                  className="me-2"
+                  onClick={() => setSelectCheckBox(!selectCheckBox)}
+                />
+              ) : (
                 <img
                   src={!selectCheckBox ? CheckBoxLight : CheckBoxSelectLight}
                   style={{ width: "25px", cursor: "pointer" }}
@@ -149,27 +163,31 @@ const AddCommentModal = (props) => {
                   onClick={() => setSelectCheckBox(!selectCheckBox)}
                   alt=""
                 />
-                I have read and agree to the{" "}
-                <span
-                  style={{
-                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                  }}
-                >
-                  Terms of use
-                </span>
-              </div>
-              <div className="d-flex justify-content-center my-3">
-                <button
-                  className={`${
-                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                  } px-3 py-1`}
-                >
-                  Publish
-                </button>
-              </div>
-              <div className="my-3">
-                "The published predictions can be edited withis 5 minutes."
-              </div>
+              )}
+              I have read and agree to the{" "}
+              <span
+                style={{
+                  color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                }}
+                onClick={() => {
+                  props.setShowModal(3);
+                }}
+              >
+                Terms of use
+              </span>
+            </div>
+            <div className="d-flex justify-content-center my-3">
+              <button
+                style={{ fontSize: "14px" }}
+                className={`${
+                  currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                } px-3 py-1`}
+              >
+                Publish
+              </button>
+            </div>
+            <div className="my-3" style={{ fontSize: "12px" }}>
+              "The published predictions can be edited withis 5 minutes."
             </div>
           </div>
         </Modal.Body>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 export const CommentFilter = () => {
-
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Select");
 
@@ -23,27 +22,15 @@ export const CommentFilter = () => {
     "UK",
   ];
 
-  const categoryOptions = [
-    'Category 1',
-    'Category 2',
-    'Category 3',
-  ];
-  const dateOptions = [
-    'Date 1',
-    'Date 2',
-    'Date 3',
-  ];
-  const leagueOptions = [
-    'League 1',
-    'League 2',
-    'League 3',
-  ];
+  const categoryOptions = ["Category 1", "Category 2", "Category 3"];
+  const dateOptions = ["Date 1", "Date 2", "Date 3"];
+  const leagueOptions = ["League 1", "League 2", "League 3"];
 
-  const [selectedCategory, setSelectedCategory] = useState('Select');
+  const [selectedCategory, setSelectedCategory] = useState("Select");
   const [categoryDropdown, setCategoryDropdown] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('Select');
+  const [selectedDate, setSelectedDate] = useState("Select");
   const [dateDropdown, setDateDropdown] = useState(false);
-  const [selectedLeague, setSelectedLeague] = useState('Select');
+  const [selectedLeague, setSelectedLeague] = useState("Select");
   const [leagueDropdown, setLeagueDropdown] = useState(false);
 
   const handleCategorySelection = (category) => {
@@ -67,15 +54,10 @@ export const CommentFilter = () => {
     setLeagueDropdown(!leagueDropdown);
   };
 
-  
   return (
     <>
-      <div className="row my-3">
+      <div className="row g-0 my-3 gap-3 position-relative" style={{fontSize:"15px"}}>
         <div className="col">
-
-          {/* Category DROPDOWN */}
-          <div className="">
-
           <CustomDropdown
             label="Category"
             options={categoryOptions}
@@ -84,24 +66,17 @@ export const CommentFilter = () => {
             isOpen={categoryDropdown}
             toggleDropdown={toggleCategoryDropdown}
           />
-          </div>
-          {/* End Category DROPDOWN */}
         </div>
         <div className="col">
-          {/* Country DROPDOWN */}
-          <div className="">
-            <CustomDropdown
-              label="Country"
-              options={countryOptions}
-              selectedOption={selectedCountry}
-              onSelectOption={handleCountrySelection}
-              isOpen={countryDropDown}
-              toggleDropdown={toggleCountryDropdown}
-            />
-          </div>
-          {/* End Country DROPDOWN */}
+          <CustomDropdown
+            label="Country"
+            options={countryOptions}
+            selectedOption={selectedCountry}
+            onSelectOption={handleCountrySelection}
+            isOpen={countryDropDown}
+            toggleDropdown={toggleCountryDropdown}
+          />
         </div>
-        {/* League DROPDOWN */}
       </div>
       <div className="row my-3">
         <div className="col">
@@ -114,20 +89,15 @@ export const CommentFilter = () => {
             toggleDropdown={toggleLeagueDropdown}
           />
         </div>
-        {/* End League DROPDOWN */}
         <div className="col">
-          {/* Date DropDown */}
-          <div className="">
-            <CustomDropdown
-              label="Date"
-              options={dateOptions}
-              selectedOption={selectedDate}
-              onSelectOption={handleDateSelection}
-              isOpen={dateDropdown}
-              toggleDropdown={toggleDateDropdown}
-            />
-          </div>
-          {/* End date Dropdown*/}
+          <CustomDropdown
+            label="Date"
+            options={dateOptions}
+            selectedOption={selectedDate}
+            onSelectOption={handleDateSelection}
+            isOpen={dateDropdown}
+            toggleDropdown={toggleDateDropdown}
+          />
         </div>
       </div>
     </>

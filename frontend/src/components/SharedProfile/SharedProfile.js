@@ -117,6 +117,7 @@ const SharedProfile = () => {
                         : "1px solid #00659D",
                     color: currentTheme === "dark" ? "#37FF80" : "#00659D",
                     backgroundColor: "transparent",
+                    borderRadius:"3px"
                   }}
                 >
                   Subscribe
