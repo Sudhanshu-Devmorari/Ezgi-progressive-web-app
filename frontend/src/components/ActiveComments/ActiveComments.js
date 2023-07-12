@@ -70,10 +70,10 @@ const ActiveComments = (props) => {
                   height={19}
                 />
               </div>
-              <div className="text-secondary" style={{ fontSize: "12px" }}>
+              <div style={{ fontSize: "12px", color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
                 Ankara/Turkiye
               </div>
-              <div className="text-secondary" style={{ fontSize: "12px" }}>
+              <div style={{ fontSize: "12px", color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
                 22.05.2022
               </div>
             </div>
@@ -82,21 +82,21 @@ const ActiveComments = (props) => {
             <div className="d-flex justify-content-end gap-2">
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span className="text-secondary" style={{ fontSize: "12px" }}>
+                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
                   Abone
                 </span>
               </div>
 
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span className="text-secondary" style={{ fontSize: "12px" }}>
+                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
                   Takipci
                 </span>
               </div>
 
               <div className="flex-column d-flex ">
                 <span style={{ fontSize: "1.2rem" }}>256</span>
-                <span className="text-secondary" style={{ fontSize: "12px" }}>
+                <span style={{ fontSize: "12px",color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}>
                   Yorum
                 </span>
               </div>
@@ -220,6 +220,7 @@ const ActiveComments = (props) => {
           <LiaLiraSignSolid
             fontSize={"1.2rem"}
             color={`${currentTheme === "dark" ? "E6E6E6" : "#0D2A53"}`}
+            style={{marginBottom:"4px"}}
           />
           <button
             className="ms-1 px-3 py-1"

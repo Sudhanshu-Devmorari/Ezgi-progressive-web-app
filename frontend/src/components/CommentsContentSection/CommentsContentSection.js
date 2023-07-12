@@ -45,7 +45,13 @@ const CommentsContentSection = (props) => {
             </div>
           </div>
           <div className="col p-0">
-            <div className="row gap-1 g-0 text-center mt-5">
+            {props.SelectComment === "resolvedComments" && (
+              <div className="d-flex justify-content-end pe-2">
+                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={publicIcon} alt="" height={35} width={35}/>
+              </div>
+            )}
+            <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
               <div className="col">
                 <div className="rate-fonts">Success Rate</div>
                 <div
@@ -94,12 +100,8 @@ const CommentsContentSection = (props) => {
                 />
                 <span className="ps-1">Super Lig</span>
               </span>
-              <span className="pe-2">07.05.2023</span>
+              <span style={{paddingRight: props.SelectComment === "activeComments" ? "83px" : "83px"}}>07.05.2023</span>
               <span>
-                <img src={publicIcon} alt="" height={35} width={35} />
-                {props.SelectComment === "resolvedComments" && (
-                  <img src={publicIcon} alt="" height={35} width={35} />
-                )}
               </span>
             </div>
             <div className="d-flex justify-content-center align-items-center">
@@ -128,7 +130,7 @@ const CommentsContentSection = (props) => {
             </div>
             <div className="text-end mt-3 mb-2">
               <span
-                className="p-2"
+                className="p-1"
                 style={{
                   backgroundColor:
                     props.SelectComment === "resolvedComments"
@@ -201,7 +203,13 @@ const CommentsContentSection = (props) => {
             </div>
           </div>
           <div className="col p-0">
-            <div className="row gap-1 g-0 text-center mt-5">
+          {props.SelectComment === "resolvedComments" && (
+              <div className="d-flex justify-content-end pe-2">
+                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={publicIcon} alt="" height={35} width={35}/>
+              </div>
+            )}
+            <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
               <div className="col">
                 <div className="rate-fonts">Success Rate</div>
                 <div
@@ -250,12 +258,8 @@ const CommentsContentSection = (props) => {
                 />
                 <span className="ps-1">Super Lig</span>
               </span>
-              <span className="pe-2">07.05.2023</span>
+              <span style={{paddingRight: props.SelectComment === "activeComments" ? "83px" : "83px"}}>07.05.2023</span>
               <span>
-                <img src={publicIcon} alt="" height={35} width={35} />
-                {props.SelectComment === "resolvedComments" && (
-                  <img src={publicIcon} alt="" height={35} width={35} />
-                )}
               </span>
             </div>
             <div className="d-flex justify-content-center align-items-center">
@@ -279,7 +283,7 @@ const CommentsContentSection = (props) => {
             <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
               <span className="ps-1" style={{color: "#FF3030", fontSize:"12px"}}>The match has been stopped</span>
               <span
-                className="p-2"
+                className="p-1"
                 style={{
                   backgroundColor:
                     props.SelectComment === "resolvedComments"
@@ -350,7 +354,13 @@ const CommentsContentSection = (props) => {
             </div>
           </div>
           <div className="col p-0">
-            <div className="row gap-1 g-0 text-center mt-5">
+          {props.SelectComment === "resolvedComments" && (
+              <div className="d-flex justify-content-end pe-2">
+                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={publicIcon} alt="" height={35} width={35}/>
+              </div>
+            )}
+            <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
               <div className="col">
                 <div className="rate-fonts">Success Rate</div>
                 <div
@@ -399,12 +409,8 @@ const CommentsContentSection = (props) => {
                 />
                 <span className="ps-1">Super Lig</span>
               </span>
-              <span className="pe-2">07.05.2023</span>
+              <span style={{paddingRight: props.SelectComment === "activeComments" ? "83px" : "83px"}}>07.05.2023</span>
               <span>
-                <img src={publicIcon} alt="" height={35} width={35} />
-                {props.SelectComment === "resolvedComments" && (
-                  <img src={publicIcon} alt="" height={35} width={35} />
-                )}
               </span>
             </div>
             <div className="d-flex justify-content-center align-items-center">
@@ -577,7 +583,7 @@ const CommentsContentSection = (props) => {
             </div>
             <div className="text-end mt-3 mb-2">
               <span
-                className="p-2"
+                className="p-1"
                 style={{
                   backgroundColor:
                     props.SelectComment === "resolvedComments"

@@ -21,7 +21,7 @@ const SharedProfile = () => {
         }`}
       >
         <div className="text-end mt-1">
-          <span className="pe-3">
+          <span className="pe-3 shared-font">
             <span
               className="pe-2"
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
@@ -34,12 +34,12 @@ const SharedProfile = () => {
             className=""
             src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
             alt=""
-            height={24}
-            width={24}
+            height={22}
+            width={22}
           />
         </div>
         <div className="row">
-          <div className="col d-flex position-relative">
+            <div className="col pe-0 d-flex position-relative">
             <div className="position-absolute">
               <img
                 src={crown}
@@ -64,14 +64,21 @@ const SharedProfile = () => {
                     color: "#FFA200",
                     backgroundColor: "transparent",
                     borderRadius: "18px",
+                    fontSize: "13px",
                   }}
                 >
                   Expert
                 </button>
               </div>
-              <div className="blueTick-responsive align-items-center">
-                melihaskar
-                <img src={blueTick} alt="" width={16} height={16} />
+              <div className="blueTick-responsive align-items-center mt-1 responsive-username">
+                melih1905
+                <img
+                  className="responsive-blue-tick"
+                  src={blueTick}
+                  alt=""
+                  width={16}
+                  height={16}
+                />
               </div>
               <div
                 style={{
@@ -84,48 +91,49 @@ const SharedProfile = () => {
             </div>
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
-            <div className="mt-2">
+            <div className="mt-1">
               <img
                 src={football}
                 alt=""
-                height={50}
-                width={50}
+                height={43}
+                width={43}
                 style={{ color: "#00C936" }}
               />
               <img
                 src={basketball}
                 alt=""
-                height={50}
-                width={50}
+                height={43}
+                width={43}
                 style={{ color: "#FF9100" }}
               />
             </div>
-            <div className="mt-1">
-              <button
-                className="my-2 px-2 py-1"
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #37FF80"
-                      : "1px solid #00659D",
-                  color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                  backgroundColor: "transparent",
-                }}
-              >
-                Subscribe
-              </button>
+            <div className="" style={{fontSize:"12px"}}>
+               <button
+                  className="my-2 px-2 py-1"
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #37FF80"
+                        : "1px solid #00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  Subscribe
+                </button>
             </div>
           </div>
         </div>
       </div>
-      
+
+
       <div
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
       >
         <div className="text-end mt-1">
-          <span className="pe-3">
+          <span className="pe-3 shared-font">
             <span
               className="pe-2"
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
@@ -138,12 +146,12 @@ const SharedProfile = () => {
             className=""
             src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
             alt=""
-            height={24}
-            width={24}
+            height={22}
+            width={22}
           />
         </div>
         <div className="row">
-          <div className="col d-flex position-relative">
+            <div className="col pe-0 d-flex position-relative">
             <div className="position-absolute">
               <img
                 src={crown}
@@ -168,14 +176,21 @@ const SharedProfile = () => {
                     color: "#FFA200",
                     backgroundColor: "transparent",
                     borderRadius: "18px",
+                    fontSize: "13px",
                   }}
                 >
                   Expert
                 </button>
               </div>
-              <div className="blueTick-responsive align-items-center">
-                melihaskar
-                <img src={blueTick} alt="" width={16} height={16} />
+              <div className="blueTick-responsive align-items-center mt-1 responsive-username">
+                melih1905
+                <img
+                  className="responsive-blue-tick"
+                  src={blueTick}
+                  alt=""
+                  width={16}
+                  height={16}
+                />
               </div>
               <div
                 style={{
@@ -188,36 +203,36 @@ const SharedProfile = () => {
             </div>
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
-            <div className="mt-2">
+            <div className="mt-1">
               <img
                 src={football}
                 alt=""
-                height={50}
-                width={50}
+                height={43}
+                width={43}
                 style={{ color: "#00C936" }}
               />
               <img
                 src={basketball}
                 alt=""
-                height={50}
-                width={50}
+                height={43}
+                width={43}
                 style={{ color: "#FF9100" }}
               />
             </div>
-            <div className="mt-1">
-              <button
-                className="my-2 px-2 py-1"
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #37FF80"
-                      : "1px solid #00659D",
-                  color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                  backgroundColor: "transparent",
-                }}
-              >
-                Subscribe
-              </button>
+            <div className="" style={{fontSize:"12px"}}>
+               <button
+                  className="my-2 px-2 py-1"
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #37FF80"
+                        : "1px solid #00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  Subscribe
+                </button>
             </div>
           </div>
         </div>
