@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
-import starIcon from "../../assets/star.png";
+import starIcon from "../../assets/star-1.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import blueTick from "../../assets/blueTick.png";
 import { CiBasketball } from "react-icons/ci";
@@ -9,7 +9,7 @@ import { RiFootballLine } from "react-icons/ri";
 import "./SharedProfile.css";
 import football from "../../assets/football.png";
 import basketball from "../../assets/basketball.png";
-import startDarkIcon from "../../assets/startFooter.svg";
+import startDarkIcon from "../../assets/star.svg";
 
 const SharedProfile = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);

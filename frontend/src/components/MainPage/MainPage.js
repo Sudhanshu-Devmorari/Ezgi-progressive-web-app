@@ -34,6 +34,7 @@ const MainPage = () => {
     }
   }, [themeMode]);
 
+  const user = "commentator";
   return (
     <>
       <div
@@ -41,31 +42,35 @@ const MainPage = () => {
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
         <NavBar />
-        {(selectContent === "home" ||
-          selectContent === "editor" ||
-          selectContent === "comments") && (
+        {user !== "commentator" && (
           <>
-            <Banner />
-            <EditorBanner />
+          {(selectContent === "home" ||
+            selectContent === "editor" ||
+            selectContent === "comments") && (
+            <>
+              <Banner />
+              <EditorBanner />
+            </>
+          )}
+
+          {selectContent === "home" && (
+            <>
+              <SelectContent
+                selectContent={selectPublicorForYou}
+                setSelectContent={setSelectPublicorForYou}
+              />
+              <ContentSection selectContent={selectPublicorForYou} setSelectContent={setSelectContent}/>
+              <HighlightMainPage />
+              <SharedProfile />
+              <AdvertisementBanner />
+            </>
+          )}
+
+          {selectContent === "editor" && <EditorsPage />}
+          {selectContent === "comments" && <CommentsPage />}
+          {selectContent === "active-comments" && <EditorProfileActiveComments setSelectContent={setSelectContent}/>}
           </>
         )}
-
-        {selectContent === "home" && (
-          <>
-            <SelectContent
-              selectContent={selectPublicorForYou}
-              setSelectContent={setSelectPublicorForYou}
-            />
-            <ContentSection selectContent={selectPublicorForYou} setSelectContent={setSelectContent}/>
-            <HighlightMainPage />
-            <SharedProfile />
-            <AdvertisementBanner />
-          </>
-        )}
-
-        {selectContent === "editor" && <EditorsPage />}
-        {selectContent === "comments" && <CommentsPage />}
-        {selectContent === "active-comments" && <EditorProfileActiveComments setSelectContent={setSelectContent}/>}
       </div>
       <Footer
         setSelectContent={setSelectContent}

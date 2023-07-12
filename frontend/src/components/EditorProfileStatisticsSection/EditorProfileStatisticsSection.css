@@ -1,0 +1,12 @@
+.Flag-content-font{
+    font-size: 13px;
+}
+@media (min-width: 360px) and (max-width: 401px){
+    .Flag-content-font{
+        font-size: 11px;
+    }
+    .flag-responsive{
+        height: 22px;
+        width: 22px;
+    }
+}

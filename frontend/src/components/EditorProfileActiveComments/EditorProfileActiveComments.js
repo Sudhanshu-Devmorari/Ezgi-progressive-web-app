@@ -3,6 +3,7 @@ import ActiveComments from "../ActiveComments/ActiveComments";
 import SelectComments from "../SelectComments/SelectComments";
 import ContentSection from "../ContentSection/ContentSection";
 import CommentsContentSection from "../CommentsContentSection/CommentsContentSection";
+import EditorProfileStatisticsSection from "../EditorProfileStatisticsSection/EditorProfileStatisticsSection";
 
 
 const EditorProfileActiveComments = (props) => {
@@ -12,7 +13,12 @@ const EditorProfileActiveComments = (props) => {
     <>
     <ActiveComments setSelectContent={props.setSelectContent}/>
     <SelectComments setSelectComment={setSelectComment} SelectComment={SelectComment}/>
-    <CommentsContentSection SelectComment={SelectComment}/>
+    {SelectComment !== "statistics" && (
+      <CommentsContentSection SelectComment={SelectComment}/>
+    )}
+    {SelectComment === "statistics" && (
+      <EditorProfileStatisticsSection/>
+    )}
     </>
   );
 };

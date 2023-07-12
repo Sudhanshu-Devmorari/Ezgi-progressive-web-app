@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="75.205" height="75.205" viewBox="0 0 75.205 75.205">
+  <g id="bell-ringing" transform="translate(0 0)">
+    <path id="Path_102" data-name="Path 102" d="M0,0H75.2V75.2H0Z" transform="translate(0 0)" fill="none"/>
+    <path id="Path_103" data-name="Path 103" d="M22.717,9.323a6.239,6.239,0,1,1,12.478,0,22.14,22.14,0,0,1,12.478,18.97v9.485a12.654,12.654,0,0,0,6.239,9.485H4a12.654,12.654,0,0,0,6.239-9.485V28.293A22.14,22.14,0,0,1,22.717,9.323" transform="translate(8.647 6.485)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_104" data-name="Path 104" d="M9,17v3.162a9.485,9.485,0,0,0,18.97,0V17" transform="translate(19.115 36.749)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_105" data-name="Path 105" d="M27.04,14.784A34.937,34.937,0,0,0,18.206,3" transform="translate(38.68 6.485)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_106" data-name="Path 106" d="M3,14.784A34.937,34.937,0,0,1,11.827,3" transform="translate(6.485 6.485)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  </g>
+</svg>

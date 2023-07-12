@@ -3,7 +3,8 @@ import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import blueTick from "../../assets/blueTick.png";
-import starIcon from "../../assets/star.png";
+import starIcon from "../../assets/star-1.svg";
+import starDark from "../../assets/star.svg";
 import { BsArrowLeft } from "react-icons/bs";
 import { LiaLiraSignSolid } from "react-icons/lia";
 import basketball from "../../assets/basketball.png";
@@ -26,7 +27,7 @@ const ActiveComments = (props) => {
             onClick={() => props.setSelectContent("home")}
             fontSize={"1.6rem"}
           />
-          <img src={starIcon} alt="" height={25} width={25} />
+          <img src={`${currentTheme === "dark" ? starDark : starIcon}`} alt="" height={25} width={25} />
         </div>
         <div className="row">
           <div className="col pe-0 d-flex position-relative">

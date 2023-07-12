@@ -5,7 +5,7 @@ import ProfileIcon from "../../assets/ProfileIcon.svg";
 import SelectedProfileIcon from "../../assets/SelectedProfileIcon.svg";
 import BowIcon from "../../assets/BowIcon.svg";
 import SelectedBow from "../../assets/SelectedBow.svg";
-import startFooter from "../../assets/startFooter.svg";
+import startFooter from "../../assets/star.svg";
 import selectedStarFooter from "../../assets/selectedStarFooter.svg";
 
 export const Footer = (props) => {

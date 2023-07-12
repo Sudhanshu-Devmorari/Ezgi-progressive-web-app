@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import publicIcon from "../../assets/publicIcon.svg";
+import world_check from "../../assets/world-check.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import "./SelectContent.css";
 
@@ -39,11 +40,11 @@ export const SelectContent = (props) => {
         <div className={`${userPhone ? "text-end ms-auto py-1 px-2" : "ms-auto py-1 px-2"}`}>
           <div className="d-flex align-items-center">
             <img
-              src={publicIcon}
+              src={`${currentTheme === "dark" ? world_check : publicIcon}`}
               alt=""
               style={{ color: "#007BF6" }}
-              height={43}
-              width={43}
+              height={35}
+              width={35}
             />
             <span className="pe-2">Only Public</span>
             <div
@@ -53,8 +54,8 @@ export const SelectContent = (props) => {
                     ? "2px solid #4DD5FF"
                     : "2px solid #007BF6",
                 borderRadius: "50%",
-                width: "2.2rem",
-                height: "2.1rem",
+                width: "1.9rem",
+                height: "1.9rem",
               }}
             ></div>
           </div>

@@ -4,11 +4,12 @@ import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import blueTick from "../../assets/blueTick.png";
 import likeIcon from "../../assets/like.png";
-import starIcon from "../../assets/star.png";
+import starIcon from "../../assets/star.svg";
 import likeIcondark from "../../assets/LikeDark.png";
 import starIcondark from "../../assets/StarDark.png";
 import clapIcon from "../../assets/clap.png";
 import publicIcon from "../../assets/publicIcon.svg";
+import world_check from "../../assets/world-check.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
 import lock from "../../assets/lock.svg";
 import darklock from "../../assets/darklock.svg";
@@ -363,7 +364,7 @@ const ContentSection = (props) => {
               </span>
               <span style={{paddingRight:"85px"}}>07.05.2023</span>
               <span>{userPhone === null ? null : (
-                  <img src={publicIcon} alt="" height={40} width={40} />
+                  <img src={`${currentTheme === "dark" ? world_check : publicIcon}`} alt="" height={35} width={35} />
                 )}</span>
             </div>
             <div className="d-flex justify-content-center align-items-center">

@@ -4,14 +4,18 @@ import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import blueTick from "../../assets/blueTick.png";
 import likeIcon from "../../assets/like.png";
-import starIcon from "../../assets/star.png";
+import starIcon from "../../assets/star-1.svg";
 import likeIcondark from "../../assets/LikeDark.png";
-import starIcondark from "../../assets/StarDark.png";
+import starIcondark from "../../assets/star.svg";
 import clapIcon from "../../assets/clap.png";
 import publicIcon from "../../assets/publicIcon.svg";
+import publicDark from "../../assets/world-check.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
 import lock from "../../assets/lock.svg";
 import darklock from "../../assets/darklock.svg";
+import circle_check from "../../assets/circle-check.svg";
+import clock_pause from "../../assets/clock-pause.svg";
+import circle_x from "../../assets/circle-x.svg";
 import { Link } from "react-router-dom";
 import "./CommentsContentSection.css";
 
@@ -47,8 +51,9 @@ const CommentsContentSection = (props) => {
           <div className="col p-0">
             {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
-                <img src={publicIcon} alt="" height={35} width={35}/>
-                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={`${currentTheme === "dark" ? publicDark : publicIcon}`} alt="" height={31} width={31}/>
+                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
+                <img src={circle_check} alt="" height={31} width={31}/>
               </div>
             )}
             <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
@@ -159,8 +164,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={25}
+                  width={25}
                 />{" "}
                 258
               </div>
@@ -205,8 +210,9 @@ const CommentsContentSection = (props) => {
           <div className="col p-0">
           {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
-                <img src={publicIcon} alt="" height={35} width={35}/>
-                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={`${currentTheme === "dark" ? publicDark : publicIcon}`} alt="" height={31} width={31}/>
+                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
+                <img src={clock_pause} alt="" height={31} width={31}/>
               </div>
             )}
             <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
@@ -312,8 +318,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={25}
+                  width={25}
                 />{" "}
                 258
               </div>
@@ -356,8 +362,8 @@ const CommentsContentSection = (props) => {
           <div className="col p-0">
           {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
-                <img src={publicIcon} alt="" height={35} width={35}/>
-                <img src={publicIcon} alt="" height={35} width={35}/>
+                <img src={circle_x} alt="" height={31} width={31}/>
+                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
               </div>
             )}
             <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
