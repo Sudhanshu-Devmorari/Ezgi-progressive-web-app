@@ -43,7 +43,7 @@ const MainPage = () => {
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
         <NavBar />
-        {user !== "abccommentator" && (
+        {user !== "commentator" && (
           <>
             {(selectContent === "home" ||
               selectContent === "editor" ||
@@ -80,7 +80,7 @@ const MainPage = () => {
           </>
         )}
 
-        {user === "abccommentator" && (
+        {user === "commentator" && (
           <>
             <CommentatorsCommentsPage user={user} />
           </>

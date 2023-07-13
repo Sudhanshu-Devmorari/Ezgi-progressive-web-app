@@ -75,9 +75,9 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             {props.selectContent === "Star" ? (
-              <img src={selectedStarFooter} alt="" height={49} width={49} />
+              <img src={selectedStarFooter} alt="" height={40} width={40} />
             ) : (
-              <img src={startFooter} alt="" height={49} width={49} />
+              <img src={startFooter} alt="" height={40} width={40} />
             )}
           </div>
         </div>

@@ -52,7 +52,6 @@ const CommentsContentSection = (props) => {
             {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
                 <img src={`${currentTheme === "dark" ? publicDark : publicIcon}`} alt="" height={31} width={31}/>
-                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
                 <img src={circle_check} alt="" height={31} width={31}/>
               </div>
             )}
@@ -155,8 +154,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={19}
+                  width={19}
                 />{" "}
                 258
               </div>
@@ -164,8 +163,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={25}
-                  width={25}
+                  height={22}
+                  width={22}
                 />{" "}
                 258
               </div>
@@ -211,7 +210,6 @@ const CommentsContentSection = (props) => {
           {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
                 <img src={`${currentTheme === "dark" ? publicDark : publicIcon}`} alt="" height={31} width={31}/>
-                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
                 <img src={clock_pause} alt="" height={31} width={31}/>
               </div>
             )}
@@ -309,8 +307,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={19}
+                  width={19}
                 />{" "}
                 258
               </div>
@@ -318,8 +316,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={25}
-                  width={25}
+                  height={22}
+                  width={22}
                 />{" "}
                 258
               </div>
@@ -363,7 +361,6 @@ const CommentsContentSection = (props) => {
           {props.SelectComment === "resolvedComments" && (
               <div className="d-flex justify-content-end pe-2">
                 <img src={circle_x} alt="" height={31} width={31}/>
-                {/* <img src={publicIcon} alt="" height={35} width={35}/> */}
               </div>
             )}
             <div className={`${props.SelectComment === "activeComments" ? "mt-5" : "mt-3"} row gap-1 g-0 text-center`}>
@@ -456,8 +453,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={19}
+                  width={19}
                 />{" "}
                 258
               </div>
@@ -465,8 +462,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={22}
+                  width={22}
                 />{" "}
                 258
               </div>
@@ -610,8 +607,8 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={19}
+                  width={19}
                 />{" "}
                 258
               </div>
@@ -619,13 +616,13 @@ const CommentsContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={22}
+                  width={22}
                 />{" "}
                 258
               </div>
               <div>
-                <img src={clapIcon} alt="" height={20} width={20} /> 258
+                <img src={clapIcon} alt="" height={22} width={22} /> 258
               </div>
             </div>
             <div className="ms-auto" style={{ fontSize: "12px" }}>

@@ -10,3 +10,15 @@
         width: 22px;
     }
 }
+.green-block{
+    background-color: #37FF80;
+    height: 12px;
+    width: 17px;
+    margin-right: 1px;
+}
+.red-block{
+    background-color: #FF5757;
+    height: 12px;
+    width: 17px;
+    margin-right: 1px;
+}

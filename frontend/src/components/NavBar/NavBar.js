@@ -6,7 +6,7 @@ import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
-// import bell from "../../assets/bell-ringing-1.svg"
+import bell from "../../assets/bell-ringing-1.svg"
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);
@@ -51,8 +51,8 @@ const NavBar = (props) => {
               </span>
             )}
             <span className="pe-2 ps-0 py-2">
-              {/* <img src={bell} alt="" height={35} width={35}/> */}
-              <PiBellSimpleRingingLight fontSize={"2rem"} />
+              <img src={bell} alt="" height={35} width={35}/>
+              {/* <PiBellSimpleRingingLight fontSize={"2rem"} /> */}
             </span>
             {userPhone ? (
               <>

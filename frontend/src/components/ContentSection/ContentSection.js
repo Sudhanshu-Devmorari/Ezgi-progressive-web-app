@@ -4,7 +4,7 @@ import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import blueTick from "../../assets/blueTick.png";
 import likeIcon from "../../assets/like.png";
-import starIcon from "../../assets/star.svg";
+import starIcon from "../../assets/star-1.svg";
 import likeIcondark from "../../assets/LikeDark.png";
 import starIcondark from "../../assets/StarDark.png";
 import clapIcon from "../../assets/clap.png";
@@ -146,7 +146,7 @@ const ContentSection = (props) => {
                 />
                 <span className="ps-1">Super Lig</span>
               </span>
-              <span style={{paddingRight:"85px"}}>07.05.2023</span>
+              <span style={{paddingRight:"49px"}}>07.05.2023</span>
               <span>{userPhone === null ? null : (
                   <img src={`${currentTheme === "dark" ? world_check : publicIcon}`} alt="" height={35} width={35} />
                 )}</span>
@@ -207,8 +207,8 @@ const ContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={20}
-                  width={20}
+                  height={22}
+                  width={22}
                 />{" "}
                 258
               </div>
