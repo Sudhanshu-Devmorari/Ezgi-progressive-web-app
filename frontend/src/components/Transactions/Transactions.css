@@ -1,0 +1,22 @@
+.fonts-res{
+    font-size: 14px;
+}
+@media (min-width: 360px) and (max-width: 413px){
+    .fonts-res{
+        font-size: 12px;
+    }
+    .balance-font{
+        font-size: 12px!important;
+    }
+    .balance-font-cur{
+        height: 14px;
+        width: 14px;
+    }
+    .total-balance{
+        font-size:13px!important;
+    }
+    .total-balance-cur{
+        height: 20px;
+        width: 20px;
+    }
+}

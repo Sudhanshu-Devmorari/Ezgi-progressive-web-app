@@ -14,7 +14,7 @@ const CommentatorIcons = (props) => {
     <>
       <div className="row my-2 g-0 gap-1">
         <div
-          onClick={() => props.setHome("home")}
+          onClick={() => props.setContent("home")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -22,20 +22,21 @@ const CommentatorIcons = (props) => {
           <img src={bowIcon} alt="" height={40} width={40} />
         </div>
         <div
-          onClick={() => props.setHome("subscribers")}
+          onClick={() => props.setContent("subscribers")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
         >
+          {/* {props.content === "subscribers" } */}
           <img
-            src={currentTheme === "dark" ? user_check : bowIcon}
+            src={(currentTheme === "dark") ? user_check : bowIcon}
             alt=""
             height={40}
             width={40}
           />
         </div>
         <div
-          onClick={() => props.setHome("home")}
+          onClick={() => props.setContent("wallet")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -48,7 +49,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setHome("home")}
+          onClick={() => props.setContent("home")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -61,7 +62,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setHome("home")}
+          onClick={() => props.setContent("home")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -74,7 +75,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setHome("home")}
+          onClick={() => props.setContent("home")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}

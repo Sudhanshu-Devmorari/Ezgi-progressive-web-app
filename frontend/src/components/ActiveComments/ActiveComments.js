@@ -40,7 +40,7 @@ const ActiveComments = (props) => {
             width={25}
           />
         </div>
-        <div className="row">
+        <div className="row g-0">
           <div className="col pe-0 d-flex position-relative">
             <div className="position-absolute">
               <img
@@ -252,14 +252,9 @@ const ActiveComments = (props) => {
           <div className="py-1">Leagues</div>
           <div className="py-1">UK Premier League + 3</div>
         </div>
-        {props.user !== "commentator" && (
+        {props.user !== "c" && (
           <div className="d-flex justify-content-center align-items-center my-3">
-            Month/29.90{" "}
-            <LiaLiraSignSolid
-              fontSize={"1.2rem"}
-              color={`${currentTheme === "dark" ? "E6E6E6" : "#0D2A53"}`}
-              style={{ marginBottom: "4px" }}
-            />
+            Month/29.90₺
             <button
               onClick={() => setSubscribeModalShow(true)}
               className="ms-1 px-3 py-1"
@@ -277,7 +272,7 @@ const ActiveComments = (props) => {
             </button>
           </div>
         )}
-        {props.user === "commentator" && (
+        {props.user === "c" && (
           <div className="d-flex justify-content-center my-3 gap-2">
             <button
             onClick={() => setAddCommentModalModalShow(true)}

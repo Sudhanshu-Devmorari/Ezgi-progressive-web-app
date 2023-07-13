@@ -35,7 +35,7 @@ const MainPage = () => {
     }
   }, [themeMode]);
 
-  const user = "commentator";
+  const user = "c";
   return (
     <>
       <div
@@ -43,7 +43,7 @@ const MainPage = () => {
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
         <NavBar />
-        {user !== "commentator" && (
+        {user !== "c" && (
           <>
             {(selectContent === "home" ||
               selectContent === "editor" ||
@@ -80,7 +80,7 @@ const MainPage = () => {
           </>
         )}
 
-        {user === "commentator" && (
+        {user === "c" && (
           <>
             <CommentatorsCommentsPage user={user} />
           </>

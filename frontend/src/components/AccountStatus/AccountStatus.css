@@ -1,0 +1,8 @@
+.font-res{
+    font-size: 12px;
+}
+@media (min-width: 360px) and (max-width: 397px){
+    .font-res{
+        font-size: 10px;
+    }
+}

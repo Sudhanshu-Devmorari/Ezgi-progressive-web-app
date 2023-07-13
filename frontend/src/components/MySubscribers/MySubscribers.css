@@ -1,0 +1,8 @@
+.fonts{
+    font-size: 14px;
+}
+@media (min-width:360px) and (max-width:400px){
+    .fonts{
+        font-size: 11px;
+    }
+}
