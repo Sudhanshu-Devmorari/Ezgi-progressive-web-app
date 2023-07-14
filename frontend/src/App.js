@@ -9,11 +9,10 @@ function App() {
     <ContextProvider>
       <Routes>
         <Route path="/" element={ <MainPage /> }  />
-        <Route path="/activeComments" element={ <EditorProfileActiveComments /> }  />
       </Routes>
     </ContextProvider>
     </>
   );
 }
 
-export default App;
+export default App;<div>DashboardSU</div>

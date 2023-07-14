@@ -1,8 +1,31 @@
 .font-res{
+    font-size: 11px;
+}
+.font-res1{
     font-size: 12px;
 }
 @media (min-width: 360px) and (max-width: 397px){
     .font-res{
-        font-size: 10px;
+        font-size: 9px;
     }
+    .cicular-content-section{
+        font-size: 12px!important;
+    }
+}
+@media (min-width: 360px) and (max-width: 367px){
+    .font-respo{
+        font-size: 11px!important;
+    }
+    .fonts{
+        font-size: 13px!important;
+    }    
+}
+.number-font{
+    font-size: 13px;
+}
+.font-respo{
+    font-size: 13px;
+}
+.fonts{
+    font-size: 14px;
 }

@@ -52,11 +52,11 @@ const NavBar = (props) => {
             )}
             <span className="pe-2 ps-0 py-2">
               <img src={bell} alt="" height={35} width={35}/>
-              {/* <PiBellSimpleRingingLight fontSize={"2rem"} /> */}
             </span>
             {userPhone ? (
               <>
                 <span
+                onClick={()=>props.setDashboardSUser(true)}
                   className="py-2 px-3"
                   style={{
                     backgroundColor:

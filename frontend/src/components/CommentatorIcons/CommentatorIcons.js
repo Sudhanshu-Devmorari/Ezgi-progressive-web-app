@@ -12,7 +12,9 @@ const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>
-      <div className="row my-2 g-0 gap-1">
+      <div className={`row my-2 g-0 gap-1 ${props.user !== "commentator" && "mx-4"}`}>
+        {props.user === "commentator" && (
+          <>
         <div
           onClick={() => props.setContent("home")}
           className={`${
@@ -21,13 +23,14 @@ const CommentatorIcons = (props) => {
         >
           <img src={bowIcon} alt="" height={40} width={40} />
         </div>
+          </>
+        )}
         <div
           onClick={() => props.setContent("subscribers")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
         >
-          {/* {props.content === "subscribers" } */}
           <img
             src={(currentTheme === "dark") ? user_check : bowIcon}
             alt=""
@@ -49,7 +52,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("home")}
+          onClick={() => props.setContent("fav")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -62,7 +65,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("home")}
+          onClick={() => props.setContent("notifications")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -75,7 +78,7 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("home")}
+          onClick={() => props.setContent("support")}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}

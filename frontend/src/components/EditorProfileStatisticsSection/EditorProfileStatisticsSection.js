@@ -49,7 +49,7 @@ const EditorProfileStatisticsSection = () => {
                 styles={{ path: { stroke: "#4DD5FF" } }}
               />
             </div>
-            <div className="col" label="Stroke width">
+            <div className="col">
               <CircularProgressbar
                 strokeWidth={5}
                 value={62}

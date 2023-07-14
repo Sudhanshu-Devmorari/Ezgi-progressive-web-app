@@ -11,8 +11,15 @@ export const SubscribersSelection = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } d-flex my-2 px-2 py-3 gap-3`} style={{fontSize:"15px"}}
       >
+        {props.user === "commentator" && (
+          <>
         <div style={{color: props.subscribersOrSubscriptions === "My subscribers" ? "#D2DB08" : ""}} onClick={()=>props.setSubscribersOrSubscriptions("My subscribers")}>My Subscribers</div>
         <div style={{color: props.subscribersOrSubscriptions === "My subscriptions" ? "#D2DB08" : ""}} onClick={()=>props.setSubscribersOrSubscriptions("My subscriptions")}>My Subscriptions</div>
+          </>
+        )}
+       { props.user !== "commentator" && (
+        <div style={{color: "#D2DB08"}}>My Subscriptions</div>
+       )}
       </div>
     </>
   )

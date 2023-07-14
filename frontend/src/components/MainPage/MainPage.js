@@ -14,6 +14,7 @@ import EditorsPage from "../EditorsPage/EditorsPage";
 import CommentsPage from "../CommentsPage/CommentsPage";
 import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
 import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCommentsPage";
+import DashboardSU from "../DashboardSU/DashboardSU"
 
 const MainPage = () => {
   // CHANGE THEME
@@ -22,6 +23,7 @@ const MainPage = () => {
   // Select Content
   const [selectContent, setSelectContent] = useState("home");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
+  const [dashboardSUser, setDashboardSUser] = useState(false);
 
   const themeMode = localStorage.getItem("CurrentTheme");
 
@@ -35,47 +37,53 @@ const MainPage = () => {
     }
   }, [themeMode]);
 
-  const user = "c";
+  const user = "c-";
   return (
     <>
       <div
         className={`container-fluid mt-3`}
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
-        <NavBar />
-        {user !== "c" && (
+        <NavBar setDashboardSUser={setDashboardSUser} />
+        {dashboardSUser ? (
+          <DashboardSU />
+        ) : (
           <>
-            {(selectContent === "home" ||
-              selectContent === "editor" ||
-              selectContent === "comments") && (
+            {user !== "c" && (
               <>
-                <Banner />
-                <EditorBanner />
-              </>
-            )}
+                {(selectContent === "home" ||
+                  selectContent === "editor" ||
+                  selectContent === "comments") && (
+                  <>
+                    <Banner />
+                    <EditorBanner />
+                  </>
+                )}
 
-            {selectContent === "home" && (
-              <>
-                <SelectContent
-                  selectContent={selectPublicorForYou}
-                  setSelectContent={setSelectPublicorForYou}
-                />
-                <ContentSection
-                  selectContent={selectPublicorForYou}
-                  setSelectContent={setSelectContent}
-                />
-                <HighlightMainPage />
-                <SharedProfile />
-                <AdvertisementBanner />
-              </>
-            )}
+                {selectContent === "home" && (
+                  <>
+                    <SelectContent
+                      selectContent={selectPublicorForYou}
+                      setSelectContent={setSelectPublicorForYou}
+                    />
+                    <ContentSection
+                      selectContent={selectPublicorForYou}
+                      setSelectContent={setSelectContent}
+                    />
+                    <HighlightMainPage />
+                    <SharedProfile />
+                    <AdvertisementBanner />
+                  </>
+                )}
 
-            {selectContent === "editor" && <EditorsPage />}
-            {selectContent === "comments" && <CommentsPage />}
-            {selectContent === "active-comments" && (
-              <EditorProfileActiveComments
-                setSelectContent={setSelectContent}
-              />
+                {selectContent === "editor" && <EditorsPage />}
+                {selectContent === "comments" && <CommentsPage />}
+                {selectContent === "active-comments" && (
+                  <EditorProfileActiveComments
+                    setSelectContent={setSelectContent}
+                  />
+                )}
+              </>
             )}
           </>
         )}
