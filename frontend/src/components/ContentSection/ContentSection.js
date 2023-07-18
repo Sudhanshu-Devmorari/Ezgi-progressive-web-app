@@ -246,7 +246,7 @@ const ContentSection = (props) => {
                   Subscribe
                 </button>
               )}
-              10 dk önce
+              <span style={{fontSize: "11px"}}>10 dk önce</span>
             </div>
           </div>
         </div>

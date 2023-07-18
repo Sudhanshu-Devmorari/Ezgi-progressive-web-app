@@ -3,12 +3,12 @@
 }
 @media (min-width:360px) and (max-width:400px){
     .fonts{
-        font-size: 11px;
+        font-size: 11px!important;
     }
 }
 @media (min-width:360px) and (max-width:400px){
     .button-status{
-        width: 3rem!important;
+        width: 4rem!important;
         font-size: 12px;
     }
 }

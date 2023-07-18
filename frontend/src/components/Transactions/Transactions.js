@@ -1,7 +1,5 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import currency from "../../assets/₺.svg";
-import currency_1 from "../../assets/₺ (1).svg";
 import "./Transactions.css";
 import TransactionArray from "../TransactionArray/TransactionArray";
 import bankLogo from "../../assets/Akbank-Logo-PNG.png";

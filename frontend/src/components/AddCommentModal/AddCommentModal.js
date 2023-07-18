@@ -42,12 +42,24 @@ const AddCommentModal = (props) => {
     setSelectedMatchDetails(matchDetails);
   };
   const toggleMatchDetailsDropdown = () => {
+    if (predictionTypeDropdown) {
+      setPredictionTypeDropdown(false);
+    }
+    if (predictionDropdown) {
+      setPredictionDropdown(false);
+    }
     setMatchDetailsDropdown(!matchDetailsDropdown);
   };
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
   };
   const togglePredictionTypeDropdown = () => {
+    if (matchDetailsDropdown) {
+      setMatchDetailsDropdown(false);
+    }
+    if (predictionDropdown) {
+      setPredictionDropdown(false);
+    }
     setPredictionTypeDropdown(!predictionTypeDropdown);
   };
 
@@ -55,8 +67,16 @@ const AddCommentModal = (props) => {
     setSelectedPrediction(prediction);
   };
   const togglePredictionDropdown = () => {
+    if (predictionTypeDropdown) {
+      setPredictionTypeDropdown(false);
+    }
+    if (matchDetailsDropdown) {
+      setMatchDetailsDropdown(false);
+    }
     setPredictionDropdown(!predictionDropdown);
   };
+
+
 
   const [toggleInput, setToggleInput] = useState(false);
 

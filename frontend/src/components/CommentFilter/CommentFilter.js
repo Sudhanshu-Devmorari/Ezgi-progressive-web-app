@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import CurrentTheme from "../../context/CurrentTheme";
 
 export const CommentFilter = () => {
   const [countryDropDown, setCountryDropDown] = useState(false);
@@ -10,6 +11,15 @@ export const CommentFilter = () => {
   };
 
   const toggleCountryDropdown = () => {
+    if (categoryDropdown) {
+      setCountryDropDown(false);
+    }
+    if (leagueDropdown) {
+      setLeagueDropdown(false);
+    }
+    if (dateDropdown) {
+      setDateDropdown(false);
+    }
     setCountryDropDown(!countryDropDown);
   };
   const countryOptions = [
@@ -37,6 +47,15 @@ export const CommentFilter = () => {
     setSelectedCategory(category);
   };
   const toggleCategoryDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (leagueDropdown) {
+      setLeagueDropdown(false);
+    }
+    if (dateDropdown) {
+      setDateDropdown(false);
+    }
     setCategoryDropdown(!categoryDropdown);
   };
 
@@ -44,6 +63,15 @@ export const CommentFilter = () => {
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (leagueDropdown) {
+      setLeagueDropdown(false);
+    }
+    if (categoryDropdown) {
+      setCategoryDropdown(false);
+    }
     setDateDropdown(!dateDropdown);
   };
 
@@ -51,12 +79,25 @@ export const CommentFilter = () => {
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {
+    if (countryDropDown) {
+      setCountryDropDown(false);
+    }
+    if (dateDropdown) {
+      setDateDropdown(false);
+    }
+    if (categoryDropdown) {
+      setCategoryDropdown(false);
+    }
     setLeagueDropdown(!leagueDropdown);
   };
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   return (
     <>
-      <div className="row g-0 my-3 gap-3 position-relative" style={{fontSize:"15px"}}>
+      <div
+        className="row g-0 my-3 gap-3 position-relative"
+        style={{ fontSize: "15px" }}
+      >
         <div className="col">
           <CustomDropdown
             label="Category"
@@ -68,17 +109,61 @@ export const CommentFilter = () => {
           />
         </div>
         <div className="col">
-          <CustomDropdown
+          {/* <CustomDropdown
             label="Country"
             options={countryOptions}
             selectedOption={selectedCountry}
             onSelectOption={handleCountrySelection}
             isOpen={countryDropDown}
             toggleDropdown={toggleCountryDropdown}
-          />
+          /> */}
+          <div className="my-2">
+            <span>Country</span>
+            <div
+              className={`${
+                currentTheme === "dark"
+                  ? "customDropdown-dark-mode"
+                  : "customDropdown-light-mode"
+              } p-1 text-center`}
+              onClick={toggleCountryDropdown}
+            >
+              <span>{selectedCountry}</span>
+            </div>
+            <div
+              className={`${
+                currentTheme === "dark"
+                  ? "customDropdown-content-dark-mode"
+                  : "customDropdown-content-light-mode"
+              } pt-2 flex-column d-flex text-center ${
+                countryDropDown ? "d-block" : "d-none"
+              }`}
+              style={{
+                width: "46%",
+              }}
+            >
+              {countryOptions.map((option, index) => (
+                <span
+                  className={`${
+                    currentTheme === "dark"
+                      ? "dpcontent-dark-mode"
+                      : "dpcontent-light-mode"
+                  } my-1 p-2`}
+                  key={index}
+                  onClick={() => {
+                    handleCountrySelection(option);
+                    toggleCountryDropdown();
+                  }}
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="row my-3">
+      <div className="row g-0 my-3 gap-3 position-relative" style={{ fontSize: "15px" }}
+      >
+      {/* <div className="row my-3" style={{ fontSize: "15px" }}> */}
         <div className="col">
           <CustomDropdown
             label="League"

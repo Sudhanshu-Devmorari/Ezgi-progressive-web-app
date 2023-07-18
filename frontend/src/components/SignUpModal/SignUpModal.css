@@ -76,7 +76,7 @@ input:focus{
 .otpbox{
     gap: 0.7rem;
 }
-@media (min-width: 360px) and (max-width: 410px) {
+@media (min-width: 360px) and (max-width: 500px) {
     .otpbox{
         gap: 0.1rem;
     }
@@ -94,11 +94,11 @@ input:focus{
         gap: 0.3rem;
     }
 }
-@media (min-width: 453px) and (max-width: 500px){
+/* @media (min-width: 453px) and (max-width: 500px){
     .otpbox{
         gap: 0.4rem;
     }
-}
+} */
 .darkMode{
     color: #E6E6E6!important; 
     background-color: #0D2A53!important;

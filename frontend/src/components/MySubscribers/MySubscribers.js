@@ -1,11 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import "./MySubscribers.css";
+import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 
 const MySubscribers = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [RenewModalShow, setRenewModalShow] = useState(false);
 
   const subscribers = [
     { name: "melih1905", status: "Active" },
@@ -118,7 +120,8 @@ const MySubscribers = (props) => {
                   <span>3 Ay</span>
                   <span className="px-2">22.04.2023 - 16:41</span>
                   <button
-                    className="px-3 me-2"
+                  onClick={()=>{sub.status === "Renew" && setRenewModalShow(true)}}
+                    className="px-3 me-2 button-status"
                     style={{
                       color:
                         currentTheme === "dark"
@@ -223,6 +226,10 @@ const MySubscribers = (props) => {
           </>
         )}
       </div>
+      <SubscribeRenewModal
+        show={RenewModalShow}
+        onHide={() => setRenewModalShow(false)}
+      />
     </>
   );
 };

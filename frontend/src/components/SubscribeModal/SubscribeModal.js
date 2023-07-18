@@ -15,8 +15,15 @@ import CurrentTheme from "../../context/CurrentTheme";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 
+const subscription = [
+  {month : "1 Month", per : "", rupee : "69.00₺"},
+  {month : "3 Month", per : "%20 Save!", rupee : "179.90₺"},
+  {month : "6 Month", per : "%30 Save!", rupee : "329.90₺"},
+  {month : "1 Year", per : "%40 Save!", rupee : "329.90₺"},
+]
+
 const SubscribeModal = (props) => {
-  const [RenewModalShow, setRenewModalShow] = useState(false);
+  
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
@@ -169,7 +176,7 @@ const SubscribeModal = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="my-2">
+              <div className="my-2" style={{fontSize: "14px"}}>
                 <div className="my-2">Subscription Plans</div>
                 <div className="d-flex mb-2">
                   <div
@@ -186,19 +193,9 @@ const SubscribeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span style={{ fontSize: "14px" }}>1 Month</span>
-                    <span style={{ fontSize: "19px" }}>
-                      69.90
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
+                    <span>1 Month</span>
+                    <span style={{ fontSize: "1.1rem" }}>
+                      69.90₺
                     </span>
                   </div>
                 </div>
@@ -217,19 +214,9 @@ const SubscribeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span style={{ fontSize: "14px" }}>1 Month</span>
-                    <span style={{ fontSize: "19px" }}>
-                      69.90
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
+                    <span>6 Month</span>
+                    <span style={{ fontSize: "1rem" }}>
+                      69.90₺
                     </span>
                   </div>
                 </div>
@@ -248,22 +235,12 @@ const SubscribeModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    <span style={{ fontSize: "14px" }}>1 Month</span>
-                    <span style={{ fontSize: "19px" }}>
+                    <span>3 Month</span>
+                    <span style={{ fontSize: "1rem" }}>
                       <span className="pe-2" style={{ color: "#7BFFAB" }}>
                         %20 Save!
                       </span>
-                      69.00
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
+                      69.00₺
                     </span>
                   </div>
                 </div>
@@ -272,17 +249,7 @@ const SubscribeModal = (props) => {
                 <div className="text-center my-2">
                   <div>Total Amount</div>
                   <div style={{ fontSize: "19px" }}>
-                    329.90
-                    <img
-                      src={
-                        currentTheme === "dark"
-                          ? currentyIcondark
-                          : currentyIcon
-                      }
-                      alt=""
-                      height={25}
-                      width={25}
-                    />
+                    329.90₺
                   </div>
                 </div>
                 <div className="text-center">
@@ -313,9 +280,6 @@ const SubscribeModal = (props) => {
                       style={{
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
-                      onClick={() => {
-                        props.setShowModal(3);
-                      }}
                     >
                       Terms of use
                     </span>
@@ -328,7 +292,6 @@ const SubscribeModal = (props) => {
                           ? "darkMode-btn"
                           : "lightMode-btn"
                       } px-3 py-1`}
-                      onClick={() => setRenewModalShow(true)}
                     >
                       Checkout
                     </button>
@@ -347,11 +310,6 @@ const SubscribeModal = (props) => {
           </div>
         </Modal.Body>
       </Modal>
-
-      <SubscribeRenewModal
-        show={RenewModalShow}
-        onHide={() => setRenewModalShow(false)}
-      />
     </>
   );
 };

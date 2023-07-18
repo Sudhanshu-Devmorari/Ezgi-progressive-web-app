@@ -129,7 +129,7 @@ const SignUpModal = (props) => {
         scrollable
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`} style={{fontSize:"14px"}}
         >
           {/* Signup modal 1 */}
           {props.ShowModal === 1 && (
@@ -397,9 +397,8 @@ const SignUpModal = (props) => {
             <div
               className="m-4"
               style={{
-                fontFamily: "none",
                 color: "#0D2A53",
-                fontWeight: "600",
+                fontSize: "12px"
               }}
             >
               <div
@@ -448,37 +447,32 @@ const SignUpModal = (props) => {
                 }}
               >
                 <p>
-                  Cras mattis consectetur purus sit amet fermentum. Cras justo
-                  odio, dapibus ac facilisis in, egestas eget quam. Morbi leo
-                  risus, porta ac consectetur ac, vestibulum at eros. dapibus ac
-                  facilisis in, egestas eget quam. Morbi leo risus, porta ac
-                  consectetur ac, vestibulum at eros.
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Exercitationem, excepturi odit, sint dolor est consequuntur
-                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                  voluptatum
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Exercitationem, excepturi odit, sint dolor est consequuntur
-                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                  voluptatum
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Exercitationem, excepturi odit, sint dolor est consequuntur
-                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                  voluptatum
-                </p>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Exercitationem, excepturi odit, sint dolor est consequuntur
-                  harum inventore, quas nesciunt aspernatur expedita. Sint qui
-                  voluptatum exercitationem eum sit impedit eligendi modi veniam
-                  rerum ipsam sapiente, dolore recusandae nesciunt sunt
-                  doloremque!
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
+                  et est facilisis, malesuada tellus sed, tempor justo. Donec
+                  nec enim mauris. Duis auctor arcu et neque malesuada
+                  tristique. Sed ac sem nec metus ultrices tincidunt. Aenean id
+                  nisl eget odio sollicitudin viverra. Cras quis tellus vel
+                  ligula euismod dapibus. Integer eu rutrum eros. Sed efficitur
+                  nulla id justo aliquet tempus. Lorem ipsum dolor sit amet,
+                  consectetur adipiscing elit. Nulla et est facilisis, malesuada
+                  tellus sed, tempor justo. Donec nec enim mauris. Duis auctor
+                  arcu et neque malesuada tristique. Sed ac sem nec metus
+                  ultrices tincidunt. Aenean id nisl eget odio sollicitudin
+                  viverra. Cras quis tellus vel ligula euismod dapibus. Integer
+                  eu rutrum eros. Sed efficitur nulla id justo aliquet tempus.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
+                  et Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Nulla et est facilisis, malesuada tellus sed, tempor justo.
+                  Donec nec enim mauris. Duis auctor arcu et neque malesuada
+                  tristique. Sed ac sem nec metus ultrices tincidunt. Aenean id
+                  nisl eget odio sollicitudin viverra. Cras quis tellus vel
+                  ligula euismod dapibus. Integer eu rutrum eros est facilisis,
+                  malesuada tellus sed, tempor justo. Donec nec enim mauris.
+                  Duis auctor arcu et neque malesuada tristique. Sed ac sem nec
+                  metus ultrices tincidunt. Aenean id nisl eget odio
+                  sollicitudin viverra. Cras quis tellus vel ligula euismod
+                  dapibus. Integer eu rutrum eros. Sed efficitur nulla id justo
+                  aliquet tempus.
                 </p>
               </div>
               <div className="d-flex justify-content-center mb-4">
@@ -634,7 +628,7 @@ const SignUpModal = (props) => {
                     }}
                     className={`${
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
+                    } px-4 py-1`}
                   >
                     Send
                   </button>
@@ -710,7 +704,7 @@ const SignUpModal = (props) => {
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
                   >
-                    Verify
+                    Continue
                   </button>
                 </div>
               </div>
@@ -738,7 +732,7 @@ const SignUpModal = (props) => {
                 <div className="">You can create your new password</div>
                 <div className="">
                   <div className="d-flex flex-column my-2">
-                    <label htmlFor="Password">Password</label>
+                    <label htmlFor="Password">New Password</label>
                     <input
                       className={`${
                         currentTheme === "dark"

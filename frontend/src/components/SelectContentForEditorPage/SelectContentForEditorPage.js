@@ -4,6 +4,8 @@ import CurrentTheme from "../../context/CurrentTheme";
 import "./SelectContentForEditorPage.css";
 import { CommentFilter } from "../CommentFilter/CommentFilter";
 import world_check from "../../assets/world-check.svg";
+import darkGrp from "../../assets/Group 712.png"
+import lighGrp from "../../assets/Group 721.png"
 
 const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -15,7 +17,7 @@ const SelectContentForEditorPage = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
       >
-        <div className="input-group">
+        <div className="input-group flex-nowrap" style={{ width: "38%" }}>
           <span
             className={`input-group-text ${
               currentTheme === "dark" ? "search-icon-dark" : "search-icon-light"
@@ -24,7 +26,9 @@ const SelectContentForEditorPage = (props) => {
           >
             <i
               className={`fa-solid fa-magnifying-glass`}
-              style={{ color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}
+              style={{
+                color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+              }}
             ></i>
           </span>
           <input
@@ -51,9 +55,8 @@ const SelectContentForEditorPage = (props) => {
             Filtre
           </button>
         </div>
-
         {props.comments && (
-          <div className="ms-auto d-flex align-items-center">
+          <div className="ms-3 d-flex align-items-center">
             <img
               src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""
@@ -63,26 +66,12 @@ const SelectContentForEditorPage = (props) => {
             />
             <span className="pe-1">Only Public</span>
             <div
-              // style={{
-              //   border:
-              //     currentTheme === "dark"
-              //       ? "2px solid #E6E6E6"
-              //       : "2px solid #0D2A53",
-              //   borderRadius: "50%",
-              //   width: "2.2rem",
-              //   height: "2.1rem",
-              // }}
             >
-
+               <img src={currentTheme === "dark" ? darkGrp : lighGrp} alt="" height={28} width={28}/>
             </div>
           </div>
         )}
       </div>
-
-      {/* <CommentFilter
-        show={FilterModalShow}
-        onHide={() => setFilterModalShow(false)}
-      /> */}
     </>
   );
 };
