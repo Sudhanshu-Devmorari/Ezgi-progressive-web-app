@@ -6,15 +6,17 @@ import blueTick from "../../assets/blueTick.png";
 import likeIcon from "../../assets/like.png";
 import starIcon from "../../assets/star-1.svg";
 import likeIcondark from "../../assets/LikeDark.png";
-import starIcondark from "../../assets/StarDark.png";
-import clapIcon from "../../assets/clap.png";
-import publicIcon from "../../assets/publicIcon.svg";
+import starIcondark from "../../assets/star.svg";
+import clapIcon from "../../assets/Path 4530.png";
+import clapLight from "../../assets/Path 4537.png";
+import world_check_light from '../../assets/world-check.png'
 import world_check from "../../assets/world-check.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
 import lock from "../../assets/lock.svg";
 import darklock from "../../assets/darklock.svg";
 import "./ContentSection.css";
-import { Link } from "react-router-dom";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 const ContentSection = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -43,27 +45,27 @@ const ContentSection = (props) => {
             <div className="col">
               <img src={profile} width={75} height={75} alt="" />
               <span className="p-1 autorname-responsive">melihaskar</span>
-              <img src={blueTick} alt="" width={14} height={14} />
+              <img src={blueTick} alt="" width={16} height={16} />
             </div>
           </div>
           <div className="col p-0">
-            {props.selectContent === "for you" && (
-              <div className="d-flex justify-content-end pe-2">
+            {(props.selectContent === "for you" || props.userComments ) && (
+              <div className="d-flex justify-content-end pe-2 mt-3">
                 <button
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #4DD5FF"
-                      : "1px solid #007BF6",
-                  color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                  backgroundColor: "transparent",
-                  borderRadius: "18px",
-                  padding: "0.2rem 2.4rem",
-                  fontSize: "13px",
-                }}
-              >
-                Follow
-              </button>
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #4DD5FF"
+                        : "1px solid #007BF6",
+                    color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                    backgroundColor: "transparent",
+                    borderRadius: "18px",
+                    padding: "0.1rem 2.1rem",
+                    fontSize: "13px",
+                  }}
+                >
+                  Follow
+                </button>
               </div>
             )}
             <div
@@ -75,7 +77,7 @@ const ContentSection = (props) => {
                 <div className="rate-fonts">Success Rate</div>
                 <div
                   style={{
-                    fontSize: "1.2rem",
+                    fontSize: "1rem",
                     color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                   }}
                 >
@@ -84,37 +86,36 @@ const ContentSection = (props) => {
               </div>
               <div className="col">
                 <div className="rate-fonts">Score Points</div>
-                <div style={{ fontSize: "1.2rem", color: "#FFA200" }}>256</div>
+                <div style={{ fontSize: "1rem", color: "#FFA200" }}>256</div>
               </div>
             </div>
           </div>
 
-
           {userPhone === null ? (
             <>
               <div
-            className="px-2 py-3 my-2 d-flex justify-content-center"
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            }}
-          >
-            <img
-              src={`${currentTheme === "dark" ? lock : darklock}`}
-              alt=""
-              height={35}
-              width={35}
-            />
-          </div>
+                className="px-2 py-3 my-2 d-flex justify-content-center"
+                style={{
+                  backgroundColor:
+                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                }}
+              >
+                <img
+                  src={`${currentTheme === "dark" ? lock : darklock}`}
+                  alt=""
+                  height={32}
+                  width={32}
+                />
+              </div>
             </>
           ) : (
             <>
               <div
-                onClick={() => props.setSelectContent("active-comments")}
-                className="p-1 my-2"
+                onClick={() => props.setSelectContent("show-all-comments")}
+                className="p-1 my-2 content-font"
                 style={{
                   backgroundColor:
                     currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                  fontSize: "14px",
                 }}
               >
                 2012 yılından beri profesyonel olarak maçları takip ediyorum.
@@ -126,55 +127,67 @@ const ContentSection = (props) => {
             </>
           )}
 
-
-          
           <div
             className="p-1"
             style={{
               backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-              fontSize: "14px",
+              fontSize: "13px",
             }}
           >
             <div className="d-flex justify-content-between align-items-center gap-1">
               <span>
                 <img
-                  className="pe-1"
+                  className=""
                   src={TurkeyFalg}
                   alt=""
-                  height={25}
-                  width={27}
+                  height={26}
+                  width={26}
                 />
-                <span className="ps-1">Super Lig</span>
+                <span className="ps-1">Süper Lig</span>
               </span>
-              <span style={{paddingRight:"49px"}}>07.05.2023</span>
-              <span>{userPhone === null ? null : (
-                  <img src={`${currentTheme === "dark" ? world_check : publicIcon}`} alt="" height={35} width={35} />
-                )}</span>
+              <span style={{ paddingRight: userPhone ? "47px" : "80px" }}>
+                07.05.2023
+              </span>
+              <span>
+                {userPhone === null ? null : (
+                  <img
+                    src={`${
+                      currentTheme === "dark" ? world_check : world_check_light
+                    }`}
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
+                )}
+              </span>
             </div>
-            <div className="d-flex justify-content-center align-items-center">
-              <span>Antalyaspor</span>
+            <div className="d-flex justify-content-center">
+              <span className="mt-2 pt-1">Antalyaspor</span>
               <div
-                className="border-bottom-0"
+                className="px-2"
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  width: "91px",
-                  height: "47px",
-                  borderRadius: " 50% / 100% 100% 0 0",
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #FFFFFF"
-                      : "1px solid #0D2A53",
+                  width: "66px",
+                  height: "38px",
                 }}
               >
-                14:30
+                <CircularProgressbar
+                  circleRatio={0.75}
+                  strokeWidth={3}
+                  value={100}
+                  text="14:30"
+                  styles={buildStyles({
+                    rotation: 1 / 2 + 1 / 8,
+                    textColor: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                    textSize: "26px",
+                    pathColor: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                  })}
+                />
               </div>
-              <span>Başakşehir</span>
+              <span className="mt-2 pt-1">Başakşehir</span>
             </div>
             <div className="text-end mt-3 mb-2">
               <span
-                className="p-1"
+                className={`p-1 ${userPhone === null && "px-2"}`}
                 style={{
                   backgroundColor:
                     props.SelectComment === "resolvedComments"
@@ -187,13 +200,13 @@ const ContentSection = (props) => {
                   fontSize: "12px",
                 }}
               >
-                FT - Home & 2.5 Over 2.40
+                {userPhone ? "FT - Home & 2.5 Over 2.40" : "Subscribers Only"}
               </span>
             </div>
           </div>
 
           <div className="d-flex mt-2 align-items-center">
-            <div className="gap-2 d-flex">
+            <div className="gap-2 d-flex align-items-center" style={{fontSize:"13px"}}>
               <div>
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
@@ -207,17 +220,17 @@ const ContentSection = (props) => {
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
-                  height={22}
-                  width={22}
+                  height={23}
+                  width={23}
                 />{" "}
                 258
               </div>
               <div>
-                <img src={clapIcon} alt="" height={20} width={20} /> 258
+                <img src={currentTheme === "dark" ? clapIcon: clapLight} alt="" height={20} width={20} /> 258
               </div>
             </div>
             <div className="ms-auto" style={{ fontSize: "12px" }}>
-            {props.selectContent === "for you" && (
+              {props.selectContent === "for you" && (
                 <button
                   className="me-2 px-2 py-1"
                   style={{
@@ -227,7 +240,7 @@ const ContentSection = (props) => {
                         : "1px solid #00659D",
                     color: currentTheme === "dark" ? "#37FF80" : "#00659D",
                     backgroundColor: "transparent",
-                    borderRadius:"3px"
+                    borderRadius: "3px",
                   }}
                 >
                   Subscribe

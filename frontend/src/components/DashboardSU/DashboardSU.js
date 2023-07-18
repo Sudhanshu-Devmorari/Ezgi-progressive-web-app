@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ProfileSU from "../ProfileSU/ProfileSU";
 import CommentatorIcons from "../CommentatorIcons/CommentatorIcons";
 import { SubscribersSelection } from "../SubscribersSelection/SubscribersSelection";
@@ -14,13 +14,28 @@ import NotificationsAndSupportSelection from "../NotificationsAndSupportSelectio
 import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
 
-const DashboardSU = () => {
+const DashboardSU = (props) => {
   const [content, setContent] = useState("subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");
+  useEffect(() => {
+    if (content === "notifications")  {
+      props.setSelectContent("notifications")
+    }
+  }, [content])
+
+  useEffect(() => {
+    console.log("inside useEffect")
+    if (props.selectContent === "notifications")  {
+      setContent("notifications")
+    } else if (props.selectContent === "fav") {
+      setContent("fav")
+    }
+  }, [props.selectContent])
+  
   return (
     <>
-      <ProfileSU />
+      <ProfileSU setSelectContent={props.setSelectContent} setDashboardSUser={props.setDashboardSUser}/>
       <CommentatorIcons
         setContent={setContent}
         content={content}
@@ -40,7 +55,7 @@ const DashboardSU = () => {
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } my-2 p-2`}
           >
-            <TransactionArray />
+            <TransactionArray user={"standard user"}/>
           </div>
         </>
       )}

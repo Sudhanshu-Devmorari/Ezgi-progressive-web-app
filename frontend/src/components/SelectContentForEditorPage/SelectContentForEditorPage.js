@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import publicIcon from "../../assets/publicIcon.svg";
+import publicIcon from "../../assets/world-check.png";
 import CurrentTheme from "../../context/CurrentTheme";
 import "./SelectContentForEditorPage.css";
 import { CommentFilter } from "../CommentFilter/CommentFilter";
@@ -15,24 +15,29 @@ const SelectContentForEditorPage = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
       >
-        <div className="d-flex">
-          <i
-            className={`fa-solid fa-magnifying-glass ${
-              currentTheme === "dark" ? "icon-dark" : "icon-light"
+        <div className="input-group">
+          <span
+            className={`input-group-text ${
+              currentTheme === "dark" ? "search-icon-dark" : "search-icon-light"
             }`}
-          ></i>
+            id="basic-addon1"
+          >
+            <i
+              className={`fa-solid fa-magnifying-glass`}
+              style={{ color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53" }}
+            ></i>
+          </span>
           <input
-            className={`${
+            type="text"
+            className={` ${
               currentTheme === "dark" ? "input-field-dark" : "input-field-light"
             }`}
-            type="text"
           />
         </div>
-
-        <div className={`${props.editor && "ms-auto"} p-2`}>
+        <div className={`${props?.editor && "ms-auto"}`}>
           <button
-          onClick={()=>setFilterModalShow(true)}
-            className="px-2 py-1"
+            onClick={() => setFilterModalShow(true)}
+            className="px-3 py-1"
             style={{
               border:
                 currentTheme === "dark"
@@ -40,32 +45,36 @@ const SelectContentForEditorPage = (props) => {
                   : "1px solid #0D2A53",
               color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
               backgroundColor: "transparent",
+              borderRadius: "2px",
             }}
           >
             Filtre
           </button>
         </div>
+
         {props.comments && (
           <div className="ms-auto d-flex align-items-center">
             <img
-              src={publicIcon}
+              src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
-              height={37}
-              width={37}
+              height={32}
+              width={32}
             />
             <span className="pe-1">Only Public</span>
             <div
-              style={{
-                border:
-                  currentTheme === "dark"
-                    ? "2px solid #E6E6E6"
-                    : "2px solid #0D2A53",
-                borderRadius: "50%",
-                width: "2.2rem",
-                height: "2.1rem",
-              }}
-            ></div>
+              // style={{
+              //   border:
+              //     currentTheme === "dark"
+              //       ? "2px solid #E6E6E6"
+              //       : "2px solid #0D2A53",
+              //   borderRadius: "50%",
+              //   width: "2.2rem",
+              //   height: "2.1rem",
+              // }}
+            >
+
+            </div>
           </div>
         )}
       </div>

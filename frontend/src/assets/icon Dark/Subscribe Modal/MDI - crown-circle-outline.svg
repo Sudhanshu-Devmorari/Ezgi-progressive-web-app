@@ -1,0 +1,7 @@
+<svg id="MDI_crown-circle-outline" data-name="MDI / crown-circle-outline" xmlns="http://www.w3.org/2000/svg" width="71.482" height="71.483" viewBox="0 0 71.482 71.483">
+  <g id="Boundary" transform="translate(0 0)" fill="#0d2a53" stroke="rgba(0,0,0,0)" stroke-width="1" opacity="0">
+    <rect width="71.483" height="71.483" stroke="none"/>
+    <rect x="0.5" y="0.5" width="70.483" height="70.483" fill="none"/>
+  </g>
+  <path id="Path_crown-circle-outline" data-name="Path / crown-circle-outline" d="M31.785,2A29.785,29.785,0,1,0,61.569,31.785,29.815,29.815,0,0,0,31.785,2m0,53.613A23.828,23.828,0,1,1,55.612,31.785,23.821,23.821,0,0,1,31.785,55.613M19.871,37.742,16.892,19.871l8.935,5.957,5.957-8.935,5.957,8.935,8.935-5.957L43.7,37.742H19.871M21.539,43.7a1.564,1.564,0,0,1-1.668-1.668V40.72H43.7v1.311A1.564,1.564,0,0,1,42.03,43.7Z" transform="translate(3.957 3.957)" fill="#ffa200"/>
+</svg>

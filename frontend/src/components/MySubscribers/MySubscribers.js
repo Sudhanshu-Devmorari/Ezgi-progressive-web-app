@@ -187,7 +187,7 @@ const MySubscribers = (props) => {
                   <span>3 Ay</span>
                   <span className="px-2">22.04.2023 - 16:41</span>
                   <button
-                    className="px-3 me-2"
+                    className="me-2 button-status"
                     style={{
                       color:
                         currentTheme === "dark"
@@ -212,6 +212,7 @@ const MySubscribers = (props) => {
                           ? "1px solid #0D2A53"
                           : "1px solid #FFFFFF",
                       borderRadius: "3px",
+                      width: "4.6rem",
                     }}
                   >
                     {sub.status}

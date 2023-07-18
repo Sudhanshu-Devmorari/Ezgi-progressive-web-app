@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { CiDark, CiLight } from "react-icons/ci";
-import { PiBellSimpleRingingLight } from "react-icons/pi";
 import "./NavBar.css";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import bell from "../../assets/bell-ringing-1.svg"
+import bellLight from "../../assets/bell-ringing.png"
+import darkmode from "../../assets/brightness-up.png"
+import moon from "../../assets/moon.png"
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);
@@ -29,6 +30,7 @@ const NavBar = (props) => {
     }
   };
   const userPhone = localStorage.getItem("userPhone");
+
   return (
     <>
       <nav
@@ -40,18 +42,20 @@ const NavBar = (props) => {
           <div className="">
             {currentTheme === "light" ? (
               <span className="p-2">
-                <CiDark fontSize={"2rem"} onClick={() => handleTheme("dark")} />
+                {/* <CiDark fontSize={"2rem"} onClick={() => handleTheme("dark")} /> */}
+                <img src={moon} alt="" height={35} width={35} onClick={() => handleTheme("dark")} />
               </span>
             ) : (
               <span className="p-2">
-                <CiLight
-                  onClick={() => handleTheme("light")}
+                <img src={darkmode} alt="" height={35} width={35} onClick={() => {handleTheme("light")}}/>
+                {/* <CiLight
+                  onClick={() => {handleTheme("light")}}
                   fontSize={"2rem"}
-                />
+                /> */}
               </span>
             )}
             <span className="pe-2 ps-0 py-2">
-              <img src={bell} alt="" height={35} width={35}/>
+              <img src={currentTheme === "dark" ? bell : bellLight} alt="" height={35} width={35} onClick={()=>{props.setDashboardSUser(true);props.setSelectContent("notifications");}}/>
             </span>
             {userPhone ? (
               <>

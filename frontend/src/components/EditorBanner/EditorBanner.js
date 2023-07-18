@@ -12,9 +12,9 @@ export const EditorBanner = () => {
         <div
           className={`col-3`}
         >
-          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex py-3 flex-column`}>
+          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} gap-1 me-2 d-flex py-3 flex-column`}>
             <div className=" d-flex justify-content-center">Futbol</div>
-            <div className="p-2 d-flex justify-content-center">
+            <div className="d-flex justify-content-center">
               <img src={football} alt="" height={50} width={50}/>
             </div>
             <div className="d-flex justify-content-center">
@@ -27,9 +27,9 @@ export const EditorBanner = () => {
         <div
           className={`col-3`}
         >
-          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex mx-2 py-3 flex-column`}>
+          <div className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"} d-flex gap-1 me-2 py-3 flex-column`}>
             <div className="d-flex justify-content-center">Basketbol</div>
-            <div className="p-2 d-flex justify-content-center">
+            <div className="d-flex justify-content-center">
             <img src={basketball} alt="" height={50} width={50}/>
             </div>
             <div className="d-flex justify-content-center">

@@ -8,7 +8,7 @@ import starDark from "../../assets/star.svg";
 import { BsArrowLeft } from "react-icons/bs";
 import "./ProfileSU.css"
 
-const ProfileSU = () => {
+const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>
@@ -19,7 +19,7 @@ const ProfileSU = () => {
       >
         <div className="d-flex justify-content-between pb-2">
           <BsArrowLeft
-            // onClick={() => props.setSelectContent("home")}
+            onClick={() => {props.setSelectContent("home"); props.setDashboardSUser(false)}}
             fontSize={"1.6rem"}
           />
         </div>
@@ -86,7 +86,7 @@ const ProfileSU = () => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                   backgroundColor: "transparent",
                   borderRadius: "18px",
-                  padding: "0.2rem 2.4rem",
+                  padding: "0.2rem 2.2rem",
                   fontSize: "13px",
                 }}
               >

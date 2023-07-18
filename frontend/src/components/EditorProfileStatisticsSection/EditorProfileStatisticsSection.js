@@ -1,13 +1,29 @@
 import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import "react-circular-progressbar/dist/styles.css";
-import { CircularProgressbar } from "react-circular-progressbar";
+import {
+  CircularProgressbar,
+  buildStyles,
+  CircularProgressbarWithChildren,
+} from "react-circular-progressbar";
 import "./EditorProfileStatisticsSection.css";
 import londonFlag from "../../assets/London_flag.png";
 
 const EditorProfileStatisticsSection = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SelectSport, setSelectSport] = useState("football");
+  const progressBarFootball = [
+    { score: "62%", text: "Money time", pathColor: "#37FF80" },
+    { score: "62%", text: "Over - Under", pathColor: "#4DD5FF" },
+    { score: "62%", text: "Half - Time", pathColor: "#951AFF" },
+    { score: "62%", text: "Other", pathColor: "#FFCC00" },
+  ];
+  const progressBarBasketball = [
+    { score: "62%", text: "Money Line", pathColor: "#37FF80" },
+    { score: "62%", text: "Over - Under", pathColor: "#4DD5FF" },
+    { score: "62%", text: "Quarter - Half", pathColor: "#951AFF" },
+    { score: "62%", text: "Other", pathColor: "#FFCC00" },
+  ];
   return (
     <>
       <div
@@ -33,65 +49,94 @@ const EditorProfileStatisticsSection = () => {
         <div className="my-2">
           <div className="my-2">Comments Type</div>
           <div className="row g-0 my-2 gap-4">
-            <div className="col">
-              <CircularProgressbar
-                strokeWidth={5}
-                value={62}
-                text="%62"
-                styles={{ path: { stroke: "#37FF80" } }}
-              />
-            </div>
-            <div className="col">
-              <CircularProgressbar
-                strokeWidth={5}
-                value={62}
-                text="%62"
-                styles={{ path: { stroke: "#4DD5FF" } }}
-              />
-            </div>
-            <div className="col">
-              <CircularProgressbar
-                strokeWidth={5}
-                value={62}
-                text="%62"
-                styles={{ path: { stroke: "#951AFF" } }}
-              />
-            </div>
-            <div className="col">
-              <CircularProgressbar
-                strokeWidth={5}
-                value={62}
-                text="%62"
-                styles={{ path: { stroke: "#FFCC00" } }}
-              />
-            </div>
+            {SelectSport === "football"
+              ? progressBarFootball.map((res, index) => (
+                  <div className="col">
+                    <CircularProgressbarWithChildren
+                      value={62}
+                      strokeWidth={5}
+                      styles={buildStyles({
+                        textColor:
+                          currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                        pathColor: res.pathColor,
+                        trailColor:
+                          currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                      })}
+                    >
+                      <span
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                        }}
+                      >
+                        {res.score}
+                      </span>
+                      <div style={{ fontSize: 10, marginTop: -5 }}>
+                        {res.text}
+                      </div>
+                    </CircularProgressbarWithChildren>
+                  </div>
+                ))
+              : SelectSport === "basketball"
+              ? progressBarBasketball.map((res, index) => (
+                  <div className="col">
+                    <CircularProgressbarWithChildren
+                      value={62}
+                      strokeWidth={5}
+                      styles={buildStyles({
+                        textColor:
+                          currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                        pathColor: res.pathColor,
+                        trailColor:
+                          currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                      })}
+                    >
+                      <span
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                        }}
+                      >
+                        {res.score}
+                      </span>
+                      <div style={{ fontSize: 10, marginTop: -5 }}>
+                        {res.text}
+                      </div>
+                    </CircularProgressbarWithChildren>
+                  </div>
+                ))
+              : null}
           </div>
         </div>
         <div className="my-4">
           <span className="my-2">Comments Journey</span>
           <div className="my-2 text-end">
-            <span style={{fontSize:"12px"}}>Son 30 Tahmine Göre <span style={{fontSize:"16px", color:"#37FF80"}}> %62</span></span>
+            <span style={{ fontSize: "12px" }}>
+              Son 30 Tahmine Göre{" "}
+              <span style={{ fontSize: "16px", color: "#37FF80" }}> %62</span>
+            </span>
             <div className="d-flex">
               <div className="green-block"></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
               <div className="green-block"></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
               <div className="green-block"></div>
 
               <div className="green-block"></div>
               <div className="green-block"></div>
               <div className="green-block"></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
-              <div className="red-block" ></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="red-block"></div>
+              <div className="green-block"></div>
               <div className="green-block"></div>
             </div>
           </div>

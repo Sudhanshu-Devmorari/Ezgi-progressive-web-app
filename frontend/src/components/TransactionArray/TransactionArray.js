@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 
-const TransactionArray = () => {
+const TransactionArray = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const transactionsHistory = [
     {
@@ -35,36 +35,103 @@ const TransactionArray = () => {
       total: "485.00₺",
     },
   ];
+  const transactions = [
+    {
+      name: "New Subscription",
+      days: "1 Month",
+      date: "22.04.2023 - 16:38",
+      total: "100.00₺",
+    },
+    {
+      name: "New Subscription",
+      days: "1 Month",
+      date: "22.04.2023 - 16:38",
+      total: "485.00₺",
+    },
+    {
+      name: "Renew Subscription",
+      days: "6 Month",
+      date: "22.04.2023 - 16:38",
+      total: "245.00₺",
+    },
+    {
+      name: "New Subscription",
+      days: "1 Month",
+      date: "22.04.2023 - 16:38",
+      total: "485.00₺",
+    },
+    {
+      name: "Renew Subscription",
+      days: "6 Month",
+      date: "22.04.2023 - 16:38",
+      total: "485.00₺",
+    },
+  ];
   return (
     <>
-      {transactionsHistory.map((tran, index) => (
-        <div
-          className="my-2 p-2 row g-0"
-          style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            fontSize: "12px",
-          }}
-        >
-          <div className="col-4">{tran.name}</div>
-          <div className="col-2">{tran.days}</div>
-          <div className="col-4">{tran.date}</div>
+      {props.user !== "standard user" &&
+        transactionsHistory.map((tran, index) => (
           <div
-            className="col-2 text-end"
+            className="my-2 p-2 row g-0"
             style={{
-              color:
-                currentTheme === "dark"
-                  ? tran.name === "Highlight"
-                    ? "#FF5757"
-                    : "#37FF80"
-                  : tran.name === "Highlight"
-                  ? "#FF5757"
-                  : "#00DE51",
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "12px",
             }}
           >
-            {tran.total}
+            <div className="col-4">{tran.name}</div>
+            <div className="col-2">{tran.days}</div>
+            <div className="col-4">{tran.date}</div>
+            <div
+              className="col-2 text-end"
+              style={{
+                color:
+                  currentTheme === "dark"
+                    ? tran.name === "Highlight"
+                      ? "#FF5757"
+                      : "#37FF80"
+                    : tran.name === "Highlight"
+                    ? "#FF5757"
+                    : "#00DE51",
+              }}
+            >
+              {tran.total}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+
+      {props.user === "standard user" &&
+        transactions.map((tran) => (
+          <div
+            className="my-2 p-2 row g-0"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              fontSize: "12px",
+            }}
+          >
+            <div
+              className="col-4"
+              style={{
+                color:
+                  currentTheme === "dark"
+                    ? tran.name === "New Subscription"
+                      ? "#37FF80"
+                      : tran.name === "Renew Subscription"
+                      ? "#4DD5FF"
+                      : ""
+                    : tran.name === "New Subscription"
+                    ? "#00DE51"
+                    : tran.name === "Renew Subscription"
+                    ? "#00659D"
+                    : "",
+              }}
+            >
+              {tran.name}
+            </div>
+            <div className="col-2">{tran.days}</div>
+            <div className="col-4">{tran.date}</div>
+            <div className="col-2 text-end">{tran.total}</div>
+          </div>
+        ))}
     </>
   );
 };

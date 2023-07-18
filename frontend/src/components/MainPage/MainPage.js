@@ -14,7 +14,7 @@ import EditorsPage from "../EditorsPage/EditorsPage";
 import CommentsPage from "../CommentsPage/CommentsPage";
 import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
 import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCommentsPage";
-import DashboardSU from "../DashboardSU/DashboardSU"
+import DashboardSU from "../DashboardSU/DashboardSU";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -38,63 +38,67 @@ const MainPage = () => {
   }, [themeMode]);
 
   const user = "c-";
+
+  console.log("selectContent: ",selectContent)
   return (
     <>
       <div
         className={`container-fluid mt-3`}
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
-        <NavBar setDashboardSUser={setDashboardSUser} />
+        <NavBar setDashboardSUser={setDashboardSUser} setSelectContent={setSelectContent}/>
+
         {dashboardSUser ? (
-          <DashboardSU />
+          user === "c" ? (
+            <CommentatorsCommentsPage user={user} />
+          ) : (
+            <DashboardSU setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} selectContent={selectContent}/>
+          )
         ) : (
           <>
-            {user !== "c" && (
+            {(selectContent === "home" ||
+              selectContent === "editor" ||
+              selectContent === "comments") && (
               <>
-                {(selectContent === "home" ||
-                  selectContent === "editor" ||
-                  selectContent === "comments") && (
-                  <>
-                    <Banner />
-                    <EditorBanner />
-                  </>
-                )}
-
-                {selectContent === "home" && (
-                  <>
-                    <SelectContent
-                      selectContent={selectPublicorForYou}
-                      setSelectContent={setSelectPublicorForYou}
-                    />
-                    <ContentSection
-                      selectContent={selectPublicorForYou}
-                      setSelectContent={setSelectContent}
-                    />
-                    <HighlightMainPage />
-                    <SharedProfile />
-                    <AdvertisementBanner />
-                  </>
-                )}
-
-                {selectContent === "editor" && <EditorsPage />}
-                {selectContent === "comments" && <CommentsPage />}
-                {selectContent === "active-comments" && (
-                  <EditorProfileActiveComments
-                    setSelectContent={setSelectContent}
-                  />
-                )}
+                <Banner />
+                <EditorBanner />
               </>
+            )}
+            {selectContent === "home" && (
+              <>
+                <SelectContent
+                  selectContent={selectPublicorForYou}
+                  setSelectContent={setSelectPublicorForYou}
+                />
+                <ContentSection
+                  selectContent={selectPublicorForYou}
+                  setSelectContent={setSelectContent}
+                />
+                <HighlightMainPage />
+                <SharedProfile />
+                <AdvertisementBanner />
+              </>
+            )}
+            {selectContent === "editor" && <EditorsPage />}
+            {selectContent === "comments" && <CommentsPage />}
+            {selectContent === "show-all-comments" && (
+              <EditorProfileActiveComments
+                setSelectContent={setSelectContent}
+              />
             )}
           </>
         )}
 
-        {user === "c" && (
-          <>
-            <CommentatorsCommentsPage user={user} />
-          </>
-        )}
+        {/* {selectContent === "notifications" && (
+          <CommentatorsCommentsPage user={user} displayNotifications={selectContent}/>
+        )} */}
+        {/* {selectContent === "notifications" && (
+          <DashboardSU setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} displayNotifications={selectContent}/>
+        )} */}
+
       </div>
       <Footer
+      setDashboardSUser={setDashboardSUser}
         setSelectContent={setSelectContent}
         selectContent={selectContent}
       />

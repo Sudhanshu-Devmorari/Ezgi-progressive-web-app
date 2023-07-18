@@ -26,7 +26,7 @@ const ActiveComments = (props) => {
       <div
         className={`card border-0 rounded-0 my-2 p-2 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
-        }`}
+        }`} style={{fontSize:"14px"}}
       >
         <div className="d-flex justify-content-between pb-2">
           <BsArrowLeft
@@ -72,7 +72,7 @@ const ActiveComments = (props) => {
                   Expert
                 </button>
               </div>
-              <div className="blueTick-responsive align-items-center mt-1 responsive-username">
+              <div className="blueTick-responsive align-items-center mt-1 responsive-username" style={{fontSize:"14px"}}>
                 melih1905
                 <img
                   className="responsive-blue-tick"
@@ -158,10 +158,9 @@ const ActiveComments = (props) => {
           </div>
         </div>
         <div
-          className="p-1 my-2"
+          className="p-1 my-2 content-font"
           style={{
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            fontSize: "14px",
           }}
         >
           2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
@@ -180,7 +179,7 @@ const ActiveComments = (props) => {
             >
               Success Rate
             </span>
-            <span style={{ fontSize: "1.2rem", color: "#D2DB08" }}>%67.6</span>
+            <span style={{ fontSize: "1.1rem", color: "#D2DB08" }}>%67.6</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -192,7 +191,7 @@ const ActiveComments = (props) => {
             >
               Score Points
             </span>
-            <span style={{ fontSize: "1.2rem", color: "#FFA200" }}>1.356</span>
+            <span style={{ fontSize: "1.1rem", color: "#FFA200" }}>1.356</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -204,7 +203,7 @@ const ActiveComments = (props) => {
             >
               Winning
             </span>
-            <span style={{ fontSize: "1.2rem", color: "#37FF80" }}>256</span>
+            <span style={{ fontSize: "1.1rem", color: "#37FF80" }}>256</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -217,7 +216,7 @@ const ActiveComments = (props) => {
             >
               Lose
             </span>
-            <span style={{ fontSize: "1.2rem", color: "#FF5757" }}>256</span>
+            <span style={{ fontSize: "1.1rem", color: "#FF5757" }}>256</span>
           </div>
         </div>
         <div

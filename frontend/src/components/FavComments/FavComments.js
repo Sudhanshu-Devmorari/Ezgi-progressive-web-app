@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ContentSection from '../ContentSection/ContentSection'
 
 const FavComments = () => {
+  const [userComments, setUserComments] = useState(true);
   return (
     <>
-    <ContentSection/>
+    <ContentSection userComments={userComments}/>
     </>
   )
 }

@@ -6,3 +6,9 @@
         font-size: 11px;
     }
 }
+@media (min-width:360px) and (max-width:400px){
+    .button-status{
+        width: 3rem!important;
+        font-size: 12px;
+    }
+}

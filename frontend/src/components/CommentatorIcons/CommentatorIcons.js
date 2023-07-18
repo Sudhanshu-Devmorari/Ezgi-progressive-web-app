@@ -2,11 +2,15 @@ import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import bowIcon from "../../assets/target-arrow.svg";
 import user_check from "../../assets/user-check.svg";
+import user_check_1 from "../../assets/user-check.png";
 import wallet from "../../assets/wallet.svg";
+import walletlight from "../../assets/wallet.png";
 import starlight from "../../assets/star-1.svg";
 import stardark from "../../assets/star.svg";
 import bell from "../../assets/bell-ringing-1.svg";
-import lifebuoy from "../../assets/lifebuoy.svg";
+import bell_1 from "../../assets/bell-ringing.png";
+import lifebuoydark from "../../assets/lifebuoydark.png";
+import lifebuoy from "../../assets/lifebuoy.png";
 
 const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -32,7 +36,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
-            src={(currentTheme === "dark") ? user_check : bowIcon}
+            src={(currentTheme === "dark") ? user_check : user_check_1}
             alt=""
             height={40}
             width={40}
@@ -45,7 +49,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
-            src={currentTheme === "dark" ? wallet : bowIcon}
+            src={currentTheme === "dark" ? wallet : walletlight}
             alt=""
             height={40}
             width={40}
@@ -71,7 +75,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
-            src={currentTheme === "dark" ? bell : starlight}
+            src={currentTheme === "dark" ? bell : bell_1}
             alt=""
             height={40}
             width={40}
@@ -84,7 +88,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
-            src={currentTheme === "dark" ? lifebuoy : starlight}
+            src={currentTheme === "dark" ? lifebuoydark : lifebuoy}
             alt=""
             height={40}
             width={40}
