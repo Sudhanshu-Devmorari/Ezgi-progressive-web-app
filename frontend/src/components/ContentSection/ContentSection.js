@@ -14,6 +14,7 @@ import world_check from "../../assets/world-check.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
 import lock from "../../assets/lock.svg";
 import darklock from "../../assets/darklock.svg";
+import starDarkLogin from "../../assets/star-1.png";
 import "./ContentSection.css";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -70,7 +71,7 @@ const ContentSection = (props) => {
             )}
             <div
               className={`${
-                props.selectContent === "for you" ? "mt-3" : "mt-5"
+               ( props.selectContent === "for you" || props.userComments) ? "mt-3" : "mt-5"
               } row gap-1 g-0 text-center`}
             >
               <div className="col">
@@ -217,12 +218,22 @@ const ContentSection = (props) => {
                 258
               </div>
               <div>
+                {userPhone ? (
+                  <img
+                    src={`${currentTheme === "dark" ? starDarkLogin : starIcon}`}
+                    alt=""
+                    height={23}
+                    width={23}
+                  />
+                ) : (
+
                 <img
                   src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
                   alt=""
                   height={23}
                   width={23}
-                />{" "}
+                />
+                )}
                 258
               </div>
               <div>

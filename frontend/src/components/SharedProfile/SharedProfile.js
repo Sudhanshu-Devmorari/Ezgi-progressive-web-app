@@ -54,8 +54,8 @@ const SharedProfile = () => {
                 <img
                   src={crown}
                   alt=""
-                  height={19}
-                  width={19}
+                  height={21}
+                  width={21}
                   style={{
                     background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                     borderRadius: "50%",
@@ -82,15 +82,15 @@ const SharedProfile = () => {
                 </div>
                 <div
                   className="blueTick-responsive align-items-center mt-1 responsive-username"
-                  style={{ fontSize: "14px" }}
+                  style={{ fontSize: "13px" }}
                 >
-                  {res.name}
+                  <span className="pe-1">{res.name}</span>
                   <img
                     className="responsive-blue-tick"
                     src={blueTick}
                     alt=""
-                    width={16}
-                    height={16}
+                    width={17}
+                    height={17}
                   />
                 </div>
                 <div

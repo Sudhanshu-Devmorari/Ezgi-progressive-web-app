@@ -40,9 +40,9 @@ const Notifications = () => {
       >
         <div className="d-flex">
             <img src={res.profile} alt="" height={42} width={42}/>
-            <div className="d-flex flex-column mt-2 ps-1">
+            <div className="d-flex flex-column mt-2 ps-1" style={{width:"66%"}}>
                 <span>{res.name}</span>
-                <span>{res.content}</span>
+                <span style={{fontSize:"10px"}}>{res.content}</span>
             </div>
             <div className="ms-auto mt-2">{res.status}</div>
         </div>
