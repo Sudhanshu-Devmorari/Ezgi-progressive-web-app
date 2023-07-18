@@ -34,8 +34,8 @@ const ContentSection = (props) => {
             <img
               src={crown}
               alt=""
-              height={19}
-              width={19}
+              height={21}
+              width={21}
               style={{
                 background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 borderRadius: "50%",

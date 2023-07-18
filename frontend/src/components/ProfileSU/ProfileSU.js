@@ -34,8 +34,8 @@ const ProfileSU = (props) => {
     display: editProfile ? "block" : "none",
     position: "absolute",
     backgroundColor: "#",
-    top: "1.85rem",
-    left: "1.89rem",
+    top: "4.4rem",
+    left: "2.3rem",
   };
 
   return (
@@ -57,6 +57,21 @@ const ProfileSU = (props) => {
         <div className="row g-0">
           <div className="col pe-0 d-flex">
             <div className="position-relative">
+              <img
+                src={profile}
+                width={100}
+                height={100}
+                alt=""
+                style={{
+                  opacity: editProfile
+                    ? currentTheme === "dark"
+                      ? "0.4"
+                      : "0.7"
+                    : "",
+                }}
+              />
+            </div>
+            <div className="">
               <label htmlFor="camera-icon">
                 <img
                   src={camera}
@@ -68,7 +83,6 @@ const ProfileSU = (props) => {
               </label>
               <input type="file" name="" id="camera-icon" className="d-none" />
             </div>
-            <img src={profile} width={100} height={100} alt="" />
             <div className="d-flex flex-column ps-1">
               <div className="blueTick-responsive align-items-center mt-4 responsive-username">
                 melih1905
