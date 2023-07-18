@@ -10,7 +10,8 @@ import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import CheckBoxDark from "../../assets/CheckBoxDark.svg";
 import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
-import toggleinputDark from "../../assets/Group 711.png";
+import SelecttoggleinputDark from "../../assets/Group 711.png";
+import toggleinputDark from "../../assets/Group 711.svg";
 import toggleinputLight from "../../assets/Group 720.png";
 import toggleinputLightSelected from "../../assets/Group 720_selected.png";
 
@@ -124,9 +125,9 @@ const AddCommentModal = (props) => {
             {currentTheme === "dark" ? (
               <img
                 onClick={() => setToggleInput(!toggleInput)}
-                src={!toggleInput ? toggleinputDark : toggleinputDark}
+                src={!toggleInput ? SelecttoggleinputDark : toggleinputDark}
                 alt=""
-                height={27}
+                height={23}
                 width={55}
               />
             ) : (
@@ -134,7 +135,7 @@ const AddCommentModal = (props) => {
                 onClick={() => setToggleInput(!toggleInput)}
                 src={!toggleInput ? toggleinputLightSelected : toggleinputLight}
                 alt=""
-                height={27}
+                height={23}
                 width={55}
               />
             )}

@@ -4,18 +4,18 @@ import currency from "../../assets/₺.svg";
 import currency_1 from "../../assets/₺ (1).svg";
 import "./Transactions.css";
 import TransactionArray from "../TransactionArray/TransactionArray";
-import bankLogo from "../../assets/Akbank-Logo-PNG.png"
+import bankLogo from "../../assets/Akbank-Logo-PNG.png";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const chart = [
-    {name: "Tem", color: "#0CC6FF", height: "4rem"},
-    {name: "Ağu", color: "#37FF80", height: "5rem"},
-    {name: "Eyl", color: "#37FF80", height: "7rem"},
-    {name: "Eki", color: "#FF5757", height: "6rem"},
-    {name: "Las", color: "#0CC6FF", height: "6rem"},
-    {name: "Ara", color: "#FFFFFF", height: "6rem"},
-  ]
+    { name: "Tem", color: "#0CC6FF", height: "2rem", darkcolor : "#0CC6FF" },
+    { name: "Ağu", color: "#37FF80", height: "3rem", darkcolor : "#37FF80" },
+    { name: "Eyl", color: "#37FF80", height: "4.5rem", darkcolor : "#37FF80" },
+    { name: "Eki", color: "#FF5757", height: "4rem", darkcolor : "#FF5757" },
+    { name: "Las", color: "#0CC6FF", height: "4rem", darkcolor : "#0CC6FF" },
+    { name: "Ara", color: "#FFFFFF", height: "4rem", darkcolor: "#0D2A53" },
+  ];
   return (
     <>
       <div
@@ -26,7 +26,7 @@ const Transactions = () => {
         <div className="row g-0">
           <div className="col-5">
             <div
-              className="me-2 p-1 fonts-res"
+              className="me-2 p-1 py-2 pb-3 fonts-res"
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
@@ -57,26 +57,25 @@ const Transactions = () => {
           </div>
           <div className="col-7">
             <div
-              className="p-2 d-flex ps-3 gap-3 chardivs"
+              className="p-2 d-flex align-items-end ps-3 gap-3 chardivs"
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                  fontSize:"12px"
+                fontSize: "12px",
               }}
             >
-              {chart.map((res,index)=>(
-
-              <div className="">
-                <div
-                  className=""
-                  style={{
-                    height: res.height,
-                    width: "12px",
-                    backgroundColor: res.color,
-                  }}
-                ></div>
-                <span>{res.name}</span>
-              </div>
+              {chart.map((res, index) => (
+                <div className="text-center">
+                  <div
+                    className=""
+                    style={{
+                      height: res.height,
+                      width: "9px",
+                      backgroundColor: currentTheme === "dark" ? res.darkcolor : res.color,
+                    }}
+                  ></div>
+                  <span style={{fontSize:"10px"}}>{res.name}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -87,7 +86,9 @@ const Transactions = () => {
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
           }}
         >
-          <span><img src={bankLogo} alt="" height={15} width={50}/></span>
+          <span>
+            <img src={bankLogo} alt="" height={15} width={50} />
+          </span>
           <span>TR00 2151 2532 0000 3315 1200 58</span>
           <button
             className="px-2"
@@ -104,11 +105,8 @@ const Transactions = () => {
             Update
           </button>
         </div>
-        <div className="my-2">
-            Transaction History
-        </div>
-        <TransactionArray/>
-
+        <div className="my-2">Transaction History</div>
+        <TransactionArray />
       </div>
     </>
   );

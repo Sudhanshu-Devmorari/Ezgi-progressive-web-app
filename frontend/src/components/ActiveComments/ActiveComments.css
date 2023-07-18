@@ -15,3 +15,23 @@
 .success-rate-font{
     font-size: 12px;
 }
+.crown-img-Editor{
+    border-radius: 50%;
+    position: absolute;
+    left: 4.4rem;
+}
+/* @media (max-width:360px) {
+    .crown-img-Editor{
+        left: 4.4rem;
+    }
+}
+@media (max-width:375px) {
+    .crown-img-Editor{
+        left: 4.4rem;
+    }
+}
+@media (max-width:414px) {
+    .crown-img-Editor{
+        left: 4.4rem;
+    }
+} */

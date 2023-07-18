@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="148.168" height="61.736" viewBox="0 0 148.168 61.736">
+  <defs>
+    <filter id="Ellipse_219" x="100.537" y="15.673" width="30.393" height="30.394" filterUnits="userSpaceOnUse">
+      <feOffset dx="8" dy="6" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-opacity="0.102" result="color"/>
+      <feComposite operator="out" in="SourceGraphic" in2="blur"/>
+      <feComposite operator="in" in="color"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Group_711" data-name="Group 711" transform="translate(17315.715 -14923.089)">
+    <rect id="Rectangle_3131" data-name="Rectangle 3131" width="148.168" height="61.737" rx="30.868" transform="translate(-17315.715 14923.089)" fill="#008ad6"/>
+    <ellipse id="Ellipse_220" data-name="Ellipse 220" cx="27.016" cy="27.016" rx="27.016" ry="27.016" transform="translate(-17226.998 14926.941)" fill="#0d2a53"/>
+    <g data-type="innerShadowGroup">
+      <ellipse id="Ellipse_219-2" data-name="Ellipse 219" cx="15.197" cy="15.197" rx="15.197" ry="15.197" transform="translate(-17215.178 14938.762)" fill="#0b2447"/>
+      <g transform="matrix(1, 0, 0, 1, -17315.71, 14923.09)" filter="url(#Ellipse_219)">
+        <ellipse id="Ellipse_219-3" data-name="Ellipse 219" cx="15.197" cy="15.197" rx="15.197" ry="15.197" transform="translate(100.54 15.67)" fill="#fff"/>
+      </g>
+    </g>
+  </g>
+</svg>

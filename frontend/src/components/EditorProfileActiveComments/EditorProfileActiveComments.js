@@ -11,7 +11,7 @@ const EditorProfileActiveComments = (props) => {
   
   return (
     <>
-    <ActiveComments setSelectContent={props.setSelectContent}/>
+    <ActiveComments setSelectContent={props.setSelectContent} setDashboardSUser={props.setDashboardSUser}/>
     <SelectComments setSelectComment={setSelectComment} SelectComment={SelectComment}/>
     {SelectComment !== "statistics" && (
       <CommentsContentSection SelectComment={SelectComment}/>

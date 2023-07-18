@@ -91,7 +91,7 @@ const MainPage = () => {
             {selectContent === "comments" && <CommentsPage />}
             {selectContent === "show-all-comments" && (
               <EditorProfileActiveComments
-                setSelectContent={setSelectContent}
+                setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser}
               />
             )}
           </>

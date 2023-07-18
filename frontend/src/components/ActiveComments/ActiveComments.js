@@ -14,7 +14,8 @@ import PromoteMeModal from "../PromoteMeModal/PromoteMeModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import camera from "../../assets/camera-plus.svg";
 import edit from "../../assets/edit.png";
-import WithdrawalModal from "../WithdrawalModal/WithdrawalModal"
+import editLight from "../../assets/edit.svg";
+import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -49,8 +50,8 @@ const ActiveComments = (props) => {
     display: editProfile ? "block" : "none",
     position: "absolute",
     backgroundColor: "#",
-    top: "1.85rem",
-    left: "1.89rem",
+    top: "4.4rem",
+    left: "2.3rem",
   };
 
   return (
@@ -77,22 +78,27 @@ const ActiveComments = (props) => {
           />
         </div>
         <div className="row g-0">
-          <div className="col pe-0 d-flex position-relative">
-            <div className="position-absolute">
+          <div className="col pe-0 d-flex ">
+            <div className="position-relative">
               <img
-                src={crown}
+                src={profile}
+                width={100}
+                height={100}
                 alt=""
-                height={19}
-                width={19}
-                style={{
-                  background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                  borderRadius: "50%",
-                  left: "3.2rem",
-                  position: "absolute",
-                }}
+                style={{ opacity: editProfile ? currentTheme === "dark" ? "0.4" : "0.7" : "" }}
               />
             </div>
-            <div className="position-relative">
+            <div className="">
+              <img
+                className="crown-img-Editor"
+                src={crown}
+                alt=""
+                height={25}
+                width={25}
+                style={{
+                  background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                }}
+              />
               <label htmlFor="camera-icon">
                 <img
                   src={camera}
@@ -104,7 +110,6 @@ const ActiveComments = (props) => {
               </label>
               <input type="file" name="" id="camera-icon" className="d-none" />
             </div>
-            <img src={profile} width={100} height={100} alt="" />
             <div className="d-flex flex-column ps-1">
               <div>
                 <button
@@ -218,29 +223,28 @@ const ActiveComments = (props) => {
           </div>
         </div>
         <div
-          className="p-1 my-2 content-font"
+          className="p-1 my-2 content-font position-relative"
           style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6", opacity: editProfile ? "0.3" : ""
           }}
         >
-          <div className="position-relative">
-            <img
-              src={edit}
-              alt=""
-              height={40}
-              width={40}
-              style={{
-                display: editProfile ? "block" : "none",
-                position: "absolute",
-                right: "12rem",
-              }}
-            />
-          </div>
           2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
           lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için teşekkürler.
           2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
           lig konusunda uzmanım. Yorumlarımı takip ettiğiniz için teşekkürler.
         </div>
+          <img
+            src={currentTheme === "dark" ? edit : editLight}
+            alt=""
+            height={35}
+            width={35}
+            style={{
+              display: editProfile ? "block" : "none",
+              position: "absolute",
+              right: "10rem",
+              top: "10rem"
+            }}
+          />
         <div className="row g-0 text-center my-2 gap-1">
           <div className="col d-flex flex-column">
             <span
@@ -385,7 +389,9 @@ const ActiveComments = (props) => {
                 Withdrawal
               </button>
             )}
-            {(props.content === "home" || props.content === "wallet" || props.content === "subscribers") && (
+            {(props.content === "home" ||
+              props.content === "wallet" ||
+              props.content === "subscribers") && (
               <button
                 onClick={() => setPromoteModalShow(true)}
                 className="p-1 px-2"
