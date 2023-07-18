@@ -37,7 +37,9 @@ const MainPage = () => {
     }
   }, [themeMode]);
 
-  const user = "c-";
+  // const user = "c-";
+  const user = localStorage.getItem("userPhone")
+  console.log("selectContent: ",selectContent)
 
   return (
     <>
@@ -52,7 +54,7 @@ const MainPage = () => {
 
         {dashboardSUser ? (
           user === "c" ? (
-            <CommentatorsCommentsPage user={user} />
+            <CommentatorsCommentsPage user={user} setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} selectContent={selectContent}/>
           ) : (
             <DashboardSU
               setSelectContent={setSelectContent}

@@ -10,6 +10,9 @@ import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import CheckBoxDark from "../../assets/CheckBoxDark.svg";
 import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
+import toggleinputDark from "../../assets/Group 711.png";
+import toggleinputLight from "../../assets/Group 720.png";
+import toggleinputLightSelected from "../../assets/Group 720_selected.png";
 
 const AddCommentModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
@@ -54,6 +57,8 @@ const AddCommentModal = (props) => {
     setPredictionDropdown(!predictionDropdown);
   };
 
+  const [toggleInput, setToggleInput] = useState(false);
+
   return (
     <>
       <Modal
@@ -80,7 +85,7 @@ const AddCommentModal = (props) => {
             </span>
           </div>
           <CommentFilter />
-          <div className="my-3 position-relative" style={{fontSize:"14px"}}>
+          <div className="my-3 position-relative" style={{ fontSize: "14px" }}>
             <CustomDropdown
               label="Match Details"
               options={matchDetailsOptions}
@@ -90,7 +95,10 @@ const AddCommentModal = (props) => {
               toggleDropdown={toggleMatchDetailsDropdown}
             />
           </div>
-          <div className="row g-0 my-3 gap-3 position-relative" style={{fontSize:"14px"}}>
+          <div
+            className="row g-0 my-3 gap-3 position-relative"
+            style={{ fontSize: "14px" }}
+          >
             <div className="col">
               <CustomDropdown
                 label="Prediction Type"
@@ -113,22 +121,29 @@ const AddCommentModal = (props) => {
             </div>
           </div>
           <div className="">
-            <div class="form-check form-switch">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="flexSwitchCheckDefault"
+            {currentTheme === "dark" ? (
+              <img
+                onClick={() => setToggleInput(!toggleInput)}
+                src={!toggleInput ? toggleinputDark : toggleinputDark}
+                alt=""
+                height={27}
+                width={55}
               />
-              <label class="form-check-label" for="flexSwitchCheckDefault">
-                Public Content
-              </label>
-            </div>
+            ) : (
+              <img
+                onClick={() => setToggleInput(!toggleInput)}
+                src={!toggleInput ? toggleinputLightSelected : toggleinputLight}
+                alt=""
+                height={27}
+                width={55}
+              />
+            )}
+            <span className="ps-2">Public Content</span>
           </div>
           <div className="">
-            <span style={{fontSize:"14px"}}>
+            <span style={{ fontSize: "14px" }}>
               Comment
-              <span style={{ color: "#FF5757",fontSize:"10px" }}>
+              <span style={{ color: "#FF5757", fontSize: "10px" }}>
                 {" "}
                 ( If illegal content is detected, the membership will be
                 terminated. )
@@ -143,7 +158,7 @@ const AddCommentModal = (props) => {
                   : "textArea-light-mode"
               }`}
             />
-            <span style={{fontSize:"10px"}}>Max. 250 character</span>
+            <span style={{ fontSize: "10px" }}>Max. 250 character</span>
           </div>
           <div className="text-center">
             <div className="my-3" style={{ fontSize: "13px" }}>
@@ -168,9 +183,6 @@ const AddCommentModal = (props) => {
               <span
                 style={{
                   color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                }}
-                onClick={() => {
-                  props.setShowModal(3);
                 }}
               >
                 Terms of use

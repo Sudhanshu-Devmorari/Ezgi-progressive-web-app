@@ -19,4 +19,13 @@
         height: 20px;
         width: 20px;
     }
+    .chardivs{
+        gap: 0.7rem!important;
+    }
+}
+@media (min-width: 360px) and (max-width: 380px){
+    .chardivs{
+        gap: 0.7rem!important;
+        padding-left: 0.7rem!important;
+    }
 }

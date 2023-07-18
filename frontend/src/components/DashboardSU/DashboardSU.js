@@ -18,14 +18,8 @@ const DashboardSU = (props) => {
   const [content, setContent] = useState("subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");
+  
   useEffect(() => {
-    if (content === "notifications")  {
-      props.setSelectContent("notifications")
-    }
-  }, [content])
-
-  useEffect(() => {
-    console.log("inside useEffect")
     if (props.selectContent === "notifications")  {
       setContent("notifications")
     } else if (props.selectContent === "fav") {

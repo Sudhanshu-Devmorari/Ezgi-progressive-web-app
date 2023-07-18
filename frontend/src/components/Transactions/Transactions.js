@@ -8,6 +8,14 @@ import bankLogo from "../../assets/Akbank-Logo-PNG.png"
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const chart = [
+    {name: "Tem", color: "#0CC6FF", height: "4rem"},
+    {name: "Ağu", color: "#37FF80", height: "5rem"},
+    {name: "Eyl", color: "#37FF80", height: "7rem"},
+    {name: "Eki", color: "#FF5757", height: "6rem"},
+    {name: "Las", color: "#0CC6FF", height: "6rem"},
+    {name: "Ara", color: "#FFFFFF", height: "6rem"},
+  ]
   return (
     <>
       <div
@@ -49,23 +57,27 @@ const Transactions = () => {
           </div>
           <div className="col-7">
             <div
-              className="p-2"
+              className="p-2 d-flex ps-3 gap-3 chardivs"
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                  fontSize:"12px"
               }}
             >
+              {chart.map((res,index)=>(
+
               <div className="">
                 <div
                   className=""
                   style={{
-                    height: "4rem",
+                    height: res.height,
                     width: "12px",
-                    backgroundColor: "#0CC6FF",
+                    backgroundColor: res.color,
                   }}
                 ></div>
-                <span>Tem</span>
+                <span>{res.name}</span>
               </div>
+              ))}
             </div>
           </div>
         </div>

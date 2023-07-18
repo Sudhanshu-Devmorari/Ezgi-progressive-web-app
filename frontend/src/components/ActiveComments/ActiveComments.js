@@ -6,31 +6,67 @@ import blueTick from "../../assets/blueTick.png";
 import starIcon from "../../assets/star-1.svg";
 import starDark from "../../assets/star.svg";
 import { BsArrowLeft } from "react-icons/bs";
-import { LiaLiraSignSolid } from "react-icons/lia";
 import basketball from "../../assets/basketball.png";
 import football from "../../assets/football.png";
-import icon from "../../assets/₺.svg";
-import icon_1 from "../../assets/₺ (1).svg";
 import "./ActiveComments.css";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import PromoteMeModal from "../PromoteMeModal/PromoteMeModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
+import camera from "../../assets/camera-plus.svg";
+import edit from "../../assets/edit.png";
+import WithdrawalModal from "../WithdrawalModal/WithdrawalModal"
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);
-  const [AddCommentModalModalShow, setAddCommentModalModalShow] = useState(false);
+  const [withdrawalModal, setWithdrawalModal] = useState(false);
+  const [AddCommentModalModalShow, setAddCommentModalModalShow] =
+    useState(false);
+
+  const [editProfile, setEditProfile] = useState(false);
+  const EditButtonStyle = {
+    border: editProfile
+      ? currentTheme === "dark"
+        ? "1px solid #4DD5FF"
+        : "1px solid #007BF6"
+      : currentTheme === "dark"
+      ? "1px solid #E6E6E6"
+      : "1px solid #0D2A53",
+    color: editProfile
+      ? currentTheme === "dark"
+        ? "#4DD5FF"
+        : "#007BF6"
+      : currentTheme === "dark"
+      ? "#E6E6E6"
+      : "#0D2A53",
+    backgroundColor: "transparent",
+    borderRadius: "18px",
+    padding: "0.1rem 2.2rem",
+    fontSize: "13px",
+  };
+  const cameraImageStyles = {
+    display: editProfile ? "block" : "none",
+    position: "absolute",
+    backgroundColor: "#",
+    top: "1.85rem",
+    left: "1.89rem",
+  };
+
   return (
     <>
       <div
         className={`card border-0 rounded-0 my-2 p-2 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
-        }`} style={{fontSize:"14px"}}
+        }`}
+        style={{ fontSize: "14px" }}
       >
         <div className="d-flex justify-content-between pb-2">
           <BsArrowLeft
-            onClick={() => props.setSelectContent("home")}
+            onClick={() => {
+              props.setSelectContent("home");
+              props.setDashboardSUser(false);
+            }}
             fontSize={"1.6rem"}
           />
           <img
@@ -56,6 +92,18 @@ const ActiveComments = (props) => {
                 }}
               />
             </div>
+            <div className="position-relative">
+              <label htmlFor="camera-icon">
+                <img
+                  src={camera}
+                  alt=""
+                  style={cameraImageStyles}
+                  height={40}
+                  width={40}
+                />
+              </label>
+              <input type="file" name="" id="camera-icon" className="d-none" />
+            </div>
             <img src={profile} width={100} height={100} alt="" />
             <div className="d-flex flex-column ps-1">
               <div>
@@ -72,7 +120,10 @@ const ActiveComments = (props) => {
                   Expert
                 </button>
               </div>
-              <div className="blueTick-responsive align-items-center mt-1 responsive-username" style={{fontSize:"14px"}}>
+              <div
+                className="blueTick-responsive align-items-center mt-1 responsive-username"
+                style={{ fontSize: "14px" }}
+              >
                 melih1905
                 <img
                   className="responsive-blue-tick"
@@ -139,21 +190,30 @@ const ActiveComments = (props) => {
               </div>
             </div>
             <div className="mt-2 d-flex justify-content-end">
-              <button
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #4DD5FF"
-                      : "1px solid #007BF6",
-                  color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                  backgroundColor: "transparent",
-                  borderRadius: "18px",
-                  padding: "0.2rem 2.4rem",
-                  fontSize: "13px",
-                }}
-              >
-                Follow
-              </button>
+              {props.user === "c" ? (
+                <button
+                  onClick={() => setEditProfile(!editProfile)}
+                  style={EditButtonStyle}
+                >
+                  Edit Profile
+                </button>
+              ) : (
+                <button
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #4DD5FF"
+                        : "1px solid #007BF6",
+                    color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                    backgroundColor: "transparent",
+                    borderRadius: "18px",
+                    padding: "0.1rem 2.2rem",
+                    fontSize: "13px",
+                  }}
+                >
+                  Follow
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -163,6 +223,19 @@ const ActiveComments = (props) => {
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
           }}
         >
+          <div className="position-relative">
+            <img
+              src={edit}
+              alt=""
+              height={40}
+              width={40}
+              style={{
+                display: editProfile ? "block" : "none",
+                position: "absolute",
+                right: "12rem",
+              }}
+            />
+          </div>
           2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
           lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için teşekkürler.
           2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
@@ -211,7 +284,6 @@ const ActiveComments = (props) => {
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                // fontSize: "11px",
               }}
             >
               Lose
@@ -252,7 +324,11 @@ const ActiveComments = (props) => {
           <div className="py-1">UK Premier League + 3</div>
         </div>
         {props.user !== "c" && (
-          <div className="d-flex justify-content-center align-items-center my-3">
+          <div
+            className={`d-flex justify-content-center align-items-center my-3 ${
+              props.content === ("home" || "wallet") && "mb-5"
+            }`}
+          >
             Month/29.90₺
             <button
               onClick={() => setSubscribeModalShow(true)}
@@ -273,38 +349,60 @@ const ActiveComments = (props) => {
         )}
         {props.user === "c" && (
           <div className="d-flex justify-content-center my-3 gap-2">
-            <button
-            onClick={() => setAddCommentModalModalShow(true)}
-              className="p-1 px-2"
-              style={{
-                color: currentTheme === "dark" ? "#4DD5FF" : "#00659D",
-                border:
-                  currentTheme === "dark"
-                    ? "1px solid #4DD5FF"
-                    : "1px solid #00659D",
-                backgroundColor: "transparent",
-                borderRadius: "4px",
-                fontSize: "15px",
-              }}
-            >
-              Add Comment
-            </button>
-            <button
-            onClick={() => setPromoteModalShow(true)}
-              className="p-1 px-2"
-              style={{
-                color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
-                border:
-                  currentTheme === "dark"
-                    ? "1px solid #6BFFC4"
-                    : "1px solid #C66EF8",
-                backgroundColor: "transparent",
-                borderRadius: "4px",
-                fontSize: "14px",
-              }}
-            >
-              Promote Me
-            </button>
+            {props.content === "home" && (
+              <button
+                onClick={() => setAddCommentModalModalShow(true)}
+                className="p-1 px-2"
+                style={{
+                  color: currentTheme === "dark" ? "#4DD5FF" : "#00659D",
+                  border:
+                    currentTheme === "dark"
+                      ? "1px solid #4DD5FF"
+                      : "1px solid #00659D",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "15px",
+                }}
+              >
+                Add Comment
+              </button>
+            )}
+            {props.content === "wallet" && (
+              <button
+                onClick={() => setWithdrawalModal(true)}
+                className="p-1 px-2"
+                style={{
+                  color: currentTheme === "dark" ? "#C66EF8" : "#00659D",
+                  border:
+                    currentTheme === "dark"
+                      ? "1px solid #C66EF8"
+                      : "1px solid #00659D",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "15px",
+                }}
+              >
+                Withdrawal
+              </button>
+            )}
+            {(props.content === "home" || props.content === "wallet" || props.content === "subscribers") && (
+              <button
+                onClick={() => setPromoteModalShow(true)}
+                className="p-1 px-2"
+                style={{
+                  color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
+                  border:
+                    currentTheme === "dark"
+                      ? "1px solid #6BFFC4"
+                      : "1px solid #C66EF8",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                }}
+              >
+                Promote Me
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -320,6 +418,10 @@ const ActiveComments = (props) => {
       <AddCommentModal
         show={AddCommentModalModalShow}
         onHide={() => setAddCommentModalModalShow(false)}
+      />
+      <WithdrawalModal
+        show={withdrawalModal}
+        onHide={() => setWithdrawalModal(false)}
       />
     </>
   );

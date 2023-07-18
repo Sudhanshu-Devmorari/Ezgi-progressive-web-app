@@ -24,9 +24,18 @@ const CommentatorsCommentsPage = (props) => {
     const [walletSelection, setWalletSelection] = useState("My transactions");
     const [favSelection, setFavSelection] = useState("fav editor");
 
+    useEffect(() => {
+      console.log("props.selectContent=>>>",props.selectContent)
+      if (props.selectContent === "notifications")  {
+        setContent("notifications")
+      } else if (props.selectContent === "fav") {
+        setContent("fav")
+      }
+    }, [props.selectContent])
+
   return (
     <>
-        <ActiveComments user={props.user}/>
+        <ActiveComments content={content} user={props.user} setDashboardSUser={props.setDashboardSUser} setSelectContent={props.setSelectContent}/>
         <CommentatorIcons setContent={setContent} content={content} user={'commentator'}/>
 
         {content === "home" && (

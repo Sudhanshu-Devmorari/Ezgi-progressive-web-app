@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
-import { currentTheme } from "../GetCurrentTheme";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const WithdrawalModal = (props) => {
   const [showBankDetail, setShowBankDetail] = useState(false);
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>
       <Modal
@@ -16,7 +17,7 @@ const WithdrawalModal = (props) => {
         scrollable
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`} style={{fontSize:"14px"}}
         >
           <div>
             <div className="m-3 mt-4">
@@ -65,8 +66,8 @@ const WithdrawalModal = (props) => {
                 </span>
               </div>
               <div className="text-center">
-                <div className="h3">Withdrawable Balance</div>
-                <div className="h3">8.000</div>
+                <div className="h5">Withdrawable Balance</div>
+                <div className="h5">8.000₺</div>
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button
@@ -81,10 +82,10 @@ const WithdrawalModal = (props) => {
                 </button>
               </div>
               <div className="mb-4 text-center">
-                <div className="">
+                <div className="" style={{fontSize:"13px"}}>
                   Withdrawal requests are processed within 1 business dat
                 </div>
-                <div className="" style={{ color: "#00659D" }}>
+                <div className="" style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#00659D",fontSize:"12px" }}>
                   If the registered bank information and the personal
                   information of the user do not match the transaction is
                   suspended.
