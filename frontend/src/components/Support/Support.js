@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import lifebuoy from "../../assets/lifebuoy.svg";
+import lifebuoy from "../../assets/lifebuoy.png";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import Form from "react-bootstrap/Form";
 

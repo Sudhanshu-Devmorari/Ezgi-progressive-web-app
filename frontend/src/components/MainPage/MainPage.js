@@ -39,20 +39,26 @@ const MainPage = () => {
 
   const user = "c-";
 
-  console.log("selectContent: ",selectContent)
   return (
     <>
       <div
         className={`container-fluid mt-3`}
         style={{ fontFamily: "none", marginBottom: "66px" }}
       >
-        <NavBar setDashboardSUser={setDashboardSUser} setSelectContent={setSelectContent}/>
+        <NavBar
+          setDashboardSUser={setDashboardSUser}
+          setSelectContent={setSelectContent}
+        />
 
         {dashboardSUser ? (
           user === "c" ? (
             <CommentatorsCommentsPage user={user} />
           ) : (
-            <DashboardSU setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} selectContent={selectContent}/>
+            <DashboardSU
+              setSelectContent={setSelectContent}
+              setDashboardSUser={setDashboardSUser}
+              selectContent={selectContent}
+            />
           )
         ) : (
           <>
@@ -88,17 +94,9 @@ const MainPage = () => {
             )}
           </>
         )}
-
-        {/* {selectContent === "notifications" && (
-          <CommentatorsCommentsPage user={user} displayNotifications={selectContent}/>
-        )} */}
-        {/* {selectContent === "notifications" && (
-          <DashboardSU setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} displayNotifications={selectContent}/>
-        )} */}
-
       </div>
       <Footer
-      setDashboardSUser={setDashboardSUser}
+        setDashboardSUser={setDashboardSUser}
         setSelectContent={setSelectContent}
         selectContent={selectContent}
       />
