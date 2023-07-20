@@ -15,6 +15,7 @@ import CommentsPage from "../CommentsPage/CommentsPage";
 import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
 import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCommentsPage";
 import DashboardSU from "../DashboardSU/DashboardSU";
+import LandingPage from "../LandingPage/LandingPage";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -38,70 +39,81 @@ const MainPage = () => {
   }, [themeMode]);
 
   // const user = "c-";
-  const user = localStorage.getItem("userPhone")
-  console.log("selectContent: ",selectContent)
+  const user = localStorage.getItem("userPhone");
+  console.log("selectContent: ", selectContent);
 
   return (
     <>
-      <div
-        className={`container-fluid mt-3`}
-        style={{ fontFamily: "none", marginBottom: "66px" }}
-      >
-        <NavBar
+      <div className="landing-page">
+        <LandingPage />
+      </div>
+      <div className="container-fluid mt-3 mobile-view">
+        <div
+          // className={`container-fluid mt-3 mobile-view`}
+          style={{ marginBottom: "66px" }}
+        >
+          <NavBar
+            setDashboardSUser={setDashboardSUser}
+            setSelectContent={setSelectContent}
+          />
+
+          {dashboardSUser ? (
+            user === "c" ? (
+              <CommentatorsCommentsPage
+                user={user}
+                setSelectContent={setSelectContent}
+                setDashboardSUser={setDashboardSUser}
+                selectContent={selectContent}
+              />
+            ) : (
+              <DashboardSU
+                setSelectContent={setSelectContent}
+                setDashboardSUser={setDashboardSUser}
+                selectContent={selectContent}
+              />
+            )
+          ) : (
+            <>
+              {(selectContent === "home" ||
+                selectContent === "editor" ||
+                selectContent === "comments") && (
+                <>
+                  <Banner />
+                  <EditorBanner />
+                </>
+              )}
+              {selectContent === "home" && (
+                <>
+                  <SelectContent
+                    selectContent={selectPublicorForYou}
+                    setSelectContent={setSelectPublicorForYou}
+                  />
+                  <ContentSection
+                    selectContent={selectPublicorForYou}
+                    setSelectContent={setSelectContent}
+                  />
+                  <HighlightMainPage />
+                  <SharedProfile />
+                  <AdvertisementBanner />
+                </>
+              )}
+              {selectContent === "editor" && <EditorsPage />}
+              {selectContent === "comments" && <CommentsPage />}
+              {selectContent === "show-all-comments" && (
+                <EditorProfileActiveComments
+                  setSelectContent={setSelectContent}
+                  setDashboardSUser={setDashboardSUser}
+                />
+              )}
+            </>
+          )}
+        </div>
+        <Footer
           setDashboardSUser={setDashboardSUser}
           setSelectContent={setSelectContent}
+          selectContent={selectContent}
         />
-
-        {dashboardSUser ? (
-          user === "c" ? (
-            <CommentatorsCommentsPage user={user} setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser} selectContent={selectContent}/>
-          ) : (
-            <DashboardSU
-              setSelectContent={setSelectContent}
-              setDashboardSUser={setDashboardSUser}
-              selectContent={selectContent}
-            />
-          )
-        ) : (
-          <>
-            {(selectContent === "home" ||
-              selectContent === "editor" ||
-              selectContent === "comments") && (
-              <>
-                <Banner />
-                <EditorBanner />
-              </>
-            )}
-            {selectContent === "home" && (
-              <>
-                <SelectContent
-                  selectContent={selectPublicorForYou}
-                  setSelectContent={setSelectPublicorForYou}
-                />
-                <ContentSection
-                  selectContent={selectPublicorForYou}
-                  setSelectContent={setSelectContent}
-                />
-                <HighlightMainPage />
-                <SharedProfile />
-                <AdvertisementBanner />
-              </>
-            )}
-            {selectContent === "editor" && <EditorsPage />}
-            {selectContent === "comments" && <CommentsPage />}
-            {selectContent === "show-all-comments" && (
-              <EditorProfileActiveComments
-                setSelectContent={setSelectContent} setDashboardSUser={setDashboardSUser}
-              />
-            )}
-          </>
-        )}
       </div>
-      <Footer
-        setDashboardSUser={setDashboardSUser}
-        setSelectContent={setSelectContent}
-        selectContent={selectContent}
-      />
     </>
   );
 };

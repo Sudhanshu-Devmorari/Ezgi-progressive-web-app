@@ -42,16 +42,11 @@ const NavBar = (props) => {
           <div className="">
             {currentTheme === "light" ? (
               <span className="p-2">
-                {/* <CiDark fontSize={"2rem"} onClick={() => handleTheme("dark")} /> */}
                 <img src={moon} alt="" height={35} width={35} onClick={() => handleTheme("dark")} />
               </span>
             ) : (
               <span className="p-2">
                 <img src={darkmode} alt="" height={35} width={35} onClick={() => {handleTheme("light")}}/>
-                {/* <CiLight
-                  onClick={() => {handleTheme("light")}}
-                  fontSize={"2rem"}
-                /> */}
               </span>
             )}
             <span className="pe-2 ps-0 py-2">

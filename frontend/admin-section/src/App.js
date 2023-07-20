@@ -1,15 +1,15 @@
 import { Route, Routes } from "react-router-dom";
 import MainPage from "./components/MainPage/MainPage";
-import ContextProvider from "./context/Provider";
+// import ContextProvider from "./context/Provider";
 
 function App() {
   return (
     <>
-    <ContextProvider>
+      {/* <ContextProvider> */}
       <Routes>
-        <Route path="/" element={ <MainPage /> }  />
+        <Route path="/" element={<MainPage />} />
       </Routes>
-    </ContextProvider>
+      {/* </ContextProvider> */}
     </>
   );
 }
