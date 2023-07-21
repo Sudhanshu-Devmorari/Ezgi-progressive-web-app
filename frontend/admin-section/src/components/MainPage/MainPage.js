@@ -17,13 +17,23 @@ import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
-import winner from '../../assets/Group 73.png'
-import lose from '../../assets/Lose.png'
+import winner from "../../assets/Group 73.png";
+import lose from "../../assets/Lose.png";
 import CommentsManagementPage from "../CommentsManagementPage/CommentsManagementPage";
 import MostLiked from "../MostLiked/MostLiked";
+import LevelCount from "../LevelCount/LevelCount";
+import EditorManagemenetPage from "../EditorManagemenetPage/EditorManagemenetPage";
+import Top10 from "../Top10/Top10";
+import EditorAccountStatus from "../EditorAccountStatus/EditorAccountStatus";
+import Requests from "../Requests/Requests";
+import bluetick from "../../assets/MDI - check-decagram.svg";
+import deactivation from "../../assets/user-off.svg";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 
 const MainPage = () => {
   const [showDetails, setshowDetails] = useState("home");
+  const [modalShow, setModalShow] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("body-dark-mode");
@@ -94,7 +104,8 @@ const MainPage = () => {
       per: "%22",
       color: "#58DEAA",
       rate_icon: "arrowUp",
-    },]
+    },
+  ];
   const losetArray = [
     {
       label: "Lose",
@@ -161,6 +172,21 @@ const MainPage = () => {
       date: "15-06-.2023 - 16:37",
       role: "Apprentice",
       profile: profile,
+    },
+  ];
+
+  const verifcationArray = [
+    {
+      name: "Verifivation Requests",
+      img: bluetick,
+      count: "127",
+    },
+  ];
+  const deactivationArray = [
+    {
+      name: "Verifivation Requests",
+      img: deactivation,
+      count: "127",
     },
   ];
 
@@ -246,7 +272,10 @@ const MainPage = () => {
                 <div className="col-8">
                   <div className="row g-0">
                     <div className="col-4">
-                      <NewUsers array={newCommentsArray} commentsPage={"commentsPage"}/>
+                      <NewUsers
+                        array={newCommentsArray}
+                        commentsPage={"commentsPage"}
+                      />
                     </div>
                     <div className="col-4">
                       <NewUsers array={winnertArray} />
@@ -262,12 +291,44 @@ const MainPage = () => {
               </div>
               <div className="row g-0 my-3 h-100">
                 <div className="col-8">
-                  <CommentsManagementPage/>
+                  <CommentsManagementPage />
                 </div>
                 <div className="col-4">
-                  <MostLiked/>
-                  {/* <NewUsers array={dailySalesArray} />
-                  <NewUsers array={WithdrawalRqstArray} /> */}
+                  <MostLiked />
+                </div>
+              </div>
+            </div>
+          )}
+          {showDetails === "editor" && (
+            <div
+              className="col-11"
+              style={{ fontSize: "0.8rem", width: "95%" }}
+            >
+              <div className="row g-0">
+                <div className="col-8">
+                  <div className="row g-0">
+                    <div className="col-4">
+                      <NewUsers array={newEditorsArray} />
+                    </div>
+                    <div className="col-8">
+                      <LevelCount />
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <EditorManagemenetPage />
+                  </div>
+                </div>
+                <div className="col-4">
+                  <Top10 />
+                  <EditorAccountStatus />
+                  <div className="row g-0 gap-3 mb-3">
+                    <div className="col">
+                      <Requests rqstArray={verifcationArray} />
+                    </div>
+                    <div className="col">
+                      <Requests rqstArray={deactivationArray} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

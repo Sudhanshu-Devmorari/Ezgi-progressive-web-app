@@ -57,7 +57,7 @@ const MostLiked = () => {
       {notification.map((res, index) => (
         <div className="card py-1 my-2 rounded-0 dark-mode border-0 neha">
           <div className="d-flex">
-            <img src={res.profile} alt="" height={50} width={50} />
+            <img className="profile-mostLiked" src={res.profile} alt="" height={50} width={50} />
             <div
               className="d-flex flex-column mt-2 ps-1"
             >
@@ -79,7 +79,7 @@ const MostLiked = () => {
                   {res.level}
                 </button>
               </span>
-              <span className="content-font" style={{ fontSize: "0.9rem" }}>{res.content}</span>
+              <span className="content-font1" style={{ fontSize: "0.9rem" }}>{res.content}</span>
             </div>
             <div className="ms-auto mt-2 icons-font" style={{ fontSize: "0.9rem" }}>
               <span><img className="icons-mostLiked" src={likeIcon} alt="" height={26} width={26} />238</span>

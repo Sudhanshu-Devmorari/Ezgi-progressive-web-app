@@ -15,5 +15,11 @@
     .name-font1{
         font-size: 0.8rem!important;
     }
-
+    .content-font1{
+        font-size: 0.6rem!important;
+    }
+    .profile-mostLiked{
+        height: 40px;
+        width: 40px;
+    }
 }

@@ -11,7 +11,7 @@ const Home = (props) => {
   return (
     <>
       <div className="dark-mode p-2 me-3 h-100">
-        {props.showDetails === "users" && (
+        {props?.showDetails === "users" && (
           <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
             <div className="p-2 flex-grow-1">
               <div class="input-group w-50">
@@ -53,7 +53,7 @@ const Home = (props) => {
             </div>
           </div>
         )}
-        {props.users.map((res, index) => (
+        {props?.users?.map((res, index) => (
           <div
             className="d-flex justify-content-between px-2 py-1 mb-2 users-section-fonts"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
