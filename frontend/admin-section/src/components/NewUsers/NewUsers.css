@@ -1,0 +1,11 @@
+@media (max-width: 1024px){
+    .label-font{
+        font-size: 1.4rem!important;
+    }
+    .count-font{
+        font-size: 2.4rem!important;
+    }
+    .rate-fonts{
+        font-size: 1.1rem!important;
+    }
+}

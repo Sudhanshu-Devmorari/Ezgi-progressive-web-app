@@ -1,0 +1,32 @@
+.input-field-dark {
+    width: 50%;
+    border: 1px solid #E6E6E6;
+    background-color: transparent;
+    border-left: none;
+    color: #E6E6E6;
+    border-radius: 3px;
+}
+.search-icon-dark{
+    background-color: transparent;
+    border: 1px solid #E6E6E6;
+    border-radius: 3px;
+    border-right: none;
+    padding: 0.2rem!important;
+}
+.input-field-dark:focus{
+    outline: none;
+}
+@media (max-width: 1024px){
+    .users-section-fonts{
+        font-size: 0.7rem!important;
+    }
+    .btn-user{
+        width: 5rem!important;
+    }
+    .block-width{
+        min-width: none!important;
+    }
+    .edit-icon-gap{
+        gap: 0rem!important;
+    }
+}

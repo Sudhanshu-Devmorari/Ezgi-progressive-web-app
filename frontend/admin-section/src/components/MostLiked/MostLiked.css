@@ -1,0 +1,19 @@
+@media (max-width: 1024px){
+    .icons-font{
+        font-size: 0.7rem!important;
+    }
+    .icons-mostLiked{
+        height: 20px!important;
+        width: 20px!important;
+    }
+    .padding{
+        padding: 0 0.1rem!important;
+    }
+    .level-btn{
+        font-size: 0.5rem!important;
+    }
+    .name-font1{
+        font-size: 0.8rem!important;
+    }
+
+}

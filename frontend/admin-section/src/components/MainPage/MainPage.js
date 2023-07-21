@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import "./MainPage.css";
@@ -12,8 +12,19 @@ import arrowdown from "../../assets/arrow-move-down.svg";
 import sales from "../../assets/basket-1.svg";
 import withdrawal from "../../assets/cash-banknote.svg";
 import Home from "../Home/Home";
+import UserTimeLine from "../UserTimeLine/UserTimeLine";
+import gender_female from "../../assets/gender-female.png";
+import gender_male from "../../assets/gender-male.png";
+import profile from "../../assets/profile.png";
+import user1 from "../../assets/user1.png";
+import winner from '../../assets/Group 73.png'
+import lose from '../../assets/Lose.png'
+import CommentsManagementPage from "../CommentsManagementPage/CommentsManagementPage";
+import MostLiked from "../MostLiked/MostLiked";
 
 const MainPage = () => {
+  const [showDetails, setshowDetails] = useState("home");
+
   useEffect(() => {
     document.body.classList.add("body-dark-mode");
   }, []);
@@ -25,7 +36,7 @@ const MainPage = () => {
       count: "127",
       per: "%22",
       color: "#58DEAA",
-      rate_icon: arrowUp,
+      rate_icon: "arrowUp",
     },
   ];
   const newEditorsArray = [
@@ -35,7 +46,7 @@ const MainPage = () => {
       count: "127",
       per: "%22",
       color: "#58DEAA",
-      rate_icon: arrowUp,
+      rate_icon: "arrowUp",
     },
   ];
   const newSubscribersArray = [
@@ -45,7 +56,7 @@ const MainPage = () => {
       count: "127",
       per: "%22",
       color: "#FF5757",
-      rate_icon: arrowdown,
+      rate_icon: "arrowdown",
     },
   ];
   const newCommentsArray = [
@@ -55,7 +66,7 @@ const MainPage = () => {
       count: "127",
       per: "%22",
       color: "#58DEAA",
-      rate_icon: arrowUp,
+      rate_icon: "arrowUp",
     },
   ];
   const dailySalesArray = [
@@ -65,7 +76,7 @@ const MainPage = () => {
       count: "12.645₺",
       per: "%22",
       color: "#58DEAA",
-      rate_icon: arrowUp,
+      rate_icon: "arrowUp",
     },
   ];
   const WithdrawalRqstArray = [
@@ -73,9 +84,83 @@ const MainPage = () => {
       label: "New Withdrawal Request",
       icon: withdrawal,
       count: "18",
-      // per: "%22",
-      // color: "#58DEAA",
-      // rate_icon: arrowUp,
+    },
+  ];
+  const winnertArray = [
+    {
+      label: "Winner",
+      icon: winner,
+      count: "127",
+      per: "%22",
+      color: "#58DEAA",
+      rate_icon: "arrowUp",
+    },]
+  const losetArray = [
+    {
+      label: "Lose",
+      icon: lose,
+      count: "127",
+      per: "%22",
+      color: "#FF5757",
+      rate_icon: "arrowDown",
+    },
+  ];
+  const totalArray = [
+    {
+      label: "Total",
+      count: "12.700",
+      rateWin: "9.845",
+      rateLose: "9.845",
+      perWin: "%22",
+      perLose: "%22",
+      color: "#FF5757",
+      rate_icon: "arrowDown",
+    },
+  ];
+
+  const users = [
+    {
+      sr: "#0001",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_female,
+      age: "25 - 34",
+      country: "Ankara",
+      date: "15-06-.2023 - 16:37",
+      role: "Journeyman",
+      profile: profile,
+    },
+    {
+      sr: "#0002",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_male,
+      age: "18 - 24",
+      country: "İstanbul",
+      date: "15-06-.2023 - 16:37",
+      profile: user1,
+    },
+    {
+      sr: "#0003",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_female,
+      age: "35 - 44",
+      country: "İzmir",
+      date: "15-06-.2023 - 16:37",
+      role: "Expert",
+      profile: profile,
+    },
+    {
+      sr: "#0004",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_male,
+      age: "25 - 34",
+      country: "Bursa",
+      date: "15-06-.2023 - 16:37",
+      role: "Apprentice",
+      profile: profile,
     },
   ];
 
@@ -84,38 +169,109 @@ const MainPage = () => {
       <div className="container-fluid">
         <NavBar />
         <div className="row g-0 row-height">
-          <div className="col-1">
-            <SideBar />
+          <div className="col-1" style={{ width: "5%" }}>
+            <SideBar
+              setshowDetails={setshowDetails}
+              showDetails={showDetails}
+            />
           </div>
-          <div className="col-11" style={{ fontSize: "0.8rem" }}>
-            <div className="row g-0">
-              <div className="col-8">
-                <div className="row g-0">
-                  <div className="col-4">
-                    <NewUsers array={newUsersArray} />
-                  </div>
-                  <div className="col-4">
-                    <NewUsers array={newEditorsArray} />
-                  </div>
-                  <div className="col-4">
-                    <NewUsers array={newSubscribersArray} />
+          {showDetails === "home" && (
+            <div
+              className="col-11"
+              style={{ fontSize: "0.8rem", width: "95%" }}
+            >
+              <div className="row g-0">
+                <div className="col-8">
+                  <div className="row g-0">
+                    <div className="col-4">
+                      <NewUsers array={newUsersArray} />
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={newEditorsArray} />
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={newSubscribersArray} />
+                    </div>
                   </div>
                 </div>
+                <div className="col-4">
+                  <NewUsers array={newCommentsArray} />
+                </div>
               </div>
-              <div className="col-4">
-                <NewUsers array={newCommentsArray} />
+              <div className="row g-0 my-3 h-100">
+                <div className="col-8">
+                  <Home users={users} />
+                </div>
+                <div className="col-4">
+                  <NewUsers array={dailySalesArray} />
+                  <NewUsers array={WithdrawalRqstArray} />
+                </div>
               </div>
             </div>
-            <div className="row g-0 my-2">
-              <div className="col-8">
-                <Home/>
-              </div>
-              <div className="col-4">
-                <NewUsers array={dailySalesArray} />
-                <NewUsers array={WithdrawalRqstArray} />
+          )}
+          {showDetails === "users" && (
+            <div
+              className="col-11"
+              style={{ fontSize: "0.8rem", width: "95%" }}
+            >
+              <div className="row g-0">
+                <div className="col-8">
+                  <div className="row g-0">
+                    <div className="col-4">
+                      <NewUsers array={newUsersArray} />
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={newEditorsArray} />
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={newSubscribersArray} />
+                    </div>
+                  </div>
+                  <div className="my-2 h-100">
+                    <Home showDetails={showDetails} users={users} />
+                  </div>
+                </div>
+                <div className="col-4 h-100">
+                  <UserTimeLine />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+          {showDetails === "comments" && (
+            <div
+              className="col-11"
+              style={{ fontSize: "0.8rem", width: "95%" }}
+            >
+              <div className="row g-0">
+                <div className="col-8">
+                  <div className="row g-0">
+                    <div className="col-4">
+                      <NewUsers array={newCommentsArray} commentsPage={"commentsPage"}/>
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={winnertArray} />
+                    </div>
+                    <div className="col-4">
+                      <NewUsers array={losetArray} />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-4">
+                  <NewUsers totalArray={totalArray} />
+                </div>
+              </div>
+              <div className="row g-0 my-3 h-100">
+                <div className="col-8">
+                  <CommentsManagementPage/>
+                </div>
+                <div className="col-4">
+                  <MostLiked/>
+                  {/* <NewUsers array={dailySalesArray} />
+                  <NewUsers array={WithdrawalRqstArray} /> */}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

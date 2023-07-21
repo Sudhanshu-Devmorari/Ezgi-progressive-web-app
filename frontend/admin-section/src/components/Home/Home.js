@@ -1,80 +1,123 @@
-import React from "react";
-import profile from "../../assets/profile.png";
-import gender_female from "../../assets/gender-female.svg";
-import gender_male from "../../assets/gender-male.svg";
+import React, { useState } from "react";
 import userEdit from "../../assets/user-edit.svg";
 import trash from "../../assets/trash.svg";
+import "./Home.css";
+import { GoSearch } from "react-icons/go";
+import CreateUserModal from "../CreateUserModal/CreateUserModal";
 
-const Home = () => {
-  const users = [
-    {
-      sr: "#0001",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "25 - 34",
-      country: "Ankara",
-      date: "15-06-.2023 - 16:37",
-    },
-    {
-      sr: "#0002",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "18 - 24",
-      country: "Ankara",
-      date: "15-06-.2023 - 16:37",
-    },
-    {
-      sr: "#0003",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "35 - 44",
-      country: "istanbul",
-      date: "15-06-.2023 - 16:37",
-    },
-    {
-      sr: "#0004",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "25 - 34",
-      country: "Bursa",
-      date: "15-06-.2023 - 16:37",
-    },
-  ];
+const Home = (props) => {
+  const [modalShow, setModalShow] = useState(false);
+
   return (
     <>
-      <div className="dark-mode px-2 py-3 me-2 h-100">
-        {users.map((res, index) => (
+      <div className="dark-mode p-2 me-3 h-100">
+        {props.showDetails === "users" && (
+          <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
+            <div className="p-2 flex-grow-1">
+              <div class="input-group w-50">
+                <span
+                  class="input-group-text search-icon-dark"
+                  id="basic-addon1"
+                >
+                  <GoSearch style={{ color: "#FFFFFF" }} />
+                </span>
+                <input type="text" className="input-field-dark" />
+              </div>
+            </div>
+            <div className="p-2">
+              <button
+                className="px-2"
+                style={{
+                  backgroundColor: "transparent",
+                  borderRadius: "3px",
+                  border: "1px solid #E6E6E6",
+                  color: "#E6E6E6",
+                }}
+              >
+                Filter
+              </button>
+            </div>
+            <div className="p-2">
+              <button
+                onClick={() => setModalShow(true)}
+                className="px-2"
+                style={{
+                  backgroundColor: "transparent",
+                  borderRadius: "3px",
+                  border: "1px solid #0CC6FF",
+                  color: "#0CC6FF",
+                }}
+              >
+                Add User
+              </button>
+            </div>
+          </div>
+        )}
+        {props.users.map((res, index) => (
           <div
-            className="d-flex justify-content-between px-2 py-1 mb-2"
-            style={{ backgroundColor: "#0B2447", fontSize: "10px" }}
+            className="d-flex justify-content-between px-2 py-1 mb-2 users-section-fonts"
+            style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
           >
             <div className="">
               <div className="">
-                <span>{res.sr}</span>
-                <img src={profile} alt="" height={34} width={34} />
-                <span>{res.name}</span>
+                <span className="pe-1">{res.sr}</span>
+                <img src={res.profile} alt="" height={37} width={37} />
+                <span className="ps-1">{res.name}</span>
               </div>
             </div>
             <div className="d-flex gap-2 align-items-center">
               <div>{res.username}</div>
               <div className="">
-                <img src={gender_female} alt="" height={23} width={23} />
+                <img src={res.gender} alt="" height={23} width={23} />
                 <span>{res.age}</span>
               </div>
               <div className="">{res.country}</div>
             </div>
-            <div className="d-flex align-items-center gap-2">
+            {props?.showDetails === "users" && (
+              <div
+                className="d-flex align-items-center block-width"
+                style={{ minWidth: "7.5rem" }}
+              >
+                {res.role ? (
+                  <button
+                  className="btn-user"
+                    style={{
+                      textAlign: "center",
+                      paddingTop: "0.1rem",
+                      width: "7.5rem",
+                      color:
+                        (res.role === "Journeyman" && "#4DD5FF") ||
+                        (res.role === "Expert" && "#FF9100") ||
+                        (res.role === "Apprentice" && "#FFEE7D"),
+                      border:
+                        (res.role === "Journeyman" && "1px solid #4DD5FF") ||
+                        (res.role === "Expert" && "1px solid #FF9100") ||
+                        (res.role === "Apprentice" && "1px solid #FFEE7D"),
+                      borderRadius: "2px",
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    {res.role}
+                  </button>
+                ) : (
+                  <span></span>
+                )}
+              </div>
+            )}
+            <div className="d-flex align-items-center gap-2 edit-icon-gap">
               <span>{res.date}</span>
-              <img src={userEdit} alt="" height={22} width={22} />
-              <img src={trash} alt="" height={22} width={22} />
+              <img src={userEdit} alt="" height={35} width={35} />
+              <img src={trash} alt="" height={35} width={35} />
             </div>
           </div>
         ))}
       </div>
+      {modalShow && 
+      <CreateUserModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+      />
+      } 
     </>
   );
 };
