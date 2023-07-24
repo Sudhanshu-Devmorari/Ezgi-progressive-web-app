@@ -75,9 +75,9 @@ const WithdrawalManagementPage = () => {
   ];
   return (
     <>
-      <div className="container-fluid">
+      <div className="container-fluid m-2">
         <NavBar />
-        <div className="row g-0 row-height">
+        <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
             <SideBar />
           </div>
@@ -86,17 +86,17 @@ const WithdrawalManagementPage = () => {
               <div className="col-8">
                 <div className="row g-0">
                   <div className="col-8">
-                    <div className={`${"dark-mode p-2 me-3 gap-ceown"} `}>
-                      <div className="" style={{ fontSize: "1.5rem" }}>
+                    <div className={`${"dark-mode p-2 mx-2 gap-ceown new-user-height"} `} style={{height:"25vh"}}>
+                      <div className="" style={{ fontSize: "1.2rem" }}>
                         Withdrawal Requests
                       </div>
                       <div className="row g-0 d-flex justify-content-center">
-                        <div className="col-2 my-4">
+                        <div className="col-2">
                           <div className="p-3 me-2 d-flex flex-column align-items-center justify-content-center">
                             <span
                               className="level-font"
                               style={{
-                                fontSize: "1.5rem",
+                                fontSize: "1.2rem",
                                 color: "#4DD5FF",
                               }}
                             >
@@ -104,18 +104,18 @@ const WithdrawalManagementPage = () => {
                             </span>
                             <span
                               className="level-count-font"
-                              style={{ fontSize: "2.7rem" }}
+                              style={{ fontSize: "1.6rem" }}
                             >
                               127
                             </span>
                           </div>
                         </div>
-                        <div className="col-3 my-4">
+                        <div className="col-3">
                           <div className="p-3 me-2 d-flex flex-column align-items-center justify-content-center">
                             <span
                               className="level-font"
                               style={{
-                                fontSize: "1.5rem",
+                                fontSize: "1.2rem",
                                 color: "#FFDD00",
                               }}
                             >
@@ -123,18 +123,18 @@ const WithdrawalManagementPage = () => {
                             </span>
                             <span
                               className="level-count-font"
-                              style={{ fontSize: "2.7rem" }}
+                              style={{ fontSize: "1.6rem" }}
                             >
                               127
                             </span>
                           </div>
                         </div>
-                        <div className="col-3 my-4">
+                        <div className="col-3">
                           <div className="p-3 me-2 d-flex flex-column align-items-center justify-content-center">
                             <span
                               className="level-font"
                               style={{
-                                fontSize: "1.5rem",
+                                fontSize: "1.2rem",
                                 color: "#58DEAA",
                               }}
                             >
@@ -142,13 +142,13 @@ const WithdrawalManagementPage = () => {
                             </span>
                             <span
                               className="level-count-font"
-                              style={{ fontSize: "2.7rem" }}
+                              style={{ fontSize: "1.6rem" }}
                             >
                               127
                             </span>
                           </div>
                         </div>
-                        <div className="col-4 my-4">
+                        <div className="col-4">
                           <div
                             className="p-3 me-2 d-flex flex-column align-items-center justify-content-center"
                             style={{ border: "1px solid #D2DB08" }}
@@ -156,7 +156,7 @@ const WithdrawalManagementPage = () => {
                             <span
                               className="level-font"
                               style={{
-                                fontSize: "1.5rem",
+                                fontSize: "1.2rem",
                                 color: "#D2DB08",
                               }}
                             >
@@ -164,20 +164,20 @@ const WithdrawalManagementPage = () => {
                             </span>
                             <span
                               className="level-count-font"
-                              style={{ fontSize: "2.7rem" }}
+                              style={{ fontSize: "1.6rem" }}
                             >
                               12.645 <small>₺</small>
                             </span>
                           </div>
                         </div>
-                        <div className="">
+                        <div className="mt-2">
                           <span>
                             <span
-                              style={{ color: "#58DEAA", fontSize: "1.5rem" }}
+                              style={{ color: "#58DEAA", fontSize: "1.2rem" }}
                             >
                               %22
                               <HiArrowSmUp
-                                fontSize={"1.7rem"}
+                                fontSize={"1.4rem"}
                                 style={{ marginBottom: "0.1rem" }}
                               />
                             </span>
@@ -188,16 +188,16 @@ const WithdrawalManagementPage = () => {
                     </div>
                   </div>
                   <div className="col-4">
-                    <div className="text-center d-flex flex-column align-items-center justify-content-center rqst-block dark-mode h-100">
+                    <div className="d-flex flex-column align-items-center justify-content-center rqst-block dark-mode new-user-height me-2" style={{height:"25vh"}}>
                       <span
                         className="level-font"
-                        style={{ fontSize: "1.5rem" }}
+                        style={{ fontSize: "1.2rem" }}
                       >
                         Bank Update Requests
                       </span>
                       <span
                         className="level-count-font"
-                        style={{ fontSize: "2.7rem" }}
+                        style={{ fontSize: "1.6rem" }}
                       >
                         127
                       </span>

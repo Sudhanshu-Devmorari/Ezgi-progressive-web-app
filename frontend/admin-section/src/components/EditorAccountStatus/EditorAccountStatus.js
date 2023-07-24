@@ -1,8 +1,8 @@
 import React from "react";
-import active from "../../assets/Group 66.png";
-import pending from "../../assets/Group 67.png";
-import deactive from "../../assets/Group 68.png";
-import './EditorAccountStatus.css'
+import active from "../../assets/Group -1.svg";
+import pending from "../../assets/Group 67.svg";
+import deactive from "../../assets/Group 68.svg";
+import "./EditorAccountStatus.css";
 
 const EditorAccountStatus = () => {
   const levelArray = [
@@ -24,26 +24,29 @@ const EditorAccountStatus = () => {
   ];
   return (
     <>
-      <div
-        className={`${"dark-mode d-flex justify-content-center gap-ceown my-3 py-4"} `}
-      >
+      <div className={`${"dark-mode my-2 mt-3"} `} style={{height:"27vh"}}>
+        <div className="p-2" style={{ fontSize: "1.3rem" }}>
+          Editor Account Status
+        </div>
+        <div className="mt-2 d-flex justify-content-center gap-ceown">
         {levelArray.map((res, index) => (
-          <div className="d-flex flex-column align-items-center justify-content-center">
-            <img
-              className="user-icon"
-              src={res.img}
-              alt=""
-              height={65}
-              width={50}
-            />
-            <span className="level-font" style={{ fontSize: "1.5rem" }}>
-              {res.name}
-            </span>
-            <span className="level-count-font" style={{ fontSize: "2.7rem" }}>
-              {res.count}
-            </span>
-          </div>
+            <div className="d-flex flex-column align-items-center ">
+              <img
+                className="user-icon"
+                src={res.img}
+                alt=""
+                height={45}
+                width={45}
+              />
+              <span className="level-font" style={{ fontSize: "1.2rem" }}>
+                {res.name}
+              </span>
+              <span className="level-count-font" style={{ fontSize: "1.6rem" }}>
+                {res.count}
+              </span>
+            </div>
         ))}
+        </div>
       </div>
     </>
   );

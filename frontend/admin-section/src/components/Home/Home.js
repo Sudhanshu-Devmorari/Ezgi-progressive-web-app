@@ -8,10 +8,16 @@ import CreateUserModal from "../CreateUserModal/CreateUserModal";
 const Home = (props) => {
   const [modalShow, setModalShow] = useState(false);
 
+  const currentUrl = window.location.href;
+  const urlObject = new URL(currentUrl);
+
+  // Extract the "users" part from the URL
+  const usersPart = urlObject.pathname.split('/').filter(part => part !== '')[0];
+
   return (
     <>
-      <div className="dark-mode p-2 me-3 h-100">
-        {props?.showDetails === "users" && (
+      <div className="dark-mode p-2 m-2 mb-0 home-height" style={{height:"65vh"}}>
+        {usersPart === "users" && (
           <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
             <div className="p-2 flex-grow-1">
               <div class="input-group w-50">
@@ -73,7 +79,7 @@ const Home = (props) => {
               </div>
               <div className="">{res.country}</div>
             </div>
-            {props?.showDetails === "users" && (
+            {usersPart === "users" && (
               <div
                 className="d-flex align-items-center block-width"
                 style={{ minWidth: "7.5rem" }}
@@ -106,8 +112,8 @@ const Home = (props) => {
             )}
             <div className="d-flex align-items-center gap-2 edit-icon-gap">
               <span>{res.date}</span>
-              <img src={userEdit} alt="" height={35} width={35} />
-              <img src={trash} alt="" height={35} width={35} />
+              <img src={userEdit} alt="" height={28} width={28} />
+              <img src={trash} alt="" height={28} width={28} />
             </div>
           </div>
         ))}

@@ -1,11 +1,5 @@
-@media (max-width: 1024px){
-    .label-font{
-        font-size: 1.4rem!important;
-    }
-    .count-font{
-        font-size: 2.4rem!important;
-    }
-    .rate-fonts{
-        font-size: 1.1rem!important;
+@media (min-width: 1024px) and (max-width: 1700px){
+    .new-user-hieght{
+        height: 26vh!important;
     }
 }

@@ -50,7 +50,7 @@ const MostLiked = () => {
     },
   ];
   return (
-    <div className="dark-mode p-2">
+    <div className="dark-mode p-2 mt-2 home-height" style={{height:"64vh"}}>
       <div className="" style={{ fontSize: "1.5rem" }}>
         Most Liked
       </div>

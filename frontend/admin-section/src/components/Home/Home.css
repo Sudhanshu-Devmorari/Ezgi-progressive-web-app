@@ -16,7 +16,10 @@
 .input-field-dark:focus{
     outline: none;
 }
-@media (max-width: 1024px){
+@media (min-width: 1024px) and (max-width: 1700px) {
+    .home-height {
+        height: 63vh!important;
+    }
     .users-section-fonts{
         font-size: 0.7rem!important;
     }

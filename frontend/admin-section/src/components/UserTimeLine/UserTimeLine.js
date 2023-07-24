@@ -91,7 +91,7 @@ const UserTimeLine = () => {
 
   return (
     <>
-      <div className="dark-mode p-2 h-100">
+      <div className="dark-mode p-2" style={{height:"89vh"}}>
         <div className="" style={{fontSize:"1.5rem"}}>User Timeline</div>
         {notification.map((res, index) => (
           <div

@@ -32,7 +32,7 @@ const LevelCount = (props) => {
   return (
     <>
       <div
-        className={`${"dark-mode h-100 d-flex justify-content-center me-3 gap-ceown"} `}
+        className={`${"dark-mode d-flex justify-content-center me-2 gap-ceown new-user-height"} `} style={{height:"25vh"}}
       >
         {levelArray.map((res, index) => (
           <div className="d-flex flex-column align-items-center justify-content-center">
@@ -40,13 +40,13 @@ const LevelCount = (props) => {
               className="crown-level-img"
               src={res.img}
               alt=""
-              height={60}
-              width={60}
+              height={45}
+              width={45}
             />
-            <span className="level-font" style={{ fontSize: "1.5rem" }}>
+            <span className="level-font" style={{ fontSize: "1.2rem" }}>
               {res.name}
             </span>
-            <span className="level-count-font" style={{ fontSize: "2.7rem" }}>
+            <span className="level-count-font" style={{ fontSize: "1.6rem" }}>
               {res.count}
             </span>
           </div>

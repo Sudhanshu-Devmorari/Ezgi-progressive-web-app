@@ -6,12 +6,12 @@ import profile from "../../assets/profile.png";
 import userEdit from "../../assets/Profile Card Edit.svg";
 import trash from "../../assets/trash.svg";
 import user1 from "../../assets/user1.png";
-import "./EditorManagemenetPage.css";
+import "./EditorManagemenet.css";
 import CreateEditorModal from "../CreateEditorModal/CreateEditorModal";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
-const EditorManagemenetPage = () => {
+const EditorManagemenet = () => {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -64,7 +64,7 @@ const EditorManagemenetPage = () => {
   ];
   return (
     <>
-      <div className="dark-mode p-2 me-3 h-100">
+      <div className="dark-mode p-2 mx-2 home-height" style={{height:"64vh"}}>
         <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
           <div className="p-2 flex-grow-1">
             <div class="input-group w-50">
@@ -151,4 +151,4 @@ const EditorManagemenetPage = () => {
   );
 };
 
-export default EditorManagemenetPage;
+export default EditorManagemenet;

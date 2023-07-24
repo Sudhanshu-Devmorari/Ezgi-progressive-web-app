@@ -7,7 +7,7 @@ import brightness from "../../assets/brightness-up.png";
 const NavBar = () => {
   return (
     <>
-      <nav className="navbar navbar-expand-lg">
+      <nav className="navbar navbar-expand-lg p-0">
         <div
           className="container-fluid justify-content-end dark-mode"
           style={{ fontSize: "1rem" }}
