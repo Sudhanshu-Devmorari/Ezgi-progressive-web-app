@@ -33,3 +33,11 @@
         gap: 0rem!important;
     }
 }
+.darkMode-input{
+    background-color: #0B2447!important;
+    border: #0B2447!important;
+    color: #F6F6F6!important;
+}
+.darkMode-input:focus{
+    outline: none!important;
+}

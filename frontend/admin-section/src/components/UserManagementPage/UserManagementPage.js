@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import NewUsers from "../NewUsers/NewUsers";
@@ -11,6 +11,7 @@ import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
+import CreateUserModal from "../CreateUserModal/CreateUserModal";
 
 const UserManagementPage = () => {
   const newUsersArray = [
@@ -88,6 +89,7 @@ const UserManagementPage = () => {
       profile: profile,
     },
   ];
+  const [showCreateUser, setShowCreateUser] = useState(false);
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -111,7 +113,7 @@ const UserManagementPage = () => {
                     </div>
                   </div>
                   <div className="my-2 h-100">
-                    <Home users={users} />
+                    <Home users={users}/>
                   </div>
                 </div>
                 <div className="col-4 h-100">
@@ -121,6 +123,7 @@ const UserManagementPage = () => {
           </div>
         </div>
       </div>
+      {/* <CreateUserModal show={showCreateUser} onHide={() => setShowCreateUser(false)}/> */}
     </>
   );
 };
