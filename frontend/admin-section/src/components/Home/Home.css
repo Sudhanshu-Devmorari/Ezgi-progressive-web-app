@@ -13,8 +13,9 @@
     border-right: none;
     padding: 0.2rem!important;
 }
-.input-field-dark:focus{
-    outline: none;
+.form-control:focus{
+    outline: none!important;
+    box-shadow: none!important;
 }
 @media (min-width: 1024px) and (max-width: 1700px) {
     .home-height {

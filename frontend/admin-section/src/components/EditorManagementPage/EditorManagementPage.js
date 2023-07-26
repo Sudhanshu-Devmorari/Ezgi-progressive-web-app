@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import NewUsers from "../NewUsers/NewUsers";
@@ -37,6 +37,7 @@ const EditorManagementPage = () => {
       count: "127",
     },
   ];
+  const [updateProfile, setupdateProfile] = useState(1);
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -57,11 +58,11 @@ const EditorManagementPage = () => {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <EditorManagemenet />
+                  <EditorManagemenet updateProfile={updateProfile}/>
                 </div>
               </div>
               <div className="col-4">
-                <Top10 />
+                <Top10 setupdateProfile={setupdateProfile}/>
                 <EditorAccountStatus />
                 <div className="row g-0 gap-2">
                   <div className="col">
