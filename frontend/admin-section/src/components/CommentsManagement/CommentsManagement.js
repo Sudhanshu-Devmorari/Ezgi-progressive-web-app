@@ -12,7 +12,7 @@ import circle_x from "../../assets/circle-x.png";
 import selectedRadio from "../../assets/Group 312.svg";
 import Radio from "../../assets/Group 323.svg";
 import clock_exclamation from "../../assets/clock-exclamation.png";
-import eye from "../../assets/eye.png";
+import eye from "../../assets/eye.svg";
 import "./CommentsManagement.css";
 import { BiSolidCrown } from "react-icons/bi";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";

@@ -652,6 +652,7 @@ const Home = (props) => {
         </div>
       </div>
 
+{/* filter modal */}
       <div
         class="modal fade"
         id="filterModal"

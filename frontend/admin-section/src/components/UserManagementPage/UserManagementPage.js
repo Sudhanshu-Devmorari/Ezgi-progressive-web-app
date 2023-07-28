@@ -89,7 +89,6 @@ const UserManagementPage = () => {
       profile: profile,
     },
   ];
-  const [showCreateUser, setShowCreateUser] = useState(false);
   return (
     <>
       <div className="conatainer-fluid m-2">

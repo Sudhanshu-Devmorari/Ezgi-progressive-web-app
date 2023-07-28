@@ -4,7 +4,7 @@ import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import userEdit from "../../assets/Profile Card Edit.svg";
-import trash from "../../assets/trash.svg";
+import eye from "../../assets/eye.svg";
 import user1 from "../../assets/user1.png";
 import "./EditorManagemenet.css";
 import camera from "../../assets/camera-plus.svg";
@@ -15,6 +15,9 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Dropdownmodal } from "../Dropdownmodal";
 import selectedRadio from "../../assets/Group 316.svg";
 import Radio from "../../assets/Group 314.svg";
+import leftArrow from "../../assets/Group 271.svg";
+import circle_check from "../../assets/circle-check-1.png";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 const EditorManagemenet = (props) => {
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
@@ -198,6 +201,187 @@ const EditorManagemenet = (props) => {
   const categoryOptions = ["Category 1", "Category 2", "Category 3"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
+
+  const subscriberArray = [
+    { id: "#0001", profile: user1, name: "johndoe", month: "3 Months" },
+    { id: "#0002", profile: user1, name: "johndoe", month: "3 Months" },
+    { id: "#0003", profile: user1, name: "johndoe", month: "6 Months" },
+    { id: "#0004", profile: user1, name: "johndoe", month: "3 Months" },
+    { id: "#0005", profile: user1, name: "johndoe", month: "3 Months" },
+  ];
+  const withdrawalArray = [
+    { id: "#0001", account: "TR00 0009 9012 3456 7800 1000 01" },
+    { id: "#0001", account: "TR00 0009 9012 3456 7800 1000 01" },
+    { id: "#0001", account: "TR00 0009 9012 3456 7800 1000 01" },
+    { id: "#0001", account: "TR00 0009 9012 3456 7800 1000 01" },
+    { id: "#0001", account: "TR00 0009 9012 3456 7800 1000 01" },
+  ];
+  const paymentArray = [
+    { id: "#0001", plan: "Expert Membership Plan" },
+    { id: "#0002", plan: "Highlight Plan 2 Week" },
+    { id: "#0003", plan: "Expert Membership Plan" },
+    { id: "#0004", plan: "Highlight Plan 2 Week" },
+  ];
+
+  const GenderFilterOptions = ["option 1", "option 2"];
+  const LevelOptions = ["option 1", "option 2"];
+  const CityFilterOptions = ["option 1", "option 2"];
+  const ageFilterOptions = ["option 1", "option 2"];
+  const SuccessRateFilterOptions = ["option 3", "option 4"];
+  const ScorePointFilterOptions = ["option 5", "option 6"];
+
+  const [selectedSuccessRateFilter, setSelectedSuccessRateFilter] =
+    useState("Select");
+  const [successRateFilterDropDown, setSuccessRateFilterDropDown] =
+    useState(false);
+
+  const [selectedScorePointFilter, setSelectedScorePointFilter] =
+    useState("Select");
+  const [scorePointFilterDropDown, setScorePointFilterDropDown] =
+    useState(false);
+
+  const [selectedGenderFilter, setSelectedGenderFilter] = useState("Select");
+  const [genderFilterDropDown, setGenderFilterDropDown] = useState(false);
+
+  const [selectedLevelFilter, setSelectedLevelFilter] = useState("Select");
+  const [levelFilterDropDown, setLevelFilterDropDown] = useState(false);
+
+  const [selectedCityFilter, setSelectedCityFilter] = useState("Select");
+  const [cityFilterDropDown, setCityFilterDropDown] = useState(false);
+
+  const [selectedAgeFilter, setSelectedAgeFilter] = useState("Select");
+  const [ageFilterDropDown, setAgeFilterDropDown] = useState(false);
+
+  const handleCityFilterSelection = (gender) => {
+    setSelectedCityFilter(gender);
+  };
+  const toggleCityFilterDropdown = () => {
+    if (ageFilterDropDown) {
+      setAgeFilterDropDown(false);
+    }
+    if (genderFilterDropDown) {
+      setGenderFilterDropDown(false);
+    }
+    if (levelFilterDropDown) {
+      setLevelFilterDropDown(false);
+    }
+    if (scorePointFilterDropDown) {
+      setScorePointFilterDropDown(false);
+    }
+    if (successRateFilterDropDown) {
+      setSuccessRateFilterDropDown(false);
+    }
+    setCityFilterDropDown(!cityFilterDropDown);
+  };
+  const handleGenderFilterSelection = (gender) => {
+    setSelectedGenderFilter(gender);
+  };
+  const toggleGenderFilterDropdown = () => {
+    if (ageFilterDropDown) {
+      setAgeFilterDropDown(false);
+    }
+    if (cityFilterDropDown) {
+      setCityFilterDropDown(false);
+    }
+    if (levelFilterDropDown) {
+      setLevelFilterDropDown(false);
+    }
+    if (scorePointFilterDropDown) {
+      setScorePointFilterDropDown(false);
+    }
+    if (successRateFilterDropDown) {
+      setSuccessRateFilterDropDown(false);
+    }
+    setGenderFilterDropDown(!genderFilterDropDown);
+  };
+  const handleAgeFilterSelection = (gender) => {
+    setSelectedAgeFilter(gender);
+  };
+  const toggleAgeFilterDropdown = () => {
+    if (genderFilterDropDown) {
+      setGenderFilterDropDown(false);
+    }
+    if (cityFilterDropDown) {
+      setCityFilterDropDown(false);
+    }
+    if (levelFilterDropDown) {
+      setLevelFilterDropDown(false);
+    }
+    if (scorePointFilterDropDown) {
+      setScorePointFilterDropDown(false);
+    }
+    if (successRateFilterDropDown) {
+      setSuccessRateFilterDropDown(false);
+    }
+    setAgeFilterDropDown(!ageFilterDropDown);
+  };
+  const toggleLevelFilterDropdown = () => {
+    if (genderFilterDropDown) {
+      setGenderFilterDropDown(false);
+    }
+    if (cityFilterDropDown) {
+      setCityFilterDropDown(false);
+    }
+    if (ageFilterDropDown) {
+      setAgeFilterDropDown(false);
+    }
+    if (scorePointFilterDropDown) {
+      setScorePointFilterDropDown(false);
+    }
+    if (successRateFilterDropDown) {
+      setSuccessRateFilterDropDown(false);
+    }
+    setLevelFilterDropDown(!levelFilterDropDown);
+  };
+  const handleLevelFilterSelection = (gender) => {
+    setSelectedLevelFilter(gender);
+  };
+  const handleSuccessRateFilterSelection = (rate) => {
+    setSelectedSuccessRateFilter(rate);
+  };
+
+  const handleScorePointFilterSelection = (point) => {
+    setSelectedScorePointFilter(point);
+  };
+
+  const toggleSuccessRateFilterDropdown = () => {
+    if (genderFilterDropDown) {
+      setGenderFilterDropDown(false);
+    }
+    if (ageFilterDropDown) {
+      setAgeFilterDropDown(false);
+    }
+    if (cityFilterDropDown) {
+      setCityFilterDropDown(false);
+    }
+    if (levelFilterDropDown) {
+      setLevelFilterDropDown(false);
+    }
+    if (scorePointFilterDropDown) {
+      setScorePointFilterDropDown(false);
+    }
+    setSuccessRateFilterDropDown(!successRateFilterDropDown);
+  };
+
+  const toggleScorePointFilterDropdown = () => {
+    if (genderFilterDropDown) {
+      setGenderFilterDropDown(false);
+    }
+    if (ageFilterDropDown) {
+      setAgeFilterDropDown(false);
+    }
+    if (cityFilterDropDown) {
+      setCityFilterDropDown(false);
+    }
+    if (levelFilterDropDown) {
+      setLevelFilterDropDown(false);
+    }
+    if (successRateFilterDropDown) {
+      setSuccessRateFilterDropDown(false);
+    }
+    setScorePointFilterDropDown(!scorePointFilterDropDown);
+  };
+
   return (
     <>
       <div
@@ -215,6 +399,8 @@ const EditorManagemenet = (props) => {
           </div>
           <div className="p-2">
             <button
+              data-bs-toggle="modal"
+              data-bs-target="#filterModal"
               className="px-2"
               style={{
                 backgroundColor: "transparent",
@@ -244,45 +430,113 @@ const EditorManagemenet = (props) => {
         </div>
         {users.map((res, index) => (
           <div
-            className="row g-0 d-flex justify-content-between px-2 py-1 mb-2 editor-section-fonts"
+            className="px-2 py-1 mb-2 editor-section-fonts"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
           >
-            <div className="col-3">
-              <div className="">
-                <span className="pe-1">{res.sr}</span>
-                <img src={res.profile} alt="" height={37} width={37} />
-                <span className="ps-1">{res.name}</span>
+            <div className="row g-0 d-flex justify-content-between align-items-center">
+              <div className="col-3">
+                <div className="d-flex align-items-center">
+                  <span className="pe-1">{res.sr}</span>
+                  <div className="position-relative">
+                    <img
+                      className="profile-icon"
+                      src={res.profile}
+                      alt=""
+                      height={42}
+                      width={42}
+                    />
+                    <div
+                      className="position-absolute d-flex justify-content-center align-items-center"
+                      style={{
+                        height: "16px",
+                        width: "16px",
+                        border: "2px solid #FF9100",
+                        borderRadius: "50%",
+                        backgroundColor: "#0B2447",
+                        top: "0px",
+                        left: "25px",
+                      }}
+                    >
+                      <BiSolidCrown
+                        fontSize={"0.62rem"}
+                        style={{ color: "#FF9100" }}
+                      />
+                    </div>
+                  </div>
+                  <span className="ps-1">{res.name}</span>
+                </div>
+              </div>
+              <div className="d-flex gap-2 align-items-center col-1">
+                <div>{res.username}</div>
+              </div>
+              <div
+                className="d-flex align-items-center block-width col-3 gap-1"
+                style={{ minWidth: "7.5rem" }}
+              >
+                <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>%62</span>
+                <img src={res.gender} alt="" height={28} width={28} />
+                <span>{res.age}</span>
+                <div className="">{res.country}</div>
+              </div>
+              <div className="d-flex align-items-center gap-2 edit-icon-gap col-3 justify-content-end">
+                <span>{res.date}</span>
+                <img
+                  className="icons-edit-eye"
+                  src={circle_check}
+                  alt=""
+                  height={28}
+                  width={28}
+                />
+                <img
+                  className="icons-edit-eye"
+                  src={eye}
+                  alt=""
+                  height={28}
+                  width={28}
+                />
               </div>
             </div>
-            <div className="d-flex gap-2 align-items-center col-1">
-              <div>{res.username}</div>
+            {props?.verifyRqst && (
+
+            <div className="my-2">
+              <button
+                className="px-3 py-1"
+                style={{
+                  border: "1px solid #4DD5FF",
+                  color: "#4DD5FF",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "0.9rem",
+                }}
+              >
+                In Progress
+              </button>
+              <button
+                className="px-3 py-1 mx-3"
+                style={{
+                  border: "1px solid #58DEAA",
+                  color: "#58DEAA",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "0.9rem",
+                }}
+              >
+                Approve
+              </button>
+              <button
+                className="px-3 py-1"
+                style={{
+                  border: "1px solid #FF5757",
+                  color: "#FF5757",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "0.9rem",
+                }}
+              >
+                Reject
+              </button>
             </div>
-            <div
-              className="d-flex align-items-center block-width col-3 gap-1"
-              style={{ minWidth: "7.5rem" }}
-            >
-              <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>%62</span>
-              <img src={res.gender} alt="" height={28} width={28} />
-              <span>{res.age}</span>
-              <div className="">{res.country}</div>
-            </div>
-            <div className="d-flex align-items-center gap-2 edit-icon-gap col-3 justify-content-end">
-              <span>{res.date}</span>
-              <img
-                className="icons-edit-eye"
-                src={userEdit}
-                alt=""
-                height={35}
-                width={35}
-              />
-              <img
-                className="icons-edit-eye"
-                src={trash}
-                alt=""
-                height={35}
-                width={35}
-              />
-            </div>
+            )}
           </div>
         ))}
       </div>
@@ -422,23 +676,126 @@ const EditorManagemenet = (props) => {
                 <div className="p-2">
                   <div className="d-flex justify-content-between">
                     <div className="p-1 gap-3 d-flex ">
-                      <i
-                        className="fa-solid fa-arrow-left-long"
+                      <img src={leftArrow} alt="" height={20} width={20} />
+                      <div
+                        onClick={() => setselectedHisory("subscriber")}
+                        className=""
                         style={{
-                          fontSize: "21px",
-                          color: "#E6E6E6",
+                          color:
+                            selectedHisory === "subscriber" ? "#D2DB0B" : "",
+                          cursor: "pointer",
                         }}
-                      ></i>
-                      <div onClick={()=>setselectedHisory('subscriber')} className="" style={{color : selectedHisory === "subscriber" ? "#D2DB0B" : "", cursor:"pointer"}}>Subscriber Income</div>
-                      <div onClick={()=>setselectedHisory('withdrawal')} className="" style={{color : selectedHisory === "withdrawal" ? "#D2DB0B" : "", cursor:"pointer"}}>Withdrawal</div>
-                      <div onClick={()=>setselectedHisory('payment')} className="" style={{color : selectedHisory === "payment" ? "#D2DB0B" : "", cursor:"pointer"}}>Payment</div>
-                    </div>
-                    {selectedHisory === "subscriber" && (
-                      <div className="row g-0 dark-mode my-2">
-                        <div className="">
-                          
-                        </div>
+                      >
+                        Subscriber Income
                       </div>
+                      <div
+                        onClick={() => setselectedHisory("withdrawal")}
+                        className=""
+                        style={{
+                          color:
+                            selectedHisory === "withdrawal" ? "#D2DB0B" : "",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Withdrawal
+                      </div>
+                      <div
+                        onClick={() => setselectedHisory("payment")}
+                        className=""
+                        style={{
+                          color: selectedHisory === "payment" ? "#D2DB0B" : "",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Payment
+                      </div>
+                    </div>
+                    <div className="">
+                      <button
+                        className="px-3 py-1"
+                        style={{
+                          color: "#FF9100",
+                          backgroundColor: "transparent",
+                          border: "1px solid #FF9100",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        Export
+                      </button>
+                    </div>
+                  </div>
+                  <div className="my-2" style={{ overflowY: "scroll" }}>
+                    {selectedHisory === "subscriber" && (
+                      <>
+                        {subscriberArray.map((res, index) => (
+                          <div
+                            className="row g-0 my-2 dark-mode px-3"
+                            style={{ backgroundColor: "#0B2447" }}
+                          >
+                            <div className="col d-flex align-items-center">
+                              <span className="pe-2">{res.id}</span>
+                              <img src={user1} alt="" height={50} width={50} />
+                              <span className="ps-2">{res.name}</span>
+                            </div>
+                            <div className="col d-flex align-items-center gap-3 justify-content-center">
+                              <div>{res.month}</div>
+                              <div>1/3</div>
+                              <div>229.90</div>
+                            </div>
+                            <div className="col d-flex align-items-center justify-content-end">
+                              <div>15-06-2023 - 16:37</div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                    {selectedHisory === "withdrawal" && (
+                      <>
+                        {withdrawalArray.map((res, index) => (
+                          <div
+                            className="my-2 dark-mode px-3 py-2 pe-0 d-flex gap-5"
+                            style={{
+                              backgroundColor: "#0B2447",
+                              fontSize: "0.9rem",
+                            }}
+                          >
+                            <div className="">{res.id}</div>
+                            <div className="">{res.account}</div>
+                            <div className="">15-06-2023 - 16:37</div>
+                            <div className="">3.500</div>
+                            <div className="gap-0">
+                              <img
+                                src={circle_check}
+                                alt=""
+                                height={25}
+                                width={25}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                    {selectedHisory === "payment" && (
+                      <>
+                        {paymentArray.map((res, index) => (
+                          <div
+                            className="row g-0 my-2 dark-mode px-3 py-2"
+                            style={{
+                              backgroundColor: "#0B2447",
+                              fontSize: "0.9rem",
+                            }}
+                          >
+                            <div className="col gap-5 d-flex">
+                              <div>{res.id}</div>
+                              <div>{res.plan}</div>
+                            </div>
+                            <div className="col gap-5 d-flex justify-content-end">
+                              <div>15-06-2023 - 16:37</div>
+                              <div>369.90</div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
                     )}
                   </div>
                 </div>
@@ -495,7 +852,7 @@ const EditorManagemenet = (props) => {
                           style={{
                             position: "absolute",
                             right: "1.6rem",
-                            top: "12rem",
+                            top: "11rem",
                           }}
                           onClick={() => setShowPassword(!showPassword)}
                         />
@@ -703,6 +1060,137 @@ const EditorManagemenet = (props) => {
                 width={45}
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Modal */}
+      <div
+        class="modal fade"
+        id="filterModal"
+        tabindex="-1"
+        aria-labelledby="filterModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body dark-mode position-relative">
+              <div className="row g-0 p-2 gap-3">
+                <div className="col d-flex flex-column">
+                  <CustomDropdown
+                    label="Level"
+                    options={LevelOptions}
+                    selectedOption={selectedLevelFilter}
+                    onSelectOption={handleLevelFilterSelection}
+                    isOpen={levelFilterDropDown}
+                    toggleDropdown={toggleLevelFilterDropdown}
+                  />
+                </div>
+                <div className="col d-flex flex-column">
+                  <CustomDropdown
+                    label="Success Rate"
+                    options={SuccessRateFilterOptions}
+                    selectedOption={selectedSuccessRateFilter}
+                    onSelectOption={handleSuccessRateFilterSelection}
+                    isOpen={successRateFilterDropDown}
+                    toggleDropdown={toggleSuccessRateFilterDropdown}
+                  />
+                </div>
+              </div>
+              <div className="row g-0 p-2 gap-3">
+                <div className="col d-flex flex-column">
+                  <CustomDropdown
+                    label="Score Point"
+                    options={ScorePointFilterOptions}
+                    selectedOption={selectedScorePointFilter}
+                    onSelectOption={handleScorePointFilterSelection}
+                    isOpen={scorePointFilterDropDown}
+                    toggleDropdown={toggleScorePointFilterDropdown}
+                  />
+                </div>
+                <div className="col d-flex flex-column">
+                  <div className="my-2">
+                    <span>City</span>
+                    <div
+                      className={`${"customDropdown-dark-mode"} p-1 text-center`}
+                      onClick={toggleCityFilterDropdown}
+                    >
+                      <span>{selectedCityFilter}</span>
+                    </div>
+                    <div
+                      className={`customDropdown-content-dark-mode p-2 flex-column d-flex text-center ${
+                        cityFilterDropDown ? "d-block" : "d-none"
+                      }`}
+                      style={{
+                        width: "45%",
+                      }}
+                    >
+                      {CityFilterOptions.map((option, index) => (
+                        <span
+                          className="dpcontent-dark-mode my-1 p-2"
+                          key={index}
+                          onClick={() => {
+                            handleCityFilterSelection(option);
+                            toggleCityFilterDropdown();
+                          }}
+                        >
+                          {option}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row g-0 p-2 gap-3">
+                <div className="col d-flex flex-column">
+                  <CustomDropdown
+                    label="Gender"
+                    options={GenderFilterOptions}
+                    selectedOption={selectedGenderFilter}
+                    onSelectOption={handleGenderFilterSelection}
+                    isOpen={genderFilterDropDown}
+                    toggleDropdown={toggleGenderFilterDropdown}
+                  />
+                </div>
+                <div className="col d-flex flex-column">
+                  <CustomDropdown
+                    label="Age"
+                    options={ageFilterOptions}
+                    selectedOption={selectedAgeFilter}
+                    ap-2
+                    onSelectOption={handleAgeFilterSelection}
+                    isOpen={ageFilterDropDown}
+                    toggleDropdown={toggleAgeFilterDropdown}
+                  />
+                </div>
+              </div>
+              <div className="d-flex justify-content-center my-2">
+                <button
+                  className="px-3 py-1"
+                  style={{
+                    color: "#D2DB08",
+                    backgroundColor: "transparent",
+                    border: "1px solid #D2DB08",
+                    borderRadius: "4px",
+                  }}
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <img
+              data-bs-dismiss="modal"
+              src={cross}
+              alt=""
+              style={{
+                position: "absolute",
+                top: "-1rem",
+                right: "-1.1rem",
+                cursor: "pointer",
+              }}
+              height={45}
+              width={45}
+            />
           </div>
         </div>
       </div>

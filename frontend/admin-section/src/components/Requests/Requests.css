@@ -3,8 +3,11 @@
         margin: 0rem!important;
     }
 }
-@media(max-width: 1025px) and (max-width: 1040px){
+@media(min-width: 1025px) and (max-width: 1040px){
     .rqst-block{
         margin: 0.4rem!important;
     }
+}
+.cursor{
+    cursor: pointer;
 }

@@ -38,6 +38,7 @@ const EditorManagementPage = () => {
     },
   ];
   const [updateProfile, setupdateProfile] = useState(1);
+  const [verifyRqst, setverifyRqst] = useState(false);
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -58,7 +59,7 @@ const EditorManagementPage = () => {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <EditorManagemenet updateProfile={updateProfile}/>
+                  <EditorManagemenet updateProfile={updateProfile} verifyRqst={verifyRqst}/>
                 </div>
               </div>
               <div className="col-4">
@@ -66,7 +67,7 @@ const EditorManagementPage = () => {
                 <EditorAccountStatus />
                 <div className="row g-0 gap-2">
                   <div className="col">
-                    <Requests rqstArray={verifcationArray} />
+                    <Requests rqstArray={verifcationArray} setverifyRqst={setverifyRqst} verifyRqst={verifyRqst}/>
                   </div>
                   <div className="col">
                     <Requests rqstArray={deactivationArray} />
