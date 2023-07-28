@@ -33,12 +33,6 @@ import deactivation from "../../assets/user-off.svg";
 // import Modal from "react-bootstrap/Modal";
 
 const MainPage = () => {
-  // const [showDetails, setshowDetails] = useState("home");
-  // const [modalShow, setModalShow] = useState(false);
-
-  // useEffect(() => {
-  //   document.body.classList.add("body-dark-mode");
-  // }, []);
 
   const newUsersArray = [
     {

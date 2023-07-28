@@ -1,0 +1,6 @@
+<svg id="rocket" xmlns="http://www.w3.org/2000/svg" width="77.037" height="77.037" viewBox="0 0 77.037 77.037">
+  <path id="Path_498" data-name="Path 498" d="M0,0H77.037V77.037H0Z" fill="none"/>
+  <path id="Path_500" data-name="Path 500" d="M13.741,14a19.259,19.259,0,0,0-9.63,19.259,19.259,19.259,0,0,0,19.259-9.63" transform="translate(8.728 30.938)" fill="none" stroke="#d2db08" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+  <path id="Path_501" data-name="Path 501" d="M17.21,11.21m-3.21,0A3.21,3.21,0,1,0,17.21,8,3.21,3.21,0,0,0,14,11.21" transform="translate(30.938 17.679)" fill="none" stroke="#d2db08" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+  <path id="Path_499" data-name="Path 499" d="M4,32.889A25.679,25.679,0,0,1,26.469,55.358,19.259,19.259,0,0,0,36.1,39.309,28.889,28.889,0,0,0,55.358,13.63,9.63,9.63,0,0,0,45.728,4,28.889,28.889,0,0,0,20.049,23.259,19.259,19.259,0,0,0,4,32.889" transform="translate(8.84 8.84)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+</svg>

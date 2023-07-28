@@ -204,7 +204,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("sales");
-              navigate("");
+              navigate("/sales/");
             }}
           />
           <img
@@ -215,7 +215,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("support");
-              navigate("");
+              navigate("/support/");
             }}
           />
           <img

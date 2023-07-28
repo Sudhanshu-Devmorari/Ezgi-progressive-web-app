@@ -1,0 +1,10 @@
+@media (min-width: 1024px) and (max-width: 1224px){
+    .row-fonts{
+        font-size: 0.7rem!important;
+    }
+}
+@media (min-width: 1225px) and (max-width: 1350px){
+    .row-fonts{
+        font-size: 0.9rem!important;
+    }
+}

@@ -1,0 +1,10 @@
+.per-block{
+    display: flex;
+    align-items: end!important;
+    justify-content: start!important;
+}
+@media (min-width: 1024px) and (max-width: 1500px){
+    .height-Net-Revenue{
+        height: 33vh!important;
+    }
+}

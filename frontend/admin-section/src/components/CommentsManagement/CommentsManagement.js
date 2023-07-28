@@ -241,7 +241,7 @@ const CommentsManagement = () => {
                 border: "1px solid #E6E6E6",
                 color: "#E6E6E6",
                 width: "7.5rem",
-                borderBottom: AllDropdown ? "" : "1px solid #E6E6E6",
+                borderBottom: AllDropdown ? "1px solid #0D2A53" : "1px solid #E6E6E6",
                 borderLeft: AllDropdown
                   ? "1px solid #E6E6E6"
                   : "1px solid #E6E6E6",

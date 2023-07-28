@@ -4,6 +4,8 @@ import WithdrawalManagementPage from "./components/WithdrawalManagementPage/With
 import UserManagementPage from "./components/UserManagementPage/UserManagementPage";
 import CommentsManagementPage from "./components/CommentsManagementPage/CommentsManagementPage";
 import EditorManagementPage from "./components/EditorManagementPage/EditorManagementPage";
+import SalesManagementPage from "./components/SalesManagementPage/SalesManagementPage";
+import SupportManagementPage from "./components/SupportManagementPage/SupportManagementPage";
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="comments" element={<CommentsManagementPage />} />
         <Route path="editors" element={<EditorManagementPage />} />
         <Route path="withdrawal" element={<WithdrawalManagementPage />} />
+        <Route path="sales" element={<SalesManagementPage />} />
+        <Route path="support" element={<SupportManagementPage />} />
       </Routes>
     </>
   );
