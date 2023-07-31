@@ -61,7 +61,7 @@ const SupportManagementPage = () => {
             <div className="row g-0">
               <div className="col-8">
                 <div className="row g-0">
-                  <div className="col p-0">
+                  <div className="col-4 p-0">
                     <div
                       className="dark-mode p-2 mx-2"
                       style={{ height: "25vh" }}

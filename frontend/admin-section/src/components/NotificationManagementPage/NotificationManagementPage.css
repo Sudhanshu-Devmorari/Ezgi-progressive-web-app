@@ -1,0 +1,18 @@
+@media (min-width: 1024px) and (max-width: 1184px){
+    .role-btn{
+        padding: 0 6px!important;
+        font-size: 0.6rem!important;
+    }
+}
+@media (min-width: 1225px) and (max-width: 1350px){
+    .role-btn{
+        padding: 0 6px!important;
+        font-size: 0.7rem!important;
+    }
+}
+@media (min-width: 1351px) and (max-width: 1566px){
+    .role-btn{
+        padding: 0 6px!important;
+        font-size: 0.8rem!important;
+    }
+}

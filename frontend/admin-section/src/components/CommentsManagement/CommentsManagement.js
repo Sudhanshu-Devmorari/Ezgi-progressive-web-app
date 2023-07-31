@@ -495,26 +495,7 @@ const CommentsManagement = () => {
                 </div>
               </div>
               <div className="">
-                <div className="d-flex justify-content-between">
-                  <div className="">
-                    <img
-                      onClick={() => setIsPublicSelected(!isPublicSelected)}
-                      src={isPublicSelected ? selectedRadio : Radio}
-                      alt=""
-                      style={{ cursor: "pointer" }}
-                    />
-                    <span className="px-2">Only Public</span>
-                  </div>
-                  <div className="">
-                    <span className="px-2">Only Subscriber</span>
-                    <img
-                      onClick={() => setIsSubscriberSelected(!isSubscriberSelected)}
-                      src={isSubscriberSelected ? selectedRadio : Radio}
-                      alt=""
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-                </div>
+http://localhost:3000/subuser/http://localhost:3000/subuser/
                 <div className="d-flex justify-content-between my-2">
                   <div className="">
                     <img

@@ -99,8 +99,6 @@ const NavBar = (props) => {
           </div>
         </div>
       </nav>
-      {/* <button onClick={() => setAddCommentShow(true)}>add comment</button> */}
-
       <SignUpModal
         show={signUpModalShow}
         onHide={() => setSignUpModalShow(false)}

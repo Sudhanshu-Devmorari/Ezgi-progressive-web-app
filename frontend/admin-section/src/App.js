@@ -7,6 +7,7 @@ import EditorManagementPage from "./components/EditorManagementPage/EditorManage
 import SalesManagementPage from "./components/SalesManagementPage/SalesManagementPage";
 import SupportManagementPage from "./components/SupportManagementPage/SupportManagementPage";
 import SubUserManagementPage from "./components/SubUserManagementPage/SubUserManagementPage";
+import NotificationManagementPage from "./components/NotificationManagementPage/NotificationManagementPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="sales" element={<SalesManagementPage />} />
         <Route path="support" element={<SupportManagementPage />} />
         <Route path="subuser" element={<SubUserManagementPage />} />
+        <Route path="notification" element={<NotificationManagementPage />} />
       </Routes>
     </>
   );

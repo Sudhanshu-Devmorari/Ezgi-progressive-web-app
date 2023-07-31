@@ -1,0 +1,5 @@
+<svg id="checks" xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34">
+  <path id="Path_550" data-name="Path 550" d="M0,0H34V34H0Z" fill="none"/>
+  <path id="Path_551" data-name="Path 551" d="M7,14.091l7.091,7.091L28.274,7" transform="translate(2.889 2.909)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+  <path id="Path_552" data-name="Path 552" d="M2,14.091l7.091,7.091m7.091-7.091L23.274,7" transform="translate(0.837 2.909)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+</svg>
