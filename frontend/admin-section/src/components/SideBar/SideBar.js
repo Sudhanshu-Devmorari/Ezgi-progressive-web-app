@@ -248,7 +248,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("ads");
-              navigate("");
+              navigate("/ads/");
             }}
           />
           <img

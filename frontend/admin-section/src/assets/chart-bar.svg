@@ -1,0 +1,7 @@
+<svg id="chart-bar" xmlns="http://www.w3.org/2000/svg" width="40.3" height="40.3" viewBox="0 0 40.3 40.3">
+  <path id="Path_555" data-name="Path 555" d="M0,0H40.3V40.3H0Z" fill="none"/>
+  <path id="Path_556" data-name="Path 556" d="M3,12m0,1.679A1.679,1.679,0,0,1,4.679,12H11.4a1.679,1.679,0,0,1,1.679,1.679V23.754A1.679,1.679,0,0,1,11.4,25.433H4.679A1.679,1.679,0,0,1,3,23.754Z" transform="translate(2.038 8.15)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  <path id="Path_557" data-name="Path 557" d="M9,8,9,9.679A1.679,1.679,0,0,1,10.679,8H17.4a1.679,1.679,0,0,1,1.679,1.679V26.471A1.679,1.679,0,0,1,17.4,28.15H10.679A1.679,1.679,0,0,1,9,26.471Z" transform="translate(6.113 5.433)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  <path id="Path_558" data-name="Path 558" d="M15,4m0,1.679A1.679,1.679,0,0,1,16.679,4H23.4a1.679,1.679,0,0,1,1.679,1.679V29.188A1.679,1.679,0,0,1,23.4,30.867H16.679A1.679,1.679,0,0,1,15,29.188Z" transform="translate(10.188 2.717)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  <path id="Path_559" data-name="Path 559" d="M4,20H27.508" transform="translate(2.717 13.584)" fill="none" stroke="#ffee7d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+</svg>

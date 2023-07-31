@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42.042" height="42.042" viewBox="0 0 42.042 42.042">
+  <g id="Group_75" data-name="Group 75" transform="translate(-1805 -575.979)">
+    <g id="ad-2" transform="translate(1805 575.979)">
+      <path id="Path_560" data-name="Path 560" d="M0,0H42.042V42.042H0Z" fill="none"/>
+      <path id="Path_561" data-name="Path 561" d="M17.145,5H5V33.028H27.773V19.014" transform="translate(3.759 3.759)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <path id="Path_562" data-name="Path 562" d="M17.759,17H9" transform="translate(6.766 12.78)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    </g>
+    <g id="pencil" transform="translate(1818 582)">
+      <path id="Path_564" data-name="Path 564" d="M0,0H24V24H0Z" fill="none"/>
+      <path id="Path_565" data-name="Path 565" d="M4,20H8L18.5,9.5a2.828,2.828,0,0,0-4-4L4,16v4" transform="translate(0)" fill="none" stroke="#0097c5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      <path id="Path_566" data-name="Path 566" d="M13.5,6.5l4,4" fill="none" stroke="#0097c5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    </g>
+  </g>
+</svg>
