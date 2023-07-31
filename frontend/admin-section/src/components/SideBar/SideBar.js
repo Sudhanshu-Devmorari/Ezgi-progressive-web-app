@@ -259,7 +259,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("settings");
-              navigate("");
+              navigate("/settings/");
             }}
           />
           <img
@@ -272,7 +272,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("settings-editor");
-              navigate("");
+              navigate("/editorSettings/");
             }}
           />
         </div>

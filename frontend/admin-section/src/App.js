@@ -9,6 +9,8 @@ import SupportManagementPage from "./components/SupportManagementPage/SupportMan
 import SubUserManagementPage from "./components/SubUserManagementPage/SubUserManagementPage";
 import NotificationManagementPage from "./components/NotificationManagementPage/NotificationManagementPage";
 import AdsManagementPage from "./components/AdsManagementPage/AdsManagementPage";
+import SettingsPage from "./components/SettingsPage/SettingsPage";
+import EditorSettingsPage from "./components/EditorSettingsPage/EditorSettingsPage";
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="subuser" element={<SubUserManagementPage />} />
         <Route path="notification" element={<NotificationManagementPage />} />
         <Route path="ads" element={<AdsManagementPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="editorSettings" element={<EditorSettingsPage />} />
       </Routes>
     </>
   );
