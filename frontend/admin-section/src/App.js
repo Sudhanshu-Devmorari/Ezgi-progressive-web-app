@@ -6,6 +6,7 @@ import CommentsManagementPage from "./components/CommentsManagementPage/Comments
 import EditorManagementPage from "./components/EditorManagementPage/EditorManagementPage";
 import SalesManagementPage from "./components/SalesManagementPage/SalesManagementPage";
 import SupportManagementPage from "./components/SupportManagementPage/SupportManagementPage";
+import SubUserManagementPage from "./components/SubUserManagementPage/SubUserManagementPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="withdrawal" element={<WithdrawalManagementPage />} />
         <Route path="sales" element={<SalesManagementPage />} />
         <Route path="support" element={<SupportManagementPage />} />
+        <Route path="subuser" element={<SubUserManagementPage />} />
       </Routes>
     </>
   );

@@ -226,7 +226,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               setshowDetails("sub_user");
-              navigate("");
+              navigate("/subuser/");
             }}
           />
           <img
