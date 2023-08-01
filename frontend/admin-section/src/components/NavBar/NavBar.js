@@ -2,7 +2,6 @@ import React from "react";
 import "./NavBar.css";
 import profile from "../../assets/profile.png";
 import bell from "../../assets/bell-ringing-1.svg";
-import brightness from "../../assets/brightness-up.png";
 import cross from "../../assets/Group 81.svg";
 
 const NavBar = () => {
@@ -27,9 +26,6 @@ const NavBar = () => {
             Send Notification
           </button>
           <span className="p-2">
-            <img src={brightness} alt="" height={35} width={35} />
-          </span>
-          <span className="pe-2 ps-0 py-2">
             <img src={bell} alt="" height={33} width={33} />
           </span>
           <span
@@ -99,7 +95,15 @@ const NavBar = () => {
                 ></textarea>
               </div>
               <div className="my-4 d-flex justify-content-center">
-                <button className="px-4 py-1" style={{border:"1px solid #D2DB08", color:"#D2DB08", borderRadius:"4px", backgroundColor:"transparent"}}>
+                <button
+                  className="px-4 py-1"
+                  style={{
+                    border: "1px solid #D2DB08",
+                    color: "#D2DB08",
+                    borderRadius: "4px",
+                    backgroundColor: "transparent",
+                  }}
+                >
                   Send
                 </button>
               </div>

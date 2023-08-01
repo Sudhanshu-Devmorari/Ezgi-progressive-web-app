@@ -217,7 +217,6 @@ const Home = (props) => {
               <div className="">
                 <img src={res.gender} alt="" height={23} width={23} />
                 <span
-                  // className="btn"
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModal"
                   onClick={() => setprofile(true)}

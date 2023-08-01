@@ -18,6 +18,10 @@ import { BiSolidCrown } from "react-icons/bi";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import cross from "../../assets/Group 81.svg";
 import { MainDiv } from "../CommonBgRow";
+import champicon from "../../assets/994_champions_league.svg";
+import world from "../../assets/world-check.svg";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 
 const CommentsManagement = () => {
   const [isPublicSelected, setIsPublicSelected] = useState(false);
@@ -309,7 +313,7 @@ const CommentsManagement = () => {
         </div>
         {users.map((res, index) => (
           <MainDiv>
-            <div className="col-3 d-flex align-items-center">
+            <div className="col-3 d-flex align-items-center cursor" data-bs-toggle="modal" data-bs-target="#filter">
               <span className="pe-1">{res.sr}</span>
               <div className="position-relative">
                 <img
@@ -588,6 +592,123 @@ const CommentsManagement = () => {
                 width={45}
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+            {/* <!-- Modal --> */}
+            <div
+        class="modal fade"
+        id="filter"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="filterLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body dark-mode p-3">
+              <div
+                className="p-1"
+                style={{
+                  backgroundColor: "#0B2447",
+                  fontSize: "13px",
+                }}
+              >
+                <div className="d-flex justify-content-between align-items-center gap-1">
+                  <span>
+                    <img
+                      className=""
+                      src={champicon}
+                      alt=""
+                      height={26}
+                      width={26}
+                    />
+                    <span className="ps-1">Champions League</span>
+                  </span>
+                  <span style={{ paddingRight: "47px" }}>07.05.2023</span>
+                  <span>
+                    Public Content
+                    <img src={`${world}`} alt="" height={26} width={26} />
+                  </span>
+                </div>
+                <div className="d-flex justify-content-center">
+                  <span className="mt-2 pt-1">Galatasaray FC</span>
+                  <div
+                    className="px-2"
+                    style={{
+                      width: "66px",
+                      height: "38px",
+                    }}
+                  >
+                    <CircularProgressbar
+                      circleRatio={0.75}
+                      strokeWidth={3}
+                      value={100}
+                      text="14:30"
+                      styles={buildStyles({
+                        rotation: 1 / 2 + 1 / 8,
+                        textColor: "#E6E6E6",
+                        textSize: "26px",
+                        paddingRight: "0px",
+                        pathColor: "#E6E6E6",
+                      })}
+                    />
+                  </div>
+                  <span className="mt-2 pt-1">Real Madrid</span>
+                </div>
+                <div className="text-end mt-3 mb-2">
+                  <span
+                    className={`p-1  "px-2"}`}
+                    style={{
+                      backgroundColor: "#00659D",
+                      color: "#FFFFFF",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <span className="pe-1" style={{ borderRight: "2px solid #0B2447" }}>
+                      FT - Home - 2.5 Over
+                    </span>
+                    <span className="ps-1">2.40</span>
+                  </span>
+                </div>
+              </div>
+              <div className="my-2">
+                <textarea
+                  style={{ height: "100px", fontSize:"0.8rem" }}
+                  className="darkMode-input form-control"
+                >
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  eleifend vehicula tristique. Suspendisse vitae lectus sed
+                  massa interdum consectetur. Pellentesque habitant morbi
+                  tristique senectus et netus et malesuada fames ac turpis
+                  egestas. Integer auctor nisl in lacus fringilla, et tincidunt
+                  ex laoreet.
+                </textarea>
+              </div>
+              <div className="my-3 d-flex justify-content-center gap-3">
+                <div className="">
+                  <button className="px-3" style={{color:"#D2DB08", backgroundColor:"transparent", border:"1px solid #D2DB08", borderRadius:"4px"}}>Publish</button>
+                </div>
+                <div className="">
+                  <button className="px-3" style={{color:"#FF5757", backgroundColor:"transparent", border:"1px solid #FF5757", borderRadius:"4px"}}>Reject</button>
+                </div>
+              </div>
+            </div>
+            <img
+              data-bs-dismiss="modal"
+              src={cross}
+              alt=""
+              style={{
+                position: "absolute",
+                top: "-1rem",
+                right: "-1.1rem",
+                cursor: "pointer",
+              }}
+              height={45}
+              width={45}
+            />
           </div>
         </div>
       </div>

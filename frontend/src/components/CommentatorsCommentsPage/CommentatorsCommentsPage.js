@@ -25,7 +25,6 @@ const CommentatorsCommentsPage = (props) => {
     const [favSelection, setFavSelection] = useState("fav editor");
 
     useEffect(() => {
-      console.log("props.selectContent=>>>",props.selectContent)
       if (props.selectContent === "notifications")  {
         setContent("notifications")
       } else if (props.selectContent === "fav") {
