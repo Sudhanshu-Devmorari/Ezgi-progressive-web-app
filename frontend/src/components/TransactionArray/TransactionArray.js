@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
+import './TransactionArray.css'
 
 const TransactionArray = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -102,7 +103,7 @@ const TransactionArray = (props) => {
       {props.user === "standard user" &&
         transactions.map((tran) => (
           <div
-            className="my-2 p-2 row g-0"
+            className="my-2 p-2 row g-0 fonts-transactions"
             style={{
               backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
               fontSize: "12px",

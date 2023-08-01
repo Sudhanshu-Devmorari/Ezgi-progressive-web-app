@@ -12,7 +12,7 @@ export const CommentFilter = () => {
 
   const toggleCountryDropdown = () => {
     if (categoryDropdown) {
-      setCountryDropDown(false);
+      setCategoryDropdown(false);
     }
     if (leagueDropdown) {
       setLeagueDropdown(false);
@@ -99,24 +99,58 @@ export const CommentFilter = () => {
         style={{ fontSize: "15px" }}
       >
         <div className="col">
-          <CustomDropdown
+          {/* <CustomDropdown
             label="Category"
             options={categoryOptions}
             selectedOption={selectedCategory}
             onSelectOption={handleCategorySelection}
             isOpen={categoryDropdown}
             toggleDropdown={toggleCategoryDropdown}
-          />
+          /> */}
+          <div className="my-2">
+            <span>Category</span>
+            <div
+              className={`${
+                currentTheme === "dark"
+                  ? "customDropdown-dark-mode"
+                  : "customDropdown-light-mode"
+              } p-1 text-center`}
+              onClick={toggleCategoryDropdown}
+            >
+              <span>{selectedCategory}</span>
+            </div>
+            <div
+              className={`${
+                currentTheme === "dark"
+                  ? "customDropdown-content-dark-mode"
+                  : "customDropdown-content-light-mode"
+              } pt-2 flex-column d-flex text-center ${
+                categoryDropdown ? "d-block" : "d-none"
+              }`}
+              style={{
+                width: "48%",
+              }}
+            >
+              {categoryOptions.map((option, index) => (
+                <span
+                  className={`${
+                    currentTheme === "dark"
+                      ? "dpcontent-dark-mode"
+                      : "dpcontent-light-mode"
+                  } my-1 p-2`}
+                  key={index}
+                  onClick={() => {
+                    handleCategorySelection(option);
+                    toggleCategoryDropdown();
+                  }}
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="col">
-          {/* <CustomDropdown
-            label="Country"
-            options={countryOptions}
-            selectedOption={selectedCountry}
-            onSelectOption={handleCountrySelection}
-            isOpen={countryDropDown}
-            toggleDropdown={toggleCountryDropdown}
-          /> */}
           <div className="my-2">
             <span>Country</span>
             <div
@@ -161,9 +195,11 @@ export const CommentFilter = () => {
           </div>
         </div>
       </div>
-      <div className="row g-0 my-3 gap-3 position-relative" style={{ fontSize: "15px" }}
+      <div
+        className="row g-0 my-3 gap-3 position-relative"
+        style={{ fontSize: "15px" }}
       >
-      {/* <div className="row my-3" style={{ fontSize: "15px" }}> */}
+        {/* <div className="row my-3" style={{ fontSize: "15px" }}> */}
         <div className="col">
           <CustomDropdown
             label="League"

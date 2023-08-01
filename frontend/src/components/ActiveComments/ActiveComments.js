@@ -43,7 +43,7 @@ const ActiveComments = (props) => {
       : "#0D2A53",
     backgroundColor: "transparent",
     borderRadius: "18px",
-    padding: "0.1rem 2.2rem",
+    padding: "0.1rem 1.7rem",
     fontSize: "13px",
   };
   const cameraImageStyles = {

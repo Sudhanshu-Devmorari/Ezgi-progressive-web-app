@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Modal from "react-bootstrap/Modal";
 import "./CommentsPageModal.css";
 import { RxCross2 } from "react-icons/rx";
@@ -6,10 +6,26 @@ import { RxCross2 } from "react-icons/rx";
 import Select from "react-select";
 import EditorFilter from "../EditorFilter/EditorFilter";
 import { CommentFilter } from "../CommentFilter/CommentFilter";
-import { currentTheme } from "../GetCurrentTheme";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import radioBlue from "../../assets/Public Content Radio Button Unselected (1).svg";
+import radioBlueSelected from "../../assets/Public Content Radio Button Selected (1).svg";
+import darkRadioBlue from "../../assets/Public Content Radio Button Unselected.svg";
+import darkRadioBlueSelected from "../../assets/Public Content Radio Button Selected.svg";
+import radioYellowSelected from "../../assets/Group 505.svg";
+import DarkradioYellowSelected from "../../assets/Group 505 (1).svg";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const CommentsPageModal = (props) => {
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+
+  const [isPublicSelected, setIsPublicSelected] = useState(false);
+  const [isFinishedSelected, setIsFinishedSelected] = useState(false);
+  const [isWinningSelected, setIsWinningSelected] = useState(false);
+
+  const [isSubscriberSelected, setIsSubscriberSelected] = useState(false);
+  const [isNotStartedSelected, setIsNotStartedSelected] = useState(false);
+  const [isLosingSelected, setIsLosingSelected] = useState(false);
+
   const [MatchDropDown, setMatchDropDown] = useState(false);
   const [LevelDropdown, setLevelDropdown] = useState(false);
   const [PredictionType, setPredictionType] = useState(false);
@@ -45,6 +61,40 @@ const CommentsPageModal = (props) => {
     "USA",
     "UK",
   ];
+  const handleRadioBlue = (e) => {
+    if (e === "public") {
+      setIsPublicSelected(!isPublicSelected);
+      setIsFinishedSelected(false);
+      setIsWinningSelected(false);
+    } 
+    else if (e === "finished") {
+      setIsPublicSelected(false);
+      setIsWinningSelected(false);
+      setIsFinishedSelected(!isFinishedSelected);
+    }
+    if (e === "winning") {
+      setIsPublicSelected(false);
+      setIsFinishedSelected(false);
+      setIsWinningSelected(!isWinningSelected);
+    }
+  };
+  const handleYellowRadio = (e) => {
+    if (e === "subscribe") {
+      setIsSubscriberSelected(!isSubscriberSelected);
+      setIsNotStartedSelected(false)
+      setIsLosingSelected(false)
+    }
+    if (e === "not started") {
+      setIsNotStartedSelected(!isNotStartedSelected);
+      setIsSubscriberSelected(false)
+      setIsLosingSelected(false)
+    }
+    if (e === "lose") {
+      setIsLosingSelected(!isLosingSelected);
+      setIsSubscriberSelected(false)
+      setIsNotStartedSelected(false)
+    }
+  };
 
   return (
     <>
@@ -108,92 +158,128 @@ const CommentsPageModal = (props) => {
             <div className="my-4">
               <div className="row">
                 <div className="col d-flex align-items-center">
-                  <div
-                    className="me-2"
-                    style={{
-                      border: "3px solid #007BF6",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <img
+                    onClick={() => {
+                      handleRadioBlue("public");
                     }}
-                  ></div>
-                  <span className="">Only Public</span>
+                    src={
+                      currentTheme === "dark"
+                        ? isPublicSelected
+                          ? darkRadioBlueSelected
+                          : darkRadioBlue
+                        : isPublicSelected
+                        ? radioBlueSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
+                  <span className="ps-1">Only Public</span>
                 </div>
                 <div className="col d-flex align-items-center justify-content-end">
-                  <span className="">Only Subscriber</span>
-                  <div
-                    className="ms-2"
-                    style={{
-                      border:
-                        currentTheme === "dark"
-                          ? "3px solid #E6E6E6"
-                          : "3px solid #0D2A53",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <span className="pe-1">Only Subscriber</span>
+                  <img
+                    onClick={() => {
+                      handleYellowRadio("subscribe");
                     }}
-                  ></div>
+                    src={
+                      currentTheme === "dark"
+                        ? isSubscriberSelected
+                          ? DarkradioYellowSelected
+                          : darkRadioBlue
+                        : isSubscriberSelected
+                        ? radioYellowSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
                 </div>
               </div>
               <div className="row my-3">
                 <div className="col d-flex align-items-center">
-                  <div
-                    className="me-2"
-                    style={{
-                      border:
-                        currentTheme === "dark"
-                          ? "3px solid #E6E6E6"
-                          : "3px solid #0D2A53",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <img
+                    onClick={() => {
+                      handleRadioBlue("finished");
                     }}
-                  ></div>
-                  <span className="">Finished</span>
+                    src={
+                      currentTheme === "dark"
+                        ? isFinishedSelected
+                          ? darkRadioBlueSelected
+                          : darkRadioBlue
+                        : isFinishedSelected
+                        ? radioBlueSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
+                  <span className="ps-1">Finished</span>
                 </div>
                 <div className="col d-flex align-items-center justify-content-end">
-                  <span className="">Not Started</span>
-                  <div
-                    className="ms-2"
-                    style={{
-                      border: "3px solid #FFCC00",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <span className="pe-1">Not Started</span>
+                  <img
+                    onClick={() => {
+                      handleYellowRadio("not started");
                     }}
-                  ></div>
+                    src={
+                      currentTheme === "dark"
+                        ? isNotStartedSelected
+                          ? DarkradioYellowSelected
+                          : darkRadioBlue
+                        : isNotStartedSelected
+                        ? radioYellowSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
                 </div>
               </div>
               <div className="row mb-3">
                 <div className="col d-flex align-items-center">
-                  <div
-                    className="me-2"
-                    style={{
-                      border:
-                        currentTheme === "dark"
-                          ? "3px solid #E6E6E6"
-                          : "3px solid #0D2A53",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <img
+                    onClick={() => {
+                      handleRadioBlue("winning");
                     }}
-                  ></div>
-                  <span className="">Winning</span>
+                    src={
+                      currentTheme === "dark"
+                        ? isWinningSelected
+                          ? darkRadioBlueSelected
+                          : darkRadioBlue
+                        : isWinningSelected
+                        ? radioBlueSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
+                  <span className="ps-1">Winning</span>
                 </div>
                 <div className="col d-flex align-items-center justify-content-end">
                   <span className="">Lose</span>
-                  <div
-                    className="ms-2"
-                    style={{
-                      border:
-                        currentTheme === "dark"
-                          ? "3px solid #E6E6E6"
-                          : "3px solid #0D2A53",
-                      borderRadius: " 50%",
-                      width: "2rem",
-                      height: "2rem",
+                  <img
+                    onClick={() => {
+                      handleYellowRadio("lose");
                     }}
-                  ></div>
+                    src={
+                      currentTheme === "dark"
+                        ? isLosingSelected
+                          ? DarkradioYellowSelected
+                          : darkRadioBlue
+                        : isLosingSelected
+                        ? radioYellowSelected
+                        : radioBlue
+                    }
+                    alt=""
+                    height={31}
+                    width={31}
+                  />
                 </div>
               </div>
             </div>

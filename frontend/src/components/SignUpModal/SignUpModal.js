@@ -8,8 +8,8 @@ import OtpInput from "react-otp-input";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
-import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
-import CheckBoxDark from "../../assets/CheckBoxDark.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 
@@ -127,9 +127,12 @@ const SignUpModal = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`} style={{fontSize:"14px"}}
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          style={{ fontSize: "14px" }}
         >
           {/* Signup modal 1 */}
           {props.ShowModal === 1 && (
@@ -180,16 +183,30 @@ const SignUpModal = (props) => {
                   </div>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
-                    <input
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name=""
-                      id="phone"
-                    />
+                    <div className="input-group">
+                      <span
+                        className={`input-group-text ${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        }`}
+                        id="basic-addon1"
+                        style={{ padding: ".375rem 0 .375rem .5rem" }}
+                      >
+                        +90
+                      </span>
+                      <input
+                        id="phone"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        aria-label="Username"
+                        aria-describedby="basic-addon1"
+                      />
+                    </div>
                   </div>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="password">Password</label>
@@ -398,7 +415,7 @@ const SignUpModal = (props) => {
               className="m-4"
               style={{
                 color: "#0D2A53",
-                fontSize: "12px"
+                fontSize: "12px",
               }}
             >
               <div
@@ -512,17 +529,31 @@ const SignUpModal = (props) => {
                 <div className="">
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
-                    <input
-                      onChange={(e) => setuserPhone(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name=""
-                      id="phone"
-                    />
+                    <div className="input-group">
+                      <span
+                        className={`input-group-text ${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        }`}
+                        id="basic-addon1"
+                        style={{ padding: ".375rem 0 .375rem .5rem" }}
+                      >
+                        +90
+                      </span>
+                      <input
+                        onChange={(e) => setuserPhone(e.target.value)}
+                        id="phone"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        aria-label="Username"
+                        aria-describedby="basic-addon1"
+                      />
+                    </div>
                   </div>
                   <div className="d-flex flex-column m-2">
                     <div className="d-flex justify-content-between">
@@ -609,16 +640,30 @@ const SignUpModal = (props) => {
                 <div className="">
                   <div className="d-flex flex-column my-2">
                     <label htmlFor="phone">Phone</label>
-                    <input
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name=""
-                      id="phone"
-                    />
+                    <div className="input-group">
+                      <span
+                        className={`input-group-text ${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        }`}
+                        id="basic-addon1"
+                        style={{ padding: ".375rem 0 .375rem .5rem" }}
+                      >
+                        +90
+                      </span>
+                      <input
+                        id="phone"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        aria-label="Username"
+                        aria-describedby="basic-addon1"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">

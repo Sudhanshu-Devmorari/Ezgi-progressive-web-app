@@ -93,7 +93,7 @@ const MainPage = () => {
                     setSelectContent={setSelectContent}
                   />
                   <HighlightMainPage />
-                  <SharedProfile />
+                  <SharedProfile setSelectContent={setSelectContent}/>      {/*  featured card */}
                   <AdvertisementBanner />
                 </>
               )}

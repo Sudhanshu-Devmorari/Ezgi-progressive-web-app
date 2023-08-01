@@ -1,26 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
-import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
-import { currentTheme } from "../GetCurrentTheme";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const EditorFilter = (props) => {
-  const [categoryDropDown, setCategoryDropDown] = useState(false);
-  const [levelDropdown, setLevelDropdown] = useState(false);
-  const [WithdrawalModalShow, setWithdrawalModalShow] = useState(false);
-
-  const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Select");
-
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
-  };
-
-  const toggleCountryDropdown = () => {
-    setCountryDropDown(!countryDropDown);
-  };
-
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const countryOptions = [
     "India",
     "Turkey",
@@ -30,6 +15,64 @@ const EditorFilter = (props) => {
     "USA",
     "UK",
   ];
+  const levelOptions = ["Beginner", "Intermediate", "Advanced"];
+  const scorePointOptions = [0, 10];
+  const successRateOptions = [0, 25, 50, 75, 100];
+
+  const [countryDropDown, setCountryDropDown] = useState(false);
+  const [levelDropDown, setLevelDropDown] = useState(false);
+  const [scorePointDropDown, setScorePointDropDown] = useState(false);
+  const [successRateDropDown, setSuccessRateDropDown] = useState(false);
+
+  const [selectedCountry, setSelectedCountry] = useState("Select");
+  const [selectedLevel, setSelectedLevel] = useState("Select");
+  const [selectedScorePoint, setSelectedScorePoint] = useState("Select");
+  const [selectedSuccessRate, setSelectedSuccessRate] = useState("Select");
+
+  const handleCountrySelection = (country) => {
+    setSelectedCountry(country);
+  };
+
+  const handleLevelSelection = (level) => {
+    setSelectedLevel(level);
+  };
+
+  const handleScorePointSelection = (scorePoint) => {
+    setSelectedScorePoint(scorePoint);
+  };
+
+  const handleSuccessRateSelection = (successRate) => {
+    setSelectedSuccessRate(successRate);
+  };
+
+  const toggleCountryDropdown = () => {
+    setCountryDropDown(!countryDropDown);
+    setLevelDropDown(false);
+    setScorePointDropDown(false);
+    setSuccessRateDropDown(false);
+  };
+
+  const toggleLevelDropdown = () => {
+    setLevelDropDown(!levelDropDown);
+    setCountryDropDown(false);
+    setScorePointDropDown(false);
+    setSuccessRateDropDown(false);
+  };
+
+  const toggleScorePointDropdown = () => {
+    setScorePointDropDown(!scorePointDropDown);
+    setCountryDropDown(false);
+    setLevelDropDown(false);
+    setSuccessRateDropDown(false);
+  };
+
+  const toggleSuccessRateDropdown = () => {
+    setSuccessRateDropDown(!successRateDropDown);
+    setCountryDropDown(false);
+    setLevelDropDown(false);
+    setScorePointDropDown(false);
+  };
+
   return (
     <>
       <Modal
@@ -38,6 +81,8 @@ const EditorFilter = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
           className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
@@ -61,7 +106,6 @@ const EditorFilter = (props) => {
               </div>
               <div className="row">
                 <div className="col">
-                  {/* Category DROPDOWN */}
                   <CustomDropdown
                     label="Category"
                     options={countryOptions}
@@ -70,45 +114,38 @@ const EditorFilter = (props) => {
                     isOpen={countryDropDown}
                     toggleDropdown={toggleCountryDropdown}
                   />
-                  {/* End Category DROPDOWN */}
                 </div>
                 <div className="col">
-                  {/* Level DROPDOWN */}
                   <CustomDropdown
                     label="Level"
-                    options={countryOptions}
-                    selectedOption={selectedCountry}
-                    onSelectOption={handleCountrySelection}
-                    isOpen={countryDropDown}
-                    toggleDropdown={toggleCountryDropdown}
+                    options={levelOptions}
+                    selectedOption={selectedLevel}
+                    onSelectOption={handleLevelSelection}
+                    isOpen={levelDropDown}
+                    toggleDropdown={toggleLevelDropdown}
                   />
-                  {/* End Level DROPDOWN */}
                 </div>
               </div>
               <div className="row my-3">
                 <div className="col">
-                  {/* Category DROPDOWN */}
                   <CustomDropdown
                     label="Score Point"
-                    options={countryOptions}
-                    selectedOption={selectedCountry}
-                    onSelectOption={handleCountrySelection}
-                    isOpen={countryDropDown}
-                    toggleDropdown={toggleCountryDropdown}
+                    options={scorePointOptions}
+                    selectedOption={selectedScorePoint}
+                    onSelectOption={handleScorePointSelection}
+                    isOpen={scorePointDropDown}
+                    toggleDropdown={toggleScorePointDropdown}
                   />
-                  {/* End Category DROPDOWN */}
                 </div>
                 <div className="col">
-                  {/* Level DROPDOWN */}
                   <CustomDropdown
                     label="Success Rate"
-                    options={countryOptions}
-                    selectedOption={selectedCountry}
-                    onSelectOption={handleCountrySelection}
-                    isOpen={countryDropDown}
-                    toggleDropdown={toggleCountryDropdown}
+                    options={successRateOptions}
+                    selectedOption={selectedSuccessRate}
+                    onSelectOption={handleSuccessRateSelection}
+                    isOpen={successRateDropDown}
+                    toggleDropdown={toggleSuccessRateDropdown}
                   />
-                  {/* End Level DROPDOWN */}
                 </div>
               </div>
               <div className="d-flex justify-content-center my-4">
@@ -116,7 +153,6 @@ const EditorFilter = (props) => {
                   className={`${
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
-                  onClick={() => setWithdrawalModalShow(true)}
                 >
                   Show
                 </button>
@@ -125,11 +161,6 @@ const EditorFilter = (props) => {
           </div>
         </Modal.Body>
       </Modal>
-
-      <WithdrawalModal
-        show={WithdrawalModalShow}
-        onHide={() => setWithdrawalModalShow(false)}
-      />
     </>
   );
 };

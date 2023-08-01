@@ -4,10 +4,10 @@ import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
-import bell from "../../assets/bell-ringing-1.svg"
-import bellLight from "../../assets/bell-ringing.png"
+import bell from "../../assets/Header Notification.svg"
+import bellLight from "../../assets/Header Notification (1).svg"
 import darkmode from "../../assets/brightness-up.png"
-import moon from "../../assets/moon.png"
+import moon from "../../assets/Header Dark Mode.svg"
 
 const NavBar = (props) => {
   const [ShowModal, setShowModal] = useState(1);

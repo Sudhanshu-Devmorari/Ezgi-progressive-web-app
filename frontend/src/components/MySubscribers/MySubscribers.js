@@ -30,7 +30,7 @@ const MySubscribers = (props) => {
       <div
         className={`${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
-        } my-2 p-2 pb-5 fonts`}
+        } my-2 p-2 pb-5 fonts-subscribers`}
       >
         {props.user === "commentator" && (
           <>

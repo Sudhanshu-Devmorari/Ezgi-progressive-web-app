@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="85.072" height="85.072" viewBox="0 0 85.072 85.072">
-  <g id="Group_479" data-name="Group 479" transform="translate(13995.273 -2481.763)">
-    <g id="checkbox" transform="translate(-13995.273 2481.763)">
-      <path id="Path_227" data-name="Path 227" d="M0,0H85.072V85.072H0Z" fill="none"/>
-      <path id="Path_229" data-name="Path 229" d="M60.715,32.357V53.625a7.089,7.089,0,0,1-7.089,7.089H11.089A7.089,7.089,0,0,1,4,53.625V11.089A7.089,7.089,0,0,1,11.089,4h31.9" transform="translate(10.179 10.179)" fill="none" stroke="#e6e6e6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-    </g>
-    <path id="Path_228" data-name="Path 228" d="M9,23.723,19.634,34.357,47.991,6" transform="translate(-13972.371 2497.031)" fill="none" stroke="#37ff80" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
-  </g>
-</svg>

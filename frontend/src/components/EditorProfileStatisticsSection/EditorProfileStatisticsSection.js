@@ -48,7 +48,7 @@ const EditorProfileStatisticsSection = () => {
         </div>
         <div className="my-2">
           <div className="my-2">Comments Type</div>
-          <div className="row g-0 my-2 gap-4">
+          <div className="row g-0 my-2 gap-2">
             {SelectSport === "football"
               ? progressBarFootball.map((res, index) => (
                   <div className="col">
@@ -71,7 +71,7 @@ const EditorProfileStatisticsSection = () => {
                       >
                         {res.score}
                       </span>
-                      <div style={{ fontSize: 10, marginTop: -5 }}>
+                      <div style={{ fontSize: 9, marginTop: -5 }}>
                         {res.text}
                       </div>
                     </CircularProgressbarWithChildren>

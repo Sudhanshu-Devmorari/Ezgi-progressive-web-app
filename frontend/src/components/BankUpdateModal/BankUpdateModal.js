@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
-import { currentTheme } from "../GetCurrentTheme";
+import CurrentTheme from "../../context/CurrentTheme";
 
 const BankUpdateModal = (props) => {
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>
       <Modal
@@ -12,9 +13,11 @@ const BankUpdateModal = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`} style={{fontSize:"14px"}}
         >
           <div>
             <div className="m-3 mt-4">
@@ -59,7 +62,7 @@ const BankUpdateModal = (props) => {
                 <div
                   className=""
                   style={{
-                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",fontSize:"12px"
                   }}
                 >
                   If the registered bank information and the personal

@@ -116,6 +116,7 @@ const Support = () => {
             <div className="">
               <div className="position-relative">
                 <CustomDropdown
+                label={" "}
                   options={matchDetailsOptions}
                   selectedOption={selectedMatchDetails}
                   onSelectOption={handleMatchDetailsSelection}

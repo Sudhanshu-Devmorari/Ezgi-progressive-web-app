@@ -4,12 +4,14 @@ import CurrentTheme from "../../context/CurrentTheme";
 import "./SelectContentForEditorPage.css";
 import { CommentFilter } from "../CommentFilter/CommentFilter";
 import world_check from "../../assets/world-check.svg";
-import darkGrp from "../../assets/Group 712.png"
-import lighGrp from "../../assets/Group 721.png"
+import darkGrp from "../../assets/Group 712.png";
+import lighGrp from "../../assets/Group 721.png";
+import EditorFilter from "../EditorFilter/EditorFilter";
+import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
 
 const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const [FilterModalShow, setFilterModalShow] = useState(false);
+  const [modalShow, setModalShow] = React.useState(false);
   return (
     <>
       <div
@@ -40,8 +42,8 @@ const SelectContentForEditorPage = (props) => {
         </div>
         <div className={`${props?.editor && "ms-auto"}`}>
           <button
-            onClick={() => setFilterModalShow(true)}
-            className="px-3 py-1"
+            onClick={() => setModalShow(true)}
+            className="px-3"
             style={{
               border:
                 currentTheme === "dark"
@@ -56,7 +58,7 @@ const SelectContentForEditorPage = (props) => {
           </button>
         </div>
         {props.comments && (
-          <div className="ms-3 d-flex align-items-center">
+          <div className="ms-auto d-flex align-items-center">
             <img
               src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""
@@ -65,13 +67,24 @@ const SelectContentForEditorPage = (props) => {
               width={32}
             />
             <span className="pe-1">Only Public</span>
-            <div
-            >
-               <img src={currentTheme === "dark" ? darkGrp : lighGrp} alt="" height={28} width={28}/>
+            <div>
+              <img
+                src={currentTheme === "dark" ? darkGrp : lighGrp}
+                alt=""
+                height={28}
+                width={28}
+              />
             </div>
           </div>
         )}
       </div>
+
+      {props?.editor && (
+        <EditorFilter show={modalShow} onHide={() => setModalShow(false)} />
+      ) }
+      {props?.comments && (
+        <CommentsPageModal show={modalShow} onHide={() => setModalShow(false)} />
+      )}
     </>
   );
 };

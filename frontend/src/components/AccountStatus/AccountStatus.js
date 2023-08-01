@@ -9,9 +9,11 @@ import "react-circular-progressbar/dist/styles.css";
 import RadialSeparators from "../RadialSeparators";
 import "./AccountStatus.css";
 import buletick from "../../assets/blueTick.png";
+import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 
 const AccountStatus = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [modalShow, setModalShow] = React.useState(false);
   return (
     <>
       <div
@@ -22,12 +24,6 @@ const AccountStatus = () => {
           color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
         }}
       >
-        {/* <div
-        className={`${
-          currentTheme === "dark" ? "dark-mode" : "light-mode"
-        } my-2 p-2`}
-        style={{ fontSize: "14px" }}
-      > */}
         <div className="row g-0">
           <div className="col-4">
             <div
@@ -46,15 +42,15 @@ const AccountStatus = () => {
                   styles={buildStyles({
                     strokeLinecap: "butt",
                     rotation: 1 / 2 + 1 / 8,
-                    textColor: "#007BF6",
+                    textColor: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
                     textSize: "23px",
-                    pathColor: "#007BF6",
+                    pathColor: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
                   })}
                 >
                   <RadialSeparators
                     count={55}
                     style={{
-                      background: "#fff",
+                      background: currentTheme === "dark" ? "#0B2447" : "#fff",
                       width: "2px",
                       height: `${10}%`,
                     }}
@@ -269,36 +265,40 @@ const AccountStatus = () => {
                 }}
               >
                 Membership Date 15-04-2023
-              
-              <div className="my-2 ms-2 d-flex flex-column">
-                <span>
-                  {" "}
-                  Active Plan <span style={{color: "#007BF6"}}>Journeyman</span>
-                </span>
-                <span>Membership Price 249.90₺</span>
-              </div>
-              <div className="d-flex justify-content-end m-2">
-
-              <button
-              className="px-3"
-                style={{
-                  color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid  #D2DB08"
-                      : "1px solid #00659D",
-                  borderRadius: "3px",
-                  backgroundColor: "transparent",
-                }}
-              >
-                Renew
-              </button>
-              </div>
+                <div className="my-2 ms-2 d-flex flex-column">
+                  <span>
+                    {" "}
+                    Active Plan{" "}
+                    <span style={{ color: "#007BF6" }}>Journeyman</span>
+                  </span>
+                  <span>Membership Price 249.90₺</span>
+                </div>
+                <div className="d-flex justify-content-end m-2">
+                  <button
+                    onClick={() => setModalShow(true)}
+                    className="px-3"
+                    style={{
+                      color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                      border:
+                        currentTheme === "dark"
+                          ? "1px solid  #D2DB08"
+                          : "1px solid #00659D",
+                      borderRadius: "3px",
+                      backgroundColor: "transparent",
+                    }}
+                  >
+                    Renew
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <SubscribeRenewModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+      />
     </>
   );
 };

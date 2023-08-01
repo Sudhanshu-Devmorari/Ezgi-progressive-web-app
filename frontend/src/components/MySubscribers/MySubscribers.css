@@ -1,12 +1,12 @@
-.fonts{
+.fonts-subscribers{
     font-size: 14px;
 }
-@media (min-width:360px) and (max-width:400px){
-    .fonts{
+@media (min-width:360px) and (max-width:420px){
+    .fonts-subscribers{
         font-size: 11px!important;
     }
 }
-@media (min-width:360px) and (max-width:400px){
+@media (min-width:360px) and (max-width:420px){
     .button-status{
         width: 4rem!important;
         font-size: 12px;

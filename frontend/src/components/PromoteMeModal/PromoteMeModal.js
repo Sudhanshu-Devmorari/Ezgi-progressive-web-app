@@ -4,18 +4,21 @@ import "./PromoteMeModal.css";
 import { RxCross2 } from "react-icons/rx";
 import { BsStar } from "react-icons/bs";
 import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
-import CheckBoxDark from "../../assets/CheckBoxDark.svg";
-import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
-import currentyIcondark from "../../assets/₺ (1).svg";
-import currentyIcon from "../../assets/₺.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CurrentTheme from "../../context/CurrentTheme";
+import lightradio from "../../assets/Ellipse 217.svg";
+import lightradioSelected from "../../assets/Ellipse 58.svg";
+import darkradioSelected from "../../assets/Ellipse 217 (1).svg";
+import darkradio from "../../assets/Ellipse 216.svg";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [planSelected, setplanSelected] = useState(false);
   return (
     <>
       <Modal
@@ -68,13 +71,21 @@ const PromoteMeModal = (props) => {
               <div className="my-2">
                 <div className="my-2">Subscription Plans</div>
                 <div className="d-flex mb-2">
-                  <div
-                    className={`${
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
                       currentTheme === "dark"
-                        ? "BlankCircle-dark-mode"
-                        : "BlankCircle-light-mode"
-                    } me-2`}
-                  ></div>
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -83,29 +94,25 @@ const PromoteMeModal = (props) => {
                     }}
                   >
                     <span style={{ fontSize: "14px" }}>1 Month</span>
-                    <span style={{ fontSize: "19px" }}>
-                      69.90
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
-                    </span>
+                    <span style={{ fontSize: "19px" }}>69.90₺</span>
                   </div>
                 </div>
                 <div className="d-flex mb-2">
-                  <div
-                    className={`${
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
                       currentTheme === "dark"
-                        ? "BlankCircle-dark-mode"
-                        : "BlankCircle-light-mode"
-                    } me-2`}
-                  ></div>
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -114,29 +121,25 @@ const PromoteMeModal = (props) => {
                     }}
                   >
                     <span style={{ fontSize: "14px" }}>1 Month</span>
-                    <span style={{ fontSize: "19px" }}>
-                      69.90
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
-                    </span>
+                    <span style={{ fontSize: "19px" }}>69.90₺</span>
                   </div>
                 </div>
                 <div className="d-flex mb-2">
-                  <div
-                    className={`${
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
                       currentTheme === "dark"
-                        ? "FilledCircle-dark-mode"
-                        : "FilledCircle-light-mode"
-                    } me-2`}
-                  ></div>
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -149,17 +152,7 @@ const PromoteMeModal = (props) => {
                       <span className="pe-2" style={{ color: "#7BFFAB" }}>
                         %20 Save!
                       </span>
-                      69.00
-                      <img
-                        src={
-                          currentTheme === "dark"
-                            ? currentyIcondark
-                            : currentyIcon
-                        }
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
+                      69.00₺
                     </span>
                   </div>
                 </div>
@@ -167,19 +160,7 @@ const PromoteMeModal = (props) => {
               <div className="">
                 <div className="text-center my-2">
                   <div>Total Amount</div>
-                  <div style={{ fontSize: "19px" }}>
-                    329.90
-                    <img
-                      src={
-                        currentTheme === "dark"
-                          ? currentyIcondark
-                          : currentyIcon
-                      }
-                      alt=""
-                      height={25}
-                      width={25}
-                    />
-                  </div>
+                  <div style={{ fontSize: "19px" }}>329.90₺</div>
                 </div>
                 <div className="text-center">
                   <div className="my-3" style={{ fontSize: "13px" }}>
@@ -230,12 +211,12 @@ const PromoteMeModal = (props) => {
                   </div>
                   <div className="text-center" style={{ fontSize: "11px" }}>
                     <div className="">
-                    <p>
-                      With Highlights, your profile and contents will be
-                      prominently displayed at the top of the lists for the
-                      duration of the plan you purchased.
-                    </p>
-                  </div>
+                      <p>
+                        With Highlights, your profile and contents will be
+                        prominently displayed at the top of the lists for the
+                        duration of the plan you purchased.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

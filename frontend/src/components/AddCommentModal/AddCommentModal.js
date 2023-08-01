@@ -8,8 +8,8 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CurrentTheme from "../../context/CurrentTheme";
-import CheckBoxDark from "../../assets/CheckBoxDark.svg";
-import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
 import SelecttoggleinputDark from "../../assets/Group 711.png";
 import toggleinputDark from "../../assets/Group 711.svg";
 import toggleinputLight from "../../assets/Group 720.png";
@@ -162,9 +162,9 @@ const AddCommentModal = (props) => {
             <span className="ps-2">Public Content</span>
           </div>
           <div className="">
-            <span style={{ fontSize: "14px" }}>
+            <span style={{ fontSize: "10px" }}>
               Comment
-              <span style={{ color: "#FF5757", fontSize: "10px" }}>
+              <span style={{ color: "#FF5757", fontSize: ".55rem" }}>
                 {" "}
                 ( If illegal content is detected, the membership will be
                 terminated. )

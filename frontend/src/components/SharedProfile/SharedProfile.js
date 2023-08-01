@@ -11,7 +11,7 @@ import football from "../../assets/football.png";
 import basketball from "../../assets/basketball.png";
 import startDarkIcon from "../../assets/star.svg";
 
-const SharedProfile = () => {
+const SharedProfile = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const editorProfile = [
@@ -24,6 +24,7 @@ const SharedProfile = () => {
     <>
       {editorProfile.map((res, index) => (
         <div
+        onClick={() => props.setSelectContent("show-all-comments")}
           className={`card p-1 my-2 border-0 rounded-0 ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}

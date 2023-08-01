@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-import { CiBasketball } from "react-icons/ci";
-import { RiFootballLine } from "react-icons/ri";
 import Modal from "react-bootstrap/Modal";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import "./SubscribeRenewModal.css";
 import PromoteMeModal from "../PromoteMeModal/PromoteMeModal";
 import { currentTheme } from "../GetCurrentTheme";
-import CheckBoxDark from "../../assets/CheckBoxDark.svg";
-import CheckBoxSelectDark from "../../assets/CheckBoxSelectDark.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
 import basketball from "../../assets/basketball.png";
 import football from "../../assets/football.png";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
@@ -27,6 +25,8 @@ const SubscribeRenewModal = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
           className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}

@@ -9,7 +9,7 @@ import likeIcondark from "../../assets/LikeDark.png";
 import starIcondark from "../../assets/star.svg";
 import clapIcon from "../../assets/Path 4530.png";
 import clapLight from "../../assets/Path 4537.png";
-import world_check_light from '../../assets/world-check.png'
+import world_check_light from "../../assets/world-check.png";
 import world_check from "../../assets/world-check.svg";
 import TurkeyFalg from "../../assets/flagTurk.png";
 import lock from "../../assets/lock.svg";
@@ -30,7 +30,10 @@ const ContentSection = (props) => {
         }`}
       >
         <div className="row m-2">
-          <div className="position-relative col p-0">
+          <div
+            className="position-relative col p-0"
+            onClick={() => props.setSelectContent("show-all-comments")}
+          >
             <img
               src={crown}
               alt=""
@@ -50,7 +53,7 @@ const ContentSection = (props) => {
             </div>
           </div>
           <div className="col p-0">
-            {(props.selectContent === "for you" || props.userComments ) && (
+            {(props.selectContent === "for you" || props.userComments) && (
               <div className="d-flex justify-content-end pe-2 mt-3">
                 <button
                   style={{
@@ -71,7 +74,9 @@ const ContentSection = (props) => {
             )}
             <div
               className={`${
-               ( props.selectContent === "for you" || props.userComments) ? "mt-3" : "mt-5"
+                props.selectContent === "for you" || props.userComments
+                  ? "mt-3"
+                  : "mt-5"
               } row gap-1 g-0 text-center`}
             >
               <div className="col">
@@ -207,7 +212,10 @@ const ContentSection = (props) => {
           </div>
 
           <div className="d-flex mt-2 align-items-center">
-            <div className="gap-2 d-flex align-items-center" style={{fontSize:"13px"}}>
+            <div
+              className="gap-2 d-flex align-items-center"
+              style={{ fontSize: "13px" }}
+            >
               <div>
                 <img
                   src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
@@ -220,29 +228,37 @@ const ContentSection = (props) => {
               <div>
                 {userPhone ? (
                   <img
-                    src={`${currentTheme === "dark" ? starDarkLogin : starIcon}`}
+                    src={`${
+                      currentTheme === "dark" ? starDarkLogin : starIcon
+                    }`}
                     alt=""
                     height={23}
                     width={23}
                   />
                 ) : (
-
-                <img
-                  src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
-                  alt=""
-                  height={23}
-                  width={23}
-                />
+                  <img
+                    src={`${currentTheme === "dark" ? starIcondark : starIcon}`}
+                    alt=""
+                    height={23}
+                    width={23}
+                  />
                 )}
                 258
               </div>
               <div>
-                <img src={currentTheme === "dark" ? clapIcon: clapLight} alt="" height={20} width={20} /> 258
+                <img
+                  src={currentTheme === "dark" ? clapIcon : clapLight}
+                  alt=""
+                  height={20}
+                  width={20}
+                />{" "}
+                258
               </div>
             </div>
             <div className="ms-auto" style={{ fontSize: "12px" }}>
               {props.selectContent === "for you" && (
                 <button
+                  onClick={() => props.setSelectContent("show-all-comments")}
                   className="me-2 px-2 py-1"
                   style={{
                     border:
@@ -257,7 +273,7 @@ const ContentSection = (props) => {
                   Subscribe
                 </button>
               )}
-              <span style={{fontSize: "11px"}}>10 dk önce</span>
+              <span style={{ fontSize: "11px" }}>10 dk önce</span>
             </div>
           </div>
         </div>

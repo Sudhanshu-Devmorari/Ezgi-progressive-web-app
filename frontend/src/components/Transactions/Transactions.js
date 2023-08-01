@@ -3,15 +3,17 @@ import CurrentTheme from "../../context/CurrentTheme";
 import "./Transactions.css";
 import TransactionArray from "../TransactionArray/TransactionArray";
 import bankLogo from "../../assets/Akbank-Logo-PNG.png";
+import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [modalShow, setModalShow] = React.useState(false);
   const chart = [
-    { name: "Tem", color: "#0CC6FF", height: "2rem", darkcolor : "#0CC6FF" },
-    { name: "Ağu", color: "#37FF80", height: "3rem", darkcolor : "#37FF80" },
-    { name: "Eyl", color: "#37FF80", height: "4.5rem", darkcolor : "#37FF80" },
-    { name: "Eki", color: "#FF5757", height: "4rem", darkcolor : "#FF5757" },
-    { name: "Las", color: "#0CC6FF", height: "4rem", darkcolor : "#0CC6FF" },
+    { name: "Tem", color: "#0CC6FF", height: "2rem", darkcolor: "#0CC6FF" },
+    { name: "Ağu", color: "#37FF80", height: "3rem", darkcolor: "#37FF80" },
+    { name: "Eyl", color: "#37FF80", height: "4.5rem", darkcolor: "#37FF80" },
+    { name: "Eki", color: "#FF5757", height: "4rem", darkcolor: "#FF5757" },
+    { name: "Las", color: "#0CC6FF", height: "4rem", darkcolor: "#0CC6FF" },
     { name: "Ara", color: "#FFFFFF", height: "4rem", darkcolor: "#0D2A53" },
   ];
   return (
@@ -69,10 +71,11 @@ const Transactions = () => {
                     style={{
                       height: res.height,
                       width: "9px",
-                      backgroundColor: currentTheme === "dark" ? res.darkcolor : res.color,
+                      backgroundColor:
+                        currentTheme === "dark" ? res.darkcolor : res.color,
                     }}
                   ></div>
-                  <span style={{fontSize:"10px"}}>{res.name}</span>
+                  <span style={{ fontSize: "10px" }}>{res.name}</span>
                 </div>
               ))}
             </div>
@@ -89,6 +92,7 @@ const Transactions = () => {
           </span>
           <span>TR00 2151 2532 0000 3315 1200 58</span>
           <button
+            onClick={() => setModalShow(true)}
             className="px-2"
             style={{
               backgroundColor: "transparent",
@@ -106,6 +110,8 @@ const Transactions = () => {
         <div className="my-2">Transaction History</div>
         <TransactionArray />
       </div>
+
+      <BankUpdateModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 };
