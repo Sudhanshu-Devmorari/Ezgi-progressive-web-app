@@ -99,7 +99,6 @@ const SalesManagementPage = () => {
                 </div>
                 <div
                   className="dark-mode p-2 m-2 mb-0 home-height"
-                  style={{ height: "65vh" }}
                 >
                   <SalesManagementFilter />
                   {users.map((res, index) => (
@@ -244,7 +243,7 @@ const SalesManagementPage = () => {
                     </div>
                   ))}
                 </div>
-                <div className="dark-mode d-flex align-items-center justify-content-center flex-column height-Net-Revenue" style={{height:"34vh"}}>
+                <div className="dark-mode d-flex align-items-center justify-content-center flex-column height-Net-Revenue" style={{height:"33vh"}}>
                   <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
                     <span style={{ fontSize: "1.2rem"}}>
                       Net Revenue

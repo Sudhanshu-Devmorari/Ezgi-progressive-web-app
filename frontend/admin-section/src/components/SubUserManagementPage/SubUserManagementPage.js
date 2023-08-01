@@ -91,7 +91,6 @@ const SubUserManagementPage = () => {
                 </div>
                 <div
                   className="dark-mode p-2 m-2 mb-0 home-height"
-                  style={{ height: "65vh" }}
                 >
                   <SubUserManagementFilter />
                   {users.map((res, index) => (
@@ -143,8 +142,8 @@ const SubUserManagementPage = () => {
                           <div className="">15-06-2023 - 16:37</div>
                         </div>
                         <div className="col-1 d-flex align-items-center justify-content-end">
-                          <img src={edit} alt="" height={27} width={27} />
-                          <img src={trash} alt="" height={27} width={27} />
+                          <img src={edit} alt="" height={25} width={25} />
+                          <img src={trash} alt="" height={25} width={25} />
                         </div>
                       </>
                     </MainDiv>

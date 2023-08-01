@@ -3,7 +3,6 @@ import { GoSearch } from "react-icons/go";
 import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
-import userEdit from "../../assets/Profile Card Edit.svg";
 import eye from "../../assets/eye.svg";
 import user1 from "../../assets/user1.png";
 import "./EditorManagemenet.css";
@@ -18,6 +17,8 @@ import Radio from "../../assets/Group 314.svg";
 import leftArrow from "../../assets/Group 271.svg";
 import circle_check from "../../assets/circle-check-1.png";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
+import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRequestsBtns";
 
 const EditorManagemenet = (props) => {
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
@@ -385,10 +386,9 @@ const EditorManagemenet = (props) => {
   return (
     <>
       <div
-        className="dark-mode p-2 mx-2 home-height"
-        style={{ height: "64vh" }}
+        className="dark-mode p-2 m-2 mb-0 home-height"
       >
-        <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
+        <div className="d-flex p-2">
           <div className="p-2 flex-grow-1">
             <div class="input-group w-50">
               <span class="input-group-text search-icon-dark" id="basic-addon1">
@@ -446,19 +446,19 @@ const EditorManagemenet = (props) => {
                       width={42}
                     />
                     <div
-                      className="position-absolute d-flex justify-content-center align-items-center"
+                      className="position-absolute d-flex justify-content-center align-items-center crown-position"
                       style={{
-                        height: "16px",
-                        width: "16px",
+                        height: "14px",
+                        width: "14px",
                         border: "2px solid #FF9100",
                         borderRadius: "50%",
                         backgroundColor: "#0B2447",
                         top: "0px",
-                        left: "25px",
+                        left: "27px",
                       }}
                     >
                       <BiSolidCrown
-                        fontSize={"0.62rem"}
+                        fontSize={"0.49rem"}
                         style={{ color: "#FF9100" }}
                       />
                     </div>
@@ -478,7 +478,7 @@ const EditorManagemenet = (props) => {
                 <span>{res.age}</span>
                 <div className="">{res.country}</div>
               </div>
-              <div className="d-flex align-items-center gap-2 edit-icon-gap col-3 justify-content-end">
+              <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
                 <span>{res.date}</span>
                 <img
                   className="icons-edit-eye"
@@ -497,45 +497,10 @@ const EditorManagemenet = (props) => {
               </div>
             </div>
             {props?.verifyRqst && (
-
-            <div className="my-2">
-              <button
-                className="px-3 py-1"
-                style={{
-                  border: "1px solid #4DD5FF",
-                  color: "#4DD5FF",
-                  backgroundColor: "transparent",
-                  borderRadius: "4px",
-                  fontSize: "0.9rem",
-                }}
-              >
-                In Progress
-              </button>
-              <button
-                className="px-3 py-1 mx-3"
-                style={{
-                  border: "1px solid #58DEAA",
-                  color: "#58DEAA",
-                  backgroundColor: "transparent",
-                  borderRadius: "4px",
-                  fontSize: "0.9rem",
-                }}
-              >
-                Approve
-              </button>
-              <button
-                className="px-3 py-1"
-                style={{
-                  border: "1px solid #FF5757",
-                  color: "#FF5757",
-                  backgroundColor: "transparent",
-                  borderRadius: "4px",
-                  fontSize: "0.9rem",
-                }}
-              >
-                Reject
-              </button>
-            </div>
+              <VerificationRequestsBtns/>
+            )}
+            {props?.deactiveRqst && (
+              <DeactivationRequestsBtns/>
             )}
           </div>
         ))}

@@ -11,7 +11,6 @@ import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
-import CreateUserModal from "../CreateUserModal/CreateUserModal";
 
 const UserManagementPage = () => {
   const newUsersArray = [
@@ -111,18 +110,17 @@ const UserManagementPage = () => {
                       <NewUsers array={newSubscribersArray} />
                     </div>
                   </div>
-                  <div className="my-2 h-100">
+                  <div className="">
                     <Home users={users}/>
                   </div>
                 </div>
                 <div className="col-4 h-100">
-                  <UserTimeLine />
+                  <UserTimeLine transactionHistory={"timeline"}/>
                 </div>
               </div>
           </div>
         </div>
       </div>
-      {/* <CreateUserModal show={showCreateUser} onHide={() => setShowCreateUser(false)}/> */}
     </>
   );
 };

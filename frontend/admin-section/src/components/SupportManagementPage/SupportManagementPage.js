@@ -109,82 +109,44 @@ const SupportManagementPage = () => {
                       ))}
                     </div>
                   </div>
-                  {/* {salesArray.map((res, index) => (
-                    <div className="col p-0">
-                      <div
-                        className={`dark-mode p-2 ${
-                          res.name === "Plan Sales" ? "mx-2" : "me-2"
-                        }`}
-                        style={{ height: "25vh" }}
-                      >
-                        <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                          <img src={res.icon} alt="" height={45} width={45} />
-                          <span style={{ fontSize: "1.2rem" }}>{res.name}</span>
-                          <span style={{ fontSize: "1.6rem" }}>
-                            12.860 <small>₺</small>
-                          </span>
-                        </div>
-                        <div className="d-flex align-items-end mt-3 p-2">
-                          <span className="" style={{ fontSize: "1rem" }}>
-                            <span
-                              className=""
-                              style={{ color: "#58DEAA", fontSize: "1.2rem" }}
-                            >
-                              %22
-                              <HiArrowSmUp
-                                fontSize={"1.4rem"}
-                                style={{ marginBottom: "0.1rem" }}
-                              />
-                            </span>
-                            last day
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))} */}
                 </div>
-                <div
-                  className="dark-mode p-2 m-2 mb-0 home-height"
-                  style={{ height: "65vh" }}
-                >
+                <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SupportManagementFilter />
                   {users.map((res, index) => (
                     <MainDiv>
                       <>
-                        <div className="col d-flex align-items-center">
+                        <div className="col-3 d-flex align-items-center">
                           <span>#0001</span>
                           <span className="px-2">
                             <img
                               src={res.profile}
                               alt=""
-                              height={50}
-                              width={50}
+                              height={45}
+                              width={45}
                             />
                           </span>
                           <span>johndoe</span>
                         </div>
-                        <div className="col d-flex align-items-center justify-content-center">
-                          <div className="">
-                            <button
-                              className="px-2"
-                              style={{
-                                backgroundColor: "transparent",
-                                borderRadius: "4px",
-                                border:
-                                  (res.btn === "Financial" &&
-                                    "1px solid #58DEAA") ||
-                                  (res.btn === "Technical" &&
-                                    "1px solid #4DD5FF"),
-                                color:
-                                  (res.btn === "Financial" && "#58DEAA") ||
-                                  (res.btn === "Technical" && "#4DD5FF"),
-                              }}
-                            >
-                              {res.btn}
-                            </button>
-                          </div>
+                        <div className="col-2 d-flex align-items-center justify-content-center">
+                          <button
+                            className="px-2"
+                            style={{
+                              backgroundColor: "transparent",
+                              borderRadius: "4px",
+                              border:
+                                (res.btn === "Financial" &&
+                                  "1px solid #58DEAA") ||
+                                (res.btn === "Technical" &&
+                                  "1px solid #4DD5FF"),
+                              color:
+                                (res.btn === "Financial" && "#58DEAA") ||
+                                (res.btn === "Technical" && "#4DD5FF"),
+                            }}
+                          >
+                            {res.btn}
+                          </button>
                         </div>
-                        <div className="col d-flex align-items-center justify-content-center">
+                        <div className="col-2 d-flex align-items-center justify-content-center">
                           <div
                             className={
                               res.rqst === "Account Request" && "cursor"
@@ -197,7 +159,7 @@ const SupportManagementPage = () => {
                             {res.rqst}
                           </div>
                         </div>
-                        <div className="col d-flex align-items-center justify-content-center">
+                        <div className="col-2 d-flex align-items-center justify-content-center">
                           <button
                             className="px-2 text-center"
                             style={{
@@ -220,11 +182,9 @@ const SupportManagementPage = () => {
                             {res.status}
                           </button>
                         </div>
-                        <div className="col d-flex align-items-center justify-content-center">
+                        <div className="col-3 d-flex align-items-center justify-content-end gap-1">
                           <div className="">15-06-2023 - 16:37</div>
-                        </div>
-                        <div className="col-1 d-flex align-items-center justify-content-end">
-                          <img src={eye} alt="" height={30} width={30} />
+                          <img src={eye} alt="" height={24} width={24} />
                         </div>
                       </>
                     </MainDiv>
@@ -256,7 +216,7 @@ const SupportManagementPage = () => {
                     </span>
                   </div>
                 </div>
-                <div className="my-2" style={{ height: "30vh" }}>
+                <div className="mt-2">
                   <SupportHistory />
                 </div>
               </div>
@@ -272,7 +232,10 @@ const SupportManagementPage = () => {
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-dialog-centered" style={{fontSize:"0.9rem"}}>
+        <div
+          class="modal-dialog modal-dialog-centered"
+          style={{ fontSize: "0.9rem" }}
+        >
           <div class="modal-content">
             <div class="modal-body dark-mode p-3">
               <div className="row g-0">
@@ -341,7 +304,10 @@ const SupportManagementPage = () => {
                 </div>
               </div>
               {/* For Redirected msg */}
-              <div className="my-2 py-2" style={{ color: "#58DEAA", fontSize:"0.8rem" }}>
+              <div
+                className="my-2 py-2"
+                style={{ color: "#58DEAA", fontSize: "0.8rem" }}
+              >
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                 eleifend vehicula tristique. Suspendisse vitae lectus sed massa
                 interdum consectetur.
@@ -350,20 +316,21 @@ const SupportManagementPage = () => {
               {/* Reply */}
               <div className="d-flex gap-2">
                 <div className="">Reply</div>
-                <div className=""  style={{ color: "#DD7DFF",}}>Jhon Doe</div>
+                <div className="" style={{ color: "#DD7DFF" }}>
+                  Jhon Doe
+                </div>
                 <div className="ms-auto">22-05-2023 - 16:38</div>
               </div>
               <textarea
-                    style={{ height: "100px", fontSize: ".8rem" }}
-                    className="darkMode-input form-control my-2 p-2"
-                  >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    eleifend vehicula tristique. Suspendisse vitae lectus sed
-                    massa interdum consectetur. Pellentesque habitant morbi
-                    tristique senectus et netus et malesuada fames ac turpis
-                    egestas. Integer auctor nisl in lacus fringilla, et
-                    tincidunt ex laoreet.
-                  </textarea>
+                style={{ height: "100px", fontSize: ".8rem" }}
+                className="darkMode-input form-control my-2 p-2"
+              >
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                eleifend vehicula tristique. Suspendisse vitae lectus sed massa
+                interdum consectetur. Pellentesque habitant morbi tristique
+                senectus et netus et malesuada fames ac turpis egestas. Integer
+                auctor nisl in lacus fringilla, et tincidunt ex laoreet.
+              </textarea>
               {/* End Reply */}
               <div className="my-3">
                 <span

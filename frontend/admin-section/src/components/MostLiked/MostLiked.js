@@ -51,7 +51,7 @@ const MostLiked = () => {
   ];
   return (
     <div className="dark-mode p-2 mt-2 home-height" style={{height:"64vh"}}>
-      <div className="" style={{ fontSize: "1.5rem" }}>
+      <div className="" style={{ fontSize: "1.2rem" }}>
         Most Liked
       </div>
       {notification.map((res, index) => (
@@ -61,7 +61,7 @@ const MostLiked = () => {
             <div
               className="d-flex flex-column mt-2 ps-1"
             >
-              <span className="name-font1" style={{ fontSize: "1.2rem" }}>
+              <span className="name-font1" style={{ fontSize: "0.9rem" }}>
                 {res.name}{" "}
                 <button
                   className="px-2 level-btn"
@@ -73,18 +73,18 @@ const MostLiked = () => {
                     color: res.level === "Expert" ? "#FF9100" : "#0CC6FF",
                     backgroundColor: "transparent",
                     borderRadius: "18px",
-                    fontSize: "0.8rem",
+                    fontSize: "0.7rem",
                   }}
                 >
                   {res.level}
                 </button>
               </span>
-              <span className="content-font1" style={{ fontSize: "0.9rem" }}>{res.content}</span>
+              <span className="content-font1" style={{ fontSize: "0.7rem" }}>{res.content}</span>
             </div>
             <div className="ms-auto mt-2 icons-font" style={{ fontSize: "0.9rem" }}>
-              <span><img className="icons-mostLiked" src={likeIcon} alt="" height={26} width={26} />238</span>
-              <span className="px-2 padding"><img className="icons-mostLiked" src={starIcon} alt="" height={24} width={25} />238</span>
-              <span><img className="icons-mostLiked" src={clapIcon} alt="" height={21} width={21} />238</span>
+              <span><img className="icons-mostLiked" src={likeIcon} alt="" height={22} width={22} />238</span>
+              <span className="px-2 padding"><img className="icons-mostLiked" src={starIcon} alt="" height={22} width={22} />238</span>
+              <span><img className="icons-mostLiked" src={clapIcon} alt="" height={18} width={18} />238</span>
             </div>
           </div>
         </div>

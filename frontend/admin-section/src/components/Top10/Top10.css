@@ -1,15 +1,15 @@
-@media (max-width: 1024px){
+@media (min-width: 1024px) and (max-width: 1246px){
     .top-1-img{
-        height: 75px;
-        width: 75px;
+        height: 60px;
+        width: 60px;
     }
     .top-2-img{
-        height: 50px;
-        width: 50px;
+        height: 41px;
+        width: 41px;
     }
     .all-user-img{
-        height: 35px;
-        width: 35px;
+        height: 36px;
+        width: 36px;
     }
     .text-top10{
         font-size: 0.7rem!important;
@@ -20,11 +20,8 @@
     .all-users-gap{
         gap: 0.4rem!important;
     }
-    .heading-top-10{
-        margin: 1rem;
-    }
 }
-@media (min-width: 1025px) and (max-width: 1440px){
+/* @media (min-width: 1025px) and (max-width: 1440px){
     .top-1-img{
         height: 80px;
         width: 80px;
@@ -52,4 +49,4 @@
     .padding-all-users{
         padding-left: 0.19rem;
     }
-}
+} */

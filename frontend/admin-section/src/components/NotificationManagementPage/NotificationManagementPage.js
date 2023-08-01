@@ -114,7 +114,6 @@ const NotificationManagementPage = () => {
             </div>
             <div
               className="dark-mode p-2 m-2 mb-0 home-height"
-              style={{ height: "65vh" }}
             >
               {users.map((res, index) => (
                 <MainDiv>
@@ -182,7 +181,7 @@ const NotificationManagementPage = () => {
                     </div>
                     <div className="col-2 d-flex align-items-center justify-content-end gap-2">
                       <div className="">15-06-2023 - 16:37</div>
-                      <img src={res.tick} alt="" height={30} width={30} />
+                      <img src={res.tick} alt="" height={22} width={22} />
                     </div>
                   </>
                 </MainDiv>

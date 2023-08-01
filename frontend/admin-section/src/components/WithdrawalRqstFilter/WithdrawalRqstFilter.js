@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
-const SupportManagementFilter = () => {
-  const [AllDropdown, setAllDropdown] = useState(false);
+const WithdrawalRqstFilter = () => {
+    const [AllDropdown, setAllDropdown] = useState(false);
   return (
     <>
-      <div className="d-flex p-2" style={{ fontSize: "1.1rem" }}>
+      <div className="d-flex p-2">
         <div className="p-2 flex-grow-1">
           <div class="input-group w-50">
             <span class="input-group-text search-icon-dark" id="basic-addon1">
@@ -60,13 +60,13 @@ const SupportManagementFilter = () => {
               className="m-1 px-2 py-1 text-center"
               style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
             >
-              Resolved
+              Approveds
             </span>
             <span
               className="m-1 px-2 py-1 text-center"
               style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
             >
-              Redirected
+              Rejecteds
             </span>
           </div>
         </div>
@@ -90,4 +90,4 @@ const SupportManagementFilter = () => {
   );
 };
 
-export default SupportManagementFilter;
+export default WithdrawalRqstFilter;

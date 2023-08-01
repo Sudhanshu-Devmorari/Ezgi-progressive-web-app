@@ -98,7 +98,7 @@ const SubUserManagementFilter = () => {
   ];
   return (
     <>
-      <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
+      <div className="d-flex p-2">
         <div className="p-2 flex-grow-1">
           <div class="input-group w-50">
             <span class="input-group-text search-icon-dark" id="basic-addon1">

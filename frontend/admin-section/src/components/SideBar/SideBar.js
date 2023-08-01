@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import homeSelected from "../../assets/apps.svg";
 import SelectedUsers from "../../assets/users.png";
 import users from "../../assets/users30.png";
@@ -22,256 +22,157 @@ import chartpie from "../../assets/chart-pie.svg";
 import Selectedchartpie from "../../assets/chart-pie (1).svg";
 import adjustments from "../../assets/adjustments.svg";
 import S_adjustments from "../../assets/adjustments (1).svg";
-
 import home from "../../assets/home.svg";
-// import Group from "../../assets/Group 95.svg"
 import logout from "../../assets/logout.svg";
 import "./SideBar.css";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SideBar = (props) => {
   const navigate = useNavigate();
   const [showDetails, setshowDetails] = useState("home");
 
+  const location = useLocation();
+  const path = location.pathname; 
+  useEffect(() => {
+    setshowDetails(path)
+  }, [path])
+  
+
   return (
     <>
-      {/* <div className="dark-mode d-flex flex-column py-3 justify-content-between align-items-center me-3 h-100 icons-gap gap-3">
-        <div className="d-flex flex-column img-gap">
-          <img
-            onClick={() => props.setshowDetails("home")}
-            className="icons-sidebar cursor"
-            src={props.showDetails === "home" ? homeSelected : home}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            onClick={() => props.setshowDetails("users")}
-            className="icons-sidebar cursor"
-            src={props.showDetails === "users" ? SelectedUsers : users}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            onClick={() => props.setshowDetails("comments")}
-            className="icons-sidebar cursor"
-            src={props.showDetails === "comments" ? selectedComments : comment}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            onClick={() => props.setshowDetails("editor")}
-            className="icons-sidebar cursor"
-            src={props.showDetails === "editor" ? selectedEditor : Editor}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            onClick={() => navigate("withdrawal/")}
-            className="icons-sidebar cursor"
-            src={props.showDetails === "wallet" ? Selectedwallet : wallet}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={basket}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={lifebuoydark}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={usercode}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={bell}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={ad2}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={chartpie}
-            alt=""
-            height={32}
-            width={32}
-          />
-          <img
-            className="icons-sidebar cursor"
-            src={adjustments}
-            alt=""
-            height={32}
-            width={32}
-          />
-        </div>
-        <div className="">
-          <img
-            className="icons-sidebar cursor"
-            src={logout}
-            alt=""
-            height={32}
-            width={32}
-          />
-        </div>
-      </div> */}
-
       <div className="dark-mode py-3 d-flex flex-column justify-content-between align-items-center sidebar-height">
-        {/* <div className="dark-mode d-flex justify-content-between align-items-center p-3 sidebar-height" style={{width:"4%"}}> */}
         <div className="d-flex flex-column icons-block">
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "home" ? homeSelected : home}
+            src={showDetails === ("/home/" && "/") ? homeSelected : home}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("home");
+              setshowDetails("/home/");
               navigate("/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "users" ? SelectedUsers : users}
+            src={showDetails === "/users/" ? SelectedUsers : users}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("users");
+              setshowDetails("/users/");
               navigate("/users/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "comments" ? selectedComments : comment}
+            src={showDetails === "/comments/" ? selectedComments : comment}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("comments");
+              setshowDetails("/comments/");
               navigate("/comments/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "editor" ? selectedEditor : Editor}
+            src={showDetails === "/editors/" ? selectedEditor : Editor}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("editor");
+              setshowDetails("/editors/");
               navigate("/editors/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "wallet" ? Selectedwallet : wallet}
+            src={showDetails === "/withdrawal/" ? Selectedwallet : wallet}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("wallet");
+              setshowDetails("/withdrawal/");
               navigate("/withdrawal/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "sales" ? Selectedsales : sales}
+            src={showDetails === "/sales/" ? Selectedsales : sales}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("sales");
+              setshowDetails("/sales/");
               navigate("/sales/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "support" ? Selectedsupport : support}
+            src={showDetails === "/support/" ? Selectedsupport : support}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("support");
+              setshowDetails("/support/");
               navigate("/support/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "sub_user" ? sub_user_selected : sub_user}
+            src={showDetails === "/subuser/" ? sub_user_selected : sub_user}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("sub_user");
+              setshowDetails("/subuser/");
               navigate("/subuser/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "notification" ? bellSelected : bell}
+            src={showDetails === "/notification/" ? bellSelected : bell}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("notification");
+              setshowDetails("/notification/");
               navigate("/notification/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "ads" ? Selected_ad2 : ad2}
+            src={showDetails === "/ads/" ? Selected_ad2 : ad2}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("ads");
+              setshowDetails("/ads/");
               navigate("/ads/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
-            src={showDetails === "settings" ? Selectedchartpie : chartpie}
+            src={showDetails === "/settings/" ? Selectedchartpie : chartpie}
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("settings");
+              setshowDetails("/settings/");
               navigate("/settings/");
             }}
           />
           <img
             className="cursor icons-responsive-size"
             src={
-              showDetails === "settings-editor" ? S_adjustments : adjustments
+              showDetails === "/editorSettings/" ? S_adjustments : adjustments
             }
             alt=""
             height={32}
             width={32}
             onClick={() => {
-              setshowDetails("settings-editor");
+              setshowDetails("/editorSettings/");
               navigate("/editorSettings/");
             }}
           />

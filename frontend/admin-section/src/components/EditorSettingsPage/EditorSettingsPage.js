@@ -25,7 +25,7 @@ const EditorSettingsPage = () => {
                 setSelectEditorSetting={setSelectEditorSetting}
               />
             </div>
-            <div className="mt-2 dark-mode ms-2" style={{ height: "78vh" }}>
+            <div className="mt-2 dark-mode ms-2" style={{ height: "77vh" }}>
               {selectEditorSetting === "Editors Settings" && (
                 <EditorsSettings />
               )}

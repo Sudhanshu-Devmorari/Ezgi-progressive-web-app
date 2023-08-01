@@ -83,7 +83,6 @@ const AdsManagementPage = () => {
             </div>
             <div
               className="dark-mode p-2 m-2 mb-0 home-height"
-              style={{ height: "65vh" }}
             >
               <div className="my-2 d-flex justify-content-end">
                 <button
@@ -115,8 +114,8 @@ const AdsManagementPage = () => {
               {ads.map((res, index) => (
                 <MainDiv>
                   <>
-                    <div className="col-2 p-2 d-flex justify-content-center">
-                      <img src={res.img} alt="" />
+                    <div className="col-2 d-flex justify-content-center">
+                      <img src={res.img} alt="" height={120} width={120}/>
                     </div>
 
                     <div className="col-4">
@@ -240,22 +239,22 @@ const AdsManagementPage = () => {
                         </>
                       )}
                     </div>
-                    <div className="col-1">
+                    <div className="col-1 d-flex align-items-center">
                       <div className="">nesine.com</div>
                     </div>
-                    <div className="col-1">
-                      <img src={eye} alt="" height={30} width={30} />
-                      <span className="ps-2">12.645</span>
+                    <div className="col-1 d-flex align-items-center">
+                      <img src={eye} alt="" height={24} width={24} />
+                      <span className="ps-1">12.645</span>
                     </div>
-                    <div className="col-1">
-                      <img src={pointer} alt="" height={30} width={30} />
-                      <span className="ps-2">4.645</span>
+                    <div className="col-1 d-flex align-items-center">
+                      <img src={pointer} alt="" height={24} width={24} />
+                      <span className="ps-1">4.645</span>
                     </div>
-                    <div className="col-1">
-                      <img src={chart} alt="" height={30} width={30} />
-                      <span className="ps-2">%43.8</span>
+                    <div className="col-1 d-flex align-items-center">
+                      <img src={chart} alt="" height={24} width={24} />
+                      <span className="ps-1">%43.8</span>
                     </div>
-                    <div className="col-2 d-flex gap-3 justify-content-end pe-2">
+                    <div className="col-2 d-flex gap-2 justify-content-end pe-2 align-items-center">
                       <div className="d-flex flex-column">
                         <span>08.06.2023 - 18:33</span>
                         <span>23.06.2023 - 00:00</span>
@@ -268,8 +267,8 @@ const AdsManagementPage = () => {
                           data-bs-target="#exampleModal"
                           src={edit}
                           alt=""
-                          height={30}
-                          width={30}
+                          height={25}
+                          width={25}
                         />
                       </div>
                     </div>

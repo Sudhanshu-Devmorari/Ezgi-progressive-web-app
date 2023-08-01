@@ -35,7 +35,7 @@ const SupportHistory = () => {
   };
   return (
     <>
-      <div className="dark-mode p-2" style={{ height: "65vh" }}>
+      <div className="dark-mode p-2 home-height">
         <div className="" style={{ fontSize: "1.2rem" }}>
           Support History
         </div>

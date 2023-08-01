@@ -7,33 +7,15 @@ import newUser from "../../assets/user-plus.svg";
 import editorIcon from "../../assets/Group 67.svg";
 import subscriberIcon from "../../assets/Group 72.svg";
 import commentsIcon from "../../assets/target-arrow-1.svg";
-import sales from "../../assets/basket-1.svg";
-import withdrawal from "../../assets/cash-banknote.svg";
 import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import Home from "../Home/Home";
-
-// import arrowUp from "../../assets/arrow-move-up.svg";
-// import arrowdown from "../../assets/arrow-move-down.svg";
-// import UserTimeLine from "../UserTimeLine/UserTimeLine";
-// import winner from "../../assets/Group 73.png";
-// import lose from "../../assets/Lose.png";
-// import CommentsManagementPage from "../CommentsManagementPage/CommentsManagementPage";
-// import MostLiked from "../MostLiked/MostLiked";
-// import LevelCount from "../LevelCount/LevelCount";
-// import EditorManagemenetPage from "../EditorManagemenetPage/EditorManagemenetPage";
-// import Top10 from "../Top10/Top10";
-// import EditorAccountStatus from "../EditorAccountStatus/EditorAccountStatus";
-// import Requests from "../Requests/Requests";
-import bluetick from "../../assets/MDI - check-decagram.svg";
-import deactivation from "../../assets/user-off.svg";
-// import Button from "react-bootstrap/Button";
-// import Modal from "react-bootstrap/Modal";
+import DailySalesArray from "../DailySalesArray/DailySalesArray";
+import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 
 const MainPage = () => {
-
   const newUsersArray = [
     {
       label: "New Users",
@@ -74,55 +56,6 @@ const MainPage = () => {
       rate_icon: "arrowUp",
     },
   ];
-  const dailySalesArray = [
-    {
-      label: "Daily Sales",
-      icon: sales,
-      count: "12.645₺",
-      per: "%22",
-      color: "#58DEAA",
-      rate_icon: "arrowUp",
-    },
-  ];
-  const WithdrawalRqstArray = [
-    {
-      label: "New Withdrawal Request",
-      icon: withdrawal,
-      count: "18",
-    },
-  ];
-  // const winnertArray = [
-  //   {
-  //     label: "Winner",
-  //     icon: winner,
-  //     count: "127",
-  //     per: "%22",
-  //     color: "#58DEAA",
-  //     rate_icon: "arrowUp",
-  //   },
-  // ];
-  // const losetArray = [
-  //   {
-  //     label: "Lose",
-  //     icon: lose,
-  //     count: "127",
-  //     per: "%22",
-  //     color: "#FF5757",
-  //     rate_icon: "arrowDown",
-  //   },
-  // ];
-  // const totalArray = [
-  //   {
-  //     label: "Total",
-  //     count: "12.700",
-  //     rateWin: "9.845",
-  //     rateLose: "9.845",
-  //     perWin: "%22",
-  //     perLose: "%22",
-  //     color: "#FF5757",
-  //     rate_icon: "arrowDown",
-  //   },
-  // ];
 
   const users = [
     {
@@ -170,171 +103,12 @@ const MainPage = () => {
     },
   ];
 
-  const verifcationArray = [
-    {
-      name: "Verifivation Requests",
-      img: bluetick,
-      count: "127",
-    },
-  ];
-  const deactivationArray = [
-    {
-      name: "Verifivation Requests",
-      img: deactivation,
-      count: "127",
-    },
-  ];
-
   return (
     <>
-      {/* <div className="container-fluid">
-        <NavBar />
-        <div className="row g-0 row-height">
-          <div className="col-1" style={{ width: "5%" }}>
-            <SideBar
-              setshowDetails={setshowDetails}
-              showDetails={showDetails}
-            />
-          </div>
-          {showDetails === "home" && (
-            <div
-              className="col-11"
-              style={{ fontSize: "0.8rem", width: "95%" }}
-            >
-              <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers array={newUsersArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newEditorsArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newSubscribersArray} />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-4">
-                  <NewUsers array={newCommentsArray} />
-                </div>
-              </div>
-              <div className="row g-0 my-3 h-100">
-                <div className="col-8">
-                  <Home users={users} />
-                </div>
-                <div className="col-4">
-                  <NewUsers array={dailySalesArray} />
-                  <NewUsers array={WithdrawalRqstArray} />
-                </div>
-              </div>
-            </div>
-          )}
-          {showDetails === "users" && (
-            <div
-              className="col-11"
-              style={{ fontSize: "0.8rem", width: "95%" }}
-            >
-              <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers array={newUsersArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newEditorsArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newSubscribersArray} />
-                    </div>
-                  </div>
-                  <div className="my-2 h-100">
-                    <Home showDetails={showDetails} users={users} />
-                  </div>
-                </div>
-                <div className="col-4 h-100">
-                  <UserTimeLine />
-                </div>
-              </div>
-            </div>
-          )}
-          {showDetails === "comments" && (
-            <div
-              className="col-11"
-              style={{ fontSize: "0.8rem", width: "95%" }}
-            >
-              <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers
-                        array={newCommentsArray}
-                        commentsPage={"commentsPage"}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={winnertArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={losetArray} />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-4">
-                  <NewUsers totalArray={totalArray} />
-                </div>
-              </div>
-              <div className="row g-0 my-3 h-100">
-                <div className="col-8">
-                  <CommentsManagementPage />
-                </div>
-                <div className="col-4">
-                  <MostLiked />
-                </div>
-              </div>
-            </div>
-          )}
-          {showDetails === "editor" && (
-            <div
-              className="col-11"
-              style={{ fontSize: "0.8rem", width: "95%" }}
-            >
-              <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers array={newEditorsArray} />
-                    </div>
-                    <div className="col-8">
-                      <LevelCount />
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <EditorManagemenetPage />
-                  </div>
-                </div>
-                <div className="col-4">
-                  <Top10 />
-                  <EditorAccountStatus />
-                  <div className="row g-0 gap-3 mb-3">
-                    <div className="col">
-                      <Requests rqstArray={verifcationArray} />
-                    </div>
-                    <div className="col">
-                      <Requests rqstArray={deactivationArray} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div> */}
-
       <div className="conatainer-fluid m-2">
         <NavBar />
         <div className="row g-0 mt-2">
-          <div className="col-1" style={{width:"5%"}}>
+          <div className="col-1" style={{ width: "5%" }}>
             <SideBar />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
@@ -357,12 +131,12 @@ const MainPage = () => {
               </div>
             </div>
             <div className="row g-0">
-              <div className="col-8 my-2">
+              <div className="col-8">
                 <Home users={users} />
               </div>
               <div className="col-4">
-                <NewUsers array={dailySalesArray} />
-                <NewUsers array={WithdrawalRqstArray} />
+                <DailySalesArray />
+                <NewWithdrawalRqst />
               </div>
             </div>
           </div>

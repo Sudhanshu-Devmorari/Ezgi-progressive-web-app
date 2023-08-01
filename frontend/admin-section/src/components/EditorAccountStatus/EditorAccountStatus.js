@@ -24,13 +24,13 @@ const EditorAccountStatus = () => {
   ];
   return (
     <>
-      <div className={`${"dark-mode my-2 mt-3"} `} style={{height:"27vh"}}>
-        <div className="p-2" style={{ fontSize: "1.3rem" }}>
+      <div className={`${"dark-mode my-2"}`} style={{height:"31vh"}}>
+        <div className="p-2" style={{ fontSize: "1.1rem" }}>
           Editor Account Status
         </div>
         <div className="mt-2 d-flex justify-content-center gap-ceown">
         {levelArray.map((res, index) => (
-            <div className="d-flex flex-column align-items-center ">
+            <div className="d-flex flex-column align-items-center mt-4">
               <img
                 className="user-icon"
                 src={res.img}
@@ -38,10 +38,10 @@ const EditorAccountStatus = () => {
                 height={45}
                 width={45}
               />
-              <span className="level-font" style={{ fontSize: "1.2rem" }}>
+              <span style={{ fontSize: "1.2rem" }}>
                 {res.name}
               </span>
-              <span className="level-count-font" style={{ fontSize: "1.6rem" }}>
+              <span style={{ fontSize: "1.6rem" }}>
                 {res.count}
               </span>
             </div>

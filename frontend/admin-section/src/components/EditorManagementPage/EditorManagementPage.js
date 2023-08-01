@@ -20,7 +20,7 @@ const EditorManagementPage = () => {
       per: "%22",
       color: "#58DEAA",
       rate_icon: "arrowUp",
-      from: "editor"
+      from: "editor",
     },
   ];
   const verifcationArray = [
@@ -39,6 +39,7 @@ const EditorManagementPage = () => {
   ];
   const [updateProfile, setupdateProfile] = useState(1);
   const [verifyRqst, setverifyRqst] = useState(false);
+  const [deactiveRqst, setDeactiveRqst] = useState(false);
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -58,19 +59,35 @@ const EditorManagementPage = () => {
                     <LevelCount />
                   </div>
                 </div>
-                <div className="mt-3">
-                  <EditorManagemenet updateProfile={updateProfile} verifyRqst={verifyRqst}/>
+                <div className="">
+                  <EditorManagemenet
+                    updateProfile={updateProfile}
+                    verifyRqst={verifyRqst}
+                    deactiveRqst={deactiveRqst}
+                  />
                 </div>
               </div>
               <div className="col-4">
-                <Top10 setupdateProfile={setupdateProfile}/>
+                <Top10 setupdateProfile={setupdateProfile} />
                 <EditorAccountStatus />
                 <div className="row g-0 gap-2">
                   <div className="col">
-                    <Requests rqstArray={verifcationArray} setverifyRqst={setverifyRqst} verifyRqst={verifyRqst}/>
+                    <Requests
+                      rqstArray={verifcationArray}
+                      setverifyRqst={setverifyRqst}
+                      verifyRqst={verifyRqst}
+                      deactiveRqst={deactiveRqst}
+                      setDeactiveRqst={setDeactiveRqst}
+                    />
                   </div>
                   <div className="col">
-                    <Requests rqstArray={deactivationArray} />
+                    <Requests
+                      rqstArray={deactivationArray}
+                      setverifyRqst={setverifyRqst}
+                      verifyRqst={verifyRqst}
+                      deactiveRqst={deactiveRqst}
+                      setDeactiveRqst={setDeactiveRqst}
+                    />
                   </div>
                 </div>
               </div>

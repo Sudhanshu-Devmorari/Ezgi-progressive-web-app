@@ -1,4 +1,4 @@
-@media(max-width: 1024px){
+/* @media(max-width: 1024px){
     .rqst-block{
         margin: 0rem!important;
     }
@@ -7,7 +7,10 @@
     .rqst-block{
         margin: 0.4rem!important;
     }
-}
+} */
 .cursor{
     cursor: pointer;
 }
+/* .reqsts-block-height{
+    height: 31vh!important;
+} */

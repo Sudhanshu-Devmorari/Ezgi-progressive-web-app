@@ -17,10 +17,10 @@
     outline: none!important;
     box-shadow: none!important;
 }
-@media (min-width: 1024px) and (max-width: 1700px) {
-    .home-height {
+@media (min-width: 1024px) and (max-width: 1583px) {
+    /* .home-height {
         height: 63vh!important;
-    }
+    } */
     .users-section-fonts{
         font-size: 0.7rem!important;
     }
@@ -41,4 +41,7 @@
 }
 .darkMode-input:focus{
     outline: none!important;
+}
+.home-height{
+    height: 64vh;
 }

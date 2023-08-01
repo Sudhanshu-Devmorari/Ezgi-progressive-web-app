@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import SideBar from "../SideBar/SideBar";
 import NavBar from "../NavBar/NavBar";
-import WithdrawalRequests from "../WithdrawalRequests/WithdrawalRequests";
 import { HiArrowSmUp } from "react-icons/hi";
-import Home from "../Home/Home";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import UserTimeLine from "../UserTimeLine/UserTimeLine";
@@ -14,26 +12,10 @@ import circle_check from "../../assets/circle-check-1.png";
 import circle_x from "../../assets/circle-x.png";
 import circle_b from "../../assets/Group 311.png";
 import circle_y from "../../assets/clock-exclamation.png";
+import WithdrawalRqstFilter from "../WithdrawalRqstFilter/WithdrawalRqstFilter";
+import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
 
 const WithdrawalManagementPage = () => {
-  const levelArray = [
-    {
-      name: "New",
-      count: "127",
-    },
-    {
-      name: "Pending",
-      count: "127",
-    },
-    {
-      name: "Approved",
-      count: "127",
-    },
-    {
-      name: "Total Payment",
-      count: "127",
-    },
-  ];
   const users = [
     {
       sr: "#0001",
@@ -42,7 +24,7 @@ const WithdrawalManagementPage = () => {
       acc: "TR76 0009 9012 3456 7800 1000 01",
       date: "15-06-2023 - 16:37",
       profile: profile,
-      icon : circle_check
+      icon: circle_check,
     },
     {
       sr: "#0002",
@@ -51,7 +33,7 @@ const WithdrawalManagementPage = () => {
       acc: "TR76 0009 9012 3456 7800 1000 01",
       date: "15-06-2023 - 16:37",
       profile: user1,
-      icon : circle_y
+      icon: circle_y,
     },
     {
       sr: "#0003",
@@ -60,7 +42,7 @@ const WithdrawalManagementPage = () => {
       acc: "TR76 0009 9012 3456 7800 1000 01",
       date: "15-06-2023 - 16:37",
       profile: profile,
-      icon : circle_x
+      icon: circle_x,
     },
     {
       sr: "#0003",
@@ -69,7 +51,7 @@ const WithdrawalManagementPage = () => {
       acc: "TR76 0009 9012 3456 7800 1000 01",
       date: "15-06-2023 - 16:37",
       profile: profile,
-      icon : circle_b
+      icon: circle_b,
     },
   ];
   const rqstArray = [
@@ -77,9 +59,10 @@ const WithdrawalManagementPage = () => {
     { name: "Pending" },
     { name: "Approved" },
   ];
+  const [Requests, setRequests] = useState(false);
   return (
     <>
-      <div className="container-fluid m-2">
+      <div className="container-fluid">
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
@@ -183,38 +166,45 @@ const WithdrawalManagementPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="my-2">
-                  <div
-                    className="dark-mode p-2 m-2 mb-0 home-height"
-                    style={{ height: "63vh" }}
-                  >
-                      {users.map((res, index) => (
-                    <MainDiv>
+                <div
+                  className="dark-mode p-2 m-2 mb-0 home-height"
+                  style={{ height: "64vh" }}
+                >
+                  <WithdrawalRqstFilter />
+                  {users.map((res, index) => (
+                    <>
+                      <MainDiv>
                         <>
-                          <div className="col d-flex align-items-center">
+                          <div className="col-3 d-flex align-items-center">
                             <span className="pe-2">{res.sr}</span>
-                            <img src={user1} alt="" height={50} width={50} />
+                            <img src={user1} alt="" height={45} width={45} />
                             <span className="ps-2">{res.name}</span>
                           </div>
-                          <div className="col d-flex align-items-center justify-content-center">
-                            <div>{res.acc}</div>
+                          <div className="col-4 d-flex align-items-center justify-content-center">
+                            <div
+                              onClick={() => setRequests(!Requests)}
+                              className="cursor"
+                            >
+                              {res.acc}
+                            </div>
                           </div>
-                          <div className="col d-flex align-items-center justify-content-center">
+                          <div className="col-1 d-flex align-items-center justify-content-center">
                             <div>3.500</div>
                           </div>
-                          <div className="d-flex align-items-center justify-content-end gap-2">
+                          <div className="col-4 d-flex align-items-center justify-content-end gap-1 pe-2">
                             <div>15-06-2023 - 16:37</div>
-                            <img src={res.icon} alt="" height={28} width={28}/>
-                            <img src={eye} alt="" height={28} width={28}/>
+                            <img src={res.icon} alt="" height={28} width={28} />
+                            <img src={eye} alt="" height={28} width={28} />
                           </div>
                         </>
-                    </MainDiv>
-                      ))}
-                  </div>
+                      </MainDiv>
+                      {Requests && <VerificationRequestsBtns />}
+                    </>
+                  ))}
                 </div>
               </div>
               <div className="col-4">
-                <UserTimeLine />
+                <UserTimeLine transactionHistory={"history"} />
               </div>
             </div>
           </div>

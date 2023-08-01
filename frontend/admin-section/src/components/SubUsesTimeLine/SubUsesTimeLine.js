@@ -37,8 +37,8 @@ const SubUsesTimeLine = () => {
     );
   };
   return (
-    <div className="dark-mode p-2" style={{ height: "91vh" }}>
-      <div className="" style={{ fontSize: "1.3rem" }}>
+    <div className="dark-mode p-2" style={{ height: "90vh" }}>
+      <div className="" style={{ fontSize: "1.1rem" }}>
         User Timeline
       </div>
       {users.map((res, index) => (
@@ -55,7 +55,7 @@ const SubUsesTimeLine = () => {
               <div>
                 <button
                   style={{
-                    fontSize: ".8rem",
+                    fontSize: ".68rem",
                     backgroundColor: "transparent",
                     borderRadius: "4px",
                     border:

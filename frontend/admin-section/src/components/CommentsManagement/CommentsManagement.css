@@ -1,22 +1,18 @@
-@media (max-width: 1024px){
+@media (min-width: 1024px) and (max-width: 1400px){
     .font-comments{
         font-size: 0.8rem!important;
     }
     .eye-icon{
-        height: 27px!important;
-        width: 27px!important;
-    }
-    .success-icon{
-        height: 23px!important;
-        width: 23px!important;
+        height: 22px!important;
+        width: 22px!important;
     }
     .profile-icon{
         height: 35px!important;
         width: 35px!important;
     }
     .flag-icon{
-        height: 27px!important;
-        width: 27px!important;
+        height: 22px!important;
+        width: 22px!important;
     }
     .eye-icon-gap{
         gap: 0.1rem!important

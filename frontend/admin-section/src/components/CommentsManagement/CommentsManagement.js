@@ -17,6 +17,7 @@ import "./CommentsManagement.css";
 import { BiSolidCrown } from "react-icons/bi";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import cross from "../../assets/Group 81.svg";
+import { MainDiv } from "../CommonBgRow";
 
 const CommentsManagement = () => {
   const [isPublicSelected, setIsPublicSelected] = useState(false);
@@ -222,8 +223,10 @@ const CommentsManagement = () => {
   ];
   return (
     <>
-      <div className="dark-mode p-2 m-2" style={{ height: "64vh" }}>
-        <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
+      <div
+        className="dark-mode p-2 m-2 mb-0 home-height"
+      >
+        <div className="d-flex p-2">
           <div className="p-2 flex-grow-1">
             <div class="input-group w-50">
               <span class="input-group-text search-icon-dark" id="basic-addon1">
@@ -241,7 +244,9 @@ const CommentsManagement = () => {
                 border: "1px solid #E6E6E6",
                 color: "#E6E6E6",
                 width: "7.5rem",
-                borderBottom: AllDropdown ? "1px solid #0D2A53" : "1px solid #E6E6E6",
+                borderBottom: AllDropdown
+                  ? "1px solid #0D2A53"
+                  : "1px solid #E6E6E6",
                 borderLeft: AllDropdown
                   ? "1px solid #E6E6E6"
                   : "1px solid #E6E6E6",
@@ -303,71 +308,66 @@ const CommentsManagement = () => {
           </div>
         </div>
         {users.map((res, index) => (
-          <div
-            className="row g-0 px-2 py-1 mb-2 font-comments"
-            style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
-          >
-            <div className="col">
-              <div className="d-flex align-items-center">
-                <span className="pe-1">{res.sr}</span>
-                <div className="position-relative">
-                  <img
-                    className="profile-icon"
-                    src={res.profile}
-                    alt=""
-                    height={42}
-                    width={42}
+          <MainDiv>
+            <div className="col-3 d-flex align-items-center">
+              <span className="pe-1">{res.sr}</span>
+              <div className="position-relative">
+                <img
+                  className="profile-icon"
+                  src={res.profile}
+                  alt=""
+                  height={42}
+                  width={42}
+                />
+                <div
+                  className="position-absolute d-flex justify-content-center align-items-center"
+                  style={{
+                    height: "16px",
+                    width: "16px",
+                    border: "2px solid #FF9100",
+                    borderRadius: "50%",
+                    backgroundColor: "#0B2447",
+                    top: "0px",
+                    left: "25px",
+                  }}
+                >
+                  <BiSolidCrown
+                    fontSize={"0.62rem"}
+                    style={{ color: "#FF9100" }}
                   />
-                  <div
-                    className="position-absolute d-flex justify-content-center align-items-center"
-                    style={{
-                      height: "16px",
-                      width: "16px",
-                      border: "2px solid #FF9100",
-                      borderRadius: "50%",
-                      backgroundColor: "#0B2447",
-                      top: "0px",
-                      left: "25px",
-                    }}
-                  >
-                    <BiSolidCrown
-                      fontSize={"0.62rem"}
-                      style={{ color: "#FF9100" }}
-                    />
-                  </div>
                 </div>
-                <span className="ps-2">{res.name}</span>
               </div>
+              <span className="ps-2">{res.name}</span>
             </div>
-            <div className="d-flex gap-2 align-items-center col">
+            <div className="col-2">
               <img
                 className="flag-icon"
                 src={res.flag}
                 alt=""
-                height={33}
-                width={33}
+                height={26}
+                width={26}
               />
-              <span>{res.league}</span>
+              <span className="ps-1">{res.league}</span>
             </div>
-            <div className="d-flex align-items-center col">{res.role}</div>
-            <div className="d-flex align-items-center gap-2 col justify-content-end eye-icon-gap">
-              <span>{res.date}</span>
+            <div className="col-4 ps-2">{res.role}</div>
+            <div className="col-3 justify-content-end d-flex">
+              <span className="pe-1">{res.date}</span>
               <img
-                className="success-icon"
+                className="eye-icon"
                 src={res.status}
                 alt=""
-                height={28}
-                width={28}
+                height={23}
+                width={23}
               />
               <img
                 className="eye-icon"
                 src={eye}
                 alt=""
-                height={28}
-                width={28}
+                height={23}
+                width={23}
               />
             </div>
-          </div>
+          </MainDiv>
         ))}
       </div>
 
@@ -495,7 +495,7 @@ const CommentsManagement = () => {
                 </div>
               </div>
               <div className="">
-http://localhost:3000/subuser/http://localhost:3000/subuser/
+                http://localhost:3000/subuser/http://localhost:3000/subuser/
                 <div className="d-flex justify-content-between my-2">
                   <div className="">
                     <img
@@ -519,7 +519,9 @@ http://localhost:3000/subuser/http://localhost:3000/subuser/
                 <div className="d-flex justify-content-between">
                   <div className="">
                     <img
-                      onClick={() => setIsPublishedSelected(!isPublishedSelected)}
+                      onClick={() =>
+                        setIsPublishedSelected(!isPublishedSelected)
+                      }
                       src={isPublishedSelected ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
@@ -549,7 +551,9 @@ http://localhost:3000/subuser/http://localhost:3000/subuser/
                   <div className="">
                     <span className="px-2">Not Started</span>
                     <img
-                      onClick={() => setIsNotStartedSelected(!isNotStartedSelected)}
+                      onClick={() =>
+                        setIsNotStartedSelected(!isNotStartedSelected)
+                      }
                       src={isNotStartedSelected ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
@@ -557,33 +561,32 @@ http://localhost:3000/subuser/http://localhost:3000/subuser/
                   </div>
                 </div>
                 <div className="d-flex justify-content-center my-2">
-                <button
-                  className="px-3 py-1"
-                  style={{
-                    color: "#D2DB08",
-                    backgroundColor: "transparent",
-                    border: "1px solid #D2DB08",
-                    borderRadius: "4px",
-                  }}
-                >
-                  Show
-                </button>
-              </div>
-              
+                  <button
+                    className="px-3 py-1"
+                    style={{
+                      color: "#D2DB08",
+                      backgroundColor: "transparent",
+                      border: "1px solid #D2DB08",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Show
+                  </button>
+                </div>
               </div>
               <img
-              data-bs-dismiss="modal"
-              src={cross}
-              alt=""
-              style={{
-                position: "absolute",
-                top: "-1rem",
-                right: "-1.1rem",
-                cursor: "pointer",
-              }}
-              height={45}
-              width={45}
-            />
+                data-bs-dismiss="modal"
+                src={cross}
+                alt=""
+                style={{
+                  position: "absolute",
+                  top: "-1rem",
+                  right: "-1.1rem",
+                  cursor: "pointer",
+                }}
+                height={45}
+                width={45}
+              />
             </div>
           </div>
         </div>

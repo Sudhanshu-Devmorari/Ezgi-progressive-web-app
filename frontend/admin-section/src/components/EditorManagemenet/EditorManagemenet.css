@@ -1,4 +1,4 @@
-@media (min-width: 1024px) and (max-width: 1508px){
+/* @media (min-width: 1024px) and (max-width: 1508px){
     .icons-edit-eye{
         height: 25px;
         width: 25px;
@@ -10,5 +10,20 @@
 @media (min-width: 1440px){
     .editor-section-fonts{
         font-size: 1rem!important;
+    }
+} */
+@media (min-width: 1024px) and (max-width: 1400px){
+    .crown-position{
+        left: 25px!important;
+    }
+    .editor-section-fonts{
+        font-size: 0.7rem!important;
+    }
+    .icons-edit-eye{
+        height: 22px;
+        width: 22px;
+    }
+    .eye-gap{
+        gap: 0.2rem!important;
     }
 }

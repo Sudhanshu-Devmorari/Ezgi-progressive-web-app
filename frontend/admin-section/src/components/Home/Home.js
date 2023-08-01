@@ -15,7 +15,6 @@ import checkbox from "../../assets/Group 319.svg";
 import Selectedcheckbox from "../../assets/Group 320.svg";
 
 const Home = (props) => {
-  const [modalShow, setModalShow] = useState(false);
   const [profile, setprofile] = useState(false);
   const [showTransactionHistory, setshowTransactionHistory] = useState(1);
   const [password, setPassword] = useState("");
@@ -73,7 +72,6 @@ const Home = (props) => {
     },
   ];
 
-  // State and event handlers for handling the dropdowns
   const UserTypeOptions = ["option 1", "option 2"];
   const cityOptions = ["option 1", "option 2"];
   const GenderFilterOptions = ["option 1", "option 2"];
@@ -155,11 +153,10 @@ const Home = (props) => {
   return (
     <>
       <div
-        className="dark-mode p-2 m-2 mb-0 home-height"
-        style={{ height: "63vh" }}
+        className="dark-mode p-2 m-2 mb-0 home-height pt-3"
       >
         {usersPart === "users" && (
-          <div className="d-flex p-2" style={{ fontSize: "1.2rem" }}>
+          <div className="d-flex p-2">
             <div className="p-2 flex-grow-1">
               <div class="input-group w-50">
                 <span
@@ -190,7 +187,6 @@ const Home = (props) => {
               <button
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
-                onClick={() => setModalShow(true)}
                 className="px-2"
                 style={{
                   backgroundColor: "transparent",
@@ -264,8 +260,8 @@ const Home = (props) => {
             )}
             <div className="d-flex align-items-center gap-2 edit-icon-gap">
               <span>{res.date}</span>
-              <img src={userEdit} alt="" height={28} width={28} />
-              <img src={trash} alt="" height={28} width={28} />
+              <img src={userEdit} alt="" height={25} width={25} />
+              <img src={trash} alt="" height={25} width={25} />
             </div>
           </div>
         ))}
