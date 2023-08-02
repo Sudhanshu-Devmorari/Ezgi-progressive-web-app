@@ -48,7 +48,7 @@ const EditorProfileStatisticsSection = () => {
         </div>
         <div className="my-2">
           <div className="my-2">Comments Type</div>
-          <div className="row g-0 my-2 gap-2">
+          <div className="row g-0 my-2 gap-3">
             {SelectSport === "football"
               ? progressBarFootball.map((res, index) => (
                   <div className="col">

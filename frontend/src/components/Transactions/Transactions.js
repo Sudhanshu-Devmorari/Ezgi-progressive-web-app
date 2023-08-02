@@ -57,25 +57,28 @@ const Transactions = () => {
           </div>
           <div className="col-7">
             <div
-              className="p-2 d-flex align-items-end ps-3 gap-3 chardivs"
+              className="p-2 d-flex align-items-end row- g-0 ps-3"
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                fontSize: "12px",
               }}
             >
-              {chart.map((res, index) => (
-                <div className="text-center">
+              {chart.map((item, index) => (
+                <div className="col d-flex flex-column justify-content-center">
                   <div
-                    className=""
+                    className="b"
                     style={{
-                      height: res.height,
-                      width: "9px",
-                      backgroundColor:
-                        currentTheme === "dark" ? res.darkcolor : res.color,
+                      height: item.height,
+                      maxWidth: "1rem",
+                      backgroundColor: item.color,
                     }}
                   ></div>
-                  <span style={{ fontSize: "10px" }}>{res.name}</span>
+                  <span
+                    className=""
+                    style={{ opacity: "1", fontSize: "0.6rem" }}
+                  >
+                    {item.name}
+                  </span>
                 </div>
               ))}
             </div>

@@ -44,3 +44,16 @@
         padding-left: 1rem!important;
     }
 }
+.b{
+  animation: moving-bars 4s linear infinite;
+}
+@keyframes moving-bars {
+  0%  { transform: translateY( 100% ); }
+  15% { transform: translateY( 0 ); }
+}
+
+#my-chart.column {
+  height: 200px;
+  max-width: 300px;
+  margin: 0 auto;
+}

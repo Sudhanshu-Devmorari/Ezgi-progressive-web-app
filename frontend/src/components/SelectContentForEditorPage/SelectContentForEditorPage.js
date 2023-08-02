@@ -43,7 +43,7 @@ const SelectContentForEditorPage = (props) => {
         <div className={`${props?.editor && "ms-auto"}`}>
           <button
             onClick={() => setModalShow(true)}
-            className="px-3"
+            className="px-3 py-1"
             style={{
               border:
                 currentTheme === "dark"

@@ -1,12 +1,12 @@
 import React from "react";
-import selectedHomeIcon from "../../assets/homeSelected.png";
-import HomeIcon from "../../assets/home.png";
-import EditorIcon from "../../assets/EditorIcon.png";
-import SelectedEditorIcon from "../../assets/SelectedEditorIcon.png";
-import BowIcon from "../../assets/target-arrow.3.png";
-import SelectedBow from "../../assets/target-arrow.svg";
-import startFooter from "../../assets/star.svg";
-import selectedFav from "../../assets/starSelected.png";
+import selectedHomeIcon from "../../assets/Main Page Selected.svg";
+import HomeIcon from "../../assets/Main Page.svg";
+import EditorIcon from "../../assets/Editors Page (1).svg";
+import SelectedEditorIcon from "../../assets/Menu Icon.svg";
+import BowIcon from "../../assets/Comments Page.svg";
+import SelectedBow from "../../assets/Menu Icon (1).svg";
+import startFooter from "../../assets/Favorite Page (1).svg";
+import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
 
 export const Footer = (props) => {
   return (
@@ -15,14 +15,14 @@ export const Footer = (props) => {
         className="navbar fixed-bottom py-0"
         style={{ backgroundColor: "#00659D" }}
       >
-        <div className="container-fluid py-1">
+        <div className="container-fluid py-2">
           <div className="col text-center">
             <img
               onClick={() => props.setSelectContent("home")}
               src={props.selectContent === "home" ? selectedHomeIcon : HomeIcon}
               alt=""
-              height={45}
-              width={45}
+              height={38}
+              width={38}
             />
           </div>
           <div className="col text-center">
@@ -34,8 +34,8 @@ export const Footer = (props) => {
                   : EditorIcon
               }
               alt=""
-              height={45}
-              width={45}
+              height={38}
+              width={38}
             />
           </div>
           <div className="col text-center">
@@ -43,16 +43,16 @@ export const Footer = (props) => {
               onClick={() => {props.setSelectContent("comments");props.setDashboardSUser(false);}}
               src={props.selectContent === "comments" ? SelectedBow : BowIcon}
               alt=""
-              height={40}
-              width={40}
+              height={38}
+              width={38}
             />
           </div>
           <div className="col text-center">
             <img
               src={props.selectContent === "fav" ? selectedFav : startFooter}
               alt=""
-              height={39}
-              width={39}
+              height={38}
+              width={38}
               onClick={() => {
                 props.setSelectContent("fav");
                 props.setDashboardSUser(true);

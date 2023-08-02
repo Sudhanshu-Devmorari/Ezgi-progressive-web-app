@@ -34,8 +34,10 @@ export const CustomDropdown = ({
           width:
             (["Category", "Level", "Score Point", "Success Rate"].includes(label) &&
               "41%") ||
-            (["Match Details", "Country", "City", "Age", "Gender", " "].includes(label) &&
+            (["Country", "City", "Age", "Gender", " "].includes(label) &&
               "100%") ||
+            (["Match Details"].includes(label) &&
+              "94%") ||
             "47%",
         }}
       >

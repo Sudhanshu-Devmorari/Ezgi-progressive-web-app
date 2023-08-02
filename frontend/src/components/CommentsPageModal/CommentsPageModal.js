@@ -26,48 +26,76 @@ const CommentsPageModal = (props) => {
   const [isNotStartedSelected, setIsNotStartedSelected] = useState(false);
   const [isLosingSelected, setIsLosingSelected] = useState(false);
 
-  const [MatchDropDown, setMatchDropDown] = useState(false);
-  const [LevelDropdown, setLevelDropdown] = useState(false);
-  const [PredictionType, setPredictionType] = useState(false);
+  const [matchDetailsDropDown, setMatchDetailsDropDown] = useState(false);
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
+
+  const handleMatchDetailsSelection = (matchDetails) => {
+    setSelectedMatchDetails(matchDetails);
+  };
+
+  const toggleMatchDetailsDropdown = () => {
+    setMatchDetailsDropDown(!matchDetailsDropDown);
+    setLevelDropDown(false)
+    setPredictionTypeDropDown(false)
+  };
+
+  const matchDetailsOptions = [
+    "Option 1",
+    "Option 2",
+    "Option 3",
+    // Add more options as needed
+  ];
+
+  // Similar state and functions for "Level" and "Prediction Type" dropdowns
+  const [levelDropDown, setLevelDropDown] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState("Select");
+
+  const handleLevelSelection = (level) => {
+    setSelectedLevel(level);
+  };
+
+  const toggleLevelDropdown = () => {
+    setLevelDropDown(!levelDropDown);
+    setMatchDetailsDropDown(false)
+    setPredictionTypeDropDown(false)
+  };
+
+  const levelOptions = [
+    "Option A",
+    "Option B",
+    "Option C",
+    // Add more options as needed
+  ];
+
+  const [predictionTypeDropDown, setPredictionTypeDropDown] = useState(false);
+  const [selectedPredictionType, setSelectedPredictionType] =
+    useState("Select");
+
+  const handlePredictionTypeSelection = (predictionType) => {
+    setSelectedPredictionType(predictionType);
+  };
+
+  const togglePredictionTypeDropdown = () => {
+    setPredictionTypeDropDown(!predictionTypeDropDown);
+    setMatchDetailsDropDown(false)
+    setLevelDropDown(false)
+  };
+
+  const predictionTypeOptions = [
+    "Type X",
+    "Type Y",
+    "Type Z",
+    // Add more options as needed
+  ];
 
   const [editorFilterModal, setEditorFlterModal] = useState(false);
 
-  const options = [
-    { value: "React", label: "React" },
-    { value: "React Native", label: "React Native" },
-    { value: "Vue", label: "Vue" },
-    { value: "Angular", label: "Angular" },
-    { value: "RxJS", label: "RxJS" },
-    { value: "jQuery", label: "jQuery" },
-  ];
-
-  const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Select");
-
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
-  };
-
-  const toggleCountryDropdown = () => {
-    setCountryDropDown(!countryDropDown);
-  };
-
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
-  ];
   const handleRadioBlue = (e) => {
     if (e === "public") {
       setIsPublicSelected(!isPublicSelected);
       setIsFinishedSelected(false);
       setIsWinningSelected(false);
-    } 
-    else if (e === "finished") {
+    } else if (e === "finished") {
       setIsPublicSelected(false);
       setIsWinningSelected(false);
       setIsFinishedSelected(!isFinishedSelected);
@@ -81,18 +109,18 @@ const CommentsPageModal = (props) => {
   const handleYellowRadio = (e) => {
     if (e === "subscribe") {
       setIsSubscriberSelected(!isSubscriberSelected);
-      setIsNotStartedSelected(false)
-      setIsLosingSelected(false)
+      setIsNotStartedSelected(false);
+      setIsLosingSelected(false);
     }
     if (e === "not started") {
       setIsNotStartedSelected(!isNotStartedSelected);
-      setIsSubscriberSelected(false)
-      setIsLosingSelected(false)
+      setIsSubscriberSelected(false);
+      setIsLosingSelected(false);
     }
     if (e === "lose") {
       setIsLosingSelected(!isLosingSelected);
-      setIsSubscriberSelected(false)
-      setIsNotStartedSelected(false)
+      setIsSubscriberSelected(false);
+      setIsNotStartedSelected(false);
     }
   };
 
@@ -106,7 +134,7 @@ const CommentsPageModal = (props) => {
         scrollable
       >
         <Modal.Body
-          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"}`}
         >
           <div>
             <div className="">
@@ -126,32 +154,32 @@ const CommentsPageModal = (props) => {
             <div className="my-3">
               <CustomDropdown
                 label="Match Details"
-                options={countryOptions}
-                selectedOption={selectedCountry}
-                onSelectOption={handleCountrySelection}
-                isOpen={countryDropDown}
-                toggleDropdown={toggleCountryDropdown}
+                options={matchDetailsOptions}
+                selectedOption={selectedMatchDetails}
+                onSelectOption={handleMatchDetailsSelection}
+                isOpen={matchDetailsDropDown}
+                toggleDropdown={toggleMatchDetailsDropdown}
               />
             </div>
             <div className="row my-3">
               <div className="col">
                 <CustomDropdown
-                  label="Level Details"
-                  options={countryOptions}
-                  selectedOption={selectedCountry}
-                  onSelectOption={handleCountrySelection}
-                  isOpen={countryDropDown}
-                  toggleDropdown={toggleCountryDropdown}
+                  label="Level"
+                  options={levelOptions}
+                  selectedOption={selectedLevel}
+                  onSelectOption={handleLevelSelection}
+                  isOpen={levelDropDown}
+                  toggleDropdown={toggleLevelDropdown}
                 />
               </div>
               <div className="col">
                 <CustomDropdown
                   label="Prediction Type"
-                  options={countryOptions}
-                  selectedOption={selectedCountry}
-                  onSelectOption={handleCountrySelection}
-                  isOpen={countryDropDown}
-                  toggleDropdown={toggleCountryDropdown}
+                  options={predictionTypeOptions}
+                  selectedOption={selectedPredictionType}
+                  onSelectOption={handlePredictionTypeSelection}
+                  isOpen={predictionTypeDropDown}
+                  toggleDropdown={togglePredictionTypeDropdown}
                 />
               </div>
             </div>

@@ -27,6 +27,8 @@ const PromoteMeModal = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
           className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"}`}

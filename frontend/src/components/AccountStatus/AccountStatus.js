@@ -33,11 +33,11 @@ const AccountStatus = () => {
                   currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
               }}
             >
-              <div className="" style={{ width: 75, height: 75 }}>
+              <div className="ms-3" style={{ width: 75, height: 75 }}>
                 <CircularProgressbarWithChildren
                   circleRatio={0.75}
                   value={45}
-                  text={`${45}%`}
+                  text={`%${45}`}
                   strokeWidth={6}
                   styles={buildStyles({
                     strokeLinecap: "butt",
@@ -45,12 +45,13 @@ const AccountStatus = () => {
                     textColor: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
                     textSize: "23px",
                     pathColor: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                    trailColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                   })}
                 >
                   <RadialSeparators
                     count={55}
                     style={{
-                      background: currentTheme === "dark" ? "#0B2447" : "#fff",
+                      background: currentTheme === "dark" ? "#0D2A53" : "#fff",
                       width: "2px",
                       height: `${10}%`,
                     }}
@@ -109,7 +110,7 @@ const AccountStatus = () => {
                 <div className="d-flex justify-content-between">
                   <span className="font-res">
                     Commmision Rate{" "}
-                    <span className="fw-bold" style={{ color: "#007BF6" }}>
+                    <span className="fw-bold" style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6", }}>
                       %25
                     </span>
                   </span>
