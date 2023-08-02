@@ -1,116 +1,129 @@
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import "./NavBar.css";
-import SignUpModal from "../SignUpModal/SignUpModal";
-import AddCommentModal from "../AddCommentModal/AddCommentModal";
-import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
-import bell from "../../assets/Header Notification.svg"
-import bellLight from "../../assets/Header Notification (1).svg"
-import darkmode from "../../assets/brightness-up.png"
-import moon from "../../assets/Header Dark Mode.svg"
+import bell from "../../assets/bell-ringing-1.svg";
+import cross from "../../assets/Group 81.svg";
 
-const NavBar = (props) => {
-  const [ShowModal, setShowModal] = useState(1);
-  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
-  const [signUpModalShow, setSignUpModalShow] = React.useState(false);
-  const [addCommentShow, setAddCommentShow] = React.useState(false);
-
-  const handleTheme = (e) => {
-    if (e === "dark") {
-      localStorage.setItem("CurrentTheme", "dark");
-      document.body.classList.remove("body-light-mode");
-      document.body.classList.add("body-dark-mode");
-      setCurrentTheme("dark");
-    } else {
-      localStorage.setItem("CurrentTheme", "light");
-      document.body.classList.remove("body-dark-mode");
-      document.body.classList.add("body-light-mode");
-      setCurrentTheme("light");
-    }
-  };
-  const userPhone = localStorage.getItem("userPhone");
-
+const NavBar = () => {
   return (
     <>
-      <nav
-        className={`navbar navbar-expand-lg ${
-          currentTheme === "dark" ? "dark-mode" : "light-mode"
-        }`}
-      >
-        <div className="container-fluid justify-content-end">
-          <div className="">
-            {currentTheme === "light" ? (
-              <span className="p-2">
-                <img src={moon} alt="" height={35} width={35} onClick={() => handleTheme("dark")} />
-              </span>
-            ) : (
-              <span className="p-2">
-                <img src={darkmode} alt="" height={35} width={35} onClick={() => {handleTheme("light")}}/>
-              </span>
-            )}
-            <span className="pe-2 ps-0 py-2">
-              <img src={currentTheme === "dark" ? bell : bellLight} alt="" height={35} width={35} onClick={()=>{props.setDashboardSUser(true);props.setSelectContent("notifications");}}/>
-            </span>
-            {userPhone ? (
-              <>
-                <span
-                onClick={()=>props.setDashboardSUser(true)}
-                  className="py-2 px-3"
-                  style={{
-                    backgroundColor:
-                      currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                  }}
-                >
-                  Dashboard
-                </span>
-                <span className="ps-2">
-                  <img
-                    src={profile}
-                    alt=""
-                    height={45}
-                    width={45}
-                    style={{ borderRadius: "50%" }}
-                  />
-                </span>
-              </>
-            ) : (
-              <>
-                <span
-                  className="p-2 cursor"
-                  onClick={() => {
-                    setSignUpModalShow(true);
-                    setShowModal(1);
-                  }}
-                >
-                  Sign Up
-                </span>
-                <span
-                  className="px-0 py-2 cursor"
-                  onClick={() => {
-                    setSignUpModalShow(true);
-                    setShowModal(4);
-                  }}
-                >
-                  Sign In
-                </span>
-              </>
-            )}
-          </div>
+      <nav className="navbar navbar-expand-lg p-0">
+        <div
+          className="container-fluid justify-content-end dark-mode"
+          style={{ fontSize: "1rem" }}
+        >
+          <button
+            className="px-3 py-1"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+            style={{
+              color: "#D2DB08",
+              border: "1px solid #D2DB08",
+              borderRadius: "3px",
+              backgroundColor: "transparent",
+            }}
+          >
+            Send Notification
+          </button>
+          <span className="p-2">
+            <img src={bell} alt="" height={33} width={33} />
+          </span>
+          <span
+            className="py-1 px-4"
+            style={{
+              backgroundColor: "#19376D",
+            }}
+          >
+            Admin Panel
+          </span>
+          <span className="ps-2">
+            <img
+              src={profile}
+              alt=""
+              height={45}
+              width={45}
+              style={{ borderRadius: "50%" }}
+            />
+          </span>
         </div>
       </nav>
-      <SignUpModal
-        show={signUpModalShow}
-        onHide={() => setSignUpModalShow(false)}
-        ShowModal={ShowModal}
-        setShowModal={setShowModal}
-      />
-      <AddCommentModal
-        show={addCommentShow}
-        onHide={() => {
-          setAddCommentShow(false);
-        }}
-      />
+
+      {/* <!-- Modal --> */}
+      <div
+        className="modal fade"
+        id="staticBackdrop"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div class="modal-body p-3 dark-mode gap-2">
+              <div className="row my-2 g-0 gap-2">
+                <div className="col d-flex flex-column">
+                  <span>Subject</span>
+                  <input type="text" className="darkMode-input form-control" />
+                </div>
+                <div className="col d-flex flex-column">
+                  <span>User Type</span>
+                  <input type="text" className="darkMode-input form-control" />
+                </div>
+              </div>
+              <div className="row my-2 g-0 gap-2">
+                <div className="col d-flex flex-column">
+                  <span>To</span>
+                  <input type="text" className="darkMode-input form-control" />
+                </div>
+                <div className="col d-flex flex-column">
+                  <span>Sending Type</span>
+                  <input type="text" className="darkMode-input form-control" />
+                </div>
+              </div>
+              <div className="my-2">
+                <div className="col-6">
+                  <span>Date</span>
+                  <input type="text" className="darkMode-input form-control" />
+                </div>
+              </div>
+              <div className="my-2">
+                <span>Message</span>
+                <textarea
+                  style={{ height: "100px" }}
+                  className="darkMode-input form-control"
+                ></textarea>
+              </div>
+              <div className="my-4 d-flex justify-content-center">
+                <button
+                  className="px-4 py-1"
+                  style={{
+                    border: "1px solid #D2DB08",
+                    color: "#D2DB08",
+                    borderRadius: "4px",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+            <img
+              data-bs-dismiss="modal"
+              src={cross}
+              alt=""
+              style={{
+                position: "absolute",
+                top: "-1rem",
+                right: "-1.1rem",
+                cursor: "pointer",
+              }}
+              height={45}
+              width={45}
+            />
+          </div>
+        </div>
+      </div>
     </>
   );
 };

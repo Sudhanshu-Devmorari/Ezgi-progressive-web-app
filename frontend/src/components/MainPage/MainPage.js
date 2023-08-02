@@ -1,118 +1,146 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
+import SideBar from "../SideBar/SideBar";
 import "./MainPage.css";
-import Banner from "../Banner/Banner";
-import CurrentTheme from "../../context/CurrentTheme";
-import ContentSection from "../ContentSection/ContentSection";
-import SharedProfile from "../SharedProfile/SharedProfile";
-import { AdvertisementBanner } from "../AdvertisementBanner/AdvertisementBanner";
-import { Footer } from "../Footer/Footer";
-import { EditorBanner } from "../EditorBanner/EditorBanner";
-import { SelectContent } from "../SelectContent/SelectContent";
-import HighlightMainPage from "../HighlightMainPage/HighlightMainPage";
-import EditorsPage from "../EditorsPage/EditorsPage";
-import CommentsPage from "../CommentsPage/CommentsPage";
-import EditorProfileActiveComments from "../EditorProfileActiveComments/EditorProfileActiveComments";
-import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCommentsPage";
-import DashboardSU from "../DashboardSU/DashboardSU";
-import LandingPage from "../LandingPage/LandingPage";
+import NewUsers from "../NewUsers/NewUsers";
+import newUser from "../../assets/user-plus.svg";
+import editorIcon from "../../assets/Group 67.svg";
+import subscriberIcon from "../../assets/Group 72.svg";
+import commentsIcon from "../../assets/target-arrow-1.svg";
+import gender_female from "../../assets/gender-female.png";
+import gender_male from "../../assets/gender-male.png";
+import profile from "../../assets/profile.png";
+import user1 from "../../assets/user1.png";
+import Home from "../Home/Home";
+import DailySalesArray from "../DailySalesArray/DailySalesArray";
+import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 
 const MainPage = () => {
-  // CHANGE THEME
-  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const newUsersArray = [
+    {
+      label: "New Users",
+      icon: newUser,
+      count: "127",
+      per: "%22",
+      color: "#58DEAA",
+      rate_icon: "arrowUp",
+    },
+  ];
+  const newEditorsArray = [
+    {
+      label: "New Editors",
+      icon: editorIcon,
+      count: "127",
+      per: "%22",
+      color: "#58DEAA",
+      rate_icon: "arrowUp",
+    },
+  ];
+  const newSubscribersArray = [
+    {
+      label: "New Subscribers",
+      icon: subscriberIcon,
+      count: "127",
+      per: "%22",
+      color: "#FF5757",
+      rate_icon: "arrowdown",
+    },
+  ];
+  const newCommentsArray = [
+    {
+      label: "New Comments",
+      icon: commentsIcon,
+      count: "127",
+      per: "%22",
+      color: "#58DEAA",
+      rate_icon: "arrowUp",
+    },
+  ];
 
-  // Select Content
-  const [selectContent, setSelectContent] = useState("home");
-  const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
-  const [dashboardSUser, setDashboardSUser] = useState(false);
-
-  const themeMode = localStorage.getItem("CurrentTheme");
-
-  useEffect(() => {
-    if (themeMode === "dark") {
-      document.body.classList.add("body-dark-mode");
-      setCurrentTheme("dark");
-    } else {
-      document.body.classList.add("body-light-mode");
-      setCurrentTheme("light");
-    }
-  }, [themeMode]);
-
-  // const user = "c-";
-  const user = localStorage.getItem("userPhone");
-  console.log("selectContent: ", selectContent);
+  const users = [
+    {
+      sr: "#0001",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_female,
+      age: "25 - 34",
+      country: "Ankara",
+      date: "15-06-.2023 - 16:37",
+      role: "Journeyman",
+      profile: profile,
+    },
+    {
+      sr: "#0002",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_male,
+      age: "18 - 24",
+      country: "İstanbul",
+      date: "15-06-.2023 - 16:37",
+      profile: user1,
+    },
+    {
+      sr: "#0003",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_female,
+      age: "35 - 44",
+      country: "İzmir",
+      date: "15-06-.2023 - 16:37",
+      role: "Expert",
+      profile: profile,
+    },
+    {
+      sr: "#0004",
+      name: "John Doe",
+      username: "johndoe",
+      gender: gender_male,
+      age: "25 - 34",
+      country: "Bursa",
+      date: "15-06-.2023 - 16:37",
+      role: "Apprentice",
+      profile: profile,
+    },
+  ];
 
   return (
     <>
-      <div className="landing-page">
-        <LandingPage />
-      </div>
-      <div className="container-fluid mt-3 mobile-view">
-        <div
-          // className={`container-fluid mt-3 mobile-view`}
-          style={{ marginBottom: "66px" }}
-        >
-          <NavBar
-            setDashboardSUser={setDashboardSUser}
-            setSelectContent={setSelectContent}
-          />
-
-          {dashboardSUser ? (
-            user === "c" ? (
-              <CommentatorsCommentsPage
-                user={user}
-                setSelectContent={setSelectContent}
-                setDashboardSUser={setDashboardSUser}
-                selectContent={selectContent}
-              />
-            ) : (
-              <DashboardSU
-                setSelectContent={setSelectContent}
-                setDashboardSUser={setDashboardSUser}
-                selectContent={selectContent}
-              />
-            )
-          ) : (
-            <>
-              {(selectContent === "home" ||
-                selectContent === "editor" ||
-                selectContent === "comments") && (
-                <>
-                  <Banner />
-                  <EditorBanner />
-                </>
-              )}
-              {selectContent === "home" && (
-                <>
-                  <SelectContent
-                    selectContent={selectPublicorForYou}
-                    setSelectContent={setSelectPublicorForYou}
-                  />
-                  <ContentSection
-                    selectContent={selectPublicorForYou}
-                    setSelectContent={setSelectContent}
-                  />
-                  <HighlightMainPage />
-                  <SharedProfile setSelectContent={setSelectContent}/>      {/*  featured card */}
-                  <AdvertisementBanner />
-                </>
-              )}
-              {selectContent === "editor" && <EditorsPage />}
-              {selectContent === "comments" && <CommentsPage />}
-              {selectContent === "show-all-comments" && (
-                <EditorProfileActiveComments
-                  setSelectContent={setSelectContent}
-                  setDashboardSUser={setDashboardSUser}
-                />
-              )}
-            </>
-          )}
+      <div className="conatainer-fluid m-2">
+        <NavBar />
+        <div className="row g-0 mt-2">
+          <div className="col-1" style={{ width: "5%" }}>
+            <SideBar />
+          </div>
+          <div className="col-11" style={{ width: "95%" }}>
+            <div className="row g-0">
+              <div className="col-8">
+                <div className="row g-0">
+                  <div className="col-4">
+                    <NewUsers array={newUsersArray} />
+                  </div>
+                  <div className="col-4">
+                    <NewUsers array={newEditorsArray} />
+                  </div>
+                  <div className="col-4">
+                    <NewUsers array={newSubscribersArray} />
+                  </div>
+                </div>
+              </div>
+              <div className="col-4">
+                <NewUsers array={newCommentsArray} />
+              </div>
+            </div>
+            <div className="row g-0">
+              <div className="col-8">
+                <Home users={users} />
+              </div>
+              <div className="col-4">
+                <DailySalesArray />
+                <NewWithdrawalRqst />
+              </div>
+            </div>
+          </div>
         </div>
-        <Footer
-          setDashboardSUser={setDashboardSUser}
-          setSelectContent={setSelectContent}
-          selectContent={selectContent}
-        />
       </div>
     </>
   );

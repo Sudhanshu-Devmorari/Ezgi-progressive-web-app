@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="73.911" height="73.911" viewBox="0 0 73.911 73.911">
-  <g id="MDI_check-decagram" data-name="MDI / check-decagram" transform="translate(0)">
-    <g id="Boundary" transform="translate(0 0)" fill="#00d4ff" stroke="rgba(0,0,0,0)" stroke-width="1" opacity="0">
-      <rect width="73.911" height="73.911" stroke="none"/>
-      <rect x="0.5" y="0.5" width="72.911" height="72.911" fill="none"/>
-    </g>
-    <path id="Path_check-decagram" data-name="Path / check-decagram" d="M68.752,33.753l-7.514-8.561,1.047-11.333L51.167,11.333,45.347,1.54l-10.471,4.5L24.405,1.54l-5.82,9.793L7.467,13.828,8.514,25.161,1,33.753l7.514,8.561L7.467,53.678,18.585,56.2,24.405,66l10.471-4.527,10.471,4.5,5.82-9.793,11.117-2.525L61.237,42.314l7.514-8.561m-40.035,15.4L16.4,36.832,20.74,32.49l7.976,7.945L49.011,20.141l4.342,4.373Z" transform="translate(0.699 4.619)" fill="#00d4ff"/>
+<svg id="MDI_check-decagram" data-name="MDI / check-decagram" xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+  <g id="Boundary" transform="translate(0 0)" fill="#00d4ff" stroke="rgba(0,0,0,0)" stroke-width="1" opacity="0">
+    <rect width="60" height="60" stroke="none"/>
+    <rect x="0.5" y="0.5" width="59" height="59" fill="none"/>
   </g>
+  <path id="Path_check-decagram" data-name="Path / check-decagram" d="M55.66,27.429,49.6,20.548l.845-9.108-8.969-2.03-4.7-7.871L28.33,5.154,19.883,1.54l-4.7,7.871-8.969,2,.845,9.108L1,27.429,7.062,34.31l-.845,9.133,8.969,2.03,4.7,7.871L28.33,49.7l8.447,3.614,4.7-7.871,8.969-2.03L49.6,34.31l6.062-6.881M23.361,39.8l-9.938-9.9,3.5-3.49L23.361,32.8,39.734,16.489,43.237,20Z" transform="translate(0.473 3.8)" fill="#00d4ff"/>
 </svg>

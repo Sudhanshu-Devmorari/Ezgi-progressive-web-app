@@ -1,7 +1,0 @@
-<svg id="camera-plus" xmlns="http://www.w3.org/2000/svg" width="52.012" height="52.012" viewBox="0 0 52.012 52.012">
-  <path id="Path_582" data-name="Path 582" d="M0,0H52.012V52.012H0Z" fill="none"/>
-  <path id="Path_583" data-name="Path 583" d="M22.5,38.675H7.334A4.334,4.334,0,0,1,3,34.34v-19.5A4.334,4.334,0,0,1,7.334,10.5H9.5a4.334,4.334,0,0,0,4.334-4.334A2.167,2.167,0,0,1,16,4h13a2.167,2.167,0,0,1,2.167,2.167A4.334,4.334,0,0,0,35.508,10.5h2.167a4.334,4.334,0,0,1,4.334,4.334v7.585" transform="translate(3.502 4.669)" fill="none" stroke="#0b2447" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
-  <path id="Path_584" data-name="Path 584" d="M16,19H29" transform="translate(18.675 22.176)" fill="none" stroke="#0b2447" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
-  <path id="Path_585" data-name="Path 585" d="M19,16V29" transform="translate(22.176 18.675)" fill="none" stroke="#0b2447" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
-  <path id="Path_586" data-name="Path 586" d="M9,16.5A6.5,6.5,0,1,0,15.5,10,6.5,6.5,0,0,0,9,16.5" transform="translate(10.505 11.672)" fill="none" stroke="#0b2447" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
-</svg>
