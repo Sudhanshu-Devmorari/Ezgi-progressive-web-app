@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import bow_dark from "../../assets/target-arrow.3.png";
 import bow_Selected from "../../assets/Menu Icon (1).svg";
-import bow_light from "../../assets/target-arrow_light.svg";
+import bow_light from "../../assets/Comments Page.svg";
 import user_check_dark from "../../assets/Sub Header Subscribers Unselected.svg";
 import user_check_light from "../../assets/Sub Header Subscriber Unselected.svg";
 import user_check_selected from "../../assets/Sub Header Subscriber Selected.svg";
@@ -16,8 +16,8 @@ import stardark from "../../assets/Favorite Page (1).svg";
 import bell from "../../assets/Header Notification.svg";
 import bell_1 from "../../assets/Header Notification (2).svg";
 import lifebuoydark from "../../assets/Support.svg";
-import lifebuoy from "../../assets/lifebuoy.png";
-import lifebuoySelected from "../../assets/lifebuoySelected.png";
+import lifebuoy from "../../assets/support unselected.svg";
+import lifebuoySelected from "../../assets/support selected.svg";
 
 const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);

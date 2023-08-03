@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import "./EditorBanner.css"
-import football from '../../assets/football.png'
-import basketball from '../../assets/basketball.png'
+import football from '../../assets/Profile Card Football.svg'
+import basketball from '../../assets/Profile Card Basketball.svg'
 
 export const EditorBanner = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);

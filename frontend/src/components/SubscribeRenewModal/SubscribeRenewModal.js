@@ -8,8 +8,8 @@ import PromoteMeModal from "../PromoteMeModal/PromoteMeModal";
 import { currentTheme } from "../GetCurrentTheme";
 import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
-import basketball from "../../assets/basketball.png";
-import football from "../../assets/football.png";
+import basketball from "../../assets/Profile Card Basketball.svg";
+import football from "../../assets/Profile Card Football.svg";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 

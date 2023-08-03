@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import "./SignUpModal.css";
 import facebook from "../../assets/FacebookLogo.png";
@@ -12,6 +12,7 @@ import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
 import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
 
 const SignUpModal = (props) => {
   // THEME
@@ -20,23 +21,142 @@ const SignUpModal = (props) => {
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const [userPhone, setuserPhone] = useState("");
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   const [selectCheckBox, setSelectCheckBox] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Select");
+  const [selectedCountry, setSelectedCountry] = useState("Turkey");
   const [cityDropDown, setCityDropDown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Select");
   const [genderDropDown, setGenderDropDown] = useState(false);
   const [selectedGender, setSelectedGender] = useState("Select");
   const [ageDropDown, setAgeDropDown] = useState(false);
   const [selectedAge, setSelectedAge] = useState("Select");
+
+  // SIGN UP API --------------------------------------------------
+
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(30);
+
+  const [phone, setPhone] = useState("");
+  const [usernameError, setNamerror] = useState("");
+  const [nameError, setUsernamerror] = useState("");
+  const [phonelError, setPhoneError] = useState("");
+  const [cityError, setCityError] = useState("");
+  const [genderError, setGenderError] = useState("");
+  const [ageError, setAgeError] = useState("");
+  const [checkboxError, setCheckboxError] = useState("");
+
+  const [passwordlError, setpasswordError] = useState("");
+  const passwordReg = /^(?=.*\d)(?=.*[a-z])[\w~@#$%^&*+=`|{}:;!.?"()[\]-]{8,}$/;
+  const phonReg = /^\d{10}$/;
+
+  const [signUpData, setSignUpData] = useState({});
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (props.ShowModal === 6 && minutes > 0 && seconds > 0) {
+        clearInterval(interval);
+      } else if (seconds === 0) {
+        setMinutes(minutes - 1);
+        setSeconds(59);
+      } else {
+        setSeconds(seconds - 1);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [minutes, seconds, props.ShowModal]);
+
+  const hadleValidation = () => {
+    if (username === "") {
+      setUsernamerror("Please enter your username");
+    } else if (name === "") {
+      setNamerror("Please enter your name");
+    } else if (!phonReg.test(phone)) {
+      setPhoneError("Invalid phone number");
+    } else if (!passwordReg.test(password)) {
+      setpasswordError(
+        "Password should contain atleast one number and one special character"
+      );
+    } else {
+      props.setShowModal(2);
+    }
+  };
+  useEffect(() => {
+    setSignUpData({
+      name: name,
+      username: username,
+      phone: phone,
+      password: password,
+      country: selectedCountry,
+      city: selectedCity,
+      gender: selectedGender,
+      age: selectedAge,
+    });
+  }, [
+    name,
+    username,
+    phone,
+    password,
+    selectedCountry,
+    selectedCity,
+    selectedGender,
+    selectedAge,
+  ]);
+
+  const handleSignUp = async () => {
+    if (selectedCity === "Select") {
+      setCityError("Please select your city.");
+    } else if (selectedGender === "Select") {
+      setCityError("");
+      setGenderError("Please select your gender.");
+    } else if (selectedAge === "Select") {
+      setGenderError("");
+      setAgeError("Please select your age.");
+    } else if (!selectCheckBox) {
+      setAgeError("");
+      setCheckboxError("Please select the checkbox to proceed.");
+    } else {
+      
+      const response = await axios.post(
+        "http://127.0.0.1:8000/signup/",
+        signUpData
+      );
+      console.log("response: ", response.data);
+      props.setShowModal(6);
+    }
+  };
+
+// OTP verify API
+const handleOTPVerification = async () =>{
+  console.log("verify otp clicked");
+  const res = await axios.post('http://127.0.0.1:8000/otp-verify/',{otp:otp})
+  console.log("afterrrrrrr");
+  console.log(res.data, "======>>otp res");
+}
+// RESEND OTP API 
+const handleResendOtp = async () => {
+  const res = await axios.post('http://127.0.0.1:8000/otp-resend/',{phone:phone})
+  console.log(res, "======>>otp resend");
+  if (res.status === 200){
+    props.onHide();
+  }
+  if (res.status === 400){
+    
+  }
+}
+
+  const [userPhone, setuserPhone] = useState("");
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleCountrySelection = (country) => {
     setSelectedCountry(country);
@@ -106,16 +226,19 @@ const SignUpModal = (props) => {
     setAgeDropDown(!ageDropDown);
   };
 
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
+  const countryOptions = ["Turkey"];
+  const cityOptions = [
+    "Istanbul",
+    "Ankara",
+    "İzmir",
+    "Bursa",
+    "Antalya",
+    "Konya",
+    "Adana",
+    "Gaziantep",
+    "Şanlıurfa",
+    "Mersin",
   ];
-  const cityOptions = ["Surat", "Baroda"];
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
@@ -143,6 +266,10 @@ const SignUpModal = (props) => {
                   <span>
                     <RxCross2
                       onClick={() => {
+                        setpasswordError("");
+                        setPhoneError("");
+                        setNamerror("");
+                        setUsernamerror("");
                         props.onHide();
                       }}
                       fontSize={"1.8rem"}
@@ -158,29 +285,45 @@ const SignUpModal = (props) => {
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="name">Name Surname</label>
                     <input
+                      required
+                      onChange={(e) => setUsername(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
                           : "lightMode-input"
                       } form-control`}
                       type="text"
-                      name=""
+                      name="name"
                       id="name"
                     />
                   </div>
+                  <small
+                    className="text-danger"
+                    style={{ fontSize: "0.71rem" }}
+                  >
+                    {usernameError}
+                  </small>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="username">Username</label>
                     <input
+                      required
+                      onChange={(e) => setName(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
                           : "lightMode-input"
                       } form-control`}
                       type="text"
-                      name=""
+                      name="username"
                       id="username"
                     />
                   </div>
+                  <small
+                    className="text-danger"
+                    style={{ fontSize: "0.71rem" }}
+                  >
+                    {nameError}
+                  </small>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
                     <div className="input-group">
@@ -196,6 +339,9 @@ const SignUpModal = (props) => {
                         +90
                       </span>
                       <input
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                        }}
                         id="phone"
                         type="text"
                         className={`${
@@ -207,10 +353,17 @@ const SignUpModal = (props) => {
                         aria-describedby="basic-addon1"
                       />
                     </div>
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {phonelError}
+                    </small>
                   </div>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="password">Password</label>
                     <input
+                      onChange={(e) => setPassword(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
@@ -220,6 +373,12 @@ const SignUpModal = (props) => {
                       name=""
                       id="password"
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {passwordlError}
+                    </small>
                   </div>
                 </div>
                 <div className="d-flex flex-column align-items-center my-3">
@@ -228,7 +387,8 @@ const SignUpModal = (props) => {
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
                     onClick={() => {
-                      props.setShowModal(2);
+                      hadleValidation();
+                      // props.setShowModal(2);
                     }}
                   >
                     Continue
@@ -288,6 +448,12 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={() => {
                         props.onHide();
+                        setpasswordError("");
+                        setPhoneError("");
+                        setGenderError("");
+                        setCityError("");
+                        setAgeError("");
+                        setCheckboxError("");
                       }}
                       fontSize={"1.8rem"}
                       className={`${
@@ -319,6 +485,12 @@ const SignUpModal = (props) => {
                       isOpen={cityDropDown}
                       toggleDropdown={toggleCityDropdown}
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {cityError}
+                    </small>
                   </div>
 
                   <div className="my-2">
@@ -330,6 +502,12 @@ const SignUpModal = (props) => {
                       isOpen={genderDropDown}
                       toggleDropdown={toggleGenderDropdown}
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {genderError}
+                    </small>
                   </div>
                   <div className="my-2">
                     <CustomDropdown
@@ -340,10 +518,16 @@ const SignUpModal = (props) => {
                       isOpen={ageDropDown}
                       toggleDropdown={toggleAgeDropdown}
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {ageError}
+                    </small>
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="my-3">
+                  <div className="mt-3">
                     {currentTheme === "dark" ? (
                       <img
                         alt=""
@@ -377,10 +561,19 @@ const SignUpModal = (props) => {
                       Terms of use
                     </span>
                   </div>
+                  <small
+                    className="text-danger mb-3"
+                    style={{ fontSize: "0.71rem" }}
+                  >
+                    {checkboxError}
+                  </small>
                   <div className="d-flex flex-column align-items-center my-4">
                     <button
                       onClick={() => {
-                        props.onHide();
+                        // props.onHide();
+                        // props.setShowModal(6);
+                        // handleSignUp();
+                        handleSignUp();
                       }}
                       className={`${
                         currentTheme === "dark"
@@ -690,7 +883,7 @@ const SignUpModal = (props) => {
                 <div className="d-flex justify-content-center">
                   <span>
                     <RxCross2
-                      onClick={props.onHide}
+                      onClick={()=>{props.onHide();}}
                       fontSize={"1.8rem"}
                       className={`${
                         currentTheme === "dark"
@@ -706,13 +899,24 @@ const SignUpModal = (props) => {
                 <div className="my-1">
                   <div className="d-flex justify-content-between">
                     <span>Enter 6 digit code</span>
-                    <span
+                    {/* <span
                       style={{
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
                     >
                       1:45
-                    </span>
+                    </span> */}
+                    {seconds > 0 && (
+                      <span
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                        }}
+                      >
+                        {minutes < 10 ? `0${minutes}` : minutes}:
+                        {seconds < 10 ? `0${seconds}` : seconds}
+                      </span>
+                    )}
                   </div>
                   <div className="w-100 d-flex justify-content-center">
                     <OtpInput
@@ -732,6 +936,7 @@ const SignUpModal = (props) => {
                   <div className="text-end">
                     <small>Didn't get the code? </small>
                     <span
+                    onClick={()=>{setSeconds(30);handleResendOtp()}}
                       style={{
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
@@ -739,11 +944,13 @@ const SignUpModal = (props) => {
                       Send Again
                     </span>
                   </div>
+                  <small className="text-danger" style={{ fontSize: "0.71rem" }}>{setOtpError}</small>
                 </div>
                 <div className="d-flex flex-column align-items-center my-4">
                   <button
                     onClick={() => {
-                      props.setShowModal(7);
+                      handleOTPVerification()
+                      // props.setShowModal(7);
                     }}
                     className={`${
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
