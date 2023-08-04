@@ -70,7 +70,7 @@ const SignUpModal = (props) => {
         "Password should contain atleast one number and one special character"
       );
     } else {
-      setShowModal(2);
+      props.props.setShowModal(2);
     }
   };
   useEffect(() => {
