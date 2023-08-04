@@ -2,7 +2,7 @@ from django.urls import path
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
-                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend)
+                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView)
 
 from core.views import (AdminMainPage, UserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement)
@@ -10,8 +10,10 @@ from core.views import (AdminMainPage, UserManagement, CommentsManagement, Filte
 
 urlpatterns = [
     path('signup/', SignupView.as_view(), name='Signup'),
+    path('login/', LoginView.as_view(), name='Login'),
     path('otp-verify/', OtpVerify.as_view(), name='Otp-Verify'),
     path('otp-resend/', OtpReSend.as_view(), name='Otp-Resend'),
+    path('password-reset/', PasswordResetView.as_view(), name='Otp-Resend'),
     path('retrieve-commentator/', RetrieveCommentatorView.as_view(), name='Retrieve-Commentator'),
     path('follow-commentator/', FollowCommentatorView.as_view(), name='Follow-Commentator'),
     path('subscription/', SubscriptionView.as_view(), name='Subscription'),

@@ -27,6 +27,7 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer)
 import pyotp
+from django.contrib.auth import authenticate
 
 totp = pyotp.TOTP('base32secret3232', interval=45)
 class SignupView(APIView):
@@ -40,51 +41,78 @@ class SignupView(APIView):
                'status' : status.HTTP_400_BAD_REQUEST
                 })
         else:
-            print(request.data['phone'],"========================")
             serializer.save()
-            otp = totp.now()
-            print()
-            print('otp: ', otp)
-            print()
-            res = sms_send(request.data['phone'],f"Your OTP verification code is {otp}")
-            print('res: ', res)
-            if res == 'Success':
-                return Response(data={'success': 'Otp successfully sent.'}, status=status.HTTP_200_OK)
-            else:
-                return Response(data={'error': 'Otp not sent. Try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
+            # otp = totp.now()
+            # print()
+            # print('otp: ', otp)
+            # print()
+            # res = sms_send(request.data['phone'],f"Your OTP verification code is {otp}")
+            # print('res: ', res)
+            # if res == 'Success':
+            #     return Response(data={'success': 'Otp successfully sent.', 'status' : status.HTTP_200_OK})
+            # else:
+            #     return Response(data={'error': 'Otp not sent. Try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
-        print("============ verify otp")
         try:
-            print("inside try")
             otp = request.data.get('otp')
             print('otp: ', otp)
             verification_result = totp.verify(otp)
             print('verification_result: ', verification_result)
 
             if verification_result:
-                print("trueeeeeee")
-                return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
+                return Response(data={'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
             else:
-                print("False===================")
                 return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
-                # return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(e,"===============e")
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class OtpReSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
         phone = request.data['phone']
-        print('phone: ', phone)
-        otp = totp.now()
-        print('otp: ', otp)
-        res = sms_send(phone, otp)  
-        if res == 'Success':
-            return Response(data={'success': 'Otp successfully sent.'}, status=status.HTTP_200_OK)
-        else:
-            return Response(data={'error': 'Otp not sent. Try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            user = User.objects.get(phone=phone)
+            otp = totp.now()
+            print('otp: ', otp)
+            # res = sms_send(phone, otp)  
+            res = "Success"
+            if res == 'Success':
+                return Response(data={'success': 'Otp successfully sent.','status' : status.HTTP_200_OK})
+            else:
+                return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+        except User.DoesNotExist:
+            return Response({
+                'data':"User Doesn't exists.",
+                'status' : status.HTTP_404_NOT_FOUND
+            })
+
+class LoginView(APIView):
+    def post(self, request, format=None):
+        phone = request.data['phone']
+        password = request.data['password']
+        print('password: ', password)
+        try:
+            user_phone = User.objects.get(phone=phone)
+            if user_phone.password == password:
+                return Response({'data' : "Login successfull!", 'status' : status.HTTP_200_OK})
+            else:
+                return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
+        except User.DoesNotExist:
+            return Response({
+                'data':"User Doesn't exists!",
+                'status' : status.HTTP_404_NOT_FOUND
+            })
+
+class PasswordResetView(APIView):
+    def post(self, request, format=None):   
+        phone = request.data['phone']
+        new_ps = request.data['new_ps']
+        user = User.objects.get(phone=phone)
+        user.password = new_ps
+        user.save()
+        return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
 class RetrieveCommentatorView(APIView): # for Home page:
     def get(self, request, format=None, *args, **kwargs):

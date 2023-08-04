@@ -4,14 +4,14 @@ import SignUpModal from "../SignUpModal/SignUpModal";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
-import bell from "../../assets/Header Notification.svg"
-import bellLight from "../../assets/Header Notification (1).svg"
-import darkmode from "../../assets/brightness-up.png"
-import moon from "../../assets/Header Dark Mode.svg"
+import bell from "../../assets/Header Notification.svg";
+import bellLight from "../../assets/Header Notification (1).svg";
+import darkmode from "../../assets/brightness-up.png";
+import moon from "../../assets/Header Dark Mode.svg";
 
 const NavBar = (props) => {
-  const [ShowModal, setShowModal] = useState(1);
-  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
+    useContext(CurrentTheme);
 
   const [signUpModalShow, setSignUpModalShow] = React.useState(false);
   const [addCommentShow, setAddCommentShow] = React.useState(false);
@@ -42,20 +42,43 @@ const NavBar = (props) => {
           <div className="">
             {currentTheme === "light" ? (
               <span className="p-2">
-                <img src={moon} alt="" height={35} width={35} onClick={() => handleTheme("dark")} />
+                <img
+                  src={moon}
+                  alt=""
+                  height={35}
+                  width={35}
+                  onClick={() => handleTheme("dark")}
+                />
               </span>
             ) : (
               <span className="p-2">
-                <img src={darkmode} alt="" height={35} width={35} onClick={() => {handleTheme("light")}}/>
+                <img
+                  src={darkmode}
+                  alt=""
+                  height={35}
+                  width={35}
+                  onClick={() => {
+                    handleTheme("light");
+                  }}
+                />
               </span>
             )}
             <span className="pe-2 ps-0 py-2">
-              <img src={currentTheme === "dark" ? bell : bellLight} alt="" height={35} width={35} onClick={()=>{props.setDashboardSUser(true);props.setSelectContent("notifications");}}/>
+              <img
+                src={currentTheme === "dark" ? bell : bellLight}
+                alt=""
+                height={35}
+                width={35}
+                onClick={() => {
+                  props.setDashboardSUser(true);
+                  props.setSelectContent("notifications");
+                }}
+              />
             </span>
             {userPhone ? (
               <>
                 <span
-                onClick={()=>props.setDashboardSUser(true)}
+                  onClick={() => props.setDashboardSUser(true)}
                   className="py-2 px-3"
                   style={{
                     backgroundColor:
@@ -103,7 +126,13 @@ const NavBar = (props) => {
         show={signUpModalShow}
         onHide={() => setSignUpModalShow(false)}
         ShowModal={ShowModal}
-        setShowModal={setShowModal}
+        // setShowModal={(mode) => {
+        //   debugger;
+        //   setShowModal((preState) => {
+        //     debugger;
+        //     return mode;
+        //   });
+        // }}
       />
       <AddCommentModal
         show={addCommentShow}

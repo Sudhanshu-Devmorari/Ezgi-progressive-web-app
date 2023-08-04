@@ -4,8 +4,6 @@ import "./SignUpModal.css";
 import facebook from "../../assets/FacebookLogo.png";
 import google from "../../assets/googleLogo.png";
 import { RxCross2 } from "react-icons/rx";
-import OtpInput from "react-otp-input";
-import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
@@ -13,16 +11,20 @@ import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
+import SignInModal from "../SignInModal/SignInModal";
+import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import OTPModal from "../OTPModal/OTPModal";
+import PasswordReset from "../PasswordReset/PasswordReset";
+import TermsOfUse from "../TermsOfUse/TermsOfUse";
 
 const SignUpModal = (props) => {
   // THEME
-  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
+    useContext(CurrentTheme);
 
-  const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
   const [selectCheckBox, setSelectCheckBox] = useState(false);
-  const [otpError, setOtpError] = useState("");
 
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Turkey");
@@ -35,12 +37,9 @@ const SignUpModal = (props) => {
 
   // SIGN UP API --------------------------------------------------
 
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(30);
-
   const [phone, setPhone] = useState("");
-  const [usernameError, setNamerror] = useState("");
-  const [nameError, setUsernamerror] = useState("");
+  const [nameError, setNamerror] = useState("");
+  const [usernameError, setUsernamerror] = useState("");
   const [phonelError, setPhoneError] = useState("");
   const [cityError, setCityError] = useState("");
   const [genderError, setGenderError] = useState("");
@@ -55,37 +54,23 @@ const SignUpModal = (props) => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
 
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (props.ShowModal === 6 && minutes > 0 && seconds > 0) {
-        clearInterval(interval);
-      } else if (seconds === 0) {
-        setMinutes(minutes - 1);
-        setSeconds(59);
-      } else {
-        setSeconds(seconds - 1);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [minutes, seconds, props.ShowModal]);
-
   const hadleValidation = () => {
-    if (username === "") {
-      setUsernamerror("Please enter your username");
-    } else if (name === "") {
+    console.log("nnnnnn");
+    if (name === "") {
       setNamerror("Please enter your name");
+    } else if (username === "") {
+      setNamerror("");
+      setUsernamerror("Please enter your username");
     } else if (!phonReg.test(phone)) {
+      setUsernamerror("");
       setPhoneError("Invalid phone number");
     } else if (!passwordReg.test(password)) {
+      setPhoneError("");
       setpasswordError(
         "Password should contain atleast one number and one special character"
       );
     } else {
-      props.setShowModal(2);
+      setShowModal(2);
     }
   };
   useEffect(() => {
@@ -123,39 +108,15 @@ const SignUpModal = (props) => {
       setAgeError("");
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
-      
       const response = await axios.post(
         "http://127.0.0.1:8000/signup/",
         signUpData
       );
       console.log("response: ", response.data);
-      props.setShowModal(6);
+      if (response.data.status === 200) {
+        props.onHide();
+      }
     }
-  };
-
-// OTP verify API
-const handleOTPVerification = async () =>{
-  console.log("verify otp clicked");
-  const res = await axios.post('http://127.0.0.1:8000/otp-verify/',{otp:otp})
-  console.log("afterrrrrrr");
-  console.log(res.data, "======>>otp res");
-}
-// RESEND OTP API 
-const handleResendOtp = async () => {
-  const res = await axios.post('http://127.0.0.1:8000/otp-resend/',{phone:phone})
-  console.log(res, "======>>otp resend");
-  if (res.status === 200){
-    props.onHide();
-  }
-  if (res.status === 400){
-    
-  }
-}
-
-  const [userPhone, setuserPhone] = useState("");
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   const handleCountrySelection = (country) => {
@@ -242,6 +203,8 @@ const handleResendOtp = async () => {
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
+  const [forgotPsPhone, setForgotPsPhone] = useState("");
+
   return (
     <>
       <Modal
@@ -257,8 +220,7 @@ const handleResendOtp = async () => {
           className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
           style={{ fontSize: "14px" }}
         >
-          {/* Signup modal 1 */}
-          {props.ShowModal === 1 && (
+          {ShowModal === 1 && (
             <div>
               <div className="m-2">
                 <div className="d-flex justify-content-center">
@@ -286,7 +248,7 @@ const handleResendOtp = async () => {
                     <label htmlFor="name">Name Surname</label>
                     <input
                       required
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e) => setName(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
@@ -296,18 +258,18 @@ const handleResendOtp = async () => {
                       name="name"
                       id="name"
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {nameError}
+                    </small>
                   </div>
-                  <small
-                    className="text-danger"
-                    style={{ fontSize: "0.71rem" }}
-                  >
-                    {usernameError}
-                  </small>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="username">Username</label>
                     <input
                       required
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => setUsername(e.target.value)}
                       className={`${
                         currentTheme === "dark"
                           ? "darkMode-input"
@@ -317,13 +279,13 @@ const handleResendOtp = async () => {
                       name="username"
                       id="username"
                     />
+                    <small
+                      className="text-danger"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {usernameError}
+                    </small>
                   </div>
-                  <small
-                    className="text-danger"
-                    style={{ fontSize: "0.71rem" }}
-                  >
-                    {nameError}
-                  </small>
                   <div className="d-flex flex-column m-2">
                     <label htmlFor="phone">Phone</label>
                     <div className="input-group">
@@ -388,7 +350,6 @@ const handleResendOtp = async () => {
                     } px-3 py-1`}
                     onClick={() => {
                       hadleValidation();
-                      // props.setShowModal(2);
                     }}
                   >
                     Continue
@@ -407,7 +368,7 @@ const handleResendOtp = async () => {
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
                       onClick={() => {
-                        props.setShowModal(4);
+                        setShowModal(4);
                       }}
                     >
                       Sign In
@@ -417,10 +378,8 @@ const handleResendOtp = async () => {
               </div>
             </div>
           )}
-          {/* End Signup modal 1 */}
 
-          {/* Signup model 2 (dropdown) */}
-          {props.ShowModal === 2 && (
+          {ShowModal === 2 && (
             <div
               className={`${
                 currentTheme === "dark" ? "darkMode" : "lightMode"
@@ -602,440 +561,27 @@ const handleResendOtp = async () => {
               </div>
             </div>
           )}
-          {/* Terms of Use */}
-          {props.ShowModal === 3 && (
-            <div
-              className="m-4"
-              style={{
-                color: "#0D2A53",
-                fontSize: "12px",
-              }}
-            >
-              <div
-                className="d-flex justify-content-between m-2"
-                style={{ fontWeight: "500", color: "#0D2A53" }}
-              >
-                <span>
-                  <i
-                    onClick={() => {
-                      props.setShowModal(2);
-                    }}
-                    className="fa-solid fa-arrow-left-long"
-                    style={{
-                      fontSize: "21px",
-                      position: "absolute",
-                      left: "17px",
-                      top: "10px",
-                      color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                    }}
-                  ></i>
-                </span>
-                <span className="">
-                  <RxCross2
-                    onClick={() => {
-                      props.onHide();
-                    }}
-                    fontSize={"1.8rem"}
-                    className={`${
-                      currentTheme === "dark"
-                        ? "closeBtn-dark"
-                        : "closeBtn-light"
-                    }`}
-                  />
-                </span>
-              </div>
-              <h4
-                style={{
-                  color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                }}
-              >
-                Terms of Use
-              </h4>
-              <div
-                style={{
-                  color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                }}
-              >
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-                  et est facilisis, malesuada tellus sed, tempor justo. Donec
-                  nec enim mauris. Duis auctor arcu et neque malesuada
-                  tristique. Sed ac sem nec metus ultrices tincidunt. Aenean id
-                  nisl eget odio sollicitudin viverra. Cras quis tellus vel
-                  ligula euismod dapibus. Integer eu rutrum eros. Sed efficitur
-                  nulla id justo aliquet tempus. Lorem ipsum dolor sit amet,
-                  consectetur adipiscing elit. Nulla et est facilisis, malesuada
-                  tellus sed, tempor justo. Donec nec enim mauris. Duis auctor
-                  arcu et neque malesuada tristique. Sed ac sem nec metus
-                  ultrices tincidunt. Aenean id nisl eget odio sollicitudin
-                  viverra. Cras quis tellus vel ligula euismod dapibus. Integer
-                  eu rutrum eros. Sed efficitur nulla id justo aliquet tempus.
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-                  et Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Nulla et est facilisis, malesuada tellus sed, tempor justo.
-                  Donec nec enim mauris. Duis auctor arcu et neque malesuada
-                  tristique. Sed ac sem nec metus ultrices tincidunt. Aenean id
-                  nisl eget odio sollicitudin viverra. Cras quis tellus vel
-                  ligula euismod dapibus. Integer eu rutrum eros est facilisis,
-                  malesuada tellus sed, tempor justo. Donec nec enim mauris.
-                  Duis auctor arcu et neque malesuada tristique. Sed ac sem nec
-                  metus ultrices tincidunt. Aenean id nisl eget odio
-                  sollicitudin viverra. Cras quis tellus vel ligula euismod
-                  dapibus. Integer eu rutrum eros. Sed efficitur nulla id justo
-                  aliquet tempus.
-                </p>
-              </div>
-              <div className="d-flex justify-content-center mb-4">
-                <button
-                  className={`${
-                    currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                  } px-3 py-1`}
-                  onClick={() => {
-                    props.setShowModal(2);
-                  }}
-                >
-                  Approve
-                </button>
-              </div>
-            </div>
-          )}
-          {/* End Terms of Use */}
 
-          {/* Sign In  */}
-          {props.ShowModal === 4 && (
-            <div className="">
-              <div className="m-2">
-                <div className="d-flex justify-content-center">
-                  <span>LOGIN</span>
-                  <span>
-                    <RxCross2
-                      onClick={props.onHide}
-                      fontSize={"1.8rem"}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "closeBtn-dark"
-                          : "closeBtn-light"
-                      }`}
-                    />
-                  </span>
-                </div>
-                <div className="">
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="phone">Phone</label>
-                    <div className="input-group">
-                      <span
-                        className={`input-group-text ${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        }`}
-                        id="basic-addon1"
-                        style={{ padding: ".375rem 0 .375rem .5rem" }}
-                      >
-                        +90
-                      </span>
-                      <input
-                        onChange={(e) => setuserPhone(e.target.value)}
-                        id="phone"
-                        type="text"
-                        className={`${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        } form-control`}
-                        aria-label="Username"
-                        aria-describedby="basic-addon1"
-                      />
-                    </div>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <div className="d-flex justify-content-between">
-                      <label htmlFor="password">Password</label>
-                      <span
-                        onClick={() => {
-                          props.setShowModal(5);
-                        }}
-                      >
-                        Forgot Password?
-                      </span>
-                    </div>
-                    <input
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="password"
-                      name=""
-                      id="password"
-                    />
-                  </div>
-                </div>
-                <div className="d-flex flex-column align-items-center my-3">
-                  <button
-                    onClick={() => {
-                      localStorage.setItem("userPhone", userPhone);
-                      props.onHide();
-                      window.location.reload();
-                    }}
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
-                  >
-                    Continue
-                  </button>
-                  <div className="text-center my-3">
-                    --------------------- or ---------------------{" "}
-                  </div>
-                  <div className="">
-                    <img className="mx-3" src={google} alt="" height={50} />
-                    <img className="mx-3" src={facebook} alt="" height={50} />
-                  </div>
-                  <div className="mt-3">
-                    You don't have Account?{" "}
-                    <span
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}
-                      onClick={() => {
-                        props.setShowModal(1);
-                      }}
-                    >
-                      Sign Up
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {ShowModal === 3 && (
+            <TermsOfUse hide={props.onHide} showModal={props.setShowModal} />
           )}
-          {/* End Sign In */}
 
-          {/* Forgot Password */}
-          {props.ShowModal === 5 && (
-            <div>
-              <div className="m-3 mt-4">
-                <div className="d-flex justify-content-center">
-                  <span>
-                    <RxCross2
-                      onClick={props.onHide}
-                      fontSize={"1.8rem"}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "closeBtn-dark"
-                          : "closeBtn-light"
-                      }`}
-                    />
-                  </span>
-                </div>
-                <div className="">
-                  We will send an SMS verification code to your phone.
-                </div>
-                <div className="">
-                  <div className="d-flex flex-column my-2">
-                    <label htmlFor="phone">Phone</label>
-                    <div className="input-group">
-                      <span
-                        className={`input-group-text ${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        }`}
-                        id="basic-addon1"
-                        style={{ padding: ".375rem 0 .375rem .5rem" }}
-                      >
-                        +90
-                      </span>
-                      <input
-                        id="phone"
-                        type="text"
-                        className={`${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        } form-control`}
-                        aria-label="Username"
-                        aria-describedby="basic-addon1"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex flex-column align-items-center my-4">
-                  <button
-                    onClick={() => {
-                      props.setShowModal(6);
-                    }}
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-4 py-1`}
-                  >
-                    Send
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* End Forgot Password */}
+          {ShowModal === 4 && <SignInModal hide={props.onHide} />}
 
-          {/* OTP */}
-          {props.ShowModal === 6 && (
-            <div className="">
-              <div className="m-3 mt-4">
-                <div className="d-flex justify-content-center">
-                  <span>
-                    <RxCross2
-                      onClick={()=>{props.onHide();}}
-                      fontSize={"1.8rem"}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "closeBtn-dark"
-                          : "closeBtn-light"
-                      }`}
-                    />
-                  </span>
-                </div>
-                <div className="">
-                  We sent a SMS verification code to your phone.
-                </div>
-                <div className="my-1">
-                  <div className="d-flex justify-content-between">
-                    <span>Enter 6 digit code</span>
-                    {/* <span
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}
-                    >
-                      1:45
-                    </span> */}
-                    {seconds > 0 && (
-                      <span
-                        style={{
-                          color:
-                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                        }}
-                      >
-                        {minutes < 10 ? `0${minutes}` : minutes}:
-                        {seconds < 10 ? `0${seconds}` : seconds}
-                      </span>
-                    )}
-                  </div>
-                  <div className="w-100 d-flex justify-content-center">
-                    <OtpInput
-                      inputStyle={`${
-                        currentTheme === "dark"
-                          ? "otpinputdesign-dark-mode"
-                          : "otpinputdesign-light-mode"
-                      } `}
-                      value={otp}
-                      onChange={setOtp}
-                      numInputs={6}
-                      renderSeparator={<span> </span>}
-                      renderInput={(props) => <input {...props} />}
-                      containerStyle={"otpbox my-2"}
-                    />
-                  </div>
-                  <div className="text-end">
-                    <small>Didn't get the code? </small>
-                    <span
-                    onClick={()=>{setSeconds(30);handleResendOtp()}}
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}
-                    >
-                      Send Again
-                    </span>
-                  </div>
-                  <small className="text-danger" style={{ fontSize: "0.71rem" }}>{setOtpError}</small>
-                </div>
-                <div className="d-flex flex-column align-items-center my-4">
-                  <button
-                    onClick={() => {
-                      handleOTPVerification()
-                      // props.setShowModal(7);
-                    }}
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
-                  >
-                    Continue
-                  </button>
-                </div>
-              </div>
-            </div>
+          {ShowModal === 5 && (
+            <ForgotPassword
+              setForgotPsPhone={setForgotPsPhone}
+              hide={props.onHide}
+            />
           )}
-          {/* End OTP */}
 
-          {/* Password Reset */}
-          {props.ShowModal === 7 && (
-            <div className="">
-              <div className="m-3 mt-4">
-                <div className="d-flex justify-content-center">
-                  <span>
-                    <RxCross2
-                      onClick={props.onHide}
-                      fontSize={"1.8rem"}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "closeBtn-dark"
-                          : "closeBtn-light"
-                      }`}
-                    />
-                  </span>
-                </div>
-                <div className="">You can create your new password</div>
-                <div className="">
-                  <div className="d-flex flex-column my-2">
-                    <label htmlFor="Password">New Password</label>
-                    <input
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type={showPassword ? "text" : "password"}
-                      name=""
-                      id="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    {showPassword ? (
-                      <AiOutlineEyeInvisible
-                        fontSize={"1.5rem"}
-                        style={{
-                          position: "absolute",
-                          right: "2.5rem",
-                          top: "6.4rem",
-                        }}
-                        onClick={togglePasswordVisibility}
-                      />
-                    ) : (
-                      <AiOutlineEye
-                        fontSize={"1.5rem"}
-                        style={{
-                          position: "absolute",
-                          right: "2.5rem",
-                          top: "6.4rem",
-                        }}
-                        onClick={togglePasswordVisibility}
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className="d-flex flex-column align-items-center my-4">
-                  <button
-                    onClick={() => {
-                      props.onHide();
-                    }}
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
-                  >
-                    Create
-                  </button>
-                </div>
-              </div>
-            </div>
+          {ShowModal === 6 && (
+            <OTPModal hide={props.onHide} forgotPsPhone={forgotPsPhone} />
           )}
-          {/* End Password Reset */}
+
+          {ShowModal === 7 && (
+            <PasswordReset hide={props.onHide} forgotPsPhone={forgotPsPhone} />
+          )}
         </Modal.Body>
       </Modal>
     </>
