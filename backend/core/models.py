@@ -31,8 +31,8 @@ EDITOR_STATUS = (
 
 class User(AbstractBaseUser):
     name = models.CharField(max_length=150)
-    username = models.CharField(max_length=150, null=True, blank=True)
-    phone = models.CharField(max_length=15)
+    username = models.CharField(max_length=150)
+    phone = models.CharField(max_length=15,unique=True)
     password = models.CharField(max_length=255)
     country = models.CharField(max_length=50, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
