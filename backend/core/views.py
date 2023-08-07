@@ -593,10 +593,10 @@ class ProfileView(APIView):
         try:
             user = User.objects.get(id=id)
         except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
         if 'file' not in request.data:
-            return Response({'error': 'No file found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
 
         profile_pic = request.data['file']
 
@@ -604,7 +604,7 @@ class ProfileView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
         
 
 class FavEditorsCreateView(APIView):
@@ -701,7 +701,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
             # serializer1 = CommentsSerializer(fav_comment_list, many=True)
             data_list['fav-comments'] = details
         except Exception as e:
-            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'Error retrieving favorite comments, {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data=data_list, status=status.HTTP_200_OK)
         
@@ -857,9 +857,12 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     #     subscription.append(obj.commentator_user)
                     serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
-                   
-            return Response(data=data_list, status=status.HTTP_200_OK) 
-             
+                    serializer = SubscriptionSerializer(my_subscription, many=True)
+                    return Response({'data' : serializer.data})
+                    
+
+            return Response(data=data_list, status=status.HTTP_200_OK)
+
         except ObjectDoesNotExist as e:
             error_message = {"error": "Object does not exist."}
             return Response(data=error_message, status=status.HTTP_404_NOT_FOUND)

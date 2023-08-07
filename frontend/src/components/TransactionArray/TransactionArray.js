@@ -70,15 +70,16 @@ const TransactionArray = (props) => {
       total: "485.00₺",
     },
   ];
-    // // Subscription API
-    // const [transactionsData, setTransactionsData] = useState([]);
-    // useEffect(() => {
-    //   async function getSubscriptions(){
-    //     const res = await axios.get(`http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`)
-    //     console.log("resL ",res.data);
-    //   }
-    //   getSubscriptions();
-    // }, [])
+    // Subscription API
+    const [transactionsData, setTransactionsData] = useState([]);
+    useEffect(() => {
+      async function getSubscriptions(){
+        const res = await axios.get(`http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`)
+        console.log("resL ",res.data);
+        // setTransactionsData(res.data.subscription)
+      }
+      getSubscriptions();
+    }, [])
   return (
     <>
       {props.user !== "standard user" &&
