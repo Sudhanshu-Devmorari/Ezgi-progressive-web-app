@@ -3,7 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 
 const TermsOfUse = (props) => {
-  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const { currentTheme, setCurrentTheme, ShowModal, setShowModal } = useContext(CurrentTheme);
   return (
     <>
       <div
@@ -20,7 +20,7 @@ const TermsOfUse = (props) => {
           <span>
             <i
               onClick={() => {
-                props.showModal(2);
+                setShowModal(2);
               }}
               className="fa-solid fa-arrow-left-long"
               style={{
@@ -88,7 +88,7 @@ const TermsOfUse = (props) => {
               currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
             } px-3 py-1`}
             onClick={() => {
-              props.showModal(2);
+              setShowModal(2);
             }}
           >
             Approve

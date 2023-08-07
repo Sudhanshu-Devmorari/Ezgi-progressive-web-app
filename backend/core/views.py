@@ -32,11 +32,66 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              HighlightSettingSerializer)
 
 
-# Create your views here.
-class RetrieveCommentatorView(APIView):
-    """
-    for Home page:
-    """
+class OtpVerify(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            otp = request.data.get('otp')
+            print('otp: ', otp)
+            verification_result = totp.verify(otp)
+            print('verification_result: ', verification_result)
+
+            if verification_result:
+                return Response(data={'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
+            else:
+                return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class OtpReSend(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        phone = request.data['phone']
+        try:
+            user = User.objects.get(phone=phone)
+            otp = totp.now()
+            print('otp: ', otp)
+            # res = sms_send(phone, otp)  
+            res = "Success"
+            if res == 'Success':
+                return Response(data={'success': 'Otp successfully sent.','status' : status.HTTP_200_OK})
+            else:
+                return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+        except User.DoesNotExist:
+            return Response({
+                'data':"User Doesn't exists.",
+                'status' : status.HTTP_404_NOT_FOUND
+            })
+
+class LoginView(APIView):
+    def post(self, request, format=None):
+        phone = request.data['phone']
+        password = request.data['password']
+        try:
+            user_phone = User.objects.get(phone=phone)
+            if user_phone.password == password:
+                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
+            else:
+                return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
+        except User.DoesNotExist:
+            return Response({
+                'data':"User Doesn't exists!",
+                'status' : status.HTTP_404_NOT_FOUND
+            })
+
+class PasswordResetView(APIView):
+    def post(self, request, format=None):   
+        phone = request.data['phone']
+        new_ps = request.data['new_ps']
+        user = User.objects.get(phone=phone)
+        user.password = new_ps
+        user.save()
+        return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
+
+class RetrieveCommentatorView(APIView): # for Home page:
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         unique_comment_ids = set()
@@ -408,11 +463,9 @@ class SubscriptionView(APIView):
 #         data = serializer.data
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
-        # user = request.user
-        user = User.objects.get(id = 2)
+    def get(self, request, id=5, format=None, *args, **kwargs):
         try:
-            notification_obj = Notification.objects.filter(receiver=user, status=False)
+            notification_obj = Notification.objects.filter(user=id, status=False)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -483,28 +536,27 @@ class CommentReactionView(APIView):
 
         return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
         
-
-class ProfileView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+class ProfileView(APIView): 
+    def get(self, request, id ,format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=request.user.id)
+            user_obj = User.objects.get(id=id)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if request.user.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=request.user).count()
+            if user_obj.user_role == 'commentator':
+                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=request.user).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=request.user).count()
+                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
                 data['Comment_Count'] = comment_obj
             else:
-                subscription_obj = Subscription.objects.filter(standard_user=request.user).count()
+                subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
                 data['Subscription_Count'] = subscription_obj
 
-                following_obj = FollowCommentator.objects.filter(standard_user=request.user).count()
+                following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
                 data['Follow_Up_Count'] = following_obj
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -517,14 +569,14 @@ class ProfileView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
+            user = User.objects.get(id=id)
         except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
         if 'file' not in request.data:
-            return Response({'error': 'No file found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
 
         profile_pic = request.data['file']
 
@@ -532,7 +584,7 @@ class ProfileView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
         
 
 class FavEditorsCreateView(APIView):
@@ -568,13 +620,13 @@ class FavEditorsCreateView(APIView):
         
 
 class RetrieveFavEditorsAndFavComment(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         data_list = {}
         fav_editor_list = []
         fav_comment_list = []
 
         # user = request.user
-        user = User.objects.get(id=6)
+        user = User.objects.get(id=id)
 
         try:
             editor = []
@@ -629,16 +681,15 @@ class RetrieveFavEditorsAndFavComment(APIView):
             # serializer1 = CommentsSerializer(fav_comment_list, many=True)
             data_list['fav-comments'] = details
         except Exception as e:
-            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'Error retrieving favorite comments, {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data=data_list, status=status.HTTP_200_OK)
         
 class SupportView(APIView):
     # for retrieve login user all tickets:
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            user = User.objects.get(id=id)
 
             support_obj = TicketSupport.objects.filter(user=user)
             serializer = TicketSupportSerializer(support_obj, many=True)
@@ -648,17 +699,18 @@ class SupportView(APIView):
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # for create new ticket:
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
+            print(request.data)
             if request.data:
                 if 'department' not in request.data:
-                        return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Department not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'subject' not in request.data:
-                        return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Subject not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'message' not in request.data:
-                        return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                user = request.user
-                # user = User.objects.get(id=1)
+                        return Response({'error': 'Message not found.', 'status' : status.HTTP_400_BAD_REQUEST})
+                # user = request.user
+                user = User.objects.get(id=id)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 
@@ -757,9 +809,9 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
-        user = User.objects.get(id=4)
+        user = User.objects.get(id=id)
         data_list = {}
         subscribers = []
         subscription = []
@@ -786,6 +838,9 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     #     subscription.append(obj.commentator_user)
                     serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
+                    serializer = SubscriptionSerializer(my_subscription, many=True)
+                    return Response({'data' : serializer.data})
+                    
 
             return Response(data=data_list, status=status.HTTP_200_OK)
 

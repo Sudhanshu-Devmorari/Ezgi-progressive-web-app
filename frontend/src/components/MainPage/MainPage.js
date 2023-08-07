@@ -38,9 +38,7 @@ const MainPage = () => {
     }
   }, [themeMode]);
 
-  // const user = "c-";
-  const user = localStorage.getItem("userPhone");
-  console.log("selectContent: ", selectContent);
+  const user = localStorage.getItem("user-role");
 
   return (
     <>
@@ -49,7 +47,6 @@ const MainPage = () => {
       </div>
       <div className="container-fluid mt-3 mobile-view">
         <div
-          // className={`container-fluid mt-3 mobile-view`}
           style={{ marginBottom: "66px" }}
         >
           <NavBar
@@ -58,7 +55,7 @@ const MainPage = () => {
           />
 
           {dashboardSUser ? (
-            user === "c" ? (
+            user !== "standard" ? (
               <CommentatorsCommentsPage
                 user={user}
                 setSelectContent={setSelectContent}

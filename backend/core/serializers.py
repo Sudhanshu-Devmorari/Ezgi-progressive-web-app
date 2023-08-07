@@ -33,9 +33,14 @@ class CommentsSerializer(serializers.ModelSerializer):
 class SubscriptionSerializer(serializers.ModelSerializer):
     commentator_user=UserSerializer()
     standard_user = UserSerializer()
+    start_date = serializers.SerializerMethodField()
     class Meta:
         model = Subscription
         fields = '__all__'
+    def get_created(self, obj):
+        formatted_date = obj.start_date.strftime("%d.%m.%Y")
+        formatted_time = obj.start_date.strftime("%H:%M")
+        return f"{formatted_date} - {formatted_time}"
 
 class NotificationSerializer(serializers.ModelSerializer):
     sender=UserSerializer()
@@ -60,9 +65,15 @@ class FavEditorsSerializer(serializers.ModelSerializer):
 
 class TicketSupportSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    created = serializers.SerializerMethodField()
     class Meta:
         model = TicketSupport
         fields = '__all__'
+
+    def get_created(self, obj):
+        formatted_date = obj.created.strftime("%d.%m.%Y")
+        formatted_time = obj.created.strftime("%H:%M")
+        return f"{formatted_date} - {formatted_time}"
 
 
 class ResponseTicketSerializer(serializers.ModelSerializer):
