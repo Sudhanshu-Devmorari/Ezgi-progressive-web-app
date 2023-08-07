@@ -92,11 +92,10 @@ class LoginView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
         password = request.data['password']
-        print('password: ', password)
         try:
             user_phone = User.objects.get(phone=phone)
             if user_phone.password == password:
-                return Response({'data' : "Login successfull!", 'status' : status.HTTP_200_OK})
+                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
         except User.DoesNotExist:
@@ -382,9 +381,9 @@ class SubscriptionView(APIView):
 #         data = serializer.data
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id=5, format=None, *args, **kwargs):
         try:
-            notification_obj = Notification.objects.filter(user=request.user, status=False)
+            notification_obj = Notification.objects.filter(user=id, status=False)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -454,28 +453,27 @@ class CommentReactionView(APIView):
 
         return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
         
-
-class ProfileView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+class ProfileView(APIView): 
+    def get(self, request, id ,format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=request.user.id)
+            user_obj = User.objects.get(id=id)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if request.user.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=request.user).count()
+            if user_obj.user_role == 'commentator':
+                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=request.user).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=request.user).count()
+                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
                 data['Comment_Count'] = comment_obj
             else:
-                subscription_obj = Subscription.objects.filter(standard_user=request.user).count()
+                subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
                 data['Subscription_Count'] = subscription_obj
 
-                following_obj = FollowCommentator.objects.filter(standard_user=request.user).count()
+                following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
                 data['Follow_Up_Count'] = following_obj
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -488,14 +486,14 @@ class ProfileView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
+            user = User.objects.get(id=id)
         except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
         if 'file' not in request.data:
-            return Response({'error': 'No file found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
 
         profile_pic = request.data['file']
 
@@ -503,7 +501,7 @@ class ProfileView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
         
 
 class FavEditorsCreateView(APIView):
@@ -530,13 +528,13 @@ class FavEditorsCreateView(APIView):
         
 
 class RetrieveFavEditorsAndFavComment(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         data_list = {}
         fav_editor_list = []
         fav_comment_list = []
 
-        user = request.user
-        # user = User.objects.get(id=6)
+        # user = request.user
+        user = User.objects.get(id=id)
 
         try:
             editor_obj = FavEditors.objects.filter(standard_user=user)
@@ -554,16 +552,15 @@ class RetrieveFavEditorsAndFavComment(APIView):
             serializer1 = CommentsSerializer(fav_comment_list, many=True)
             data_list['fav-comments'] = serializer1.data
         except Exception as e:
-            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'Error retrieving favorite comments, {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data=data_list, status=status.HTTP_200_OK)
         
 class SupportView(APIView):
     # for retrieve login user all tickets:
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            user = User.objects.get(id=id)
 
             support_obj = TicketSupport.objects.filter(user=user)
             serializer = TicketSupportSerializer(support_obj, many=True)
@@ -573,17 +570,18 @@ class SupportView(APIView):
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # for create new ticket:
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
+            print(request.data)
             if request.data:
                 if 'department' not in request.data:
-                        return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Department not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'subject' not in request.data:
-                        return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Subject not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'message' not in request.data:
-                        return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                user = request.user
-                # user = User.objects.get(id=1)
+                        return Response({'error': 'Message not found.', 'status' : status.HTTP_400_BAD_REQUEST})
+                # user = request.user
+                user = User.objects.get(id=id)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 
@@ -682,9 +680,9 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
-        user = User.objects.get(id=4)
+        user = User.objects.get(id=id)
         data_list = {}
         subscribers = []
         subscription = []
@@ -693,24 +691,27 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
             if user.user_role == 'commentator':
                 if Subscription.objects.filter(commentator_user=user).exists():
                     my_subscribers = Subscription.objects.filter(commentator_user=user)
-                    for obj in my_subscribers:
-                        subscribers.append(obj.standard_user)
-                    serializer = UserSerializer(subscribers, many=True)
+                    # for obj in my_subscribers:
+                    #     subscribers.append(obj.standard_user)
+                    serializer = SubscriptionSerializer(my_subscribers, many=True)
                     data_list['subscribers'] = serializer.data
 
                 if Subscription.objects.filter(standard_user=user).exists():
                     my_subscription = Subscription.objects.filter(standard_user=user)
-                    for obj in my_subscription:
-                        subscription.append(obj.commentator_user)
-                    serializer1 = UserSerializer(subscription, many=True)
+                    # for obj in my_subscription:
+                    #     subscription.append(obj.commentator_user)
+                    serializer1 = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer1.data
             else:
                 if Subscription.objects.filter(standard_user=user).exists():
                     my_subscription = Subscription.objects.filter(standard_user=user)
-                    for obj in my_subscription:
-                        subscription.append(obj.commentator_user)
-                    serializer = UserSerializer(subscription, many=True)
+                    # for obj in my_subscription:
+                    #     subscription.append(obj.commentator_user)
+                    serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
+                    serializer = SubscriptionSerializer(my_subscription, many=True)
+                    return Response({'data' : serializer.data})
+                    
 
             return Response(data=data_list, status=status.HTTP_200_OK)
 

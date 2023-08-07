@@ -31,7 +31,8 @@ const SignInModal = (props) => {
       });
       console.log("response login: ", res.data);
       if (res.data.status === 200) {
-        localStorage.setItem("userPhone", phone);
+        localStorage.setItem("user-role", res.data.userRole);
+        localStorage.setItem("user-id", res.data.userId);
         window.location.reload();
       } else if (res.data.status === 400) {
         setpasswordError(res.data.data);

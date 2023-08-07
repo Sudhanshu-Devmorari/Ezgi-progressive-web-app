@@ -29,7 +29,7 @@ const NavBar = (props) => {
       setCurrentTheme("light");
     }
   };
-  const userPhone = localStorage.getItem("userPhone");
+  const userPhone = localStorage.getItem("user-role");
 
   return (
     <>
