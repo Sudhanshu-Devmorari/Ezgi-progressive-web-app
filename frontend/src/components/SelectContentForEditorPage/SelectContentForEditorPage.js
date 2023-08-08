@@ -12,6 +12,20 @@ import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
 const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
+  const filterData = (e) => {
+    if(props.editor == true){
+      props.setFilterData(null)
+      const val = e.target.value
+      const filteredArray = props.data.filter((obj) =>
+        obj?.value?.user?.username?.toLowerCase().startsWith(val.toLowerCase())
+      );
+      props.setDisplayData(filteredArray);
+    }
+    else{
+      // console.log("=======>>>>>>", props.comments)
+      // props.setFilterData(null)
+    }
+  };
   return (
     <>
       <div
@@ -34,6 +48,8 @@ const SelectContentForEditorPage = (props) => {
             ></i>
           </span>
           <input
+            onChange={filterData}
+            // onClick={props.setFilterData(null)}
             type="text"
             className={` ${
               currentTheme === "dark" ? "input-field-dark" : "input-field-light"
@@ -67,7 +83,7 @@ const SelectContentForEditorPage = (props) => {
               width={32}
             />
             <span className="pe-1">Only Public</span>
-            <div>
+            <div onClick={()=>props.setOnlyPublic('Only public')}>
               <img
                 src={currentTheme === "dark" ? darkGrp : lighGrp}
                 alt=""
@@ -75,12 +91,13 @@ const SelectContentForEditorPage = (props) => {
                 width={28}
               />
             </div>
+            
           </div>
         )}
       </div>
 
       {props?.editor && (
-        <EditorFilter show={modalShow} onHide={() => setModalShow(false)} />
+        <EditorFilter show={modalShow} onHide={() => setModalShow(false)} setFilterData={props.setFilterData}/>
       ) }
       {props?.comments && (
         <CommentsPageModal show={modalShow} onHide={() => setModalShow(false)} />
