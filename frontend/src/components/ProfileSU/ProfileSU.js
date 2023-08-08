@@ -24,15 +24,14 @@ const ProfileSU = (props) => {
 
   // UPDATE PROFILE PIC
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
-  function handleChangeProfilePic (e){
+  function handleChangeProfilePic(e) {
     setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-    setEditProfile(false)
+    setEditProfile(false);
     const formData = new FormData();
-    formData.append("file", e.target.files[0] )
+    formData.append("file", e.target.files[0]);
     const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-    console.log("res: ",res);
-  };
-
+    console.log("res: ", res);
+  }
 
 
 

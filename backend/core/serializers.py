@@ -73,7 +73,7 @@ class CommentReactionSerializer(serializers.ModelSerializer):
 
 
 class FavEditorsSerializer(serializers.ModelSerializer):
-    commentator_user=UserSerializer()
+    commentator_user = UserSerializer()
     class Meta:
         model = FavEditors
         fields = '__all__'

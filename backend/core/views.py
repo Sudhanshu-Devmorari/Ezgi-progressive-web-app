@@ -484,7 +484,9 @@ class NotificationView(APIView):
         # user = request.user
         user = User.objects.get(id = 2)
         try:
-            notification_obj = Notification.objects.filter(receiver=user, status=False)
+            ten_days_ago = timezone.now() - timedelta(days=10)
+            notification_obj = Notification.objects.filter(user=id, status=False)
+            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -653,8 +655,10 @@ class RetrieveFavEditorsAndFavComment(APIView):
             editor_obj = FavEditors.objects.filter(standard_user=user)
             for obj in editor_obj:
                 details = {}
+                print("********** ", obj.commentator_user.username)
 
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
+                print("********** ", count)
 
                 serializer = FavEditorsSerializer(obj)
                 data = serializer.data
@@ -665,9 +669,11 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
 
             # serializer = UserSerializer(fav_editor_list, many=True)
-            data_list['fav-editors'] = editor
+            data_list['favEditors'] = editor
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        print("========== ", data_list)
 
         try:
             comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
@@ -699,12 +705,12 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
 
             # serializer1 = CommentsSerializer(fav_comment_list, many=True)
-            data_list['fav-comments'] = details
+            data_list['favComments'] = details
         except Exception as e:
-            return Response(data={'error': f'Error retrieving favorite comments, {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=data_list, status=status.HTTP_200_OK)
-        
+        return Response(data=data_list, status=status.HTTP_200_OK)       
+
 class SupportView(APIView):
     # for retrieve login user all tickets:
     def get(self, request, id, format=None, *args, **kwargs):
@@ -857,12 +863,9 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     #     subscription.append(obj.commentator_user)
                     serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
-                    serializer = SubscriptionSerializer(my_subscription, many=True)
-                    return Response({'data' : serializer.data})
-                    
-
-            return Response(data=data_list, status=status.HTTP_200_OK)
-
+                   
+            return Response(data=data_list, status=status.HTTP_200_OK) 
+             
         except ObjectDoesNotExist as e:
             error_message = {"error": "Object does not exist."}
             return Response(data=error_message, status=status.HTTP_404_NOT_FOUND)
