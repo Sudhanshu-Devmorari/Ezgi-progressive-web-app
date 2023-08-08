@@ -40,7 +40,7 @@ const Support = () => {
       setTicketsData(res.data);
     }
     getTicketsData();
-  }, []);
+  }, [showModal]);
 
   // Ticket View
   const [ticketId, setticketId] = useState('');

@@ -12,14 +12,6 @@ const ProfileSU = (props) => {
 
   const [editProfile, setEditProfile] = useState(false);
 
-  const cameraImageStyles = {
-    display: editProfile ? "block" : "none",
-    position: "absolute",
-    backgroundColor: "#",
-    top: "4.4rem",
-    left: "2.3rem",
-  };
-
   // PROFILE API
   const [progileData, setProgileData] = useState();
   useEffect(() => {
@@ -32,15 +24,14 @@ const ProfileSU = (props) => {
 
   // UPDATE PROFILE PIC
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
-  function handleChangeProfilePic (e){
+  function handleChangeProfilePic(e) {
     setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-    setEditProfile(false)
+    setEditProfile(false);
     const formData = new FormData();
-    formData.append("file", e.target.files[0] )
+    formData.append("file", e.target.files[0]);
     const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-    console.log("res: ",res);
-  };
-
+    console.log("res: ", res);
+  }
 
   return (
     <>
@@ -87,7 +78,13 @@ const ProfileSU = (props) => {
                   <img
                     src={camera}
                     alt=""
-                    style={cameraImageStyles}
+                    style={{
+                      display: editProfile ? "block" : "none",
+                      position: "absolute",
+                      backgroundColor: "#",
+                      top: "4.4rem",
+                      left: "2.3rem",
+                    }}
                     height={40}
                     width={40}
                   />

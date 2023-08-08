@@ -57,7 +57,6 @@ const MainPage = () => {
           {dashboardSUser ? (
             user !== "standard" ? (
               <CommentatorsCommentsPage
-                user={user}
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}

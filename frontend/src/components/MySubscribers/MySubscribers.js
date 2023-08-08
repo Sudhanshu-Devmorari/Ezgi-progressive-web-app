@@ -31,11 +31,15 @@ const MySubscribers = (props) => {
   const [subscriptiosData, setSubscriptiosData] = useState([]);
   useEffect(() => {
     async function getSubscriptions() {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`
-      );
-      console.log("res", res.data.data);
-      setSubscriptiosData(res.data.data);
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`
+        );
+        console.log("res", res.data.data);
+        setSubscriptiosData(res.data.data);
+      } catch (error) {
+        console.log(error);
+      }
     }
     getSubscriptions();
   }, []);
@@ -219,14 +223,18 @@ const MySubscribers = (props) => {
                     style={{
                       color:
                         currentTheme === "dark"
-                          ? sub.commentator_user.commentator_status === "pending"
+                          ? sub.commentator_user.commentator_status ===
+                            "pending"
                             ? "#FFCC00"
-                            : sub.commentator_user.commentator_status === "active"
+                            : sub.commentator_user.commentator_status ===
+                              "active"
                             ? "#37FF80"
-                            : sub.commentator_user.commentator_status === "renew"
+                            : sub.commentator_user.commentator_status ===
+                              "renew"
                             ? "#4DD5FF"
                             : ""
-                          : sub.commentator_user.commentator_status === "pending"
+                          : sub.commentator_user.commentator_status ===
+                            "pending"
                           ? "#FFCC00"
                           : sub.commentator_user.commentator_status === "renew"
                           ? "#00659D"

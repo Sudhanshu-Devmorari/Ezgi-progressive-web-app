@@ -11,16 +11,9 @@ import football from "../../assets/Profile Card Football.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
-
-const subscription = [
-  {month : "1 Month", per : "", rupee : "69.00₺"},
-  {month : "3 Month", per : "%20 Save!", rupee : "179.90₺"},
-  {month : "6 Month", per : "%30 Save!", rupee : "329.90₺"},
-  {month : "1 Year", per : "%40 Save!", rupee : "329.90₺"},
-]
+import PlanSelection from "../PlanSelection/PlanSelection";
 
 const SubscribeModal = (props) => {
-  
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
@@ -32,6 +25,8 @@ const SubscribeModal = (props) => {
         aria-labelledby="contained-modal-title-vcenter"
         centered
         scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
           className={`${currentTheme === "dark" ? "dark-mode" : "light-mode"}`}
@@ -173,16 +168,24 @@ const SubscribeModal = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="my-2" style={{fontSize: "14px"}}>
+              {/* <div className="my-2" style={{ fontSize: "14px" }}>
                 <div className="my-2">Subscription Plans</div>
                 <div className="d-flex mb-2">
-                  <div
-                    className={`${
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
                       currentTheme === "dark"
-                        ? "BlankCircle-dark-mode"
-                        : "BlankCircle-light-mode"
-                    } me-2`}
-                  ></div>
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -191,40 +194,25 @@ const SubscribeModal = (props) => {
                     }}
                   >
                     <span>1 Month</span>
-                    <span style={{ fontSize: "1.1rem" }}>
-                      69.90₺
-                    </span>
+                    <span style={{ fontSize: "1.1rem" }}>69.90₺</span>
                   </div>
                 </div>
                 <div className="d-flex mb-2">
-                  <div
-                    className={`${
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
                       currentTheme === "dark"
-                        ? "BlankCircle-dark-mode"
-                        : "BlankCircle-light-mode"
-                    } me-2`}
-                  ></div>
-                  <div
-                    className="d-flex justify-content-between w-100 px-2 py-1"
-                    style={{
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    }}
-                  >
-                    <span>6 Month</span>
-                    <span style={{ fontSize: "1rem" }}>
-                      69.90₺
-                    </span>
-                  </div>
-                </div>
-                <div className="d-flex mb-2">
-                  <div
-                    className={`${
-                      currentTheme === "dark"
-                        ? "FilledCircle-dark-mode"
-                        : "FilledCircle-light-mode"
-                    } me-2`}
-                  ></div>
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
                   <div
                     className="d-flex justify-content-between w-100 px-2 py-1"
                     style={{
@@ -234,20 +222,83 @@ const SubscribeModal = (props) => {
                   >
                     <span>3 Month</span>
                     <span style={{ fontSize: "1rem" }}>
-                      <span className="pe-2" style={{ color: "#7BFFAB" }}>
+                      <span className="pe-2" style={{ color: "#47FF8A" }}>
                         %20 Save!
                       </span>
-                      69.00₺
+                      179.90₺
                     </span>
                   </div>
                 </div>
-              </div>
+                <div className="d-flex mb-2">
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
+                      currentTheme === "dark"
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
+                  <div
+                    className="d-flex justify-content-between w-100 px-2 py-1"
+                    style={{
+                      backgroundColor:
+                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                    }}
+                  >
+                    <span>6 Month</span>
+                    <span style={{ fontSize: "1rem" }}>
+                      <span className="pe-2" style={{ color: "#7BFFAB" }}>
+                        %30 Save!
+                      </span>
+                      329.90₺
+                    </span>
+                  </div>
+                </div>
+                <div className="d-flex mb-2">
+                  <img
+                    onClick={() => setplanSelected(!planSelected)}
+                    src={
+                      currentTheme === "dark"
+                        ? planSelected
+                          ? darkradioSelected
+                          : darkradio
+                        : planSelected
+                        ? lightradioSelected
+                        : lightradio
+                    }
+                    alt=""
+                    height={28}
+                    width={28}
+                  />
+                  <div
+                    className="d-flex justify-content-between w-100 px-2 py-1"
+                    style={{
+                      backgroundColor:
+                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                    }}
+                  >
+                    <span>1 Year</span>
+                    <span style={{ fontSize: "1rem" }}>
+                      <span className="pe-2" style={{ color: "#47FF8A" }}>
+                        %40 Save!
+                      </span>
+                      609.90₺
+                    </span>
+                  </div>
+                </div>
+              </div> */}
+              <PlanSelection/>
               <div className="">
                 <div className="text-center my-2">
                   <div>Total Amount</div>
-                  <div style={{ fontSize: "19px" }}>
-                    329.90₺
-                  </div>
+                  <div style={{ fontSize: "19px" }}>329.90₺</div>
                 </div>
                 <div className="text-center">
                   <div className="my-3" style={{ fontSize: "13px" }}>
