@@ -21,7 +21,8 @@ import "react-circular-progressbar/dist/styles.css";
 
 const ContentSection = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const userPhone = localStorage.getItem("userPhone");
+  const userPhone = localStorage.getItem("user-id");
+  console.log("FavData", props?.FavData);
   return (
     <>
       <div

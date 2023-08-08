@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import bow_dark from "../../assets/target-arrow.3.png";
+import bow_dark from "../../assets/Comments Page.svg";
 import bow_Selected from "../../assets/Menu Icon (1).svg";
-import bow_light from "../../assets/Comments Page.svg";
+import bow_light from "../../assets/comment unselected.svg";
 import user_check_dark from "../../assets/Sub Header Subscribers Unselected.svg";
 import user_check_light from "../../assets/Sub Header Subscriber Unselected.svg";
 import user_check_selected from "../../assets/Sub Header Subscriber Selected.svg";
@@ -21,14 +21,15 @@ import lifebuoySelected from "../../assets/support selected.svg";
 
 const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const user = localStorage.getItem("user-role");
   return (
     <>
       <div
         className={`row my-2 g-0 gap-1 ${
-          props.user !== "commentator" && "mx-4"
+          user !== "commentator" && "mx-4"
         }`}
       >
-        {props.user === "commentator" && (
+        {user === "commentator" && (
           <>
             <div
               onClick={() => props.setContent("home")}
