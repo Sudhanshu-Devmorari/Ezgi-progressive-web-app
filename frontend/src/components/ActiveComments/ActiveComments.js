@@ -18,6 +18,7 @@ import editLight from "../../assets/edit.svg";
 import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 import axios from "axios";
 import { userId } from "../GetUser";
+import Form from "react-bootstrap/Form";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -26,6 +27,10 @@ const ActiveComments = (props) => {
   const [withdrawalModal, setWithdrawalModal] = useState(false);
   const [AddCommentModalModalShow, setAddCommentModalModalShow] =
     useState(false);
+
+  const [textareaValue, setTextareaValue] = useState(
+    "2012 yılından beri profesyonel olarak..."
+  );
 
   const [editProfile, setEditProfile] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -260,32 +265,28 @@ const ActiveComments = (props) => {
             </div>
           </div>
         </div>
-        {/* <div
-          className="p-1 my-2 content-font position-relative"
+        <div
+          className="my-2 p-1 content-font position-relative"
           style={{
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
             opacity: editProfile ? "0.3" : "",
           }}
         >
-          2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
-          lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için teşekkürler.
-          2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
-          lig konusunda uzmanım. Yorumlarımı takip ettiğiniz için teşekkürler.
-        </div> */}
-        <div className="my-2 p-1 content-font position-relative" style={{backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            opacity: editProfile ? "0.3" : "",}}>
-          <textarea
-          className="w-100 border-0"
-            style={{ height: "100px", backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6", color : currentTheme === "dark" ? "#" : "#F6F6F6"}}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-            eleifend vehicula tristique. Suspendisse vitae lectus sed massa
-            interdum consectetur. Pellentesque habitant morbi tristique senectus
-            et netus et malesuada fames ac turpis egestas. Integer auctor nisl
-            in lacus fringilla, et tincidunt ex laoreet.
-          </textarea>
+          <Form.Control
+            as="textarea"
+            maxLength={250}
+            className={`${
+              currentTheme === "dark"
+                ? "textArea-dark-mode content-font"
+                : "textArea-light-mode content-font"
+            }`}
+            value={textareaValue}
+            onChange={(e) => setTextareaValue(e.target.value)}
+            disabled={!editProfile}
+          />
         </div>
         <img
+          // onClick={() => setEditProfile(!editProfile)}
           src={currentTheme === "dark" ? edit : editLight}
           alt=""
           height={35}

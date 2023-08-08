@@ -208,10 +208,11 @@ class CommentView(APIView):
     #     return Response(serializer.errors)
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            user = User.objects.get(id=1)
+            # user = request.user
+            user = User.objects.get(id=id)
+            print('user: ', user)
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -250,19 +251,23 @@ class CommentView(APIView):
                     if comments_this_month_count >= 50:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
 
-
+                print("-----------")
                 category = request.data.get('category')
+                # category = request.data['category']
+                print('category: ', category)
                 country = request.data.get('country')
                 league = request.data.get('league')
                 date = request.data.get('date')
                 match_detail = request.data.get('match_detail')
                 prediction_type = request.data.get('prediction_type')
                 prediction = request.data.get('prediction')
+                print('prediction: ', prediction)
                 if user.commentator_level == 'apprentice':
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
                 comment = request.data.get('comment')
+                print('comment: ', comment)
 
                 if not category:
                     raise NotFound("Category not found.")
@@ -282,9 +287,10 @@ class CommentView(APIView):
                     raise NotFound("Public Content not found.")
                 if not comment:
                     raise NotFound("Comment not found.")
-
+                
+                print("===vbn==========")
                 comment_obj = Comments.objects.create(
-                    commentator_user=request.user,
+                    commentator_user=user,
                     category=category,
                     country=country,
                     league=league,
@@ -295,11 +301,12 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
+                print('comment_obj: ', comment_obj)
                 # send new Comment notification:
-                subscription_obj = Subscription.objects.filter(commentator_user=request.user)
+                subscription_obj = Subscription.objects.filter(commentator_user=user)
                 for obj in subscription_obj:
                     # user = obj.standard_user
-                    notification_obj = Notification.objects.create(user=obj.standard_user, status=False, context=f'{request.user.username} upload a new Comment.')
+                    notification_obj = Notification.objects.create(user=obj.standard_user, status=False, context=f'{user.username} upload a new Comment.')
 
                 serializer = CommentsSerializer(comment_obj)
                 data = serializer.data
