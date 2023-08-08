@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification,
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
-                          Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
-                          SubscriptionSetting, HighlightSetting)
-
+                          Highlight, Advertisement, CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting)
+from datetime import datetime
+from django.template.defaultfilters import timesince
+from django.utils import timezone
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,13 +43,26 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         formatted_time = obj.start_date.strftime("%H:%M")
         return f"{formatted_date} - {formatted_time}"
 
-class NotificationSerializer(serializers.ModelSerializer):
-    sender=UserSerializer()
+# class NotificationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Notification
+#         fields = '__all__'
 
+class NotificationSerializer(serializers.ModelSerializer):
+    time_since_created = serializers.SerializerMethodField()
+    def get_time_since_created(self, obj):
+        now = timezone.now()
+        time_difference = timesince(obj.created, now)
+
+        # Check if the notification was created within the same day
+        if "hour" in time_difference and "day" not in time_difference:
+            return time_difference.split(",")[0] + " ago"
+        else:
+            return time_difference + " ago"
     class Meta:
         model = Notification
         fields = '__all__'
-
+        extra_fields = ['time_since_created']
 
 class CommentReactionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,7 +71,7 @@ class CommentReactionSerializer(serializers.ModelSerializer):
 
 
 class FavEditorsSerializer(serializers.ModelSerializer):
-    commentator_user=UserSerializer()
+    commentator_user = UserSerializer()
     class Meta:
         model = FavEditors
         fields = '__all__'

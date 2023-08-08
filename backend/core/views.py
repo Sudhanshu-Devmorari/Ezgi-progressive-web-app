@@ -232,6 +232,11 @@ class FollowCommentatorView(APIView):
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
+                follow_commentator_obj = FollowCommentator.objects.create(
+                    commentator_user=commentator_obj, standard_user=request.user
+                )
+                # send follow notification:
+                notification_obj = Notification.objects.create(user=commentator_obj, status=False, context=f'{request.user.username} started following you.')
 
                 if not FollowCommentator.objects.filter(commentator_user=commentator_obj, standard_user=user).exists():
 
@@ -465,7 +470,9 @@ class SubscriptionView(APIView):
 class NotificationView(APIView):
     def get(self, request, id=5, format=None, *args, **kwargs):
         try:
+            ten_days_ago = timezone.now() - timedelta(days=10)
             notification_obj = Notification.objects.filter(user=id, status=False)
+            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -633,8 +640,10 @@ class RetrieveFavEditorsAndFavComment(APIView):
             editor_obj = FavEditors.objects.filter(standard_user=user)
             for obj in editor_obj:
                 details = {}
+                print("********** ", obj.commentator_user.username)
 
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
+                print("********** ", count)
 
                 serializer = FavEditorsSerializer(obj)
                 data = serializer.data
@@ -645,46 +654,23 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
 
             # serializer = UserSerializer(fav_editor_list, many=True)
-            data_list['fav-editors'] = editor
+            data_list['favEditors'] = editor
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        print("========== ", data_list)
+
         try:
             comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
-            details = []
             for obj in comment_obj:
-                comment_data = CommentsSerializer(obj.comment).data
-
-                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
-
-                # Format the datetime object as desired (DD.MM.YYYY)
-                formatted_date = date_obj.strftime("%d.%m.%Y")
-
-                comment_data['date'] = formatted_date 
-                # fav_comment_list.append(obj.comment)
-                comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
-                total_reactions = comment_reactions.aggregate(
-                    total_likes=Sum('like'),
-                    total_favorite=Sum('favorite'),
-                    total_clap=Sum('clap')
-                )
-                
-                comment_data['total_reactions'] = {
-                    'total_likes': total_reactions['total_likes'] or 0,
-                    'total_favorite': total_reactions['total_favorite'] or 0,
-                    'total_clap': total_reactions['total_clap'] or 0
-                }
-
-                details.append(comment_data)
-
-
-            # serializer1 = CommentsSerializer(fav_comment_list, many=True)
-            data_list['fav-comments'] = details
+                fav_comment_list.append(obj.comment)
+            serializer1 = CommentsSerializer(fav_comment_list, many=True)
+            data_list['favComments'] = serializer1.data
         except Exception as e:
-            return Response(data={'error': f'Error retrieving favorite comments, {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=data_list, status=status.HTTP_200_OK)
-        
+        return Response(data=data_list, status=status.HTTP_200_OK)       
+
 class SupportView(APIView):
     # for retrieve login user all tickets:
     def get(self, request, id, format=None, *args, **kwargs):
@@ -815,7 +801,6 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
         data_list = {}
         subscribers = []
         subscription = []
-
         try:
             if user.user_role == 'commentator':
                 if Subscription.objects.filter(commentator_user=user).exists():
@@ -823,7 +808,7 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     # for obj in my_subscribers:
                     #     subscribers.append(obj.standard_user)
                     serializer = SubscriptionSerializer(my_subscribers, many=True)
-                    data_list['subscribers'] = serializer.data
+                    data_list['subscribers'] = serializer.data 
 
                 if Subscription.objects.filter(standard_user=user).exists():
                     my_subscription = Subscription.objects.filter(standard_user=user)
@@ -838,20 +823,17 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     #     subscription.append(obj.commentator_user)
                     serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
-                    serializer = SubscriptionSerializer(my_subscription, many=True)
-                    return Response({'data' : serializer.data})
-                    
-
-            return Response(data=data_list, status=status.HTTP_200_OK)
-
+                   
+            return Response(data=data_list, status=status.HTTP_200_OK) 
+             
         except ObjectDoesNotExist as e:
             error_message = {"error": "Object does not exist."}
             return Response(data=error_message, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             error_message = {"error": "An unexpected error occurred."}
-            return Response(data=error_message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(data=e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 class DeactivateProfile(APIView):
     def get(self, request, format=None, *args, **kwargs):
