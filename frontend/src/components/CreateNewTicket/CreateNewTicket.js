@@ -9,7 +9,7 @@ const CreateNewTicket = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
-  const matchDetailsOptions = ["Financial", "Financial", "Financial"];
+  const matchDetailsOptions = ["Financial", "Technical"];
   const [selectedMatchDetails, setSelectedMatchDetails] =
     useState("Select Department");
   const toggleMatchDetailsDropdown = () => {

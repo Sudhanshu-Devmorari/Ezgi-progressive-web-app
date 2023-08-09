@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
+import './SupportManagementFilter.css'
 
 const SupportManagementFilter = () => {
   const [AllDropdown, setAllDropdown] = useState(false);
@@ -72,8 +73,6 @@ const SupportManagementFilter = () => {
         </div>
         <div className="p-2">
           <button
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",
