@@ -11,6 +11,8 @@ from core.views import (AdminMainPage, UserManagement, CommentsManagement, Filte
 
 
 urlpatterns = [
+    path('signup/', SignupView.as_view(), name='Signup'),
+    path('login/', LoginView.as_view(), name='Login'),
     path('retrieve-commentator/', RetrieveCommentatorView.as_view(), name='Retrieve-Commentator'),
     path('follow-commentator/', FollowCommentatorView.as_view(), name='Follow-Commentator'),
     path('subscription/', SubscriptionView.as_view(), name='Subscription'),
