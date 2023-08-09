@@ -47,5 +47,15 @@ urlpatterns = [
     path('deactivate-commentator/<int:pk>/', DeactivateCommentator.as_view(), name='Deactivate-Commentator'),
     path('sales-management/', SalesManagement.as_view(), name='Sales-Management'),
     path('support-management/', SupportManagement.as_view(), name='Support-Management'),
+    path('notification-management/', NotificationManagement.as_view(), name='Notification-Management'),
+    path('subuser-management/', SubUserManagement.as_view(), name='SubUser-Management'),
+    path('subuser-management/<int:pk>/', SubUserManagement.as_view(), name='SubUser-Management'),
+    path('ads-management/', AdvertisementManagement.as_view(), name='Advertisement-Management'),
+    path('ads-management/<int:pk>/', AdvertisementManagement.as_view(), name='Advertisement-Management'),
+    path('level-rule/', LevelRule.as_view(), name='Level-Rule'),
+    path('membership-setting/', MembershipSettingView.as_view(), name='Membership-Setting'),
+    path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
+    path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
+    path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
 
 ]
