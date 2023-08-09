@@ -27,9 +27,9 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
-                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,
-                             CommentatorLevelRuleSerializer, MembershipSettingSerializer, SubscriptionSettingSerializer,
-                             HighlightSettingSerializer)
+                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer)
+import pyotp
+from django.contrib.auth import authenticate
 
 
 class OtpVerify(APIView):
@@ -91,7 +91,12 @@ class PasswordResetView(APIView):
         user.save()
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
-class RetrieveCommentatorView(APIView): # for Home page:
+
+# Create your views here.
+class RetrieveCommentatorView(APIView):
+    """
+    for Home page:
+    """
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         unique_comment_ids = set()
@@ -238,13 +243,6 @@ class FollowCommentatorView(APIView):
                 # send follow notification:
                 notification_obj = Notification.objects.create(user=commentator_obj, status=False, context=f'{request.user.username} started following you.')
 
-                if not FollowCommentator.objects.filter(commentator_user=commentator_obj, standard_user=user).exists():
-
-                    follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator_obj, standard_user=user)
-
-                    # send follow notification:
-                    notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,subject='Follow Commentator', date=datetime.today().date(), status=False, context=f'{request.user.username} stated following you.')
-
                     serializer = FollowCommentatorSerializer(follow_commentator_obj)
                     data = serializer.data
                     return Response(data=data, status=status.HTTP_200_OK)
@@ -330,23 +328,19 @@ class CommentView(APIView):
                     if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
 
-                print("-----------")
+
                 category = request.data.get('category')
-                # category = request.data['category']
-                print('category: ', category)
                 country = request.data.get('country')
                 league = request.data.get('league')
                 date = request.data.get('date')
                 match_detail = request.data.get('match_detail')
                 prediction_type = request.data.get('prediction_type')
                 prediction = request.data.get('prediction')
-                print('prediction: ', prediction)
                 if user.commentator_level == 'apprentice':
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
                 comment = request.data.get('comment')
-                print('comment: ', comment)
 
                 if not category:
                     raise NotFound("Category not found.")
@@ -378,12 +372,18 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
-                print('comment_obj: ', comment_obj)
                 # send new Comment notification:
                 subscription_obj = Subscription.objects.filter(commentator_user=user)
                 for obj in subscription_obj:
                     # user = obj.standard_user
-                    notification_obj = Notification.objects.create(user=obj.standard_user, status=False, context=f'{user.username} upload a new Comment.')
+                    notification_obj = Notification.objects.create(
+                            sender = user,
+                            receiver=obj.standard_user,
+                            subject='New Comment',
+                            date=datetime.today().date(),  
+                            status=False,
+                            context=f'{request.user.username} uploaded a new Comment.'
+                            )
 
                 serializer = CommentsSerializer(comment_obj)
                 data = serializer.data
@@ -466,11 +466,11 @@ class SubscriptionView(APIView):
 #         data = serializer.data
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
-    def get(self, request, id=5, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
+        # user = request.user
+        user = User.objects.get(id = 2)
         try:
-            ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(user=id, status=False)
-            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
+            notification_obj = Notification.objects.filter(receiver=user, status=False)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -541,27 +541,28 @@ class CommentReactionView(APIView):
 
         return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
         
-class ProfileView(APIView): 
-    def get(self, request, id ,format=None, *args, **kwargs):
+
+class ProfileView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=id)
+            user_obj = User.objects.get(id=request.user.id)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if user_obj.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
+            if request.user.user_role == 'commentator':
+                follow_obj = FollowCommentator.objects.filter(commentator_user=request.user).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=request.user).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
+                comment_obj = Comments.objects.filter(commentator_user=request.user).count()
                 data['Comment_Count'] = comment_obj
             else:
-                subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
+                subscription_obj = Subscription.objects.filter(standard_user=request.user).count()
                 data['Subscription_Count'] = subscription_obj
 
-                following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
+                following_obj = FollowCommentator.objects.filter(standard_user=request.user).count()
                 data['Follow_Up_Count'] = following_obj
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -574,14 +575,14 @@ class ProfileView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    def post(self, request, id, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            user = request.user
         except User.DoesNotExist:
-            return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         if 'file' not in request.data:
-            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
+            return Response({'error': 'No file found'}, status=status.HTTP_400_BAD_REQUEST)
 
         profile_pic = request.data['file']
 
@@ -589,7 +590,7 @@ class ProfileView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
-        return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
 
 class FavEditorsCreateView(APIView):
@@ -638,10 +639,8 @@ class RetrieveFavEditorsAndFavComment(APIView):
             editor_obj = FavEditors.objects.filter(standard_user=user)
             for obj in editor_obj:
                 details = {}
-                print("********** ", obj.commentator_user.username)
 
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
-                print("********** ", count)
 
                 serializer = FavEditorsSerializer(obj)
                 data = serializer.data
@@ -652,28 +651,52 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
 
             # serializer = UserSerializer(fav_editor_list, many=True)
-            data_list['favEditors'] = editor
+            data_list['fav-editors'] = editor
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        print("========== ", data_list)
-
         try:
             comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
+            details = []
             for obj in comment_obj:
-                fav_comment_list.append(obj.comment)
-            serializer1 = CommentsSerializer(fav_comment_list, many=True)
-            data_list['favComments'] = serializer1.data
+                comment_data = CommentsSerializer(obj.comment).data
+
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+                # fav_comment_list.append(obj.comment)
+                comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+
+                details.append(comment_data)
+
+
+            # serializer1 = CommentsSerializer(fav_comment_list, many=True)
+            data_list['fav-comments'] = details
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=data_list, status=status.HTTP_200_OK)       
-
+        return Response(data=data_list, status=status.HTTP_200_OK)
+        
 class SupportView(APIView):
     # for retrieve login user all tickets:
-    def get(self, request, id, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            user = request.user
+            # user = User.objects.get(id=1)
 
             support_obj = TicketSupport.objects.filter(user=user)
             serializer = TicketSupportSerializer(support_obj, many=True)
@@ -1646,8 +1669,6 @@ class SupportManagement(APIView):
             ticket_id = request.data.get('ticket_id')
             message = request.data.get('message')
 
-            if not ticket_id:
-                return Response({'error': 'Ticket-id not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if not message:
                 return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
