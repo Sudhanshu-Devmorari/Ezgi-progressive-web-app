@@ -243,17 +243,17 @@ class FollowCommentatorView(APIView):
                 # send follow notification:
                 notification_obj = Notification.objects.create(user=commentator_obj, status=False, context=f'{request.user.username} started following you.')
 
-                    serializer = FollowCommentatorSerializer(follow_commentator_obj)
-                    data = serializer.data
-                    return Response(data=data, status=status.HTTP_200_OK)
-                else:
-                    return Response(
-                        create_response(
-                            status.HTTP_400_BAD_REQUEST,
-                            "You already follow that commentator."
-                        ),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                serializer = FollowCommentatorSerializer(follow_commentator_obj)
+                data = serializer.data
+                return Response(data=data, status=status.HTTP_200_OK)
+                # else:
+                #     return Response(
+                #         create_response(
+                #             status.HTTP_400_BAD_REQUEST,
+                #             "You already follow that commentator."
+                #         ),
+                #         status=status.HTTP_400_BAD_REQUEST
+                #     )
             else:
                 return Response(
                     create_response(
