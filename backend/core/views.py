@@ -27,10 +27,24 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
-                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer)
+                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
+                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
+class SignupView(APIView):
+    def post(self, request, format=None):
+        serializer = UserSerializer(data=request.data)
+        if not serializer.is_valid():
+            print(serializer.errors)
+            return Response({
+                'message': 'Error',
+                'data' : serializer.errors,
+               'status' : status.HTTP_400_BAD_REQUEST
+                })
+        else:
+            serializer.save()
+            return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
@@ -543,26 +557,26 @@ class CommentReactionView(APIView):
         
 
 class ProfileView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=request.user.id)
+            user_obj = User.objects.get(id=id)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if request.user.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=request.user).count()
+            if user_obj.user_role == 'commentator':
+                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=request.user).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=request.user).count()
+                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
                 data['Comment_Count'] = comment_obj
             else:
-                subscription_obj = Subscription.objects.filter(standard_user=request.user).count()
+                subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
                 data['Subscription_Count'] = subscription_obj
 
-                following_obj = FollowCommentator.objects.filter(standard_user=request.user).count()
+                following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
                 data['Follow_Up_Count'] = following_obj
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -575,9 +589,9 @@ class ProfileView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
+            user = User.objects.get(id=id)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -693,10 +707,9 @@ class RetrieveFavEditorsAndFavComment(APIView):
         
 class SupportView(APIView):
     # for retrieve login user all tickets:
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            user = User.objects.get(id=id)
 
             support_obj = TicketSupport.objects.filter(user=user)
             serializer = TicketSupportSerializer(support_obj, many=True)

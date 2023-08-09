@@ -5,7 +5,9 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend)
 
 from core.views import (AdminMainPage, UserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
-                        FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement)
+                        FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
+                        SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
+                        HighlightSettingView, CommentSetting)
 
 
 urlpatterns = [
