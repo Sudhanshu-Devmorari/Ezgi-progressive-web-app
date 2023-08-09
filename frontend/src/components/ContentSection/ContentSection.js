@@ -33,7 +33,6 @@ const ContentSection = ({
 
   const server_url = "http://127.0.0.1:8000";
 
-
   const followCommentator = async (commentator_id) => {
     const res = await axios
       .get(`http://127.0.0.1:8000/follow-commentator/?id=${commentator_id}`)
@@ -43,6 +42,16 @@ const ContentSection = ({
       .catch((error) => {
         console.error("Error fetching data.", error);
       }, []);
+  };
+
+  const handleCommentReaction = async (id, reaction) => {
+    const res = await axios.post(
+      `http://127.0.0.1:8000/comment-reaction/${id}/`,
+      {
+        reaction_type: `${reaction}`,
+      }
+    );
+    console.log(res)
   };
 
   return (
@@ -88,7 +97,9 @@ const ContentSection = ({
               </div>
             </div>
             <div className="col p-0">
-              {(selectContent === "for you" || userComments || selectContent === "comments" ) && (
+              {(selectContent === "for you" ||
+                userComments ||
+                selectContent === "comments") && (
                 <div className="d-flex justify-content-end pe-2 mt-3">
                   {userPhone ? (
                     <button
@@ -130,7 +141,11 @@ const ContentSection = ({
               )}
               <div
                 className={`${
-                  selectContent === "for you" || userComments || selectContent === "comments" ? "mt-3" : "mt-5"
+                  selectContent === "for you" ||
+                  userComments ||
+                  selectContent === "comments"
+                    ? "mt-3"
+                    : "mt-5"
                 } row gap-1 g-0 text-center`}
               >
                 <div className="col">
@@ -277,7 +292,11 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-                <div>
+              {userPhone ? (<div
+                  onClick={() => {
+                    handleCommentReaction(data?.value.id, "like");
+                  }}
+                >
                   <img
                     src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
                     alt=""
@@ -285,9 +304,22 @@ const ContentSection = ({
                     width={20}
                   />{" "}
                   {data?.value.total_reactions.total_likes}
-                </div>
-                <div>
-                  {userPhone ? (
+                </div>) : (<div
+                  
+                >
+                  <img
+                    src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
+                    alt=""
+                    height={20}
+                    width={20}
+                  />{" "}
+                  {data?.value.total_reactions.total_likes}
+                </div>)}
+                
+                {userPhone ? (
+                  <div onClick={() => {
+                    handleCommentReaction(data?.value.id, "favorite");
+                  }}>
                     <img
                       src={`${
                         currentTheme === "dark" ? starDarkLogin : starIcon
@@ -295,8 +327,11 @@ const ContentSection = ({
                       alt=""
                       height={23}
                       width={23}
-                    />
-                  ) : (
+                    />{" "}
+                    {data?.value.total_reactions.total_favorite}
+                  </div>
+                ) : (
+                  <div>
                     <img
                       src={`${
                         currentTheme === "dark" ? starIcondark : starIcon
@@ -304,11 +339,15 @@ const ContentSection = ({
                       alt=""
                       height={23}
                       width={23}
-                    />
-                  )}
-                  {data?.value.total_reactions.total_favorite}
-                </div>
-                <div>
+                    />{" "}
+                    {data?.value.total_reactions.total_favorite}
+                  </div>
+                )}
+
+                {userPhone ? (<div 
+                    onClick={() => {
+                    handleCommentReaction(data?.value.id, "clap");
+                  }}>
                   <img
                     src={currentTheme === "dark" ? clapIcon : clapLight}
                     alt=""
@@ -316,45 +355,57 @@ const ContentSection = ({
                     width={20}
                   />{" "}
                   {data?.value.total_reactions.total_clap}
-                </div>
+                </div>) : (<div>
+                  <img
+                    src={currentTheme === "dark" ? clapIcon : clapLight}
+                    alt=""
+                    height={20}
+                    width={20}
+                  />{" "}
+                  {data?.value.total_reactions.total_clap}
+                </div>)}
+                
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
-                {selectContent === "for you" || selectContent === "comments" &&
-                  (userPhone ? (
-                    <button
-                      onClick={() => {
-                        setSelectContent("show-all-comments");
-                      }}
-                      className="me-2 px-2 py-1"
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #37FF80"
-                            : "1px solid #00659D",
-                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                        backgroundColor: "transparent",
-                        borderRadius: "3px",
-                      }}
-                    >
-                      Subscribe
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setSelectContent("show-all-comments")}
-                      className="me-2 px-2 py-1"
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #37FF80"
-                            : "1px solid #00659D",
-                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                        backgroundColor: "transparent",
-                        borderRadius: "3px",
-                      }}
-                    >
-                      Subscribe
-                    </button>
-                  ))}
+                {selectContent === "for you" ||
+                  (selectContent === "comments" &&
+                    (userPhone ? (
+                      <button
+                        onClick={() => {
+                          setSelectContent("show-all-comments");
+                        }}
+                        className="me-2 px-2 py-1"
+                        style={{
+                          border:
+                            currentTheme === "dark"
+                              ? "1px solid #37FF80"
+                              : "1px solid #00659D",
+                          color:
+                            currentTheme === "dark" ? "#37FF80" : "#00659D",
+                          backgroundColor: "transparent",
+                          borderRadius: "3px",
+                        }}
+                      >
+                        Subscribe
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setSelectContent("show-all-comments")}
+                        className="me-2 px-2 py-1"
+                        style={{
+                          border:
+                            currentTheme === "dark"
+                              ? "1px solid #37FF80"
+                              : "1px solid #00659D",
+                          color:
+                            currentTheme === "dark" ? "#37FF80" : "#00659D",
+                          backgroundColor: "transparent",
+                          borderRadius: "3px",
+                        }}
+                      >
+                        Subscribe
+                      </button>
+                    )))}
                 <span style={{ fontSize: "11px" }}>10 dk önce</span>
               </div>
             </div>

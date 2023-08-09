@@ -15,13 +15,18 @@ const CommentsPage = ({
   selectPublicorForYou,
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
-  console.log('&&&&&&&&', onlyPublicResult)
-  console.log('&&-----&&', selectContent)
+  // console.log('&&&&&&&&', mergedResult)
+  // console.log('&&-----&&', selectContent)
+  const [filterCommentData, setFilterCommentData] = useState(null)
+  const [displayData, setDisplayData] = useState(mergedResult)
   return (
     <>
       <SelectContentForEditorPage
+        data={mergedResult}
         comments={true}
         setOnlyPublic={setOnlyPublic}
+        setFilterCommentData={setFilterCommentData}
+        setDisplayData={setDisplayData}
       />
       {/* <ContentSection />
       <HighlightMainPage />
@@ -32,7 +37,7 @@ const CommentsPage = ({
         data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
       />
       {onlyPublic == "" &&
-        mergedResult.map((val, index) => {
+      (filterCommentData == null ? displayData : filterCommentData)?.map((val, index) => {
           let lastType = mergedResult[index == 0 ? 0 : index - 1]?.type;
 
           if (val.type == "comment") {

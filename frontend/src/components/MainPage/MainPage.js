@@ -21,9 +21,9 @@ import axios from "axios";
 const MainPage = () => {
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
   // Select Content
   const [selectContent, setSelectContent] = useState("home");
+  console.log("--------", selectContent)
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const [dashboardSUser, setDashboardSUser] = useState(false);
 
@@ -227,6 +227,7 @@ const MainPage = () => {
 
   // const user = "c-";
   const user = localStorage.getItem("userPhone");
+  console.log("----------", mergedResult)
   
   
 
@@ -464,6 +465,7 @@ const MainPage = () => {
               )}
               {selectContent === "show-all-comments" && (
                 <EditorProfileActiveComments
+                  selectContent={selectContent}
                   setSelectContent={setSelectContent}
                   setDashboardSUser={setDashboardSUser}
                 />

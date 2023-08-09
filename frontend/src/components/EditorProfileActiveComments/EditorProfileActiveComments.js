@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ActiveComments from "../ActiveComments/ActiveComments";
 import SelectComments from "../SelectComments/SelectComments";
 import ContentSection from "../ContentSection/ContentSection";
 import CommentsContentSection from "../CommentsContentSection/CommentsContentSection";
 import EditorProfileStatisticsSection from "../EditorProfileStatisticsSection/EditorProfileStatisticsSection";
+import axios from "axios";
+
 
 
 const EditorProfileActiveComments = (props) => {

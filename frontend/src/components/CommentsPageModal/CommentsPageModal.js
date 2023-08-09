@@ -14,8 +14,49 @@ import darkRadioBlueSelected from "../../assets/Public Content Radio Button Sele
 import radioYellowSelected from "../../assets/Group 505.svg";
 import DarkradioYellowSelected from "../../assets/Group 505 (1).svg";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
+
 
 const CommentsPageModal = (props) => {
+  const handleShowButtonClick = async () => {
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000/filter-comments/',
+        {
+          category: [categoryData],
+          country: countryData,
+          league: leagueData,
+          match_detail: selectedMatchDetails,
+          prediction_type: selectedPredictionType,
+          // prediction: ,
+          // status: ,
+          date: dateData,
+          filter_type: blueSelect,
+          filter_type0: yellowSelect,
+        }
+      );
+  
+      const editorData = response.data.map((item) => ({
+        type: "editor",
+        value: item,
+      }));
+      props.setFilterCommentData(editorData)
+      // Handle the response here if needed
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error('Error making POST request:', error);
+    }
+    // console.log("$$$$$$$")
+  };
+
+  const [categoryData, setCategoryData] = useState('');
+  const [countryData, setCountryData] = useState('');
+  const [dateData, setDateData] = useState('');
+  const [leagueData, setLeagueData] = useState('');
+
+  const [blueSelect, setBlueSelect] = useState('');
+  const [yellowSelect, setYellowSelect] = useState('');
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [isPublicSelected, setIsPublicSelected] = useState(false);
@@ -25,7 +66,7 @@ const CommentsPageModal = (props) => {
   const [isSubscriberSelected, setIsSubscriberSelected] = useState(false);
   const [isNotStartedSelected, setIsNotStartedSelected] = useState(false);
   const [isLosingSelected, setIsLosingSelected] = useState(false);
-
+  
   const [matchDetailsDropDown, setMatchDetailsDropDown] = useState(false);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
 
@@ -38,7 +79,7 @@ const CommentsPageModal = (props) => {
     setLevelDropDown(false)
     setPredictionTypeDropDown(false)
   };
-
+  
   const matchDetailsOptions = [
     "Option 1",
     "Option 2",
@@ -92,15 +133,18 @@ const CommentsPageModal = (props) => {
 
   const handleRadioBlue = (e) => {
     if (e === "public") {
+      setBlueSelect("public_content")
       setIsPublicSelected(!isPublicSelected);
       setIsFinishedSelected(false);
       setIsWinningSelected(false);
     } else if (e === "finished") {
+      setBlueSelect("finished")
       setIsPublicSelected(false);
       setIsWinningSelected(false);
       setIsFinishedSelected(!isFinishedSelected);
     }
     if (e === "winning") {
+      setBlueSelect("winning")
       setIsPublicSelected(false);
       setIsFinishedSelected(false);
       setIsWinningSelected(!isWinningSelected);
@@ -108,22 +152,26 @@ const CommentsPageModal = (props) => {
   };
   const handleYellowRadio = (e) => {
     if (e === "subscribe") {
+      setYellowSelect('only_subscriber')
       setIsSubscriberSelected(!isSubscriberSelected);
       setIsNotStartedSelected(false);
       setIsLosingSelected(false);
     }
     if (e === "not started") {
+      setYellowSelect('not_stated')
       setIsNotStartedSelected(!isNotStartedSelected);
       setIsSubscriberSelected(false);
       setIsLosingSelected(false);
     }
     if (e === "lose") {
+      setYellowSelect('finished')
       setIsLosingSelected(!isLosingSelected);
       setIsSubscriberSelected(false);
       setIsNotStartedSelected(false);
     }
   };
-
+  //     console.log( categoryData,"===",countryData,"===",dateData,"===",leagueData,"===",selectedMatchDetails,"===",selectedLevel,"===",selectedPredictionType )
+  // console.log('^^^^^^', blueSelect,"******", yellowSelect)
   return (
     <>
       <Modal
@@ -150,7 +198,7 @@ const CommentsPageModal = (props) => {
                 />
               </span>
             </div>
-            <CommentFilter />
+            <CommentFilter setCategoryData={setCategoryData} setCountryData={setCountryData} setDateData={setDateData} setLeagueData={setLeagueData} />
             <div className="my-3">
               <CustomDropdown
                 label="Match Details"
@@ -313,10 +361,14 @@ const CommentsPageModal = (props) => {
             </div>
             <div className="d-flex justify-content-center my-4">
               <button
+                onClick={() => {
+                  handleShowButtonClick();
+                  // setEditorFlterModal(true);
+                      props.onHide();
+                    }}
                 className={`${
                   currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                 } px-3 py-1`}
-                onClick={() => setEditorFlterModal(true)}
               >
                 Show
               </button>

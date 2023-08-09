@@ -78,7 +78,7 @@ const NavBar = (props) => {
             {userPhone ? (
               <>
                 <span
-                  onClick={() => props.setDashboardSUser(true)}
+                  onClick={() => {props.setDashboardSUser(true); props.setSelectContent("show-all-comments")}}
                   className="py-2 px-3"
                   style={{
                     backgroundColor:

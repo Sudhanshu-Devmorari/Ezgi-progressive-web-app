@@ -22,8 +22,13 @@ const SelectContentForEditorPage = (props) => {
       props.setDisplayData(filteredArray);
     }
     else{
-      // console.log("=======>>>>>>", props.comments)
-      // props.setFilterData(null)
+      console.log("*=======>>>>>>", props.comments)
+      props.setFilterCommentData(null)
+      const val = e.target.value
+      const filteredArray = props.data.filter((obj) =>
+        obj?.value?.commentator_user?.username?.toLowerCase().startsWith(val.toLowerCase())
+      );
+      props.setDisplayData(filteredArray);
     }
   };
   return (
@@ -100,7 +105,7 @@ const SelectContentForEditorPage = (props) => {
         <EditorFilter show={modalShow} onHide={() => setModalShow(false)} setFilterData={props.setFilterData}/>
       ) }
       {props?.comments && (
-        <CommentsPageModal show={modalShow} onHide={() => setModalShow(false)} />
+        <CommentsPageModal show={modalShow} onHide={() => setModalShow(false)} setFilterCommentData={props.setFilterCommentData}/>
       )}
     </>
   );
