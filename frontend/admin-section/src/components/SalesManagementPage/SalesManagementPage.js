@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import subscriptionIcon from "../../assets/Group 67.svg";
@@ -14,6 +14,7 @@ import user4 from "../../assets/user6.png";
 import adsIcon from "../../assets/badge-ad.svg";
 import perIcon from "../../assets/per.svg";
 import './SalesManagementPage.css'
+import axios from 'axios'
 
 const SalesManagementPage = () => {
   const salesArray = [
@@ -51,6 +52,21 @@ const SalesManagementPage = () => {
     { icon: adsIcon, name: "Ads Revenues" },
     { icon: perIcon, name: "Ads Revenues" },
   ];
+
+  // Sales management API
+  useEffect(() => {
+    async function getSalesData(){
+      try{
+        const res = await axios.get('http://127.0.0.1:8000/sales-management')
+        console.log("res====>>>>",res?.data);
+      } catch (error){
+        console.log(error);
+      }
+    }
+    getSalesData();
+  }, [])
+  
+
   return (
     <>
       <div className="conatainer-fluid m-2">

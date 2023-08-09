@@ -38,7 +38,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
-    def get_created(self, obj):
+    def get_start_date(self, obj):
         formatted_date = obj.start_date.strftime("%d.%m.%Y")
         formatted_time = obj.start_date.strftime("%H:%M")
         return f"{formatted_date} - {formatted_time}"
