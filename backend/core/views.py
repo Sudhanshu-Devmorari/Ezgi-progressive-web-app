@@ -168,12 +168,16 @@ class RetrieveCommentatorView(APIView):
             data_list['Public_Comments'] = []
 
         try:
-            # if request.data:
+            if request.query_params.get('id') != 'null':
+                user = User.objects.get(id=request.query_params.get('id'))
+
                 # for retrieving subscription comments:
                 data_list['Subscription_Comments'] = []
-                s = User.objects.get(id=6)
-                subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
-                # subscription_obj = Subscription.objects.filter(standard_user=request.user, end_date__gte=datetime.now(), status='approve').order_by('-created')
+                # s = User.objects.get(id=6)
+                # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
+                # if Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve').exists():
+                subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='active').order_by('-created')
+
 
                 for obj in subscription_obj:
                     if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
@@ -210,6 +214,8 @@ class RetrieveCommentatorView(APIView):
 
                 # serializer2 = CommentsSerializer(subscribe_comment, many=True)
                 # data_list['Subscription_Comments'] = serializer2.data
+            else:
+                data_list['Subscription_Comments'] = []
         except ObjectDoesNotExist:
             data_list['Subscription_Comments'] = []
 
@@ -244,18 +250,18 @@ class RetrieveCommentatorView(APIView):
 class FollowCommentatorView(APIView):
     # permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None, *args, **kwargs):
-        user = User.objects.get(id=6)
+    def get(self, request, id, format=None, *args, **kwargs):
+        user = User.objects.get(id=id)
         # user = request.user
         try:
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
                 follow_commentator_obj = FollowCommentator.objects.create(
-                    commentator_user=commentator_obj, standard_user=request.user
+                    commentator_user=commentator_obj, standard_user=user
                 )
                 # send follow notification:
-                notification_obj = Notification.objects.create(user=commentator_obj, status=False, context=f'{request.user.username} started following you.')
+                notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
 
                 serializer = FollowCommentatorSerializer(follow_commentator_obj)
                 data = serializer.data
@@ -395,7 +401,7 @@ class CommentView(APIView):
                 subscription_obj = Subscription.objects.filter(commentator_user=user)
                 for obj in subscription_obj:
                     # user = obj.standard_user
-                    notification_obj = Notification.objects.create(user=obj.standard_user, status=False, context=f'{user.username} upload a new Comment.')
+                    notification_obj = Notification.objects.create(sender=user,receiver=obj.standard_user,date=datetime.today().date(), status=False, context=f'{user.username} upload a new Comment.')
 
                 serializer = CommentsSerializer(comment_obj)
                 data = serializer.data
@@ -515,14 +521,16 @@ class NotificationView(APIView):
 
 
 class CommentReactionView(APIView):
-    def post(self, request, comment_id, format=None, *args, **kwargs):
+    def post(self, request, comment_id, id, format=None, *args, **kwargs):
+        print("------- ",comment_id,"====", id)
+
         try:
             comment = Comments.objects.get(id=comment_id)
         except Comments.DoesNotExist:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        user = request.user
-        # user = User.objects.get(id=2)
+        # user = request.user
+        user = User.objects.get(id=id)
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
         if reaction_type not in ('like', 'favorite', 'clap'):
             return Response({'error': 'Invalid reaction type'}, status=status.HTTP_400_BAD_REQUEST)
@@ -811,21 +819,68 @@ class ResolvedTicket(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ActiveResolvedCommentRetrieveView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
+        # print("--===--", id)
+        user = User.objects.get(id=id)
         data_list = {}
-        user = request.user
 
         try:
+            details =[]
             all_active_comment = Comments.objects.filter(commentator_user=user, date__gt=datetime.now().date())
-            serializer = CommentsSerializer(all_active_comment, many=True)
-            data_list['active_comments'] = serializer.data
+            for obj in all_active_comment:
+                comment_data = CommentsSerializer(obj).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+
+                comment_reactions = CommentReaction.objects.filter(comment=obj)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                details.append(comment_data)
+            # serializer = CommentsSerializer(all_active_comment, many=True)
+            data_list['active_comments'] = details
         except Comments.DoesNotExist:
             data_list['active_comments'] = []
 
         try:
+            details =[]
             all_resolved_comment = Comments.objects.filter(commentator_user=user, date__lt=datetime.now().date())
-            serializer1 = CommentsSerializer(all_resolved_comment, many=True)
-            data_list['resolved_comments'] = serializer1.data
+            for obj in all_resolved_comment:
+                comment_data = CommentsSerializer(obj).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+
+                comment_reactions = CommentReaction.objects.filter(comment=obj)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                details.append(comment_data)
+            # serializer1 = CommentsSerializer(all_resolved_comment, many=True)
+            data_list['resolved_comments'] = details
         except Comments.DoesNotExist:
             data_list['resolved_comments'] = []
 
@@ -1106,7 +1161,42 @@ class UserManagement(APIView):
             user.delete()
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+
+class FilterUserManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = {}
+        try:
+            filters = {}
+            if request.data:
+                if 'user_type' in request.data and request.data.get('user_type') != None:
+                    filters['user_role'] = request.data.get('user_type').lower()
+
+                if 'city' in request.data and request.data.get('city') != None:
+                    filters['city'] = request.data.get('city')
+
+                if 'gender' in request.data and request.data.get('gender') != None:
+                    filters['gender'] = request.data.get('gender')
+
+                if 'age' in request.data and request.data.get('age') != None:
+                    filters['age'] = request.data.get('age')
+
+                print("****", filters)
+                query_filters = Q(**filters)
+                filtered_user = User.objects.filter(query_filters)
+                serializer = UserSerializer(filtered_user, many=True)
+                data = serializer.data
+
+                # data_list['']
+
+                # serializer = UserSerializer(filtered_comments, many=True)
+                # data = serializer.data
+                return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                return Response(data={'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CommentsManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
@@ -1186,32 +1276,33 @@ class CommentsManagement(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FilterComments(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request,id, format=None, *args, **kwargs):
         data_list = []
         filters = {}
+        user = User.objects.get(id=id)
         try:
-            if 'category' in request.data:
+            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "":
                 filters['category__contains'] = request.data.get('category')
 
-            if 'country' in request.data:
+            if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "":
                 filters['country'] = request.data.get('country')
 
-            if 'league' in request.data:
+            if 'league' in request.data  and request.data.get('league') != None and request.data.get('league') != "":
                 filters['league'] = request.data.get('league')
 
-            if 'match_detail' in request.data:
+            if 'match_detail' in request.data  and request.data.get('match_detail') != None and request.data.get('match_detail') != "Select":
                 filters['match_detail'] = request.data.get('match_detail')
 
-            if 'prediction_type' in request.data:
+            if 'prediction_type' in request.data  and request.data.get('prediction_type') != None and request.data.get('prediction_type') != "Select":
                 filters['prediction_type'] = request.data.get('prediction_type')
 
-            if 'prediction' in request.data:
+            if 'prediction' in request.data  and request.data.get('prediction') != None and request.data.get('prediction') != "":
                 filters['prediction'] = request.data.get('prediction')
 
-            if 'status' in request.data:
+            if 'status' in request.data  and request.data.get('status') != None and request.data.get('status') != "":
                 filters['status'] = request.data.get('status')
 
-            if 'date' in request.data:
+            if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "":
                 filters['date'] = request.data.get('date')
 
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
@@ -1220,16 +1311,65 @@ class FilterComments(APIView):
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
                     all_comments = Comments.objects.filter(status='approve', public_content=True,**filters)
-                    serializer11 = CommentsSerializer(all_comments, many=True)
-                    data0 = serializer11.data
-                    data_list.append(data0)
+                    # data_list['Public_Comments'] = []
+
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer11 = CommentsSerializer(all_comments, many=True)
+                    # data0 = serializer11.data
+                    # data_list.append(data0)
                     # return Response(data=data0, status=status.HTTP_200_OK)
                 
                 if filter_type == "finished":
-                    all_resolved_comment = Comments.objects.filter(commentator_user=request.user, date__lt=datetime.now().date(),**filters)
-                    serializer4 = CommentsSerializer(all_resolved_comment, many=True)
-                    data0 = serializer4.data
-                    data_list.append(data0)
+                    # all_resolved_comment = Comments.objects.filter(commentator_user=request.user, date__lt=datetime.now().date(),**filters)
+                    all_resolved_comment = Comments.objects.filter(date__lt=datetime.now().date(),**filters)
+                    for comment in all_resolved_comment:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer4 = CommentsSerializer(all_resolved_comment, many=True)
+                    # data0 = serializer4.data
+                    # data_list.append(data0)
 
                     # return Response(data=data0, status=status.HTTP_200_OK)
 
@@ -1247,24 +1387,71 @@ class FilterComments(APIView):
                     subscribe_comment = []
                     # s = User.objects.get(id=6)
                     # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
-                    subscription_obj = Subscription.objects.filter(standard_user=request.user, end_date__gte=datetime.now(), status='approve')
+                    subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve')
 
                     for obj in subscription_obj:
                         if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
                             subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user,**filters)
-                            for obj in subscription_comment:
-                                subscribe_comment.append(obj)
+                            # for obj in subscription_comment:
+                            #     subscribe_comment.append(obj)
+                            for comment in subscription_comment:
+                                comment_data = CommentsSerializer(comment).data
+                                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                        
+                                # Format the datetime object as desired (DD.MM.YYYY)
+                                formatted_date = date_obj.strftime("%d.%m.%Y")
 
-                    serializer2 = CommentsSerializer(subscribe_comment, many=True)
-                    data1 = serializer2.data
-                    data_list.append(data1)
+                                comment_data['date'] = formatted_date 
+
+                                # Fetch comment reactions and calculate the total count of reactions
+                                comment_reactions = CommentReaction.objects.filter(comment=comment)
+                                total_reactions = comment_reactions.aggregate(
+                                    total_likes=Sum('like'),
+                                    total_favorite=Sum('favorite'),
+                                    total_clap=Sum('clap')
+                                )
+                                
+                                comment_data['total_reactions'] = {
+                                    'total_likes': total_reactions['total_likes'] or 0,
+                                    'total_favorite': total_reactions['total_favorite'] or 0,
+                                    'total_clap': total_reactions['total_clap'] or 0
+                                }
+                                data_list.append(comment_data)
+
+                    # serializer2 = CommentsSerializer(subscribe_comment, many=True)
+                    # data1 = serializer2.data
+                    # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
 
                 if filter_type0 == "not_stated":
-                    all_active_comment = Comments.objects.filter(commentator_user=request.user, date__gt=datetime.now().date(),**filters)
-                    serializer3 = CommentsSerializer(all_active_comment, many=True)
-                    data1 = serializer3.data
-                    data_list.append(data1)
+                    # all_active_comment = Comments.objects.filter(commentator_user=request.user, date__gt=datetime.now().date(),**filters)
+                    all_active_comment = Comments.objects.filter(date__gt=datetime.now().date(),**filters)
+                    for comment in all_active_comment:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer3 = CommentsSerializer(all_active_comment, many=True)
+                    # data1 = serializer3.data
+                    # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
 
                 if filter_type == "lose":
@@ -1273,14 +1460,37 @@ class FilterComments(APIView):
                     """
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
-                
-            if filter_type == None and filter_type0 == None:
+            if filter_type == "" and filter_type0 == "":
 
                 query_filters = Q(**filters)
                 filtered_comments = Comments.objects.filter(query_filters)
-                serializer = CommentsSerializer(filtered_comments, many=True)
-                data = serializer.data
-                data_list.append(data)
+                for comment in filtered_comments:
+                    comment_data = CommentsSerializer(comment).data
+                    date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+            
+                    # Format the datetime object as desired (DD.MM.YYYY)
+                    formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                    comment_data['date'] = formatted_date 
+
+                    # Fetch comment reactions and calculate the total count of reactions
+                    comment_reactions = CommentReaction.objects.filter(comment=comment)
+                    total_reactions = comment_reactions.aggregate(
+                        total_likes=Sum('like'),
+                        total_favorite=Sum('favorite'),
+                        total_clap=Sum('clap')
+                    )
+                    
+                    comment_data['total_reactions'] = {
+                        'total_likes': total_reactions['total_likes'] or 0,
+                        'total_favorite': total_reactions['total_favorite'] or 0,
+                        'total_clap': total_reactions['total_clap'] or 0
+                    }
+                    data_list.append(comment_data)
+                # serializer = CommentsSerializer(filtered_comments, many=True)
+                # data = serializer.data
+                # data_list.append(data)
+            
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:

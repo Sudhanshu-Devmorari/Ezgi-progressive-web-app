@@ -1,7 +1,9 @@
-import React, { useDebugValue, useState } from "react";
+import React, { useEffect, useDebugValue, useState } from "react";
 import userEdit from "../../assets/user-edit.svg";
 import trash from "../../assets/trash.svg";
 import "./Home.css";
+import gender_female from "../../assets/gender-female.png";
+import gender_male from "../../assets/gender-male.png";
 import { GoSearch } from "react-icons/go";
 import { BiSolidCrown } from "react-icons/bi";
 import camera from "../../assets/camera-plus.svg";
@@ -13,8 +15,60 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import checkbox from "../../assets/Group 319.svg";
 import Selectedcheckbox from "../../assets/Group 320.svg";
+import moment from "moment";
+import axios from "axios";
 
 const Home = (props) => {
+  const [cities, setCities] = useState([]);
+
+  const cityApiData1 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=1",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  const cityApiData2 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=2",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data1 = await cityApiData1();
+      const data2 = await cityApiData2();
+      const combinedCities = [...data1, ...data2];
+      setCities(combinedCities);
+    };
+
+    fetchData();
+  }, []);
+
+  // console.log("Cities:", cities);
+
+  const server_url = "http://127.0.0.1:8000";
   const [profile, setprofile] = useState(false);
   const [showTransactionHistory, setshowTransactionHistory] = useState(1);
   const [password, setPassword] = useState("");
@@ -72,10 +126,10 @@ const Home = (props) => {
     },
   ];
 
-  const UserTypeOptions = ["option 1", "option 2"];
-  const cityOptions = ["option 1", "option 2"];
-  const GenderFilterOptions = ["option 1", "option 2"];
-  const ageFilterOptions = ["option 1", "option 2"];
+  const UserTypeOptions = ["Standard", "Commentator", "Sub_User"];
+  const cityOptions = cities;
+  const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
+  const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("Select");
   const [genderFilterDropDown, setGenderFilterDropDown] = useState(false);
 
@@ -88,7 +142,7 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-
+  const [displayUser, setDisplayUser] = useState(props.users)
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -150,11 +204,19 @@ const Home = (props) => {
     setAgeFilterDropDown(!ageFilterDropDown);
   };
 
+  const filterData = (e) => {
+      const val = e.target.value
+      const filteredArray = props.users.filter((obj) =>
+        obj?.name?.toLowerCase().startsWith(val.toLowerCase()) ||
+        obj?.username?.toLowerCase().startsWith(val.toLowerCase())
+      );
+      setDisplayUser(filteredArray);
+    }
+
+
   return (
     <>
-      <div
-        className="dark-mode p-2 m-2 mb-0 home-height pt-3"
-      >
+      <div className="dark-mode p-2 m-2 mb-0 home-height pt-3">
         {usersPart === "users" && (
           <div className="d-flex p-2">
             <div className="p-2 flex-grow-1">
@@ -165,7 +227,8 @@ const Home = (props) => {
                 >
                   <GoSearch style={{ color: "#FFFFFF" }} />
                 </span>
-                <input type="text" className="input-field-dark" />
+                <input onChange={filterData}
+                type="text" className="input-field-dark" />
               </div>
             </div>
             <div className="p-2">
@@ -200,70 +263,95 @@ const Home = (props) => {
             </div>
           </div>
         )}
-        {props?.users?.map((res, index) => (
-          <div
-            className="d-flex justify-content-between px-2 py-1 mb-2 users-section-fonts"
-            style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
-          >
-            <div className="">
+        {displayUser
+          ?.slice()
+          .reverse()
+          .map((res, index) => (
+            <div
+              className="d-flex justify-content-between px-2 py-1 mb-2 users-section-fonts"
+              style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
+            >
               <div className="">
-                <span className="pe-1">{res.sr}</span>
-                <img src={res.profile} alt="" height={37} width={37} />
-                <span className="ps-1">{res.name}</span>
+                <div className="">
+                  <span className="pe-1">{`# ${res?.id
+                    .toString()
+                    .padStart(4, "0")}`}</span>
+                  <img
+                    src={`${server_url + res?.profile_pic}`}
+                    className="rounded-circle"
+                    alt=""
+                    height={37}
+                    width={37}
+                  />
+                  <span className="ps-1">{res?.name}</span>
+                </div>
               </div>
-            </div>
-            <div className="d-flex gap-2 align-items-center">
-              <div>{res.username}</div>
-              <div className="">
-                <img src={res.gender} alt="" height={23} width={23} />
-                <span
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  onClick={() => setprofile(true)}
-                >
-                  {res.age}
-                </span>
-              </div>
-              <div className="">{res.country}</div>
-            </div>
-            {usersPart === "users" && (
-              <div
-                className="d-flex align-items-center block-width"
-                style={{ minWidth: "7.5rem" }}
-              >
-                {res.role ? (
-                  <button
-                    className="btn-user"
-                    style={{
-                      textAlign: "center",
-                      paddingTop: "0.1rem",
-                      width: "7.5rem",
-                      color:
-                        (res.role === "Journeyman" && "#4DD5FF") ||
-                        (res.role === "Expert" && "#FF9100") ||
-                        (res.role === "Apprentice" && "#FFEE7D"),
-                      border:
-                        (res.role === "Journeyman" && "1px solid #4DD5FF") ||
-                        (res.role === "Expert" && "1px solid #FF9100") ||
-                        (res.role === "Apprentice" && "1px solid #FFEE7D"),
-                      borderRadius: "2px",
-                      backgroundColor: "transparent",
-                    }}
+              <div className="d-flex gap-2 align-items-center">
+                <div>{res?.username?.trim()}</div>
+                <div className="">
+                  {res.gender == "Male" && (
+                    <img src={gender_male} alt="" height={23} width={23} />
+                  )}
+                  {res.gender == "Female" && (
+                    <img src={gender_female} alt="" height={23} width={23} />
+                  )}
+                  <span
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    onClick={() => setprofile(true)}
                   >
-                    {res.role}
-                  </button>
-                ) : (
-                  <span></span>
-                )}
+                    {res.age}
+                  </span>
+                </div>
+                <div className="">{res.country?.trim()}</div>
               </div>
-            )}
-            <div className="d-flex align-items-center gap-2 edit-icon-gap">
-              <span>{res.date}</span>
-              <img src={userEdit} alt="" height={25} width={25} />
-              <img src={trash} alt="" height={25} width={25} />
+              {usersPart === "users" && (
+                <div
+                  className="d-flex align-items-center block-width"
+                  style={{ minWidth: "7.5rem" }}
+                >
+                  {res.commentator_level ? (
+                    <button
+                      className="btn-user"
+                      style={{
+                        textAlign: "center",
+                        paddingTop: "0.1rem",
+                        width: "7.5rem",
+                        color:
+                          (res.commentator_level === "journeyman" &&
+                            "#4DD5FF") ||
+                          (res.commentator_level === "master" && "#03fc77") ||
+                          (res.commentator_level === "grandmaster" &&
+                            "#FF9100") ||
+                          (res.commentator_level === "apprentice" && "#FFEE7D"),
+                        border:
+                          (res.commentator_level === "journeyman" &&
+                            "1px solid #4DD5FF") ||
+                          (res.commentator_level === "master" &&
+                            "1px solid #03fc77") ||
+                          (res.commentator_level === "grandmaster" &&
+                            "1px solid #FF9100") ||
+                          (res.commentator_level === "apprentice" &&
+                            "1px solid #FFEE7D"),
+                        borderRadius: "2px",
+                        backgroundColor: "transparent",
+                      }}
+                    >
+                      {res.commentator_level.charAt(0).toUpperCase() +
+                        res.commentator_level.slice(1).toLowerCase()}
+                    </button>
+                  ) : (
+                    <span></span>
+                  )}
+                </div>
+              )}
+              <div className="d-flex align-items-center gap-2 edit-icon-gap">
+                <span>{moment(res.created).format("DD-MM.YYYY - HH:mm")}</span>
+                <img src={userEdit} alt="" height={25} width={25} />
+                <img src={trash} alt="" height={25} width={25} />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <div
@@ -647,7 +735,7 @@ const Home = (props) => {
         </div>
       </div>
 
-{/* filter modal */}
+      {/* filter modal */}
       <div
         class="modal fade"
         id="filterModal"

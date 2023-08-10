@@ -31,15 +31,16 @@ const ContentSection = ({
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const userPhone = localStorage.getItem("user-id");
-  console.log("FavData", props?.FavData);
+  // console.log("FavData", props?.FavData);
   
-  const userPhone = localStorage.getItem("userPhone");
+  // const userPhone = localStorage.getItem("userPhone");
 
   const server_url = "http://127.0.0.1:8000";
 
   const followCommentator = async (commentator_id) => {
+    const user_id = localStorage.getItem("user-id");
     const res = await axios
-      .get(`http://127.0.0.1:8000/follow-commentator/?id=${commentator_id}`)
+      .get(`http://127.0.0.1:8000/follow-commentator/${user_id}?id=${commentator_id}`)
       .then((res) => {
         // console.log(res);
       })
@@ -49,8 +50,9 @@ const ContentSection = ({
   };
 
   const handleCommentReaction = async (id, reaction) => {
+    const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `http://127.0.0.1:8000/comment-reaction/${id}/`,
+      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
       {
         reaction_type: `${reaction}`,
       }
@@ -87,7 +89,7 @@ const ContentSection = ({
               <div className="col">
                 <img
                   src={`${
-                    server_url + data?.value.commentator_user.profile_pic
+                    server_url + data?.value.commentator_user?.profile_pic
                   }`}
                   className="rounded-circle"
                   width={75}

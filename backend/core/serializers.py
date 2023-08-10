@@ -51,6 +51,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 #         fields = '__all__'
 
 class NotificationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer()
+    receiver = UserSerializer()
     time_since_created = serializers.SerializerMethodField()
     def get_time_since_created(self, obj):
         now = timezone.now()

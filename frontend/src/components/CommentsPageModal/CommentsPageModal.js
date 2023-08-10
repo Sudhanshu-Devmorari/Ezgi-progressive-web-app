@@ -19,9 +19,10 @@ import axios from "axios";
 
 const CommentsPageModal = (props) => {
   const handleShowButtonClick = async () => {
+    const user_id = localStorage.getItem("user-id");
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/filter-comments/',
+        `http://127.0.0.1:8000/filter-comments/${user_id}/`,
         {
           category: [categoryData],
           country: countryData,
@@ -35,9 +36,8 @@ const CommentsPageModal = (props) => {
           filter_type0: yellowSelect,
         }
       );
-  
       const editorData = response.data.map((item) => ({
-        type: "editor",
+        type: "comment",
         value: item,
       }));
       props.setFilterCommentData(editorData)

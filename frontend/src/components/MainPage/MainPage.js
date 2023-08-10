@@ -23,9 +23,9 @@ const MainPage = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // Select Content
   const [selectContent, setSelectContent] = useState("home");
-  console.log("--------", selectContent)
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const [dashboardSUser, setDashboardSUser] = useState(false);
+  console.log("--------", selectContent,"=======", selectPublicorForYou)
 
   const themeMode = localStorage.getItem("CurrentTheme");
 
@@ -42,9 +42,10 @@ const MainPage = () => {
   const SubscriptionCount = 3;
   const highlightCount = 5;
 
-  const homeApiData = async () => {
+
+  const homeApiData = async (user_id) => {
     const res = await axios
-      .get("http://127.0.0.1:8000/retrieve-commentator/")
+      .get(`http://127.0.0.1:8000/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
@@ -64,33 +65,84 @@ const MainPage = () => {
   };
 
   const mergeArrays = () => {
-    let merged = [];
+    if (subscriptionComments.length > 0) {
+      let merged = [];
+      let remainingPublic = [...publicComments];
+      let remainingHighlights = [...highlights];
+      let remainingSubscription = [...subscriptionComments];
+  
+      while (
+        remainingPublic.length > 0 &&
+        remainingHighlights.length > 0 &&
+        remainingSubscription.length > 0
+      ) {
+        merged = [
+          ...merged,
+          ...remainingPublic
+            .splice(0, publicCount)
+            .map((comment) => ({ type: "comment", value: comment })),
+          ...remainingHighlights
+            .splice(0, highlightCount)
+            .map((highlight) => ({ type: "highlight", value: highlight })),
+          ...remainingSubscription
+            .splice(0, SubscriptionCount)
+            .map((remainingSubscription) => ({
+              type: "comment",
+              value: remainingSubscription,
+            })),
+        ];
+      }
+  
+      if (remainingPublic.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingPublic.map((comment) => ({
+            type: "comment",
+            value: comment,
+          })),
+        ];
+      }
+  
+      if (remainingHighlights.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingHighlights.map((highlight) => ({
+            type: "highlight",
+            value: highlight,
+          })),
+        ];
+      }
+  
+      if (remainingSubscription.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingSubscription.map((Subscription) => ({
+            type: "comment",
+            value: Subscription,
+          })),
+        ];
+      }
+      setMergedResult(merged);
+    }
+
+    if (subscriptionComments.length === 0) {
+      let merged = [];
     let remainingPublic = [...publicComments];
     let remainingHighlights = [...highlights];
-    let remainingSubscription = [...subscriptionComments];
 
-    while (
-      remainingPublic.length > 0 &&
-      remainingHighlights.length > 0 &&
-      remainingSubscription.length > 0
-    ) {
+    while (remainingHighlights.length > 0 && remainingPublic.length > 0) {
       merged = [
-        ...merged,
         ...remainingPublic
-          .splice(0, publicCount)
-          .map((comment) => ({ type: "comment", value: comment })),
+          .splice(0, SubscriptionCount)
+          .map((remainingPublic) => ({
+            type: "comment",
+            value: remainingPublic,
+          })),
         ...remainingHighlights
           .splice(0, highlightCount)
           .map((highlight) => ({ type: "highlight", value: highlight })),
-        ...remainingSubscription
-          .splice(0, SubscriptionCount)
-          .map((remainingSubscription) => ({
-            type: "comment",
-            value: remainingSubscription,
-          })),
       ];
     }
-
     if (remainingPublic.length > 0) {
       merged = [
         ...merged,
@@ -111,16 +163,8 @@ const MainPage = () => {
       ];
     }
 
-    if (remainingSubscription.length > 0) {
-      merged = [
-        ...merged,
-        ...remainingSubscription.map((Subscription) => ({
-          type: "comment",
-          value: Subscription,
-        })),
-      ];
-    }
     setMergedResult(merged);
+    }
     
   };
 
@@ -216,11 +260,11 @@ const MainPage = () => {
       document.body.classList.add("body-light-mode");
       setCurrentTheme("light");
     }
-    homeApiData();
+    const user_id = localStorage.getItem("user-id");
+    homeApiData(user_id);
   }, [themeMode]);
 
-  const user = localStorage.getItem("user-role");
-
+  // const user = localStorage.getItem("user-role");
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();
@@ -229,7 +273,7 @@ const MainPage = () => {
 
   // const user = "c-";
   const user = localStorage.getItem("userPhone");
-  console.log("----------", mergedResult)
+  // console.log("-----user_id-----", user_id)
   
 
   return (

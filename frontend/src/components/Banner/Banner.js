@@ -23,9 +23,9 @@ const Banner = ({ data }) => {
           }`}
         >
           <a href={`${data?.link}`} target="_blank">
-            <div style={{ width: "300px", height: "150px" }}>
+            <div>
               <img
-                style={{ width: "100%", height: "100%" }}
+                style={{ height: "100%", width: "100%", objectFit: "cover" }}
                 src={`${server_url + data?.picture}`}
                 alt=""
               />

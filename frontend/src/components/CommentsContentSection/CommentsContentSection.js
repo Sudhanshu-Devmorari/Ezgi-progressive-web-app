@@ -29,10 +29,11 @@ import starDarkLogin from "../../assets/star-1.png";
 const CommentsContentSection = (props) => {
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
+  const server_url = "http://127.0.0.1:8000";
 
-  const activeResolved = async () => {
+  const activeResolved = async (user_id) => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/active-resolved-comment/`)
+      .get(`http://127.0.0.1:8000/active-resolved-comment/${user_id}`)
       .then((res) => {
         console.log("activeResolved: ", res);
         setActive(res.data?.active_comments);
@@ -43,18 +44,20 @@ const CommentsContentSection = (props) => {
       }, []);
   };
   const handleCommentReaction = async (id, reaction) => {
-    // const res = await axios.post(
-    //   `http://127.0.0.1:8000/comment-reaction/${id}/`,
-    //   {
-    //     reaction_type: `${reaction}`,
-    //   }
-    // );
-    // console.log(res);
-    console.log(id, "!!!!!!!!!!!!!!!", reaction);
+    const user_id = localStorage.getItem("user-id");
+    const res = await axios.post(
+      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
+      {
+        reaction_type: `${reaction}`,
+      }
+    );
+    console.log(res);
+    // console.log(id, "!!!!!!!!!!!!!!!", reaction);
   };
 
   useEffect(() => {
-    activeResolved();
+    const user_id = localStorage.getItem("user-id");
+    activeResolved(user_id);
   }, []);
   console.log("^^^^^^^^", active);
   console.log("^^^^^^^^", resolve);
@@ -81,6 +84,7 @@ const CommentsContentSection = (props) => {
           {active.map((val) => {
             return (
               <>
+                {console.log("------->><<", val)}
                 {val.public_content == true ? (
                   <>
                     <div
@@ -339,7 +343,15 @@ const CommentsContentSection = (props) => {
                             }}
                           />
                           <div className="col">
-                            <img src={profile} width={75} height={75} alt="" />
+                            <img
+                              src={`${
+                                server_url + val?.commentator_user?.profile_pic
+                              }`}
+                              className="rounded-circle"
+                              width={75}
+                              height={75}
+                              alt=""
+                            />
                             <span className="p-1 autorname-responsive">
                               {val?.commentator_user?.username}
                             </span>
@@ -575,7 +587,15 @@ const CommentsContentSection = (props) => {
                     }}
                   />
                   <div className="col">
-                    <img src={profile} width={75} height={75} alt="" />
+                    <img
+                      src={`${
+                        server_url + res?.commentator_user?.profile_pic
+                      }`}
+                      className="rounded-circle"
+                      width={75}
+                      height={75}
+                      alt=""
+                    />
                     <span className="p-1 autorname-responsive">
                       {res?.commentator_user?.username}
                     </span>

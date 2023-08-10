@@ -33,8 +33,8 @@ const NewUsers = (props) => {
         >
           <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
             {item.icon && <img src={item.icon} alt="" height={45} width={45} />}
-            <span style={{ fontSize: "1.2rem" }}>{item.label}</span>
-            <span style={{ fontSize: "1.6rem" }}>{item.count}</span>
+            <span style={{ fontSize: "1.2rem" }}>{item.label  || "New Users"}</span>
+            <span style={{ fontSize: "1.6rem" }}>{item.count || props.total_user}</span>
           </div>
           {item.per && (
             <div className="d-flex align-items-end mt-3 p-2">

@@ -19,6 +19,7 @@ const CommentsPage = ({
   // console.log('&&-----&&', selectContent)
   const [filterCommentData, setFilterCommentData] = useState(null)
   const [displayData, setDisplayData] = useState(mergedResult)
+  console.log(":::::::::::", filterCommentData)
   return (
     <>
       <SelectContentForEditorPage
@@ -38,7 +39,7 @@ const CommentsPage = ({
       />
       {onlyPublic == "" &&
       (filterCommentData == null ? displayData : filterCommentData)?.map((val, index) => {
-          let lastType = mergedResult[index == 0 ? 0 : index - 1]?.type;
+          let lastType = displayData[index == 0 ? 0 : index - 1]?.type;
 
           if (val.type == "comment") {
             return (
