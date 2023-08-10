@@ -29,6 +29,10 @@ const ContentSection = ({
   SelectComment,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+
+  const userPhone = localStorage.getItem("user-id");
+  console.log("FavData", props?.FavData);
+  
   const userPhone = localStorage.getItem("userPhone");
 
   const server_url = "http://127.0.0.1:8000";

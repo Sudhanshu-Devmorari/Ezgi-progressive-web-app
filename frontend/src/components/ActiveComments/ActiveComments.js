@@ -16,6 +16,9 @@ import camera from "../../assets/camera-plus.svg";
 import edit from "../../assets/edit.png";
 import editLight from "../../assets/edit.svg";
 import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
+import axios from "axios";
+import { userId } from "../GetUser";
+import Form from "react-bootstrap/Form";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -25,34 +28,23 @@ const ActiveComments = (props) => {
   const [AddCommentModalModalShow, setAddCommentModalModalShow] =
     useState(false);
 
+  const [textareaValue, setTextareaValue] = useState(
+    "2012 yılından beri profesyonel olarak..."
+  );
+
   const [editProfile, setEditProfile] = useState(false);
-  const EditButtonStyle = {
-    border: editProfile
-      ? currentTheme === "dark"
-        ? "1px solid #4DD5FF"
-        : "1px solid #007BF6"
-      : currentTheme === "dark"
-      ? "1px solid #E6E6E6"
-      : "1px solid #0D2A53",
-    color: editProfile
-      ? currentTheme === "dark"
-        ? "#4DD5FF"
-        : "#007BF6"
-      : currentTheme === "dark"
-      ? "#E6E6E6"
-      : "#0D2A53",
-    backgroundColor: "transparent",
-    borderRadius: "18px",
-    padding: "0.1rem 1.7rem",
-    fontSize: "13px",
-  };
-  const cameraImageStyles = {
-    display: editProfile ? "block" : "none",
-    position: "absolute",
-    backgroundColor: "#",
-    top: "4.4rem",
-    left: "2.3rem",
-  };
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+
+  const profileData = props.profileData;
+
+  function handleChangeProfilePic(e) {
+    setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+    setEditProfile(false);
+    const formData = new FormData();
+    formData.append("file", e.target.files[0]);
+    const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+    console.log("res: ", res);
+  }
 
   return (
     <>
@@ -81,11 +73,23 @@ const ActiveComments = (props) => {
           <div className="col pe-0 d-flex ">
             <div className="position-relative">
               <img
-                src={profile}
+                src={
+                  preveiwProfilePic
+                    ? preveiwProfilePic
+                    : `http://127.0.0.1:8000${profileData?.profile_pic}`
+                }
                 width={100}
                 height={100}
                 alt=""
-                style={{ opacity: editProfile ? currentTheme === "dark" ? "0.4" : "0.7" : "" }}
+                style={{
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  opacity: editProfile
+                    ? currentTheme === "dark"
+                      ? "0.4"
+                      : "0.7"
+                    : "",
+                }}
               />
             </div>
             <div className="">
@@ -99,16 +103,30 @@ const ActiveComments = (props) => {
                   background: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 }}
               />
-              <label htmlFor="camera-icon">
-                <img
-                  src={camera}
-                  alt=""
-                  style={cameraImageStyles}
-                  height={40}
-                  width={40}
-                />
-              </label>
-              <input type="file" name="" id="camera-icon" className="d-none" />
+              {(preveiwProfilePic || editProfile) && (
+                <label htmlFor="camera-icon">
+                  <img
+                    src={camera}
+                    alt=""
+                    style={{
+                      display: editProfile ? "block" : "none",
+                      position: "absolute",
+                      backgroundColor: "#",
+                      top: "4.4rem",
+                      left: "2.3rem",
+                    }}
+                    height={40}
+                    width={40}
+                  />
+                </label>
+              )}
+              <input
+                type="file"
+                name=""
+                id="camera-icon"
+                className="d-none"
+                onChange={handleChangeProfilePic}
+              />
             </div>
             <div className="d-flex flex-column ps-1">
               <div>
@@ -129,7 +147,7 @@ const ActiveComments = (props) => {
                 className="blueTick-responsive align-items-center mt-1 responsive-username"
                 style={{ fontSize: "14px" }}
               >
-                melih1905
+                {profileData?.username}
                 <img
                   className="responsive-blue-tick"
                   src={blueTick}
@@ -144,7 +162,7 @@ const ActiveComments = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                Ankara/Turkiye
+                {profileData?.city}/{profileData?.country}
               </div>
               <div
                 style={{
@@ -158,8 +176,10 @@ const ActiveComments = (props) => {
           </div>
           <div className="col">
             <div className="d-flex justify-content-end gap-2">
-              <div className="flex-column d-flex ">
-                <span style={{ fontSize: "1.2rem" }}>256</span>
+              <div className="flex-column d-flex text-center">
+                <span style={{ fontSize: "1.2rem" }}>
+                  {profileData?.Subscriber_Count}
+                </span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -170,8 +190,10 @@ const ActiveComments = (props) => {
                 </span>
               </div>
 
-              <div className="flex-column d-flex ">
-                <span style={{ fontSize: "1.2rem" }}>256</span>
+              <div className="flex-column d-flex text-center">
+                <span style={{ fontSize: "1.2rem" }}>
+                  {profileData?.Follower_Count}
+                </span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -182,8 +204,10 @@ const ActiveComments = (props) => {
                 </span>
               </div>
 
-              <div className="flex-column d-flex ">
-                <span style={{ fontSize: "1.2rem" }}>256</span>
+              <div className="flex-column d-flex text-center">
+                <span style={{ fontSize: "1.2rem" }}>
+                  {profileData?.Comment_Count}
+                </span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -195,10 +219,29 @@ const ActiveComments = (props) => {
               </div>
             </div>
             <div className="mt-2 d-flex justify-content-end">
-              {props.user === "c" ? (
+              {props.profile === "commentator" ? (
                 <button
                   onClick={() => setEditProfile(!editProfile)}
-                  style={EditButtonStyle}
+                  style={{
+                    border: editProfile
+                      ? currentTheme === "dark"
+                        ? "1px solid #4DD5FF"
+                        : "1px solid #007BF6"
+                      : currentTheme === "dark"
+                      ? "1px solid #E6E6E6"
+                      : "1px solid #0D2A53",
+                    color: editProfile
+                      ? currentTheme === "dark"
+                        ? "#4DD5FF"
+                        : "#007BF6"
+                      : currentTheme === "dark"
+                      ? "#E6E6E6"
+                      : "#0D2A53",
+                    backgroundColor: "transparent",
+                    borderRadius: "18px",
+                    padding: "0.1rem 1.7rem",
+                    fontSize: "13px",
+                  }}
                 >
                   Edit Profile
                 </button>
@@ -223,28 +266,38 @@ const ActiveComments = (props) => {
           </div>
         </div>
         <div
-          className="p-1 my-2 content-font position-relative"
+          className="my-2 p-1 content-font position-relative"
           style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6", opacity: editProfile ? "0.3" : ""
+            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+            opacity: editProfile ? "0.3" : "",
           }}
         >
-          2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
-          lig konusunda uzmanım.Yorumlarımı takip ettiğiniz için teşekkürler.
-          2012 yılından beri profesyonel olarak maçları takip ediyorum. Premier
-          lig konusunda uzmanım. Yorumlarımı takip ettiğiniz için teşekkürler.
-        </div>
-          <img
-            src={currentTheme === "dark" ? edit : editLight}
-            alt=""
-            height={35}
-            width={35}
-            style={{
-              display: editProfile ? "block" : "none",
-              position: "absolute",
-              right: "10rem",
-              top: "10rem"
-            }}
+          <Form.Control
+            as="textarea"
+            maxLength={250}
+            className={`${
+              currentTheme === "dark"
+                ? "textArea-dark-mode content-font"
+                : "textArea-light-mode content-font"
+            }`}
+            value={textareaValue}
+            onChange={(e) => setTextareaValue(e.target.value)}
+            disabled={!editProfile}
           />
+        </div>
+        <img
+          // onClick={() => setEditProfile(!editProfile)}
+          src={currentTheme === "dark" ? edit : editLight}
+          alt=""
+          height={35}
+          width={35}
+          style={{
+            display: editProfile ? "block" : "none",
+            position: "absolute",
+            right: "10rem",
+            top: "10rem",
+          }}
+        />
         <div className="row g-0 text-center my-2 gap-1">
           <div className="col d-flex flex-column">
             <span
@@ -327,7 +380,7 @@ const ActiveComments = (props) => {
           <div className="py-1">Leagues</div>
           <div className="py-1">UK Premier League + 3</div>
         </div>
-        {props.user !== "c" && (
+        {props.profile !== "commentator" && (
           <div
             className={`d-flex justify-content-center align-items-center my-3 ${
               props.content === ("home" || "wallet") && "mb-5"
@@ -351,7 +404,7 @@ const ActiveComments = (props) => {
             </button>
           </div>
         )}
-        {props.user === "c" && (
+        {props.profile === "commentator" && (
           <div className="d-flex justify-content-center my-3 gap-2">
             {props.content === "home" && (
               <button

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, 
-                         CommentReaction, FavEditors, TicketSupport, Highlight)
+                         CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
+                         CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting)
 
 # Register your models here.
 @admin.register(User)
@@ -23,7 +24,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('id','user','status', 'context','created','updated')
+    list_display = ('id','sender', 'receiver','status', 'context','created','updated')
 
 
 @admin.register(CommentReaction)
@@ -44,3 +45,28 @@ class SupportTicketAdmin(admin.ModelAdmin):
 @admin.register(Highlight)
 class HighlightAdmin(admin.ModelAdmin):
     list_display = ('id','user','duration','start_date','end_date','status','created','updated')
+
+
+@admin.register(Advertisement)
+class AdvertisementAdmin(admin.ModelAdmin):
+    list_display = ('id','picture','ads_space','start_date','end_date','company_name','link','ads_budget','status','created','updated')
+
+
+@admin.register(CommentatorLevelRule)
+class CommentatorLevelRuleAdmin(admin.ModelAdmin):
+    list_display = ('id','commentator_level','daily_match_limit','monthly_min_limit','ods_limit','winning_limit','sucess_rate','subscriber_limit','level_icon','created','updated')
+
+
+@admin.register(MembershipSetting)
+class MembershipSettingAdmin(admin.ModelAdmin):
+    list_display = ('id','commentator_level','plan_price','commission_rate','promotion_rate','promotion_duration','created','updated')
+
+
+@admin.register(SubscriptionSetting)
+class SubscriptionSettingAdmin(admin.ModelAdmin):
+    list_display = ('id','commentator_level','duration','month_1','month_3','month_6','year_1','created','updated')
+
+
+@admin.register(HighlightSetting)
+class HighlightSettingAdmin(admin.ModelAdmin):
+    list_display = ('id','commentator_level','week_1','week_2','month_1','highlight_icon','created','updated')

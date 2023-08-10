@@ -25,18 +25,15 @@ def sms_send(number, msg):
     xml = f'<?xml version="1.0"?><mainbody><header><usercode>{usercode}</usercode><password>{password}</password><msgheader>{usercode}</msgheader></header><body><msg><![CDATA[{msg}]]></msg><no>{number}</no></body></mainbody>'
     headers = {'Content-Type': 'application/xml'}
     res =  requests.post('https://api.netgsm.com.tr/sms/send/otp', data=xml, headers=headers)
-    print('res-------: ', res)
 
     root = ET.fromstring(res.text)
 
     # Find the 'code' element in the response
     code_element = root.find('main/code')
-    print('code_element: ', code_element)
 
     if code_element is not None:
         # Extract the value of the 'code' element
         code_value = code_element.text
-        print('code_value: ', code_value)
         
         if code_value == '0':
             return "Success"

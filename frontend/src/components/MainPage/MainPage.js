@@ -219,6 +219,8 @@ const MainPage = () => {
     homeApiData();
   }, [themeMode]);
 
+  const user = localStorage.getItem("user-role");
+
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();
@@ -229,7 +231,6 @@ const MainPage = () => {
   const user = localStorage.getItem("userPhone");
   console.log("----------", mergedResult)
   
-  
 
   return (
     <>
@@ -238,7 +239,6 @@ const MainPage = () => {
       </div>
       <div className="container-fluid mt-3 mobile-view">
         <div
-          // className={`container-fluid mt-3 mobile-view`}
           style={{ marginBottom: "66px" }}
         >
           <NavBar
@@ -247,9 +247,8 @@ const MainPage = () => {
           />
 
           {dashboardSUser ? (
-            user === "c" ? (
+            user !== "standard" ? (
               <CommentatorsCommentsPage
-                user={user}
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}

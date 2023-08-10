@@ -95,6 +95,8 @@ const SignUpModal = (props) => {
     selectedAge,
   ]);
 
+  const [userExists, setuserExists] = useState("");
+
   const handleSignUp = async () => {
     if (selectedCity === "Select") {
       setCityError("Please select your city.");
@@ -115,6 +117,8 @@ const SignUpModal = (props) => {
       console.log("response: ", response.data);
       if (response.data.status === 200) {
         props.onHide();
+      } else if (response.data.status === 400){
+        setuserExists(response.data?.data?.phone)
       }
     }
   };
@@ -386,13 +390,14 @@ const SignUpModal = (props) => {
               }`}
             >
               <div className="m-4">
+                <div className="text-danger text-center text-capitalize">{userExists}</div>
                 <div
                   className="d-flex justify-content-between m-2"
                   style={{ fontWeight: "500", color: "#0D2A53" }}
                 >
                   <span>
                     <i
-                      onClick={() => props.setShowModal(1)}
+                      onClick={() => setShowModal(1)}
                       className="fa-solid fa-arrow-left-long"
                       style={{
                         fontSize: "21px",
@@ -514,7 +519,7 @@ const SignUpModal = (props) => {
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
                       onClick={() => {
-                        props.setShowModal(3);
+                        setShowModal(3);
                       }}
                     >
                       Terms of use
@@ -563,7 +568,7 @@ const SignUpModal = (props) => {
           )}
 
           {ShowModal === 3 && (
-            <TermsOfUse hide={props.onHide} showModal={props.setShowModal} />
+            <TermsOfUse hide={props.onHide} />
           )}
 
           {ShowModal === 4 && <SignInModal hide={props.onHide} />}
