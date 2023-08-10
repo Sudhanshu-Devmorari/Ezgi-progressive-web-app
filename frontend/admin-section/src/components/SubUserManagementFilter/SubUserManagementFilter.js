@@ -15,16 +15,20 @@ import circle_x from "../../assets/circle-x.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Dropdownmodal } from "../Dropdownmodal";
 import axios from "axios";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 
-const SubUserManagementFilter = () => {
+const SubUserManagementFilter = (props) => {
   const [isTransactionSelected, setIsTransactionSelected] = useState(false);
   const [isOnlyViewSelected, setIsOnlyViewSelected] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   // const authTypeOptions = ["Option A", "Option B", "Option C"];
-  const departmentOptions = ["Financial", "Technical"];
+  const departmentOptions = [
+    "Support Supervisor",
+    "Financial Supervisor",
+    "IT Supervisor",
+    "Ads Manager",
+    "Director Manager",
+  ];
 
   const [authTypeDropDown, setAuthTypeDropDown] = useState(false);
   const [departmentDropDown, setDepartmentDropDown] = useState(false);
@@ -103,55 +107,172 @@ const SubUserManagementFilter = () => {
   // Upload Profile
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
   const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(false);
+
   function handleAddProfile(e) {
-    setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-    // setEditProfile(false);
-    const formData = new FormData();
-    formData.append("file", e.target.files[0]);
-    // const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-    // console.log("res: ", res);
+    const imageFile = e.target.files[0];
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+    setSelectedImage(imageFile);
   }
   // Create Sub user API
   const [Name, setName] = useState("");
   const [NameError, setNameError] = useState("");
   const [Phone, setPhone] = useState("");
   const [PhoneError, setPhoneError] = useState("");
-  const [Authorization, setAuthorization] = useState("Staff");
+  const [AuthorizationType, setAuthorizationType] = useState("Staff");
   const [AuthorizationError, setAuthorizationError] = useState("");
   const [AuthorizationTypeError, setAuthorizationTypeError] = useState("");
   const [PasswordError, setPasswordError] = useState("");
   const [DepartmentError, setDepartmentError] = useState("");
 
+  const phoneReg = /^\d{10}$/;
   const handleCreateNewSubUser = async () => {
-    if (Name === ""){
-      setNameError("Required*")
-    }
-    if (Phone === ""){
-      setPhoneError("Required*")
-    }
-    if (password === ""){
-      setPasswordError("Required*")
-    }
-    if (Authorization === ""){
-      setAuthorizationError("Required*")
-    }
-    if (departmentOptions === "Select"){
-      setDepartmentError("Required*")
-    }
-    const res = await axios.post("http://127.0.0.1:8000/");
-  };
+    let hasError = false;
 
-  // Get sub-users
-  useEffect(() => {
-    async function getSubUsers() {
-      try {
-        const res = await axios.get("http://127.0.0.1/subuser-management/");
-        console.log(res, "==========>>>res sub users");
-      } catch (error) {
-        console.log(error);
+    if (Name === "") {
+      setNameError("Required*");
+      hasError = true;
+    } else {
+      setNameError("");
+    }
+
+    if (Phone === "") {
+      setPhoneError("Required*");
+      hasError = true;
+    } else {
+      if (!phoneReg.test(Phone)) {
+        setPhoneError("Invalid phone number");
+      } else {
+        setPhoneError("");
       }
     }
-  }, []);
+
+    if (password === "") {
+      setPasswordError("Required*");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+
+    if (AuthorizationType === "") {
+      setAuthorizationTypeError("Required*");
+      hasError = true;
+    } else {
+      setAuthorizationTypeError("");
+    }
+
+    if (selectedDepartment === "Select") {
+      setDepartmentError("Required*");
+      hasError = true;
+    } else {
+      setDepartmentError("");
+    }
+
+    if (!isTransactionSelected && !isOnlyViewSelected) {
+      setAuthorizationError("*Required");
+      hasError = true;
+    } else {
+      setAuthorizationError("");
+    }
+    if (hasError) {
+      return;
+    }
+
+    if (!hasError) {
+      const formData = new FormData();
+
+      // Append image file to FormData
+      formData.append("file", selectedImage);
+
+      // Append other data to FormData
+      formData.append("name", Name);
+      formData.append("phone", Phone);
+      formData.append("password", password);
+      formData.append("authorization_type", AuthorizationType);
+      formData.append("department", selectedDepartment);
+      formData.append(
+        "permission",
+        (isTransactionSelected && "transaction") ||
+          (isOnlyViewSelected && "only_view")
+      );
+
+      if (isAllSelected) {
+        formData.append("all_permission", "true");
+      }
+      if (isRulesUpdateSelected) {
+        formData.append("is_rules_update", "true");
+      }
+      if (isSalesExportSelected) {
+        formData.append("is_sales_export", "true");
+      }
+      if (isPriceUpdateSelected) {
+        formData.append("is_price_update", "true");
+      }
+      const res = await axios.post(
+        "http://127.0.0.1:8000/subuser-management/",
+        formData
+      );
+      console.log(res);
+    }
+  };
+
+  // Edit Sub User Profile
+  useEffect(() => {
+    async function editUser() {
+      const res = await axios.patch(
+        `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`
+      );
+      console.log(res.data);
+      setName(res?.data.name);
+      setPhone(res?.data.phone);
+      setPassword(res?.data.password);
+      setAuthorizationType(res?.data.authorization_type);
+      setSelectedDepartment(res?.data.department);
+      if (res?.data.is_transaction) {
+        setIsTransactionSelected(true);
+        setIsWithdrawalRequestsSelected(
+          res?.data.is_process_withdrawal_request
+        );
+        setIsRulesUpdateSelected(res?.data.is_rule_update);
+        setIsPriceUpdateSelected(res?.data.is_price_update);
+        setIsWithdrawalExportSelected(res?.data.is_withdrawal_export);
+        setIsSalesExportSelected(res?.data.is_sales_export);
+        setIsAllSelected(res?.data.is_all_permission);
+      } else if (res?.data.is_view_only) {
+        setIsOnlyViewSelected(true);
+      }
+    }
+    if (props.editUserId !== "") {
+      editUser();
+    }
+  }, [props?.editUserId]);
+
+  const handleUpdateProfile = async () => {
+    try {
+      console.log("props.editUserId=>>>",props.editUserId);
+      const res = await axios.patch(
+        `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`,
+        {
+          name: Name,
+          phone: Phone,
+          password: password,
+          authorization_type: AuthorizationType,
+          department: selectedDepartment,
+          is_transaction: isTransactionSelected,
+          is_view_only: isOnlyViewSelected,
+          is_process_withdrawal_request: isWithdrawalRequestsSelected,
+          is_rule_update: isRulesUpdateSelected,
+          is_price_update: isPriceUpdateSelected,
+          is_withdrawal_export: isWithdrawalExportSelected,
+          is_sales_export: isSalesExportSelected,
+          is_all_permission: isAllSelected,
+        }
+      );
+      console.log("res============>>>", res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -270,9 +391,7 @@ const SubUserManagementFilter = () => {
                       Upload
                     </span>
                   </span>
-                  {/* {(isWithdrawalRequestsSelected ||
-                    isPriceUpdateSelected ||
-                    isTransactionSelected) && (
+                  {props?.editProfileModal === 2 && (
                     <span
                       data-bs-toggle="modal"
                       data-bs-target="#transactions"
@@ -280,16 +399,21 @@ const SubUserManagementFilter = () => {
                     >
                       Transaction History
                     </span>
-                  )} */}
+                  )}
                 </div>
               </div>
               <div className="row my-2 g-0 py-2 gap-2">
                 <div className="col d-flex flex-column">
                   <span>Name Surname</span>
                   <input
+                    onChange={(e) => setName(e.target.value)}
                     type="text"
                     className="darkMode-input form-control text-center"
+                    value={Name}
                   />
+                  <small className="text-danger" style={{ color: "#FF5757" }}>
+                    {NameError}
+                  </small>
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Phone</span>
@@ -302,6 +426,8 @@ const SubUserManagementFilter = () => {
                       +90
                     </span>
                     <input
+                      value={Phone}
+                      onChange={(e) => setPhone(e.target.value)}
                       style={{ paddingLeft: "0.4rem" }}
                       type="text"
                       class="form-control darkMode-input "
@@ -309,6 +435,9 @@ const SubUserManagementFilter = () => {
                       aria-describedby="basic-addon1"
                     />
                   </div>
+                  <small className="text-danger" style={{ color: "#FF5757" }}>
+                    {PhoneError}
+                  </small>
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Password</span>
@@ -339,16 +468,23 @@ const SubUserManagementFilter = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     />
                   )}
+                  <small className="text-danger" style={{ color: "#FF5757" }}>
+                    {PasswordError}
+                  </small>
                 </div>
               </div>
               <div className="row g-0 gap-2">
                 <div className="col d-flex flex-column">
                   <span>Authorization Type</span>
                   <input
+                    onChange={(e) => setAuthorizationType(e.target.value)}
                     type="text"
                     className="darkMode-input form-control text-center"
-                    value={Authorization}
+                    value={AuthorizationType}
                   />
+                  <small className="text-danger" style={{ color: "#FF5757" }}>
+                    {AuthorizationTypeError}
+                  </small>
                 </div>
                 <div className="col d-flex flex-column">
                   <Dropdownmodal
@@ -359,6 +495,9 @@ const SubUserManagementFilter = () => {
                     isOpen={departmentDropDown}
                     toggleDropdown={toggleDepartmentDropdown}
                   />
+                  <small className="text-danger" style={{ color: "#FF5757" }}>
+                    {DepartmentError}
+                  </small>
                 </div>
                 <div className="col"></div>
               </div>
@@ -394,6 +533,9 @@ const SubUserManagementFilter = () => {
                     <span className="ps-1">Only View</span>
                   </div>
                 </div>
+                <small className="text-danger" style={{ color: "#FF5757" }}>
+                  {AuthorizationError}
+                </small>
               </div>
               {isTransactionSelected && (
                 <>
@@ -489,10 +631,8 @@ const SubUserManagementFilter = () => {
                   </div>
                 </>
               )}
-              <div className="my-3 justify-content-center align-items-center d-flex">
-                {/* {isOnlyViewSelected ||
-                isWithdrawalRequestsSelected ||
-                isPriceUpdateSelected && (
+              <div className="my-3 justify-content-center align-items-center d-flex py-2">
+                {props?.editProfileModal === 2 && (
                   <>
                     <button
                       className="py-1 px-2"
@@ -517,6 +657,7 @@ const SubUserManagementFilter = () => {
                       Deactive
                     </button>
                     <button
+                      onClick={handleUpdateProfile}
                       className="py-1 px-2"
                       style={{
                         backgroundColor: "transparent",
@@ -528,19 +669,21 @@ const SubUserManagementFilter = () => {
                       Update
                     </button>
                   </>
-                ) } */}
-
-                <button
-                  className="py-1 px-2"
-                  style={{
-                    backgroundColor: "transparent",
-                    borderRadius: "4px",
-                    border: "1px solid #D2DB08",
-                    color: "#D2DB08",
-                  }}
-                >
-                  Create
-                </button>
+                )}
+                {props?.editProfileModal === 1 && (
+                  <button
+                    onClick={handleCreateNewSubUser}
+                    className="py-1 px-2"
+                    style={{
+                      backgroundColor: "transparent",
+                      borderRadius: "4px",
+                      border: "1px solid #D2DB08",
+                      color: "#D2DB08",
+                    }}
+                  >
+                    Create
+                  </button>
+                )}
               </div>
             </div>
             <img
@@ -634,7 +777,7 @@ const SubUserManagementFilter = () => {
               </div>
               <div className="my-2" style={{ overflowY: "auto" }}>
                 {transactions.map((res, index) => (
-                  <div
+                  <div key={index}
                     className="row g-0 dark-mode px-2 my-2"
                     style={{ backgroundColor: "#0B2447" }}
                   >
@@ -647,7 +790,6 @@ const SubUserManagementFilter = () => {
                         <img
                           src={res.profile}
                           alt=""
-                          srcset=""
                           height={45}
                           width={45}
                         />

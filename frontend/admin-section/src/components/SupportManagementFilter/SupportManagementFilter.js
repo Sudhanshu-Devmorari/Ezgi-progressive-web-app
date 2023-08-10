@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 import "./SupportManagementFilter.css";
 
-const SupportManagementFilter = () => {
+const SupportManagementFilter = (props) => {
   const options = ["All", "Pendings", "Resolved", "Redirected"];
 
-  const [selectedOption, setSelectedOption] = useState("All");
+  
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
+    props?.setSelectedOption(option);
     setShowDropdown(false);
   };
 
@@ -47,7 +47,7 @@ const SupportManagementFilter = () => {
                 : "1px solid #E6E6E6",
             }}
           >
-            {selectedOption}
+            {props?.selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
@@ -61,7 +61,7 @@ const SupportManagementFilter = () => {
             }}
           >
             {options
-              .filter((option) => option !== selectedOption)
+              .filter((option) => option !== props?.selectedOption)
               .map((option) => (
                 <span
                   key={option}

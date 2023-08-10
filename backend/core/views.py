@@ -1805,19 +1805,23 @@ class SubUserManagement(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
+                print('request.data: ', request.data)
                 role = 'sub_user'
                 
-                required_fields = ['file', 'name', 'phone', 'password', 'authorization_type', 'department', 'permission']
-                for field in required_fields:
-                    if field not in request.data:
-                        return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
+                # required_fields = ['file', 'name', 'phone', 'password', 'authorization_type', 'department', 'permission']
+                # for field in required_fields:
+                #     if field not in request.data:
+                #         return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 password = request.data.get('password')
+                print('password: ', password)
 
                 permission_type = request.data.get('permission')
+                print('permission_type: ', permission_type)
                 if permission_type == 'transaction':
                     transaction = True
                     all_permission = request.data.get('all_permission')
+                    print('all_permission: ', all_permission)
                     
                     if all_permission and all_permission.lower() == 'true':
                         process_withdrawal = True
@@ -1827,18 +1831,26 @@ class SubUserManagement(APIView):
                         sales_export = True
                     else:
                         process_withdrawal = request.data.get('process_withdrawal')
+                        print('process_withdrawal: ', process_withdrawal)
                         rule_update = request.data.get('rule_update')
                         price_update = request.data.get('price_update')
                         withdrawal_export = request.data.get('withdrawal_export')
                         sales_export = request.data.get('sales_export')
                         all_permission = False
 
+                    print("================================")
+                    print("================================", request.data.get('file'))
+                    print("================================request.data.get('name')", request.data.get('name'))
+                    print("================================request.data.get('phone')", request.data.get('phone'))
+                    print("================================request.data.get('authorization_type')", request.data.get('authorization_type'))
+                    print("================================request.data.get('department')", request.data.get('department'))
+
                     sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
                                                        password=password, authorization_type=request.data.get('authorization_type'),
                                                        department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
-
+                    print(sub_user_obj,"===================sub_user_obj")
                 elif permission_type == 'only_view':
                     view_only = True
                     process_withdrawal = False
@@ -1853,6 +1865,7 @@ class SubUserManagement(APIView):
                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
 
+                print("***************************")
                 sub_user_obj.set_password(password)
                 sub_user_obj.save()
                 serializer = UserSerializer(sub_user_obj)
@@ -1885,6 +1898,7 @@ class SubUserManagement(APIView):
             data['is_all_permission'] = True
 
         serializer = UserSerializer(user, data=data, partial=True)
+        print('erializer.is_valid: ', serializer.is_valid)
         if serializer.is_valid():
             try:
                 serializer.save()
@@ -1892,6 +1906,7 @@ class SubUserManagement(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(serializer.data)
         else:
+            print('serializer.errors: ', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         
