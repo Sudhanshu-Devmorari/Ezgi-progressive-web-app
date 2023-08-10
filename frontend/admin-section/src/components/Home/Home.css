@@ -44,4 +44,5 @@
 }
 .home-height{
     height: 64vh;
+    overflow-y: auto;
 }

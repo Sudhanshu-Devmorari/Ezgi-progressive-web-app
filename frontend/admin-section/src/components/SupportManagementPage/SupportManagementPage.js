@@ -26,6 +26,7 @@ const SupportManagementPage = () => {
    const [ResolvedRequest, setResolvedRequest] = useState('');
    const [Total, setTotal] = useState('');
    const [tickets, setTickets] = useState([]);
+   const [supportHistory, setSupportHistory] = useState([]);
    useEffect(() => {
      async function getSupportData(){
        try{
@@ -36,6 +37,7 @@ const SupportManagementPage = () => {
          setPendingRequest(res?.data?.pending_request)
          setResolvedRequest(res?.data?.resolved_request)
          setTotal(res?.data?.total)
+         setSupportHistory(res?.data?.support_history)
        } catch (error){
          console.log(error);
        }
@@ -135,7 +137,7 @@ const SupportManagementPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="dark-mode p-2 m-2 mb-0 home-height">
+                <div className="dark-mode p-2 m-2 mb-0 home-height" style={{overflowY:"auto"}}>
                   <SupportManagementFilter />
                   {tickets.map((res, index) => (
                     <MainDiv>
@@ -242,7 +244,7 @@ const SupportManagementPage = () => {
                   </div>
                 </div>
                 <div className="mt-2">
-                  <SupportHistory />
+                  <SupportHistory supportHistory={supportHistory}/>
                 </div>
               </div>
             </div>

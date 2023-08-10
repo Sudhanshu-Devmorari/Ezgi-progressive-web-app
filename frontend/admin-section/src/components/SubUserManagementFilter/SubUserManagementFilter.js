@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoSearch } from "react-icons/go";
 import camera from "../../assets/camera-plus.svg";
 import cross from "../../assets/Group 81.svg";
@@ -14,14 +14,17 @@ import circle_check from "../../assets/circle-check-1.png";
 import circle_x from "../../assets/circle-x.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Dropdownmodal } from "../Dropdownmodal";
+import axios from "axios";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const SubUserManagementFilter = () => {
   const [isTransactionSelected, setIsTransactionSelected] = useState(false);
   const [isOnlyViewSelected, setIsOnlyViewSelected] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const authTypeOptions = ["Option A", "Option B", "Option C"];
-  const departmentOptions = ["Department X", "Department Y", "Department Z"];
+  // const authTypeOptions = ["Option A", "Option B", "Option C"];
+  const departmentOptions = ["Financial", "Technical"];
 
   const [authTypeDropDown, setAuthTypeDropDown] = useState(false);
   const [departmentDropDown, setDepartmentDropDown] = useState(false);
@@ -96,6 +99,60 @@ const SubUserManagementFilter = () => {
       acc: "TR76 0009 2545 15478",
     },
   ];
+
+  // Upload Profile
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  function handleAddProfile(e) {
+    setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+    // setEditProfile(false);
+    const formData = new FormData();
+    formData.append("file", e.target.files[0]);
+    // const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+    // console.log("res: ", res);
+  }
+  // Create Sub user API
+  const [Name, setName] = useState("");
+  const [NameError, setNameError] = useState("");
+  const [Phone, setPhone] = useState("");
+  const [PhoneError, setPhoneError] = useState("");
+  const [Authorization, setAuthorization] = useState("Staff");
+  const [AuthorizationError, setAuthorizationError] = useState("");
+  const [AuthorizationTypeError, setAuthorizationTypeError] = useState("");
+  const [PasswordError, setPasswordError] = useState("");
+  const [DepartmentError, setDepartmentError] = useState("");
+
+  const handleCreateNewSubUser = async () => {
+    if (Name === ""){
+      setNameError("Required*")
+    }
+    if (Phone === ""){
+      setPhoneError("Required*")
+    }
+    if (password === ""){
+      setPasswordError("Required*")
+    }
+    if (Authorization === ""){
+      setAuthorizationError("Required*")
+    }
+    if (departmentOptions === "Select"){
+      setDepartmentError("Required*")
+    }
+    const res = await axios.post("http://127.0.0.1:8000/");
+  };
+
+  // Get sub-users
+  useEffect(() => {
+    async function getSubUsers() {
+      try {
+        const res = await axios.get("http://127.0.0.1/subuser-management/");
+        console.log(res, "==========>>>res sub users");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, []);
+
   return (
     <>
       <div className="d-flex p-2">
@@ -111,7 +168,7 @@ const SubUserManagementFilter = () => {
         <div className="p-2">
           <button
             data-bs-toggle="modal"
-            data-bs-target="#staticBackdrop"
+            data-bs-target="#create-sub-user"
             className="px-3"
             style={{
               backgroundColor: "transparent",
@@ -127,18 +184,23 @@ const SubUserManagementFilter = () => {
       {/* Modal */}
       <div
         class="modal fade"
-        id="staticBackdrop"
+        id="create-sub-user"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
         tabindex="-1"
-        aria-labelledby="staticBackdropLabel"
+        aria-labelledby="create-sub-userLabel"
         aria-hidden="true"
       >
         <div class="modal-dialog modal-dialog-centered modal-lg">
           <div class="modal-content">
             <div class="modal-body dark-mode p-3" style={{ fontSize: ".9rem" }}>
               <div className="d-flex position-relative my-2 gap-2">
-                <label htmlFor="camera">
+                <label
+                  htmlFor="camera"
+                  style={{
+                    display: displaySelectedImg ? "none" : "block",
+                  }}
+                >
                   <div
                     className="my-1 cursor"
                     style={{
@@ -159,9 +221,25 @@ const SubUserManagementFilter = () => {
                     />
                   </div>
                 </label>
-                <input type="file" className="d-none" id="camera" />
+                <img
+                  src={preveiwProfilePic}
+                  alt=""
+                  height={135}
+                  width={135}
+                  style={{
+                    display: displaySelectedImg ? "block" : "none",
+                    objectFit: "cover",
+                    borderRadius: "50%  ",
+                  }}
+                />
+                <input
+                  type="file"
+                  className="d-none"
+                  id="camera"
+                  onChange={(e) => handleAddProfile(e)}
+                />
                 <div className="d-flex justify-content-center align-items-center flex-column gap-2">
-                  {isTransactionSelected && (
+                  {selectedDepartment !== "Select" && (
                     <button
                       className="px-3"
                       style={{
@@ -171,7 +249,7 @@ const SubUserManagementFilter = () => {
                         color: "#58DEAA",
                       }}
                     >
-                      Financial
+                      {selectedDepartment}
                     </button>
                   )}
                   <span
@@ -185,9 +263,14 @@ const SubUserManagementFilter = () => {
                       height={20}
                       width={20}
                     />
-                    <span className="ps-1">Upload</span>
+                    <span
+                      className="ps-1 cursor"
+                      onClick={() => setdisplaySelectedImg(true)}
+                    >
+                      Upload
+                    </span>
                   </span>
-                  {(isWithdrawalRequestsSelected ||
+                  {/* {(isWithdrawalRequestsSelected ||
                     isPriceUpdateSelected ||
                     isTransactionSelected) && (
                     <span
@@ -197,13 +280,16 @@ const SubUserManagementFilter = () => {
                     >
                       Transaction History
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
-              <div className="row my-2 g-0 p-2 gap-2">
+              <div className="row my-2 g-0 py-2 gap-2">
                 <div className="col d-flex flex-column">
                   <span>Name Surname</span>
-                  <input type="text" className="darkMode-input form-control" />
+                  <input
+                    type="text"
+                    className="darkMode-input form-control text-center"
+                  />
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Phone</span>
@@ -211,13 +297,14 @@ const SubUserManagementFilter = () => {
                     <span
                       class="input-group-text darkMode-input"
                       id="basic-addon1"
-                      style={{ padding: ".375rem 1rem .375rem .1rem" }}
+                      style={{ padding: "0.375rem 0.375rem .375rem 4rem" }}
                     >
                       +90
                     </span>
                     <input
+                      style={{ paddingLeft: "0.4rem" }}
                       type="text"
-                      class="form-control darkMode-input"
+                      class="form-control darkMode-input "
                       aria-label="Username"
                       aria-describedby="basic-addon1"
                     />
@@ -226,7 +313,7 @@ const SubUserManagementFilter = () => {
                 <div className="col d-flex flex-column">
                   <span>Password</span>
                   <input
-                    className="darkMode-input form-control"
+                    className="darkMode-input form-control text-center"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -237,7 +324,7 @@ const SubUserManagementFilter = () => {
                       style={{
                         position: "absolute",
                         right: "2rem",
-                        top: "12.6rem",
+                        top: "12.9rem",
                       }}
                       onClick={() => setShowPassword(!showPassword)}
                     />
@@ -256,13 +343,11 @@ const SubUserManagementFilter = () => {
               </div>
               <div className="row g-0 gap-2">
                 <div className="col d-flex flex-column">
-                  <Dropdownmodal
-                    label="Authorization Type"
-                    options={authTypeOptions}
-                    selectedOption={selectedAuthType}
-                    onSelectOption={handleAuthTypeSelection}
-                    isOpen={authTypeDropDown}
-                    toggleDropdown={toggleAuthTypeDropdown}
+                  <span>Authorization Type</span>
+                  <input
+                    type="text"
+                    className="darkMode-input form-control text-center"
+                    value={Authorization}
                   />
                 </div>
                 <div className="col d-flex flex-column">
@@ -283,9 +368,10 @@ const SubUserManagementFilter = () => {
                   <div className="">
                     <img
                       className="cursor"
-                      onClick={() =>
-                        setIsTransactionSelected(!isTransactionSelected)
-                      }
+                      onClick={() => {
+                        setIsTransactionSelected(!isTransactionSelected);
+                        setIsOnlyViewSelected(false);
+                      }}
                       src={isTransactionSelected ? selectedRadio : radio}
                       alt=""
                       height={30}
@@ -296,7 +382,10 @@ const SubUserManagementFilter = () => {
                   <div className="">
                     <img
                       className="cursor"
-                      onClick={() => setIsOnlyViewSelected(!isOnlyViewSelected)}
+                      onClick={() => {
+                        setIsOnlyViewSelected(!isOnlyViewSelected);
+                        setIsTransactionSelected(false);
+                      }}
                       src={isOnlyViewSelected ? selectedRadio : radio}
                       alt=""
                       height={30}
@@ -306,7 +395,7 @@ const SubUserManagementFilter = () => {
                   </div>
                 </div>
               </div>
-              {(isTransactionSelected || isOnlyViewSelected) && (
+              {isTransactionSelected && (
                 <>
                   <div className="my-2">
                     <div className="d-flex justify-content-between">
@@ -401,9 +490,9 @@ const SubUserManagementFilter = () => {
                 </>
               )}
               <div className="my-3 justify-content-center align-items-center d-flex">
-                {isOnlyViewSelected ||
+                {/* {isOnlyViewSelected ||
                 isWithdrawalRequestsSelected ||
-                isPriceUpdateSelected ? (
+                isPriceUpdateSelected && (
                   <>
                     <button
                       className="py-1 px-2"
@@ -439,19 +528,19 @@ const SubUserManagementFilter = () => {
                       Update
                     </button>
                   </>
-                ) : (
-                  <button
-                    className="py-1 px-2"
-                    style={{
-                      backgroundColor: "transparent",
-                      borderRadius: "4px",
-                      border: "1px solid #D2DB08",
-                      color: "#D2DB08",
-                    }}
-                  >
-                    Create
-                  </button>
-                )}
+                ) } */}
+
+                <button
+                  className="py-1 px-2"
+                  style={{
+                    backgroundColor: "transparent",
+                    borderRadius: "4px",
+                    border: "1px solid #D2DB08",
+                    color: "#D2DB08",
+                  }}
+                >
+                  Create
+                </button>
               </div>
             </div>
             <img
@@ -585,11 +674,23 @@ const SubUserManagementFilter = () => {
                       </button>
                     </div>
                     <div className="col-2 d-flex justify-content-center align-items-center">
-                        <div className="" style={{width:"72%", overflow:"hidden", textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{res.acc}</div>
+                      <div
+                        className=""
+                        style={{
+                          width: "72%",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {res.acc}
+                      </div>
                     </div>
                     <div className="col-4 d-flex justify-content-end align-items-center gap-3">
                       <div className="">15-06-2023 - 16:37</div>
-                      <div className=""><img src={res.sym} alt="" height={23} width={23} /></div>
+                      <div className="">
+                        <img src={res.sym} alt="" height={23} width={23} />
+                      </div>
                     </div>
                   </div>
                 ))}
