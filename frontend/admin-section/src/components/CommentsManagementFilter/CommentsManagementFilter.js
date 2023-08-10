@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
-const WithdrawalRqstFilter = () => {
+const CommentsManagementFilter = () => {
   const [selectedOption, setSelectedOption] = useState("All");
 
   const options = ["All", "Pendings", "Resolved", "Redirected"];
@@ -12,6 +12,7 @@ const WithdrawalRqstFilter = () => {
     setSelectedOption(option);
     setShowDropdown(false);
   };
+
   return (
     <>
       <div className="d-flex p-2">
@@ -80,12 +81,12 @@ const WithdrawalRqstFilter = () => {
             className="px-3"
             style={{
               backgroundColor: "transparent",
-              borderRadius: "4px",
-              border: "1px solid #58DEAA",
-              color: "#58DEAA",
+              borderRadius: "3px",
+              border: "1px solid #E6E6E6",
+              color: "#E6E6E6",
             }}
           >
-            Export
+            Filter
           </button>
         </div>
       </div>
@@ -93,4 +94,4 @@ const WithdrawalRqstFilter = () => {
   );
 };
 
-export default WithdrawalRqstFilter;
+export default CommentsManagementFilter;

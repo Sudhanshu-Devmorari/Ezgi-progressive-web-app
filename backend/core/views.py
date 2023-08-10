@@ -1957,6 +1957,7 @@ class AdvertisementManagement(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
+                print('request.data:: ', request.data)
                 required_fields = ['file', 'ads_space', 'start_date', 'end_date', 'company_name', 'link', 'ads_budget']
                 for field in required_fields:
                     if field not in request.data:
@@ -2060,7 +2061,7 @@ class MembershipSettingView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
     
 
 class SubscriptionSettingView(APIView):

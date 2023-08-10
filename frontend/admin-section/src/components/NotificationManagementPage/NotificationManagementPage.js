@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MainDiv } from "../CommonBgRow";
 import SideBar from "../SideBar/SideBar";
 import NavBar from "../NavBar/NavBar";
@@ -11,12 +11,19 @@ import user3 from "../../assets/user1.png";
 import user4 from "../../assets/user6.png";
 import green_tick from "../../assets/checks-1.svg";
 import yellow_tick from "../../assets/checks.svg";
-import './NotificationManagementPage.css'
+import "./NotificationManagementPage.css";
+import axios from "axios";
 
 const NotificationManagementPage = () => {
+
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [viewedCount, setViewedCount] = useState(0);
+
   const requestArray = [
-    { img: bell2, name: "Viewed" },
-    { img: bell3, name: "Pending" },
+    { img: bell2, name: "Viewed", count : viewedCount },
+    { img: bell3, name: "Pending", count : pendingCount },
   ];
   const users = [
     {
@@ -58,6 +65,27 @@ const NotificationManagementPage = () => {
       tick: green_tick,
     },
   ];
+
+  // Get Notification API
+  useEffect(() => {
+    async function getNotificationsData() {
+      try {
+        const res = await axios.get(
+          "http://127.0.0.1:8000/notification-management/"
+        );
+        console.log(res.data, "==========>>>res sub users");
+        const data = res.data;
+        setNotifications(data.notification);
+        setNotificationCount(data.notification_count);
+        setPendingCount(data.pending);
+        setViewedCount(data.viewed);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getNotificationsData();
+  }, []);
+
   const formatContent = (content) => {
     const parts = content.split(/(@\S+)/);
     return (
@@ -89,7 +117,7 @@ const NotificationManagementPage = () => {
                 <span className="name-fonts" style={{ fontSize: "1.2rem" }}>
                   Notifications
                 </span>
-                <span style={{ fontSize: "1.6rem" }}>127</span>
+                <span style={{ fontSize: "1.6rem" }}>{notificationCount}</span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
@@ -102,7 +130,7 @@ const NotificationManagementPage = () => {
                       >
                         {res.name}
                       </span>
-                      <span style={{ fontSize: "1.6rem" }}>127</span>
+                      <span style={{ fontSize: "1.6rem" }}>{res.count}</span>
                     </div>
                   ))}
                 </div>
@@ -112,9 +140,7 @@ const NotificationManagementPage = () => {
                 <span style={{ fontSize: "1.6rem" }}>658</span>
               </div>
             </div>
-            <div
-              className="dark-mode p-2 m-2 mb-0 home-height"
-            >
+            <div className="dark-mode p-2 m-2 mb-0 home-height">
               {users.map((res, index) => (
                 <MainDiv>
                   <>
