@@ -2,11 +2,12 @@ import React, { useContext, useState } from "react";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 
-export const CommentFilter = () => {
+export const CommentFilter = (props) => {
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Select");
 
   const handleCountrySelection = (country) => {
+    props.setCountryData(country)
     setSelectedCountry(country);
   };
 
@@ -32,7 +33,7 @@ export const CommentFilter = () => {
     "UK",
   ];
 
-  const categoryOptions = ["Category 1", "Category 2", "Category 3"];
+  const categoryOptions = ["Football", "Basketball"];
   const dateOptions = ["Date 1", "Date 2", "Date 3"];
   const leagueOptions = ["League 1", "League 2", "League 3"];
 
@@ -44,6 +45,7 @@ export const CommentFilter = () => {
   const [leagueDropdown, setLeagueDropdown] = useState(false);
 
   const handleCategorySelection = (category) => {
+    props.setCategoryData(category)
     setSelectedCategory(category);
   };
   const toggleCategoryDropdown = () => {
@@ -60,6 +62,7 @@ export const CommentFilter = () => {
   };
 
   const handleDateSelection = (date) => {
+    props.setDateData(date)
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
@@ -76,6 +79,7 @@ export const CommentFilter = () => {
   };
 
   const handleLeagueSelection = (league) => {
+    props.setLeagueData(league)
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {

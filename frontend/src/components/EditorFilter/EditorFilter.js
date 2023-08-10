@@ -3,19 +3,40 @@ import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
 
 const EditorFilter = (props) => {
+  const handleShowButtonClick = async () => {
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000/filter-editors/',
+        {
+          category: [selectedCountry],
+          lavel: selectedLevel,
+          score_point: selectedScorePoint,
+          sucess_rate: selectedSuccessRate,
+        }
+      );
+      
+
+      const editorData = response.data.map((item) => ({
+        type: "editor",
+        value: item,
+      }));
+      props.setFilterData(editorData)
+      // Handle the response here if needed
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error('Error making POST request:', error);
+    }
+  };
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
+    "Football",
+    "Basketball",
   ];
-  const levelOptions = ["Beginner", "Intermediate", "Advanced"];
+  const levelOptions = ["Apprentice", "Journeyman", "Master","Grandmaster"];
   const scorePointOptions = [0, 10];
   const successRateOptions = [0, 25, 50, 75, 100];
 
@@ -24,10 +45,10 @@ const EditorFilter = (props) => {
   const [scorePointDropDown, setScorePointDropDown] = useState(false);
   const [successRateDropDown, setSuccessRateDropDown] = useState(false);
 
-  const [selectedCountry, setSelectedCountry] = useState("Select");
-  const [selectedLevel, setSelectedLevel] = useState("Select");
-  const [selectedScorePoint, setSelectedScorePoint] = useState("Select");
-  const [selectedSuccessRate, setSelectedSuccessRate] = useState("Select");
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedScorePoint, setSelectedScorePoint] = useState(null);
+  const [selectedSuccessRate, setSelectedSuccessRate] = useState(null);
 
   const handleCountrySelection = (country) => {
     setSelectedCountry(country);
@@ -109,7 +130,7 @@ const EditorFilter = (props) => {
                   <CustomDropdown
                     label="Category"
                     options={countryOptions}
-                    selectedOption={selectedCountry}
+                    selectedOption={selectedCountry?selectedCountry:"Select"}
                     onSelectOption={handleCountrySelection}
                     isOpen={countryDropDown}
                     toggleDropdown={toggleCountryDropdown}
@@ -119,7 +140,7 @@ const EditorFilter = (props) => {
                   <CustomDropdown
                     label="Level"
                     options={levelOptions}
-                    selectedOption={selectedLevel}
+                    selectedOption={selectedLevel?selectedLevel:"Select"}
                     onSelectOption={handleLevelSelection}
                     isOpen={levelDropDown}
                     toggleDropdown={toggleLevelDropdown}
@@ -131,7 +152,7 @@ const EditorFilter = (props) => {
                   <CustomDropdown
                     label="Score Point"
                     options={scorePointOptions}
-                    selectedOption={selectedScorePoint}
+                    selectedOption={selectedScorePoint?selectedScorePoint:"Select"}
                     onSelectOption={handleScorePointSelection}
                     isOpen={scorePointDropDown}
                     toggleDropdown={toggleScorePointDropdown}
@@ -141,7 +162,7 @@ const EditorFilter = (props) => {
                   <CustomDropdown
                     label="Success Rate"
                     options={successRateOptions}
-                    selectedOption={selectedSuccessRate}
+                    selectedOption={selectedSuccessRate?selectedSuccessRate:"Select"}
                     onSelectOption={handleSuccessRateSelection}
                     isOpen={successRateDropDown}
                     toggleDropdown={toggleSuccessRateDropdown}
@@ -150,6 +171,10 @@ const EditorFilter = (props) => {
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button
+                  onClick={() => {
+                    handleShowButtonClick();
+                    props.onHide();
+                  }}
                   className={`${
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
