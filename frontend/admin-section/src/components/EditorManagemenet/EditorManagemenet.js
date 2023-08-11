@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect,useState } from "react";
 import { GoSearch } from "react-icons/go";
 import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
@@ -19,56 +19,85 @@ import circle_check from "../../assets/circle-check-1.png";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
 import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRequestsBtns";
+import moment from "moment";
+
 
 const EditorManagemenet = (props) => {
+  console.log("deactiveRqst----->: ", props?.deactiveRqst)
+  console.log("deactivateUser----->: ", props?.deactivateUser)
+  console.log("users----->: ", props?.users)
+  const [displayUser, setDisplayUser] = useState(props?.users);
+  console.log("displayUser----->: ", displayUser)
+
+  useEffect(() => {
+    if(props?.deactiveRqst){
+      setDisplayUser(props?.deactivateUser)
+    }
+    else {
+      setDisplayUser(props?.users==undefined?[]:props?.users)
+  
+    }
+    // setDisplayUser(props?.users==undefined?[]:props?.users)
+  }, [props])
+
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
   const [isExpertSelected, setIsExpertSelected] = useState(false);
   const [isGrandmasterSelected, setIsGrandmasterSelected] = useState(false);
-  const users = [
-    {
-      sr: "#0001",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "25 - 34",
-      country: "Ankara",
-      date: "15-06-.2023 - 16:37",
-      role: "Journeyman",
-      profile: profile,
-    },
-    {
-      sr: "#0002",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "18 - 24",
-      country: "İstanbul",
-      date: "15-06-.2023 - 16:37",
-      profile: user1,
-    },
-    {
-      sr: "#0003",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "35 - 44",
-      country: "İzmir",
-      date: "15-06-.2023 - 16:37",
-      role: "Expert",
-      profile: profile,
-    },
-    {
-      sr: "#0004",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "25 - 34",
-      country: "Bursa",
-      date: "15-06-.2023 - 16:37",
-      role: "Apprentice",
-      profile: profile,
-    },
-  ];
+
+  const filteredData = (e) => {
+    // props.setFilterData(null)
+      const val = e.target.value
+      const filteredArray = props?.users.filter((obj) =>
+        obj?.editor_data?.username?.toLowerCase().startsWith(val.toLowerCase()) ||
+        obj?.editor_data?.name?.toLowerCase().startsWith(val.toLowerCase())
+      );
+      setDisplayUser(filteredArray);
+  }
+  // const users = [
+  //   {
+  //     sr: "#0001",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_female,
+  //     age: "25 - 34",
+  //     country: "Ankara",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Journeyman",
+  //     profile: profile,
+  //   },
+  //   {
+  //     sr: "#0002",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_male,
+  //     age: "18 - 24",
+  //     country: "İstanbul",
+  //     date: "15-06-.2023 - 16:37",
+  //     profile: user1,
+  //   },
+  //   {
+  //     sr: "#0003",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_female,
+  //     age: "35 - 44",
+  //     country: "İzmir",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Expert",
+  //     profile: profile,
+  //   },
+  //   {
+  //     sr: "#0004",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_male,
+  //     age: "25 - 34",
+  //     country: "Bursa",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Apprentice",
+  //     profile: profile,
+  //   },
+  // ];
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [countryDropDown, setCountryDropDown] = useState(false);
@@ -382,6 +411,8 @@ const EditorManagemenet = (props) => {
     }
     setScorePointFilterDropDown(!scorePointFilterDropDown);
   };
+  const server_url = "http://127.0.0.1:8000";
+
 
   return (
     <>
@@ -394,7 +425,7 @@ const EditorManagemenet = (props) => {
               <span class="input-group-text search-icon-dark" id="basic-addon1">
                 <GoSearch style={{ color: "#FFFFFF" }} />
               </span>
-              <input type="text" className="input-field-dark" />
+              <input onChange={filteredData} type="text" className="input-field-dark" />
             </div>
           </div>
           <div className="p-2">
@@ -428,7 +459,7 @@ const EditorManagemenet = (props) => {
             </button>
           </div>
         </div>
-        {users.map((res, index) => (
+        {displayUser?.map((res, index) => (
           <div
             className="px-2 py-1 mb-2 editor-section-fonts"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
@@ -436,11 +467,13 @@ const EditorManagemenet = (props) => {
             <div className="row g-0 d-flex justify-content-between align-items-center">
               <div className="col-3">
                 <div className="d-flex align-items-center">
-                  <span className="pe-1">{res.sr}</span>
+                  <span className="pe-1">{`# ${res?.editor_data?.id
+                    .toString()
+                    .padStart(4, "0")}`}</span>
                   <div className="position-relative">
                     <img
-                      className="profile-icon"
-                      src={res.profile}
+                      className="rounded-circle profile-icon"
+                      src={`${server_url + res?.editor_data?.profile_pic}`}
                       alt=""
                       height={42}
                       width={42}
@@ -463,23 +496,28 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                   </div>
-                  <span className="ps-1">{res.name}</span>
+                  <span className="ps-1">{res?.editor_data?.name}</span>
                 </div>
               </div>
               <div className="d-flex gap-2 align-items-center col-1">
-                <div>{res.username}</div>
+                <div>{res?.editor_data?.username}</div>
               </div>
               <div
                 className="d-flex align-items-center block-width col-3 gap-1"
                 style={{ minWidth: "7.5rem" }}
               >
                 <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>%62</span>
-                <img src={res.gender} alt="" height={28} width={28} />
-                <span>{res.age}</span>
-                <div className="">{res.country}</div>
+                {res?.editor_data?.gender == "Male" && (
+                    <img src={gender_male} alt="" height={23} width={23} />
+                  )}
+                  {res?.editor_data?.gender == "Female" && (
+                    <img src={gender_female} alt="" height={23} width={23} />
+                  )}
+                <span>{res?.editor_data?.age}</span>
+                <div className="">{res?.editor_data?.country}</div>
               </div>
               <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
-                <span>{res.date}</span>
+                <span>{moment(res?.editor_data?.created).format("DD-MM.YYYY - HH:mm")}</span>
                 <img
                   className="icons-edit-eye"
                   src={circle_check}
@@ -500,7 +538,7 @@ const EditorManagemenet = (props) => {
               <VerificationRequestsBtns/>
             )}
             {props?.deactiveRqst && (
-              <DeactivationRequestsBtns/>
+              <DeactivationRequestsBtns id={res?.editor_data?.id} editorManagementApiData={props.editorManagementApiData}/>
             )}
           </div>
         ))}

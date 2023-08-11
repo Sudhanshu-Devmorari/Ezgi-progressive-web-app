@@ -170,8 +170,7 @@ const CommentsPageModal = (props) => {
       setIsNotStartedSelected(false);
     }
   };
-  //     console.log( categoryData,"===",countryData,"===",dateData,"===",leagueData,"===",selectedMatchDetails,"===",selectedLevel,"===",selectedPredictionType )
-  // console.log('^^^^^^', blueSelect,"******", yellowSelect)
+
   return (
     <>
       <Modal

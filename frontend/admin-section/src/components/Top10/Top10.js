@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import user1 from "../../assets/user3.png";
 import user2 from "../../assets/user1.png";
 import user3 from "../../assets/user2.png";
@@ -8,15 +8,10 @@ import user6 from "../../assets/user6.png";
 import './Top10.css'
 
 const Top10 = (props) => {
-  const users = [
-    { profile: user4 },
-    { profile: user5 },
-    { profile: user6 },
-    { profile: user4 },
-    { profile: user5 },
-    { profile: user6 },
-    { profile: user1 },
-  ];
+  const [data, setData] = useState([])
+  useEffect(() => {
+    setData(props.userData==undefined?[]:props.userData)
+  }, [props])
   return (
     <>
       <div className="dark-mode p-2" style={{height:"25vh"}}>
@@ -27,23 +22,23 @@ const Top10 = (props) => {
           <div className="text-center d-flex gap-4 align-items-end">
             <div className="d-flex flex-column">
               <img  onClick={()=>props.setupdateProfile(2)} className="top-2-img" src={user2} alt="" height={53} width={53} />
-              <span className="text-top10" style={{ fontSize: "0.7rem" }}>2.455</span>
+              <span className="text-top10" style={{ fontSize: "0.7rem" }}>{data.length>0?data[1].Subscriber_Count:null}</span>
             </div>
             <div className="d-flex flex-column">
               <img onClick={()=>props.setupdateProfile(2)}  className="top-1-img" src={user1} alt="" height={73} width={73} />
-              <span className="text-top10" style={{ fontSize: "0.8rem" }}>2.455</span>
+              <span className="text-top10" style={{ fontSize: "0.8rem" }}>{data.length>0?data[0].Subscriber_Count:null}</span>
             </div>
             <div className="d-flex flex-column">
               <img onClick={()=>props.setupdateProfile(2)}  className="top-2-img" src={user3} alt="" height={53} width={53} />
-              <span className="text-top10" style={{ fontSize: "0.7rem" }}>2.455</span>
+              <span className="text-top10" style={{ fontSize: "0.7rem" }}>{data.length>0?data[2].Subscriber_Count:null}</span>
             </div>
           </div>
-        </div>
+        </div>  
         <div className="my-2 d-flex justify-content-center gap-2 all-users-gap">
-          {users.map((res, index) => (
+          {data?.slice(3).map((res, index) => (
             <div className="d-flex flex-column text-center padding-all-users">
               <img onClick={()=>props.setupdateProfile(2)}  className="all-user-img" src={user1} alt="" height={42} width={42} />
-              <span className="all-user-text" style={{ fontSize: "0.7rem" }}>2.455</span>
+              <span className="all-user-text" style={{ fontSize: "0.7rem" }}>{res.Subscriber_Count}</span>
             </div>
           ))}
         </div>

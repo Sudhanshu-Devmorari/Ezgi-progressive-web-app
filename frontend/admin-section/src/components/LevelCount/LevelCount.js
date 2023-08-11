@@ -10,22 +10,22 @@ const LevelCount = (props) => {
     {
       name: "Apprentice",
       img: apprenticeCrown,
-      count: "127",
+      count: `${props?.data?.apprentice_count}`,
     },
     {
       name: "Journeyman",
       img: journeymanCrown,
-      count: "127",
+      count: `${props?.data?.journeyman_count}`,
     },
     {
       name: "Expert",
       img: expertCrown,
-      count: "127",
+      count: `${props?.data?.master_count}`,
     },
     {
       name: "Grandmaster",
       img: grandMasterCrown,
-      count: "127",
+      count: `${props?.data?.grandmaster_count}`,
     },
   ];
 
