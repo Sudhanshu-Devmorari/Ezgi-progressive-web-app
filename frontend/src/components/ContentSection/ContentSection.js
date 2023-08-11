@@ -95,6 +95,7 @@ const ContentSection = ({
                   width={75}
                   height={75}
                   alt=""
+                  style={{objectFit:"cover"}}
                 />
                 <span className="p-1 autorname-responsive">
                   {data?.value.commentator_user.username}

@@ -1,49 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import SalesSubscriptionSettings from "../SalesSubscriptionSettings/SalesSubscriptionSettings";
+import axios from "axios";
 
 const EditorsubscriptionSettings = () => {
+  const [selectLevel, setSelectLevel] = useState("Journeyman");
+
+  // Subscription Settings API
+  const [subscriptionSettingsData, setSubscriptionSettingsData] = useState([]);
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/subscription-setting/?commentator_level=${selectLevel.toLowerCase()}`
+        );
+        console.log("res==>>", res.data[0]);
+        setSubscriptionSettingsData(res.data[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, [selectLevel]);
   return (
     <>
       <div className="my-2 mt-3">
-        <span className="p-2 ps-0" style={{ color: "#4DD5FF" }}>
+        <span
+          className="p-2 ps-0 cursor"
+          style={{ color: selectLevel === "Journeyman" && "#4DD5FF" }}
+          onClick={() => setSelectLevel("Journeyman")}
+        >
           Journeyman
         </span>
-        <span className="p-2">Expert</span>
-        <span className="p-2">Grandmaster</span>
+        <span
+          className="p-2 cursor"
+          style={{ color: selectLevel === "Expert" && "#4DD5FF" }}
+          onClick={() => setSelectLevel("Expert")}
+        >
+          Expert
+        </span>
+        <span
+          className="p-2 cursor"
+          style={{ color: selectLevel === "Grandmaster" && "#4DD5FF" }}
+          onClick={() => setSelectLevel("Grandmaster")}
+        >
+          Grandmaster
+        </span>
       </div>
-      <div className="my-2 mt-3 d-flex gap-3">
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Duration</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">1 Month</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">3 Month</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-      </div>
-      <div className="my-2 mt-3 d-flex gap-3">
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">6 Months</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">1 Year</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-      </div>
+      <SalesSubscriptionSettings
+        subscriptionSettingsData={subscriptionSettingsData}
+        setSubscriptionSettingsData={setSubscriptionSettingsData}
+        selectLevel={selectLevel}
+      />
     </>
   );
 };

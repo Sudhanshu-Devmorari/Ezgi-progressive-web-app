@@ -2225,7 +2225,8 @@ class LevelRule(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
+        # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -2346,6 +2347,7 @@ class HighlightSettingView(APIView):
 class CommentSetting(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data = request.data.copy() 
+        print('data: ', data)
         data['status'] = 'approve'  # Set the status to 'approve'
 
         comment_serializer = CommentsSerializer(data=data)
@@ -2375,7 +2377,8 @@ class CommentSetting(APIView):
                 }
 
             return Response(response_data, status=status.HTTP_201_CREATED)
-        
+        print("==========")
+        print('comment_serializer.errors: ', comment_serializer.errors)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 totp = pyotp.TOTP('base32secret3232', interval=45)

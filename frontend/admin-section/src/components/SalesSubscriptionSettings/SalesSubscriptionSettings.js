@@ -1,21 +1,21 @@
-import React from "react";
 import axios from "axios";
+import React from "react";
 
-const LevelRules = (props) => {
-  const getRuleForLevel = props?.getRuleForLevel || {};
+const SalesSubscriptionSettings = (props) => {
+  const subscriptionSettingsData = props?.subscriptionSettingsData || {};
 
   const handleChange = (e) => {
-    props?.setGetRuleForLevel({
-      ...getRuleForLevel,
+    props?.setSubscriptionSettingsData({
+      ...subscriptionSettingsData,
       [e.target.name]: e.target.value,
     });
   };
 
-  //   Update Level - Rule
-  const updateRule = async () => {
+  //  Update Subscription Setting
+  const UpdateSubscriptionSettings = async () => {
     const res = await axios.post(
-      `http://127.0.0.1:8000/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
-      getRuleForLevel
+      `http://127.0.0.1:8000/subscription-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+      subscriptionSettingsData
     );
     console.log("res========>>>", res);
   };
@@ -24,37 +24,37 @@ const LevelRules = (props) => {
       <div className="my-2 mt-3 d-flex gap-3">
         <div className="col-2">
           <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Daily Match Limit</span>
+            <span className="p-1 ps-0">Duration</span>
             <input
-              onChange={handleChange}
-              name="daily_match_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={getRuleForLevel.daily_match_limit}
+              value={subscriptionSettingsData.duration}
+              name="duration"
+              onChange={handleChange}
             />
           </div>
         </div>
         <div className="col-2">
           <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Monthly Min.Content</span>
+            <span className="p-1 ps-0">1 Month</span>
             <input
-              onChange={handleChange}
-              name="monthly_min_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={getRuleForLevel.monthly_min_limit}
+              value={subscriptionSettingsData.month_1}
+              name="month_1"
+              onChange={handleChange}
             />
           </div>
         </div>
         <div className="col-2">
           <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Odds Limit</span>
+            <span className="p-1 ps-0">3 Month</span>
             <input
-              onChange={handleChange}
-              name="ods_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={getRuleForLevel.ods_limit}
+              value={subscriptionSettingsData.month_3}
+              name="month_3"
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -62,49 +62,25 @@ const LevelRules = (props) => {
       <div className="my-2 mt-3 d-flex gap-3">
         <div className="col-2">
           <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Winning Limit</span>
+            <span className="p-1 ps-0">6 Months</span>
             <input
-              onChange={handleChange}
-              name="winning_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={getRuleForLevel.winning_limit}
+              value={subscriptionSettingsData.month_6}
+              name="month_6"
+              onChange={handleChange}
             />
           </div>
         </div>
         <div className="col-2">
           <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Success Rate</span>
+            <span className="p-1 ps-0">1 Year</span>
             <input
-              onChange={handleChange}
-              name="sucess_rate"
               type="text"
               className="darkMode-input form-control text-center"
-              value={getRuleForLevel.sucess_rate}
-            />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Subscriber Limit</span>
-            <input
+              value={subscriptionSettingsData.year_1}
+              name="year_1"
               onChange={handleChange}
-              name="subscriber_limit"
-              type="text"
-              className="darkMode-input form-control text-center"
-              value={getRuleForLevel.subscriber_limit}
-            />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Level Icon & Color</span>
-            <input
-              onChange={handleChange}
-              name="level_icon"
-              type="text"
-              className="darkMode-input form-control text-center"
-              value={getRuleForLevel.level_icon}
             />
           </div>
         </div>
@@ -115,7 +91,7 @@ const LevelRules = (props) => {
           style={{ marginBottom: "200px" }}
         >
           <button
-            onClick={updateRule}
+            onClick={UpdateSubscriptionSettings}
             className="py-1 px-3"
             style={{
               color: "#D2DB08",
@@ -132,4 +108,4 @@ const LevelRules = (props) => {
   );
 };
 
-export default LevelRules;
+export default SalesSubscriptionSettings;

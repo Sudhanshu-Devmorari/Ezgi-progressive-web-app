@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from "react";
 import "./EditorsSettings.css";
 import LevelRules from "../LevelRules/LevelRules";
-import axios from 'axios';
+import axios from "axios";
 
 const EditorsSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Apprentice");
 
-  // Level - Rule API 
+  // Level - Rule API
   const [getRuleForLevel, setGetRuleForLevel] = useState([]);
   useEffect(() => {
-    async function getData(){
-      try{
-        const res = await axios.get(`http://127.0.0.1:8000/level-rule/?commentator_level=${selectLevel.toLowerCase()}`)
-        console.log("res======>>>>",res.data);
-        setGetRuleForLevel(res.data[0])
-      } catch (error){
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/level-rule/?commentator_level=${selectLevel.toLowerCase()}`
+        );
+        setGetRuleForLevel(res.data[0]);
+      } catch (error) {
         console.log(error);
       }
     }
     getData();
-  }, [selectLevel])
+  }, [selectLevel]);
 
   return (
     <>
@@ -29,14 +30,40 @@ const EditorsSettings = () => {
         </div>
         <div className="m-3">
           <div className="my-2 mt-3">
-            <span className="p-2 cursor ps-0" style={{ color: selectLevel === "Apprentice" && "#FFEE7D" }} onClick={()=>setSelectLevel("Apprentice")}>
+            <span
+              className="p-2 cursor ps-0"
+              style={{ color: selectLevel === "Apprentice" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Apprentice")}
+            >
               Apprentice
             </span>
-            <span className="p-2 cursor" style={{color: selectLevel === "Journeyman" && "#FFEE7D"}} onClick={()=>setSelectLevel("Journeyman")}>Journeyman</span>
-            <span className="p-2 cursor" style={{color: selectLevel === "Expert" && "#FFEE7D"}} onClick={()=>setSelectLevel("Expert")}>Expert</span>
-            <span className="p-2 cursor" style={{color: selectLevel === "Grandmaster" && "#FFEE7D"}} onClick={()=>setSelectLevel("Grandmaster")}>Grandmaster</span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Journeyman" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Journeyman")}
+            >
+              Journeyman
+            </span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Expert" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Expert")}
+            >
+              Expert
+            </span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Grandmaster" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Grandmaster")}
+            >
+              Grandmaster
+            </span>
           </div>
-          <LevelRules getRuleForLevel={getRuleForLevel} selectLevel={selectLevel}/>
+          <LevelRules
+            getRuleForLevel={getRuleForLevel}
+            selectLevel={selectLevel}
+            setGetRuleForLevel={setGetRuleForLevel}
+          />
         </div>
       </div>
     </>

@@ -142,7 +142,7 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-  const [displayUser, setDisplayUser] = useState(props.users)
+  const [displayUser, setDisplayUser] = useState(props.users);
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -205,14 +205,35 @@ const Home = (props) => {
   };
 
   const filterData = (e) => {
-      const val = e.target.value
-      const filteredArray = props.users.filter((obj) =>
+    const val = e.target.value;
+    const filteredArray = props.users.filter(
+      (obj) =>
         obj?.name?.toLowerCase().startsWith(val.toLowerCase()) ||
         obj?.username?.toLowerCase().startsWith(val.toLowerCase())
-      );
-      setDisplayUser(filteredArray);
-    }
+    );
+    setDisplayUser(filteredArray);
+  };
 
+  const monthOptions = ["1 Month", "3 Month", "6 Month"];
+  const [selectedMonth, setSelectedMonth] = useState("Select");
+  const [monthDropDown, setMonthDropDown] = useState(false);
+
+  const numberOptions = [1, 3, 5];
+  const [selectedNumber, setSelectedNumber] = useState("Select");
+  const [numberDropDown, setNumberDropDown] = useState(false);
+
+  const levelOptions = ["Journeyman", "Expert", "Grandmaster"];
+  const [selectedLevel, setSelectedLevel] = useState("Select");
+  const [levelDropDown, setLevelDropDown] = useState(false);
+
+  const toggleDropdown = (dropdownStateSetter) => {
+    setAgeDropDown(false);
+    setMonthDropDown(false);
+    setNumberDropDown(false);
+    setLevelDropDown(false);
+
+    dropdownStateSetter((prevState) => !prevState);
+  };
 
   return (
     <>
@@ -227,8 +248,11 @@ const Home = (props) => {
                 >
                   <GoSearch style={{ color: "#FFFFFF" }} />
                 </span>
-                <input onChange={filterData}
-                type="text" className="input-field-dark" />
+                <input
+                  onChange={filterData}
+                  type="text"
+                  className="input-field-dark"
+                />
               </div>
             </div>
             <div className="p-2">
@@ -535,29 +559,32 @@ const Home = (props) => {
                   <div className="row g-0 gap-2">
                     <div className="col">
                       <CustomDropdown
-                        options={ageOptions}
-                        selectedOption={selectedAge}
-                        onSelectOption={handleAgeSelection}
-                        isOpen={ageDropDown}
-                        toggleDropdown={toggleAgeDropdown}
+                      label=" "
+                        options={monthOptions}
+                        selectedOption={selectedMonth}
+                        onSelectOption={setSelectedMonth}
+                        isOpen={monthDropDown}
+                        toggleDropdown={() => toggleDropdown(setMonthDropDown)}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
-                        options={ageOptions}
-                        selectedOption={selectedAge}
-                        onSelectOption={handleAgeSelection}
-                        isOpen={ageDropDown}
-                        toggleDropdown={toggleAgeDropdown}
+                      label=" "
+                        options={numberOptions}
+                        selectedOption={selectedNumber}
+                        onSelectOption={setSelectedNumber}
+                        isOpen={numberDropDown}
+                        toggleDropdown={() => toggleDropdown(setNumberDropDown)}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
-                        options={ageOptions}
-                        selectedOption={selectedAge}
-                        onSelectOption={handleAgeSelection}
-                        isOpen={ageDropDown}
-                        toggleDropdown={toggleAgeDropdown}
+                      label=" "
+                        options={levelOptions}
+                        selectedOption={selectedLevel}
+                        onSelectOption={setSelectedLevel}
+                        isOpen={levelDropDown}
+                        toggleDropdown={() => toggleDropdown(setLevelDropDown)}
                       />
                     </div>
                   </div>

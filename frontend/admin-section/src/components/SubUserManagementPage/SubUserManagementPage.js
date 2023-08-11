@@ -15,6 +15,7 @@ import edit from "../../assets/user-edit.svg";
 import trash from "../../assets/trash.svg";
 import SubUsesTimeLine from "../SubUsesTimeLine/SubUsesTimeLine";
 import axios from "axios";
+import moment from "moment";
 
 const SubUserManagementPage = () => {
   const users = [
@@ -176,7 +177,7 @@ const SubUserManagementPage = () => {
                           </button>
                         </div>
                         <div className="col d-flex align-items-center justify-content-end">
-                          <div className="">15-06-2023 - 16:37</div>
+                          <div className="">{moment(res.created).format("DD.MM.YYYY - HH:mm")}</div>
                         </div>
                         <div className="col-1 d-flex align-items-center justify-content-end gap-1">
                           <img

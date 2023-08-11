@@ -1,42 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import SalesMembershipSettings from "../SalesMembershipSettings/SalesMembershipSettings";
+import axios from "axios";
 
 const EditorMembershipSettings = () => {
+  const [selectLevel, setSelectLevel] = useState("Apprentice");
+
+  const [getMembershipData, setGetMembershipData] = useState([]);
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/membership-setting/?commentator_level=${selectLevel.toLowerCase()}`
+        );
+        setGetMembershipData(res.data[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, [selectLevel]);
   return (
     <>
       <div className="my-2 mt-3">
-        <span className="p-2 ps-0" style={{ color: "#FFEE7D" }}>
+        <span
+          className="p-2 cursor ps-0"
+          style={{ color: selectLevel === "Apprentice" && "#FFEE7D" }}
+          onClick={() => setSelectLevel("Apprentice")}
+        >
           Apprentice
         </span>
-        <span className="p-2">Journeyman</span>
-        <span className="p-2">Expert</span>
-        <span className="p-2">Grandmaster</span>
+        <span
+          className="p-2 cursor"
+          style={{ color: selectLevel === "Journeyman" && "#FFEE7D" }}
+          onClick={() => setSelectLevel("Journeyman")}
+        >
+          Journeyman
+        </span>
+        <span
+          className="p-2 cursor"
+          style={{ color: selectLevel === "Expert" && "#FFEE7D" }}
+          onClick={() => setSelectLevel("Expert")}
+        >
+          Expert
+        </span>
+        <span
+          className="p-2 cursor"
+          style={{ color: selectLevel === "Grandmaster" && "#FFEE7D" }}
+          onClick={() => setSelectLevel("Grandmaster")}
+        >
+          Grandmaster
+        </span>
       </div>
-      <div className="my-2 mt-3 d-flex gap-3">
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Plan Price</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Commision Rate</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Promotion Rate</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-        <div className="col-2">
-          <div className="col d-flex flex-column">
-            <span className="p-1 ps-0">Promotion Duration</span>
-            <input type="text" className="darkMode-input form-control" />
-          </div>
-        </div>
-      </div>
+      <SalesMembershipSettings
+        getMembershipData={getMembershipData}
+        setGetMembershipData={setGetMembershipData}
+        selectLevel={selectLevel}
+      />
     </>
   );
 };

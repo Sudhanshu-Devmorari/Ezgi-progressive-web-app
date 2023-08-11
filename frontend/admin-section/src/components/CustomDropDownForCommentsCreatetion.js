@@ -1,5 +1,4 @@
-import './CustomDropdown.css'
-export const CustomDropdown = ({
+export const CustomDropDownForCommentsCreatetion = ({
   label,
   options,
   selectedOption,
@@ -17,25 +16,15 @@ export const CustomDropdown = ({
         <span>{selectedOption}</span>
       </div>
       <div
-        className={`customDropdown-content-dark-mode p-2 flex-column d-flex text-center ${isOpen ? "d-block" : "d-none"}`}
+        className={`customDropdown-content-dark-mode p-2 flex-column d-flex text-center ${
+          isOpen ? "d-block" : "d-none"
+        }`}
         style={{
-          width:
-          ([" "].includes(label) &&
-              "20%") ||
-            (["Country", "City", "Match Details"].includes(label) &&
-              "100%") || "45%" ,
-            // label === "Match Details" ||
-            // label === "Country" ||
-            // label === "City" 
-            // // label === "Age" ||
-            // // label === "Gender"
-            //   ? "100%"
-            //   : "45%",
+          width: "19%",
         }}
       >
         {options.map((option, index) => (
           <span
-          style={{fontSize: label === " " && "12px"}}
             className="dpcontent-dark-mode my-1 p-2"
             key={index}
             onClick={() => {
