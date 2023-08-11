@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
 const WithdrawalRqstFilter = () => {
-    const [AllDropdown, setAllDropdown] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("All");
+
+  const options = ["All", "Pendings", "Resolved", "Redirected"];
+
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    setShowDropdown(false);
+  };
   return (
     <>
       <div className="d-flex p-2">
@@ -16,32 +25,32 @@ const WithdrawalRqstFilter = () => {
         </div>
         <div className="p-2 position-relative">
           <button
-            onClick={() => setAllDropdown(!AllDropdown)}
+            onClick={() => setShowDropdown(!showDropdown)}
             style={{
               backgroundColor: "transparent",
               borderRadius: "3px",
               border: "1px solid #E6E6E6",
               color: "#E6E6E6",
               width: "7.5rem",
-              borderBottom: AllDropdown
+              borderBottom: showDropdown
                 ? "1px solid #0D2A53"
                 : "1px solid #E6E6E6",
-              borderLeft: AllDropdown
+              borderLeft: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
-              borderRight: AllDropdown
+              borderRight: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
-              borderTop: AllDropdown
+              borderTop: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
             }}
           >
-            All
+            {selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
-              AllDropdown ? "d-block" : "d-none"
+              showDropdown ? "d-block" : "d-none"
             }`}
             style={{
               backgroundColor: "#0B2447",
@@ -50,24 +59,18 @@ const WithdrawalRqstFilter = () => {
               borderTop: "none",
             }}
           >
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Pendings
-            </span>
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Approveds
-            </span>
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Rejecteds
-            </span>
+            {options
+              .filter((option) => option !== selectedOption)
+              .map((option) => (
+                <span
+                  key={option}
+                  className="m-1 px-2 py-1 text-center cursor"
+                  style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
+                  onClick={() => handleOptionClick(option)}
+                >
+                  {option}
+                </span>
+              ))}
           </div>
         </div>
         <div className="p-2">

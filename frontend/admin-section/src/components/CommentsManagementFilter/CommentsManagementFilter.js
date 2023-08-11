@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
-import "./SupportManagementFilter.css";
 
-const SupportManagementFilter = (props) => {
+const CommentsManagementFilter = () => {
+  const [selectedOption, setSelectedOption] = useState("All");
+
   const options = ["All", "Pendings", "Resolved", "Redirected"];
 
-  
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
-    props?.setSelectedOption(option);
+    setSelectedOption(option);
     setShowDropdown(false);
   };
 
   return (
     <>
-      <div className="d-flex p-2" style={{ fontSize: "1.1rem" }}>
+      <div className="d-flex p-2">
         <div className="p-2 flex-grow-1">
           <div class="input-group w-50">
             <span class="input-group-text search-icon-dark" id="basic-addon1">
@@ -26,7 +26,7 @@ const SupportManagementFilter = (props) => {
         </div>
         <div className="p-2 position-relative">
           <button
-            onClick={()=>setShowDropdown(!showDropdown)}
+            onClick={() => setShowDropdown(!showDropdown)}
             style={{
               backgroundColor: "transparent",
               borderRadius: "3px",
@@ -47,7 +47,7 @@ const SupportManagementFilter = (props) => {
                 : "1px solid #E6E6E6",
             }}
           >
-            {props?.selectedOption}
+            {selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
@@ -61,7 +61,7 @@ const SupportManagementFilter = (props) => {
             }}
           >
             {options
-              .filter((option) => option !== props?.selectedOption)
+              .filter((option) => option !== selectedOption)
               .map((option) => (
                 <span
                   key={option}
@@ -76,15 +76,17 @@ const SupportManagementFilter = (props) => {
         </div>
         <div className="p-2">
           <button
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",
-              borderRadius: "4px",
-              border: "1px solid #58DEAA",
-              color: "#58DEAA",
+              borderRadius: "3px",
+              border: "1px solid #E6E6E6",
+              color: "#E6E6E6",
             }}
           >
-            Export
+            Filter
           </button>
         </div>
       </div>
@@ -92,4 +94,4 @@ const SupportManagementFilter = (props) => {
   );
 };
 
-export default SupportManagementFilter;
+export default CommentsManagementFilter;

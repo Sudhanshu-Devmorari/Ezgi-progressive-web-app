@@ -19,35 +19,51 @@ import cross from "../../assets/Group 81.svg";
 import axios from "axios";
 
 const SupportManagementPage = () => {
+  
+  // Support management API
+  const [NewRequest, setNewRequest] = useState("");
+  const [PendingRequest, setPendingRequest] = useState("");
+  const [ResolvedRequest, setResolvedRequest] = useState("");
+  const [Total, setTotal] = useState("");
+  const [tickets, setTickets] = useState([]);
+  const [supportHistory, setSupportHistory] = useState([]);
 
-   // Support management API
-   const [NewRequest, setNewRequest] = useState('');
-   const [PendingRequest, setPendingRequest] = useState('');
-   const [ResolvedRequest, setResolvedRequest] = useState('');
-   const [Total, setTotal] = useState('');
-   const [tickets, setTickets] = useState([]);
-   const [supportHistory, setSupportHistory] = useState([]);
-   useEffect(() => {
-     async function getSupportData(){
-       try{
-         const res = await axios.get('http://127.0.0.1:8000/support-management')
-         console.log("res====>>>>",res?.data);
-         setTickets(res?.data?.tickets)
-         setNewRequest(res?.data?.new_request)
-         setPendingRequest(res?.data?.pending_request)
-         setResolvedRequest(res?.data?.resolved_request)
-         setTotal(res?.data?.total)
-         setSupportHistory(res?.data?.support_history)
-       } catch (error){
-         console.log(error);
-       }
-     }
-     getSupportData();
-   }, [])
+  const [selectedOption, setSelectedOption] = useState("All");
+
+  useEffect(() => {
+    async function getSupportData() {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/support-management");
+        console.log("res====>>>>", res?.data.tickets);
+        setTickets(res?.data?.tickets);
+        setNewRequest(res?.data?.new_request);
+        setPendingRequest(res?.data?.pending_request);
+        setResolvedRequest(res?.data?.resolved_request);
+        setTotal(res?.data?.total);
+        setSupportHistory(res?.data?.support_history);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getSupportData();
+  }, []);
+
+  const filteredTickets = tickets.filter((ticket) => {
+    if (selectedOption === "All") {
+      return true;
+    } else if (selectedOption === "Pendings") {
+      return ticket.status === "pending";
+    } else if (selectedOption === "Resolved") {
+      return ticket.status === "resolved";
+    } else if (selectedOption === "Redirected") {
+      return ticket.status === "redirected";
+    }
+    return false;
+  });
 
   const requestArray = [
-    { img: pending, name: "Pending Requests", count : PendingRequest },
-    { img: resolved, name: "Resolved Requests", count : ResolvedRequest },
+    { img: pending, name: "Pending Requests", count: PendingRequest },
+    { img: resolved, name: "Resolved Requests", count: ResolvedRequest },
   ];
   const users = [
     {
@@ -131,22 +147,30 @@ const SupportManagementPage = () => {
                           >
                             {res.name}
                           </span>
-                          <span style={{ fontSize: "1.6rem" }}>{res.count}</span>
+                          <span style={{ fontSize: "1.6rem" }}>
+                            {res.count}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div className="dark-mode p-2 m-2 mb-0 home-height" style={{overflowY:"auto"}}>
-                  <SupportManagementFilter />
-                  {tickets.map((res, index) => (
+                <div
+                  className="dark-mode p-2 m-2 mb-0 home-height"
+                  style={{ overflowY: "auto" }}
+                >
+                  <SupportManagementFilter setSelectedOption={setSelectedOption} selectedOption={selectedOption} />
+                  {filteredTickets.map((res, index) => (
                     <MainDiv>
                       <>
                         <div className="col-3 d-flex align-items-center">
-                          <span>#000{index+1}</span>
+                          <span>#000{index + 1}</span>
                           <span className="px-2">
                             <img
-                            style={{objectFit:"cover", borderRadius:"50%"}}
+                              style={{
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
                               src={`http://127.0.0.1:8000${res?.user?.profile_pic}`}
                               alt=""
                               height={45}
@@ -167,8 +191,10 @@ const SupportManagementPage = () => {
                                 (res.department.toLowerCase() === "technical" &&
                                   "1px solid #4DD5FF"),
                               color:
-                                (res.department.toLowerCase() === "financial" && "#58DEAA") ||
-                                (res.department.toLowerCase() === "technical" && "#4DD5FF"),
+                                (res.department.toLowerCase() === "financial" &&
+                                  "#58DEAA") ||
+                                (res.department.toLowerCase() === "technical" &&
+                                  "#4DD5FF"),
                             }}
                           >
                             {res.department}
@@ -178,7 +204,6 @@ const SupportManagementPage = () => {
                           <div
                             className="cursor"
                             data-bs-toggle="modal"
-                            
                             data-bs-target="#exampleModal"
                           >
                             {res?.subject}
@@ -200,7 +225,7 @@ const SupportManagementPage = () => {
                                 (res.status === "answered" && "#4DD5FF") ||
                                 (res.status === "resolved" && "#58DEAA") ||
                                 (res.status === "progress" && "#FF9100"),
-                                // (res.status === "redirected" && "#FF9100"),
+                              // (res.status === "redirected" && "#FF9100"),
                               color: "#0D2A53",
                               width: "5.4rem",
                             }}
@@ -244,7 +269,7 @@ const SupportManagementPage = () => {
                   </div>
                 </div>
                 <div className="mt-2">
-                  <SupportHistory supportHistory={supportHistory}/>
+                  <SupportHistory supportHistory={supportHistory} />
                 </div>
               </div>
             </div>
