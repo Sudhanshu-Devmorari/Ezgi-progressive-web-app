@@ -286,14 +286,7 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-
-  // console.log("diaplay: ", displayUser)
-  // console.log("users: ", props?.users)
-
-  useEffect(() => {
-    setDisplayUser(props.users);
-  }, [props.users]);
-
+  // const [displayUser, setDisplayUser] = useState(props.users);
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -376,6 +369,16 @@ const Home = (props) => {
   const levelOptions = ["Journeyman", "Expert", "Grandmaster"];
   const [selectedLevel, setSelectedLevel] = useState("Select");
   const [levelDropDown, setLevelDropDown] = useState(false);
+
+  const toggleDropdown = (dropdownStateSetter) => {
+    setAgeDropDown(false);
+    setMonthDropDown(false);
+    setNumberDropDown(false);
+    setLevelDropDown(false);
+
+    dropdownStateSetter((prevState) => !prevState);
+  };
+
 
   const toggleMonthDropdown = () => {
     setGenderDropDown(false);
