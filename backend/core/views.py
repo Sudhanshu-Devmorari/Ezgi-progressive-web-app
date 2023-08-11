@@ -1404,9 +1404,6 @@ class UserManagement(APIView):
                 # user.deactivate_commentator = 'pending'
                 user.is_delete = True
                 user.save()
-                message = {"success": "Profile deactivation request send to Admin."}
-                return Response(data=message, status=status.HTTP_200_OK)
-
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
