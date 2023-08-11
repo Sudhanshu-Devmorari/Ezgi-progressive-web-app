@@ -77,7 +77,7 @@ NEW_COMMENT_CHOISE = (
         ('reject','Reject'),
     )
 class Comments(models.Model):
-    commentator_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     category = ArrayField(models.CharField(null=True, blank=True), default=list)
     country = models.CharField(max_length=50)
     league = models.CharField(max_length=120)

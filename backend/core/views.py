@@ -1158,7 +1158,17 @@ class UserManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            user.delete()
+            if user.user_role == "standard":
+                user.delete()
+                user.save()
+                message = {"success": "User profile Deactivate sucessfully."}
+                return Response(data=message, status=status.HTTP_200_OK)
+            else:
+                user.deactivate_commentator = 'pending'
+                user.save()
+                message = {"success": "Profile deactivation request send to Admin."}
+                return Response(data=message, status=status.HTTP_200_OK)
+
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1168,16 +1178,16 @@ class FilterUserManagement(APIView):
         try:
             filters = {}
             if request.data:
-                if 'user_type' in request.data and request.data.get('user_type') != None:
+                if 'user_type' in request.data and request.data.get('user_type') != None and request.data.get('user_type') != "Select":
                     filters['user_role'] = request.data.get('user_type').lower()
 
-                if 'city' in request.data and request.data.get('city') != None:
+                if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
                     filters['city'] = request.data.get('city')
 
-                if 'gender' in request.data and request.data.get('gender') != None:
+                if 'gender' in request.data and request.data.get('gender') != None and request.data.get('gender') != "Select":
                     filters['gender'] = request.data.get('gender')
 
-                if 'age' in request.data and request.data.get('age') != None:
+                if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
 
                 print("****", filters)
@@ -1557,10 +1567,30 @@ class EditorManagement(APIView):
                     output_field=IntegerField(),
                 ),
             ).order_by('-priority', '-created')[:10]
+            top_ten_commentators_list = []
 
-            serializer1 = UserSerializer(top_ten_commentators, many=True)
-            data1 = serializer1.data
-            data_list['top_ten'] = data1
+            for obj in top_ten_commentators:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                top_ten_commentators_list.append(detail)
+
+            # serializer1 = UserSerializer(top_ten_commentators, many=True)
+            # data1 = serializer1.data
+            data_list['top_ten'] = top_ten_commentators_list
 
 
             active_editor = User.objects.filter(user_role='commentator', commentator_status='active').count()
@@ -1573,8 +1603,28 @@ class EditorManagement(APIView):
             data_list['deactivate_editor'] = deactivate_editor
 
 
-            deactivation_request = User.objects.filter(deactivate_commentator='pending').count()
-            data_list['deactivation_request'] = deactivation_request
+            deactivation_request = User.objects.filter(deactivate_commentator='pending')
+            deactivation_request_user = []
+            for obj in deactivation_request:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                deactivation_request_user.append(detail)
+            data_list['deactivat_user'] = deactivation_request_user
+            data_list['deactivation_request'] = deactivation_request.count()
 
             return Response(data=data_list, status=status.HTTP_200_OK)
         

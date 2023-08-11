@@ -1,10 +1,38 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
+import axios from "axios";
 
-const DeactivationRequestsBtns = () => {
+
+const DeactivationRequestsBtns = (props) => {
+
+  const [time , setTime] = useState(false);
+  const handleDeactivation = async (status) => {
+    console.log("::::::::::::;>>>>>>",props.id, "^^^^", status)
+    try {
+      const res = await axios.patch(
+        `http://127.0.0.1:8000/user-management/${props.id}/`,
+        {
+          deactivate_commentator:status
+        }
+      )
+      props.editorManagementApiData();
+
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  }
+  // useEffect(() => {
+  //   if(time){
+      
+  //   }
+  // }, [time])
+  
+  
   return (
     <>
       <div className="my-2">
-        <button
+        <button onClick={() => {handleDeactivation('pending')}}
           className="px-2"
           style={{
             border: "1px solid #4DD5FF",
@@ -16,7 +44,7 @@ const DeactivationRequestsBtns = () => {
         >
           In Progress
         </button>
-        <button
+        <button onClick={() => {handleDeactivation('accept')}}
           className="px-2 mx-3"
           style={{
             border: "1px solid #FFDD00",
@@ -28,7 +56,7 @@ const DeactivationRequestsBtns = () => {
         >
           Deactive
         </button>
-        <button
+        <button onClick={() => {handleDeactivation('reject')}}
           className="px-2"
           style={{
             border: "1px solid #FF5757",

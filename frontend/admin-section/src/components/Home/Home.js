@@ -19,6 +19,31 @@ import moment from "moment";
 import axios from "axios";
 
 const Home = (props) => {
+  const handleFile = async (e) => {
+    const file = e.target.files[0]
+    console.log(":::::::: ", file?.path)
+  }
+  const handleDeactive = async (id) => {
+    try {
+      const res = await axios.delete(
+        `http://127.0.0.1:8000/user-management/${id}/`
+      );
+      console.log("API Response: ", res)
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  }
+  const [addUser, setAddUser] = useState({});
+  const submitUserData = (e) => {
+    let name, value;
+
+    name = e.target.name;
+
+    value = e.target.value;
+
+    setAddUser({ ...addUser, [name]: value });
+  }
   const [cities, setCities] = useState([]);
 
   const cityApiData1 = async () => {
@@ -65,6 +90,46 @@ const Home = (props) => {
 
     fetchData();
   }, []);
+  const [displayUser, setDisplayUser] = useState(props?.users);
+  const [userData, setUserData] = useState([]);
+  const handleShow = async () => {
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/filter-user-management/`,
+        {
+          user_type: selectedUserTypeFilter,
+          city: selectedCityFilter,
+          gender: selectedGenderFilter,
+          age: selectedAgeFilter,
+        }
+      );
+      setDisplayUser(response.data);
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+  const handleAddUser = async () => {
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/user-management/`,
+        {
+          file : "",
+          date : "",
+          name : "",
+          username : "",
+          phone : "",
+          password : "",
+          gender : "",
+          age : "",
+        }
+      );
+      // setDisplayUser(response.data);
+      console.log('API Response:', response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  }
 
   // console.log("Cities:", cities);
 
@@ -91,6 +156,7 @@ const Home = (props) => {
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
+    setAddUser({...addUser, gender:gender})
   };
 
   const toggleGenderDropdown = () => {
@@ -102,6 +168,7 @@ const Home = (props) => {
 
   const handleAgeSelection = (age) => {
     setSelectedAge(age);
+    setAddUser({...addUser, age:age})
   };
 
   const toggleAgeDropdown = () => {
@@ -142,7 +209,14 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-  const [displayUser, setDisplayUser] = useState(props.users)
+
+  // console.log("diaplay: ", displayUser)
+  // console.log("users: ", props?.users)
+
+  useEffect(() => {
+    setDisplayUser(props.users);
+  }, [props.users]);
+
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -205,14 +279,14 @@ const Home = (props) => {
   };
 
   const filterData = (e) => {
-      const val = e.target.value
-      const filteredArray = props.users.filter((obj) =>
+    const val = e.target.value;
+    const filteredArray = props.users.filter(
+      (obj) =>
         obj?.name?.toLowerCase().startsWith(val.toLowerCase()) ||
         obj?.username?.toLowerCase().startsWith(val.toLowerCase())
-      );
-      setDisplayUser(filteredArray);
-    }
-
+    );
+    setDisplayUser(filteredArray);
+  };
 
   return (
     <>
@@ -227,8 +301,11 @@ const Home = (props) => {
                 >
                   <GoSearch style={{ color: "#FFFFFF" }} />
                 </span>
-                <input onChange={filterData}
-                type="text" className="input-field-dark" />
+                <input
+                  onChange={filterData}
+                  type="text"
+                  className="input-field-dark"
+                />
               </div>
             </div>
             <div className="p-2">
@@ -298,7 +375,7 @@ const Home = (props) => {
                   <span
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
-                    onClick={() => setprofile(true)}
+                    onClick={() => {setprofile(true); setUserData(res)}}
                   >
                     {res.age}
                   </span>
@@ -398,7 +475,7 @@ const Home = (props) => {
                       width={20}
                     />
                   </label>
-                  <input type="file" name="" id="upload" className="d-none" />
+                  <input onChange={handleFile} type="file" name="" id="upload" className="d-none" />
                   <span className="ps-1">Upload</span>
                 </span>
               </div>
@@ -435,11 +512,11 @@ const Home = (props) => {
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
                   <span>Name Surname</span>
-                  <input type="text" className="darkMode-input form-control" />
+                  <input onChange={submitUserData} name="name" value={userData ? userData?.name : addUser.name} type="text" className="darkMode-input form-control" />
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Username</span>
-                  <input type="text" className="darkMode-input form-control" />
+                  <input onChange={submitUserData} name="username" value={userData ? userData?.username : addUser.username} type="text" className="darkMode-input form-control" />
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -453,7 +530,7 @@ const Home = (props) => {
                     >
                       +90
                     </span>
-                    <input
+                    <input onChange={submitUserData} name="phone" value={userData ? userData?.phone : addUser.phone}
                       type="text"
                       class="form-control darkMode-input"
                       aria-label="Username"
@@ -463,13 +540,13 @@ const Home = (props) => {
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Password</span>
-                  <input
+                  <input onChange={submitUserData} name="password" value={userData ? userData?.password : addUser.password}
                     // style={{-webkit-text-security: square;}}
                     // style={{webkitTextSecurity: "star"}}
                     className="darkMode-input form-control"
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    // value={password}
+                    // onChange={(e) => setPassword(e.target.value)}
                   />
                   {showPassword ? (
                     <AiOutlineEyeInvisible
@@ -496,7 +573,7 @@ const Home = (props) => {
               </div>
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdown onChange={submitUserData} name="gender" value={userData ? userData?.gender : addUser.selectedGender}
                     label="Gender"
                     options={genderOptions}
                     selectedOption={selectedGender}
@@ -506,7 +583,7 @@ const Home = (props) => {
                   />
                 </div>
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdown onChange={submitUserData} name="age" value={userData ? userData?.age : addUser.selectedAge}
                     label="Age"
                     options={ageOptions}
                     selectedOption={selectedAge}
@@ -528,7 +605,9 @@ const Home = (props) => {
                     style={{ cursor: "pointer" }}
                     height={58}
                     width={55}
-                    onClick={() => setSelectCheckBox(!selectCheckBox)}
+                    name="subscription" value={addUser.selectCheckBox}
+                    onClick={() => {setSelectCheckBox(!selectCheckBox)
+                                    setAddUser({...addUser, subscription:(!selectCheckBox == true ? 'True' : 'False')})}}
                   />
                 </div>
                 <div className="col-8">
@@ -565,7 +644,7 @@ const Home = (props) => {
                 {profile ? (
                   <div className="my-2 d-flex row g-0 mb-3 gap-4 px-3">
                     <div className="col">
-                      <button
+                      <button data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#FF5757",
@@ -578,7 +657,7 @@ const Home = (props) => {
                       </button>
                     </div>
                     <div className="col">
-                      <button
+                      <button data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#FF9100",
@@ -587,11 +666,11 @@ const Home = (props) => {
                           borderRadius: "4px",
                         }}
                       >
-                        Deactive
+                        Update
                       </button>
                     </div>
                     <div className="col">
-                      <button
+                      <button onClick={() => handleDeactive(userData?.id)} data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#D2DB08",
@@ -604,7 +683,7 @@ const Home = (props) => {
                       </button>
                     </div>
                     <div className="col">
-                      <button
+                      <button data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#E6E6E6",
@@ -620,6 +699,10 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
+                      onClick={() => {
+                        handleAddUser();
+                        // props.onHide();
+                      }}
                       className="px-3 py-1"
                       style={{
                         color: "#D2DB0B",
@@ -823,6 +906,11 @@ const Home = (props) => {
               </div>
               <div className="d-flex justify-content-center my-2">
                 <button
+                  data-bs-dismiss="modal"
+                  onClick={() => {
+                    handleShow();
+                    // props.onHide();
+                  }}
                   className="px-3 py-1"
                   style={{
                     color: "#D2DB08",

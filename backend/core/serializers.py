@@ -26,7 +26,7 @@ class CustomDateField(serializers.Field):
             return value.strftime("%d.%m.%Y")
         return None
 class CommentsSerializer(serializers.ModelSerializer):
-    commentator_user = UserSerializer()
+    commentator_user = UserSerializer(required=False)
     # date = CustomDateField()
     class Meta:
         model = Comments

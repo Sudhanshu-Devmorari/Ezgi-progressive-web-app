@@ -4,22 +4,22 @@ import pending from "../../assets/Group 67.svg";
 import deactive from "../../assets/Group 68.svg";
 import "./EditorAccountStatus.css";
 
-const EditorAccountStatus = () => {
+const EditorAccountStatus = (props) => {
   const levelArray = [
     {
       name: "Active",
       img: active,
-      count: "127",
+      count: `${props?.active_editor}`,
     },
     {
       name: "Pending",
       img: pending,
-      count: "127",
+      count: `${props?.pending_editor}`,
     },
     {
       name: "Deactive",
       img: deactive,
-      count: "127",
+      count: `${props?.deactivate_editor}`,
     },
   ];
   return (
