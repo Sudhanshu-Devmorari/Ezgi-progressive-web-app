@@ -20,6 +20,7 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
 import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRequestsBtns";
 import moment from "moment";
+import axios from "axios";
 
 
 const EditorManagemenet = (props) => {
@@ -28,6 +29,20 @@ const EditorManagemenet = (props) => {
   console.log("users----->: ", props?.users)
   const [displayUser, setDisplayUser] = useState(props?.users);
   console.log("displayUser----->: ", displayUser)
+
+  const [addUser, setAddUser] = useState({});
+  const submitEditorData = (e,val) => {
+    let name, value;
+
+    name = e.target.name;
+
+    value = val?val:e.target.value;
+
+    console.log("---", name,"----",value)
+
+    setAddUser({ ...addUser, [name]: value });
+  }
+  console.log("+++++++", addUser)
 
   useEffect(() => {
     if(props?.deactiveRqst){
@@ -39,6 +54,65 @@ const EditorManagemenet = (props) => {
     }
     // setDisplayUser(props?.users==undefined?[]:props?.users)
   }, [props])
+
+  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  function handleAddProfile(e) {
+    const imageFile = e.target.files[0];
+    console.log("SDDD",e.target.files[0])
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+    setSelectedImage(imageFile);
+    
+  }
+  const handleNewEditor = async () => {
+    console.log("_____: ", addUser)
+    // const formData = new FormData();
+    // formData.append('file', selectedImage);
+    // formData.append('name', addUser.name)
+    // formData.append('username', addUser.username)
+    // formData.append('phone', addUser.phone)
+    // formData.append('password', addUser.password)
+    // formData.append('about', addUser.about)
+    // formData.append('country', addUser.country)
+    // formData.append('city', addUser.city)
+    // formData.append('category', addUser.category)
+    // formData.append('gender', addUser.gender)
+    // formData.append('age', addUser.age)
+    // formData.append('level', addUser.level)
+    // try {
+    //   const response = await axios.post(
+    //     `http://127.0.0.1:8000/editor-management/`,
+    //     formData
+    //   );
+    //   // setDisplayUser(response.data);
+    //   console.log('API Response:', response.data);
+    // } catch (error) {
+    //   console.error("Error making POST request:", error);
+    // }
+  }
+
+  const handleEditorFiltor = async () => {
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/filter-editors/`,
+        {
+          lavel : selectedLevelFilter,
+          sucess_rate : selectedSuccessRateFilter,
+          score_point : selectedScorePointFilter,
+          city : selectedCityFilter,
+          age : selectedAgeFilter,
+          gender : selectedGenderFilter,
+        }
+      );
+      setDisplayUser(response.data);
+      console.log('API Response:', response.data);
+      // console.log(">>>>>>: ",selectedLevelFilter,"-",selectedSuccessRateFilter,"-",selectedScorePointFilter,"-",selectedCityFilter,"-",selectedAgeFilter,"-",selectedGenderFilter)
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  }
 
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
   const [isExpertSelected, setIsExpertSelected] = useState(false);
@@ -113,8 +187,12 @@ const EditorManagemenet = (props) => {
 
   const [showHistory, setshowHistory] = useState(false);
 
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
+  const handleCountrySelection = (name, value) => {
+    setSelectedCountry(value);
+    
+    console.log("---", name,"----",value)
+
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCountryDropdown = () => {
@@ -133,8 +211,9 @@ const EditorManagemenet = (props) => {
     setCountryDropDown(!countryDropDown);
   };
 
-  const handleCitySelection = (city) => {
-    setSelectedCity(city);
+  const handleCitySelection = (name, value) => {
+    setSelectedCity(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCityDropdown = () => {
@@ -153,8 +232,9 @@ const EditorManagemenet = (props) => {
     setCityDropDown(!cityDropDown);
   };
 
-  const handleGenderSelection = (gender) => {
-    setSelectedGender(gender);
+  const handleGenderSelection = (name, value) => {
+    setSelectedGender(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleGenderDropdown = () => {
@@ -176,8 +256,9 @@ const EditorManagemenet = (props) => {
     setGenderDropDown(!genderDropDown);
   };
 
-  const handleAgeSelection = (age) => {
-    setSelectedAge(age);
+  const handleAgeSelection = (name, value) => {
+    setSelectedAge(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleAgeDropdown = () => {
@@ -196,8 +277,9 @@ const EditorManagemenet = (props) => {
     setAgeDropDown(!ageDropDown);
   };
 
-  const handleCategorySelection = (category) => {
-    setSelectedCategory(category);
+  const handleCategorySelection = (name, value) => {
+    setSelectedCategory(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCategoryDropdown = () => {
@@ -253,12 +335,12 @@ const EditorManagemenet = (props) => {
     { id: "#0004", plan: "Highlight Plan 2 Week" },
   ];
 
-  const GenderFilterOptions = ["option 1", "option 2"];
-  const LevelOptions = ["option 1", "option 2"];
-  const CityFilterOptions = ["option 1", "option 2"];
-  const ageFilterOptions = ["option 1", "option 2"];
-  const SuccessRateFilterOptions = ["option 3", "option 4"];
-  const ScorePointFilterOptions = ["option 5", "option 6"];
+  const GenderFilterOptions = ["option 1G", "option 12"];
+  const LevelOptions = ["option 1L", "option 21"];
+  const CityFilterOptions = ["option 1C", "option 21"];
+  const ageFilterOptions = ["option 1A", "option 21"];
+  const SuccessRateFilterOptions = ["option 3SR", "option 41"];
+  const ScorePointFilterOptions = ["option 5SP", "option 61"];
 
   const [selectedSuccessRateFilter, setSelectedSuccessRateFilter] =
     useState("Select");
@@ -556,25 +638,49 @@ const EditorManagemenet = (props) => {
           <div class="modal-content">
             <div class="modal-body dark-mode p-3">
               <div className="d-flex position-relative my-2">
-                <div
-                  className="my-1"
+              <label
+                  htmlFor="camera"
                   style={{
-                    backgroundColor: "#E6E6E6",
-                    borderRadius: "50%",
-                    height: "7rem",
-                    width: "7rem",
+                    display: displaySelectedImg ? "none" : "block",
                   }}
                 >
-                  <img
+                  <div
+                    className="my-1 cursor"
                     style={{
-                      position: "absolute",
-                      top: "2rem",
-                      left: "1.9rem",
+                      backgroundColor: "#E6E6E6",
+                      borderRadius: "50%",
+                      height: "8rem",
+                      width: "8rem",
                     }}
-                    src={camera}
-                    alt=""
-                  />
-                </div>
+                  >
+                    <img
+                      style={{
+                        position: "absolute",
+                        top: "2.34rem",
+                        left: "2.4rem",
+                      }}
+                      src={camera}
+                      alt=""
+                    />
+                  </div>
+                </label>
+                <img
+                  src={preveiwProfilePic}
+                  alt=""
+                  height={135}
+                  width={135}
+                  style={{
+                    display: displaySelectedImg ? "block" : "none",
+                    objectFit: "cover",
+                    borderRadius: "50%  ",
+                  }}
+                />
+                <input
+                  type="file"
+                  className="d-none"
+                  id="camera"
+                  onChange={(e) => handleAddProfile(e)}
+                />
                 <div
                   className="position-absolute d-flex justify-content-center align-items-center"
                   style={{
@@ -807,14 +913,14 @@ const EditorManagemenet = (props) => {
                   <div className="row g-0 gap-3 my-2">
                     <div className="col d-flex flex-column">
                       <span>Name Surname</span>
-                      <input
+                      <input onChange={submitEditorData} name="name" value={addUser.name}
                         type="text"
                         className="darkMode-input form-control"
                       />
                     </div>
                     <div className="col d-flex flex-column">
                       <span>Username</span>
-                      <input
+                      <input onChange={submitEditorData} name="username" value={addUser.username}
                         type="text"
                         className="darkMode-input form-control"
                       />
@@ -829,7 +935,7 @@ const EditorManagemenet = (props) => {
                         >
                           +90
                         </span>
-                        <input
+                        <input onChange={submitEditorData} name="phone" value={addUser.phone}
                           type="text"
                           class="form-control darkMode-input"
                           aria-label="Username"
@@ -841,13 +947,13 @@ const EditorManagemenet = (props) => {
                   <div className="row g-0 gap-3">
                     <div className="col d-flex flex-column">
                       <span>Password</span>
-                      <input
+                      <input onChange={submitEditorData} name="password" value={addUser.password}
                         // style={{-webkit-text-security: square;}}
                         style={{ webkitTextSecurity: "circle" }}
                         className="darkMode-input form-control"
                         type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        // value={password}
+                        // onChange={(e) => setPassword(e.target.value)}
                       />
                       {showPassword ? (
                         <AiOutlineEyeInvisible
@@ -872,7 +978,7 @@ const EditorManagemenet = (props) => {
                       )}
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <Dropdownmodal onChange={submitEditorData} name="country" value={addUser.selectedCountry}
                         label="Country"
                         options={countryOptions}
                         selectedOption={selectedCountry}
@@ -882,7 +988,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <Dropdownmodal onChange={submitEditorData} name="city" value={addUser.selectedCity}
                         label="City"
                         options={cityOptions}
                         selectedOption={selectedCity}
@@ -894,7 +1000,7 @@ const EditorManagemenet = (props) => {
                   </div>
                   <div className="row gap-3 g-0 my-2">
                     <div className="col">
-                      <Dropdownmodal
+                      <Dropdownmodal onChange={submitEditorData} name="category" value={addUser.selectedCategory}
                         label="Category"
                         options={categoryOptions}
                         selectedOption={selectedCategory}
@@ -904,7 +1010,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <Dropdownmodal onChange={submitEditorData} name="gender" value={addUser.selectedGender}
                         label="Gender"
                         options={genderOptions}
                         selectedOption={selectedGender}
@@ -914,7 +1020,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <Dropdownmodal onChange={submitEditorData} name="age" value={addUser.selectedAge}
                         label="Age"
                         options={ageOptions}
                         selectedOption={selectedAge}
@@ -930,7 +1036,7 @@ const EditorManagemenet = (props) => {
                       <div className="">
                         <span></span>
                         <div class="form-floating">
-                          <textarea
+                          <textarea onChange={submitEditorData} name="about" value={addUser.about}
                             style={{ height: "100px" }}
                             className="darkMode-input form-control"
                           ></textarea>
@@ -942,41 +1048,44 @@ const EditorManagemenet = (props) => {
                     </div>
                     <div className="col-4 d-flex flex-column justify-content-center gap-2">
                       <div className="">
-                        <img
+                        <img name='level' value='jouneyman'
                           height={30}
                           width={30}
-                          onClick={() =>
-                            setIsJourneymanSelected(!isJourneymanSelected)
+                          onClick={(e) =>
+                            {setIsJourneymanSelected(!isJourneymanSelected);
+                            submitEditorData(e,'jouneyman')}
                           }
-                          src={isJourneymanSelected ? selectedRadio : Radio}
+                          src={addUser.level =='jouneyman' ? selectedRadio : Radio} 
                           alt=""
                           style={{ cursor: "pointer" }}
                         />
                         <span className="px-2">Jouneyman</span>
                       </div>
                       <div className="">
-                        <img
+                        <img name='level' value='master'
                           height={30}
                           width={30}
-                          onClick={() => setIsExpertSelected(!isExpertSelected)}
-                          src={isExpertSelected ? selectedRadio : Radio}
+                          onClick={(e) => {setIsExpertSelected(!isExpertSelected);
+                            submitEditorData(e,'master')}}
+                          src={addUser.level =='master' ? selectedRadio : Radio}
                           alt=""
                           style={{ cursor: "pointer" }}
                         />
                         <span className="px-2">Expert</span>
                       </div>
                       <div className="">
-                        <img
+                        <img name='level' value='grandmaster'
                           height={30}
                           width={30}
-                          onClick={() =>
-                            setIsGrandmasterSelected(!isGrandmasterSelected)
+                          onClick={(e) =>
+                            {setIsGrandmasterSelected(!isGrandmasterSelected);
+                              submitEditorData(e,'grandmaster')}
                           }
-                          src={isGrandmasterSelected ? selectedRadio : Radio}
+                          src={ addUser.level =='grandmaster'? selectedRadio : Radio}
                           alt=""
                           style={{ cursor: "pointer" }}
                         />
-                        <span className="px-2">Jouneyman</span>
+                        <span className="px-2">Grandmaster</span>
                       </div>
                     </div>
 
@@ -1033,7 +1142,7 @@ const EditorManagemenet = (props) => {
                           </button>
                         </>
                       ) : (
-                        <button
+                        <button onClick={handleNewEditor} data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
                             color: "#D2DB08",
@@ -1168,7 +1277,8 @@ const EditorManagemenet = (props) => {
                 </div>
               </div>
               <div className="d-flex justify-content-center my-2">
-                <button
+                <button data-bs-dismiss="modal"
+                onClick={() => handleEditorFiltor()}
                   className="px-3 py-1"
                   style={{
                     color: "#D2DB08",
@@ -1177,7 +1287,7 @@ const EditorManagemenet = (props) => {
                     borderRadius: "4px",
                   }}
                 >
-                  Show
+                  Show11111111
                 </button>
               </div>
             </div>

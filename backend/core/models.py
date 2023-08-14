@@ -38,6 +38,7 @@ class User(AbstractBaseUser):
     city = models.CharField(max_length=50, null=True, blank=True)
     gender  = models.CharField(max_length=30, null=True, blank=True)
     age = models.CharField(max_length=12, null=True, blank=True)
+    about = models.CharField(max_length=250, null=True, blank=True)
     category = ArrayField(models.CharField(null=True, blank=True), default=list)
     profile_pic = models.ImageField(upload_to='profile_pic', null=True, blank=True)
     user_role = models.CharField(max_length = 20, choices = USER_ROLE_CHOISE, default='standard')

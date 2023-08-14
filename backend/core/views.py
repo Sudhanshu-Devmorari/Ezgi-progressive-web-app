@@ -1638,8 +1638,9 @@ class EditorManagement(APIView):
         """
         Create new commentator User.
         """
+        print("+++++", request.data)
         try:
-            profile = request.data.get('file')
+            profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
@@ -1745,25 +1746,25 @@ class FilterEditors(APIView):
         try:
             filters = {}
             if request.data:
-                if 'lavel' in request.data and request.data.get('lavel') != None:
+                if 'lavel' in request.data and request.data.get('lavel') != None and request.data.get('lavel') != "Select":
                     filters['commentator_level'] = request.data.get('lavel').lower()
 
-                if 'category' in request.data and request.data.get('category') != None:
+                if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "Select":
                     filters['category__contains'] = request.data.get('category')
 
-                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None:
+                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None and request.data.get('sucess_rate') != "Select":
                     filters['sucess_rate'] = request.data.get('sucess_rate')
 
-                if 'score_point' in request.data and request.data.get('score_point') != None:
+                if 'score_point' in request.data and request.data.get('score_point') != None and request.data.get('score_point') != "Select":
                     filters['score_point'] = request.data.get('score_point')
 
-                if 'city' in request.data and request.data.get('city') != None:
+                if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
                     filters['city'] = request.data.get('city')
 
-                if 'age' in request.data and request.data.get('age') != None:
+                if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
 
-                if 'gender' in request.data and request.data.get('gender') != None:
+                if 'gender' in request.data and request.data.get('gender') != None and request.data.get('gender') != "Select":
                     filters['gender'] = request.data.get('gender')
 
                 filters['user_role'] = 'commentator'
@@ -1774,9 +1775,8 @@ class FilterEditors(APIView):
                 for obj in filtered_comments:
                     details = {}
                     count = Subscription.objects.filter(commentator_user=obj).count()
-                    print("-------", count, "---------", obj.name)
                     serializer = UserSerializer(obj)
-                    details['user'] = serializer.data
+                    details['editor_data'] = serializer.data
                     details['subscriber_count'] = count
                     data.append(details)
 
