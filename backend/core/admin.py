@@ -24,7 +24,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('id','sender', 'receiver','status', 'context','created','updated')
+    list_display = ('id','sender', 'receiver','status', "subject", 'context','created','updated')
 
 
 @admin.register(CommentReaction)

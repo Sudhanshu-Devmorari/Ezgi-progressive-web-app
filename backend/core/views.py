@@ -1864,8 +1864,9 @@ class SalesManagement(APIView):
         filters = {}
         try:
             if request.data:
-                if 'type' not in request.data:
-                    return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                # if 'type' not in request.data:
+                    # type = request.data.get('type')
+                    # return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 if 'date' in request.data:
                     filters['start_date__contains'] = request.data.get('date')
@@ -1874,7 +1875,10 @@ class SalesManagement(APIView):
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
-                type = request.data.get('type')
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
                 query_filters = Q(**filters)
 
                 if type == 'subscription':
@@ -1904,6 +1908,55 @@ class SalesManagement(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class FilterSalesManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = []
+        try:
+            filters = {}
+            if request.data:
+                if 'date' in request.data and request.data.get('date') != None and request.data.get('date') != "Select":
+                    filters['start_date__contains'] = request.data.get('date')
+
+                if 'status' in request.data and request.data.get('status') != None and request.data.get('status') != "Select":
+                    filters['status'] = request.data.get('status')
+
+                if 'duration' in request.data and request.data.get('duration') != None and request.data.get('duration') != "Select":
+                    filters['duration'] = request.data.get('duration')
+
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
+                query_filters = Q(**filters)
+
+                if type == 'subscription':
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    data_list.append(serializer.data)
+
+                elif type == 'highlights':
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    data_list.append(serializer1.data)
+                else:
+                    details = {}
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    details['subscription'] = serializer.data
+
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    details['highlight'] = serializer1.data
+
+                    data_list.append(details)
+
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class SupportManagement(APIView):
@@ -2054,7 +2107,8 @@ class SubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            all_notification = Notification.objects.all().order_by('-created')
+            all_notification = Notification.objects.filter(Q(subject__icontains='subscription') | Q(subject__icontains='highlights')).order_by('-created')
+            # all_notification = Notification.objects.all().order_by('-created')
             serializer1 = NotificationSerializer(all_notification, many=True)
             data_list['user_timeline'] = serializer1.data
         except Exception as e:
@@ -2168,6 +2222,14 @@ class SubUserManagement(APIView):
         else:
             print('serializer.errors: ', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, pk, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=pk)
+            user.delete()
+            user.save()
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
         
 class AdvertisementManagement(APIView):

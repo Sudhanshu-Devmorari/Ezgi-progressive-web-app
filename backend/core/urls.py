@@ -7,7 +7,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
-                        HighlightSettingView, CommentSetting)
+                        HighlightSettingView, CommentSetting, FilterSalesManagement)
 
 
 urlpatterns = [
@@ -49,6 +49,7 @@ urlpatterns = [
     path('deactivate-commentator/', DeactivateCommentator.as_view(), name='Deactivate-Commentator'),
     path('deactivate-commentator/<int:pk>/', DeactivateCommentator.as_view(), name='Deactivate-Commentator'),
     path('sales-management/', SalesManagement.as_view(), name='Sales-Management'),
+    path('filter-sales-management/', FilterSalesManagement.as_view(), name='Filter-Sales-Management'),
     path('support-management/', SupportManagement.as_view(), name='Support-Management'),
     path('notification-management/', NotificationManagement.as_view(), name='Notification-Management'),
     path('subuser-management/', SubUserManagement.as_view(), name='SubUser-Management'),
