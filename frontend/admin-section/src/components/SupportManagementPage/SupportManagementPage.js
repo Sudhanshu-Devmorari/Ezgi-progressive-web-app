@@ -19,7 +19,6 @@ import cross from "../../assets/Group 81.svg";
 import axios from "axios";
 
 const SupportManagementPage = () => {
-  
   // Support management API
   const [NewRequest, setNewRequest] = useState("");
   const [PendingRequest, setPendingRequest] = useState("");
@@ -27,6 +26,8 @@ const SupportManagementPage = () => {
   const [Total, setTotal] = useState("");
   const [tickets, setTickets] = useState([]);
   const [supportHistory, setSupportHistory] = useState([]);
+  const [filteredArray, setFilteredArray] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
 
   const [selectedOption, setSelectedOption] = useState("All");
 
@@ -48,18 +49,44 @@ const SupportManagementPage = () => {
     getSupportData();
   }, []);
 
-  const filteredTickets = tickets.filter((ticket) => {
-    if (selectedOption === "All") {
-      return true;
-    } else if (selectedOption === "Pendings") {
-      return ticket.status === "pending";
-    } else if (selectedOption === "Resolved") {
-      return ticket.status === "resolved";
-    } else if (selectedOption === "Redirected") {
-      return ticket.status === "redirected";
-    }
-    return false;
-  });
+  // var filteredTickets = tickets.filter((ticket) => {
+  //   if (selectedOption === "All") {
+  //     return true;
+  //   } else if (selectedOption === "Pendings") {
+  //     return ticket.status === "pending";
+  //   } else if (selectedOption === "Resolved") {
+  //     return ticket.status === "resolved";
+  //   } else if (selectedOption === "Redirected") {
+  //     return ticket.status === "redirected";
+  //   }
+  //   return false;
+  // }); 
+  
+  useEffect(() => {
+    const updatedFilteredTickets = tickets.filter((ticket) => {
+      if (selectedOption === "All") {
+        return true;
+      } else if (selectedOption === "Pendings") {
+        return ticket.status === "pending";
+      } else if (selectedOption === "Resolved") {
+        return ticket.status === "resolved";
+      } else if (selectedOption === "Redirected") {
+        return ticket.status === "redirected";
+      }
+      return false;
+    });
+    setFilteredTickets(updatedFilteredTickets);
+  }, [selectedOption, tickets]);
+
+  const filteredData = (value) => {
+    const filteredArray = tickets.filter((obj) =>
+      obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
+      obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setFilteredArray(filteredArray);
+  };
+
+  const displayTickets = filteredArray.length > 0 ? filteredArray : filteredTickets;
 
   const requestArray = [
     { img: pending, name: "Pending Requests", count: PendingRequest },
@@ -159,8 +186,15 @@ const SupportManagementPage = () => {
                   className="dark-mode p-2 m-2 mb-0 home-height"
                   style={{ overflowY: "auto" }}
                 >
-                  <SupportManagementFilter setSelectedOption={setSelectedOption} selectedOption={selectedOption} />
-                  {filteredTickets.map((res, index) => (
+                  <SupportManagementFilter
+                    setSelectedOption={setSelectedOption}
+                    selectedOption={selectedOption}
+                    // filteredTickets={filteredTickets}
+                    tickets={tickets}
+                    setTickets={setTickets}
+                    filteredData={filteredData}
+                  />
+                  {displayTickets.map((res, index) => (
                     <MainDiv>
                       <>
                         <div className="col-3 d-flex align-items-center">

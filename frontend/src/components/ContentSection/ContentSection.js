@@ -32,7 +32,7 @@ const ContentSection = ({
 
   const userPhone = localStorage.getItem("user-id");
   // console.log("FavData", props?.FavData);
-  
+
   // const userPhone = localStorage.getItem("userPhone");
 
   const server_url = "http://127.0.0.1:8000";
@@ -40,7 +40,9 @@ const ContentSection = ({
   const followCommentator = async (commentator_id) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios
-      .get(`http://127.0.0.1:8000/follow-commentator/${user_id}?id=${commentator_id}`)
+      .get(
+        `http://127.0.0.1:8000/follow-commentator/${user_id}?id=${commentator_id}`
+      )
       .then((res) => {
         // console.log(res);
       })
@@ -57,7 +59,7 @@ const ContentSection = ({
         reaction_type: `${reaction}`,
       }
     );
-    console.log(res)
+    console.log(res);
   };
 
   return (
@@ -95,7 +97,7 @@ const ContentSection = ({
                   width={75}
                   height={75}
                   alt=""
-                  style={{objectFit:"cover"}}
+                  style={{ objectFit: "cover" }}
                 />
                 <span className="p-1 autorname-responsive">
                   {data?.value.commentator_user.username}
@@ -107,7 +109,7 @@ const ContentSection = ({
               {(selectContent === "for you" ||
                 userComments ||
                 selectContent === "comments") && (
-                <div className="d-flex justify-content-end pe-2 mt-3">
+                <div className="d-flex justify-content-end pe-2 mt-3" style={{height:"24.69px"}}>
                   {userPhone ? (
                     <button
                       onClick={() => {
@@ -146,15 +148,7 @@ const ContentSection = ({
                   )}
                 </div>
               )}
-              <div
-                className={`${
-                  selectContent === "for you" ||
-                  userComments ||
-                  selectContent === "comments"
-                    ? "mt-3"
-                    : "mt-5"
-                } row gap-1 g-0 text-center`}
-              >
+              <div className={`${"mt-3"} row gap-1 g-0 text-center`}>
                 <div className="col">
                   <div className="rate-fonts">Success Rate</div>
                   <div
@@ -299,34 +293,42 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-              {userPhone ? (<div
-                  onClick={() => {
-                    handleCommentReaction(data?.value.id, "like");
-                  }}
-                >
-                  <img
-                    src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
-                    alt=""
-                    height={20}
-                    width={20}
-                  />{" "}
-                  {data?.value.total_reactions.total_likes}
-                </div>) : (<div
-                  
-                >
-                  <img
-                    src={`${currentTheme === "dark" ? likeIcondark : likeIcon}`}
-                    alt=""
-                    height={20}
-                    width={20}
-                  />{" "}
-                  {data?.value.total_reactions.total_likes}
-                </div>)}
-                
                 {userPhone ? (
-                  <div onClick={() => {
-                    handleCommentReaction(data?.value.id, "favorite");
-                  }}>
+                  <div
+                    onClick={() => {
+                      handleCommentReaction(data?.value.id, "like");
+                    }}
+                  >
+                    <img
+                      src={`${
+                        currentTheme === "dark" ? likeIcondark : likeIcon
+                      }`}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />{" "}
+                    {data?.value.total_reactions.total_likes}
+                  </div>
+                ) : (
+                  <div>
+                    <img
+                      src={`${
+                        currentTheme === "dark" ? likeIcondark : likeIcon
+                      }`}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />{" "}
+                    {data?.value.total_reactions.total_likes}
+                  </div>
+                )}
+
+                {userPhone ? (
+                  <div
+                    onClick={() => {
+                      handleCommentReaction(data?.value.id, "favorite");
+                    }}
+                  >
                     <img
                       src={`${
                         currentTheme === "dark" ? starDarkLogin : starIcon
@@ -351,27 +353,31 @@ const ContentSection = ({
                   </div>
                 )}
 
-                {userPhone ? (<div 
+                {userPhone ? (
+                  <div
                     onClick={() => {
-                    handleCommentReaction(data?.value.id, "clap");
-                  }}>
-                  <img
-                    src={currentTheme === "dark" ? clapIcon : clapLight}
-                    alt=""
-                    height={20}
-                    width={20}
-                  />{" "}
-                  {data?.value.total_reactions.total_clap}
-                </div>) : (<div>
-                  <img
-                    src={currentTheme === "dark" ? clapIcon : clapLight}
-                    alt=""
-                    height={20}
-                    width={20}
-                  />{" "}
-                  {data?.value.total_reactions.total_clap}
-                </div>)}
-                
+                      handleCommentReaction(data?.value.id, "clap");
+                    }}
+                  >
+                    <img
+                      src={currentTheme === "dark" ? clapIcon : clapLight}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />{" "}
+                    {data?.value.total_reactions.total_clap}
+                  </div>
+                ) : (
+                  <div>
+                    <img
+                      src={currentTheme === "dark" ? clapIcon : clapLight}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />{" "}
+                    {data?.value.total_reactions.total_clap}
+                  </div>
+                )}
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
                 {selectContent === "for you" ||

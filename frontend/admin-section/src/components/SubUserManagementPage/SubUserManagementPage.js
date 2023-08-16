@@ -31,7 +31,8 @@ const SubUserManagementPage = () => {
   const [subuserCount, setSubuserCount] = useState(0);
   const [subuserList, setSubuserList] = useState([]);
   const [userTimeline, setUserTimeline] = useState([]);
-  
+  const [filteredSubuserList, setFilteredSubuserList] = useState([]);
+
   useEffect(() => {
     async function getSubUsers() {
       try {
@@ -52,7 +53,10 @@ const SubUserManagementPage = () => {
   }, []);
 
   const [editProfileModal, seteditProfileModal] = useState(1);
-  const [editUserId, setEditUserId] = useState('');
+  const [editUserId, setEditUserId] = useState("");
+
+  const displaySubuserList =
+    filteredSubuserList.length > 0 ? filteredSubuserList : subuserList;
 
   return (
     <>
@@ -123,8 +127,13 @@ const SubUserManagementPage = () => {
                   </div>
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
-                  <SubUserManagementFilter editProfileModal={editProfileModal} editUserId={editUserId}/>
-                  {subuserList.map((res, index) => (
+                  <SubUserManagementFilter
+                    editProfileModal={editProfileModal}
+                    editUserId={editUserId}
+                    setFilteredSubuserList={setFilteredSubuserList}
+                    subuserList={subuserList}
+                  />
+                  {displaySubuserList.map((res, index) => (
                     <MainDiv key={index}>
                       <>
                         <div className="col d-flex align-items-center">
@@ -177,11 +186,16 @@ const SubUserManagementPage = () => {
                           </button>
                         </div>
                         <div className="col d-flex align-items-center justify-content-end">
-                          <div className="">{moment(res.created).format("DD.MM.YYYY - HH:mm")}</div>
+                          <div className="">
+                            {moment(res.created).format("DD.MM.YYYY - HH:mm")}
+                          </div>
                         </div>
                         <div className="col-1 d-flex align-items-center justify-content-end gap-1">
                           <img
-                            onClick={()=>{seteditProfileModal(2);setEditUserId(res.id)}}
+                            onClick={() => {
+                              seteditProfileModal(2);
+                              setEditUserId(res.id);
+                            }}
                             className="cursor"
                             data-bs-toggle="modal"
                             data-bs-target="#create-sub-user"

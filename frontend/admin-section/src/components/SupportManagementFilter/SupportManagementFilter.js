@@ -21,7 +21,7 @@ const SupportManagementFilter = (props) => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" />
+            <input onChange={(e) => props.filteredData(e.target.value)} type="text" className="input-field-dark" />
           </div>
         </div>
         <div className="p-2 position-relative">

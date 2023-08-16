@@ -22,6 +22,8 @@ export const CustomDropdown = ({
           width:
           ([" "].includes(label) &&
               "20%") ||
+          ([ "Type", "Status", "Duration"].includes(label) &&
+              "43.5%") ||
             (["Country", "City", "Match Details"].includes(label) &&
               "100%") || "45%" ,
             // label === "Match Details" ||

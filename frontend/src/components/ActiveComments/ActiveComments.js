@@ -405,7 +405,7 @@ const ActiveComments = (props) => {
           </div>
         )}
         {props.profile === "commentator" && (
-          <div className="d-flex justify-content-center my-3 gap-2">
+          <div className="d-flex justify-content-center my-3 gap-2" style={{height:"32.5px"}}>
             {props.content === "home" && (
               <button
                 onClick={() => setAddCommentModalModalShow(true)}

@@ -1874,7 +1874,7 @@ class SalesManagement(APIView):
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
-                type = request.data.get('type')
+                type = (request.data.get('type')).lower()
                 query_filters = Q(**filters)
 
                 if type == 'subscription':

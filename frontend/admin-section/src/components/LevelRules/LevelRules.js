@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import upload from "../../assets/upload.svg";
 
 const LevelRules = (props) => {
   const getRuleForLevel = props?.getRuleForLevel || {};
+
+  const [previewIcon, setPreviewIcon] = useState(null);
 
   const handleChange = (e) => {
     props?.setGetRuleForLevel({
@@ -13,12 +16,22 @@ const LevelRules = (props) => {
 
   //   Update Level - Rule
   const updateRule = async () => {
+    const formData = new FormData();
+    formData.append("level_icon", getRuleForLevel.level_icon); // Append the image file
+
+    // Append other properties to the FormData object
+    for (const key in getRuleForLevel) {
+      if (key !== "level_icon") {
+        formData.append(key, getRuleForLevel[key]);
+      }
+    }
     const res = await axios.post(
       `http://127.0.0.1:8000/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
-      getRuleForLevel
+      formData
     );
     console.log("res========>>>", res);
   };
+  console.log(getRuleForLevel, getRuleForLevel.level_icon);
   return (
     <>
       <div className="my-2 mt-3 d-flex gap-3">
@@ -99,13 +112,50 @@ const LevelRules = (props) => {
         <div className="col-2">
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Level Icon & Color</span>
-            <input
+            {/* <input
               onChange={handleChange}
               name="level_icon"
               type="text"
               className="darkMode-input form-control text-center"
               value={getRuleForLevel.level_icon}
-            />
+            /> */}
+            <label
+              className="p-1 text-center cursor"
+              htmlFor="level-icon"
+              style={{ backgroundColor: "#0B2447", borderRadius: "4px" }}
+            >
+              {(previewIcon || getRuleForLevel.level_icon) && (
+                <span className="pe-2">
+                  {" "}
+                  <img
+                    src={
+                      previewIcon
+                        ? previewIcon
+                        : `http://127.0.0.1:8000${getRuleForLevel.level_icon}`
+                    }
+                    alt=""
+                    height={22}
+                    width={22}
+                  />
+                </span>
+              )}
+              <img src={upload} alt="" height={22} width={22} />
+              <input
+                type="file"
+                id="level-icon"
+                className="d-none"
+                onChange={(e) => {
+                  const selectedFile = e.target.files[0];
+                  if (selectedFile) {
+                    setPreviewIcon(URL.createObjectURL(selectedFile));
+                    props?.setGetRuleForLevel({
+                      ...getRuleForLevel,
+                      level_icon: selectedFile,
+                    });
+                  }
+                }}
+              />
+            </label>
           </div>
         </div>
       </div>

@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import cross from "../../assets/Group 81.svg";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
 
 const SalesManagementFilter = () => {
   const DateOptions = ["option 1", "option 2"];
-  const TypeOptions = ["option 1", "option 2"];
-  const StatusOptions = ["option 1", "option 2"];
-  const DurationOptions = ["option 1", "option 2"];
+  const TypeOptions = ["Subscription", "Highlight"];
+  const StatusOptions = ["Active", "Pending", "Deactive"];
+  const DurationOptions = ["1 Month", "3 Month", "6 Month", "1 Year"];
   const [selectedDateFilter, setSelectedDateFilter] = useState("Select");
   const [dateDropDown, setDateDropDown] = useState(false);
 
@@ -19,7 +22,7 @@ const SalesManagementFilter = () => {
     setDateDropDown(!dateDropDown);
     setStatusDropDown(false);
     setDurationDropDown(false);
-    setTypeDropDown(false)
+    setTypeDropDown(false);
   };
   const [selectedType, setSelectedType] = useState("Select");
   const [typeDropDown, setTypeDropDown] = useState(false);
@@ -44,22 +47,42 @@ const SalesManagementFilter = () => {
     setTypeDropDown(!typeDropDown);
     setStatusDropDown(false);
     setDurationDropDown(false);
-    setDateDropDown(false)
+    setDateDropDown(false);
   };
 
   const toggleStatusDropdown = () => {
     setStatusDropDown(!statusDropDown);
     setTypeDropDown(false);
     setDurationDropDown(false);
-    setDateDropDown(false)
+    setDateDropDown(false);
   };
 
   const toggleDurationDropdown = () => {
     setDurationDropDown(!durationDropDown);
     setTypeDropDown(false);
     setStatusDropDown(false);
-    setDateDropDown(false)
+    setDateDropDown(false);
   };
+
+  // Filter API
+  const [date, setDate] = useState("");
+  console.log(date);
+  const handleFilter = async () => {
+    const payload = {
+      ...(date && { date }),
+      ...(selectedType !== "Select" && { type: selectedType }),
+      ...(selectedStatus !== "Select" && { status: selectedStatus }),
+      ...(selectedDuration !== "Select" && { duration: selectedDuration }),
+    };
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/sales-management/",
+        payload
+      );
+      console.log(res.data, "====>>>>>res");
+    } catch (error) {}
+  };
+
   return (
     <>
       <div className="d-flex p-2">
@@ -88,9 +111,6 @@ const SalesManagementFilter = () => {
         </div>
         <div className="p-2">
           <button
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-            // onClick={() => setModalShow(true)}
             className="px-3"
             style={{
               backgroundColor: "transparent",
@@ -111,19 +131,20 @@ const SalesManagementFilter = () => {
         tabindex="-1"
         aria-labelledby="filterModalLabel"
         aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
       >
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-body dark-mode position-relative">
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column cursor">
-                  <CustomDropdown
-                    label="Date"
-                    options={DateOptions}
-                    selectedOption={selectedDateFilter}
-                    onSelectOption={handleDateSelection}
-                    isOpen={dateDropDown}
-                    toggleDropdown={toggleDateFilterDropdown}
+                  <span className="p-1 ps-0">Date</span>
+                  <input
+                    onClick={(e) => setDate(e.target.value)}
+                    name="date"
+                    type="date"
+                    className="darkMode-input form-control text-center"
                   />
                 </div>
                 <div className="col d-flex flex-column cursor">
@@ -159,8 +180,9 @@ const SalesManagementFilter = () => {
                   />
                 </div>
               </div>
-              <div className="d-flex justify-content-center my-2">
+              <div className="d-flex justify-content-center my-5">
                 <button
+                  onClick={handleFilter}
                   className="px-3 py-1"
                   style={{
                     color: "#D2DB08",
