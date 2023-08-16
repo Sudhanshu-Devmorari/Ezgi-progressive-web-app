@@ -8,7 +8,6 @@ import user6 from "../../assets/user6.png";
 import "./Top10.css";
 
 const Top10 = (props) => {
-
   const [data, setData] = useState([]);
   useEffect(() => {
     setData(props.userData == undefined ? [] : props.userData);
