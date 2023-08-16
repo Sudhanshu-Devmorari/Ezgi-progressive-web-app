@@ -24,25 +24,68 @@ import axios from "axios";
 
 
 const EditorManagemenet = (props) => {
-  console.log("deactiveRqst----->: ", props?.deactiveRqst)
-  console.log("deactivateUser----->: ", props?.deactivateUser)
-  console.log("users----->: ", props?.users)
+
+  const [cities, setCities] = useState([]);
+
+  const cityApiData1 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=1",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  const cityApiData2 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=2",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data1 = await cityApiData1();
+      const data2 = await cityApiData2();
+      const combinedCities = [...data1, ...data2];
+      setCities(combinedCities);
+    };
+
+    fetchData();
+  }, []);
+
+  // console.log("deactiveRqst----->: ", props?.deactiveRqst)
+  // console.log("deactivateUser----->: ", props?.deactivateUser)
+  // console.log("users----->: ", props?.users)
   const [displayUser, setDisplayUser] = useState(props?.users);
-  console.log("displayUser----->: ", displayUser)
+  // console.log("displayUser----->: ", displayUser)
 
   const [addUser, setAddUser] = useState({});
   const submitEditorData = (e,val) => {
     let name, value;
-
     name = e.target.name;
-
     value = val?val:e.target.value;
-
-    console.log("---", name,"----",value)
-
     setAddUser({ ...addUser, [name]: value });
   }
-  console.log("+++++++", addUser)
+  // console.log("+++++++", addUser)
 
   useEffect(() => {
     if(props?.deactiveRqst){
@@ -61,13 +104,49 @@ const EditorManagemenet = (props) => {
 
   function handleAddProfile(e) {
     const imageFile = e.target.files[0];
-    console.log("SDDD",e.target.files[0])
+    // console.log("SDDD",e.target.files[0])
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
-    
+  }
+
+  const updateEditorData = () => {
+
   }
   const handleNewEditor = async () => {
-    console.log("_____: ", addUser)
+    // console.log("_____: ", addUser)
+    const formData = new FormData();
+    formData.append('file', selectedImage);
+    formData.append('name', addUser.name)
+    formData.append('username', addUser.username)
+    formData.append('phone', addUser.phone)
+    formData.append('password', addUser.password)
+    formData.append('about', addUser.about)
+    formData.append('country', addUser.country)
+    formData.append('city', addUser.city)
+    formData.append('category', `{"${addUser.category}"}`)
+    formData.append('gender', addUser.gender)
+    formData.append('age', addUser.age)
+    formData.append('level', addUser.level)
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/editor-management/`,
+        formData
+      );
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  }
+
+  const [updateEditor, setUpdateEditor] = useState({});
+  const submitUpadteEditorData = (e,val) => {
+    let name, value;
+    name = e.target.name;
+    value = val?val:e.target.value;
+    setUpdateEditor({ ...updateEditor, [name]: value });
+  }
+  const handleUpdateEditor = async (id) => {
+    // console.log("_____: ", updateEditor)
     // const formData = new FormData();
     // formData.append('file', selectedImage);
     // formData.append('name', addUser.name)
@@ -83,7 +162,7 @@ const EditorManagemenet = (props) => {
     // formData.append('level', addUser.level)
     // try {
     //   const response = await axios.post(
-    //     `http://127.0.0.1:8000/editor-management/`,
+    //     `http://127.0.0.1:8000/editor-management/${id}`,
     //     formData
     //   );
     //   // setDisplayUser(response.data);
@@ -107,7 +186,7 @@ const EditorManagemenet = (props) => {
         }
       );
       setDisplayUser(response.data);
-      console.log('API Response:', response.data);
+      // console.log('API Response:', response.data);
       // console.log(">>>>>>: ",selectedLevelFilter,"-",selectedSuccessRateFilter,"-",selectedScorePointFilter,"-",selectedCityFilter,"-",selectedAgeFilter,"-",selectedGenderFilter)
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -189,9 +268,7 @@ const EditorManagemenet = (props) => {
 
   const handleCountrySelection = (name, value) => {
     setSelectedCountry(value);
-    
-    console.log("---", name,"----",value)
-
+    // console.log("---", name,"----",value)
     setAddUser({ ...addUser, [name]: value });
   };
 
@@ -298,19 +375,27 @@ const EditorManagemenet = (props) => {
     setCategoryDropdown(!categoryDropdown);
   };
 
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
-  ];
-  const cityOptions = ["Surat", "Baroda"];
+  const countryOptions = cities;
+  const cityOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Mersin",
+    "Diyarbakır",
+    "Kayseri",
+    "Eskişehir",
+    "Trabzon",
+    "Samsun",
+    "Denizli"
+];
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const categoryOptions = ["Category 1", "Category 2", "Category 3"];
+  const categoryOptions = ["Football", "Basketball"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
 
@@ -335,10 +420,26 @@ const EditorManagemenet = (props) => {
     { id: "#0004", plan: "Highlight Plan 2 Week" },
   ];
 
-  const GenderFilterOptions = ["option 1G", "option 12"];
-  const LevelOptions = ["option 1L", "option 21"];
-  const CityFilterOptions = ["option 1C", "option 21"];
-  const ageFilterOptions = ["option 1A", "option 21"];
+  const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
+  const LevelOptions = ["Apprentice", "Journeyman", "Expert", "Grandmaster"];
+  const CityFilterOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Mersin",
+    "Diyarbakır",
+    "Kayseri",
+    "Eskişehir",
+    "Trabzon",
+    "Samsun",
+    "Denizli"
+];
+  const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const SuccessRateFilterOptions = ["option 3SR", "option 41"];
   const ScorePointFilterOptions = ["option 5SP", "option 61"];
 
@@ -1118,7 +1219,7 @@ const EditorManagemenet = (props) => {
                           >
                             Deactive
                           </button>
-                          <button
+                          <button onClick={handleUpdateEditor} data-bs-dismiss="modal"
                             className="px-3 py-1"
                             style={{
                               color: "#D2DB08",
@@ -1287,7 +1388,7 @@ const EditorManagemenet = (props) => {
                     borderRadius: "4px",
                   }}
                 >
-                  Show11111111
+                  Show
                 </button>
               </div>
             </div>

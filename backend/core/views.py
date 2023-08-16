@@ -1222,41 +1222,42 @@ class CommentsManagement(APIView):
 
         # Next, get the comment with the most likes
         comment_with_most_likes = comments_with_likes.order_by('-like_count')
-
+        print("********* ", len(comment_with_most_likes))
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:
             if i:
-                commentator_of_most_liked_comment = i.commentator_user
+                if i.commentator_user:
+                    commentator_of_most_liked_comment = i.commentator_user
 
-                # Get the total likes for the comment object
-                total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
+                    # Get the total likes for the comment object
+                    total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
 
-                # Get the total favorites for the comment object
-                total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
+                    # Get the total favorites for the comment object
+                    total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
 
-                # Get the total claps for the comment object
-                total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
+                    # Get the total claps for the comment object
+                    total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
 
-                # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
-                total_likes = total_likes or 0
-                total_favorites = total_favorites or 0
-                total_claps = total_claps or 0
+                    # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
+                    total_likes = total_likes or 0
+                    total_favorites = total_favorites or 0
+                    total_claps = total_claps or 0
 
-                # print("Posted by commentator:", commentator_of_most_liked_comment.username)
-                user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
-                serializer = UserSerializer(user_obj)
-                data = serializer.data
+                    # print("Posted by commentator:", commentator_of_most_liked_comment.username)
+                    user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
+                    serializer = UserSerializer(user_obj)
+                    data = serializer.data
 
-                comment_serializer = CommentsSerializer(i)
+                    comment_serializer = CommentsSerializer(i)
 
-                details = {
-                    "user":data,
-                    "comment_data":comment_serializer.data,
-                    "total_likes":total_likes,
-                    "total_favorites":total_favorites,
-                    "total_clap":total_claps,
-                }
-                commentator.append(details)
+                    details = {
+                        "user":data,
+                        "comment_data":comment_serializer.data,
+                        "total_likes":total_likes,
+                        "total_favorites":total_favorites,
+                        "total_clap":total_claps,
+                    }
+                    commentator.append(details)
             else:
                 return Response({"error": "No comments with likes found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1652,7 +1653,9 @@ class EditorManagement(APIView):
             city = request.data['city']
             category = request.data['category']
             role = 'commentator'
-            commentator_level = request.data['level']
+            commentator_level = request.data['level'].lower()
+            if commentator_level == "expert":
+                commentator_level = 'master'
 
 
             # Any additional validations or processing can be done here

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import NewUsers from "../NewUsers/NewUsers";
@@ -7,14 +7,34 @@ import MostLiked from "../MostLiked/MostLiked";
 import commentsIcon from "../../assets/Group 59.svg";
 import winner from "../../assets/Group 73.svg";
 import lose from "../../assets/Group 74.svg";
+import axios from "axios";
 
 
 const CommentsManagementPage = () => {
+  const [data, setData] = useState({});
+
+  const commentManagementApiData =  () => {
+    console.log(data)
+    axios
+      .get(`http://127.0.0.1:8000/comments-management/`)
+      .then((res) => {
+        console.log("=-=-=-=-=-=-=> ", res.data)
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data.", error);
+      });
+  };
+
+  useEffect(() => {
+    commentManagementApiData();
+  }, []);
+
     const newCommentsArray = [
         {
           label: "New Comments",
           icon: commentsIcon,
-          count: "127",
+          count: `${data.comments_count}`,
           per: "%22",
           color: "#58DEAA",
           rate_icon: "arrowUp",
