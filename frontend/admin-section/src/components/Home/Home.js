@@ -90,7 +90,11 @@ const Home = (props) => {
 
     fetchData();
   }, []);
+<
   // const [displayUser, setDisplayUser] = useState(props?.users);
+
+  const [displayUser, setDisplayUser] = useState(props?.users);
+
   const [userData, setUserData] = useState([]);
   const handleShow = async () => {
     try {
@@ -209,7 +213,15 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-  const [displayUser, setDisplayUser] = useState(props.users);
+
+
+  // console.log("diaplay: ", displayUser)
+  // console.log("users: ", props?.users)
+
+  useEffect(() => {
+    setDisplayUser(props.users);
+  }, [props.users]);
+
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -301,6 +313,7 @@ const Home = (props) => {
 
     dropdownStateSetter((prevState) => !prevState);
   };
+
 
   return (
     <>

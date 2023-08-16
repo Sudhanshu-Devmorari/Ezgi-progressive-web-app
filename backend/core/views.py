@@ -1222,41 +1222,42 @@ class CommentsManagement(APIView):
 
         # Next, get the comment with the most likes
         comment_with_most_likes = comments_with_likes.order_by('-like_count')
-
+        print("********* ", len(comment_with_most_likes))
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:
             if i:
-                commentator_of_most_liked_comment = i.commentator_user
+                if i.commentator_user:
+                    commentator_of_most_liked_comment = i.commentator_user
 
-                # Get the total likes for the comment object
-                total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
+                    # Get the total likes for the comment object
+                    total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
 
-                # Get the total favorites for the comment object
-                total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
+                    # Get the total favorites for the comment object
+                    total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
 
-                # Get the total claps for the comment object
-                total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
+                    # Get the total claps for the comment object
+                    total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
 
-                # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
-                total_likes = total_likes or 0
-                total_favorites = total_favorites or 0
-                total_claps = total_claps or 0
+                    # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
+                    total_likes = total_likes or 0
+                    total_favorites = total_favorites or 0
+                    total_claps = total_claps or 0
 
-                # print("Posted by commentator:", commentator_of_most_liked_comment.username)
-                user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
-                serializer = UserSerializer(user_obj)
-                data = serializer.data
+                    # print("Posted by commentator:", commentator_of_most_liked_comment.username)
+                    user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
+                    serializer = UserSerializer(user_obj)
+                    data = serializer.data
 
-                comment_serializer = CommentsSerializer(i)
+                    comment_serializer = CommentsSerializer(i)
 
-                details = {
-                    "user":data,
-                    "comment_data":comment_serializer.data,
-                    "total_likes":total_likes,
-                    "total_favorites":total_favorites,
-                    "total_clap":total_claps,
-                }
-                commentator.append(details)
+                    details = {
+                        "user":data,
+                        "comment_data":comment_serializer.data,
+                        "total_likes":total_likes,
+                        "total_favorites":total_favorites,
+                        "total_clap":total_claps,
+                    }
+                    commentator.append(details)
             else:
                 return Response({"error": "No comments with likes found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1569,6 +1570,7 @@ class EditorManagement(APIView):
             ).order_by('-priority', '-created')[:10]
             top_ten_commentators_list = []
 
+
             for obj in top_ten_commentators:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -1638,8 +1640,9 @@ class EditorManagement(APIView):
         """
         Create new commentator User.
         """
+        print("+++++", request.data)
         try:
-            profile = request.data.get('file')
+            profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
@@ -1651,7 +1654,9 @@ class EditorManagement(APIView):
             city = request.data['city']
             category = request.data['category']
             role = 'commentator'
-            commentator_level = request.data['level']
+            commentator_level = request.data['level'].lower()
+            if commentator_level == "expert":
+                commentator_level = 'master'
 
 
             # Any additional validations or processing can be done here
@@ -1745,25 +1750,25 @@ class FilterEditors(APIView):
         try:
             filters = {}
             if request.data:
-                if 'lavel' in request.data and request.data.get('lavel') != None:
+                if 'lavel' in request.data and request.data.get('lavel') != None and request.data.get('lavel') != "Select":
                     filters['commentator_level'] = request.data.get('lavel').lower()
 
-                if 'category' in request.data and request.data.get('category') != None:
+                if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "Select":
                     filters['category__contains'] = request.data.get('category')
 
-                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None:
+                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None and request.data.get('sucess_rate') != "Select":
                     filters['sucess_rate'] = request.data.get('sucess_rate')
 
-                if 'score_point' in request.data and request.data.get('score_point') != None:
+                if 'score_point' in request.data and request.data.get('score_point') != None and request.data.get('score_point') != "Select":
                     filters['score_point'] = request.data.get('score_point')
 
-                if 'city' in request.data and request.data.get('city') != None:
+                if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
                     filters['city'] = request.data.get('city')
 
-                if 'age' in request.data and request.data.get('age') != None:
+                if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
 
-                if 'gender' in request.data and request.data.get('gender') != None:
+                if 'gender' in request.data and request.data.get('gender') != None and request.data.get('gender') != "Select":
                     filters['gender'] = request.data.get('gender')
 
                 filters['user_role'] = 'commentator'
@@ -1774,9 +1779,8 @@ class FilterEditors(APIView):
                 for obj in filtered_comments:
                     details = {}
                     count = Subscription.objects.filter(commentator_user=obj).count()
-                    print("-------", count, "---------", obj.name)
                     serializer = UserSerializer(obj)
-                    details['user'] = serializer.data
+                    details['editor_data'] = serializer.data
                     details['subscriber_count'] = count
                     data.append(details)
 
@@ -1864,8 +1868,9 @@ class SalesManagement(APIView):
         filters = {}
         try:
             if request.data:
-                if 'type' not in request.data:
-                    return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                # if 'type' not in request.data:
+                    # type = request.data.get('type')
+                    # return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 if 'date' in request.data:
                     filters['start_date__contains'] = request.data.get('date')
@@ -1874,7 +1879,12 @@ class SalesManagement(APIView):
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
-                type = (request.data.get('type')).lower()
+
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
+
                 query_filters = Q(**filters)
 
                 if type == 'subscription':
@@ -1904,6 +1914,55 @@ class SalesManagement(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class FilterSalesManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = []
+        try:
+            filters = {}
+            if request.data:
+                if 'date' in request.data and request.data.get('date') != None and request.data.get('date') != "Select":
+                    filters['start_date__contains'] = request.data.get('date')
+
+                if 'status' in request.data and request.data.get('status') != None and request.data.get('status') != "Select":
+                    filters['status'] = request.data.get('status')
+
+                if 'duration' in request.data and request.data.get('duration') != None and request.data.get('duration') != "Select":
+                    filters['duration'] = request.data.get('duration')
+
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
+                query_filters = Q(**filters)
+
+                if type == 'subscription':
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    data_list.append(serializer.data)
+
+                elif type == 'highlights':
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    data_list.append(serializer1.data)
+                else:
+                    details = {}
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    details['subscription'] = serializer.data
+
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    details['highlight'] = serializer1.data
+
+                    data_list.append(details)
+
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 
 class SupportManagement(APIView):
@@ -2054,7 +2113,8 @@ class SubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            all_notification = Notification.objects.all().order_by('-created')
+            all_notification = Notification.objects.filter(Q(subject__icontains='subscription') | Q(subject__icontains='highlights')).order_by('-created')
+            # all_notification = Notification.objects.all().order_by('-created')
             serializer1 = NotificationSerializer(all_notification, many=True)
             data_list['user_timeline'] = serializer1.data
         except Exception as e:
@@ -2168,6 +2228,14 @@ class SubUserManagement(APIView):
         else:
             print('serializer.errors: ', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, pk, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=pk)
+            user.delete()
+            user.save()
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
         
 class AdvertisementManagement(APIView):
