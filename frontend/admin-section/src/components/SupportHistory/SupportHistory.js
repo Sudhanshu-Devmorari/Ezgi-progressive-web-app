@@ -49,7 +49,7 @@ const SupportHistory = (props) => {
             </div>
             <div className=" flex-grow-1 d-flex flex-column">
               <div className="d-flex justify-content-between">
-                <span>{res?.user?.username}</span>
+                <span className="username">{res?.user?.username}</span>
                 <span className="support-history-fonts" style={{ fontSize: "0.8rem" }}>10 min ago</span>
               </div>
               <span className="support-history-fonts" style={{ fontSize: "0.8rem" }}>

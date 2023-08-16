@@ -5,6 +5,7 @@ import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForComment
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import './CommentsSettings.css'
 
 const CommentsSettings = () => {
   const headers = {
@@ -377,8 +378,7 @@ const CommentsSettings = () => {
           </div>
           <div lassName="my-3 d-flex justify-content-center">
             <div
-              class="fixed-bottom  d-flex justify-content-center"
-              style={{ marginBottom: "200px" }}
+              className="fixed-bottom  d-flex justify-content-center create-btn"
             >
               <button
                 type="submit"

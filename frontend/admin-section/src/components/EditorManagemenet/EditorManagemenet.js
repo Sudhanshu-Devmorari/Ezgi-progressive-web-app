@@ -637,7 +637,7 @@ const EditorManagemenet = (props) => {
             onClick={() => props.setupdateProfile(2)}
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
-            className="px-2 py-1 mb-2 editor-section-fonts cursor"
+            className="px-2 py-1 mb-2 row-fonts cursor"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
           >
             <div className="row g-0 d-flex justify-content-between align-items-center">

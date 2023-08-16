@@ -238,11 +238,12 @@ const CommentsManagement = () => {
               <span className="pe-1">{res.sr}</span>
               <div className="position-relative">
                 <img
+                style={{objectFit:"cover", borderRadius:"50%"}}
                   className="profile-icon"
                   src={res.profile}
                   alt=""
-                  height={42}
-                  width={42}
+                  height={45}
+                  width={45}
                 />
                 <div
                   className="position-absolute d-flex justify-content-center align-items-center"

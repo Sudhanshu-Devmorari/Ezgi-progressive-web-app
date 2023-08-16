@@ -37,8 +37,7 @@ const WithdrawalSettings = (props) => {
       </div>
       <div lassName="my-3 d-flex justify-content-center">
         <div
-          class="fixed-bottom  d-flex justify-content-center"
-          style={{ marginBottom: "200px" }}
+          class="fixed-bottom  d-flex justify-content-center save-btn"
         >
           <button
             onClick={UpdateWithdrawalSettings}

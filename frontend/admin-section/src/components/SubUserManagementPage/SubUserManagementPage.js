@@ -74,39 +74,27 @@ const SubUserManagementPage = () => {
                     className="col p-0 mx-2 dark-mode d-flex flex-column align-items-center justify-content-center"
                     style={{ height: "25vh" }}
                   >
-                    <img src={SubUsers} alt="" height={45} width={45} />
-                    <span style={{ fontSize: "1.2rem" }}>Sub Users</span>
-                    <span style={{ fontSize: "1.6rem" }}>{subuserCount}</span>
+                    <img src={SubUsers} alt="" className="icon" />
+                    <span className="heading">Sub Users</span>
+                    <span className="number">{subuserCount}</span>
                   </div>
                   <div className="col p-0">
                     <div
-                      className="dark-mode p-2 mx-2"
+                      className="dark-mode p-2 d-flex flex-column align-items-center justify-content-center"
                       style={{ height: "25vh" }}
                     >
-                      <div className="mt-2 d-flex flex-column p-2 align-items-center justify-content-center">
-                        <img
-                          src={transactionIcon}
-                          alt=""
-                          height={45}
-                          width={45}
-                        />
-                        <span
-                          className="name-fonts"
-                          style={{ fontSize: "1.2rem" }}
-                        >
-                          Transactions
-                        </span>
-                        <span style={{ fontSize: "1.6rem" }}>127</span>
-                      </div>
-                      <div className="d-flex align-items-end mt-3 p-2">
-                        <span className="" style={{ fontSize: "1rem" }}>
+                      <img src={transactionIcon} alt="" className="icon" />
+                      <span className="heading">Transactions</span>
+                      <span className="number">127</span>
+                      <div className="w-100">
+                        <span className="rate-font">
                           <span
-                            className=""
-                            style={{ color: "#58DEAA", fontSize: "1.2rem" }}
+                            className="rate-font"
+                            style={{ color: "#58DEAA" }}
                           >
                             %22
                             <HiArrowSmUp
-                              fontSize={"1.4rem"}
+                              className="arrow"
                               style={{ marginBottom: "0.1rem" }}
                             />
                           </span>
@@ -119,9 +107,9 @@ const SubUserManagementPage = () => {
                     className="col p-0 mx-2 dark-mode d-flex flex-column align-items-center justify-content-center"
                     style={{ height: "25vh" }}
                   >
-                    <img src={bell} alt="" height={45} width={45} />
-                    <span style={{ fontSize: "1.2rem" }}>Notifications</span>
-                    <span style={{ fontSize: "1.6rem" }}>
+                    <img src={bell} alt="" className="icon" />
+                    <span className="heading">Notifications</span>
+                    <span className="number">
                       {notificationCount}
                     </span>
                   </div>
@@ -146,8 +134,8 @@ const SubUserManagementPage = () => {
                               }}
                               src={`http://127.0.0.1:8000${res.profile_pic}`}
                               alt=""
-                              height={50}
-                              width={50}
+                              height={45}
+                              width={45}
                             />
                           </span>
                           <span>{res.name}</span>
@@ -204,7 +192,7 @@ const SubUserManagementPage = () => {
                             height={25}
                             width={25}
                           />
-                          <img src={trash} alt="" height={25} width={25} />
+                          <img src={trash} alt="" height={22} width={22} />
                         </div>
                       </>
                     </MainDiv>

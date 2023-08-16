@@ -1,0 +1,8 @@
+@media (min-height: 600px) and (max-height: 750px) {
+    .save-btn{
+      margin-bottom: 100px!important;
+    }
+  }
+.save-btn{
+    margin-bottom: 200px;
+  }

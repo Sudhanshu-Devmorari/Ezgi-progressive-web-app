@@ -60,8 +60,8 @@ const SupportManagementPage = () => {
   //     return ticket.status === "redirected";
   //   }
   //   return false;
-  // }); 
-  
+  // });
+
   useEffect(() => {
     const updatedFilteredTickets = tickets.filter((ticket) => {
       if (selectedOption === "All") {
@@ -79,14 +79,16 @@ const SupportManagementPage = () => {
   }, [selectedOption, tickets]);
 
   const filteredData = (value) => {
-    const filteredArray = tickets.filter((obj) =>
-      obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
-      obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
+    const filteredArray = tickets.filter(
+      (obj) =>
+        obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
+        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
     );
     setFilteredArray(filteredArray);
   };
 
-  const displayTickets = filteredArray.length > 0 ? filteredArray : filteredTickets;
+  const displayTickets =
+    filteredArray.length > 0 ? filteredArray : filteredTickets;
 
   const requestArray = [
     { img: pending, name: "Pending Requests", count: PendingRequest },
@@ -133,28 +135,21 @@ const SupportManagementPage = () => {
                 <div className="row g-0">
                   <div className="col-4 p-0">
                     <div
-                      className="dark-mode p-2 mx-2"
+                      className="dark-mode p-2 mx-2 d-flex flex-column align-items-center justify-content-center"
                       style={{ height: "25vh" }}
                     >
-                      <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                        <img src={support} alt="" height={45} width={45} />
-                        <span
-                          className="name-fonts"
-                          style={{ fontSize: "1.2rem" }}
-                        >
-                          New Requests
-                        </span>
-                        <span style={{ fontSize: "1.6rem" }}>{NewRequest}</span>
-                      </div>
-                      <div className="d-flex align-items-end mt-3 p-2">
-                        <span className="" style={{ fontSize: "1rem" }}>
+                      <img src={support} alt="" className="icon" />
+                      <span className="heading">New Requests</span>
+                      <span className="number">{NewRequest}</span>
+                      <div className="w-100">
+                        <span className="rate-font">
                           <span
-                            className=""
-                            style={{ color: "#58DEAA", fontSize: "1.2rem" }}
+                            className="rate-font"
+                            style={{ color: "#58DEAA" }}
                           >
                             %22
                             <HiArrowSmUp
-                              fontSize={"1.4rem"}
+                              className="arrow"
                               style={{ marginBottom: "0.1rem" }}
                             />
                           </span>
@@ -167,25 +162,15 @@ const SupportManagementPage = () => {
                     <div className="row g-0 h-100">
                       {requestArray.map((res, index) => (
                         <div className="d-flex flex-column align-items-center justify-content-center col">
-                          <img src={res.img} alt="" height={45} width={45} />
-                          <span
-                            className="name-fonts"
-                            style={{ fontSize: "1.2rem" }}
-                          >
-                            {res.name}
-                          </span>
-                          <span style={{ fontSize: "1.6rem" }}>
-                            {res.count}
-                          </span>
+                          <img src={res.img} alt="" className="icon" />
+                          <span className="heading">{res.name}</span>
+                          <span className="number">{res.count}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div
-                  className="dark-mode p-2 m-2 mb-0 home-height"
-                  style={{ overflowY: "auto" }}
-                >
+                <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SupportManagementFilter
                     setSelectedOption={setSelectedOption}
                     selectedOption={selectedOption}
@@ -279,22 +264,17 @@ const SupportManagementPage = () => {
               </div>
               <div className="col-4">
                 <div
-                  className="row dark-mode d-flex align-items-center justify-content-center flex-column g-0 gap-2"
+                  className="p-2 dark-mode d-flex align-items-center justify-content-center flex-column g-0"
                   style={{ height: "25vh" }}
                 >
-                  <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                    <span style={{ fontSize: "1.2rem" }}>Total</span>
-                    <span style={{ fontSize: "1.6rem" }}>{Total}</span>
-                  </div>
-                  <div className="d-flex text-start mt-3 p-2 pb-0">
-                    <span className="" style={{ fontSize: "1rem" }}>
-                      <span
-                        className=""
-                        style={{ color: "#58DEAA", fontSize: "1.2rem" }}
-                      >
+                  <span className="heading">Total</span>
+                  <span className="number">{Total}</span>
+                  <div className="w-100 pt-2">
+                    <span className="rate-font">
+                      <span className="rate-font" style={{ color: "#58DEAA" }}>
                         %22
                         <HiArrowSmUp
-                          fontSize={"1.4rem"}
+                          className="arrow"
                           style={{ marginBottom: "0.1rem" }}
                         />
                       </span>

@@ -6,6 +6,7 @@ import EditorsSettings from "../EditorsSettings/EditorsSettings";
 import EditorSalesSettings from "../EditorSalesSettings/EditorSalesSettings";
 import EditorWithdrawalSettings from "../EditorWithdrawalSettings/EditorWithdrawalSettings";
 import EditorCommentsSettings from "../EditorCommentsSettings/EditorCommentsSettings";
+import './EditorSettingsPage.css'
 
 const EditorSettingsPage = () => {
   const [selectEditorSetting, setSelectEditorSetting] =
@@ -25,7 +26,7 @@ const EditorSettingsPage = () => {
                 setSelectEditorSetting={setSelectEditorSetting}
               />
             </div>
-            <div className="mt-2 dark-mode ms-2" style={{ height: "77vh" }}>
+            <div className="mt-2 dark-mode ms-2 setting">
               {selectEditorSetting === "Editors Settings" && (
                 <EditorsSettings />
               )}

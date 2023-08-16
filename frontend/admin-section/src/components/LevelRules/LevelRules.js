@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import upload from "../../assets/upload.svg";
+import './LevelRules.css'
 
 const LevelRules = (props) => {
   const getRuleForLevel = props?.getRuleForLevel || {};
@@ -161,8 +162,7 @@ const LevelRules = (props) => {
       </div>
       <div lassName="my-3 d-flex justify-content-center">
         <div
-          class="fixed-bottom  d-flex justify-content-center"
-          style={{ marginBottom: "200px" }}
+          class="fixed-bottom  d-flex justify-content-center save-btn"
         >
           <button
             onClick={updateRule}

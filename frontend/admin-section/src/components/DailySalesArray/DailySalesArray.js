@@ -5,20 +5,18 @@ import sales from "../../assets/basket-1.svg";
 const DailySalesArray = () => {
   return (
     <>
-      <div className="dark-mode p-2 mt-2" style={{ height: "31vh" }}>
-        <div className="mt-5 d-flex flex-column align-items-center justify-content-center p-2">
-          <img src={sales} alt="" height={45} width={45} />
-          <span className="name-fonts" style={{ fontSize: "1.2rem" }}>
+      <div className="dark-mode p-2 mt-2 d-flex flex-column align-items-center justify-content-center block-height" style={{ height: "31vh" }}>
+          <img className="icon" src={sales} alt="" />
+          <span className="heading">
             Daily 
           </span>
-          <span style={{ fontSize: "1.6rem" }}>12.645 <small>₺</small></span>
-        </div>
-        <div className="d-flex align-items-end p-2 mt-2">
-          <span className="" style={{ fontSize: "1rem" }}>
-            <span className="" style={{ color: "#58DEAA", fontSize: "1.2rem" }}>
+          <span className="number">12.645 <small>₺</small></span>
+        <div className="w-100 pt-2">
+          <span>
+            <span className="" style={{ color: "#58DEAA", fontSize: "0.9rem" }}>
               %22
               <HiArrowSmUp
-                fontSize={"1.4rem"}
+                className="arrow"
                 style={{ marginBottom: "0.1rem" }}
               />
             </span>
