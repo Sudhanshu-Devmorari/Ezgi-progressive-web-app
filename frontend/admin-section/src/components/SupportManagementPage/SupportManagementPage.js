@@ -79,16 +79,14 @@ const SupportManagementPage = () => {
   }, [selectedOption, tickets]);
 
   const filteredData = (value) => {
-    const filteredArray = tickets.filter(
-      (obj) =>
-        obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
-        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
+    const filteredArray = tickets.filter((obj) =>
+      obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
+      obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
     );
     setFilteredArray(filteredArray);
   };
 
-  const displayTickets =
-    filteredArray.length > 0 ? filteredArray : filteredTickets;
+  const displayTickets = filteredArray.length > 0 ? filteredArray : filteredTickets;
 
   const requestArray = [
     { img: pending, name: "Pending Requests", count: PendingRequest },
