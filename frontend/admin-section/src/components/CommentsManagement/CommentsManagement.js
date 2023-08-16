@@ -406,8 +406,9 @@ const CommentsManagement = (props) => {
                 .padStart(4, "0")}`}</span>
               <div className="position-relative">
                 <img
-                  className="rounded-circle profile-icon"
-                  src={`${server_url + res.commentator_user?.profile_pic}`}
+                style={{objectFit:"cover", borderRadius:"50%"}}
+                  className="profile-icon"
+                  src={server_url + res.commentator_user?.profile_pic}
                   alt=""
                   height={45}
                   width={45}
