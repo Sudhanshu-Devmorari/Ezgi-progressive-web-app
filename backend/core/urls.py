@@ -2,7 +2,8 @@ from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
-                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend)
+                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
+                         GoogleLoginview, FacebookLoginview)
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
@@ -11,6 +12,8 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
 
 
 urlpatterns = [
+    path('facebook-login/', FacebookLoginview.as_view(), name='facebook-login'),
+    path('google-login/', GoogleLoginview.as_view(), name='google-login'),
     path('signup/', SignupView.as_view(), name='Signup'),
     path('login/', LoginView.as_view(), name='Login'),
     path('otp-verify/', OtpVerify.as_view(), name='Otp-Verify'),
@@ -61,7 +64,5 @@ urlpatterns = [
     path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
-
-    path('auth/',include('drf_social_oauth2.urls',namespace='drf')) # add this
 
 ]

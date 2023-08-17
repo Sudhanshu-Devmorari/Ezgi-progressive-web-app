@@ -2,8 +2,8 @@ import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
-import facebook from "../../assets/FacebookLogo.png";
-import { LoginSocialGoogle } from "reactjs-social-login";
+import GoogleLogin from "../GoogleLogin";
+import FacebookLogin from "../FacebookLogin";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -135,16 +135,9 @@ const SignInModal = (props) => {
             <div className="text-center my-3">
               --------------------- or ---------------------{" "}
             </div>
-            <div className="">
-              {/* <img className="mx-3" src={google} alt="" height={50} /> */}
-              <LoginSocialGoogle
-                clientId="YOUR_GOOGLE_CLIENT_ID"
-                buttonText="Login with Google"
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                cookiePolicy={"single_host_origin"}
-              />
-              <img className="mx-3" src={facebook} alt="" height={50} />
+            <div className="d-flex">
+              <GoogleLogin />
+              <FacebookLogin />
             </div>
             <div className="mt-3">
               You don't have Account?{" "}

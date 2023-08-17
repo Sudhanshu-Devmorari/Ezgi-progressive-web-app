@@ -34,6 +34,7 @@ from django.contrib.auth import authenticate
 
 class SignupView(APIView):
     def post(self, request, format=None):
+        print('request.data: ', request.data)
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
             print(serializer.errors)
@@ -43,7 +44,10 @@ class SignupView(APIView):
                'status' : status.HTTP_400_BAD_REQUEST
                 })
         else:
-            serializer.save()
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
             return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
@@ -96,6 +100,53 @@ class LoginView(APIView):
                 'status' : status.HTTP_404_NOT_FOUND
             })
 
+class GoogleLoginview(APIView):
+    def post(self, request, format=None):
+        print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
+            print("Email already exists")
+        except User.DoesNotExist:
+            print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='google',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+        
+class FacebookLoginview(APIView):
+    def post(self, request, format=None):
+        print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='facebook'))
+            print("Email already exists")
+        except User.DoesNotExist:
+            print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='facebook',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+
+
 class PasswordResetView(APIView):
     def post(self, request, format=None):   
         phone = request.data['phone']
@@ -106,7 +157,6 @@ class PasswordResetView(APIView):
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
 
-# Create your views here.
 class RetrieveCommentatorView(APIView):
     """
     for Home page:

@@ -16,6 +16,8 @@ import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import OTPModal from "../OTPModal/OTPModal";
 import PasswordReset from "../PasswordReset/PasswordReset";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
+import GoogleLogin from "../GoogleLogin";
+import FacebookLogin from "../FacebookLogin";
 
 const SignUpModal = (props) => {
   // THEME
@@ -117,8 +119,8 @@ const SignUpModal = (props) => {
       console.log("response: ", response.data);
       if (response.data.status === 200) {
         props.onHide();
-      } else if (response.data.status === 400){
-        setuserExists(response.data?.data?.phone)
+      } else if (response.data.status === 400) {
+        setuserExists(response.data?.data);
       }
     }
   };
@@ -361,9 +363,9 @@ const SignUpModal = (props) => {
                   <div className="text-center my-3">
                     --------------------- or ---------------------{" "}
                   </div>
-                  <div className="">
-                    <img className="mx-3" src={google} alt="" height={50} />
-                    <img className="mx-3" src={facebook} alt="" height={50} />
+                  <div className="d-flex">
+                    <GoogleLogin />
+                    <FacebookLogin />
                   </div>
                   <div className="mt-3">
                     Already Account?{" "}
@@ -390,7 +392,9 @@ const SignUpModal = (props) => {
               }`}
             >
               <div className="m-4">
-                <div className="text-danger text-center text-capitalize">{userExists}</div>
+                <div className="text-danger text-center text-capitalize">
+                  {userExists}
+                </div>
                 <div
                   className="d-flex justify-content-between m-2"
                   style={{ fontWeight: "500", color: "#0D2A53" }}
@@ -567,9 +571,7 @@ const SignUpModal = (props) => {
             </div>
           )}
 
-          {ShowModal === 3 && (
-            <TermsOfUse hide={props.onHide} />
-          )}
+          {ShowModal === 3 && <TermsOfUse hide={props.onHide} />}
 
           {ShowModal === 4 && <SignInModal hide={props.onHide} />}
 
