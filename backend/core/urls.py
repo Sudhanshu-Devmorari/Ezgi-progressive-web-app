@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
@@ -61,5 +61,7 @@ urlpatterns = [
     path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
+
+    path('auth/',include('drf_social_oauth2.urls',namespace='drf')) # add this
 
 ]

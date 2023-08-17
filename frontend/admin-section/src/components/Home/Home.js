@@ -17,23 +17,24 @@ import checkbox from "../../assets/Group 319.svg";
 import Selectedcheckbox from "../../assets/Group 320.svg";
 import moment from "moment";
 import axios from "axios";
+import { MainDiv } from "../CommonBgRow";
 
 const Home = (props) => {
   const handleFile = async (e) => {
-    const file = e.target.files[0]
-    console.log(":::::::: ", file?.path)
-  }
+    const file = e.target.files[0];
+    console.log(":::::::: ", file?.path);
+  };
   const handleDeactive = async (id) => {
     try {
       const res = await axios.delete(
         `http://127.0.0.1:8000/user-management/${id}/`
       );
-      console.log("API Response: ", res)
+      console.log("API Response: ", res);
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
-  }
+  };
   const [addUser, setAddUser] = useState({});
   const submitUserData = (e) => {
     let name, value;
@@ -43,7 +44,7 @@ const Home = (props) => {
     value = e.target.value;
 
     setAddUser({ ...addUser, [name]: value });
-  }
+  };
   const [cities, setCities] = useState([]);
 
   const cityApiData1 = async () => {
@@ -90,10 +91,10 @@ const Home = (props) => {
 
     fetchData();
   }, []);
-<
-  // const [displayUser, setDisplayUser] = useState(props?.users);
 
   const [displayUser, setDisplayUser] = useState(props?.users);
+
+  // const [displayUser, setDisplayUser] = useState(props?.users);
 
   const [userData, setUserData] = useState([]);
   const handleShow = async () => {
@@ -118,22 +119,22 @@ const Home = (props) => {
       const response = await axios.post(
         `http://127.0.0.1:8000/user-management/`,
         {
-          file : "",
-          date : "",
-          name : "",
-          username : "",
-          phone : "",
-          password : "",
-          gender : "",
-          age : "",
+          file: "",
+          date: "",
+          name: "",
+          username: "",
+          phone: "",
+          password: "",
+          gender: "",
+          age: "",
         }
       );
       // setDisplayUser(response.data);
-      console.log('API Response:', response.data);
+      console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
-  }
+  };
 
   // console.log("Cities:", cities);
 
@@ -160,25 +161,27 @@ const Home = (props) => {
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
-    setAddUser({...addUser, gender:gender})
+    setAddUser({ ...addUser, gender: gender });
   };
 
   const toggleGenderDropdown = () => {
-    if (ageDropDown) {
-      setAgeDropDown(false);
-    }
+    setAgeDropDown(false);
+    setLevelDropDown(false);
+    setMonthDropDown(false);
+    setNumberDropDown(false);
     setGenderDropDown(!genderDropDown);
   };
 
   const handleAgeSelection = (age) => {
     setSelectedAge(age);
-    setAddUser({...addUser, age:age})
+    setAddUser({ ...addUser, age: age });
   };
 
   const toggleAgeDropdown = () => {
-    if (genderDropDown) {
-      setGenderDropDown(false);
-    }
+    setLevelDropDown(false);
+    setMonthDropDown(false);
+    setNumberDropDown(false);
+    setGenderDropDown(false);
     setAgeDropDown(!ageDropDown);
   };
 
@@ -213,7 +216,6 @@ const Home = (props) => {
   const [selectedUserTypeFilter, setSelectedUserTypeFilter] =
     useState("Select");
   const [userTypeFilterDropDown, setUserTypeFilterDropDown] = useState(false);
-
 
   // console.log("diaplay: ", displayUser)
   // console.log("users: ", props?.users)
@@ -305,16 +307,33 @@ const Home = (props) => {
   const [selectedLevel, setSelectedLevel] = useState("Select");
   const [levelDropDown, setLevelDropDown] = useState(false);
 
-  const toggleDropdown = (dropdownStateSetter) => {
+  const toggleMonthDropdown = () => {
+    setGenderDropDown(false);
+    setAgeDropDown(false);
+    setNumberDropDown(false);
+    setLevelDropDown(false);
+    setMonthDropDown(!monthDropDown);
+  };
+  const toggleNumberDropdown = () => {
+    setGenderDropDown(false);
+    setAgeDropDown(false);
+    setLevelDropDown(false);
+    setMonthDropDown(false);
+    setNumberDropDown(!numberDropDown);
+  };
+  const toggleLevelDropdown = () => {
+    setGenderDropDown(false);
     setAgeDropDown(false);
     setMonthDropDown(false);
     setNumberDropDown(false);
-    setLevelDropDown(false);
-
-    dropdownStateSetter((prevState) => !prevState);
+    setLevelDropDown(!levelDropDown);
   };
 
-
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  function handleAddProfile(e) {
+    const imageFile = e.target.files[0];
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+  }
   return (
     <>
       <div className="dark-mode p-2 m-2 mb-0 home-height pt-3">
@@ -371,38 +390,36 @@ const Home = (props) => {
           ?.slice()
           .reverse()
           .map((res, index) => (
-            <div
-              className="d-flex justify-content-between px-2 py-1 mb-2 users-section-fonts"
-              style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
-            >
-              <div className="">
-                <div className="">
-                  <span className="pe-1">{`# ${res?.id
-                    .toString()
-                    .padStart(4, "0")}`}</span>
-                  <img
-                    src={`${server_url + res?.profile_pic}`}
-                    className="rounded-circle"
-                    alt=""
-                    height={37}
-                    width={37}
-                  />
-                  <span className="ps-1">{res?.name}</span>
-                </div>
+            <MainDiv>
+              <div className="col">
+                <span className="pe-1">{`# ${res?.id
+                  .toString()
+                  .padStart(4, "0")}`}</span>
+                <img
+                  src={`${server_url + res?.profile_pic}`}
+                  className="rounded-circle"
+                  alt=""
+                  height={42}
+                  width={42}
+                />
+                <span className="ps-1">{res?.name}</span>
               </div>
-              <div className="d-flex gap-2 align-items-center">
+              <div className="d-flex gap-2 align-items-center col ">
                 <div>{res?.username?.trim()}</div>
                 <div className="">
                   {res.gender == "Male" && (
-                    <img src={gender_male} alt="" height={23} width={23} />
+                    <img src={gender_male} alt="" height={22} width={22} />
                   )}
                   {res.gender == "Female" && (
-                    <img src={gender_female} alt="" height={23} width={23} />
+                    <img src={gender_female} alt="" height={22} width={22} />
                   )}
                   <span
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
-                    onClick={() => {setprofile(true); setUserData(res)}}
+                    onClick={() => {
+                      setprofile(true);
+                      setUserData(res);
+                    }}
                   >
                     {res.age}
                   </span>
@@ -411,7 +428,7 @@ const Home = (props) => {
               </div>
               {usersPart === "users" && (
                 <div
-                  className="d-flex align-items-center block-width"
+                  className="d-flex align-items-center block-width col justify-content-center"
                   style={{ minWidth: "7.5rem" }}
                 >
                   {res.commentator_level ? (
@@ -449,20 +466,23 @@ const Home = (props) => {
                   )}
                 </div>
               )}
-              <div className="d-flex align-items-center gap-2 edit-icon-gap">
+              <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
                 <span>{moment(res.created).format("DD-MM.YYYY - HH:mm")}</span>
                 <img src={userEdit} alt="" height={25} width={25} />
                 <img src={trash} alt="" height={25} width={25} />
               </div>
-            </div>
+            </MainDiv>
           ))}
       </div>
 
       <div
         className="modal fade"
         id="exampleModal"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
         tabindex="-1"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
       >
         <div class="modal-dialog modal-dialog-centered">
           {showTransactionHistory === 1 && (
@@ -475,6 +495,7 @@ const Home = (props) => {
                     borderRadius: "50%",
                     height: "8rem",
                     width: "8rem",
+                    display: preveiwProfilePic === null ? "block" : "none",
                   }}
                 >
                   <img
@@ -487,13 +508,24 @@ const Home = (props) => {
                     alt=""
                   />
                 </div>
+                <img
+                  src={preveiwProfilePic}
+                  alt=""
+                  height={135}
+                  width={135}
+                  style={{
+                    display: preveiwProfilePic !== null ? "block" : "none",
+                    objectFit: "cover",
+                    borderRadius: "50%  ",
+                  }}
+                />
               </div>
               <div className="d-flex justify-content-center my-2">
-                <span
-                  className="px-3 py-2"
-                  style={{ backgroundColor: "#0B2447", borderRadius: "2px" }}
-                >
-                  <label htmlFor="upload">
+                <label htmlFor="upload">
+                  <span
+                    className="px-3 py-2 cursor"
+                    style={{ backgroundColor: "#0B2447", borderRadius: "2px" }}
+                  >
                     <img
                       className="mb-1"
                       src={upload}
@@ -501,10 +533,16 @@ const Home = (props) => {
                       height={20}
                       width={20}
                     />
-                  </label>
-                  <input onChange={handleFile} type="file" name="" id="upload" className="d-none" />
-                  <span className="ps-1">Upload</span>
-                </span>
+                    <input
+                      onChange={(e) => handleAddProfile(e)}
+                      type="file"
+                      name=""
+                      id="upload"
+                      className="d-none"
+                    />
+                    <span className="ps-1">Upload</span>
+                  </span>
+                </label>
               </div>
               <div className="d-flex justify-content-center">
                 {profile ? (
@@ -539,11 +577,23 @@ const Home = (props) => {
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
                   <span>Name Surname</span>
-                  <input onChange={submitUserData} name="name" value={userData ? userData?.name : addUser.name} type="text" className="darkMode-input form-control" />
+                  <input
+                    onChange={submitUserData}
+                    name="name"
+                    value={userData ? userData?.name : addUser.name}
+                    type="text"
+                    className="darkMode-input form-control"
+                  />
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Username</span>
-                  <input onChange={submitUserData} name="username" value={userData ? userData?.username : addUser.username} type="text" className="darkMode-input form-control" />
+                  <input
+                    onChange={submitUserData}
+                    name="username"
+                    value={userData ? userData?.username : addUser.username}
+                    type="text"
+                    className="darkMode-input form-control"
+                  />
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -557,7 +607,10 @@ const Home = (props) => {
                     >
                       +90
                     </span>
-                    <input onChange={submitUserData} name="phone" value={userData ? userData?.phone : addUser.phone}
+                    <input
+                      onChange={submitUserData}
+                      name="phone"
+                      value={userData ? userData?.phone : addUser.phone}
                       type="text"
                       class="form-control darkMode-input"
                       aria-label="Username"
@@ -567,7 +620,10 @@ const Home = (props) => {
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Password</span>
-                  <input onChange={submitUserData} name="password" value={userData ? userData?.password : addUser.password}
+                  <input
+                    onChange={submitUserData}
+                    name="password"
+                    value={userData ? userData?.password : addUser.password}
                     // style={{-webkit-text-security: square;}}
                     // style={{webkitTextSecurity: "star"}}
                     className="darkMode-input form-control"
@@ -600,7 +656,10 @@ const Home = (props) => {
               </div>
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
-                  <CustomDropdown onChange={submitUserData} name="gender" value={userData ? userData?.gender : addUser.selectedGender}
+                  <CustomDropdown
+                    onChange={submitUserData}
+                    name="gender"
+                    value={userData ? userData?.gender : addUser.selectedGender}
                     label="Gender"
                     options={genderOptions}
                     selectedOption={selectedGender}
@@ -610,7 +669,10 @@ const Home = (props) => {
                   />
                 </div>
                 <div className="col d-flex flex-column">
-                  <CustomDropdown onChange={submitUserData} name="age" value={userData ? userData?.age : addUser.selectedAge}
+                  <CustomDropdown
+                    onChange={submitUserData}
+                    name="age"
+                    value={userData ? userData?.age : addUser.selectedAge}
                     label="Age"
                     options={ageOptions}
                     selectedOption={selectedAge}
@@ -632,41 +694,48 @@ const Home = (props) => {
                     style={{ cursor: "pointer" }}
                     height={58}
                     width={55}
-                    name="subscription" value={addUser.selectCheckBox}
-                    onClick={() => {setSelectCheckBox(!selectCheckBox)
-                                    setAddUser({...addUser, subscription:(!selectCheckBox == true ? 'True' : 'False')})}}
+                    name="subscription"
+                    value={addUser.selectCheckBox}
+                    onClick={() => {
+                      setSelectCheckBox(!selectCheckBox);
+                      setAddUser({
+                        ...addUser,
+                        subscription:
+                          !selectCheckBox == true ? "True" : "False",
+                      });
+                    }}
                   />
                 </div>
                 <div className="col-8">
                   <div className="row g-0 gap-2">
                     <div className="col">
                       <CustomDropdown
-                      label=" "
+                        label=" "
                         options={monthOptions}
                         selectedOption={selectedMonth}
                         onSelectOption={setSelectedMonth}
                         isOpen={monthDropDown}
-                        toggleDropdown={() => toggleDropdown(setMonthDropDown)}
+                        toggleDropdown={toggleMonthDropdown}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
-                      label=" "
+                        label=" "
                         options={numberOptions}
                         selectedOption={selectedNumber}
                         onSelectOption={setSelectedNumber}
                         isOpen={numberDropDown}
-                        toggleDropdown={() => toggleDropdown(setNumberDropDown)}
+                        toggleDropdown={toggleNumberDropdown}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
-                      label=" "
+                        label=" "
                         options={levelOptions}
                         selectedOption={selectedLevel}
                         onSelectOption={setSelectedLevel}
                         isOpen={levelDropDown}
-                        toggleDropdown={() => toggleDropdown(setLevelDropDown)}
+                        toggleDropdown={toggleLevelDropdown}
                       />
                     </div>
                   </div>
@@ -674,7 +743,8 @@ const Home = (props) => {
                 {profile ? (
                   <div className="my-2 d-flex row g-0 mb-3 gap-4 px-3">
                     <div className="col">
-                      <button data-bs-dismiss="modal"
+                      <button
+                        data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#FF5757",
@@ -687,7 +757,8 @@ const Home = (props) => {
                       </button>
                     </div>
                     <div className="col">
-                      <button data-bs-dismiss="modal"
+                      <button
+                        data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#FF9100",
@@ -700,7 +771,9 @@ const Home = (props) => {
                       </button>
                     </div>
                     <div className="col">
-                      <button onClick={() => handleDeactive(userData?.id)} data-bs-dismiss="modal"
+                      <button
+                        onClick={() => handleDeactive(userData?.id)}
+                        data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#D2DB08",
@@ -713,7 +786,8 @@ const Home = (props) => {
                       </button>
                     </div>
                     <div className="col">
-                      <button data-bs-dismiss="modal"
+                      <button
+                        data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#E6E6E6",
@@ -850,15 +924,17 @@ const Home = (props) => {
 
       {/* filter modal */}
       <div
-        class="modal fade"
+        className="modal fade"
         id="filterModal"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
         tabindex="-1"
-        aria-labelledby="filterModalLabel"
+        aria-labelledby="staticBackdropLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body dark-mode position-relative">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body dark-mode position-relative">
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
                   <CustomDropdown
