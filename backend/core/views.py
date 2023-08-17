@@ -56,6 +56,10 @@ class SignupView(APIView):
                 obj.save()
             else:
                 obj = DataCount.objects.create(user=1)
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
             return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
