@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
-import Swal from "sweetalert2";
 
 const ForgotPassword = (props) => {
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
@@ -27,27 +26,7 @@ const ForgotPassword = (props) => {
         setShowModal(6);
         props.setForgotPsPhone(phone);
       } else if (res.data.status === 404) {
-        // setPhoneError(res.data.data);
-        Swal.fire({
-          title: "Error",
-          text: res.data.data,
-          icon: "error",
-          backdrop: false,
-          customClass: `${
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
-          }`,
-        });
-      } else if (res.data.status === 500) {
-        // setPhoneError(res.data.data);
-        Swal.fire({
-          title: "Error",
-          text: res.data.data,
-          icon: "error",
-          backdrop: false,
-          customClass: `${
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
-          }`,
-        });
+        setPhoneError(res.data.data);
       }
     }
   };
