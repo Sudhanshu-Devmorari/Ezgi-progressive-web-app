@@ -1,5 +1,6 @@
 import './CustomDropdown.css'
 export const CustomDropdown = ({
+  name,
   label,
   options,
   selectedOption,
@@ -35,13 +36,13 @@ export const CustomDropdown = ({
             //   : "45%",
         }}
       >
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <span
           style={{fontSize: label === " " && "12px"}}
             className="dpcontent-dark-mode my-1 p-2"
             key={index}
             onClick={() => {
-              onSelectOption(option);
+              onSelectOption(name,option);
               toggleDropdown();
             }}
           >

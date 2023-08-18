@@ -1,16 +1,36 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
-const CommentsManagementFilter = () => {
+const CommentsManagementFilter = (props) => {
+  console.log("***:::::***", props?.commentData)
   const [selectedOption, setSelectedOption] = useState("All");
 
-  const options = ["All", "Pendings", "Resolved", "Redirected"];
+  const options = ["All", "Pending", "Resolved", "Redirected"];
 
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setShowDropdown(false);
+  };
+  const filterCommentData = (e) => {
+    const val = e.target.value;
+    const filteredArray = props?.commentData.filter(
+      (obj) =>
+        obj?.commentator_user?.name?.toLowerCase().startsWith(val.toLowerCase())
+    );
+    props.setDisplayUser(val == "" ? props?.commentData :filteredArray);
+  };
+
+  const filterData = (e) => {
+    console.log("^^^^^^^", e)
+    const val = e;
+    const filteredArray = props?.commentData.filter(
+      (obj) =>
+        obj?.status?.toLowerCase() == val?.toLowerCase()
+    );
+    console.log("filtered:", filteredArray)
+    props.setDisplayUser(val == "All" ? props?.commentData :filteredArray);
   };
 
   return (
@@ -21,7 +41,7 @@ const CommentsManagementFilter = () => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" />
+            <input onChange={filterCommentData} type="text" className="input-field-dark" />
           </div>
         </div>
         <div className="p-2 position-relative">
@@ -65,9 +85,11 @@ const CommentsManagementFilter = () => {
               .map((option) => (
                 <span
                   key={option}
+                  value={option}
                   className="m-1 px-2 py-1 text-center cursor"
                   style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-                  onClick={() => handleOptionClick(option)}
+                  onClick={(e) => {handleOptionClick(option);
+                    filterData(option)}}
                 >
                   {option}
                 </span>

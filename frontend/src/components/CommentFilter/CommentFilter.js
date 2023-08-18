@@ -1,10 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
+
 
 export const CommentFilter = (props) => {
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Select");
+  const [categoryType, setCategoryType] = useState(null);
+
+  const [LeagueValue, setLeagueValue] = useState([]);
+  const [DateValue, setDateValue] = useState([]);
+
 
   const handleCountrySelection = (country) => {
     props.setCountryData(country)
@@ -23,19 +30,25 @@ export const CommentFilter = (props) => {
     }
     setCountryDropDown(!countryDropDown);
   };
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
-  ];
+  // const countryOptions = [
+  //   "India",
+  //   "Turkey",
+  //   "Paris",
+  //   "Japan",
+  //   "Germany",
+  //   "USA",
+  //   "UK",
+  // ];
+  const [countryOptions, setCountryOptions] = useState([]);
 
-  const categoryOptions = ["Football", "Basketball"];
-  const dateOptions = ["Date 1", "Date 2", "Date 3"];
-  const leagueOptions = ["League 1", "League 2", "League 3"];
+
+  // const categoryOptions = ["Football", "Basketball"];
+  const categoryOptions = ["Futbol", "Basketbol"];
+
+  // const dateOptions = ["Date 1", "Date 2", "Date 3"];
+  const dateOptions = DateValue;
+  // const leagueOptions = ["League 1", "League 2", "League 3"];DateValue
+  const leagueOptions = LeagueValue;
 
   const [selectedCategory, setSelectedCategory] = useState("Select");
   const [categoryDropdown, setCategoryDropdown] = useState(false);
@@ -43,6 +56,76 @@ export const CommentFilter = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
   const [selectedLeague, setSelectedLeague] = useState("Select");
   const [leagueDropdown, setLeagueDropdown] = useState(false);
+
+  useEffect(() => {
+    async function getCountryOptions() {
+      if (selectedCategory !== "Select") {
+        try {
+          const headers = {
+            // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`
+          };
+          let type;
+          if (selectedCategory === "Futbol") {
+            type = 1;
+          } else if (selectedCategory === "Basketbol") {
+            type = 2;
+          }
+          setCategoryType(type);
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+            { headers }
+          );
+          const countryData = res.data.data;
+          setCountryOptions(countryData.map((item) => item.country));
+
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    getCountryOptions();
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    async function getLeague() {
+      if (selectedCountry !== "Select") {
+        try {
+          const headers = {
+            // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`
+          };
+          // contriesAPi(categoryType, selectedCountry);
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
+            { headers }
+          );
+          const leagueValue = res.data.data.map((item) => item.league);
+          setLeagueValue(leagueValue);
+          if (selectedLeague !== "Select") {
+            const res = await axios.get(
+              `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
+              { headers }
+            );
+            setDateValue(res?.data?.data.map((item) => item.date));
+
+            if (selectedDate !== "Select") {
+              const res1 = await axios.get(
+                `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
+                { headers }
+              );
+
+              props.setMatchdetailsValue(res1?.data?.data?.map((item) => item.takimlar));
+              // props.setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    getLeague();
+  }, [selectedCountry, selectedLeague, selectedDate]);
 
   const handleCategorySelection = (category) => {
     props.setCategoryData(category)

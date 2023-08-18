@@ -100,7 +100,7 @@ const ContentSection = ({
                   style={{ objectFit: "cover" }}
                 />
                 <span className="p-1 autorname-responsive">
-                  {data?.value.commentator_user.username}
+                  {data?.value?.commentator_user?.username}
                 </span>
                 <img src={blueTick} alt="" width={16} height={16} />
               </div>

@@ -12,14 +12,18 @@ import axios from "axios";
 
 const CommentsManagementPage = () => {
   const [data, setData] = useState({});
+  const [mostLike, setMostLike] = useState([]);
+  const [commentData, setCommentData] = useState([]);
 
-  const commentManagementApiData =  () => {
+  const commentManagementApiData = async () => {
     console.log(data)
-    axios
+    await axios
       .get(`http://127.0.0.1:8000/comments-management/`)
       .then((res) => {
-        console.log("=-=-=-=-=-=-=> ", res.data)
+        // console.log("=-=-=-=-=-=-=> ", res.data)
         setData(res.data);
+        setMostLike(res?.data?.most_like)
+        setCommentData(res.data.all_comment)
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -105,10 +109,10 @@ const CommentsManagementPage = () => {
               </div>
               <div className="row g-0">
                 <div className="col-8">
-                  <CommentsManagement />
+                  <CommentsManagement commentData={commentData} />
                 </div>
                 <div className="col-4">
-                  <MostLiked />
+                  <MostLiked mostLike={mostLike} />
                 </div>
               </div>
           </div>

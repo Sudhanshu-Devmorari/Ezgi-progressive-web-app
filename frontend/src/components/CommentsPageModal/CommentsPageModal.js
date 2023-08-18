@@ -46,7 +46,6 @@ const CommentsPageModal = (props) => {
     } catch (error) {
       console.error('Error making POST request:', error);
     }
-    // console.log("$$$$$$$")
   };
 
   const [categoryData, setCategoryData] = useState('');
@@ -69,6 +68,8 @@ const CommentsPageModal = (props) => {
   
   const [matchDetailsDropDown, setMatchDetailsDropDown] = useState(false);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
+  const [MatchdetailsValue, setMatchdetailsValue] = useState([]);
+
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -80,12 +81,13 @@ const CommentsPageModal = (props) => {
     setPredictionTypeDropDown(false)
   };
   
-  const matchDetailsOptions = [
-    "Option 1",
-    "Option 2",
-    "Option 3",
-    // Add more options as needed
-  ];
+  // const matchDetailsOptions = [
+  //   "Option 1",
+  //   "Option 2",
+  //   "Option 3",
+  //   // Add more options as needed
+  // ];
+  const matchDetailsOptions = MatchdetailsValue
 
   // Similar state and functions for "Level" and "Prediction Type" dropdowns
   const [levelDropDown, setLevelDropDown] = useState(false);
@@ -164,7 +166,7 @@ const CommentsPageModal = (props) => {
       setIsLosingSelected(false);
     }
     if (e === "lose") {
-      setYellowSelect('finished')
+      setYellowSelect('lose')
       setIsLosingSelected(!isLosingSelected);
       setIsSubscriberSelected(false);
       setIsNotStartedSelected(false);
@@ -197,7 +199,7 @@ const CommentsPageModal = (props) => {
                 />
               </span>
             </div>
-            <CommentFilter setCategoryData={setCategoryData} setCountryData={setCountryData} setDateData={setDateData} setLeagueData={setLeagueData} />
+            <CommentFilter setMatchdetailsValue={setMatchdetailsValue} setSelectedMatchDetails={setSelectedMatchDetails} setCategoryData={setCategoryData} setCountryData={setCountryData} setDateData={setDateData} setLeagueData={setLeagueData} />
             <div className="my-3">
               <CustomDropdown
                 label="Match Details"

@@ -1,12 +1,13 @@
 from django.contrib import admin
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, 
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
-                         CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting)
+                         CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
+                         BecomeCommentator, BlueTick, DataCount)
 
 # Register your models here.
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id','name','username','phone','password','country','city','age','category','profile_pic','user_role','commentator_level','deactivate_commentator','commentator_status','created','updated')
+    list_display = ('id','name','username','phone','password','country','city','age','category','profile_pic','user_role', 'is_delete','commentator_level','deactivate_commentator','commentator_status','created','updated')
 
 @admin.register(FollowCommentator)
 class FollowCommentatorAdmin(admin.ModelAdmin):
@@ -70,3 +71,18 @@ class SubscriptionSettingAdmin(admin.ModelAdmin):
 @admin.register(HighlightSetting)
 class HighlightSettingAdmin(admin.ModelAdmin):
     list_display = ('id','commentator_level','week_1','week_2','month_1','highlight_icon','created','updated')
+
+
+@admin.register(BecomeCommentator)
+class BecomeCommentatorAdmin(admin.ModelAdmin):
+    list_display = ('id','user','duration', 'money', 'commentator','start_date','end_date','status','created','updated')
+
+
+@admin.register(BlueTick)
+class BlueTickAdmin(admin.ModelAdmin):
+    list_display = ('id','user','status','created','updated')
+
+
+@admin.register(DataCount)
+class DataCountAdmin(admin.ModelAdmin):
+    list_display = ('id','user','editor','subscription','comment','highlight','advertisement', 'ticket','comment_win','comment_lose','created','updated')

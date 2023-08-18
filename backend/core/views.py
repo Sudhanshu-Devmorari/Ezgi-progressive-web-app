@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from django.db.models.functions import TruncDate
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models import Sum
@@ -22,13 +23,13 @@ from rest_framework.exceptions import NotFound, ParseError, APIException
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
-                          MembershipSetting, SubscriptionSetting, HighlightSetting)
+                          MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
-                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer)
+                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -48,6 +49,13 @@ class SignupView(APIView):
                 return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
             else:
                 serializer.save()
+            serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.user += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(user=1)
             return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
@@ -89,7 +97,7 @@ class LoginView(APIView):
         phone = request.data['phone']
         password = request.data['password']
         try:
-            user_phone = User.objects.get(phone=phone)
+            user_phone = User.objects.get(phone=phone, is_delete=False)
             if user_phone.password == password:
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
             else:
@@ -151,7 +159,7 @@ class PasswordResetView(APIView):
     def post(self, request, format=None):   
         phone = request.data['phone']
         new_ps = request.data['new_ps']
-        user = User.objects.get(phone=phone)
+        user = User.objects.get(phone=phone, is_delete=False)
         user.password = new_ps
         user.save()
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
@@ -398,7 +406,7 @@ class CommentView(APIView):
                     if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
 
-                print("-----------")
+                # print("-----------")
                 category = request.data.get('category')
                 # category = request.data['category']
                 print('category: ', category)
@@ -446,7 +454,14 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
-                print('comment_obj: ', comment_obj)
+                # print('comment_obj: ', comment_obj)
+                if comment_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.comment += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(comment=1)
                 # send new Comment notification:
                 subscription_obj = Subscription.objects.filter(commentator_user=user)
                 for obj in subscription_obj:
@@ -521,6 +536,13 @@ class SubscriptionView(APIView):
                                                            start_date=start_date, end_date=end_date, status='active', money=money)
             # send Subscription notification:
             notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{request.user.username} Subscribe you.')
+            if Subscription_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.subscription += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(subscription=1)
 
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
@@ -795,7 +817,13 @@ class SupportView(APIView):
                 user = User.objects.get(id=id)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
-                
+                if support_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.ticket += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(ticket=1)
                 serializer = TicketSupportSerializer(support_obj)
                 data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
@@ -983,7 +1011,9 @@ class DeactivateProfile(APIView):
         # user = User.objects.get(id=8)
         user = request.user
         if user.user_role == 'standard':
-            user.delete()
+            # user.delete()
+            user.is_delete = True
+            user.save()
             message = {"success": "User profile Deactivate sucessfully."}
             return Response(data=message, status=status.HTTP_200_OK)
         else:
@@ -1023,6 +1053,13 @@ class HighlightPurchaseView(APIView):
                     end_date = start_date + timezone.timedelta(days=30)
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
+                if highlight_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.highlight += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(highlight=1)
                 serializer = HighlightSerializer(highlight_obj)
                 data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
@@ -1081,11 +1118,68 @@ class CommentFilterView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class VerifyUserView(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        user = User.objects.get(id=id)
+        try:
+            subscribers = Subscription.objects.filter(commentator_user=user)
+
+            commentator_membership = BecomeCommentator.objects.get(user=user, status='active')
+            start_date = commentator_membership.start_date
+            end_date = commentator_membership.end_date
+
+            # Calculate the membership duration
+            membership_duration = end_date - start_date
+            if membership_duration >= timedelta(days=90):  # At least 3 months
+                if subscribers.count() >= 250:
+                    obj = BlueTick.objects.create(user=user)
+                    serializer = BlueTickSerializer(obj).data
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                    # return Response({'message': 'This request has been processed and it has been forwarded to the manager for review.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'message': 'There are fewer than 250 subscribers for the user.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'User does not have active membership for at least 3 months.'}, status=status.HTTP_200_OK)
+
+        except BecomeCommentator.DoesNotExist:
+            return Response({'message': 'User does not have an active membership.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'message': 'An error occurred while processing the request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class AdminMainPage(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
+        previous_24_hours = timezone.now() - timedelta(hours=24)
 
         try:
+            """user percentage"""
+            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+            data_list['new_user_percentage'] = user_percentage
+            
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+
             new_user = User.objects.all().count()
             data_list['new_user'] = new_user
 
@@ -1112,8 +1206,39 @@ class AdminMainPage(APIView):
 class UserManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
+        # print("previous_24_hours********", previous_24_hours)
+
 
         try:
+            """user percentage"""
+            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+            data_list['new_user_percentage'] = user_percentage
+
+            
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+
             new_user = User.objects.all().count()
             data_list['new_user'] = new_user
 
@@ -1143,7 +1268,7 @@ class UserManagement(APIView):
         Create new User.
         """
         try:
-            profile = request.data.get('file')
+            profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
@@ -1156,7 +1281,11 @@ class UserManagement(APIView):
             if subscription:
                 duration = request.data.get('duration')
                 role = 'commentator'
-                level = request.data.get('level').lower()
+                if request.data.get('level').lower() == 'expert':
+                    level = 'master'
+                else:
+                    level = request.data.get('level').lower()
+
 
             # Any additional validations or processing can be done here
 
@@ -1167,8 +1296,37 @@ class UserManagement(APIView):
             )
             user_obj.set_password(password)
             user_obj.save()
+            if user_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.user += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(user=1)
             serializer = UserSerializer(user_obj)
             data = serializer.data
+
+            if subscription and user_obj != None:
+                start_date = datetime.now()
+                if duration == "1 Month":
+                    end_date = start_date + timedelta(days=30)
+                if duration == "3 Month":
+                    end_date = start_date + timedelta(days=90)
+                if duration == "6 Month":
+                    end_date = start_date + timedelta(days=180)
+                
+                editor_obj = BecomeCommentator.objects.create(user=user_obj, duration=duration, status='active', commentator=True, end_date=end_date)
+                editor_obj.save()
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
+                serializer = BecomeCommentatorSerializer(editor_obj)
+                data = serializer.data
+                return Response(data=data, status=status.HTTP_200_OK)
+
             return Response(data=data, status=status.HTTP_200_OK)
 
         except KeyError as e:
@@ -1192,15 +1350,39 @@ class UserManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(serializer.data)
+        if request.data.get('subscription') == 'undefined':
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                try:
+                    serializer.save()
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            duration = request.data.get('duration')
+            start_date = datetime.now()
+            if duration == "1 Month":
+                end_date = start_date + timedelta(days=30)
+            if duration == "3 Month":
+                end_date = start_date + timedelta(days=90)
+            if duration == "6 Month":
+                end_date = start_date + timedelta(days=180)
+            
+            editor_obj = BecomeCommentator.objects.create(user=user, duration=duration, status='active', commentator=True, end_date=end_date)
+            editor_obj.save()
+            if editor_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
+            serializer = BecomeCommentatorSerializer(editor_obj)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
             
     def delete(self, request, pk, format=None, *args, **kwargs):
         """
@@ -1209,12 +1391,14 @@ class UserManagement(APIView):
         try:
             user = User.objects.get(pk=pk)
             if user.user_role == "standard":
-                user.delete()
+                # user.delete()
+                user.is_delete = True
                 user.save()
                 message = {"success": "User profile Deactivate sucessfully."}
                 return Response(data=message, status=status.HTTP_200_OK)
             else:
-                user.deactivate_commentator = 'pending'
+                # user.deactivate_commentator = 'pending'
+                user.is_delete = True
                 user.save()
                 message = {"success": "Profile deactivation request send to Admin."}
                 return Response(data=message, status=status.HTTP_200_OK)
@@ -1262,6 +1446,23 @@ class CommentsManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         management = {}
         commentator = []
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
+        
+        """user percentage"""
+        # deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+        # users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+        # users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+        # count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+        # user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+
+
+        # status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+        # new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+        # comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+        # count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+        # user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+        # management['comments_percentage'] = user_percentage
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -1272,7 +1473,7 @@ class CommentsManagement(APIView):
 
         # Next, get the comment with the most likes
         comment_with_most_likes = comments_with_likes.order_by('-like_count')
-        print("********* ", len(comment_with_most_likes))
+
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:
             if i:
@@ -1330,6 +1531,7 @@ class CommentsManagement(APIView):
         if serializer.is_valid():
             try:
                 serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(serializer.data)
@@ -1342,32 +1544,32 @@ class FilterComments(APIView):
         filters = {}
         user = User.objects.get(id=id)
         try:
-            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "":
+            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
                 filters['category__contains'] = request.data.get('category')
 
-            if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "":
+            if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')
 
-            if 'league' in request.data  and request.data.get('league') != None and request.data.get('league') != "":
+            if 'league' in request.data  and request.data.get('league') != None and request.data.get('league') != "" and request.data.get('league') != "Select":
                 filters['league'] = request.data.get('league')
 
-            if 'match_detail' in request.data  and request.data.get('match_detail') != None and request.data.get('match_detail') != "Select":
+            if 'match_detail' in request.data  and request.data.get('match_detail') != None and request.data.get('match_detail') != "Select" and request.data.get('match_detail') != "Select":
                 filters['match_detail'] = request.data.get('match_detail')
 
-            if 'prediction_type' in request.data  and request.data.get('prediction_type') != None and request.data.get('prediction_type') != "Select":
+            if 'prediction_type' in request.data  and request.data.get('prediction_type') != None and request.data.get('prediction_type') != "Select" and request.data.get('prediction_type') != "Select":
                 filters['prediction_type'] = request.data.get('prediction_type')
 
-            if 'prediction' in request.data  and request.data.get('prediction') != None and request.data.get('prediction') != "":
+            if 'prediction' in request.data  and request.data.get('prediction') != None and request.data.get('prediction') != "" and request.data.get('prediction') != "Select":
                 filters['prediction'] = request.data.get('prediction')
 
-            if 'status' in request.data  and request.data.get('status') != None and request.data.get('status') != "":
+            if 'status' in request.data  and request.data.get('status') != None and request.data.get('status') != "" and request.data.get('status') != "Select":
                 filters['status'] = request.data.get('status')
 
-            if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "":
+            if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "" and request.data.get('date') != "Select":
                 filters['date'] = request.data.get('date')
 
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
-            if filter_type in ('public_content', 'finished', 'winning'):
+            if filter_type in ('public_content', 'finished', 'winning', 'published'):
 
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
@@ -1434,6 +1636,32 @@ class FilterComments(APIView):
 
                     # return Response(data=data0, status=status.HTTP_200_OK)
 
+                if filter_type == "published":
+                    all_comments = Comments.objects.filter(status='approve',**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+
                 if filter_type == "winning":
                     """
                     winning logic here.
@@ -1442,7 +1670,7 @@ class FilterComments(APIView):
                     # return Response(data=data0, status=status.HTTP_200_OK)
 
             filter_type0 = request.data.get('filter_type0') # This will contain 'only_subscriber', 'not_stated', 'finished'
-            if filter_type0 in ('only_subscriber', 'not_stated', 'finished'):
+            if filter_type0 in ('only_subscriber', 'not_stated', 'lose', 'pending'):
 
                 if filter_type0 == "only_subscriber":
                     subscribe_comment = []
@@ -1515,6 +1743,32 @@ class FilterComments(APIView):
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
 
+                if filter_type0 == "pending":
+                    all_comments = Comments.objects.filter(status='pending',**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+
                 if filter_type == "lose":
                     """
                     lose logic here.
@@ -1563,7 +1817,7 @@ class EditorManagement(APIView):
         
         try:
             editor_list = []
-            commentator = User.objects.filter(user_role='commentator')
+            commentator = User.objects.filter(user_role='commentator').order_by('created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -1678,6 +1932,29 @@ class EditorManagement(APIView):
             data_list['deactivat_user'] = deactivation_request_user
             data_list['deactivation_request'] = deactivation_request.count()
 
+            verify_obj = BlueTick.objects.filter(status='pending')
+            verify_obj_user = []
+            for obj in verify_obj:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                verify_obj_user.append(detail)
+            data_list['verify_user'] = verify_obj_user
+            data_list['verify_request_count'] = verify_obj.count()
+
             return Response(data=data_list, status=status.HTTP_200_OK)
         
         except Exception as e:
@@ -1719,6 +1996,13 @@ class EditorManagement(APIView):
             )
             user_obj.set_password(password)
             user_obj.save()
+            if user_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
             serializer = UserSerializer(user_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -1757,8 +2041,10 @@ class EditorManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            user.deactivate_commentator = 'pending'
+            # user.deactivate_commentator = 'pending'
+            user.is_delete = True
             user.save()
+            return Response({"success": "The deactivation request for a user has been processed successfully."}, status=status.HTTP_404_NOT_FOUND)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
@@ -2241,6 +2527,13 @@ class SubUserManagement(APIView):
                 print("***************************")
                 sub_user_obj.set_password(password)
                 sub_user_obj.save()
+                # if sub_user_obj != None:
+                #     if DataCount.objects.filter(id=1).exists():
+                #         obj = DataCount.objects.get(id=1)
+                #         obj.user += 1
+                #         obj.save()
+                #     else:
+                #         obj = DataCount.objects.create(user=1)
                 serializer = UserSerializer(sub_user_obj)
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -2285,7 +2578,8 @@ class SubUserManagement(APIView):
     def delete(self, request, pk, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=pk)
-            user.delete()
+            # user.delete()
+            user.is_delete = True
             user.save()
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -2354,6 +2648,13 @@ class AdvertisementManagement(APIView):
                                                 start_date=request.data.get('start_date'), end_date=request.data.get('end_date'),
                                                 company_name=request.data.get('company_name'), link=request.data.get('link'),
                                                 ads_budget = request.data.get('ads_budget'))
+                if ads_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.advertisement += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(advertisement=1)
                 
                 serializer = AdvertisementSerializer(ads_obj)
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -2511,6 +2812,12 @@ class HighlightSettingView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.highlight += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(highlight=1)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -2524,6 +2831,12 @@ class CommentSetting(APIView):
         comment_serializer = CommentsSerializer(data=data)
         if comment_serializer.is_valid():
             comment = comment_serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.comment += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(comment=1)
 
             # Extract favorite and clap counts from request data
             favorite_count = data.get('favorite', 0)

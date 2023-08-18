@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoSearch } from "react-icons/go";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
@@ -23,8 +23,56 @@ import world from "../../assets/world-check.svg";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import CommentsManagementFilter from "../CommentsManagementFilter/CommentsManagementFilter";
+import moment from "moment";
+import axios from "axios";
 
-const CommentsManagement = () => {
+const CommentsManagement = (props) => {
+  const [fData, setFdata] = useState({});
+  const [status, setStatus] = useState("");
+  const [secondStatus, setSecondStatus] = useState("");
+
+  const [currentData, setCurrentData] = useState([]);
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
+  const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
+  const [selectedPredictionType, setSelectedPredictionType] =
+    useState("Select");
+  const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
+  const [selectedPrediction, setSelectedPrediction] = useState("Select");
+  const [predictionDropdown, setPredictionDropdown] = useState(false);
+  // Get League / Date / Match details
+  const [LeagueValue, setLeagueValue] = useState([]);
+  const [DateValue, setDateValue] = useState([]);
+  const [MatchdetailsValue, setMatchdetailsValue] = useState("");
+
+  const [displayUser, setDisplayUser] = useState(props?.commentData);
+  useEffect(() => {
+    setDisplayUser(props?.commentData);
+  }, [props?.commentData]);
+
+
+  const updateCommentApiData = async () => {
+    const user_id = localStorage.getItem("user-id");
+    await axios
+      .post(`http://127.0.0.1:8000/filter-comments/${user_id}/`, {
+        category: selectedCategory,
+        country: selectedCountry,
+        league: selectedLeague,
+        date: selectedDate,
+        match_detail: selectedMatchDetails,
+        level: selectedPrediction,
+        prediction_type: selectedPredictionType,
+        filter_type: status,
+        filter_type0: secondStatus,
+      })
+      .then((res) => {
+        setFdata(res.data);
+        setDisplayUser(res.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data.", error);
+      });
+  };
+
   const [isPublicSelected, setIsPublicSelected] = useState(false);
   const [isSubscriberSelected, setIsSubscriberSelected] = useState(false);
   const [isWinningSelected, setIsWinningSelected] = useState(false);
@@ -54,19 +102,73 @@ const CommentsManagement = () => {
     }
     setCountryDropDown(!countryDropDown);
   };
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
-  ];
+  const handleStatus = async (id, status) => {
+    try {
+      const res = await axios.patch(
+        `http://127.0.0.1:8000/comments-management/${id}/`,
+        { status: `${status}` }
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
 
-  const categoryOptions = ["Category 1", "Category 2", "Category 3"];
-  const dateOptions = ["Date 1", "Date 2", "Date 3"];
-  const leagueOptions = ["League 1", "League 2", "League 3"];
+  const [cities, setCities] = useState([]);
+
+  const cityApiData1 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=1",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  const cityApiData2 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=2",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data1 = await cityApiData1();
+      const data2 = await cityApiData2();
+      const combinedCities = [...data1, ...data2];
+      setCities(combinedCities);
+    };
+
+    fetchData();
+  }, []);
+
+  const [countryOptions, setCountryOptions] = useState([]);
+  // const countryOptions = cities;
+  const categoryOptions = ["Futbol", "Basketbol"];
+  // const categoryOptions = ["Football", "Basketball"];
+  // const dateOptions = ["Date 1", "Date 2", "Date 3"];
+  const dateOptions = DateValue;
+  // const leagueOptions = ["League 1", "League 2", "League 3"];
+  const leagueOptions = LeagueValue;
 
   const [selectedCategory, setSelectedCategory] = useState("Select");
   const [categoryDropdown, setCategoryDropdown] = useState(false);
@@ -74,8 +176,73 @@ const CommentsManagement = () => {
   const [dateDropdown, setDateDropdown] = useState(false);
   const [selectedLeague, setSelectedLeague] = useState("Select");
   const [leagueDropdown, setLeagueDropdown] = useState(false);
+  const [categoryType, setCategoryType] = useState(null);
+  useEffect(() => {
+    async function getCountryOptions() {
+      if (selectedCategory !== "Select") {
+        try {
+          const headers = {
+            Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+          };
+          let type;
+          if (selectedCategory === "Futbol") {
+            type = 1;
+          } else if (selectedCategory === "Basketbol") {
+            type = 2;
+          }
+          setCategoryType(type);
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+            { headers }
+          );
+          const countryData = res.data.data;
+          setCountryOptions(countryData.map((item) => item.country));
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    getCountryOptions();
+  }, [selectedCategory]);
 
-  const handleCategorySelection = (category) => {
+  useEffect(() => {
+    async function getLeague() {
+      if (selectedCountry !== "Select") {
+        try {
+          const headers = {
+            Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+          };
+          // contriesAPi(categoryType, selectedCountry);
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
+            { headers }
+          );
+          const leagueValue = res.data.data.map((item) => item.league);
+          setLeagueValue(leagueValue);
+          if (selectedLeague !== "Select") {
+            const res = await axios.get(
+              `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
+              { headers }
+            );
+            setDateValue(res?.data?.data.map((item) => item.date));
+            if (selectedDate !== "Select") {
+              const res1 = await axios.get(
+                `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
+                { headers }
+              );
+              setMatchdetailsValue(res1?.data?.data?.map((item) => item.takimlar));
+              // setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    getLeague();
+  }, [selectedCountry, selectedLeague, selectedDate]);
+
+  const handleCategorySelection = (name, category) => {
     setSelectedCategory(category);
   };
   const toggleCategoryDropdown = () => {
@@ -91,7 +258,7 @@ const CommentsManagement = () => {
     setCategoryDropdown(!categoryDropdown);
   };
 
-  const handleDateSelection = (date) => {
+  const handleDateSelection = (name, date) => {
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
@@ -107,7 +274,7 @@ const CommentsManagement = () => {
     setDateDropdown(!dateDropdown);
   };
 
-  const handleLeagueSelection = (league) => {
+  const handleLeagueSelection = (name, league) => {
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {
@@ -134,15 +301,7 @@ const CommentsManagement = () => {
   ];
   const predictionOptions = ["Prediction 1", "Prediction 2", "Prediction 3"];
 
-  const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
-  const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
-  const [selectedPredictionType, setSelectedPredictionType] =
-    useState("Select");
-  const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
-  const [selectedPrediction, setSelectedPrediction] = useState("Select");
-  const [predictionDropdown, setPredictionDropdown] = useState(false);
-
-  const handleMatchDetailsSelection = (matchDetails) => {
+  const handleMatchDetailsSelection = (name, matchDetails) => {
     setSelectedMatchDetails(matchDetails);
   };
   const toggleMatchDetailsDropdown = () => {
@@ -154,7 +313,7 @@ const CommentsManagement = () => {
     }
     setMatchDetailsDropdown(!matchDetailsDropdown);
   };
-  const handlePredictionTypeSelection = (predictionType) => {
+  const handlePredictionTypeSelection = (name, predictionType) => {
     setSelectedPredictionType(predictionType);
   };
   const togglePredictionTypeDropdown = () => {
@@ -167,7 +326,7 @@ const CommentsManagement = () => {
     setPredictionTypeDropdown(!predictionTypeDropdown);
   };
 
-  const handlePredictionSelection = (prediction) => {
+  const handlePredictionSelection = (name, prediction) => {
     setSelectedPrediction(prediction);
   };
   const togglePredictionDropdown = () => {
@@ -226,21 +385,29 @@ const CommentsManagement = () => {
       status: circle_check,
     },
   ];
+  const server_url = "http://127.0.0.1:8000";
   return (
     <>
-      <div
-        className="dark-mode p-2 m-2 mb-0 home-height"
-      >
-        <CommentsManagementFilter />
-        {users.map((res, index) => (
+      <div className="dark-mode p-2 m-2 mb-0 home-height">
+        <CommentsManagementFilter
+          commentData={props?.commentData}
+          setDisplayUser={setDisplayUser}
+        />
+        {displayUser.map((res, index) => (
           <MainDiv>
-            <div className="col-3 d-flex align-items-center cursor" data-bs-toggle="modal" data-bs-target="#filter">
-              <span className="pe-1">{res.sr}</span>
+            <div
+              onClick={() => setCurrentData(res)}
+              className="col-3 d-flex align-items-center cursor"
+              data-bs-toggle="modal"
+              data-bs-target="#filter"
+            >
+              <span className="pe-1">{`# ${res?.id
+                .toString()
+                .padStart(4, "0")}`}</span>
               <div className="position-relative">
                 <img
-                style={{objectFit:"cover", borderRadius:"50%"}}
-                  className="profile-icon"
-                  src={res.profile}
+                  className="rounded-circle profile-icon"
+                  src={`${server_url + res.commentator_user?.profile_pic}`}
                   alt=""
                   height={45}
                   width={45}
@@ -263,24 +430,26 @@ const CommentsManagement = () => {
                   />
                 </div>
               </div>
-              <span className="ps-2">{res.name}</span>
+              <span className="ps-2">{res.commentator_user?.name}</span>
             </div>
             <div className="col-2">
               <img
                 className="flag-icon"
-                src={res.flag}
+                src={flag}
                 alt=""
                 height={26}
                 width={26}
               />
               <span className="ps-1">{res.league}</span>
             </div>
-            <div className="col-4 ps-2">{res.role}</div>
+            <div className="col-4 ps-2">{res.match_detail}</div>
             <div className="col-3 justify-content-end d-flex">
-              <span className="pe-1">{res.date}</span>
+              <span className="pe-1">
+                {moment(res.date).format("DD-MM.YYYY - HH:mm")}
+              </span>
               <img
                 className="eye-icon"
-                src={res.status}
+                src={circle_check}
                 alt=""
                 height={23}
                 width={23}
@@ -421,12 +590,44 @@ const CommentsManagement = () => {
                 </div>
               </div>
               <div className="">
-                http://localhost:3000/subuser/http://localhost:3000/subuser/
                 <div className="d-flex justify-content-between my-2">
                   <div className="">
                     <img
-                      onClick={() => setIsWinningSelected(!isWinningSelected)}
-                      src={isWinningSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsPublicSelected(!isPublicSelected);
+                        setStatus("public_content");
+                      }}
+                      src={status == "public_content" ? selectedRadio : Radio}
+                      alt=""
+                      style={{ cursor: "pointer" }}
+                    />
+                    <span className="px-2">Only Public</span>
+                  </div>
+                  <div className="">
+                    <span className="px-2">Only Subscribers</span>
+                    <img
+                      onClick={() => {
+                        setIsSubscriberSelected(!isSubscriberSelected);
+                        setSecondStatus("only_subscriber");
+                      }}
+                      src={
+                        secondStatus == "only_subscriber"
+                          ? selectedRadio
+                          : Radio
+                      }
+                      alt=""
+                      style={{ cursor: "pointer" }}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex justify-content-between my-2">
+                  <div className="">
+                    <img
+                      onClick={() => {
+                        setIsWinningSelected(!isWinningSelected);
+                        setStatus("winning");
+                      }}
+                      src={status == "winning" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -435,8 +636,11 @@ const CommentsManagement = () => {
                   <div className="">
                     <span className="px-2">Losing</span>
                     <img
-                      onClick={() => setIsLosingSelected(!isLosingSelected)}
-                      src={isLosingSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsLosingSelected(!isLosingSelected);
+                        setSecondStatus("lose");
+                      }}
+                      src={secondStatus == "lose" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -445,10 +649,11 @@ const CommentsManagement = () => {
                 <div className="d-flex justify-content-between">
                   <div className="">
                     <img
-                      onClick={() =>
-                        setIsPublishedSelected(!isPublishedSelected)
-                      }
-                      src={isPublishedSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsPublishedSelected(!isPublishedSelected);
+                        setStatus("published");
+                      }}
+                      src={status == "published" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -457,8 +662,11 @@ const CommentsManagement = () => {
                   <div className="">
                     <span className="px-2">Pending</span>
                     <img
-                      onClick={() => setIsPendingSelected(!isPendingSelected)}
-                      src={isPendingSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsPendingSelected(!isPendingSelected);
+                        setSecondStatus("pending");
+                      }}
+                      src={secondStatus == "pending" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -467,8 +675,11 @@ const CommentsManagement = () => {
                 <div className="d-flex justify-content-between my-2">
                   <div className="">
                     <img
-                      onClick={() => setIsFinishedSelected(!isFinishedSelected)}
-                      src={isFinishedSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsFinishedSelected(!isFinishedSelected);
+                        setStatus("finished");
+                      }}
+                      src={status == "finished" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -477,10 +688,11 @@ const CommentsManagement = () => {
                   <div className="">
                     <span className="px-2">Not Started</span>
                     <img
-                      onClick={() =>
-                        setIsNotStartedSelected(!isNotStartedSelected)
-                      }
-                      src={isNotStartedSelected ? selectedRadio : Radio}
+                      onClick={() => {
+                        setIsNotStartedSelected(!isNotStartedSelected);
+                        setSecondStatus("not_stated");
+                      }}
+                      src={secondStatus == "not_stated" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -488,6 +700,8 @@ const CommentsManagement = () => {
                 </div>
                 <div className="d-flex justify-content-center my-2">
                   <button
+                    onClick={updateCommentApiData}
+                    data-bs-dismiss="modal"
                     className="px-3 py-1"
                     style={{
                       color: "#D2DB08",
@@ -518,8 +732,8 @@ const CommentsManagement = () => {
         </div>
       </div>
 
-            {/* <!-- Modal --> */}
-            <div
+      {/* <!-- Modal --> */}
+      <div
         class="modal fade"
         id="filter"
         data-bs-backdrop="static"
@@ -547,13 +761,22 @@ const CommentsManagement = () => {
                       height={26}
                       width={26}
                     />
-                    <span className="ps-1">Champions League</span>
+                    <span className="ps-1">{currentData.league}</span>
                   </span>
-                  <span style={{ paddingRight: "47px" }}>07.05.2023</span>
-                  <span>
-                    Public Content
-                    <img src={`${world}`} alt="" height={26} width={26} />
+                  <span style={{ paddingRight: "47px" }}>
+                    {moment(currentData.date).format("DD-MM.YYYY")}
                   </span>
+                  {currentData.public_content == true && (
+                    <span>
+                      Public Content
+                      <img src={`${world}`} alt="" height={26} width={26} />
+                    </span>
+                  )}
+                  {currentData.public_content == false && (
+                    <span>
+                      <p src="" alt="" height={26} width={26} />
+                    </span>
+                  )}
                 </div>
                 <div className="d-flex justify-content-center">
                   <span className="mt-2 pt-1">Galatasaray FC</span>
@@ -589,7 +812,10 @@ const CommentsManagement = () => {
                       fontSize: "12px",
                     }}
                   >
-                    <span className="pe-1" style={{ borderRight: "2px solid #0B2447" }}>
+                    <span
+                      className="pe-1"
+                      style={{ borderRight: "2px solid #0B2447" }}
+                    >
                       FT - Home - 2.5 Over
                     </span>
                     <span className="ps-1">2.40</span>
@@ -598,23 +824,41 @@ const CommentsManagement = () => {
               </div>
               <div className="my-2">
                 <textarea
-                  style={{ height: "100px", fontSize:"0.8rem" }}
+                  value={currentData.comment}
+                  style={{ height: "100px", fontSize: "0.8rem" }}
                   className="darkMode-input form-control"
-                >
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  eleifend vehicula tristique. Suspendisse vitae lectus sed
-                  massa interdum consectetur. Pellentesque habitant morbi
-                  tristique senectus et netus et malesuada fames ac turpis
-                  egestas. Integer auctor nisl in lacus fringilla, et tincidunt
-                  ex laoreet.
-                </textarea>
+                ></textarea>
               </div>
               <div className="my-3 d-flex justify-content-center gap-3">
                 <div className="">
-                  <button className="px-3" style={{color:"#D2DB08", backgroundColor:"transparent", border:"1px solid #D2DB08", borderRadius:"4px"}}>Publish</button>
+                  <button
+                    data-bs-dismiss="modal"
+                    onClick={() => handleStatus(currentData.id, "approve")}
+                    className="px-3"
+                    style={{
+                      color: "#D2DB08",
+                      backgroundColor: "transparent",
+                      border: "1px solid #D2DB08",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Publish
+                  </button>
                 </div>
                 <div className="">
-                  <button className="px-3" style={{color:"#FF5757", backgroundColor:"transparent", border:"1px solid #FF5757", borderRadius:"4px"}}>Reject</button>
+                  <button
+                    data-bs-dismiss="modal"
+                    onClick={() => handleStatus(currentData.id, "reject")}
+                    className="px-3"
+                    style={{
+                      color: "#FF5757",
+                      backgroundColor: "transparent",
+                      border: "1px solid #FF5757",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Reject
+                  </button>
                 </div>
               </div>
             </div>
