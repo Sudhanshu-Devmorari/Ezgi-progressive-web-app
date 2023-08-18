@@ -22,7 +22,6 @@ import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRe
 import moment from "moment";
 import axios from "axios";
 
-
 const EditorManagemenet = (props) => {
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);

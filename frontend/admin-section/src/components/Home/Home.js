@@ -114,26 +114,80 @@ const Home = (props) => {
       console.error("Error making POST request:", error);
     }
   };
+
+  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [preveiwProfile, setPreveiwProfile] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  function handleAddProfilePic(e) {
+    const imageFile = e.target.files[0];
+    setPreveiwProfile(URL.createObjectURL(imageFile));
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+    setSelectedImage(imageFile);
+  }
+
   const handleAddUser = async () => {
+    const formData = new FormData();
+    selectedImage != false && formData.append("file", selectedImage);
+    // formData.append("date", addUser.date);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    formData.append("subscription", addUser.subscription);
+    formData.append("duration", addUser.duration);
+    // formData.append("month", addUser.month);
+    formData.append("level", addUser.level);
     try {
       const response = await axios.post(
         `http://127.0.0.1:8000/user-management/`,
-        {
-          file: "",
-          date: "",
-          name: "",
-          username: "",
-          phone: "",
-          password: "",
-          gender: "",
-          age: "",
-        }
+        formData
       );
-      // setDisplayUser(response.data);
       console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
+  };
+
+  const handleUpdateUser = async (id) => {
+    console.log("::::::::", addUser);
+    const formData = new FormData();
+    selectedImage != false && formData.append("profile_pic", selectedImage);
+    // formData.append("date", addUser.date);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    formData.append("subscription", addUser.subscription);
+    formData.append("duration", addUser.duration);
+    // formData.append("month", addUser.month);
+    formData.append("level", addUser.level);
+    try {
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/user-management/${id}/`,
+        formData
+      );
+      console.log("API Response:", response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
+  const handleduration = (name, value) => {
+    setSelectedMonth(value);
+    setAddUser({ ...addUser, [name]: value });
+  };
+  const handleNumber = (name, value) => {
+    setSelectedNumber(value);
+    setAddUser({ ...addUser, [name]: value });
+  };
+  const handleLevel = (name, value) => {
+    setSelectedLevel(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   // console.log("Cities:", cities);
@@ -159,9 +213,9 @@ const Home = (props) => {
 
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const handleGenderSelection = (gender) => {
-    setSelectedGender(gender);
-    setAddUser({ ...addUser, gender: gender });
+  const handleGenderSelection = (name, value) => {
+    setSelectedGender(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleGenderDropdown = () => {
@@ -172,9 +226,9 @@ const Home = (props) => {
     setGenderDropDown(!genderDropDown);
   };
 
-  const handleAgeSelection = (age) => {
-    setSelectedAge(age);
-    setAddUser({ ...addUser, age: age });
+  const handleAgeSelection = (name, value) => {
+    setSelectedAge(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleAgeDropdown = () => {
@@ -201,7 +255,23 @@ const Home = (props) => {
   ];
 
   const UserTypeOptions = ["Standard", "Commentator", "Sub_User"];
-  const cityOptions = cities;
+  const cityOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Kayseri",
+    "Mersin",
+    "Diyarbakir",
+    "Eskisehir",
+    "Sakarya",
+    "Denizli",
+    "Samsun"
+];
   const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
   const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("Select");
@@ -419,6 +489,8 @@ const Home = (props) => {
                     onClick={() => {
                       setprofile(true);
                       setUserData(res);
+                      setAddUser(res);
+                      setPreveiwProfilePic(true);
                     }}
                   >
                     {res.age}
@@ -508,17 +580,34 @@ const Home = (props) => {
                     alt=""
                   />
                 </div>
-                <img
-                  src={preveiwProfilePic}
-                  alt=""
-                  height={135}
-                  width={135}
-                  style={{
-                    display: preveiwProfilePic !== null ? "block" : "none",
-                    objectFit: "cover",
-                    borderRadius: "50%  ",
-                  }}
-                />
+                {/* {console.log("********", preveiwProfilePic)} */}
+                {profile ? (
+                  <img
+                    src={server_url + addUser.profile_pic}
+                    alt=""
+                    height={135}
+                    width={135}
+                    style={{
+                      display: preveiwProfilePic !== null ? "block" : "none",
+                      objectFit: "cover",
+                      borderRadius: "50%  ",
+                    }}
+                  />
+                ) : (
+                  <>
+                    <img
+                      src={preveiwProfilePic}
+                      alt=""
+                      height={135}
+                      width={135}
+                      style={{
+                        display: preveiwProfilePic !== null ? "block" : "none",
+                        objectFit: "cover",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </>
+                )}
               </div>
               <div className="d-flex justify-content-center my-2">
                 <label htmlFor="upload">
@@ -534,7 +623,10 @@ const Home = (props) => {
                       width={20}
                     />
                     <input
-                      onChange={(e) => handleAddProfile(e)}
+                      onChange={(e) => {
+                        handleAddProfile(e);
+                        handleAddProfilePic(e);
+                      }}
                       type="file"
                       name=""
                       id="upload"
@@ -580,7 +672,7 @@ const Home = (props) => {
                   <input
                     onChange={submitUserData}
                     name="name"
-                    value={userData ? userData?.name : addUser.name}
+                    value={addUser.name}
                     type="text"
                     className="darkMode-input form-control"
                   />
@@ -590,7 +682,7 @@ const Home = (props) => {
                   <input
                     onChange={submitUserData}
                     name="username"
-                    value={userData ? userData?.username : addUser.username}
+                    value={addUser.username}
                     type="text"
                     className="darkMode-input form-control"
                   />
@@ -610,7 +702,7 @@ const Home = (props) => {
                     <input
                       onChange={submitUserData}
                       name="phone"
-                      value={userData ? userData?.phone : addUser.phone}
+                      value={addUser.phone}
                       type="text"
                       class="form-control darkMode-input"
                       aria-label="Username"
@@ -623,7 +715,7 @@ const Home = (props) => {
                   <input
                     onChange={submitUserData}
                     name="password"
-                    value={userData ? userData?.password : addUser.password}
+                    value={addUser.password}
                     // style={{-webkit-text-security: square;}}
                     // style={{webkitTextSecurity: "star"}}
                     className="darkMode-input form-control"
@@ -631,26 +723,54 @@ const Home = (props) => {
                     // value={password}
                     // onChange={(e) => setPassword(e.target.value)}
                   />
-                  {showPassword ? (
-                    <AiOutlineEyeInvisible
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "1.6rem",
-                        top: "22rem",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
+                  {profile ? (
+                    <>
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "24.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "24.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </>
                   ) : (
-                    <AiOutlineEye
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "1.6rem",
-                        top: "22rem",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
+                    <>
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "22.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "22.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -659,10 +779,12 @@ const Home = (props) => {
                   <CustomDropdown
                     onChange={submitUserData}
                     name="gender"
-                    value={userData ? userData?.gender : addUser.selectedGender}
+                    value={addUser.selectedGender}
                     label="Gender"
                     options={genderOptions}
-                    selectedOption={selectedGender}
+                    selectedOption={
+                      addUser.gender ? addUser.gender : selectedGender
+                    }
                     onSelectOption={handleGenderSelection}
                     isOpen={genderDropDown}
                     toggleDropdown={toggleGenderDropdown}
@@ -672,10 +794,10 @@ const Home = (props) => {
                   <CustomDropdown
                     onChange={submitUserData}
                     name="age"
-                    value={userData ? userData?.age : addUser.selectedAge}
+                    value={addUser.selectedAge}
                     label="Age"
                     options={ageOptions}
-                    selectedOption={selectedAge}
+                    selectedOption={addUser.age ? addUser.age : selectedAge}
                     onSelectOption={handleAgeSelection}
                     isOpen={ageDropDown}
                     toggleDropdown={toggleAgeDropdown}
@@ -710,30 +832,47 @@ const Home = (props) => {
                   <div className="row g-0 gap-2">
                     <div className="col">
                       <CustomDropdown
+                        onChange={submitUserData}
+                        name="duration"
+                        value={
+                          userData ? userData?.duration : addUser.selectedMonth
+                        }
                         label=" "
                         options={monthOptions}
                         selectedOption={selectedMonth}
-                        onSelectOption={setSelectedMonth}
+                        onSelectOption={handleduration}
                         isOpen={monthDropDown}
                         toggleDropdown={toggleMonthDropdown}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
+                        onChange={submitUserData}
+                        name="month"
+                        value={
+                          userData ? userData?.duration : addUser.selectedNumber
+                        }
                         label=" "
                         options={numberOptions}
                         selectedOption={selectedNumber}
-                        onSelectOption={setSelectedNumber}
+                        onSelectOption={handleNumber}
                         isOpen={numberDropDown}
                         toggleDropdown={toggleNumberDropdown}
                       />
                     </div>
                     <div className="col">
                       <CustomDropdown
+                        onChange={submitUserData}
+                        name="level"
+                        value={
+                          userData
+                            ? userData?.commentator_level
+                            : addUser.selectedLevel
+                        }
                         label=" "
                         options={levelOptions}
                         selectedOption={selectedLevel}
-                        onSelectOption={setSelectedLevel}
+                        onSelectOption={handleLevel}
                         isOpen={levelDropDown}
                         toggleDropdown={toggleLevelDropdown}
                       />
@@ -744,6 +883,18 @@ const Home = (props) => {
                   <div className="my-2 d-flex row g-0 mb-3 gap-4 px-3">
                     <div className="col">
                       <button
+                        onClick={() => {
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -758,6 +909,19 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
+                        onClick={() => {
+                          handleUpdateUser(userData?.id);
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -772,7 +936,19 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
-                        onClick={() => handleDeactive(userData?.id)}
+                        onClick={() => {
+                          handleDeactive(userData?.id);
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -787,6 +963,18 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
+                        onClick={() => {
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -803,6 +991,7 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
+                      data-bs-dismiss="modal"
                       onClick={() => {
                         handleAddUser();
                         // props.onHide();
@@ -820,7 +1009,18 @@ const Home = (props) => {
                   </div>
                 )}
               </div>
-              <img
+              <img onClick={() => {
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
