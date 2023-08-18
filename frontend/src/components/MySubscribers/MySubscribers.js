@@ -35,7 +35,7 @@ const MySubscribers = (props) => {
         const res = await axios.get(
           `http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`
         );
-        console.log("res", res.data.data);
+        console.log("res", res.data);
         setSubscriptiosData(res.data.data);
       } catch (error) {
         console.log(error);

@@ -2106,6 +2106,7 @@ class NotificationManagement(APIView):
             return Response(data=error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None, *args, **kwargs):
+        print('request.data: ', request.data)
         try:
             subject = request.data.get('subject')
             user_type = request.data.get('user_type')
@@ -2125,13 +2126,15 @@ class NotificationManagement(APIView):
 
             try:
                 user = User.objects.get(id=to)
+                print('user: ', user)
             except User.DoesNotExist:
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
             """sender and receiver baki.."""
             notification_obj = Notification.objects.create(user=user, subject=subject, status=False, date=date, context=message)
+            print('notification_obj: ', notification_obj)
             serializer = NotificationSerializer(notification_obj)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
 
         except Exception as e:
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

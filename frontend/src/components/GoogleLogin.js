@@ -46,9 +46,7 @@ const GoogleLogin = () => {
           localStorage.setItem("user-id", response.data.userId);
           window.location.reload();
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch((error) => {});
     }
   }, [user]);
 

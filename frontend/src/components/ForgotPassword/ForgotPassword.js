@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const ForgotPassword = (props) => {
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
@@ -13,6 +14,7 @@ const ForgotPassword = (props) => {
   const phoneReg = /^\d{10}$/;
 
   // FORGOT PASSWORD API
+  const [alert, setAlert] = useState(null);
   const handleForgotPS = async () => {
     if (!phoneReg.test(phone)) {
       setPhoneError("Invalid phone number");
@@ -25,7 +27,41 @@ const ForgotPassword = (props) => {
         setShowModal(6);
         props.setForgotPsPhone(phone);
       } else if (res.data.status === 404) {
-        setPhoneError(res.data.data);
+        // setPhoneError(res.data.data);
+        setAlert(
+          <SweetAlert
+            customClass={`${
+              currentTheme === "dark" ? "dark-mode" : "light-mode"
+            }`}
+            style={{ backgroundColor : currentTheme === "dark" ? "#0D2A53" : "#FFFFFF" }}
+            btnSize="sm"
+            error
+            title="Error"
+            onConfirm={() => {
+              setAlert(null);
+            }}
+          >
+            {res.data.data}
+          </SweetAlert>
+        );
+      } else if (res.data.status === 500) {
+        // setPhoneError(res.data.data);
+        setAlert(
+          <SweetAlert
+            customClass={`${
+              currentTheme === "dark" ? "dark-mode" : "light-mode"
+            }`}
+            style={{ backgroundColor : currentTheme === "dark" ? "#0D2A53" : "#FFFFFF" }}
+            btnSize="sm"
+            error
+            title="Error"
+            onConfirm={() => {
+              setAlert(null);
+            }}
+          >
+            {res.data.data}
+          </SweetAlert>
+        );
       }
     }
   };
@@ -93,6 +129,7 @@ const ForgotPassword = (props) => {
             </button>
           </div>
         </div>
+        {alert}
       </div>
     </>
   );
