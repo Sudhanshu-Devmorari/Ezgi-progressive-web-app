@@ -2,7 +2,8 @@ from django.urls import path
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
-                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend)
+                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, 
+                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend, VerifyUserView)
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
@@ -32,6 +33,7 @@ urlpatterns = [
     path('active-resolved-comment/<int:id>', ActiveResolvedCommentRetrieveView.as_view(), name='Active-Resolved-Comment-Retrieve'),
     path('retrieve-subscribers-subscription/<int:id>', RetrieveSubscriberListAndSubscriptionList.as_view(), name='SubscriberList-SubscriptionList'),
     path('deactivate-profile/', DeactivateProfile.as_view(), name='Deactivate-Profile'),
+    path('verify/<int:id>/', VerifyUserView.as_view(), name='Verify-User'),
 
 
     # Admin Panel's api

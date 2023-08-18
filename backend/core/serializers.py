@@ -2,7 +2,7 @@ from rest_framework import serializers
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification,
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
-                          SubscriptionSetting, HighlightSetting)
+                          SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -135,4 +135,18 @@ class SubscriptionSettingSerializer(serializers.ModelSerializer):
 class HighlightSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = HighlightSetting
+        fields = '__all__'
+
+
+class BecomeCommentatorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = BecomeCommentator
+        fields = '__all__'
+
+
+class BlueTickSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = BlueTick
         fields = '__all__'

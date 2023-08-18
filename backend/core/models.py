@@ -55,6 +55,7 @@ class User(AbstractBaseUser):
     is_withdrawal_export = models.BooleanField(default=False)
     is_sales_export = models.BooleanField(default=False)
     is_all_permission = models.BooleanField(default=False)
+    is_delete = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -269,5 +270,47 @@ class HighlightSetting(models.Model):
 class OtpDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     otp_secret = models.CharField(max_length=16)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+COMMENTATOR_STATUS = (
+        ('active','Active'),
+        ('pending','Pending'),
+        ('deactive','Deactive'),
+    )
+class BecomeCommentator(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    duration = models.CharField(max_length=20)
+    money = models.FloatField(null=True, blank=True)
+    commentator = models.BooleanField()
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField()
+    status = models.CharField(max_length = 20, choices = COMMENTATOR_STATUS)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+BLUETICK_CHOISE = (
+        ('pending','Pending'),
+        ('approve','Approve'),
+        ('reject','Reject'),
+    )
+class BlueTick(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length = 20, choices = BLUETICK_CHOISE, default='pending')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class DataCount(models.Model):
+    user = models.IntegerField(default=0)
+    editor = models.IntegerField(default=0)
+    subscription = models.IntegerField(default=0)
+    comment = models.IntegerField(default=0)
+    highlight = models.IntegerField(default=0)
+    advertisement = models.IntegerField(default=0)
+    ticket = models.IntegerField(default=0)
+    comment_win = models.IntegerField(default=0)
+    comment_lose = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
