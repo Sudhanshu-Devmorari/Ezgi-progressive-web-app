@@ -637,7 +637,7 @@ const Home = (props) => {
                       style={{
                         position: "absolute",
                         right: "1.6rem",
-                        top: "23.1rem",
+                        top: "22rem",
                       }}
                       onClick={() => setShowPassword(!showPassword)}
                     />
@@ -647,7 +647,7 @@ const Home = (props) => {
                       style={{
                         position: "absolute",
                         right: "1.6rem",
-                        top: "23.1rem",
+                        top: "22rem",
                       }}
                       onClick={() => setShowPassword(!showPassword)}
                     />

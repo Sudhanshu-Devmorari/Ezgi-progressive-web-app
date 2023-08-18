@@ -5,6 +5,7 @@ import img1 from "../../assets/img1.svg";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
@@ -37,12 +38,29 @@ const CreateAdsModal = (props) => {
 
       console.log("Response from backend:", response);
       if (response.status === 200){
-        window.location.reload();
+        Swal.fire({
+          title: "Success",
+          text: "Ads Created!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        }).then((result) => {
+          if (result.isConfirmed){
+            window.location.reload();
+          }
+        })
       }
     } catch (error) {
       console.error("Error sending data:", error);
     }
   };
+
+  // Update Ads
+  const updateAds = async () => {
+    try{
+      const res = await axios.patch("http://127.0.0.1:8000/ads-management/",)
+    } catch (error){}
+  }
 
   return (
     <>

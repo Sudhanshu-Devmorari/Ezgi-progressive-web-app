@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
-import SweetAlert from "react-bootstrap-sweetalert";
+import Swal from "sweetalert2";
 
 const ForgotPassword = (props) => {
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
@@ -28,40 +28,26 @@ const ForgotPassword = (props) => {
         props.setForgotPsPhone(phone);
       } else if (res.data.status === 404) {
         // setPhoneError(res.data.data);
-        setAlert(
-          <SweetAlert
-            customClass={`${
-              currentTheme === "dark" ? "dark-mode" : "light-mode"
-            }`}
-            style={{ backgroundColor : currentTheme === "dark" ? "#0D2A53" : "#FFFFFF" }}
-            btnSize="sm"
-            error
-            title="Error"
-            onConfirm={() => {
-              setAlert(null);
-            }}
-          >
-            {res.data.data}
-          </SweetAlert>
-        );
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: `${
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+          }`,
+        });
       } else if (res.data.status === 500) {
         // setPhoneError(res.data.data);
-        setAlert(
-          <SweetAlert
-            customClass={`${
-              currentTheme === "dark" ? "dark-mode" : "light-mode"
-            }`}
-            style={{ backgroundColor : currentTheme === "dark" ? "#0D2A53" : "#FFFFFF" }}
-            btnSize="sm"
-            error
-            title="Error"
-            onConfirm={() => {
-              setAlert(null);
-            }}
-          >
-            {res.data.data}
-          </SweetAlert>
-        );
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: `${
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+          }`,
+        });
       }
     }
   };

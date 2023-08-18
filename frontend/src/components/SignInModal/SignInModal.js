@@ -4,7 +4,7 @@ import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
 import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
-import SweetAlert from "react-bootstrap-sweetalert";
+import "./SignInModal.css";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -37,25 +37,7 @@ const SignInModal = (props) => {
         localStorage.setItem("user-id", res.data.userId);
         window.location.reload();
       } else if (res.data.status === 400) {
-        // setpasswordError(res.data.data);
-        setAlert(
-          <SweetAlert
-            customClass={`${
-              currentTheme === "dark" ? "dark-mode" : "light-mode"
-            }`}
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-            }}
-            btnSize="sm"
-            error
-            title="Error"
-            onConfirm={() => {
-              setAlert(null);
-            }}
-          >
-            {res.data.data}
-          </SweetAlert>
-        );
+        setpasswordError(res.data.data);
       } else if (res.data.status === 404) {
         alert(res.data.data);
       }
@@ -133,20 +115,9 @@ const SignInModal = (props) => {
                 id="password"
               />
             </div>
-            {/* <small className="text-danger m-2" style={{ fontSize: "0.71rem" }}>
+            <small className="text-danger m-2" style={{ fontSize: "0.71rem" }}>
               {passwordError}
-            </small> */}
-            {/* {showErrorAlert && (
-              <SweetAlert
-                error
-                title="Error"
-                onConfirm={() => {
-                  setShowErrorAlert(false); // Hide the SweetAlert
-                }}
-              >
-                {passwordError}{" "}
-              </SweetAlert>
-            )} */}
+            </small>
           </div>
           <div className="d-flex flex-column align-items-center my-3">
             <button

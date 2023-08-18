@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import upload from "../../assets/upload.svg";
-import './LevelRules.css'
+import "./LevelRules.css";
+import Swal from "sweetalert2";
 
 const LevelRules = (props) => {
   const getRuleForLevel = props?.getRuleForLevel || {};
@@ -18,9 +19,9 @@ const LevelRules = (props) => {
   //   Update Level - Rule
   const updateRule = async () => {
     const formData = new FormData();
-    formData.append("level_icon", getRuleForLevel.level_icon); // Append the image file
-
-    // Append other properties to the FormData object
+    if (previewIcon) {
+      formData.append("level_icon", getRuleForLevel.level_icon);
+    }
     for (const key in getRuleForLevel) {
       if (key !== "level_icon") {
         formData.append(key, getRuleForLevel[key]);
@@ -31,6 +32,15 @@ const LevelRules = (props) => {
       formData
     );
     console.log("res========>>>", res);
+    if (res.status === 201) {
+      Swal.fire({
+        title: "Success",
+        text: "Level Rules setting Updated!",
+        icon: "success",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+    }
   };
   console.log(getRuleForLevel, getRuleForLevel.level_icon);
   return (
@@ -161,9 +171,7 @@ const LevelRules = (props) => {
         </div>
       </div>
       <div lassName="my-3 d-flex justify-content-center">
-        <div
-          class="fixed-bottom  d-flex justify-content-center save-btn"
-        >
+        <div class="fixed-bottom  d-flex justify-content-center save-btn">
           <button
             onClick={updateRule}
             className="py-1 px-3"

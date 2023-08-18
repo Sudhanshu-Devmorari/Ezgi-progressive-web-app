@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import Swal from "sweetalert2";
 
 const SalesMembershipSettings = (props) => {
   const getMembershipData = props.getMembershipData || {};
@@ -17,6 +18,15 @@ const SalesMembershipSettings = (props) => {
       getMembershipData
     );
     console.log("res========>>>", res);
+    if (res.status === 201) {
+      Swal.fire({
+        title: "Success",
+        text: "Membership Setting Updated!",
+        icon: "success",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+    }
   };
 
   return (

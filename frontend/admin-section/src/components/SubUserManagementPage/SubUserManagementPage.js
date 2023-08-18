@@ -16,6 +16,7 @@ import trash from "../../assets/trash.svg";
 import SubUsesTimeLine from "../SubUsesTimeLine/SubUsesTimeLine";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 const SubUserManagementPage = () => {
   const users = [
@@ -57,6 +58,25 @@ const SubUserManagementPage = () => {
 
   const displaySubuserList =
     filteredSubuserList.length > 0 ? filteredSubuserList : subuserList;
+
+  // Delete User
+  const handleDeleteUser = async (e) => {
+    try {
+      const res = await axios.delete(
+        `http://127.0.0.1:8000/subuser-management/${e}`
+      );
+      console.log(res.data);
+      if (res.data.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: res.data.data,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+    } catch (e) {}
+  };
 
   return (
     <>
@@ -109,14 +129,13 @@ const SubUserManagementPage = () => {
                   >
                     <img src={bell} alt="" className="icon" />
                     <span className="heading">Notifications</span>
-                    <span className="number">
-                      {notificationCount}
-                    </span>
+                    <span className="number">{notificationCount}</span>
                   </div>
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SubUserManagementFilter
                     editProfileModal={editProfileModal}
+                    seteditProfileModal={seteditProfileModal}
                     editUserId={editUserId}
                     setFilteredSubuserList={setFilteredSubuserList}
                     subuserList={subuserList}
@@ -192,7 +211,14 @@ const SubUserManagementPage = () => {
                             height={25}
                             width={25}
                           />
-                          <img src={trash} alt="" height={22} width={22} />
+                          <img
+                            className="cursor"
+                            src={trash}
+                            alt=""
+                            height={22}
+                            width={22}
+                            onClick={() => handleDeleteUser(res.id)}
+                          />
                         </div>
                       </>
                     </MainDiv>

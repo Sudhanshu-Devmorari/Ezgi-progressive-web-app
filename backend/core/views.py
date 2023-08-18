@@ -71,7 +71,7 @@ class OtpVerify(APIView):
             print('verification_result: ', verification_result)
 
             if verification_result:
-                return Response(data={'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
+                return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
             else:
                 return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
         except Exception as e:
@@ -87,7 +87,7 @@ class OtpReSend(APIView):
             # res = sms_send(phone, otp)  
             res = "Success"
             if res == 'Success':
-                return Response(data={'success': 'Otp successfully sent.','status' : status.HTTP_200_OK})
+                return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
             else:
                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
         except User.DoesNotExist:
@@ -2574,10 +2574,10 @@ class SubUserManagement(APIView):
                 serializer.save()
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(serializer.data)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
         else:
             print('serializer.errors: ', serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data' : serializer.errors, 'status' : status.HTTP_400_BAD_REQUEST})
         
     def delete(self, request, pk, format=None, *args, **kwargs):
         try:
@@ -2585,6 +2585,7 @@ class SubUserManagement(APIView):
             # user.delete()
             user.is_delete = True
             user.save()
+            return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
@@ -2888,15 +2889,15 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class OtpVerify(APIView):
-    def post(self, request, format=None, *args, **kwargs):
-        try:
-            otp = request.data.get('otp')
-            verification_result = totp.verify(otp)
+# class OtpVerify(APIView):
+#     def post(self, request, format=None, *args, **kwargs):
+#         try:
+#             otp = request.data.get('otp')
+#             verification_result = totp.verify(otp)
 
-            if verification_result:
-                return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
-            else:
-                return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#             if verification_result:
+#                 return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
+#             else:
+#                 return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

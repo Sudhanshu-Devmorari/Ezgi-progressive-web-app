@@ -5,7 +5,8 @@ import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForComment
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import './CommentsSettings.css'
+import "./CommentsSettings.css";
+import Swal from "sweetalert2";
 
 const CommentsSettings = () => {
   const headers = {
@@ -37,7 +38,7 @@ const CommentsSettings = () => {
     "Total Goal Over/Under",
     "Both Teams to Score",
     "Home Team Total Goals",
-    "Away Team Total Goals"
+    "Away Team Total Goals",
   ];
 
   const [selectedPredictionType, setSelectedPredictionType] =
@@ -162,6 +163,15 @@ const CommentsSettings = () => {
       clap: values.clap,
     });
     console.log("res", res);
+    if (res.status === 201) {
+      Swal.fire({
+        title: "Success",
+        text: "Comment Created!",
+        icon: "success",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+    }
   };
 
   return (
@@ -377,9 +387,7 @@ const CommentsSettings = () => {
             </div>
           </div>
           <div lassName="my-3 d-flex justify-content-center">
-            <div
-              className="fixed-bottom  d-flex justify-content-center create-btn"
-            >
+            <div className="fixed-bottom  d-flex justify-content-center create-btn">
               <button
                 type="submit"
                 className="py-1 px-3"

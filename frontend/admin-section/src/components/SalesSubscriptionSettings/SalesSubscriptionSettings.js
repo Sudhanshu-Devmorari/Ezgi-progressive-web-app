@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import Swal from "sweetalert2";
 
 const SalesSubscriptionSettings = (props) => {
   const subscriptionSettingsData = props?.subscriptionSettingsData || {};
@@ -18,6 +19,15 @@ const SalesSubscriptionSettings = (props) => {
       subscriptionSettingsData
     );
     console.log("res========>>>", res);
+    if (res.status === 201) {
+      Swal.fire({
+        title: "Success",
+        text: "Subscription Setting Updated!",
+        icon: "success",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+    }
   };
   return (
     <>
