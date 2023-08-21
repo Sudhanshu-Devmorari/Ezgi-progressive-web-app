@@ -1,15 +1,6 @@
 .neha{
     border-bottom: 0.2px solid #E6E6E6!important;
 }
-@media (max-width: 1024px){
-    .name-font{
-        font-size: 1rem!important;
-    }
-    .content-font{
-        font-size: 0.7rem!important;
-    }
-    .div-width{
-        /* width: none!important; */
-        width: 61%!important;
-    }
+.username{
+    font-size: 0.9rem;
 }

@@ -79,7 +79,7 @@ const SelectContentForEditorPage = (props) => {
           </button>
         </div>
         {props.comments && (
-          <div className="ms-auto d-flex align-items-center">
+          <div className="ms-auto d-flex align-items-center py-1 px-2">
             <img
               src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""
@@ -87,7 +87,7 @@ const SelectContentForEditorPage = (props) => {
               height={32}
               width={32}
             />
-            <span className="pe-1">Only Public</span>
+            <span className="pe-2">Only Public</span>
             <div onClick={()=>props.setOnlyPublic('Only public')}>
               <img
                 src={currentTheme === "dark" ? darkGrp : lighGrp}

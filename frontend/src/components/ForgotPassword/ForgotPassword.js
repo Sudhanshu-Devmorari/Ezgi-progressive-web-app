@@ -13,6 +13,7 @@ const ForgotPassword = (props) => {
   const phoneReg = /^\d{10}$/;
 
   // FORGOT PASSWORD API
+  const [alert, setAlert] = useState(null);
   const handleForgotPS = async () => {
     if (!phoneReg.test(phone)) {
       setPhoneError("Invalid phone number");
@@ -93,6 +94,7 @@ const ForgotPassword = (props) => {
             </button>
           </div>
         </div>
+        {alert}
       </div>
     </>
   );

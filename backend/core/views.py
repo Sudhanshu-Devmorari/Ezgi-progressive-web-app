@@ -35,6 +35,7 @@ from django.contrib.auth import authenticate
 
 class SignupView(APIView):
     def post(self, request, format=None):
+        print('request.data: ', request.data)
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
             print(serializer.errors)
@@ -44,6 +45,21 @@ class SignupView(APIView):
                'status' : status.HTTP_400_BAD_REQUEST
                 })
         else:
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
+            serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.user += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(user=1)
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
             serializer.save()
             if DataCount.objects.filter(id=1).exists():
                 obj = DataCount.objects.get(id=1)
@@ -62,7 +78,7 @@ class OtpVerify(APIView):
             print('verification_result: ', verification_result)
 
             if verification_result:
-                return Response(data={'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
+                return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
             else:
                 return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
         except Exception as e:
@@ -78,7 +94,7 @@ class OtpReSend(APIView):
             # res = sms_send(phone, otp)  
             res = "Success"
             if res == 'Success':
-                return Response(data={'success': 'Otp successfully sent.','status' : status.HTTP_200_OK})
+                return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
             else:
                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
         except User.DoesNotExist:
@@ -103,6 +119,53 @@ class LoginView(APIView):
                 'status' : status.HTTP_404_NOT_FOUND
             })
 
+class GoogleLoginview(APIView):
+    def post(self, request, format=None):
+        print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
+            print("Email already exists")
+        except User.DoesNotExist:
+            print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='google',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+        
+class FacebookLoginview(APIView):
+    def post(self, request, format=None):
+        print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='facebook'))
+            print("Email already exists")
+        except User.DoesNotExist:
+            print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='facebook',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+
+
 class PasswordResetView(APIView):
     def post(self, request, format=None):   
         phone = request.data['phone']
@@ -113,7 +176,6 @@ class PasswordResetView(APIView):
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
 
-# Create your views here.
 class RetrieveCommentatorView(APIView):
     """
     for Home page:
@@ -370,6 +432,7 @@ class CommentView(APIView):
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
+                    print('public_content: ', public_content)
                 comment = request.data.get('comment')
                 print('comment: ', comment)
 
@@ -403,7 +466,7 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
-                # print('comment_obj: ', comment_obj)
+
                 if comment_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1349,9 +1412,8 @@ class UserManagement(APIView):
                 # user.deactivate_commentator = 'pending'
                 user.is_delete = True
                 user.save()
-                message = {"success": "Profile deactivation request send to Admin."}
+                message = {"success": "User profile Deactivate sucessfully."}
                 return Response(data=message, status=status.HTTP_200_OK)
-
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1823,6 +1885,7 @@ class EditorManagement(APIView):
             ).order_by('-priority', '-created')[:10]
             top_ten_commentators_list = []
 
+
             for obj in top_ten_commentators:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2163,10 +2226,12 @@ class SalesManagement(APIView):
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
+
                 if request.data.get('type'):
                     type = request.data.get('type').lower()
                 else:
                     type = ''
+
                 query_filters = Q(**filters)
 
                 if type == 'subscription':
@@ -2338,6 +2403,7 @@ class NotificationManagement(APIView):
             return Response(data=error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None, *args, **kwargs):
+        print('request.data: ', request.data)
         try:
             subject = request.data.get('subject')
             user_type = request.data.get('user_type')
@@ -2357,13 +2423,16 @@ class NotificationManagement(APIView):
 
             try:
                 user = User.objects.get(id=to)
+                print('user: ', user)
             except User.DoesNotExist:
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
             """sender and receiver baki.."""
+
             notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message)
+
             serializer = NotificationSerializer(notification_obj)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
 
         except Exception as e:
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2513,10 +2582,10 @@ class SubUserManagement(APIView):
                 serializer.save()
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(serializer.data)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
         else:
             print('serializer.errors: ', serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data' : serializer.errors, 'status' : status.HTTP_400_BAD_REQUEST})
         
     def delete(self, request, pk, format=None, *args, **kwargs):
         try:
@@ -2524,6 +2593,7 @@ class SubUserManagement(APIView):
             # user.delete()
             user.is_delete = True
             user.save()
+            return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
@@ -2640,7 +2710,8 @@ class LevelRule(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
+        # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -2767,6 +2838,7 @@ class HighlightSettingView(APIView):
 class CommentSetting(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data = request.data.copy() 
+        print('data: ', data)
         data['status'] = 'approve'  # Set the status to 'approve'
 
         comment_serializer = CommentsSerializer(data=data)
@@ -2802,7 +2874,8 @@ class CommentSetting(APIView):
                 }
 
             return Response(response_data, status=status.HTTP_201_CREATED)
-        
+        print("==========")
+        print('comment_serializer.errors: ', comment_serializer.errors)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 totp = pyotp.TOTP('base32secret3232', interval=45)
@@ -2824,15 +2897,15 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class OtpVerify(APIView):
-    def post(self, request, format=None, *args, **kwargs):
-        try:
-            otp = request.data.get('otp')
-            verification_result = totp.verify(otp)
+# class OtpVerify(APIView):
+#     def post(self, request, format=None, *args, **kwargs):
+#         try:
+#             otp = request.data.get('otp')
+#             verification_result = totp.verify(otp)
 
-            if verification_result:
-                return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
-            else:
-                return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#             if verification_result:
+#                 return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
+#             else:
+#                 return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

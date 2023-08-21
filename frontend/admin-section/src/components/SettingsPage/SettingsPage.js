@@ -5,6 +5,7 @@ import editorIcon from "../../assets/Group 67.svg";
 import salesIcon from "../../assets/basket-1.svg";
 import SubIcon from "../../assets/wallet (1).svg";
 import commentsIcon from "../../assets/target-arrow-1.svg";
+import './SettingsPage.css'
 
 const SettingsPage = () => {
   const [selecteSetting, setSelecteSetting] = useState("Editor Statistics");
@@ -43,7 +44,7 @@ const SettingsPage = () => {
                 </div>
               ))}
             </div>
-            <div className="row g-0 my-2 gap-2" style={{ height: "38vh" }}>
+            <div className="row g-0 my-2 gap-2 chart">
               <div className="col p-2 dark-mode ms-2">
                 <div className="">Chart 1</div>
               </div>
@@ -51,7 +52,7 @@ const SettingsPage = () => {
                 <div className="m-2">Chart 3</div>
               </div>
             </div>
-            <div className="row g-0 mt-2 gap-2" style={{ height: "38vh" }}>
+            <div className="row g-0 mt-2 gap-2 chart">
               <div className="col p-2 dark-mode ms-2">
                 <div className="">Chart 2</div>
               </div>

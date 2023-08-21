@@ -15,15 +15,14 @@ import "./NotificationManagementPage.css";
 import axios from "axios";
 
 const NotificationManagementPage = () => {
-
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [viewedCount, setViewedCount] = useState(0);
 
   const requestArray = [
-    { img: bell2, name: "Viewed", count : viewedCount },
-    { img: bell3, name: "Pending", count : pendingCount },
+    { img: bell2, name: "Viewed", count: viewedCount },
+    { img: bell3, name: "Pending", count: pendingCount },
   ];
   const users = [
     {
@@ -113,31 +112,24 @@ const NotificationManagementPage = () => {
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>
               <div className="d-flex flex-column align-items-center justify-content-center col-3 dark-mode mx-2">
-                <img src={bell1} alt="" height={45} width={45} />
-                <span className="name-fonts" style={{ fontSize: "1.2rem" }}>
-                  Notifications
-                </span>
-                <span style={{ fontSize: "1.6rem" }}>{notificationCount}</span>
+                <img src={bell1} alt="" className="icon" />
+                <span className="heading">Notifications</span>
+                <span className="number">{notificationCount}</span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
                   {requestArray.map((res, index) => (
                     <div className="d-flex flex-column align-items-center justify-content-center col">
-                      <img src={res.img} alt="" height={45} width={45} />
-                      <span
-                        className="name-fonts"
-                        style={{ fontSize: "1.2rem" }}
-                      >
-                        {res.name}
-                      </span>
-                      <span style={{ fontSize: "1.6rem" }}>{res.count}</span>
+                      <img src={res.img} alt="" className="icon" />
+                      <span className="heading">{res.name}</span>
+                      <span className="number">{res.count}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="d-flex flex-column align-items-center justify-content-center col-3 dark-mode mx-2">
-                <span style={{ fontSize: "1.2rem" }}>Total</span>
-                <span style={{ fontSize: "1.6rem" }}>658</span>
+                <span className="heading">Total</span>
+                <span className="number">658</span>
               </div>
             </div>
             <div className="dark-mode p-2 m-2 mb-0 home-height">
@@ -147,7 +139,7 @@ const NotificationManagementPage = () => {
                     <div className="col-2 d-flex align-items-center">
                       <span>#0001</span>
                       <span className="px-2">
-                        <img src={res.profile} alt="" height={50} width={50} />
+                        <img src={res.profile} alt="" height={45} width={45} />
                       </span>
                       <span>johndoe</span>
                     </div>

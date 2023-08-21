@@ -32,11 +32,10 @@ const SideBar = (props) => {
   const [showDetails, setshowDetails] = useState("home");
 
   const location = useLocation();
-  const path = location.pathname; 
+  const path = location.pathname;
   useEffect(() => {
-    setshowDetails(path)
-  }, [path])
-  
+    setshowDetails(path);
+  }, [path]);
 
   return (
     <>

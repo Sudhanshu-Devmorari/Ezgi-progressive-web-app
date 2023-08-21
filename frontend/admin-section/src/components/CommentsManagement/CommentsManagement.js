@@ -408,9 +408,10 @@ const CommentsManagement = (props) => {
                 <img
                   className="rounded-circle profile-icon"
                   src={`${server_url + res.commentator_user?.profile_pic}`}
+
                   alt=""
-                  height={42}
-                  width={42}
+                  height={45}
+                  width={45}
                 />
                 <div
                   className="position-absolute d-flex justify-content-center align-items-center"

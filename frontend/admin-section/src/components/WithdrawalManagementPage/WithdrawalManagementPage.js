@@ -14,6 +14,12 @@ import circle_b from "../../assets/Group 311.png";
 import circle_y from "../../assets/clock-exclamation.png";
 import WithdrawalRqstFilter from "../WithdrawalRqstFilter/WithdrawalRqstFilter";
 import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
+import user2 from "../../assets/user2.png";
+import user3 from "../../assets/user3.png";
+import user4 from "../../assets/user4.png";
+import user5 from "../../assets/user5.png";
+import user6 from "../../assets/user6.png";
+import './WithdrawalManagementPage.css'
 
 const WithdrawalManagementPage = () => {
   const users = [
@@ -60,6 +66,62 @@ const WithdrawalManagementPage = () => {
     { name: "Approved" },
   ];
   const [Requests, setRequests] = useState(false);
+  const notification = [
+    {
+      profile_pic: user3,
+      countPeople: "283",
+      people: "people",
+      name: "johndoe+",
+      content: "Become a Editor viewed the pages",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user2,
+      countPeople: "283",
+      people: "people",
+      name: "johndoe+",
+      content: "clap @johndoe Liverpool - Arsenal comment",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user1,
+      countPeople: "283",
+      people: "people",
+      name: "johndoe+",
+      content: "added  fovarites @johndoe Liverpool - Arsenal comment",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user4,
+      name: "johndoe",
+      content: "started following @johndoe",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user5,
+      name: "melihjohndoe905",
+      content: "viewed @johndoe profile",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user6,
+      name: "johndoe",
+      content: "subscribed for 3 months @johndoe",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user6,
+      name: "johndoe",
+      content: "upgrade a MASTER level",
+      status: "10 min ago",
+    },
+    {
+      profile_pic: user6,
+      name: "johndoe",
+      content: "become a Editor",
+      status: "10 min ago",
+    },
+  ];
   return (
     <>
       <div className="container-fluid">
@@ -74,14 +136,14 @@ const WithdrawalManagementPage = () => {
                 <div className="row g-0">
                   <div className="col-8">
                     <div
-                      className={`${"dark-mode p-2 mx-2 gap-ceown new-user-height"} `}
+                      className={`${"dark-mode p-2 mx-2 gap-ceown new-user-height "} `}
                       style={{ height: "25vh" }}
                     >
-                      <div className="" style={{ fontSize: "1.2rem" }}>
+                      <div className="" style={{ fontSize: "1.1rem" }}>
                         Withdrawal Requests
                       </div>
-                      <div className="row g-0 mb-2">
-                        {rqstArray.map((res, index) => (
+                      <div className="row g-0 py-2 padding-0">
+                        {rqstArray?.map((res, index) => (
                           <div
                             className={`${
                               res.name === "New" ? "col-2" : "col-3"
@@ -89,8 +151,8 @@ const WithdrawalManagementPage = () => {
                           >
                             <div className="d-flex flex-column">
                               <span
+                                className="heading"
                                 style={{
-                                  fontSize: "1.2rem",
                                   color:
                                     (res.name === "New" && "#4DD5FF") ||
                                     (res.name === "Pending" && "#FFDD00") ||
@@ -99,12 +161,7 @@ const WithdrawalManagementPage = () => {
                               >
                                 {res.name}
                               </span>
-                              <span
-                                className="name-block"
-                                style={{ fontSize: "1.6rem" }}
-                              >
-                                127
-                              </span>
+                              <span className="number">127</span>
                             </div>
                           </div>
                         ))}
@@ -114,30 +171,28 @@ const WithdrawalManagementPage = () => {
                             style={{ border: "1px solid #D2DB08" }}
                           >
                             <span
+                              className="heading"
                               style={{
-                                fontSize: "1.2rem",
                                 color: "#D2DB08",
                               }}
                             >
                               Total Payment
                             </span>
-                            <span
-                              className="name-block"
-                              style={{ fontSize: "1.6rem" }}
-                            >
+                            <span className="number">
                               12.645 <small>₺</small>
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="d-flex align-items-end">
-                        <span>
+                      <div className="">
+                        <span className="rate-font">
                           <span
-                            style={{ color: "#58DEAA", fontSize: "1.2rem" }}
+                            className="rate-font"
+                            style={{ color: "#58DEAA" }}
                           >
                             %22
                             <HiArrowSmUp
-                              fontSize={"1.4rem"}
+                              className="arrow"
                               style={{ marginBottom: "0.1rem" }}
                             />
                           </span>
@@ -151,18 +206,8 @@ const WithdrawalManagementPage = () => {
                       className="d-flex flex-column align-items-center justify-content-center dark-mode new-user-height me-2"
                       style={{ height: "25vh" }}
                     >
-                      <span
-                        className="level-font"
-                        style={{ fontSize: "1.2rem" }}
-                      >
-                        Bank Update Requests
-                      </span>
-                      <span
-                        className="level-count-font"
-                        style={{ fontSize: "1.6rem" }}
-                      >
-                        127
-                      </span>
+                      <span className="heading">Bank Update Requests</span>
+                      <span className="number">127</span>
                     </div>
                   </div>
                 </div>
@@ -193,8 +238,8 @@ const WithdrawalManagementPage = () => {
                           </div>
                           <div className="col-4 d-flex align-items-center justify-content-end gap-1 pe-2">
                             <div>15-06-2023 - 16:37</div>
-                            <img src={res.icon} alt="" height={28} width={28} />
-                            <img src={eye} alt="" height={28} width={28} />
+                            <img src={res.icon} alt="" height={22} width={22} />
+                            <img src={eye} alt="" height={22} width={22} />
                           </div>
                         </>
                       </MainDiv>
@@ -204,7 +249,7 @@ const WithdrawalManagementPage = () => {
                 </div>
               </div>
               <div className="col-4">
-                <UserTimeLine transactionHistory={"history"} />
+                {/* <UserTimeLine transactionHistory={"history"} notification={notification}/> */}
               </div>
             </div>
           </div>

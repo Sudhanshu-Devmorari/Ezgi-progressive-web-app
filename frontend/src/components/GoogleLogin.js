@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from "react";
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import google from "../assets/googleLogo.png";
+
+const GoogleLogin = () => {
+  const [user, setUser] = useState([]);
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      console.log("User Login Success =================", codeResponse);
+      setUser(codeResponse);
+    },
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data, "==================res.data");
+          try {
+            const username = res.data.name.split(" ")[0].toLowerCase();
+            console.log(username);
+            const formData = new FormData();
+            formData.append("email", res.data.email);
+            formData.append("name", res.data.name);
+            formData.append("username", username);
+            return axios.post("http://127.0.0.1:8000/google-login/", formData);
+          } catch (e) {
+            throw e;
+          }
+        })
+        .then((response) => {
+          console.log(response.data);
+          localStorage.setItem("user-role", response.data.userRole);
+          localStorage.setItem("user-id", response.data.userId);
+          window.location.reload();
+        })
+        .catch((error) => {});
+    }
+  }, [user]);
+
+  const logOut = () => {
+    googleLogout();
+  };
+  return (
+    <>
+      <img
+        onClick={() => login()}
+        className="mx-3"
+        src={google}
+        alt=""
+        height={50}
+      />
+    </>
+  );
+};
+
+export default GoogleLogin;

@@ -1,42 +1,48 @@
 import React, { useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 import axios from "axios";
+import upload from "../../assets/upload.svg";
+import "./LevelRules.css";
+import Swal from "sweetalert2";
 
 const LevelRules = (props) => {
-
   const getRuleForLevel = props?.getRuleForLevel || {};
 
-  const [levelRules, setLevelRules] = useState({
-    daily_match_limit: getRuleForLevel.daily_match_limit || "",
-    monthly_min_limit: getRuleForLevel.monthly_min_limit || "",
-    ods_limit: getRuleForLevel.ods_limit || "",
-    winning_limit: getRuleForLevel.winning_limit || "",
-    sucess_rate: getRuleForLevel.sucess_rate || "",
-    subscriber_limit: getRuleForLevel.subscriber_limit || "",
-    level_icon: getRuleForLevel.level_icon || "",
-  });
+  const [previewIcon, setPreviewIcon] = useState(null);
 
-  const handleChangeInput = (e) => {
-    const { name, value } = e.target;
-    setLevelRules((prevRules) => ({
-      ...prevRules,
-      [name]: value,
-    }));
+  const handleChange = (e) => {
+    props?.setGetRuleForLevel({
+      ...getRuleForLevel,
+      [e.target.name]: e.target.value,
+    });
   };
-  console.log("Initialized State:", levelRules);
-  console.log("getRuleForLevel=====>>>", getRuleForLevel);
-  console.log(
-    "getRuleForLevel.daily_match_limit=====>>>",
-    getRuleForLevel.daily_match_limit
-  );
+
   //   Update Level - Rule
   const updateRule = async () => {
+    const formData = new FormData();
+    if (previewIcon) {
+      formData.append("level_icon", getRuleForLevel.level_icon);
+    }
+    for (const key in getRuleForLevel) {
+      if (key !== "level_icon") {
+        formData.append(key, getRuleForLevel[key]);
+      }
+    }
     const res = await axios.post(
       `http://127.0.0.1:8000/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
-      levelRules
+      formData
     );
+    console.log("res========>>>", res);
+    if (res.status === 201) {
+      Swal.fire({
+        title: "Success",
+        text: "Level Rules setting Updated!",
+        icon: "success",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+    }
   };
+  console.log(getRuleForLevel, getRuleForLevel.level_icon);
   return (
     <>
       <div className="my-2 mt-3 d-flex gap-3">
@@ -44,11 +50,11 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Daily Match Limit</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="daily_match_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.daily_match_limit}
+              value={getRuleForLevel.daily_match_limit}
             />
           </div>
         </div>
@@ -56,11 +62,11 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Monthly Min.Content</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="monthly_min_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.monthly_min_limit}
+              value={getRuleForLevel.monthly_min_limit}
             />
           </div>
         </div>
@@ -68,11 +74,11 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Odds Limit</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="ods_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.ods_limit}
+              value={getRuleForLevel.ods_limit}
             />
           </div>
         </div>
@@ -82,11 +88,11 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Winning Limit</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="winning_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.winning_limit}
+              value={getRuleForLevel.winning_limit}
             />
           </div>
         </div>
@@ -94,11 +100,11 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Success Rate</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="sucess_rate"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.sucess_rate}
+              value={getRuleForLevel.sucess_rate}
             />
           </div>
         </div>
@@ -106,33 +112,68 @@ const LevelRules = (props) => {
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Subscriber Limit</span>
             <input
-              onChange={handleChangeInput}
+              onChange={handleChange}
               name="subscriber_limit"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.subscriber_limit}
+              value={getRuleForLevel.subscriber_limit}
             />
           </div>
         </div>
         <div className="col-2">
           <div className="col d-flex flex-column">
             <span className="p-1 ps-0">Level Icon & Color</span>
-            <input
-              onChange={handleChangeInput}
+            {/* <input
+              onChange={handleChange}
               name="level_icon"
               type="text"
               className="darkMode-input form-control text-center"
-              value={levelRules.level_icon}
-            />
+              value={getRuleForLevel.level_icon}
+            /> */}
+            <label
+              className="p-1 text-center cursor"
+              htmlFor="level-icon"
+              style={{ backgroundColor: "#0B2447", borderRadius: "4px" }}
+            >
+              {(previewIcon || getRuleForLevel.level_icon) && (
+                <span className="pe-2">
+                  {" "}
+                  <img
+                    src={
+                      previewIcon
+                        ? previewIcon
+                        : `http://127.0.0.1:8000${getRuleForLevel.level_icon}`
+                    }
+                    alt=""
+                    height={22}
+                    width={22}
+                  />
+                </span>
+              )}
+              <img src={upload} alt="" height={22} width={22} />
+              <input
+                type="file"
+                id="level-icon"
+                className="d-none"
+                onChange={(e) => {
+                  const selectedFile = e.target.files[0];
+                  if (selectedFile) {
+                    setPreviewIcon(URL.createObjectURL(selectedFile));
+                    props?.setGetRuleForLevel({
+                      ...getRuleForLevel,
+                      level_icon: selectedFile,
+                    });
+                  }
+                }}
+              />
+            </label>
           </div>
         </div>
       </div>
       <div lassName="my-3 d-flex justify-content-center">
-        <div
-          class="fixed-bottom  d-flex justify-content-center"
-          style={{ marginBottom: "200px" }}
-        >
+        <div class="fixed-bottom  d-flex justify-content-center save-btn">
           <button
+            onClick={updateRule}
             className="py-1 px-3"
             style={{
               color: "#D2DB08",

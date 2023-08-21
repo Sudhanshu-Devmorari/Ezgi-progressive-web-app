@@ -83,6 +83,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
               />
             </div>
             <img
+            style={{objectFit:"cover"}}
               src={`${server_url + data?.value.user.profile_pic}`}
               className="rounded-circle"
               width={75}

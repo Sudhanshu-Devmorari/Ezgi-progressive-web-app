@@ -1,0 +1,18 @@
+@media (min-height: 600px) and (max-height: 650px) {
+    .setting{
+      height: 74vh!important;
+    }
+  }
+@media (min-height: 651px) and (max-height: 725px) {
+    .setting{
+        height: 75vh!important;
+    }
+}
+  @media (min-height: 726px) and (max-height: 750px) {
+    .setting{
+        height: 76vh!important;
+    }
+}
+.setting{
+    height: 77vh;
+}

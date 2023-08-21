@@ -19,6 +19,7 @@ import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Form from "react-bootstrap/Form";
+import Swal from "sweetalert2";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -37,14 +38,47 @@ const ActiveComments = (props) => {
 
   const profileData = props.profileData;
 
-  function handleChangeProfilePic(e) {
-    setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-    setEditProfile(false);
-    const formData = new FormData();
-    formData.append("file", e.target.files[0]);
-    const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-    console.log("res: ", res);
+  // function handleChangeProfilePic(e) {
+  //   setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+  //   setEditProfile(false);
+  //   const formData = new FormData();
+  //   formData.append("file", e.target.files[0]);
+  //   const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+  //   console.log("res: ", res);
+  // }
+
+  async function handleChangeProfilePic(e) {
+    try {
+      setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+      setEditProfile(false);
+      const formData = new FormData();
+      formData.append("file", e.target.files[0]);
+      
+      const res = await axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+      console.log("res: ", res);
+      console.log("res: ", res.status);
+      if (res.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: 'Profile Updated!',
+          icon: "success",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      } else if (res.status === 400){
+        Swal.fire({
+          title: "Error",
+          text: 'Failed',
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      // Handle errors
+    }
   }
+  
 
   return (
     <>
@@ -405,7 +439,10 @@ const ActiveComments = (props) => {
           </div>
         )}
         {props.profile === "commentator" && (
-          <div className="d-flex justify-content-center my-3 gap-2">
+          <div
+            className="d-flex justify-content-center my-3 gap-2"
+            style={{ height: "32.5px" }}
+          >
             {props.content === "home" && (
               <button
                 onClick={() => setAddCommentModalModalShow(true)}

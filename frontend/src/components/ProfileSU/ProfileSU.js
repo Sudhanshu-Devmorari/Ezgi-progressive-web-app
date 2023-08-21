@@ -6,6 +6,7 @@ import { BsArrowLeft } from "react-icons/bs";
 import "./ProfileSU.css";
 import axios from "axios";
 import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -24,15 +25,45 @@ const ProfileSU = (props) => {
 
   // UPDATE PROFILE PIC
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
-  function handleChangeProfilePic(e) {
-    setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-    setEditProfile(false);
-    const formData = new FormData();
-    formData.append("file", e.target.files[0]);
-    const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-    console.log("res: ", res);
+  // function handleChangeProfilePic(e) {
+  //   setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+  //   setEditProfile(false);
+  //   const formData = new FormData();
+  //   formData.append("file", e.target.files[0]);
+  //   const res = axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+  //   console.log("res: ", res);
+  // }
+  async function handleChangeProfilePic(e) {
+    try {
+      setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+      setEditProfile(false);
+      const formData = new FormData();
+      formData.append("file", e.target.files[0]);
+      
+      const res = await axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+      console.log("res: ", res);
+      console.log("res: ", res.status);
+      if (res.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: 'Profile Updated!',
+          icon: "success",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      } else if (res.status === 400){
+        Swal.fire({
+          title: "Error",
+          text: 'Failed',
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      // Handle errors
+    }
   }
-
 
 
   return (

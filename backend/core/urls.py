@@ -1,9 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
-                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, 
-                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend, VerifyUserView)
+                        
+                         RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
+                         GoogleLoginview, FacebookLoginview, VerifyUserView)
+
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
@@ -12,6 +14,8 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
 
 
 urlpatterns = [
+    path('facebook-login/', FacebookLoginview.as_view(), name='facebook-login'),
+    path('google-login/', GoogleLoginview.as_view(), name='google-login'),
     path('signup/', SignupView.as_view(), name='Signup'),
     path('login/', LoginView.as_view(), name='Login'),
     path('otp-verify/', OtpVerify.as_view(), name='Otp-Verify'),

@@ -21,6 +21,8 @@ import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRe
 import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRequestsBtns";
 import moment from "moment";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 
 const EditorManagemenet = (props) => {
   const [partialData, setPartialData] = useState([]);
@@ -31,7 +33,17 @@ const EditorManagemenet = (props) => {
       const res = await axios.delete(
         `http://127.0.0.1:8000/editor-management/${id}/`
       );
-      console.log("API Response: ", res);
+      console.log("API Response: ,IIIIIIIIIIIIIII", res);
+      if (res.status === 404) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor account Deactived!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -133,11 +145,25 @@ const EditorManagemenet = (props) => {
     formData.append("gender", addUser.gender);
     formData.append("age", addUser.age);
     formData.append("level", addUser.level);
+
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/editor-management/`,
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/editor-management/${id}/`,
         formData
       );
+
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor Created!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+
+      // setDisplayUser(response.data);
+
       // console.log('API Response:', response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -153,22 +179,32 @@ const EditorManagemenet = (props) => {
   };
   const handleUpdateEditor = async (id) => {
     const formData = new FormData();
-    selectedImage != false && formData.append('profile_pic', selectedImage)
-    formData.append('name', addUser.name)
-    formData.append('username', addUser.username)
-    formData.append('phone', addUser.phone)
-    formData.append('password', addUser.password)
-    formData.append('about', addUser.about)
-    formData.append('country', addUser.country)
-    formData.append('city', addUser.city)
-    formData.append('category', addUser.category)
-    formData.append('gender', addUser.gender)
-    formData.append('age', addUser.age)
+    selectedImage != false && formData.append("profile_pic", selectedImage);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("about", addUser.about);
+    formData.append("country", addUser.country);
+    formData.append("city", addUser.city);
+    formData.append("category", addUser.category);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
     try {
       const response = await axios.patch(
         `http://127.0.0.1:8000/editor-management/${id}/`,
         formData
       );
+      console.log(response, "iiiiiiiii");
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
       // setDisplayUser(response.data);
       // console.log('API Response:', response.data);
     } catch (error) {
@@ -634,6 +670,10 @@ const EditorManagemenet = (props) => {
           </div>
           <div className="p-2">
             <button
+              onClick={() => {
+                props.setupdateProfile(1);
+                setAddUser({});
+              }}
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
               className="px-2"
@@ -643,7 +683,7 @@ const EditorManagemenet = (props) => {
                 border: "1px solid #5BDEAA",
                 color: "#5BDEAA",
               }}
-              onClick={() => setAddUser({})}
+              // onClick={() => setAddUser({})}
             >
               Create Editor
             </button>
@@ -651,19 +691,33 @@ const EditorManagemenet = (props) => {
         </div>
         {displayUser?.map((res, index) => (
           <div
-            className="px-2 py-1 mb-2 editor-section-fonts"
+            // onClick={() => props.setupdateProfile(2)}
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+            onClick={() => {
+              props.setupdateProfile(2);
+              console.log("LLLL");
+              console.log(res, "NEha");
+              setPartialData(res);
+              setAddUser(res.editor_data);
+            }}
+            className="px-2 py-1 mb-2 row-fonts cursor"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
           >
             <div className="row g-0 d-flex justify-content-between align-items-center">
               <div
                 className="col-3"
-                data-bs-toggle="modal"
-                onClick={() => {
-                  props.setupdateProfile(2);
-                  setPartialData(res);
-                  setAddUser(res.editor_data);
-                }}
-                data-bs-target="#exampleModal"
+
+                // data-bs-toggle="modal"
+                // onClick={() => {
+                //   props.setupdateProfile(2);
+                //   console.log("LLLL");
+                //   console.log(res,"NEha");
+                //   setPartialData(res);
+                //   setAddUser(res.editor_data);
+                // }}
+                // data-bs-target="#exampleModal"
+
               >
                 <div className="d-flex align-items-center">
                   <span className="pe-1">{`# ${res?.editor_data?.id
@@ -841,6 +895,7 @@ const EditorManagemenet = (props) => {
                             .charAt(0)
                             .toUpperCase() +
                             partialData.editor_data.commentator_level
+
                               .slice(1)
                               .toLowerCase()}
                         </button>
@@ -1088,7 +1143,7 @@ const EditorManagemenet = (props) => {
                         name="password"
                         value={addUser.password}
                         // style={{-webkit-text-security: square;}}
-                        style={{ webkitTextSecurity: "circle" }}
+                        // style={{ webkitTextSecurity: "circle" }}
                         className="darkMode-input form-control"
                         type={showPassword ? "text" : "password"}
                         // value={password}
@@ -1099,8 +1154,8 @@ const EditorManagemenet = (props) => {
                           fontSize={"1.5rem"}
                           style={{
                             position: "absolute",
-                            right: "1.6rem",
-                            top: "11rem",
+                            top: "16.6rem",
+                            left: "14rem",
                           }}
                           onClick={() => setShowPassword(!showPassword)}
                         />
@@ -1109,8 +1164,8 @@ const EditorManagemenet = (props) => {
                           fontSize={"1.5rem"}
                           style={{
                             position: "absolute",
-                            right: "1.6rem",
-                            top: "12rem",
+                            top: "16.6rem",
+                            left: "14rem",
                           }}
                           onClick={() => setShowPassword(!showPassword)}
                         />

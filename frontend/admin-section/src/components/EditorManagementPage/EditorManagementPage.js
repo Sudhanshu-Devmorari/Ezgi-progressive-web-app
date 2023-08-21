@@ -93,6 +93,7 @@ const EditorManagementPage = () => {
                   users={data.editor_list}
                   deactivateUser={deactivateUser}
                     updateProfile={updateProfile}
+                    setupdateProfile={setupdateProfile}
                     verifyRqst={verifyRqst}
                     deactiveRqst={deactiveRqst}
                     setupdateProfile={setupdateProfile}

@@ -264,7 +264,7 @@ const MainPage = () => {
     homeApiData(user_id);
   }, [themeMode]);
 
-  // const user = localStorage.getItem("user-role");
+  const user = localStorage.getItem("user-role");
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();
@@ -272,7 +272,7 @@ const MainPage = () => {
   }, [publicComments, highlights, subscriptionComments]);
 
   // const user = "c-";
-  const user = localStorage.getItem("userPhone");
+  // const user = localStorage.getItem("userPhone");
   // console.log("-----user_id-----", user_id)
   
 

@@ -16,15 +16,21 @@ import toggleinputLight from "../../assets/Group 720.png";
 import toggleinputLightSelected from "../../assets/Group 720_selected.png";
 import { userId } from "../GetUser";
 import axios from "axios";
+import { headers } from "../AuthorizationBearer";
+import { LeagueAPI } from "../GetLeagueAPI";
+import { DateAPI } from "../GetDateAPI";
+import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
+import Swal from "sweetalert2";
 
 const AddCommentModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const matchDetailsOptions = [
-    "Match Details 1",
-    "Match Details 2",
-    "Match Details 3",
-  ];
+  // const matchDetailsOptions = [
+  //   "Match Details 1",
+  //   "Match Details 2",
+  //   "Match Details 3",
+  // ];
+  const [matchDetailsOptions, setMatchDetailsOptions] = useState([]);
   const predictionTypeOptions = [
     "Prediction Type 1",
     "Prediction Type 2",
@@ -43,8 +49,10 @@ const AddCommentModal = (props) => {
   // ];
 
   const categoryOptions = ["Futbol", "Basketbol"];
-  const dateOptions = ["Date 1", "Date 2", "Date 3"];
-  const leagueOptions = ["League 1", "League 2", "League 3"];
+  // const dateOptions = ["Date 1", "Date 2", "Date 3"];
+  const [dateOptions, setDateOptions] = useState([]);
+  // const leagueOptions = ["League 1", "League 2", "League 3"];
+  const [leagueOptions, setLeagueOptions] = useState([]);
 
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
@@ -66,6 +74,13 @@ const AddCommentModal = (props) => {
     setSelectedMatchDetails(matchDetails);
   };
   const toggleMatchDetailsDropdown = () => {
+    MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
+      .then((res) => {
+        console.log(res.data, "========================res");
+        const MatchList = res.data;
+        setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+      })
+      .catch((err) => {});
     setPredictionTypeDropdown(false);
     setPredictionDropdown(false);
     setCountryDropDown(false);
@@ -126,6 +141,13 @@ const AddCommentModal = (props) => {
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
+    DateAPI(categoryType, selectedLeague)
+      .then((res) => {
+        console.log(res.data, "========================res date");
+        const DateList = res.data;
+        setDateOptions(DateList.map((item) => item.date));
+      })
+      .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -139,6 +161,15 @@ const AddCommentModal = (props) => {
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {
+    LeagueAPI(categoryType, selectedCountry)
+      // console.log(res,"========================res leauge");
+      // const LeagueList = res.data;
+      .then((res) => {
+        console.log(res, "========================res leauge");
+        const LeagueList = res.data;
+        setLeagueOptions(LeagueList.map((item) => item.league));
+      })
+      .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -175,10 +206,6 @@ const AddCommentModal = (props) => {
     props.onHide();
   }
 
-  const headers = {
-    Authorization: `Bearer ${"lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"}`,
-  };
-
   // Get Country from Category
   const [categoryType, setCategoryType] = useState(null);
   useEffect(() => {
@@ -207,44 +234,44 @@ const AddCommentModal = (props) => {
   }, [selectedCategory]);
 
   // Get League / Date / Match details
-  const [LeagueValue, setLeagueValue] = useState("");
-  const [DateValue, setDateValue] = useState("");
-  const [MatchdetailsValue, setMatchdetailsValue] = useState("");
-  useEffect(() => {
-    async function getLeague() {
-      if (selectedCountry !== "Select") {
-        // console.log(`https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`);
-        try {
-          const res = await axios.get(
-            `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
-            { headers }
-          );
-          console.log("res=>>>>>>", res.data);
-          console.log("res=>>>>>>", res?.data?.data[0]?.league);
-          const leagueValue = res?.data?.data[0]?.league;
-          console.log("League Value from API:", leagueValue);
-          setLeagueValue(leagueValue);
-          if (leagueValue !== "") {
-            const res = await axios.get(
-              `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${leagueValue}`,
-              { headers }
-            );
-            setDateValue(res?.data?.data[0]?.date);
-            const date = res?.data?.data[0]?.date;
-            const res1 = await axios.get(
-              `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${leagueValue}&t=${date}`,
-              { headers }
-            );
-            console.log("===??????>>>>>..", res1?.data?.data[0]?.takimlar);
-            setMatchdetailsValue(res1?.data?.data[0]?.takimlar);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    }
-    getLeague();
-  }, [selectedCountry]);
+  // const [LeagueValue, setLeagueValue] = useState("");
+  // const [DateValue, setDateValue] = useState("");
+  // const [MatchdetailsValue, setMatchdetailsValue] = useState("");
+  // useEffect(() => {
+  //   async function getLeague() {
+  //     if (selectedCountry !== "Select") {
+  //       try {
+  //         contriesAPi(categoryType, selectedCountry);
+  //         const res = await axios.get(
+  //           `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
+  //           { headers }
+  //         );
+  //         console.log("res=>>>>>>", res.data);
+  //         console.log("res=>>>>>>", res?.data?.data[0]?.league);
+  //         const leagueValue = res?.data?.data[0]?.league;
+  //         console.log("League Value from API:", leagueValue);
+  //         setLeagueValue(leagueValue);
+  //         if (leagueValue !== "") {
+  //           const res = await axios.get(
+  //             `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${leagueValue}`,
+  //             { headers }
+  //           );
+  //           setDateValue(res?.data?.data[0]?.date);
+  //           const date = res?.data?.data[0]?.date;
+  //           const res1 = await axios.get(
+  //             `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${leagueValue}&t=${date}`,
+  //             { headers }
+  //           );
+  //           console.log("===??????>>>>>..", res1?.data?.data[0]?.takimlar);
+  //           setMatchdetailsValue(res1?.data?.data[0]?.takimlar);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   }
+  //   getLeague();
+  // }, [selectedCountry]);
 
   // Add Comment pr Post comment API
   const postComment = async () => {
@@ -254,13 +281,13 @@ const AddCommentModal = (props) => {
     if (countryOptions === "Select") {
       setCountryError("Required*");
     }
-    if (LeagueValue === "") {
+    if (selectedLeague === "Select") {
       setLeagueError("Required*");
     }
-    if (DateValue === "") {
+    if (selectedDate === "Select") {
       setDateError("Required*");
     }
-    if (MatchdetailsValue === "") {
+    if (selectedMatchDetails === "Select") {
       setMatchDetailsError("Required*");
     }
     // if (selectedPredictionType === "Select") {
@@ -273,15 +300,16 @@ const AddCommentModal = (props) => {
       setCommentError("Required*");
     }
     if (selectCheckBox) {
+      console.log(toggleInput, "========================toggleInput");
       try {
         const res = await axios.post(
           `http://127.0.0.1:8000/post-comment/${userId}`,
           {
             category: selectedCategory,
             country: selectedCountry,
-            league: LeagueValue,
-            date: DateValue,
-            match_detail: MatchdetailsValue,
+            league: selectedLeague,
+            date: selectedDate,
+            match_detail: selectedMatchDetails,
             prediction_type: selectedPredictionType,
             prediction: selectedPrediction,
             public_content: toggleInput,
@@ -289,8 +317,29 @@ const AddCommentModal = (props) => {
           }
         );
         console.log("res", res);
+        if (res.data.status === 200) {
+          Swal.fire({
+            title: "Success",
+            text: "Level Rules setting Updated!",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
       } catch (error) {
         console.log(error);
+        console.log(error.response.status);
+        console.log(error.response.data.message);
+        if (error.response.status === 404){
+          console.log("KKKK");
+          Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error",
+            backdrop: false,
+            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
     }
   };
@@ -532,15 +581,15 @@ const AddCommentModal = (props) => {
               // style={{ fontSize: "15px" }}
             >
               <div className="col">
-                {/* <CustomDropdown
+                <CustomDropdown
                   label="League"
                   options={leagueOptions}
                   selectedOption={selectedLeague}
                   onSelectOption={handleLeagueSelection}
                   isOpen={leagueDropdown}
                   toggleDropdown={toggleLeagueDropdown}
-                /> */}
-                <div className="d-flex flex-column">
+                />
+                {/* <div className="d-flex flex-column">
                   <label htmlFor="name">League</label>
                   <input
                     // style={{ fontSize: "12px" }}
@@ -555,21 +604,21 @@ const AddCommentModal = (props) => {
                     name="name"
                     id="name"
                   />
-                </div>
+                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {leagueError}
                 </small>
               </div>
               <div className="col">
-                {/* <CustomDropdown
+                <CustomDropdown
                   label="Date"
                   options={dateOptions}
                   selectedOption={selectedDate}
                   onSelectOption={handleDateSelection}
                   isOpen={dateDropdown}
                   toggleDropdown={toggleDateDropdown}
-                /> */}
-                <div className="d-flex flex-column">
+                />
+                {/* <div className="d-flex flex-column">
                   <label htmlFor="name">Date</label>
                   <input
                     value={DateValue}
@@ -583,7 +632,7 @@ const AddCommentModal = (props) => {
                     name="Date"
                     id="Date"
                   />
-                </div>
+                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {dateError}
                 </small>
@@ -593,15 +642,15 @@ const AddCommentModal = (props) => {
               className="my-3 position-relative"
               // style={{ fontSize: "14px" }}
             >
-              {/* <CustomDropdown
+              <CustomDropdown
                 label="Match Details"
                 options={matchDetailsOptions}
                 selectedOption={selectedMatchDetails}
                 onSelectOption={handleMatchDetailsSelection}
                 isOpen={matchDetailsDropdown}
                 toggleDropdown={toggleMatchDetailsDropdown}
-              /> */}
-              <div className="d-flex flex-column">
+              />
+              {/* <div className="d-flex flex-column">
                 <label htmlFor="name">Match Details</label>
                 <input
                   value={MatchdetailsValue}
@@ -614,7 +663,7 @@ const AddCommentModal = (props) => {
                   name="Match Details"
                   id="Match Details"
                 />
-              </div>
+              </div> */}
               <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                 {matchDetailsError}
               </small>
@@ -624,15 +673,15 @@ const AddCommentModal = (props) => {
               // style={{ fontSize: "14px" }}
             >
               <div className="col">
-                {/* <CustomDropdown
+                <CustomDropdown
                   label="Prediction Type"
                   options={predictionTypeOptions}
                   selectedOption={selectedPredictionType}
                   onSelectOption={handlePredictionTypeSelection}
                   isOpen={predictionTypeDropdown}
                   toggleDropdown={togglePredictionTypeDropdown}
-                /> */}
-                <div className="d-flex flex-column">
+                />
+                {/* <div className="d-flex flex-column">
                   <label htmlFor="name">Prediction Type</label>
                   <input
                     required
@@ -645,21 +694,21 @@ const AddCommentModal = (props) => {
                     name="Match Details"
                     id="Match Details"
                   />
-                </div>
+                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {predictionTypeError}
                 </small>
               </div>
               <div className="col">
-                {/* <CustomDropdown
+                <CustomDropdown
                   label="Prediction"
                   options={predictionOptions}
                   selectedOption={selectedPrediction}
                   onSelectOption={handlePredictionSelection}
                   isOpen={predictionDropdown}
                   toggleDropdown={togglePredictionDropdown}
-                /> */}
-                <div className="d-flex flex-column">
+                />
+                {/* <div className="d-flex flex-column">
                   <label htmlFor="name">Prediction</label>
                   <input
                     required
@@ -672,7 +721,7 @@ const AddCommentModal = (props) => {
                     name="Prediction"
                     id="Prediction"
                   />
-                </div>
+                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {predictionError}
                 </small>

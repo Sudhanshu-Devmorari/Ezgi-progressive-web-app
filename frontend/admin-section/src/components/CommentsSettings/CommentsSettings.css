@@ -1,0 +1,8 @@
+@media (min-height: 600px) and (max-height: 750px) {
+    .create-btn{
+      margin-bottom: 60px!important;
+    }
+  }
+.create-btn{
+    margin-bottom: 200px;
+  }

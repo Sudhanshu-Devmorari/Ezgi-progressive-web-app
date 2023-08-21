@@ -19,17 +19,31 @@ import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
 
+import Swal from "sweetalert2";
+
+
 const Home = (props) => {
   const handleFile = async (e) => {
     const file = e.target.files[0];
     console.log(":::::::: ", file?.path);
   };
   const handleDeactive = async (id) => {
+    console.log(id,"=============>>id");
     try {
       const res = await axios.delete(
         `http://127.0.0.1:8000/user-management/${id}/`
       );
       console.log("API Response: ", res);
+      if (res.status === 200){
+        Swal.fire({
+          title: "Success",
+          text: "User Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -171,7 +185,17 @@ const Home = (props) => {
         `http://127.0.0.1:8000/user-management/${id}/`,
         formData
       );
-      console.log("API Response:", response.data);
+
+      console.log("API Response:", response);
+      if (response.status === 200){
+        Swal.fire({
+          title: "Success",
+          text: "User Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
     } catch (error) {
       console.error("Error making POST request:", error);
     }
@@ -270,8 +294,9 @@ const Home = (props) => {
     "Eskisehir",
     "Sakarya",
     "Denizli",
-    "Samsun"
-];
+
+    "Samsun",
+  ];
   const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
   const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("Select");
@@ -484,14 +509,16 @@ const Home = (props) => {
                     <img src={gender_female} alt="" height={22} width={22} />
                   )}
                   <span
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={() => {
-                      setprofile(true);
-                      setUserData(res);
-                      setAddUser(res);
-                      setPreveiwProfilePic(true);
-                    }}
+
+                  // data-bs-toggle="modal"
+                  // data-bs-target="#exampleModal"
+                  // onClick={() => {
+                  //   setprofile(true);
+                  //   setUserData(res);
+                  //   setAddUser(res);
+                  //   setPreveiwProfilePic(true);
+                  // }}
+
                   >
                     {res.age}
                   </span>
@@ -540,8 +567,29 @@ const Home = (props) => {
               )}
               <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
                 <span>{moment(res.created).format("DD-MM.YYYY - HH:mm")}</span>
-                <img src={userEdit} alt="" height={25} width={25} />
-                <img src={trash} alt="" height={25} width={25} />
+                <img
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  onClick={() => {
+                    setprofile(true);
+                    setUserData(res);
+                    setAddUser(res);
+                    setPreveiwProfilePic(true);
+                  }}
+                  className="cursor"
+                  src={userEdit}
+                  alt=""
+                  height={25}
+                  width={25}
+                />
+                <img
+                onClick={()=> handleDeactive(res.id)}
+                  className="cursor"
+                  src={trash}
+                  alt=""
+                  height={25}
+                  width={25}
+                />
               </div>
             </MainDiv>
           ))}
@@ -1009,18 +1057,21 @@ const Home = (props) => {
                   </div>
                 )}
               </div>
-              <img onClick={() => {
-                          setAddUser({
-                            name: "",
-                            username: "",
-                            phone: "",
-                            password: "",
-                            gender: "",
-                            age: "",
-                          });
-                          setprofile(false);
-                          setPreveiwProfilePic(null);
-                        }}
+
+              <img
+                onClick={() => {
+                  setAddUser({
+                    name: "",
+                    username: "",
+                    phone: "",
+                    password: "",
+                    gender: "",
+                    age: "",
+                  });
+                  setprofile(false);
+                  setPreveiwProfilePic(null);
+                }}
+
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""

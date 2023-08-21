@@ -77,24 +77,21 @@ const AdsManagementPage = () => {
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>
               <div className="d-flex flex-column align-items-center justify-content-center col-2 dark-mode mx-2">
-                <img src={ad1} alt="" height={45} width={45} />
-                <span className="name-fonts" style={{ fontSize: "1.2rem" }}>
-                  Advertisements
-                </span>
-                <span style={{ fontSize: "1.6rem" }}>{adsCount}</span>
+                <img src={ad1} alt=""  className="icon" />
+                <span className="heading">Advertisements</span>
+                <span className="number">{adsCount}</span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
                   {AdsArray.map((res, index) => (
                     <div className="d-flex flex-column align-items-center justify-content-center col">
-                      <img src={res.img} alt="" height={45} width={45} />
+                      <img src={res.img} alt="" className="icon" />
                       <span
-                        className="name-fonts"
-                        style={{ fontSize: "1.2rem" }}
+                        className="heading"
                       >
                         {res.name}
                       </span>
-                      <span style={{ fontSize: "1.6rem" }}>{res.count}</span>
+                      <span className="number">{res.count}</span>
                     </div>
                   ))}
                 </div>
@@ -103,13 +100,13 @@ const AdsManagementPage = () => {
                 <div className="" style={{ fontSize: "1.2rem" }}>
                   Advertisements Spaces
                 </div>
-                <div className="row g-0 h-100">
+                <div className="row g-0 pt-3">
                   <div className="col d-flex flex-column align-items-center justify-content-center">
-                    <span style={{ fontSize: "1.2rem" }}>Banners</span>
-                    <span style={{ fontSize: "1.6rem" }}>{banners}</span>
+                    <span className="heading">Banners</span>
+                    <span className="number">{banners}</span>
                   </div>
                   <div className="col d-flex flex-column align-items-center justify-content-center">
-                    <span style={{ fontSize: "1.2rem" }}>Pop ups</span>
+                    <span className="heading">Pop ups</span>
                     <span style={{ fontSize: "1.6rem" }}>{popUps}</span>
                   </div>
                 </div>
@@ -147,7 +144,7 @@ const AdsManagementPage = () => {
                 <MainDiv>
                   <>
                     <div className="col-2 d-flex justify-content-center">
-                      <img src={res.img} alt="" height={120} width={120} />
+                      <img src={res.img} alt="" height={100} width={100} />
                     </div>
 
                     <div className="col-4">
@@ -313,7 +310,7 @@ const AdsManagementPage = () => {
       </div>
 
       {/* <!-- Modal --> */}
-      <CreateAdsModal setEditTrue={setEditTrue} editTrue={editTrue}/>
+      <CreateAdsModal setEditTrue={setEditTrue} editTrue={editTrue} />
     </>
   );
 };

@@ -7,6 +7,8 @@ import BowIcon from "../../assets/Comments Page.svg";
 import SelectedBow from "../../assets/Menu Icon (1).svg";
 import startFooter from "../../assets/Favorite Page (1).svg";
 import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
+import logout from "../../assets/logout icon (1).svg";
+import { userId } from "../GetUser";
 
 export const Footer = (props) => {
   return (
@@ -18,7 +20,10 @@ export const Footer = (props) => {
         <div className="container-fluid py-2">
           <div className="col text-center">
             <img
-              onClick={() => props.setSelectContent("home")}
+              onClick={() => {
+                props.setSelectContent("home");
+                props.setDashboardSUser(false);
+              }}
               src={props.selectContent === "home" ? selectedHomeIcon : HomeIcon}
               alt=""
               height={38}
@@ -27,7 +32,10 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             <img
-              onClick={() => {props.setSelectContent("editor");props.setDashboardSUser(false);}}
+              onClick={() => {
+                props.setSelectContent("editor");
+                props.setDashboardSUser(false);
+              }}
               src={
                 props.selectContent === "editor"
                   ? SelectedEditorIcon
@@ -40,7 +48,10 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             <img
-              onClick={() => {props.setSelectContent("comments");props.setDashboardSUser(false);}}
+              onClick={() => {
+                props.setSelectContent("comments");
+                props.setDashboardSUser(false);
+              }}
               src={props.selectContent === "comments" ? SelectedBow : BowIcon}
               alt=""
               height={38}
@@ -59,6 +70,20 @@ export const Footer = (props) => {
               }}
             />
           </div>
+          {userId && (
+            <div className="col text-center">
+              <img
+                src={logout}
+                alt=""
+                height={38}
+                width={38}
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+              />
+            </div>
+          )}
         </div>
       </nav>
     </>
