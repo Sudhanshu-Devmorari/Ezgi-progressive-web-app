@@ -3,10 +3,9 @@ import cross from "../../assets/Group 81.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import { useFormik } from "formik";
 import axios from "axios";
-import SweetAlert from "react-bootstrap-sweetalert";
+import Swal from "sweetalert2";
 
 const NotificationModel = () => {
-  const [alert, setAlert] = useState(null);
   const userTypeOptions = ["Standard", "Commentator", "Sub User"];
   const [userTypeDropdown, setUserTypeDropdown] = useState(false);
   const handleUserTypeSelection = (e) => {
@@ -32,20 +31,16 @@ const NotificationModel = () => {
           "http://127.0.0.1:8000/notification-management/",
           values
         );
-        console.log(res,"========================MMMM");
+        console.log(res, "========================MMMM");
         console.log(res.status);
         if (res.status === 200) {
-          setAlert(
-            <SweetAlert
-              success
-              title="Success"
-              onConfirm={() => {
-                setAlert(null);
-              }}
-            >
-              Your notification has been sent successfully!
-            </SweetAlert>
-          );
+          Swal.fire({
+            title: "Success",
+            text: "Notification sent successfully",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
         } else {
           console.log(res);
         }
@@ -195,6 +190,7 @@ const NotificationModel = () => {
                 </div>
                 <div className="my-4 d-flex justify-content-center">
                   <button
+                    data-bs-dismiss="modal"
                     type="submit"
                     className="px-4 py-1"
                     style={{

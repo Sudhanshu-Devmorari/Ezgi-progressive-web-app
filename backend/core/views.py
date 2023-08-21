@@ -432,6 +432,7 @@ class CommentView(APIView):
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
+                    print('public_content: ', public_content)
                 comment = request.data.get('comment')
                 print('comment: ', comment)
 
@@ -465,7 +466,7 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
-                # print('comment_obj: ', comment_obj)
+                print('comment_obj: ', comment_obj)
                 if comment_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1411,6 +1412,8 @@ class UserManagement(APIView):
                 # user.deactivate_commentator = 'pending'
                 user.is_delete = True
                 user.save()
+                message = {"success": "User profile Deactivate sucessfully."}
+                return Response(data=message, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -2425,7 +2428,8 @@ class NotificationManagement(APIView):
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
             """sender and receiver baki.."""
-            notification_obj = Notification.objects.create(user=user, subject=subject, status=False, date=date, context=message)
+            notification_obj = Notification.objects.create(subject=subject, status=False, date=date, context=message)
+            # notification_obj = Notification.objects.create(user=user, subject=subject, status=False, date=date, context=message)
             print('notification_obj: ', notification_obj)
             serializer = NotificationSerializer(notification_obj)
             return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})

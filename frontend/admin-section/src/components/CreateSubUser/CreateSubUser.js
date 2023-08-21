@@ -177,31 +177,34 @@ const CreateSubUser = (props) => {
   };
 
   // Edit Sub User Profile
+  const [userProfile, setuserProfile] = useState(null);
   useEffect(() => {
     async function editUser() {
       const res = await axios.patch(
         `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`
       );
       console.log(res.data);
-      setName(res?.data.name);
-      setPhone(res?.data.phone);
-      setPassword(res?.data.password);
-      setAuthorizationType(res?.data.authorization_type);
-      setSelectedDepartment(res?.data.department);
-      if (res?.data.is_transaction) {
+      setName(res?.data.data.name);
+      setPhone(res?.data.data.phone);
+      setPassword(res?.data.data.password);
+      setuserProfile(res?.data.data.profile_pic);
+      setAuthorizationType(res?.data.data.authorization_type);
+      setSelectedDepartment(res?.data.data.department);
+      if (res?.data.data.is_transaction) {
         setIsTransactionSelected(true);
         setIsWithdrawalRequestsSelected(
-          res?.data.is_process_withdrawal_request
+          res?.data.data.is_process_withdrawal_request
         );
-        setIsRulesUpdateSelected(res?.data.is_rule_update);
-        setIsPriceUpdateSelected(res?.data.is_price_update);
-        setIsWithdrawalExportSelected(res?.data.is_withdrawal_export);
-        setIsSalesExportSelected(res?.data.is_sales_export);
-        setIsAllSelected(res?.data.is_all_permission);
-      } else if (res?.data.is_view_only) {
+        setIsRulesUpdateSelected(res?.data.data.is_rule_update);
+        setIsPriceUpdateSelected(res?.data.data.is_price_update);
+        setIsWithdrawalExportSelected(res?.data.data.is_withdrawal_export);
+        setIsSalesExportSelected(res?.data.data.is_sales_export);
+        setIsAllSelected(res?.data.data.is_all_permission);
+      } else if (res?.data.data.is_view_only) {
         setIsOnlyViewSelected(true);
       }
     }
+    console.log(props.editUserId, "LLLLprops.editUserId");
     if (props.editUserId !== "") {
       editUser();
     }
@@ -261,7 +264,7 @@ const CreateSubUser = (props) => {
     setIsPriceUpdateSelected(false);
     setIsAllSelected(false);
     setPreveiwProfilePic(null);
-    setdisplaySelectedImg(false);
+    setuserProfile(null);
     setSelectedImage(null);
     setAuthorizationError("");
     setAuthorizationTypeError("");
@@ -271,6 +274,7 @@ const CreateSubUser = (props) => {
 
   useEffect(() => {
     if (props.editProfileModal === 1) {
+      console.log("object");
       resetFields();
     }
   }, [props.editProfileModal]);
@@ -290,12 +294,7 @@ const CreateSubUser = (props) => {
           <div class="modal-content">
             <div class="modal-body dark-mode p-3" style={{ fontSize: ".9rem" }}>
               <div className="d-flex position-relative my-2 gap-2">
-                <label
-                  htmlFor="camera"
-                  style={{
-                    display: displaySelectedImg ? "none" : "block",
-                  }}
-                >
+                {userProfile === null && (
                   <div
                     className="my-1 cursor"
                     style={{
@@ -303,6 +302,7 @@ const CreateSubUser = (props) => {
                       borderRadius: "50%",
                       height: "8rem",
                       width: "8rem",
+                      // display: preveiwProfilePic === null ? "block" : "none",
                     }}
                   >
                     <img
@@ -315,24 +315,23 @@ const CreateSubUser = (props) => {
                       alt=""
                     />
                   </div>
-                </label>
-                <img
-                  src={preveiwProfilePic}
-                  alt=""
-                  height={135}
-                  width={135}
-                  style={{
-                    display: displaySelectedImg ? "block" : "none",
-                    objectFit: "cover",
-                    borderRadius: "50%  ",
-                  }}
-                />
-                <input
-                  type="file"
-                  className="d-none"
-                  id="camera"
-                  onChange={(e) => handleAddProfile(e)}
-                />
+                )}
+                {(props.editProfileModal === 1 && userProfile !== null) && (
+                  <img
+                    src={
+                      preveiwProfilePic === null
+                        ? `http://127.0.0.1:8000${userProfile}`
+                        : preveiwProfilePic
+                    }
+                    alt=""
+                    height={135}
+                    width={135}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: "50%  ",
+                    }}
+                  />
+                )}
                 <div className="d-flex justify-content-center align-items-center flex-column gap-2">
                   {selectedDepartment !== "Select" &&
                     props?.seteditProfileModal === 2 && (
@@ -348,24 +347,30 @@ const CreateSubUser = (props) => {
                         {selectedDepartment}
                       </button>
                     )}
-                  <span
-                    className="px-3 py-1"
-                    style={{ backgroundColor: "#0B2447", borderRadius: "2px" }}
-                  >
-                    <img
-                      className="mb-1"
-                      src={upload}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
+                  <label htmlFor="camera">
                     <span
-                      className="ps-1 cursor"
-                      onClick={() => setdisplaySelectedImg(true)}
+                      className="px-3 py-1"
+                      style={{
+                        backgroundColor: "#0B2447",
+                        borderRadius: "2px",
+                      }}
                     >
-                      Upload
+                      <img
+                        className="mb-1"
+                        src={upload}
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
+                      <span className="ps-1 cursor">Upload</span>
                     </span>
-                  </span>
+                    <input
+                      type="file"
+                      className="d-none"
+                      id="camera"
+                      onChange={(e) => handleAddProfile(e)}
+                    />
+                  </label>
                   {props?.editProfileModal === 2 && (
                     <span
                       data-bs-toggle="modal"

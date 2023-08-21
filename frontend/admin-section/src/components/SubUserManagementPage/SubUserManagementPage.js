@@ -55,9 +55,19 @@ const SubUserManagementPage = () => {
 
   const [editProfileModal, seteditProfileModal] = useState(1);
   const [editUserId, setEditUserId] = useState("");
+  const [filteredArray, setFilteredArray] = useState([]);
+
+  const filteredData = (value) => {
+    const filteredArray = subuserList.filter(
+      (obj) =>
+        obj?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
+        obj?.name?.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setFilteredArray(filteredArray);
+  };
 
   const displaySubuserList =
-    filteredSubuserList.length > 0 ? filteredSubuserList : subuserList;
+    filteredArray.length > 0 ? filteredArray : subuserList;
 
   // Delete User
   const handleDeleteUser = async (e) => {
@@ -134,6 +144,7 @@ const SubUserManagementPage = () => {
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SubUserManagementFilter
+                    filteredData={filteredData}
                     editProfileModal={editProfileModal}
                     seteditProfileModal={seteditProfileModal}
                     editUserId={editUserId}

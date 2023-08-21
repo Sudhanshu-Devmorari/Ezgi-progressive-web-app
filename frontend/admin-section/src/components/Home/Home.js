@@ -18,6 +18,7 @@ import Selectedcheckbox from "../../assets/Group 320.svg";
 import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
+import Swal from "sweetalert2";
 
 const Home = (props) => {
   const handleFile = async (e) => {
@@ -25,11 +26,21 @@ const Home = (props) => {
     console.log(":::::::: ", file?.path);
   };
   const handleDeactive = async (id) => {
+    console.log(id,"=============>>id");
     try {
       const res = await axios.delete(
         `http://127.0.0.1:8000/user-management/${id}/`
       );
       console.log("API Response: ", res);
+      if (res.status === 200){
+        Swal.fire({
+          title: "Success",
+          text: "User Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -114,26 +125,89 @@ const Home = (props) => {
       console.error("Error making POST request:", error);
     }
   };
+
+  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [preveiwProfile, setPreveiwProfile] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  function handleAddProfilePic(e) {
+    const imageFile = e.target.files[0];
+    setPreveiwProfile(URL.createObjectURL(imageFile));
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+    setSelectedImage(imageFile);
+  }
+
   const handleAddUser = async () => {
+    const formData = new FormData();
+    selectedImage != false && formData.append("file", selectedImage);
+    // formData.append("date", addUser.date);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    formData.append("subscription", addUser.subscription);
+    formData.append("duration", addUser.duration);
+    // formData.append("month", addUser.month);
+    formData.append("level", addUser.level);
     try {
       const response = await axios.post(
         `http://127.0.0.1:8000/user-management/`,
-        {
-          file: "",
-          date: "",
-          name: "",
-          username: "",
-          phone: "",
-          password: "",
-          gender: "",
-          age: "",
-        }
+        formData
       );
-      // setDisplayUser(response.data);
       console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
+  };
+
+  const handleUpdateUser = async (id) => {
+    console.log("::::::::", addUser);
+    const formData = new FormData();
+    selectedImage != false && formData.append("profile_pic", selectedImage);
+    // formData.append("date", addUser.date);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    formData.append("subscription", addUser.subscription);
+    formData.append("duration", addUser.duration);
+    // formData.append("month", addUser.month);
+    formData.append("level", addUser.level);
+    try {
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/user-management/${id}/`,
+        formData
+      );
+      console.log("API Response:", response);
+      if (response.status === 200){
+        Swal.fire({
+          title: "Success",
+          text: "User Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
+  const handleduration = (name, value) => {
+    setSelectedMonth(value);
+    setAddUser({ ...addUser, [name]: value });
+  };
+  const handleNumber = (name, value) => {
+    setSelectedNumber(value);
+    setAddUser({ ...addUser, [name]: value });
+  };
+  const handleLevel = (name, value) => {
+    setSelectedLevel(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   // console.log("Cities:", cities);
@@ -159,9 +233,9 @@ const Home = (props) => {
 
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const handleGenderSelection = (gender) => {
-    setSelectedGender(gender);
-    setAddUser({ ...addUser, gender: gender });
+  const handleGenderSelection = (name, value) => {
+    setSelectedGender(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleGenderDropdown = () => {
@@ -172,9 +246,9 @@ const Home = (props) => {
     setGenderDropDown(!genderDropDown);
   };
 
-  const handleAgeSelection = (age) => {
-    setSelectedAge(age);
-    setAddUser({ ...addUser, age: age });
+  const handleAgeSelection = (name, value) => {
+    setSelectedAge(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleAgeDropdown = () => {
@@ -201,7 +275,23 @@ const Home = (props) => {
   ];
 
   const UserTypeOptions = ["Standard", "Commentator", "Sub_User"];
-  const cityOptions = cities;
+  const cityOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Kayseri",
+    "Mersin",
+    "Diyarbakir",
+    "Eskisehir",
+    "Sakarya",
+    "Denizli",
+    "Samsun",
+  ];
   const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
   const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
   const [selectedGenderFilter, setSelectedGenderFilter] = useState("Select");
@@ -414,12 +504,14 @@ const Home = (props) => {
                     <img src={gender_female} alt="" height={22} width={22} />
                   )}
                   <span
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={() => {
-                      setprofile(true);
-                      setUserData(res);
-                    }}
+                  // data-bs-toggle="modal"
+                  // data-bs-target="#exampleModal"
+                  // onClick={() => {
+                  //   setprofile(true);
+                  //   setUserData(res);
+                  //   setAddUser(res);
+                  //   setPreveiwProfilePic(true);
+                  // }}
                   >
                     {res.age}
                   </span>
@@ -468,8 +560,29 @@ const Home = (props) => {
               )}
               <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
                 <span>{moment(res.created).format("DD-MM.YYYY - HH:mm")}</span>
-                <img src={userEdit} alt="" height={25} width={25} />
-                <img src={trash} alt="" height={25} width={25} />
+                <img
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  onClick={() => {
+                    setprofile(true);
+                    setUserData(res);
+                    setAddUser(res);
+                    setPreveiwProfilePic(true);
+                  }}
+                  className="cursor"
+                  src={userEdit}
+                  alt=""
+                  height={25}
+                  width={25}
+                />
+                <img
+                onClick={()=> handleDeactive(res.id)}
+                  className="cursor"
+                  src={trash}
+                  alt=""
+                  height={25}
+                  width={25}
+                />
               </div>
             </MainDiv>
           ))}
@@ -508,17 +621,34 @@ const Home = (props) => {
                     alt=""
                   />
                 </div>
-                <img
-                  src={preveiwProfilePic}
-                  alt=""
-                  height={135}
-                  width={135}
-                  style={{
-                    display: preveiwProfilePic !== null ? "block" : "none",
-                    objectFit: "cover",
-                    borderRadius: "50%  ",
-                  }}
-                />
+                {/* {console.log("********", preveiwProfilePic)} */}
+                {profile ? (
+                  <img
+                    src={server_url + addUser.profile_pic}
+                    alt=""
+                    height={135}
+                    width={135}
+                    style={{
+                      display: preveiwProfilePic !== null ? "block" : "none",
+                      objectFit: "cover",
+                      borderRadius: "50%  ",
+                    }}
+                  />
+                ) : (
+                  <>
+                    <img
+                      src={preveiwProfilePic}
+                      alt=""
+                      height={135}
+                      width={135}
+                      style={{
+                        display: preveiwProfilePic !== null ? "block" : "none",
+                        objectFit: "cover",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </>
+                )}
               </div>
               <div className="d-flex justify-content-center my-2">
                 <label htmlFor="upload">
@@ -534,7 +664,10 @@ const Home = (props) => {
                       width={20}
                     />
                     <input
-                      onChange={(e) => handleAddProfile(e)}
+                      onChange={(e) => {
+                        handleAddProfile(e);
+                        handleAddProfilePic(e);
+                      }}
                       type="file"
                       name=""
                       id="upload"
@@ -631,26 +764,54 @@ const Home = (props) => {
                     // value={password}
                     // onChange={(e) => setPassword(e.target.value)}
                   />
-                  {showPassword ? (
-                    <AiOutlineEyeInvisible
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "1.6rem",
-                        top: "23.1rem",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
+                  {profile ? (
+                    <>
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "24.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "24.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </>
                   ) : (
-                    <AiOutlineEye
-                      fontSize={"1.5rem"}
-                      style={{
-                        position: "absolute",
-                        right: "1.6rem",
-                        top: "23.1rem",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
+                    <>
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "22.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: "1.6rem",
+                            top: "22.1rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -662,7 +823,9 @@ const Home = (props) => {
                     value={addUser.selectedGender}
                     label="Gender"
                     options={genderOptions}
-                    selectedOption={selectedGender}
+                    selectedOption={
+                      addUser.gender ? addUser.gender : selectedGender
+                    }
                     onSelectOption={handleGenderSelection}
                     isOpen={genderDropDown}
                     toggleDropdown={toggleGenderDropdown}
@@ -675,7 +838,7 @@ const Home = (props) => {
                     value={addUser.selectedAge}
                     label="Age"
                     options={ageOptions}
-                    selectedOption={selectedAge}
+                    selectedOption={addUser.age ? addUser.age : selectedAge}
                     onSelectOption={handleAgeSelection}
                     isOpen={ageDropDown}
                     toggleDropdown={toggleAgeDropdown}
@@ -761,6 +924,18 @@ const Home = (props) => {
                   <div className="my-2 d-flex row g-0 mb-3 gap-4 px-3">
                     <div className="col">
                       <button
+                        onClick={() => {
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -775,6 +950,19 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
+                        onClick={() => {
+                          handleUpdateUser(userData?.id);
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -789,7 +977,19 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
-                        onClick={() => handleDeactive(userData?.id)}
+                        onClick={() => {
+                          handleDeactive(userData?.id);
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -804,6 +1004,18 @@ const Home = (props) => {
                     </div>
                     <div className="col">
                       <button
+                        onClick={() => {
+                          setAddUser({
+                            name: "",
+                            username: "",
+                            phone: "",
+                            password: "",
+                            gender: "",
+                            age: "",
+                          });
+                          setprofile(false);
+                          setPreveiwProfilePic(null);
+                        }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
@@ -820,6 +1032,7 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
+                      data-bs-dismiss="modal"
                       onClick={() => {
                         handleAddUser();
                         // props.onHide();
@@ -838,6 +1051,18 @@ const Home = (props) => {
                 )}
               </div>
               <img
+                onClick={() => {
+                  setAddUser({
+                    name: "",
+                    username: "",
+                    phone: "",
+                    password: "",
+                    gender: "",
+                    age: "",
+                  });
+                  setprofile(false);
+                  setPreveiwProfilePic(null);
+                }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""

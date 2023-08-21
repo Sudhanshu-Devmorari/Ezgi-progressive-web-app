@@ -5,9 +5,11 @@ export const DateAPI = async (categoryType, selectedLeague) => {
   console.log("Category  selectedLeague", categoryType, selectedLeague);
 
   try {
-    await axios.get(
+    const res = await axios.get(
         `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
       { headers }
     );
+    console.log(res,"MMM");
+    return res.data;
   } catch (error) {}
 };

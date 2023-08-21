@@ -115,8 +115,8 @@ class Subscription(models.Model):
 
 
 class Notification(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True, blank=True)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', null=True, blank=True)
     subject = models.CharField(max_length = 100)
     status = models.BooleanField()
     date = models.DateField()

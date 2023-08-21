@@ -20,6 +20,7 @@ import { headers } from "../AuthorizationBearer";
 import { LeagueAPI } from "../GetLeagueAPI";
 import { DateAPI } from "../GetDateAPI";
 import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
+import Swal from "sweetalert2";
 
 const AddCommentModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
@@ -73,10 +74,13 @@ const AddCommentModal = (props) => {
     setSelectedMatchDetails(matchDetails);
   };
   const toggleMatchDetailsDropdown = () => {
-    const res = MatchDetailsAPI(categoryType , selectedLeague, selectedDate)
-    console.log(res,"========================res");
-    const MatchList = res.data.data;
-    setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+    MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
+      .then((res) => {
+        console.log(res.data, "========================res");
+        const MatchList = res.data;
+        setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+      })
+      .catch((err) => {});
     setPredictionTypeDropdown(false);
     setPredictionDropdown(false);
     setCountryDropDown(false);
@@ -137,10 +141,13 @@ const AddCommentModal = (props) => {
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
-    const res = DateAPI(categoryType , selectedLeague)
-    console.log(res,"========================res");
-    const DateList = res.data.data;
-    setDateOptions(DateList.map((item) => item.date));
+    DateAPI(categoryType, selectedLeague)
+      .then((res) => {
+        console.log(res.data, "========================res date");
+        const DateList = res.data;
+        setDateOptions(DateList.map((item) => item.date));
+      })
+      .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -154,10 +161,15 @@ const AddCommentModal = (props) => {
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {
-    const res = LeagueAPI(categoryType , selectedCountry)
-    console.log(res,"========================res");
-    const LeagueList = res.data;
-    setLeagueOptions(LeagueList.map((item) => item.league));
+    LeagueAPI(categoryType, selectedCountry)
+      // console.log(res,"========================res leauge");
+      // const LeagueList = res.data;
+      .then((res) => {
+        console.log(res, "========================res leauge");
+        const LeagueList = res.data;
+        setLeagueOptions(LeagueList.map((item) => item.league));
+      })
+      .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -288,6 +300,7 @@ const AddCommentModal = (props) => {
       setCommentError("Required*");
     }
     if (selectCheckBox) {
+      console.log(toggleInput, "========================toggleInput");
       try {
         const res = await axios.post(
           `http://127.0.0.1:8000/post-comment/${userId}`,
@@ -304,8 +317,29 @@ const AddCommentModal = (props) => {
           }
         );
         console.log("res", res);
+        if (res.data.status === 200) {
+          Swal.fire({
+            title: "Success",
+            text: "Level Rules setting Updated!",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
       } catch (error) {
         console.log(error);
+        console.log(error.response.status);
+        console.log(error.response.data.message);
+        if (error.response.status === 404){
+          console.log("KKKK");
+          Swal.fire({
+            title: "Error",
+            text: error.response.data.message,
+            icon: "error",
+            backdrop: false,
+            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
     }
   };
