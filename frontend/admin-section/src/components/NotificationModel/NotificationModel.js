@@ -31,8 +31,8 @@ const NotificationModel = () => {
           "http://127.0.0.1:8000/notification-management/",
           values
         );
-        console.log(res, "========================MMMM");
-        console.log(res.status);
+        // console.log(res,"========================MMMM");
+        // console.log(res.status);
         if (res.status === 200) {
           Swal.fire({
             title: "Success",
@@ -42,7 +42,7 @@ const NotificationModel = () => {
             customClass: "dark-mode-alert",
           });
         } else {
-          console.log(res);
+          // console.log(res);
         }
       } catch (error) {
         console.error("Error submitting form:", error);

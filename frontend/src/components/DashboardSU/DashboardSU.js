@@ -38,7 +38,7 @@ const DashboardSU = (props) => {
         const res = await axios.get(
           `http://127.0.0.1:8000/fav-editor-comment/${userId}`
         );
-        console.log("=>>>", res.data);
+        // console.log("=>>>", res.data);
         setFavEditorData(res.data.favEditors);
         setFavCommentData(res.data.favComments);
       } catch (error) {

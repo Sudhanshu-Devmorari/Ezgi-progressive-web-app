@@ -58,7 +58,7 @@ const SalesManagementPage = () => {
     async function getSalesData() {
       try {
         const res = await axios.get("http://127.0.0.1:8000/sales-management");
-        console.log("res====>>>>", res?.data);
+        // console.log("res====>>>>", res?.data);
       } catch (error) {
         console.log(error);
       }

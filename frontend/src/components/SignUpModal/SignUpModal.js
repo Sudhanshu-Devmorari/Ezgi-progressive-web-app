@@ -57,7 +57,7 @@ const SignUpModal = (props) => {
   const [name, setName] = useState("");
 
   const hadleValidation = () => {
-    console.log("nnnnnn");
+    // console.log("nnnnnn");
     if (name === "") {
       setNamerror("Please enter your name");
     } else if (username === "") {
@@ -116,7 +116,7 @@ const SignUpModal = (props) => {
         "http://127.0.0.1:8000/signup/",
         signUpData
       );
-      console.log("response: ", response.data);
+      // console.log("response: ", response.data);
       if (response.data.status === 200) {
         props.onHide();
       } else if (response.data.status === 400) {

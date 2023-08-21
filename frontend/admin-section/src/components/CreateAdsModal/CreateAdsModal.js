@@ -36,7 +36,7 @@ const CreateAdsModal = (props) => {
         formData
       );
 
-      console.log("Response from backend:", response);
+      // console.log("Response from backend:", response);
       if (response.status === 200){
         Swal.fire({
           title: "Success",

@@ -7,7 +7,7 @@ const FacebookLogin = () => {
   const login = (response) => {
     // console.log(response);
     const username = response.data.name.split(" ")[0].toLowerCase();
-    console.log(username);
+    // console.log(username);
     const formData = new FormData();
     formData.append("email", response.data.email);
     formData.append("name", response.data.name);
@@ -15,7 +15,7 @@ const FacebookLogin = () => {
     axios
       .post("http://127.0.0.1:8000/facebook-login/", formData)
       .then((response) => {
-        console.log(response.data, "====BE");
+        // console.log(response.data, "====BE");
         localStorage.setItem("user-role", response.data.userRole);
         localStorage.setItem("user-id", response.data.userId);
         window.location.reload();

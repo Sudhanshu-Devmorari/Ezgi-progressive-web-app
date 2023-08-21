@@ -172,7 +172,7 @@ const CreateSubUser = (props) => {
         "http://127.0.0.1:8000/subuser-management/",
         formData
       );
-      console.log(res);
+      // console.log(res);
     }
   };
 
@@ -212,7 +212,7 @@ const CreateSubUser = (props) => {
 
   const handleUpdateProfile = async () => {
     try {
-      console.log("props.editUserId=>>>", props.editUserId);
+      // console.log("props.editUserId=>>>", props.editUserId);
       const res = await axios.patch(
         `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`,
         {
@@ -231,7 +231,7 @@ const CreateSubUser = (props) => {
           is_all_permission: isAllSelected,
         }
       );
-      console.log("res============>>>", res.data);
+      // console.log("res============>>>", res.data);
       if (res.data.status === 200) {
         Swal.fire({
           title: "Success",

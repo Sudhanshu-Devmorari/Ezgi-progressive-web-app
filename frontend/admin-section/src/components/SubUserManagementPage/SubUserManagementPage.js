@@ -40,7 +40,7 @@ const SubUserManagementPage = () => {
         const res = await axios.get(
           "http://127.0.0.1:8000/subuser-management/"
         );
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotificationCount(data.notification_count);
         setSubuserCount(data.subuser_count);
@@ -75,7 +75,7 @@ const SubUserManagementPage = () => {
       const res = await axios.delete(
         `http://127.0.0.1:8000/subuser-management/${e}`
       );
-      console.log(res.data);
+      // console.log(res.data);
       if (res.data.status === 200) {
         Swal.fire({
           title: "Success",

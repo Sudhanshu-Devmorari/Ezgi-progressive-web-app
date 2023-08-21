@@ -6,7 +6,7 @@ const DeactivationRequestsBtns = (props) => {
 
   const [time , setTime] = useState(false);
   const handleDeactivation = async (status) => {
-    console.log("::::::::::::;>>>>>>",props.id, "^^^^", status)
+    // console.log("::::::::::::;>>>>>>",props.id, "^^^^", status)
     try {
       const res = await axios.patch(
         `http://127.0.0.1:8000/user-management/${props.id}/`,

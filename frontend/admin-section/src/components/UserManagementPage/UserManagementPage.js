@@ -35,8 +35,8 @@ const UserManagementPage = () => {
     userManagementApiData();
   }, []);
 
-  console.log("---Data----", data)
-  console.log("---UserList----", users)
+  // console.log("---Data----", data)
+  // console.log("---UserList----", users)
 
   const newUsersArray = [
     {

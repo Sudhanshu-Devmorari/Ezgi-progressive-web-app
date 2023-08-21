@@ -22,7 +22,7 @@ const SelectContentForEditorPage = (props) => {
       props.setDisplayData(filteredArray);
     }
     else{
-      console.log("*=======>>>>>>", props.comments)
+      // console.log("*=======>>>>>>", props.comments)
       props.setFilterCommentData(null)
       const val = e.target.value
       const filteredArray = props.data.filter((obj) =>

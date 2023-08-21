@@ -35,7 +35,7 @@ const SupportManagementPage = () => {
     async function getSupportData() {
       try {
         const res = await axios.get("http://127.0.0.1:8000/support-management");
-        console.log("res====>>>>", res?.data.tickets);
+        // console.log("res====>>>>", res?.data.tickets);
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);
         setPendingRequest(res?.data?.pending_request);

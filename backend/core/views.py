@@ -35,10 +35,10 @@ from django.contrib.auth import authenticate
 
 class SignupView(APIView):
     def post(self, request, format=None):
-        print('request.data: ', request.data)
+        # print('request.data: ', request.data)
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
-            print(serializer.errors)
+            # print(serializer.errors)
             return Response({
                 'message': 'Error',
                 'data' : serializer.errors,
@@ -73,9 +73,9 @@ class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             otp = request.data.get('otp')
-            print('otp: ', otp)
+            # print('otp: ', otp)
             verification_result = totp.verify(otp)
-            print('verification_result: ', verification_result)
+            # print('verification_result: ', verification_result)
 
             if verification_result:
                 return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
@@ -90,7 +90,7 @@ class OtpReSend(APIView):
         try:
             user = User.objects.get(phone=phone)
             otp = totp.now()
-            print('otp: ', otp)
+            # print('otp: ', otp)
             # res = sms_send(phone, otp)  
             res = "Success"
             if res == 'Success':
@@ -121,14 +121,14 @@ class LoginView(APIView):
 
 class GoogleLoginview(APIView):
     def post(self, request, format=None):
-        print(request.data, "=============================================request.data")
+        # print(request.data, "=============================================request.data")
         email = request.data.get('email')
         print('email: ', email)
         try: 
             user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
             print("Email already exists")
         except User.DoesNotExist:
-            print(request.data, "=============================================request.data")
+            # print(request.data, "=============================================request.data")
             user = User.objects.create(
                 email=email,
                 name=request.data.get('name'),
@@ -144,14 +144,14 @@ class GoogleLoginview(APIView):
         
 class FacebookLoginview(APIView):
     def post(self, request, format=None):
-        print(request.data, "=============================================request.data")
+        # print(request.data, "=============================================request.data")
         email = request.data.get('email')
-        print('email: ', email)
+        # print('email: ', email)
         try: 
             user = User.objects.get(Q(email=email) & Q(logged_in_using='facebook'))
-            print("Email already exists")
+            # print("Email already exists")
         except User.DoesNotExist:
-            print(request.data, "=============================================request.data")
+            # print(request.data, "=============================================request.data")
             user = User.objects.create(
                 email=email,
                 name=request.data.get('name'),
@@ -378,7 +378,7 @@ class CommentView(APIView):
         try:
             # user = request.user
             user = User.objects.get(id=id)
-            print('user: ', user)
+            # print('user: ', user)
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -420,21 +420,21 @@ class CommentView(APIView):
                 # print("-----------")
                 category = request.data.get('category')
                 # category = request.data['category']
-                print('category: ', category)
+                # print('category: ', category)
                 country = request.data.get('country')
                 league = request.data.get('league')
                 date = request.data.get('date')
                 match_detail = request.data.get('match_detail')
                 prediction_type = request.data.get('prediction_type')
                 prediction = request.data.get('prediction')
-                print('prediction: ', prediction)
+                # print('prediction: ', prediction)
                 if user.commentator_level == 'apprentice':
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
                     print('public_content: ', public_content)
                 comment = request.data.get('comment')
-                print('comment: ', comment)
+                # print('comment: ', comment)
 
                 if not category:
                     raise NotFound("Category not found.")
@@ -606,7 +606,7 @@ class NotificationView(APIView):
 
 class CommentReactionView(APIView):
     def post(self, request, comment_id, id, format=None, *args, **kwargs):
-        print("------- ",comment_id,"====", id)
+        # print("------- ",comment_id,"====", id)
 
         try:
             comment = Comments.objects.get(id=comment_id)
@@ -705,7 +705,7 @@ class FavEditorsCreateView(APIView):
             if request.data:
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                print("******* ", request.data.get("id"))
+                # print("******* ", request.data.get("id"))
                 comment = User.objects.get(id=request.data.get("id"))
                 user = User.objects.get(id=13)
                 # user = request.user
@@ -745,10 +745,10 @@ class RetrieveFavEditorsAndFavComment(APIView):
             editor_obj = FavEditors.objects.filter(standard_user=user)
             for obj in editor_obj:
                 details = {}
-                print("********** ", obj.commentator_user.username)
+                # print("********** ", obj.commentator_user.username)
 
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
-                print("********** ", count)
+                # print("********** ", count)
 
                 serializer = FavEditorsSerializer(obj)
                 data = serializer.data
@@ -763,7 +763,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        print("========== ", data_list)
+        # print("========== ", data_list)
 
         try:
             comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
@@ -817,7 +817,7 @@ class SupportView(APIView):
     # for create new ticket:
     def post(self, request, id, format=None, *args, **kwargs):
         try:
-            print(request.data)
+            # print(request.data)
             if request.data:
                 if 'department' not in request.data:
                         return Response({'error': 'Department not found.', 'status' : status.HTTP_400_BAD_REQUEST})
@@ -1435,7 +1435,7 @@ class FilterUserManagement(APIView):
                 if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
 
-                print("****", filters)
+                # print("****", filters)
                 query_filters = Q(**filters)
                 filtered_user = User.objects.filter(query_filters)
                 serializer = UserSerializer(filtered_user, many=True)
@@ -1978,7 +1978,7 @@ class EditorManagement(APIView):
         """
         Create new commentator User.
         """
-        print("+++++", request.data)
+        # print("+++++", request.data)
         try:
             profile = request.FILES.get('file')
             date = request.data.get('date')
@@ -2403,7 +2403,7 @@ class NotificationManagement(APIView):
             return Response(data=error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None, *args, **kwargs):
-        print('request.data: ', request.data)
+        # print('request.data: ', request.data)
         try:
             subject = request.data.get('subject')
             user_type = request.data.get('user_type')
@@ -2423,7 +2423,7 @@ class NotificationManagement(APIView):
 
             try:
                 user = User.objects.get(id=to)
-                print('user: ', user)
+                # print('user: ', user)
             except User.DoesNotExist:
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2476,7 +2476,7 @@ class SubUserManagement(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
-                print('request.data: ', request.data)
+                # print('request.data: ', request.data)
                 role = 'sub_user'
                 
                 # required_fields = ['file', 'name', 'phone', 'password', 'authorization_type', 'department', 'permission']
@@ -2485,14 +2485,14 @@ class SubUserManagement(APIView):
                 #         return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 password = request.data.get('password')
-                print('password: ', password)
+                # print('password: ', password)
 
                 permission_type = request.data.get('permission')
-                print('permission_type: ', permission_type)
+                # print('permission_type: ', permission_type)
                 if permission_type == 'transaction':
                     transaction = True
                     all_permission = request.data.get('all_permission')
-                    print('all_permission: ', all_permission)
+                    # print('all_permission: ', all_permission)
                     
                     if all_permission and all_permission.lower() == 'true':
                         process_withdrawal = True
@@ -2502,26 +2502,26 @@ class SubUserManagement(APIView):
                         sales_export = True
                     else:
                         process_withdrawal = request.data.get('process_withdrawal')
-                        print('process_withdrawal: ', process_withdrawal)
+                        # print('process_withdrawal: ', process_withdrawal)
                         rule_update = request.data.get('rule_update')
                         price_update = request.data.get('price_update')
                         withdrawal_export = request.data.get('withdrawal_export')
                         sales_export = request.data.get('sales_export')
                         all_permission = False
 
-                    print("================================")
-                    print("================================", request.data.get('file'))
-                    print("================================request.data.get('name')", request.data.get('name'))
-                    print("================================request.data.get('phone')", request.data.get('phone'))
-                    print("================================request.data.get('authorization_type')", request.data.get('authorization_type'))
-                    print("================================request.data.get('department')", request.data.get('department'))
+                    # print("================================")
+                    # print("================================", request.data.get('file'))
+                    # print("================================request.data.get('name')", request.data.get('name'))
+                    # print("================================request.data.get('phone')", request.data.get('phone'))
+                    # print("================================request.data.get('authorization_type')", request.data.get('authorization_type'))
+                    # print("================================request.data.get('department')", request.data.get('department'))
 
                     sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
                                                        password=password, authorization_type=request.data.get('authorization_type'),
                                                        department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
-                    print(sub_user_obj,"===================sub_user_obj")
+                    # print(sub_user_obj,"===================sub_user_obj")
                 elif permission_type == 'only_view':
                     view_only = True
                     process_withdrawal = False
@@ -2536,7 +2536,7 @@ class SubUserManagement(APIView):
                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
 
-                print("***************************")
+                # print("***************************")
                 sub_user_obj.set_password(password)
                 sub_user_obj.save()
                 # if sub_user_obj != None:
@@ -2576,7 +2576,7 @@ class SubUserManagement(APIView):
             data['is_all_permission'] = True
 
         serializer = UserSerializer(user, data=data, partial=True)
-        print('erializer.is_valid: ', serializer.is_valid)
+        # print('erializer.is_valid: ', serializer.is_valid)
         if serializer.is_valid():
             try:
                 serializer.save()
@@ -2584,7 +2584,7 @@ class SubUserManagement(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
         else:
-            print('serializer.errors: ', serializer.errors)
+            # print('serializer.errors: ', serializer.errors)
             return Response({'data' : serializer.errors, 'status' : status.HTTP_400_BAD_REQUEST})
         
     def delete(self, request, pk, format=None, *args, **kwargs):
@@ -2645,7 +2645,7 @@ class AdvertisementManagement(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
-                print('request.data:: ', request.data)
+                # print('request.data:: ', request.data)
                 required_fields = ['file', 'ads_space', 'start_date', 'end_date', 'company_name', 'link', 'ads_budget']
                 for field in required_fields:
                     if field not in request.data:
@@ -2838,7 +2838,7 @@ class HighlightSettingView(APIView):
 class CommentSetting(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data = request.data.copy() 
-        print('data: ', data)
+        # print('data: ', data)
         data['status'] = 'approve'  # Set the status to 'approve'
 
         comment_serializer = CommentsSerializer(data=data)
@@ -2874,8 +2874,8 @@ class CommentSetting(APIView):
                 }
 
             return Response(response_data, status=status.HTTP_201_CREATED)
-        print("==========")
-        print('comment_serializer.errors: ', comment_serializer.errors)
+        # print("==========")
+        # print('comment_serializer.errors: ', comment_serializer.errors)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 totp = pyotp.TOTP('base32secret3232', interval=45)

@@ -37,7 +37,7 @@ const Support = () => {
   useEffect(() => {
     async function getTicketsData() {
       const res = await axios.get(`http://127.0.0.1:8000/support/${userId}`);
-      console.log("res----------", res.data);
+      // console.log("res----------", res.data);
       setTicketsData(res.data);
     }
     getTicketsData();

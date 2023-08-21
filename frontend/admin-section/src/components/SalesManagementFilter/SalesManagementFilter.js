@@ -66,7 +66,7 @@ const SalesManagementFilter = () => {
 
   // Filter API
   const [date, setDate] = useState("");
-  console.log(date);
+  // console.log(date);
   const handleFilter = async () => {
     const payload = {
       ...(date && { date }),
@@ -79,7 +79,7 @@ const SalesManagementFilter = () => {
         "http://127.0.0.1:8000/sales-management/",
         payload
       );
-      console.log(res.data, "====>>>>>res");
+      // console.log(res.data, "====>>>>>res");
     } catch (error) {}
   };
 

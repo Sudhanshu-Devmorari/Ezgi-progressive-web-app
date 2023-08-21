@@ -17,7 +17,7 @@ const SalesMembershipSettings = (props) => {
       `http://127.0.0.1:8000/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       getMembershipData
     );
-    console.log("res========>>>", res);
+    // console.log("res========>>>", res);
     if (res.status === 201) {
       Swal.fire({
         title: "Success",

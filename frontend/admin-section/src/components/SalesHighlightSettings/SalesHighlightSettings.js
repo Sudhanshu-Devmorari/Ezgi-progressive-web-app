@@ -30,7 +30,7 @@ const SalesHighlightSettings = (props) => {
       `http://127.0.0.1:8000/highlight-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       formData
     );
-    console.log("res========>>>", res);
+    // console.log("res========>>>", res);
     if (res.status === 201) {
       Swal.fire({
         title: "Success",

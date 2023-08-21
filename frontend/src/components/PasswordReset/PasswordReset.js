@@ -19,7 +19,7 @@ const PasswordReset = (props) => {
         new_ps: password,
         phone: props.forgotPsPhone,
       });
-      console.log("res password reset ", res.data);
+      // console.log("res password reset ", res.data);
       if (res.data.status === 200) {
         Swal.fire({
           title: "Success",
