@@ -466,7 +466,7 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
-                print('comment_obj: ', comment_obj)
+
                 if comment_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -2428,9 +2428,9 @@ class NotificationManagement(APIView):
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
             """sender and receiver baki.."""
-            notification_obj = Notification.objects.create(subject=subject, status=False, date=date, context=message)
-            # notification_obj = Notification.objects.create(user=user, subject=subject, status=False, date=date, context=message)
-            print('notification_obj: ', notification_obj)
+
+            notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message)
+
             serializer = NotificationSerializer(notification_obj)
             return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
 

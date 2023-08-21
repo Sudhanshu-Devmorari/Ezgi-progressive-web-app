@@ -18,7 +18,9 @@ import Selectedcheckbox from "../../assets/Group 320.svg";
 import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
+
 import Swal from "sweetalert2";
+
 
 const Home = (props) => {
   const handleFile = async (e) => {
@@ -41,6 +43,7 @@ const Home = (props) => {
           customClass: "dark-mode-alert",
         });
       }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -182,6 +185,7 @@ const Home = (props) => {
         `http://127.0.0.1:8000/user-management/${id}/`,
         formData
       );
+
       console.log("API Response:", response);
       if (response.status === 200){
         Swal.fire({
@@ -290,6 +294,7 @@ const Home = (props) => {
     "Eskisehir",
     "Sakarya",
     "Denizli",
+
     "Samsun",
   ];
   const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
@@ -504,6 +509,7 @@ const Home = (props) => {
                     <img src={gender_female} alt="" height={22} width={22} />
                   )}
                   <span
+
                   // data-bs-toggle="modal"
                   // data-bs-target="#exampleModal"
                   // onClick={() => {
@@ -512,6 +518,7 @@ const Home = (props) => {
                   //   setAddUser(res);
                   //   setPreveiwProfilePic(true);
                   // }}
+
                   >
                     {res.age}
                   </span>
@@ -1050,6 +1057,7 @@ const Home = (props) => {
                   </div>
                 )}
               </div>
+
               <img
                 onClick={() => {
                   setAddUser({
@@ -1063,6 +1071,7 @@ const Home = (props) => {
                   setprofile(false);
                   setPreveiwProfilePic(null);
                 }}
+
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""

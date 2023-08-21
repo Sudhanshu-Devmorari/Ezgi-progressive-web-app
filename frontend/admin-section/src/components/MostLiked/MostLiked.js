@@ -20,6 +20,18 @@ const MostLiked = (props) => {
   
   // console.log("********", displayUser)
 
+
+const MostLiked = (props) => {
+  // console.log("********", props?.mostLike)
+  const [displayUser, setDisplayUser] = useState([]);
+  
+  useEffect(() => {
+    setDisplayUser(props?.mostLike);
+  }, [props?.mostLike]);
+  
+  // console.log("********", displayUser)
+
+
   const notification = [
     {
       profile: user3,
@@ -68,6 +80,7 @@ const MostLiked = (props) => {
       {displayUser?.map((res, index) => (
         <div className="card py-1 my-2 rounded-0 dark-mode border-0 neha">
           <div className="d-flex">
+
             <img
               className="profile-mostLiked user-profile"
               src={res.profile}
@@ -78,6 +91,7 @@ const MostLiked = (props) => {
             <div className="d-flex flex-column mt-2 ps-1">
               <span className="username" style={{ fontSize: "0.9rem" }}>
               {res.comment_data.commentator_user.name}{" "}
+
                 <button
                   className="px-2 level-btn"
                   style={{
@@ -94,6 +108,7 @@ const MostLiked = (props) => {
                   {res.comment_data.commentator_user.commentator_level}
                 </button>
               </span>
+
               <span className="content-font1" style={{ fontSize: "0.7rem" }}>
                 {res.content}
               </span>
@@ -132,6 +147,7 @@ const MostLiked = (props) => {
                 />
                 238
               </span>
+
             </div>
           </div>
         </div>

@@ -23,6 +23,7 @@ import moment from "moment";
 import axios from "axios";
 import Swal from "sweetalert2";
 
+
 const EditorManagemenet = (props) => {
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);
@@ -42,6 +43,7 @@ const EditorManagemenet = (props) => {
           customClass: "dark-mode-alert",
         });
       }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -143,11 +145,13 @@ const EditorManagemenet = (props) => {
     formData.append("gender", addUser.gender);
     formData.append("age", addUser.age);
     formData.append("level", addUser.level);
+
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/editor-management/`,
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/editor-management/${id}/`,
         formData
       );
+
       if (response.status === 200) {
         Swal.fire({
           title: "Success",
@@ -157,6 +161,9 @@ const EditorManagemenet = (props) => {
           customClass: "dark-mode-alert",
         });
       }
+
+      // setDisplayUser(response.data);
+
       // console.log('API Response:', response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -700,6 +707,7 @@ const EditorManagemenet = (props) => {
             <div className="row g-0 d-flex justify-content-between align-items-center">
               <div
                 className="col-3"
+
                 // data-bs-toggle="modal"
                 // onClick={() => {
                 //   props.setupdateProfile(2);
@@ -709,6 +717,7 @@ const EditorManagemenet = (props) => {
                 //   setAddUser(res.editor_data);
                 // }}
                 // data-bs-target="#exampleModal"
+
               >
                 <div className="d-flex align-items-center">
                   <span className="pe-1">{`# ${res?.editor_data?.id
@@ -882,10 +891,11 @@ const EditorManagemenet = (props) => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {partialData.editor_data?.commentator_level
+                          {partialData.editor_data.commentator_level
                             .charAt(0)
                             .toUpperCase() +
-                            partialData.editor_data?.commentator_level
+                            partialData.editor_data.commentator_level
+
                               .slice(1)
                               .toLowerCase()}
                         </button>
