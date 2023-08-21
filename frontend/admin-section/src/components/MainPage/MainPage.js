@@ -37,7 +37,6 @@ const MainPage = () => {
     adminHomeApiData();
   }, []);
 
-  console.log(":::::::", data)
   const newUsersArray = [
     {
       label: "New Users",

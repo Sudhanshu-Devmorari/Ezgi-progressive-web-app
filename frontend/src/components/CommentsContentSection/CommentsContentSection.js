@@ -35,7 +35,7 @@ const CommentsContentSection = (props) => {
     const res = await axios
       .get(`http://127.0.0.1:8000/active-resolved-comment/${user_id}`)
       .then((res) => {
-        console.log("activeResolved: ", res);
+        // console.log("activeResolved: ", res);
         setActive(res.data?.active_comments);
         setResolve(res.data?.resolved_comments);
       })
@@ -51,7 +51,7 @@ const CommentsContentSection = (props) => {
         reaction_type: `${reaction}`,
       }
     );
-    console.log(res);
+    // console.log(res);
     // console.log(id, "!!!!!!!!!!!!!!!", reaction);
   };
 
@@ -59,9 +59,9 @@ const CommentsContentSection = (props) => {
     const user_id = localStorage.getItem("user-id");
     activeResolved(user_id);
   }, []);
-  console.log("^^^^^^^^", active);
-  console.log("^^^^^^^^", resolve);
-  console.log("SelectComment^^^^^^^^", props.SelectComment);
+  // console.log("^^^^^^^^", active);
+  // console.log("^^^^^^^^", resolve);
+  // console.log("SelectComment^^^^^^^^", props.SelectComment);
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const subscribersContent = [{ name: "melihaksar" }];
@@ -84,7 +84,6 @@ const CommentsContentSection = (props) => {
           {active.map((val) => {
             return (
               <>
-                {console.log("------->><<", val)}
                 {val.public_content == true ? (
                   <>
                     <div

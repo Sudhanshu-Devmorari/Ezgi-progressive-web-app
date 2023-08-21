@@ -76,7 +76,7 @@ const AddCommentModal = (props) => {
   const toggleMatchDetailsDropdown = () => {
     MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
       .then((res) => {
-        console.log(res.data, "========================res");
+        // console.log(res.data, "========================res");
         const MatchList = res.data;
         setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
       })
@@ -143,7 +143,7 @@ const AddCommentModal = (props) => {
   const toggleDateDropdown = () => {
     DateAPI(categoryType, selectedLeague)
       .then((res) => {
-        console.log(res.data, "========================res date");
+        // console.log(res.data, "========================res date");
         const DateList = res.data;
         setDateOptions(DateList.map((item) => item.date));
       })
@@ -165,7 +165,7 @@ const AddCommentModal = (props) => {
       // console.log(res,"========================res leauge");
       // const LeagueList = res.data;
       .then((res) => {
-        console.log(res, "========================res leauge");
+        // console.log(res, "========================res leauge");
         const LeagueList = res.data;
         setLeagueOptions(LeagueList.map((item) => item.league));
       })

@@ -50,7 +50,7 @@ const AdsManagementPage = () => {
     async function getAdsData() {
       try {
         const res = await axios.get("http://127.0.0.1:8000/ads-management/");
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setBanners(data.Banners);
         setActive(data.active);

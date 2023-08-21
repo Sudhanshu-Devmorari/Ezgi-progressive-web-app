@@ -72,7 +72,7 @@ const NotificationManagementPage = () => {
         const res = await axios.get(
           "http://127.0.0.1:8000/notification-management/"
         );
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotifications(data.notification);
         setNotificationCount(data.notification_count);

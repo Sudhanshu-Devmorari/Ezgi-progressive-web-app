@@ -13,7 +13,7 @@ const EditorHighlightSettings = () => {
         const res = await axios.get(
           `http://127.0.0.1:8000/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
         );
-        console.log("res==>>", res.data[0]);
+        // console.log("res==>>", res.data[0]);
         setHighlightssettingData(res.data[0]);
       } catch (error) {
         console.log(error);

@@ -19,7 +19,7 @@ const CommentsPage = ({
   // console.log('&&-----&&', selectContent)
   const [filterCommentData, setFilterCommentData] = useState(null)
   const [displayData, setDisplayData] = useState(mergedResult)
-  console.log(":::::::::::", filterCommentData)
+  // console.log(":::::::::::", filterCommentData)
   return (
     <>
       <SelectContentForEditorPage

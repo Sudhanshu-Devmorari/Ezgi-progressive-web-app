@@ -16,7 +16,7 @@ const CommentsManagementPage = () => {
   const [commentData, setCommentData] = useState([]);
 
   const commentManagementApiData = async () => {
-    console.log(data)
+    // console.log(data)
     await axios
       .get(`http://127.0.0.1:8000/comments-management/`)
       .then((res) => {

@@ -32,7 +32,7 @@ const SignInModal = (props) => {
         password: password,
         phone: phone,
       });
-      console.log("response login: ", res.data);
+      // console.log("response login: ", res.data);
       if (res.data.status === 200) {
         localStorage.setItem("user-role", res.data.userRole);
         localStorage.setItem("user-id", res.data.userId);

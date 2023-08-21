@@ -36,7 +36,7 @@ const OTPModal = (props) => {
     const res = await axios.post("http://127.0.0.1:8000/otp-verify/", {
       otp: otp,
     });
-    console.log(res.data, "======>>otp res");
+    // console.log(res.data, "======>>otp res");
     if (res.data.status === 200) {
       setShowModal(7);
       console.log("verified");
@@ -55,7 +55,7 @@ const OTPModal = (props) => {
     const res = await axios.post("http://127.0.0.1:8000/otp-resend/", {
       phone: props.forgotPsPhone,
     });
-    console.log(res.data, "======>>otp resend");
+    // console.log(res.data, "======>>otp resend");
     if (res.data.status === 500) {
       setOtpError(res.data.error);
     }

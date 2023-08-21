@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
 const CommentsManagementFilter = (props) => {
-  console.log("***:::::***", props?.commentData)
+  // console.log("***:::::***", props?.commentData)
   const [selectedOption, setSelectedOption] = useState("All");
 
   const options = ["All", "Pending", "Resolved", "Redirected"];
@@ -23,13 +23,13 @@ const CommentsManagementFilter = (props) => {
   };
 
   const filterData = (e) => {
-    console.log("^^^^^^^", e)
+    // console.log("^^^^^^^", e)
     const val = e;
     const filteredArray = props?.commentData.filter(
       (obj) =>
         obj?.status?.toLowerCase() == val?.toLowerCase()
     );
-    console.log("filtered:", filteredArray)
+    // console.log("filtered:", filteredArray)
     props.setDisplayUser(val == "All" ? props?.commentData :filteredArray);
   };
 

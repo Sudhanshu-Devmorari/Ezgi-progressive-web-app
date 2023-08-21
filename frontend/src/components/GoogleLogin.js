@@ -8,7 +8,7 @@ const GoogleLogin = () => {
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse) => {
-      console.log("User Login Success =================", codeResponse);
+      // console.log("User Login Success =================", codeResponse);
       setUser(codeResponse);
     },
     onError: (error) => console.log("Login Failed:", error),
@@ -27,10 +27,10 @@ const GoogleLogin = () => {
           }
         )
         .then((res) => {
-          console.log(res.data, "==================res.data");
+          // console.log(res.data, "==================res.data");
           try {
             const username = res.data.name.split(" ")[0].toLowerCase();
-            console.log(username);
+            // console.log(username);
             const formData = new FormData();
             formData.append("email", res.data.email);
             formData.append("name", res.data.name);
@@ -41,7 +41,7 @@ const GoogleLogin = () => {
           }
         })
         .then((response) => {
-          console.log(response.data);
+          // console.log(response.data);
           localStorage.setItem("user-role", response.data.userRole);
           localStorage.setItem("user-id", response.data.userId);
           window.location.reload();

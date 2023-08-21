@@ -5,6 +5,7 @@ import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForComment
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import Swal from 'sweetalert2'
 
 const CommentsSettings = () => {
   const headers = {
@@ -56,7 +57,7 @@ const CommentsSettings = () => {
       `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${1}&country=${selectedCountry}`,
       { headers }
     );
-    console.log(res.data);
+    // console.log(res.data);
     const leagueOptions = res.data.data;
     setLeagueOptions(leagueOptions.map((item) => item.league));
     setMatchDetailsDropdown(false);
@@ -76,13 +77,13 @@ const CommentsSettings = () => {
     const day = String(currentDate.getDate()).padStart(2, "0");
 
     const formattedDate = `${year}-${month}-${day}`;
-    console.log(formattedDate, "=formattedDate");
+    // console.log(formattedDate, "=formattedDate");
     // Match Details API
     const res = await axios.get(
       `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${1}&league=${selectedLeague}&t=${formattedDate}`,
       { headers }
     );
-    console.log(res.data);
+    // console.log(res.data);
     const matchOptions = res.data.data;
     setmatchDetailsOptions(matchOptions.map((item) => item.takimlar));
     setPredictionTypeDropdown(false);
@@ -129,7 +130,7 @@ const CommentsSettings = () => {
         `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=1`,
         { headers }
       );
-      console.log(res.data);
+      // console.log(res.data);
       const countryData = res.data.data;
       setCountryOptions(countryData.map((item) => item.country));
     }
@@ -146,7 +147,7 @@ const CommentsSettings = () => {
   });
 
   const onSubmit = async (values) => {
-    console.log(values);
+    // console.log(values);
     const res = await axios.post(`http://127.0.0.1:8000/comment-setting/`, {
       editor: values.editor,
       country: selectedCountry,
@@ -160,7 +161,7 @@ const CommentsSettings = () => {
       favorite: values.favorite,
       clap: values.clap,
     });
-    console.log("res", res);
+    // console.log("res", res);
     if (res.status === 201) {
       Swal.fire({
         title: "Success",

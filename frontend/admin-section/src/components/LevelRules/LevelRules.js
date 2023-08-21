@@ -31,7 +31,7 @@ const LevelRules = (props) => {
       `http://127.0.0.1:8000/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       formData
     );
-    console.log("res========>>>", res);
+    // console.log("res========>>>", res);
     if (res.status === 201) {
       Swal.fire({
         title: "Success",
@@ -42,7 +42,7 @@ const LevelRules = (props) => {
       });
     }
   };
-  console.log(getRuleForLevel, getRuleForLevel.level_icon);
+  // console.log(getRuleForLevel, getRuleForLevel.level_icon);
   return (
     <>
       <div className="my-2 mt-3 d-flex gap-3">

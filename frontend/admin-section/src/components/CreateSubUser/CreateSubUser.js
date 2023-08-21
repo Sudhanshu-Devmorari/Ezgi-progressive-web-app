@@ -172,7 +172,7 @@ const CreateSubUser = (props) => {
         "http://127.0.0.1:8000/subuser-management/",
         formData
       );
-      console.log(res);
+      // console.log(res);
     }
   };
 
@@ -212,7 +212,7 @@ const CreateSubUser = (props) => {
 
   const handleUpdateProfile = async () => {
     try {
-      console.log("props.editUserId=>>>", props.editUserId);
+      // console.log("props.editUserId=>>>", props.editUserId);
       const res = await axios.patch(
         `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`,
         {
@@ -231,7 +231,7 @@ const CreateSubUser = (props) => {
           is_all_permission: isAllSelected,
         }
       );
-      console.log("res============>>>", res.data);
+      // console.log("res============>>>", res.data);
       if (res.data.status === 200) {
         Swal.fire({
           title: "Success",
@@ -274,7 +274,6 @@ const CreateSubUser = (props) => {
 
   useEffect(() => {
     if (props.editProfileModal === 1) {
-      console.log("object");
       resetFields();
     }
   }, [props.editProfileModal]);
@@ -294,43 +293,82 @@ const CreateSubUser = (props) => {
           <div class="modal-content">
             <div class="modal-body dark-mode p-3" style={{ fontSize: ".9rem" }}>
               <div className="d-flex position-relative my-2 gap-2">
-                {userProfile === null && (
-                  <div
-                    className="my-1 cursor"
-                    style={{
-                      backgroundColor: "#E6E6E6",
-                      borderRadius: "50%",
-                      height: "8rem",
-                      width: "8rem",
-                      // display: preveiwProfilePic === null ? "block" : "none",
-                    }}
-                  >
-                    <img
+                {props?.editProfileModal === 2 ? (
+                  <>
+                    <div
+                      className="my-1 cursor"
                       style={{
-                        position: "absolute",
-                        top: "2.34rem",
-                        left: "2.4rem",
+                        backgroundColor: "#E6E6E6",
+                        borderRadius: "50%",
+                        height: "8rem",
+                        width: "8rem",
+                        display: userProfile === null ? "block" : "none",
                       }}
-                      src={camera}
+                    >
+                      <img
+                        style={{
+                          position: "absolute",
+                          top: "2.34rem",
+                          left: "2.4rem",
+                        }}
+                        src={camera}
+                        alt=""
+                      />
+                    </div>
+                    <img
+                      src={
+                        preveiwProfilePic === null
+                          ? `http://127.0.0.1:8000${userProfile}`
+                          : preveiwProfilePic
+                      }
                       alt=""
+                      height={135}
+                      width={135}
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: "50%  ",
+                        display: userProfile !== null ? "block" : "none",
+                      }}
                     />
-                  </div>
-                )}
-                {(props.editProfileModal === 1 && userProfile !== null) && (
-                  <img
-                    src={
-                      preveiwProfilePic === null
-                        ? `http://127.0.0.1:8000${userProfile}`
-                        : preveiwProfilePic
-                    }
-                    alt=""
-                    height={135}
-                    width={135}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "50%  ",
-                    }}
-                  />
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className="my-1 cursor"
+                      style={{
+                        backgroundColor: "#E6E6E6",
+                        borderRadius: "50%",
+                        height: "8rem",
+                        width: "8rem",
+                        display: preveiwProfilePic === null ? "block" : "none",
+                      }}
+                    >
+                      <img
+                        style={{
+                          position: "absolute",
+                          top: "2.34rem",
+                          left: "2.4rem",
+                        }}
+                        src={camera}
+                        alt=""
+                      />
+                    </div>
+                    <img
+                      src={
+                        preveiwProfilePic === null
+                          ? `http://127.0.0.1:8000${userProfile}`
+                          : preveiwProfilePic
+                      }
+                      alt=""
+                      height={135}
+                      width={135}
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: "50%  ",
+                        display: preveiwProfilePic !== null ? "block" : "none",
+                      }}
+                    />
+                  </>
                 )}
                 <div className="d-flex justify-content-center align-items-center flex-column gap-2">
                   {selectedDepartment !== "Select" &&
@@ -615,6 +653,7 @@ const CreateSubUser = (props) => {
                 {props?.editProfileModal === 2 && (
                   <>
                     <button
+                      data-bs-dismiss="modal"
                       className="py-1 px-2"
                       style={{
                         backgroundColor: "transparent",
@@ -626,6 +665,7 @@ const CreateSubUser = (props) => {
                       Remove
                     </button>
                     <button
+                      // data-bs-dismiss="modal"
                       className="py-1 px-2 mx-3"
                       style={{
                         backgroundColor: "transparent",
@@ -637,6 +677,7 @@ const CreateSubUser = (props) => {
                       Deactive
                     </button>
                     <button
+                      data-bs-dismiss="modal"
                       onClick={handleUpdateProfile}
                       className="py-1 px-2"
                       style={{
@@ -652,6 +693,7 @@ const CreateSubUser = (props) => {
                 )}
                 {props?.editProfileModal === 1 && (
                   <button
+                    data-bs-dismiss="modal"
                     onClick={handleCreateNewSubUser}
                     className="py-1 px-2"
                     style={{
@@ -667,6 +709,7 @@ const CreateSubUser = (props) => {
               </div>
             </div>
             <img
+              onClick={() => resetFields()}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

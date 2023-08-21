@@ -59,7 +59,7 @@ const ContentSection = ({
         reaction_type: `${reaction}`,
       }
     );
-    console.log(res);
+    // console.log(res);
   };
 
   return (

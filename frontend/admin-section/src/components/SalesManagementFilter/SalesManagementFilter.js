@@ -66,7 +66,7 @@ const SalesManagementFilter = () => {
 
   // Filter API
   const [date, setDate] = useState("");
-  console.log(date);
+  // console.log(date);
   const handleFilter = async () => {
     const payload = {
       ...(date && { date }),
@@ -79,10 +79,11 @@ const SalesManagementFilter = () => {
         "http://127.0.0.1:8000/sales-management/",
         payload
       );
-      console.log(res.data, "====>>>>>res");
+      // console.log(res.data, "====>>>>>res");
     } catch (error) {}
   };
 
+  const [modalShow, setModalShow] = React.useState(false);
   return (
     <>
       <div className="d-flex p-2">
@@ -111,6 +112,7 @@ const SalesManagementFilter = () => {
         </div>
         <div className="p-2">
           <button
+            data-bs-toggle="modal" data-bs-target="#exportModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",

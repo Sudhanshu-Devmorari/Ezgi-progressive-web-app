@@ -41,8 +41,8 @@ const ProfileSU = (props) => {
       formData.append("file", e.target.files[0]);
       
       const res = await axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
-      console.log("res: ", res);
-      console.log("res: ", res.status);
+      // console.log("res: ", res);
+      // console.log("res: ", res.status);
       if (res.status === 200) {
         Swal.fire({
           title: "Success",

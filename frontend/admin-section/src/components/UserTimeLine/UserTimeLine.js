@@ -106,13 +106,13 @@ const UserTimeLine = (props) => {
           >
             <div>
               <img src={`${
-                    server_url + res?.sender.profile_pic
+                    server_url + res?.sender?.profile_pic
                   }`}
                   className="rounded-circle" alt="" height={45} width={45} style={{objectFit:"cover"}}/>
             </div>
             <div className=" flex-grow-1 d-flex flex-column">
               <div className="d-flex justify-content-between">
-                <span className="username">{res?.sender.name}</span>
+                <span className="username">{res?.sender?.name}</span>
                 <span
                   className="support-history-fonts"
                   style={{ fontSize: "0.8rem" }}
@@ -124,7 +124,7 @@ const UserTimeLine = (props) => {
                 className="support-history-fonts"
                 style={{ fontSize: "0.8rem" }}
               >
-                {highlightUsername(res?.context, `@${res?.receiver.username}`)}
+                {highlightUsername(res?.context, `@${res?.receiver?.username}`)}
               </span>
             </div>
           </div>

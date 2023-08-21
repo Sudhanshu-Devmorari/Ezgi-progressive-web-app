@@ -21,11 +21,11 @@ const EditorManagementPage = () => {
   const [deactivateUser, setDeactivateUser] = useState([]);
 
   const editorManagementApiData =  () => {
-    console.log(data)
+    // console.log(data)
     axios
       .get(`http://127.0.0.1:8000/editor-management/`)
       .then((res) => {
-        console.log("%%%%%%%%%", res.data)
+        // console.log("%%%%%%%%%", res.data)
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user)
         // setUsers(res?.data?.users_list)

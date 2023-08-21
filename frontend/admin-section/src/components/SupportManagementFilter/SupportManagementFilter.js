@@ -5,7 +5,6 @@ import "./SupportManagementFilter.css";
 const SupportManagementFilter = (props) => {
   const options = ["All", "Pendings", "Resolved", "Redirected"];
 
-  
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
@@ -21,12 +20,16 @@ const SupportManagementFilter = (props) => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input onChange={(e) => props.filteredData(e.target.value)} type="text" className="input-field-dark" />
+            <input
+              onChange={(e) => props.filteredData(e.target.value)}
+              type="text"
+              className="input-field-dark"
+            />
           </div>
         </div>
         <div className="p-2 position-relative">
           <button
-            onClick={()=>setShowDropdown(!showDropdown)}
+            onClick={() => setShowDropdown(!showDropdown)}
             style={{
               backgroundColor: "transparent",
               borderRadius: "3px",
@@ -76,6 +79,8 @@ const SupportManagementFilter = (props) => {
         </div>
         <div className="p-2">
           <button
+            data-bs-toggle="modal"
+            data-bs-target="#exportModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",

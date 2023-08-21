@@ -29,11 +29,11 @@ const SharedProfile = ({ data, setSelectContent }) => {
           id:id
         }
       );
-      console.log('API Response:', response.data);
+      // console.log('API Response:', response.data);
     } catch (error) {
       console.error('Error making POST request:', error);
     }
-    console.log(".........", id);
+    // console.log(".........", id);
   };
 
   return (

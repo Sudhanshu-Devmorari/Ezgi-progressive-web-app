@@ -25,7 +25,7 @@ const MainPage = () => {
   const [selectContent, setSelectContent] = useState("home");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const [dashboardSUser, setDashboardSUser] = useState(false);
-  console.log("--------", selectContent,"=======", selectPublicorForYou)
+  // console.log("--------", selectContent,"=======", selectPublicorForYou)
 
   const themeMode = localStorage.getItem("CurrentTheme");
 

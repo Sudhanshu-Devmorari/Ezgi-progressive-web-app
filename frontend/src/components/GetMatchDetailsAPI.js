@@ -2,7 +2,7 @@ import axios from "axios";
 import { headers } from "./AuthorizationBearer";
 
 export const MatchDetailsAPI = async (categoryType, selectedLeague, selectedDate) => {
-  console.log("Category  selectedLeague", categoryType, selectedLeague, selectedDate);
+  // console.log("Category  selectedLeague", categoryType, selectedLeague, selectedDate);
 
   try {
     const res = await axios.get(

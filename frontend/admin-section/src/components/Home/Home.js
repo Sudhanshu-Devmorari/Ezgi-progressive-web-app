@@ -25,7 +25,7 @@ import Swal from "sweetalert2";
 const Home = (props) => {
   const handleFile = async (e) => {
     const file = e.target.files[0];
-    console.log(":::::::: ", file?.path);
+    // console.log(":::::::: ", file?.path);
   };
   const handleDeactive = async (id) => {
     console.log(id,"=============>>id");
@@ -159,14 +159,14 @@ const Home = (props) => {
         `http://127.0.0.1:8000/user-management/`,
         formData
       );
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
   };
 
   const handleUpdateUser = async (id) => {
-    console.log("::::::::", addUser);
+    // console.log("::::::::", addUser);
     const formData = new FormData();
     selectedImage != false && formData.append("profile_pic", selectedImage);
     // formData.append("date", addUser.date);
@@ -294,7 +294,6 @@ const Home = (props) => {
     "Eskisehir",
     "Sakarya",
     "Denizli",
-
     "Samsun",
   ];
   const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
