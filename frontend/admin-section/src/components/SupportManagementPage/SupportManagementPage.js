@@ -17,6 +17,7 @@ import SupportHistory from "../SupportHistory/SupportHistory";
 import { BiSolidCrown } from "react-icons/bi";
 import cross from "../../assets/Group 81.svg";
 import axios from "axios";
+import Export from "../Export/Export";
 
 const SupportManagementPage = () => {
   // Support management API
@@ -90,6 +91,8 @@ const SupportManagementPage = () => {
   const displayTickets =
     filteredArray.length > 0 ? filteredArray : filteredTickets;
 
+    console.log(displayTickets,"==>>displayTickets");
+
   const requestArray = [
     { img: pending, name: "Pending Requests", count: PendingRequest },
     { img: resolved, name: "Resolved Requests", count: ResolvedRequest },
@@ -121,6 +124,7 @@ const SupportManagementPage = () => {
     },
   ];
   const [selecteReply, setSelecteReply] = useState("reply");
+
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -475,6 +479,8 @@ const SupportManagementPage = () => {
           </div>
         </div>
       </div>
+
+      <Export exportList={displayTickets}/>
     </>
   );
 };

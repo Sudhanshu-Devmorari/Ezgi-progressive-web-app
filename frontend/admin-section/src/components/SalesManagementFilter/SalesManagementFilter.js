@@ -83,6 +83,7 @@ const SalesManagementFilter = () => {
     } catch (error) {}
   };
 
+  const [modalShow, setModalShow] = React.useState(false);
   return (
     <>
       <div className="d-flex p-2">
@@ -111,6 +112,7 @@ const SalesManagementFilter = () => {
         </div>
         <div className="p-2">
           <button
+            data-bs-toggle="modal" data-bs-target="#exportModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",

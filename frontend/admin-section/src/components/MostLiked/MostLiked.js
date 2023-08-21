@@ -155,5 +155,5 @@ const MostLiked = (props) => {
     </div>
   );
 };
-
+}
 export default MostLiked;

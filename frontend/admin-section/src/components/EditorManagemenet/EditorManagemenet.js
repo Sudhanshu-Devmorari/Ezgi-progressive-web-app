@@ -145,7 +145,7 @@ const EditorManagemenet = (props) => {
     formData.append("gender", addUser.gender);
     formData.append("age", addUser.age);
     formData.append("level", addUser.level);
-
+    const id = 1;  // temp
     try {
       const response = await axios.patch(
         `http://127.0.0.1:8000/editor-management/${id}/`,

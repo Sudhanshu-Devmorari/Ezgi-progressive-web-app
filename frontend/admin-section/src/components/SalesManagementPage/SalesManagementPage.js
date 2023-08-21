@@ -15,6 +15,7 @@ import adsIcon from "../../assets/badge-ad.svg";
 import perIcon from "../../assets/per.svg";
 import "./SalesManagementPage.css";
 import axios from "axios";
+import Export from "../Export/Export";
 
 const SalesManagementPage = () => {
   const salesArray = [
@@ -277,6 +278,7 @@ const SalesManagementPage = () => {
           </div>
         </div>
       </div>
+      <Export />
     </>
   );
 };
