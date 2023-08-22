@@ -1221,7 +1221,7 @@ class VerifyUserView(APIView):
                     return Response(data=serializer, status=status.HTTP_200_OK)
                     # return Response({'message': 'This request has been processed and it has been forwarded to the manager for review.'}, status=status.HTTP_200_OK)
                 else:
-                    return Response({'message': 'There are fewer than 250 subscribers for the user.'}, status=status.HTTP_200_OK)
+                    return Response({'message': 'There are fewer than 250 subscribers for the user.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'message': 'User does not have active membership for at least 3 months.'}, status=status.HTTP_200_OK)
 

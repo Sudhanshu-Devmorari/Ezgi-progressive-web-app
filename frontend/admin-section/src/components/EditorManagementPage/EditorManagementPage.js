@@ -96,7 +96,6 @@ const EditorManagementPage = () => {
                     setupdateProfile={setupdateProfile}
                     verifyRqst={verifyRqst}
                     deactiveRqst={deactiveRqst}
-                    setupdateProfile={setupdateProfile}
                   />
                 </div>
               </div>
