@@ -2,7 +2,7 @@ from django.contrib import admin
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, 
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
                          CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
-                         BecomeCommentator, BlueTick, DataCount)
+                         BecomeCommentator, BlueTick, DataCount, TicketHistory)
 
 # Register your models here.
 @admin.register(User)
@@ -86,3 +86,8 @@ class BlueTickAdmin(admin.ModelAdmin):
 @admin.register(DataCount)
 class DataCountAdmin(admin.ModelAdmin):
     list_display = ('id','user','editor','subscription','comment','highlight','advertisement', 'ticket','comment_win','comment_lose','created','updated')
+
+
+@admin.register(TicketHistory)
+class TicketHistoryAdmin(admin.ModelAdmin):
+    list_display = ('id','user','ticket_support','status','response_ticket','request_to', 'redirect_to', 'note','created','updated')

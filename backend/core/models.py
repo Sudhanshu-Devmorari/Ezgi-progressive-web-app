@@ -159,7 +159,6 @@ class TicketSupport(models.Model):
     subject = models.CharField(max_length = 100)
     message = models.TextField()
     status = models.CharField(max_length = 20, choices = SUPPORT_STATUS, default='pending')
-    # chat = ArrayField(models.JSONField(null=True, blank=True))
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -168,6 +167,25 @@ class ResponseTicket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey(TicketSupport, on_delete=models.CASCADE)
     response = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+TICKET_HISTORY_STATUS = (
+        ('create','Create'),
+        ('comment_by_user','Comment_by_user'),
+        ('request_for_update','Request_for_update'),
+        ('redirect','Redirect'),
+    )
+class TicketHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ticket_create', null=True, blank=True)
+    ticket_support = models.ForeignKey(TicketSupport, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = TICKET_HISTORY_STATUS, default='pending', null=True, blank=True)
+    response_ticket = models.ForeignKey(ResponseTicket, on_delete=models.CASCADE, null=True, blank=True)
+    request_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ticket_request', null=True, blank=True)
+    redirect_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='redirect_ticket', null=True, blank=True)
+    note = models.CharField(max_length = 500, null=True, blank=True)
+    message = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

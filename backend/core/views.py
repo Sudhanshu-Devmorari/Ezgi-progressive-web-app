@@ -23,13 +23,15 @@ from rest_framework.exceptions import NotFound, ParseError, APIException
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
-                          MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount)
+                          MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
+                          TicketHistory)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
-                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer)
+                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
+                             TicketHistorySerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -830,6 +832,8 @@ class SupportView(APIView):
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 if support_obj != None:
+                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                if support_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
                         obj.ticket += 1
@@ -845,8 +849,73 @@ class SupportView(APIView):
             return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+class ShowTicketData(APIView):
+     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response(data={"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            support_obj = TicketSupport.objects.get(id=ticket_id)
+        except TicketSupport.DoesNotExist:
+            return Response(data={"error": "TicketSupport not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            ticket_history = TicketHistory.objects.filter(user=user, ticket_support=support_obj, status='comment_by_user').latest('-created')
+        except TicketHistory.DoesNotExist:
+            ticket_history = None
+        
+        serializer = TicketSupportSerializer(support_obj).data
+        # serializer['admin_response'] = TicketHistorySerializer(ticket_history).data if ticket_history else None
+        serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
+        return Response(data=serializer, status=status.HTTP_200_OK)
+
+
+class ReplyTicketView(APIView):
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+            ticket_obj = get_object_or_404(TicketSupport, id=ticket_id)
+            
+            if 'message' not in request.data:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if 'admin_id' not in request.data:
+                return Response({'error': 'Admin id not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            admin_id = request.data.get('admin_id')
+            admin_obj = get_object_or_404(User, id=admin_id)
+            
+            ticket_history = TicketHistory.objects.create(
+                user=user,
+                ticket_support=ticket_obj,
+                status='request_for_update',
+                message=request.data.get('message'),
+                request_to=admin_obj
+            )
+            if ticket_history != None:
+                ticket_obj.status = 'pending'
+                ticket_obj.save()
+
+            serializer = TicketHistorySerializer(ticket_history)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+        
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except TicketSupport.DoesNotExist:
+            return Response({'error': 'Ticket support not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
 class UpdateTicketMessageView(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
+        """
+        Admin or Sub_user answer the user ticket.
+        """
         try:
             if request.data:
                 if 'ticket_id' not in request.data:
@@ -854,8 +923,8 @@ class UpdateTicketMessageView(APIView):
                 if 'message' not in request.data:
                     return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                user = request.user
-                # user = User.objects.get(id=1)
+                # user = request.user
+                user = User.objects.get(id=id)
 
                 ticket_id = request.data.get('ticket_id')
                 ticket_obj = TicketSupport.objects.get(id=ticket_id)
@@ -865,6 +934,9 @@ class UpdateTicketMessageView(APIView):
                 serializer = ResponseTicketSerializer(result_obj)
                 data = serializer.data
 
+                if result_obj != None:
+                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_obj, status='comment_by_user',
+                                                              response_ticket=result_obj)
                 return Response(data=data, status=status.HTTP_200_OK)
 
         except TicketSupport.DoesNotExist:
@@ -1460,20 +1532,13 @@ class CommentsManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         
-        """user percentage"""
-        # deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
-        # users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
-        # users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-        # count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
-        # user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
-
-
-        # status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
-        # new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
-        # comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-        # count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
-        # user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
-        # management['comments_percentage'] = user_percentage
+        """Comments percentage"""
+        status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+        new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+        comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+        count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+        comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+        management['comments_percentage'] = comments_percentage
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -1825,8 +1890,18 @@ class FilterComments(APIView):
 class EditorManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
-        
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
             editor_list = []
             commentator = User.objects.filter(user_role='commentator').order_by('created')
             for obj in commentator:
@@ -2059,6 +2134,23 @@ class EditorManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
+
+class UpdateStatusForVerifyRequest(APIView):
+    def post(self, request, id, format=None, *args, **kwargs):
+        try:
+            if 'status' not in request.data:
+                    return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            obj_status = request.data.get('status')
+            obj = BlueTick.objects.get(id=id)
+            obj.status = obj_status
+            obj.save()
+            serializer = BlueTickSerializer(obj).data
+            return Response(data=serializer, status=status.HTTP_200_OK)
+        except BlueTick.DoesNotExist:
+            return Response(data={'error': 'BlueTick object not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class EditorSubscriptionDetails(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = []
@@ -2177,7 +2269,25 @@ class SalesManagement(APIView):
         """
         Plan sale logic here.
         """
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+            """Highlights percentage"""
+            highlights_status_changed_to_pending = Highlight.objects.annotate(date_updated=TruncDate('updated')).filter(status='pending', date_updated__gte=previous_24_hours).count()
+            highlights_purchased = Highlight.objects.annotate(date_created=TruncDate('created')).filter(status='active', highlight=True, date_created__gte=previous_24_hours).count()
+            highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
+            highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = highlights_percentage
+
             # Subscription objects handling
             subscription_obj = Subscription.objects.filter(subscription=True)
             subscription_cal = 0
@@ -2315,7 +2425,17 @@ class FilterSalesManagement(APIView):
 class SupportManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         all_data = {}
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """Ticket percentage"""
+            status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
+            new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='progress', date_created__gte=previous_24_hours).count()
+            tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (tickets_before_24_hours - status_changed_to_resolved) + new_tickets_progress
+            tickets_percentage = ((count-tickets_before_24_hours)/tickets_before_24_hours) * 100
+            all_data['new_user_percentage'] = tickets_percentage
+
             current_datetime = timezone.now()
 
             twenty_four_hours_ago = current_datetime - timedelta(hours=24)
@@ -2332,11 +2452,13 @@ class SupportManagement(APIView):
             all_ticket = TicketSupport.objects.all()
             all_data['total'] = all_ticket.count()
 
+            # pending_tickets = TicketSupport.objects.filter(status='pending')
+            # serializer = TicketSupportSerializer(pending_tickets, many=True)
             serializer = TicketSupportSerializer(all_ticket, many=True)
             all_data['tickets'] = serializer.data
 
-            support_history = TicketSupport.objects.all()
-            serializer11 = TicketSupportSerializer(support_history, many=True)
+            support_history = TicketHistory.objects.all()
+            serializer11 = TicketHistorySerializer(support_history, many=True)
             all_data['support_history'] = serializer11.data
 
             sub_users = User.objects.filter(user_role='sub_user')
@@ -2347,9 +2469,11 @@ class SupportManagement(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
+            user = User.objects.get(id=id)
             ticket_id = request.data.get('ticket_id')
+
             message = request.data.get('message')
 
 
@@ -2362,7 +2486,162 @@ class SupportManagement(APIView):
             except TicketSupport.DoesNotExist:
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-            res_obj = ResponseTicket.objects.create(ticket=ticket_support, response=message)
+            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            if res_obj != None:
+                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                                                            response_ticket=res_obj)
+                ticket_support.status = 'progress'
+                ticket_support.save()
+
+            serializer = ResponseTicketSerializer(res_obj)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ShowTicketData(APIView):
+    def get(self, request, ticket_id, format=None, *args, **kwargs):
+        try:
+            ticket_obj = TicketSupport.objects.get(id=ticket_id)
+            try:
+                history = TicketHistory.objects.filter(ticket_support=ticket_obj).latest('-created')
+                if history.message is None:
+                    serializer = TicketSupportSerializer(ticket_obj).data
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                else:
+                    serializer = TicketSupportSerializer(ticket_obj).data
+                    serializer['updated_ticket_message'] = history.message
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+            except TicketHistory.DoesNotExist:
+                serializer = TicketSupportSerializer(ticket_obj).data
+                return Response(data=serializer, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(data={"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class RetrieveSubUserView(APIView):
+    # Retrieve the sub user as per department.
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            department = request.data.get('department')
+            if not department:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            sub_users = User.objects.filter(department=department, user_role='sub_user')
+            serializer = UserSerializer(sub_users, many=True)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class TicketRedirectView(APIView):
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        """
+        store history for which admin user assign the ticket to sub user.
+        """
+        try:
+            admin_user = User.objects.get(id=id)
+            ticket = TicketSupport.objects.get(id=ticket_id)
+            note = request.data.get('note')
+            user_id = request.data.get('id')  # sub user id
+            
+            if user_id is None:
+                return Response({'error': 'User-Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                user_obj = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            ticket_redirect_history = TicketHistory.objects.create(user=admin_user, ticket_support=ticket, status='redirect',
+                                                                   redirect_to=user_obj, note=note)
+            if ticket_redirect_history != None:
+                ticket.status = 'progress'
+                ticket.save()
+            serializer = TicketHistorySerializer(ticket_redirect_history)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except TicketSupport.DoesNotExist:
+            return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class SubUserSupportTicket(APIView):
+    """show Sub user's assign tickets."""
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            data_list = []
+            user = User.objects.get(id=id)  # sub user
+
+            try:
+                ticket_obj = TicketHistory.objects.filter(redirect_to=user)
+                for obj in ticket_obj:
+                    serializer = TicketSupportSerializer(obj.ticket_support).data
+                    data_list.append(serializer)
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            except TicketHistory.DoesNotExist:
+                return Response(data={"detail": "No ticket history found for this user."},
+                                status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response(data={"detail": "User not found."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RedirectAnswerView(APIView):
+    """Sub user open perticular ticket."""
+    def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+        details = {}
+        
+        try:
+            user = get_object_or_404(User, id=id)  # sub user
+            ticket = get_object_or_404(TicketSupport, id=ticket_id)
+            
+            ticket_serializer = TicketSupportSerializer(ticket).data
+            details['ticket'] = ticket_serializer
+
+            ticket_history = TicketHistory.objects.filter(ticket_support=ticket, status='redirect').latest('-created')
+            admin_serializer = UserSerializer(ticket_history.user).data
+            details['admin_user'] = admin_serializer
+            details['note'] = ticket_history.note
+
+            return Response(data=details, status=status.HTTP_200_OK)
+        except (User.DoesNotExist, TicketSupport.DoesNotExist, TicketHistory.DoesNotExist):
+            return Response(data={'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    """Sub user answer the ticket."""
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id) # sub user
+            message = request.data.get('message') # ticket answer
+
+            if not message:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket_support = None
+            try:
+                ticket_support = TicketSupport.objects.get(id=ticket_id)
+            except TicketSupport.DoesNotExist:
+                return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            if res_obj != None:
+                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                                                            response_ticket=res_obj)
+                ticket_support.status = 'progress'
+                ticket_support.save()
+
             serializer = ResponseTicketSerializer(res_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)

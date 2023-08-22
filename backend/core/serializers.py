@@ -2,7 +2,8 @@ from rest_framework import serializers
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification,
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
-                          SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator)
+                          SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
+                          TicketHistory)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -149,4 +150,14 @@ class BlueTickSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = BlueTick
+        fields = '__all__'
+
+
+class TicketHistorySerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    ticket_support = TicketSupportSerializer()
+    response_ticket = ResponseTicketSerializer()
+    request_to = UserSerializer()
+    class Meta:
+        model = TicketHistory
         fields = '__all__'

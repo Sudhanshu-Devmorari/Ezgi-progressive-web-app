@@ -1,8 +1,9 @@
 from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
-                         SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView,
-                        
+                         SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
+                         TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData,
+        
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView)
 
@@ -10,7 +11,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
-                        HighlightSettingView, CommentSetting, FilterSalesManagement)
+                        HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, ShowTicketData)
 
 
 urlpatterns = [
@@ -33,11 +34,17 @@ urlpatterns = [
     path('fav-editor-comment/<int:id>', RetrieveFavEditorsAndFavComment.as_view(), name='FavEditors-FavComment'),
     path('support/<int:id>', SupportView.as_view(), name='Support'),
     path('update-support-ticket/', UpdateTicketMessageView.as_view(), name='Update-Ticket-Message'),
+    path('reply-ticket/<int:id>/<int:ticket_id>/', ReplyTicketView.as_view(), name='Reply-Ticket'),
     path('resolved-ticket/', ResolvedTicket.as_view(), name='Resolved-Ticket'),
     path('active-resolved-comment/<int:id>', ActiveResolvedCommentRetrieveView.as_view(), name='Active-Resolved-Comment-Retrieve'),
     path('retrieve-subscribers-subscription/<int:id>', RetrieveSubscriberListAndSubscriptionList.as_view(), name='SubscriberList-SubscriptionList'),
     path('deactivate-profile/', DeactivateProfile.as_view(), name='Deactivate-Profile'),
     path('verify/<int:id>/', VerifyUserView.as_view(), name='Verify-User'),
+    path('retrieve-redirect-user/', RetrieveSubUserView.as_view(), name='Retrieve-Sub-User'),
+    path('redirect-ticket/', TicketRedirectView.as_view(), name='Ticket-Redirect'),
+    path('subuser-tickets/<int:id>/', SubUserSupportTicket.as_view(), name='SubUser-Support-Ticket'),
+    path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', RedirectAnswerView.as_view(), name='Redirect-Answer'),
+    path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
 
 
     # Admin Panel's api
@@ -57,6 +64,7 @@ urlpatterns = [
     path('sales-management/', SalesManagement.as_view(), name='Sales-Management'),
     path('filter-sales-management/', FilterSalesManagement.as_view(), name='Filter-Sales-Management'),
     path('support-management/', SupportManagement.as_view(), name='Support-Management'),
+    path('support-management/<int:id>/', SupportManagement.as_view(), name='Support-Management-Response'),
     path('notification-management/', NotificationManagement.as_view(), name='Notification-Management'),
     path('subuser-management/', SubUserManagement.as_view(), name='SubUser-Management'),
     path('subuser-management/<int:pk>/', SubUserManagement.as_view(), name='SubUser-Management'),
@@ -67,5 +75,6 @@ urlpatterns = [
     path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
-
+    path('verify-user/<int:id>/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
+    path('show-ticket-data/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
 ]
