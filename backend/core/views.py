@@ -2501,7 +2501,7 @@ class SupportManagement(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class ShowTicketData(APIView):
+class SubUserShowTicketData(APIView):
     def get(self, request, ticket_id, format=None, *args, **kwargs):
         try:
             ticket_obj = TicketSupport.objects.get(id=ticket_id)

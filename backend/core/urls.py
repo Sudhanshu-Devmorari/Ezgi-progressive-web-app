@@ -11,7 +11,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
-                        HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, ShowTicketData)
+                        HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData)
 
 
 urlpatterns = [
@@ -76,5 +76,5 @@ urlpatterns = [
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
     path('verify-user/<int:id>/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
-    path('show-ticket-data/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
+    path('show-ticket-data/<int:ticket_id>/', SubUserShowTicketData.as_view(), name='Show-Ticket-Data'),
 ]
