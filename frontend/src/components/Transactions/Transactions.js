@@ -64,22 +64,34 @@ const Transactions = () => {
               }}
             >
               {chart.map((item, index) => (
-                <div className="col d-flex flex-column justify-content-center">
-                  <div
-                    className="b"
+                // <div className="col d-flex flex-column justify-content-center">
+                //   <div
+                //     className="chart-bar"
+                //     style={{
+                //       height: item.height,
+                //       width: "1rem",
+                //       backgroundColor: item.color,
+                //     }}
+                //   ></div>
+                //   <span
+                //     className=""
+                //     style={{ opacity: "1", fontSize: "0.6rem" }}
+                //   >
+                //     {item.name}
+                //   </span>
+                // </div>
+                <dl className="col d-flex flex-column justify-content-center m-0">
+                  <dt style={{ opacity: "1", fontSize: "0.6rem" }}>
+                    {item.name}
+                  </dt>
+                  <dd
                     style={{
                       height: item.height,
-                      maxWidth: "1rem",
+                      width: "1rem",
                       backgroundColor: item.color,
                     }}
-                  ></div>
-                  <span
-                    className=""
-                    style={{ opacity: "1", fontSize: "0.6rem" }}
-                  >
-                    {item.name}
-                  </span>
-                </div>
+                  ></dd>
+                </dl>
               ))}
             </div>
           </div>

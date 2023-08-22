@@ -18,7 +18,7 @@ const Requests = (props) => {
         <>
           <div
             onClick={() => handleRqst(res.name)}
-            className="cursor dark-mode d-flex justify-content-center flex-column align-items-center block-height text-center"
+            className="p-1 cursor dark-mode d-flex justify-content-center flex-column align-items-center block-height text-center"
             style={{ height: "32vh" }}
           >
             {res.img && (

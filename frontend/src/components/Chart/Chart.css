@@ -1,0 +1,42 @@
+/* .dl{
+     position: relative ; height: 200px ; 
+}
+.dt .dd{
+    position: absolute ;
+}
+.dt{ bottom: 0 ; }
+.dd{
+     height: 70% ; 
+     width: 30px ; 
+     background: grey ; 
+     bottom: 20px ; 
+     -webkit-animation: animate-bar 1.25s 1 linear; }
+
+
+@-webkit-keyframes animate-bar{
+    0% {height: 0% ; }
+}  */
+
+
+/* dl{ position: relative ; height: 200px ; }
+dt,dd{ position: absolute ; }
+dd{ height: 70% ; 
+    width: 30px ; 
+    background: grey ; 
+    bottom: 20px ; 
+    animation: animate-bar 1.25s 1 linear; }
+
+dt{ bottom: 0 ; }
+@keyframes animate-bar{
+    0% {height: 0% ; }
+}
+
+.chart-bar{
+    animation: animate-bar 1.25s 1 linear;
+}
+@keyframes animate-bar{
+    0% {height: 0% ; }
+}
+.span-tag{
+    bottom: 0!important;
+} */

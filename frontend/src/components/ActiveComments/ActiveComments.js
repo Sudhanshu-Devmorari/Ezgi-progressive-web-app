@@ -53,32 +53,36 @@ const ActiveComments = (props) => {
       setEditProfile(false);
       const formData = new FormData();
       formData.append("file", e.target.files[0]);
-      
-      const res = await axios.post(`http://127.0.0.1:8000/profile/${userId}`, formData);
+
+      const res = await axios.post(
+        `http://127.0.0.1:8000/profile/${userId}`,
+        formData
+      );
       console.log("res: ", res);
       console.log("res: ", res.status);
       if (res.status === 200) {
         Swal.fire({
           title: "Success",
-          text: 'Profile Updated!',
+          text: "Profile Updated!",
           icon: "success",
           backdrop: false,
-          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         });
-      } else if (res.status === 400){
+      } else if (res.status === 400) {
         Swal.fire({
           title: "Error",
-          text: 'Failed',
+          text: "Failed",
           icon: "error",
           backdrop: false,
-          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         });
       }
     } catch (error) {
       // Handle errors
     }
   }
-  
 
   return (
     <>
@@ -165,7 +169,7 @@ const ActiveComments = (props) => {
             <div className="d-flex flex-column ps-1">
               <div>
                 <button
-                  className="px-3"
+                  className="px-3 text-capitalize"
                   style={{
                     border: "1px solid #FFA200",
                     color: "#FFA200",
@@ -174,7 +178,7 @@ const ActiveComments = (props) => {
                     fontSize: "13px",
                   }}
                 >
-                  Expert
+                  {profileData?.commentator_level}
                 </button>
               </div>
               <div
@@ -196,7 +200,7 @@ const ActiveComments = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                {profileData?.city}/{profileData?.country}
+                {profileData && profileData?.city}
               </div>
               <div
                 style={{
@@ -389,12 +393,16 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="flex-grow-1">Category</div>
-          <div className="">
-            <img src={basketball} alt="" height={45} width={45} />
-          </div>
-          <div className="">
-            <img src={football} alt="" height={45} width={45} />
-          </div>
+          {profileData?.category.some(categoryItem => categoryItem.includes("Basketball")) && (
+            <div className="">
+              <img src={basketball} alt="" height={45} width={45} />
+            </div>
+          )}
+          {profileData?.category.some(categoryItem => categoryItem.includes("Football")) && (
+            <div className="">
+              <img src={football} alt="" height={45} width={45} />
+            </div>
+          )}
         </div>
         <div
           className="d-flex justify-content-between p-2 my-2"

@@ -141,7 +141,7 @@ const ProfileSU = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                {progileData?.city}/{progileData?.country}
+                {progileData && progileData?.city}
               </div>
               <div
                 style={{
