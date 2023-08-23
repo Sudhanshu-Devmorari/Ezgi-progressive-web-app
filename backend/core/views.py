@@ -866,7 +866,12 @@ class ShowTicketData(APIView):
         except TicketHistory.DoesNotExist:
             ticket_history = None
         
-        serializer = TicketSupportSerializer(support_obj).data
+        if TicketHistory.objects.filter(ticket_support=support_obj, status='request_for_update').exists():
+            history_obj = TicketHistory.objects.filter(ticket_support=support_obj, status='request_for_update').latest('created')
+            serializer = TicketSupportSerializer(support_obj).data
+            serializer['message'] = history_obj.message
+        else:
+            serializer = TicketSupportSerializer(support_obj).data
         # serializer['admin_response'] = TicketHistorySerializer(ticket_history).data if ticket_history else None
         serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
         return Response(data=serializer, status=status.HTTP_200_OK)
