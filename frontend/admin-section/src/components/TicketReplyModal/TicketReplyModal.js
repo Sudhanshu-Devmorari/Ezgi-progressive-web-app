@@ -13,11 +13,16 @@ const TicketReplyModal = (props) => {
 
   const [subUsersOptions, setSubUsersOptions] = useState([]);
 
-  const [selectedSubUser, setSelectedSubUser] = useState("Select");
+  const [selectedSubUser, setSelectedSubUser] = useState({
+    id: null,
+    name: "Select",
+  });
   const [subUserDropDown, setSubUserDropDown] = useState(false);
+  console.log("subUsersOptions: ", subUsersOptions);
+  console.log("selectedSubUser :", selectedSubUser);
 
   const handleSetSelectedSubUser = (name, value) => {
-    setSelectedSubUser(value);
+    setSelectedSubUser({ id: name, name: value });
   };
 
   const toggleSubUserDropDown = () => {
@@ -27,9 +32,11 @@ const TicketReplyModal = (props) => {
         department: tickeview?.department,
       })
       .then((res) => {
-        console.log(res, "==>>>>res");
+        // console.log(res.data, "==>>>>res");
         const subUsers = res.data;
-        setSubUsersOptions(subUsers.map((item) => item.name));
+        setSubUsersOptions(
+          subUsers.map((user) => ({ id: user.id, name: user.name }))
+        );
       })
       .catch((err) => {
         console.log(err);
@@ -41,6 +48,7 @@ const TicketReplyModal = (props) => {
     reply: "",
     note: "",
   });
+  console.log(ticketRepltOrRedirect);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTicketRepltOrRedirect((prevDateSelected) => ({
@@ -82,7 +90,7 @@ const TicketReplyModal = (props) => {
           });
       }
     } else if (selecteReply === "redirect") {
-      if (selectedSubUser === "Select"){
+      if (selectedSubUser.name === "Select") {
         Swal.fire({
           title: "Error",
           text: "Please select a user",
@@ -90,7 +98,7 @@ const TicketReplyModal = (props) => {
           backdrop: false,
           customClass: "dark-mode-alert",
         });
-      } else if ( ticketRepltOrRedirect.note === "" ){
+      } else if (ticketRepltOrRedirect.note === "") {
         Swal.fire({
           title: "Error",
           text: "Please add a note",
@@ -99,26 +107,35 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else {
-        axios
-        .post(`http://127.0.0.1:8000/redirect-ticket/${38}/${tickeview?.id}`, {
-          note: ticketRepltOrRedirect.redirect,
-          id: tickeview?.id,    // sub user id
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            Swal.fire({
-              title: "Success",
-              text: "Reply sent successfully",
-              icon: "success",
-              backdrop: false,
-              customClass: "dark-mode-alert",
+        const selectedId = subUsersOptions.find(
+          (subUser) => subUser.name === selectedSubUser.name
+        )?.id;
+        console.log(selectedId);
+        if (selectedId) {
+          axios
+            .post(
+              `http://127.0.0.1:8000/redirect-ticket/${38}/${tickeview?.id}`,
+              {
+                note: ticketRepltOrRedirect.note,
+                id: selectedId, // sub user id
+              }
+            )
+            .then((res) => {
+              console.log(res);
+              if (res.status === 200) {
+                Swal.fire({
+                  title: "Success",
+                  text: "Ticket Redirected Successfully",
+                  icon: "success",
+                  backdrop: false,
+                  customClass: "dark-mode-alert",
+                });
+              }
+            })
+            .catch((error) => {
+              console.log(error);
             });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        }
       }
     }
   };
@@ -215,25 +232,22 @@ const TicketReplyModal = (props) => {
                 interdum consectetur.
               </div> */}
               {/* End For Redirected msg */}
-              {/* Reply */}
-              {/* <div className="d-flex gap-2">
-                <div className="">Reply</div>
-                <div className="" style={{ color: "#DD7DFF" }}>
-                  Jhon Doe
-                </div>
-                <div className="ms-auto">22-05-2023 - 16:38</div>
-              </div>
-              <textarea
-                style={{ height: "100px", fontSize: ".8rem" }}
-                className="darkMode-input form-control my-2 p-2"
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                eleifend vehicula tristique. Suspendisse vitae lectus sed massa
-                interdum consectetur. Pellentesque habitant morbi tristique
-                senectus et netus et malesuada fames ac turpis egestas. Integer
-                auctor nisl in lacus fringilla, et tincidunt ex laoreet.
-              </textarea> */}
-              {/* End Reply */}
+              {tickeview?.updated_ticket_message && (
+                <>
+                  <div className="d-flex gap-2">
+                    <div className="">Reply</div>
+                    <div className="" style={{ color: "#DD7DFF" }}>
+                      {tickeview?.user?.name}
+                    </div>
+                    <div className="ms-auto">{tickeview?.created}</div>
+                  </div>
+                  <textarea
+                    style={{ height: "100px", fontSize: ".8rem" }}
+                    className="darkMode-input form-control my-2 p-2"
+                    defaultValue={tickeview?.updated_ticket_message}
+                  ></textarea>
+                </>
+              )}
               <div className="my-3">
                 <span
                   className="cursor"
@@ -264,20 +278,32 @@ const TicketReplyModal = (props) => {
                       <div className="cursor" style={{ width: "99.59px" }}>
                         <CustomDropdown
                           label=" "
-                          name=" "
-                          value={selectedSubUser}
-                          options={subUsersOptions}
-                          selectedOption={selectedSubUser}
+                          name={""}
+                          value={selectedSubUser.name}
+                          options={subUsersOptions.map((user) => user.name)}
+                          selectedOption={selectedSubUser?.name}
                           onSelectOption={handleSetSelectedSubUser}
                           isOpen={subUserDropDown}
                           toggleDropdown={toggleSubUserDropDown}
                         />
+                        {/* <CustomDropdown
+                          label=" "
+                          name=" "
+                          value={selectedSubUser ? selectedSubUser.name : "Select"}
+                          options={subUsersOptions.map((user) => user.name)} // Display only user names in the dropdown
+                          selectedOption={selectedSubUser.name}
+                          onSelectOption={handleSetSelectedSubUser}
+                          isOpen={subUserDropDown}
+                          toggleDropdown={toggleSubUserDropDown}
+                        /> */}
                       </div>
                       <div className="my-2">
                         <span>Note</span>
                         <input
+                        onChange={handleChange}
+                        value={ticketRepltOrRedirect?.note}
                           type="text"
-                          name=""
+                          name="note"
                           id=""
                           className="form-control darkMode-input "
                         />

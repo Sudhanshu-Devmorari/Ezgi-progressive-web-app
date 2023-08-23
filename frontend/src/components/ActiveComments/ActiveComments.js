@@ -175,7 +175,7 @@ const ActiveComments = (props) => {
                     color: "#FFA200",
                     backgroundColor: "transparent",
                     borderRadius: "18px",
-                    fontSize: "13px",
+                    fontSize: "12px",
                   }}
                 >
                   {profileData?.commentator_level}

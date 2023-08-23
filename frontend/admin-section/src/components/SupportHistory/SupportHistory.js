@@ -41,6 +41,7 @@ const SupportHistory = (props) => {
         </div>
         {props?.supportHistory.map((res, index) => (
           <div
+          key={index}
             className="d-flex gap-1 my-2 pb-2"
             style={{ borderBottom: "0.2px solid #E6E6E6" }}
           >
