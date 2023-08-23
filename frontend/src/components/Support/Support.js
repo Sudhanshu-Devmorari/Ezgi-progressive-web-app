@@ -4,8 +4,8 @@ import lifebuoy from "../../assets/lifebuoy.png";
 import axios from "axios";
 import { userId } from "../GetUser";
 import CreateNewTicket from "../CreateNewTicket/CreateNewTicket";
-import Form from "react-bootstrap/Form";
 import AnsweredTicketView from "../AnsweredTicketView/AnsweredTicketView";
+import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal";
 
 const Support = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -44,10 +44,25 @@ const Support = () => {
   }, [showModal]);
 
   // Ticket View
-  const [ticketId, setticketId] = useState('');
-  function handleTicketView (e){
+  const [ticketId, setticketId] = useState("");
+  function handleTicketView(e) {
     setticketId(e);
     setShowModal(3);
+  }
+
+  const [ticketData, setTicketData] = useState([]);
+  function getData(e) {
+    try {
+      axios
+        .get(`http://127.0.0.1:8000/subuser-answer-ticket/${userId}/${e}/`)
+        .then((res) => {
+          console.log(res, "=================>>>>res");
+          setTicketData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (e) {}
   }
 
   return (
@@ -90,6 +105,10 @@ const Support = () => {
             {ticketsData?.map((res, index) => (
               <>
                 <div
+                  onClick={() => {
+                    handleTicketView(res.id);
+                    getData(res.id);
+                  }}
                   key={index}
                   className="my-2 row g-0 p-2 ps-0"
                   style={{
@@ -116,12 +135,7 @@ const Support = () => {
                     </span>
                   </div>
                   <div className="col-6 text-center">{res.created}</div>
-                  <div
-                    className="text-capitalize col-2 text-end"
-                    onClick={() => {
-                      handleTicketView(res.id)
-                    }}
-                  >
+                  <div className="text-capitalize col-2 text-end">
                     {res.status}
                   </div>
                 </div>
@@ -136,91 +150,19 @@ const Support = () => {
           </>
         )}
 
-        {showModal === 3 && <AnsweredTicketView setShowModal={setShowModal} ticketId={ticketId}/>}
+        {showModal === 3 && (
+          <AnsweredTicketView
+            setShowModal={setShowModal}
+            ticketId={ticketId}
+            ticketData={ticketData}
+          />
+        )}
 
         {showModal === 4 && (
-          <>
-            <div className="p-2">
-              <div className="d-flex">
-                <span className="pe-2">Department</span>
-                <span style={{ color: "#D2DB08" }}>Financial</span>
-                <span className="ms-auto">Ticket #0125</span>
-              </div>
-              <div className="my-2">Subject My withdrawal request</div>
-              <div className="my-2">Message</div>
-
-              <div className="d-flex justify-content-between">
-                <span>
-                  Support -{" "}
-                  <span style={{ color: "#D2DB08" }}>Jenny Barden</span>
-                </span>
-                <span className="">23.05.2023 - 16:38</span>
-              </div>
-              <div
-                className="p-1 mb-2 mt-1"
-                style={{
-                  backgroundColor:
-                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                  fontSize: "13px",
-                }}
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                eleifend vehicula tristique. Suspendisse vitae lectus sed massa
-                interdum consectetur. Pellentesque habitant morbi tristique
-                senectus et netus et malesuada fames ac turpis egestas. Integer
-                auctor nisl in lacus fringilla, et tincidunt ex laoreet. Nulla
-                ac posuere tellus, a scelerisque purus. Sed euismod eleifend
-                vulputate.
-              </div>
-              <div className="">
-                <label htmlFor="Reply">Reply</label>
-                <br />
-                <Form.Control
-                  id="Reply"
-                  as="textarea"
-                  maxLength={250}
-                  className={`${
-                    currentTheme === "dark"
-                      ? "textArea-dark-mode"
-                      : "textArea-light-mode"
-                  }`}
-                />
-              </div>
-              <div className="my-3 d-flex justify-content-center gap-2">
-                <button
-                  onClick={() => {
-                    setShowModal(4);
-                  }}
-                  className="px-3"
-                  style={{
-                    color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
-                    backgroundColor: "transparent",
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #37FF80"
-                        : "1px solid #00DE51",
-                    borderRadius: "3px",
-                  }}
-                >
-                  Reply
-                </button>
-                <button
-                  onClick={() => {
-                    setShowModal(3);
-                  }}
-                  className="px-2"
-                  style={{
-                    color: "#FF5757",
-                    backgroundColor: "transparent",
-                    border: "1px solid #FF5757",
-                    borderRadius: "3px",
-                  }}
-                >
-                  Go Back
-                </button>
-              </div>
-            </div>
-          </>
+          <TicketReplyModal
+            setShowModal={setShowModal}
+            ticketData={ticketData}
+          />
         )}
       </div>
     </>

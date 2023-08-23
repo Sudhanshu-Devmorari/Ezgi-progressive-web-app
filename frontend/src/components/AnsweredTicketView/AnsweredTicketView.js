@@ -1,18 +1,42 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
+import Form from "react-bootstrap/Form";
+import moment from "moment";
+import { userId } from "../GetUser";
+import axios from "axios";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+
+  const ticketData = props?.ticketData || [];
+
+  const handleResolvedTicket = () => {
+    axios
+      .post(`http://127.0.0.1:8000/resolved-ticket/${userId}`, {
+        ticket_id: ticketData?.id,
+      })
+      .then((res) => {
+        console.log(res);
+        if(res.status === 200){
+          props.setShowModal(1);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
       <div className="p-2">
         <div className="d-flex">
           <span className="pe-2">Department</span>
-          <span style={{ color: "#D2DB08" }}>Financial</span>
-          <span className="ms-auto">Ticket #0125</span>
+          <span style={{ color: "#D2DB08" }}>{ticketData?.department}</span>
+          <span className="ms-auto">
+            Ticket {`#${ticketData?.id?.toString()?.padStart(4, "0")}`}
+          </span>
         </div>
-        <div className="my-2">Subject My withdrawal request</div>
+        <div className="my-2">Subject {ticketData?.subject}</div>
         <div className="my-2">Message</div>
         <div className="d-flex justify-content-between">
           <span
@@ -21,44 +45,50 @@ const AnsweredTicketView = (props) => {
               color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
             }}
           >
-            johndoe
+            {ticketData?.user?.name}
           </span>
-          <span className="">23.05.2023 - 16:38</span>
+          <span className="">{ticketData?.created}</span>
         </div>
         <div
           className="p-1 mb-2 mt-1"
           style={{
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            fontSize: "13px",
+            fontSize: "14px",
+            height: "100px",
           }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eleifend
-          vehicula tristique. Suspendisse vitae lectus sed massa interdum
-          consectetur. Pellentesque habitant morbi tristique senectus et netus
-          et malesuada fames ac turpis egestas. Integer auctor nisl in lacus
-          fringilla, et tincidunt ex laoreet. Nulla ac posuere tellus, a
-          scelerisque purus. Sed euismod eleifend vulputate.
+          {ticketData?.message}
         </div>
-        <div className="d-flex justify-content-between">
-          <span>
-            Support - <span style={{ color: "#D2DB08" }}>Jenny Barden</span>
-          </span>
-          <span className="">23.05.2023 - 16:38</span>
-        </div>
-        <div
-          className="p-1 mb-2 mt-1"
-          style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            fontSize: "13px",
-          }}
-        >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eleifend
-          vehicula tristique. Suspendisse vitae lectus sed massa interdum
-          consectetur. Pellentesque habitant morbi tristique senectus et netus
-          et malesuada fames ac turpis egestas. Integer auctor nisl in lacus
-          fringilla, et tincidunt ex laoreet. Nulla ac posuere tellus, a
-          scelerisque purus. Sed euismod eleifend vulputate.
-        </div>
+        {ticketData?.admin_response && (
+          <>
+            <div className="d-flex justify-content-between">
+              <span>
+                Support -{" "}
+                <span style={{ color: "#D2DB08" }}>
+                  {ticketData?.admin_response?.user?.username}
+                </span>
+              </span>
+              <span className="">
+                {moment(ticketData?.admin_response?.created).format(
+                  "DD-MM.YYYY - HH:mm"
+                )}
+              </span>
+            </div>
+            <Form.Control
+              disabled
+              style={{ fontSize: "14px", height: "100px" }}
+              id="Reply"
+              as="textarea"
+              maxLength={250}
+              className={`${
+                currentTheme === "dark"
+                  ? "textArea-dark-mode"
+                  : "textArea-light-mode"
+              } mb-2 mt-1`}
+              defaultValue={ticketData?.admin_response?.response}
+            />
+          </>
+        )}
         <div className="my-3 d-flex justify-content-center gap-2">
           <button
             onClick={() => {
@@ -79,7 +109,7 @@ const AnsweredTicketView = (props) => {
           </button>
           <button
             onClick={() => {
-              props.setShowModal(1);
+              handleResolvedTicket();
             }}
             className="px-3"
             style={{

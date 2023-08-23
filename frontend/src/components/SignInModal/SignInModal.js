@@ -5,12 +5,11 @@ import { RxCross2 } from "react-icons/rx";
 import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
 import "./SignInModal.css";
-import SweetAlert from "react-bootstrap-sweetalert";
+import Swal from "sweetalert2";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
-  const [alert, setAlert] = useState(null);
 
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,33 +31,28 @@ const SignInModal = (props) => {
         password: password,
         phone: phone,
       });
-      // console.log("response login: ", res.data);
+      console.log("response login: ", res.data);
       if (res.data.status === 200) {
         localStorage.setItem("user-role", res.data.userRole);
         localStorage.setItem("user-id", res.data.userId);
         window.location.reload();
       } else if (res.data.status === 400) {
         // setpasswordError(res.data.data);
-        setAlert(
-          <SweetAlert
-            customClass={`${
-              currentTheme === "dark" ? "dark-mode" : "light-mode"
-            }`}
-            style={{
-              backgroundColor: currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-            }}
-            btnSize="sm"
-            error
-            title="Error"
-            onConfirm={() => {
-              setAlert(null);
-            }}
-          >
-            {res.data.data}
-          </SweetAlert>
-        );
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       } else if (res.data.status === 404) {
-        alert(res.data.data);
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
   };
@@ -180,7 +174,6 @@ const SignInModal = (props) => {
                 Sign Up
               </span>
             </div>
-            {alert}
           </div>
         </div>
       </div>
