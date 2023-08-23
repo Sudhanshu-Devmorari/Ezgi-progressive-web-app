@@ -2,7 +2,7 @@ from django.contrib import admin
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, 
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
                          CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
-                         BecomeCommentator, BlueTick, DataCount, TicketHistory)
+                         BecomeCommentator, BlueTick, DataCount, TicketHistory, ResponseTicket)
 
 # Register your models here.
 @admin.register(User)
@@ -41,6 +41,11 @@ class FavEditorsAdmin(admin.ModelAdmin):
 @admin.register(TicketSupport)
 class SupportTicketAdmin(admin.ModelAdmin):
     list_display = ('id','user','department','subject','message','status','created','updated')
+
+
+@admin.register(ResponseTicket)
+class ResponseTicketAdmin(admin.ModelAdmin):
+    list_display = ('id','user','ticket','response','created','updated')
 
 
 @admin.register(Highlight)
@@ -90,4 +95,4 @@ class DataCountAdmin(admin.ModelAdmin):
 
 @admin.register(TicketHistory)
 class TicketHistoryAdmin(admin.ModelAdmin):
-    list_display = ('id','user','ticket_support','status','response_ticket','request_to', 'redirect_to', 'note','created','updated')
+    list_display = ('id','user','ticket_support','status','response_ticket','request_to', 'redirect_to', 'note', 'message','created','updated')

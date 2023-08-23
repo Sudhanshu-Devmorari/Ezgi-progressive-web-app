@@ -862,7 +862,7 @@ class ShowTicketData(APIView):
             return Response(data={"error": "TicketSupport not found"}, status=status.HTTP_404_NOT_FOUND)
         
         try:
-            ticket_history = TicketHistory.objects.filter(user=user, ticket_support=support_obj, status='comment_by_user').latest('-created')
+            ticket_history = TicketHistory.objects.filter(ticket_support=support_obj, status='comment_by_user').latest('created')
         except TicketHistory.DoesNotExist:
             ticket_history = None
         
@@ -2506,7 +2506,7 @@ class SubUserShowTicketData(APIView):
         try:
             ticket_obj = TicketSupport.objects.get(id=ticket_id)
             try:
-                history = TicketHistory.objects.filter(ticket_support=ticket_obj).latest('-created')
+                history = TicketHistory.objects.filter(ticket_support=ticket_obj).latest('created')
                 if history.message is None:
                     serializer = TicketSupportSerializer(ticket_obj).data
                     return Response(data=serializer, status=status.HTTP_200_OK)
@@ -2609,7 +2609,7 @@ class RedirectAnswerView(APIView):
             ticket_serializer = TicketSupportSerializer(ticket).data
             details['ticket'] = ticket_serializer
 
-            ticket_history = TicketHistory.objects.filter(ticket_support=ticket, status='redirect').latest('-created')
+            ticket_history = TicketHistory.objects.filter(ticket_support=ticket, status='redirect').latest('created')
             admin_serializer = UserSerializer(ticket_history.user).data
             details['admin_user'] = admin_serializer
             details['note'] = ticket_history.note
