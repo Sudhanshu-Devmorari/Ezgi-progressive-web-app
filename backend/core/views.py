@@ -2555,7 +2555,9 @@ class TicketRedirectView(APIView):
             admin_user = User.objects.get(id=id)
             ticket = TicketSupport.objects.get(id=ticket_id)
             note = request.data.get('note')
+            print('note: ', note)
             user_id = request.data.get('id')  # sub user id
+            print('user_id: ', user_id)
             
             if user_id is None:
                 return Response({'error': 'User-Id not found.'}, status=status.HTTP_400_BAD_REQUEST)

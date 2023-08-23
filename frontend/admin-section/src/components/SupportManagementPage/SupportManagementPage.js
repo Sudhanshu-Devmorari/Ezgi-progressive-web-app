@@ -33,6 +33,17 @@ const SupportManagementPage = () => {
 
   const [tickeview, setTickeview] = useState([]);
 
+  function getTicketsLatestData(e){
+    axios.get(`http://127.0.0.1:8000/show-ticket-data/${e}/`)
+    .then((res) => {
+      console.log(res.data);
+      setTickeview(res.data)
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
+
   useEffect(() => {
     async function getSupportData() {
       try {
@@ -189,9 +200,9 @@ const SupportManagementPage = () => {
                           className="col-3 d-flex align-items-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => setTickeview(res)}
+                          onClick={() => getTicketsLatestData(res.id)}
                         >
-                          <span>#000{index + 1}</span>
+                          <span>{`#${res?.id?.toString()?.padStart(4, "0")}`}</span>
                           <span className="px-2">
                             <img
                               style={{
@@ -210,7 +221,7 @@ const SupportManagementPage = () => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => setTickeview(res)}
+                          onClick={() => getTicketsLatestData(res.id)}
                         >
                           <button
                             className="px-2"
@@ -236,7 +247,7 @@ const SupportManagementPage = () => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => setTickeview(res)}
+                          onClick={() => getTicketsLatestData(res.id)}
                         >
                           <div>{res?.subject}</div>
                         </div>
@@ -244,7 +255,7 @@ const SupportManagementPage = () => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => setTickeview(res)}
+                          onClick={() => getTicketsLatestData(res.id)}
                         >
                           <button
                             className="px-2 text-center text-capitalize"
@@ -273,7 +284,7 @@ const SupportManagementPage = () => {
                           className="col-3 d-flex align-items-center justify-content-end gap-1 cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => setTickeview(res)}
+                          onClick={() => getTicketsLatestData(res.id)}
                         >
                           <div className="">{res?.created}</div>
                           {/* <div className="">15-06-2023 - 16:37</div> */}
