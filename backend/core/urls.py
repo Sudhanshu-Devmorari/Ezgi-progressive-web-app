@@ -35,15 +35,15 @@ urlpatterns = [
     path('support/<int:id>', SupportView.as_view(), name='Support'),
     path('update-support-ticket/', UpdateTicketMessageView.as_view(), name='Update-Ticket-Message'),
     path('reply-ticket/<int:id>/<int:ticket_id>/', ReplyTicketView.as_view(), name='Reply-Ticket'),
-    path('resolved-ticket/', ResolvedTicket.as_view(), name='Resolved-Ticket'),
+    path('resolved-ticket/<int:id>', ResolvedTicket.as_view(), name='Resolved-Ticket'),
     path('active-resolved-comment/<int:id>', ActiveResolvedCommentRetrieveView.as_view(), name='Active-Resolved-Comment-Retrieve'),
     path('retrieve-subscribers-subscription/<int:id>', RetrieveSubscriberListAndSubscriptionList.as_view(), name='SubscriberList-SubscriptionList'),
     path('deactivate-profile/', DeactivateProfile.as_view(), name='Deactivate-Profile'),
     path('verify/<int:id>/', VerifyUserView.as_view(), name='Verify-User'),
     path('retrieve-redirect-user/', RetrieveSubUserView.as_view(), name='Retrieve-Sub-User'),
-    path('redirect-ticket/', TicketRedirectView.as_view(), name='Ticket-Redirect'),
+    path('redirect-ticket/<int:id>/<int:ticket_id>', TicketRedirectView.as_view(), name='Ticket-Redirect'),
     path('subuser-tickets/<int:id>/', SubUserSupportTicket.as_view(), name='SubUser-Support-Ticket'),
-    path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', RedirectAnswerView.as_view(), name='Redirect-Answer'),
+    path('subuser-redirect-ticket/<int:id>/<int:ticket_id>/', RedirectAnswerView.as_view(), name='Redirect-Answer'),
     path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
 
 

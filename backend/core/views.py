@@ -947,10 +947,10 @@ class UpdateTicketMessageView(APIView):
 
 
 class ResolvedTicket(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            # user = request.user
+            user = User.objects.get(id=id)
 
             if request.data:
                 if 'ticket_id' not in request.data:
@@ -2487,6 +2487,7 @@ class SupportManagement(APIView):
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            print('res_obj: ', res_obj)
             if res_obj != None:
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
                                                             response_ticket=res_obj)
@@ -2526,10 +2527,12 @@ class RetrieveSubUserView(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             department = request.data.get('department')
+            print('department: ', department)
             if not department:
-                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
             sub_users = User.objects.filter(department=department, user_role='sub_user')
+            print('sub_users: ', sub_users)
             serializer = UserSerializer(sub_users, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)

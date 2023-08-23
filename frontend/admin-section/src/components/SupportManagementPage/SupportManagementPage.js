@@ -14,10 +14,9 @@ import user4 from "../../assets/user6.png";
 import eye from "../../assets/eye.svg";
 import { MainDiv } from "../CommonBgRow";
 import SupportHistory from "../SupportHistory/SupportHistory";
-import { BiSolidCrown } from "react-icons/bi";
-import cross from "../../assets/Group 81.svg";
 import axios from "axios";
 import Export from "../Export/Export";
+import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 
 const SupportManagementPage = () => {
   // Support management API
@@ -32,11 +31,13 @@ const SupportManagementPage = () => {
 
   const [selectedOption, setSelectedOption] = useState("All");
 
+  const [tickeview, setTickeview] = useState([]);
+
   useEffect(() => {
     async function getSupportData() {
       try {
         const res = await axios.get("http://127.0.0.1:8000/support-management");
-        // console.log("res====>>>>", res?.data.tickets);
+        // console.log("res====>>>>", res?.data);
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);
         setPendingRequest(res?.data?.pending_request);
@@ -91,8 +92,6 @@ const SupportManagementPage = () => {
   const displayTickets =
     filteredArray.length > 0 ? filteredArray : filteredTickets;
 
-    console.log(displayTickets,"==>>displayTickets");
-
   const requestArray = [
     { img: pending, name: "Pending Requests", count: PendingRequest },
     { img: resolved, name: "Resolved Requests", count: ResolvedRequest },
@@ -123,7 +122,6 @@ const SupportManagementPage = () => {
       status: "Redirected",
     },
   ];
-  const [selecteReply, setSelecteReply] = useState("reply");
 
   return (
     <>
@@ -186,7 +184,13 @@ const SupportManagementPage = () => {
                   {displayTickets.map((res, index) => (
                     <MainDiv>
                       <>
-                        <div className="col-3 d-flex align-items-center">
+                        <div
+                          key={index}
+                          className="col-3 d-flex align-items-center cursor"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => setTickeview(res)}
+                        >
                           <span>#000{index + 1}</span>
                           <span className="px-2">
                             <img
@@ -202,7 +206,12 @@ const SupportManagementPage = () => {
                           </span>
                           <span>{res?.user?.username}</span>
                         </div>
-                        <div className="col-2 d-flex align-items-center justify-content-center">
+                        <div
+                          className="col-2 d-flex align-items-center justify-content-center cursor"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => setTickeview(res)}
+                        >
                           <button
                             className="px-2"
                             style={{
@@ -223,16 +232,20 @@ const SupportManagementPage = () => {
                             {res.department}
                           </button>
                         </div>
-                        <div className="col-2 d-flex align-items-center justify-content-center">
-                          <div
-                            className="cursor"
-                            data-bs-toggle="modal"
-                            data-bs-target="#exampleModal"
-                          >
-                            {res?.subject}
-                          </div>
+                        <div
+                          className="col-2 d-flex align-items-center justify-content-center cursor"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => setTickeview(res)}
+                        >
+                          <div>{res?.subject}</div>
                         </div>
-                        <div className="col-2 d-flex align-items-center justify-content-center">
+                        <div
+                          className="col-2 d-flex align-items-center justify-content-center cursor"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => setTickeview(res)}
+                        >
                           <button
                             className="px-2 text-center text-capitalize"
                             style={{
@@ -256,7 +269,12 @@ const SupportManagementPage = () => {
                             {res?.status}
                           </button>
                         </div>
-                        <div className="col-3 d-flex align-items-center justify-content-end gap-1">
+                        <div
+                          className="col-3 d-flex align-items-center justify-content-end gap-1 cursor"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => setTickeview(res)}
+                        >
                           <div className="">{res?.created}</div>
                           {/* <div className="">15-06-2023 - 16:37</div> */}
                           <img src={eye} alt="" height={24} width={24} />
@@ -294,193 +312,10 @@ const SupportManagementPage = () => {
           </div>
         </div>
       </div>
-      {/* <!-- Modal --> */}
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div
-          class="modal-dialog modal-dialog-centered"
-          style={{ fontSize: "0.9rem" }}
-        >
-          <div class="modal-content">
-            <div class="modal-body dark-mode p-3">
-              <div className="row g-0">
-                <div className="col position-relative d-flex gap-2">
-                  <img src={user3} alt="" height={100} width={100} />
-                  <div
-                    className="position-absolute d-flex justify-content-center align-items-center"
-                    style={{
-                      height: "1.7rem",
-                      width: "1.7rem",
-                      border: "3px solid #FF9100",
-                      borderRadius: "50%",
-                      backgroundColor: "#0B2447",
-                      top: "5px",
-                      left: "4.6rem",
-                    }}
-                  >
-                    <BiSolidCrown
-                      fontSize={"0.8rem"}
-                      style={{ color: "#FF9100" }}
-                    />
-                  </div>
-                  <div
-                    className="d-flex justify-content-center flex-column"
-                    style={{ fontSize: "0.9rem" }}
-                  >
-                    <span>John Doe</span>
-                    <span>johndoe</span>
-                  </div>
-                </div>
-                <div className="col d-flex justify-content-end flex-column">
-                  <span className="mb-1">Date</span>
-                  <div className="">
-                    <span
-                      className="py-1 px-2"
-                      style={{ backgroundColor: "#0B2447" }}
-                    >
-                      22-05-2023 - 16:38
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="my-2 d-flex flex-column">
-                <span>Subject</span>
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="form-control darkMode-input "
-                />
-              </div>
-              <div className="my-2">
-                <span>Message</span>
-                <div className="">
-                  <textarea
-                    style={{ height: "100px", fontSize: ".8rem" }}
-                    className="darkMode-input form-control my-2 p-2"
-                  >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    eleifend vehicula tristique. Suspendisse vitae lectus sed
-                    massa interdum consectetur. Pellentesque habitant morbi
-                    tristique senectus et netus et malesuada fames ac turpis
-                    egestas. Integer auctor nisl in lacus fringilla, et
-                    tincidunt ex laoreet.
-                  </textarea>
-                </div>
-              </div>
-              {/* For Redirected msg */}
-              <div
-                className="my-2 py-2"
-                style={{ color: "#58DEAA", fontSize: "0.8rem" }}
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                eleifend vehicula tristique. Suspendisse vitae lectus sed massa
-                interdum consectetur.
-              </div>
-              {/* End For Redirected msg */}
-              {/* Reply */}
-              <div className="d-flex gap-2">
-                <div className="">Reply</div>
-                <div className="" style={{ color: "#DD7DFF" }}>
-                  Jhon Doe
-                </div>
-                <div className="ms-auto">22-05-2023 - 16:38</div>
-              </div>
-              <textarea
-                style={{ height: "100px", fontSize: ".8rem" }}
-                className="darkMode-input form-control my-2 p-2"
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                eleifend vehicula tristique. Suspendisse vitae lectus sed massa
-                interdum consectetur. Pellentesque habitant morbi tristique
-                senectus et netus et malesuada fames ac turpis egestas. Integer
-                auctor nisl in lacus fringilla, et tincidunt ex laoreet.
-              </textarea>
-              {/* End Reply */}
-              <div className="my-3">
-                <span
-                  className="cursor"
-                  onClick={() => setSelecteReply("reply")}
-                  style={{ color: selecteReply === "reply" && "#D2DB08" }}
-                >
-                  Reply
-                </span>
-                <span
-                  onClick={() => setSelecteReply("redirect")}
-                  style={{ color: selecteReply === "redirect" && "#D2DB08" }}
-                  className="ps-2 cursor"
-                >
-                  Redirect
-                </span>
-                <div className="my-2">
-                  {selecteReply === "reply" && (
-                    <textarea
-                      style={{ height: "100px", fontSize: ".9rem" }}
-                      className="darkMode-input form-control"
-                    >
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      Sed eleifend vehicula tristique. Suspendisse vitae lectus
-                      sed massa interdum consectetur.
-                    </textarea>
-                  )}
-                  {selecteReply === "redirect" && (
-                    <>
-                      <div
-                        style={{ backgroundColor: "#0B2447" }}
-                        className="col-3 text-center"
-                      >
-                        Select
-                      </div>
-                      <div className="my-2">
-                        <span>Note</span>
-                        <input
-                          type="text"
-                          name=""
-                          id=""
-                          className="form-control darkMode-input "
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="my-3 d-flex justify-content-center">
-                  <button
-                    className="px-3 py-1"
-                    style={{
-                      backgroundColor: "transparent",
-                      borderRadius: "4px",
-                      border: "1px solid #D2DB08",
-                      color: "#D2DB08",
-                    }}
-                  >
-                    Done
-                  </button>
-                </div>
-              </div>
-            </div>
-            <img
-              data-bs-dismiss="modal"
-              src={cross}
-              alt=""
-              style={{
-                position: "absolute",
-                top: "-1rem",
-                right: "-1.1rem",
-                cursor: "pointer",
-              }}
-              height={45}
-              width={45}
-            />
-          </div>
-        </div>
-      </div>
 
-      <Export exportList={displayTickets}/>
+      <TicketReplyModal tickeview={tickeview}/>
+
+      <Export exportList={displayTickets} />
     </>
   );
 };

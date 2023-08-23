@@ -16,8 +16,8 @@ const SupportManagementFilter = (props) => {
     <>
       <div className="d-flex p-2">
         <div className="p-2 flex-grow-1">
-          <div class="input-group w-50">
-            <span class="input-group-text search-icon-dark" id="basic-addon1">
+          <div className="input-group w-50">
+            <span className="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
             <input

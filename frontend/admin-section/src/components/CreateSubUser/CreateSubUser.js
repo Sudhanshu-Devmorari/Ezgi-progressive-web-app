@@ -25,8 +25,9 @@ const CreateSubUser = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   // const authTypeOptions = ["Option A", "Option B", "Option C"];
   const departmentOptions = [
-    "Support Supervisor",
-    "Financial Supervisor",
+    "Support",
+    "Financial",
+    "Technical",
     "IT Supervisor",
     "Ads Manager",
     "Director Manager",
