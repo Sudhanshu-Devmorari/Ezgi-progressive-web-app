@@ -17,6 +17,7 @@ import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCo
 import DashboardSU from "../DashboardSU/DashboardSU";
 import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
+import config from "../../config";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -45,7 +46,7 @@ const MainPage = () => {
 
   const homeApiData = async (user_id) => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/retrieve-commentator/?id=${user_id}`)
+      .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
         setData(res.data);
         setPublicComments(res.data.Public_Comments);

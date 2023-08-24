@@ -13,6 +13,7 @@ import green_tick from "../../assets/checks-1.svg";
 import yellow_tick from "../../assets/checks.svg";
 import "./NotificationManagementPage.css";
 import axios from "axios";
+import config from "../../config";
 
 const NotificationManagementPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -70,7 +71,7 @@ const NotificationManagementPage = () => {
     async function getNotificationsData() {
       try {
         const res = await axios.get(
-          "http://127.0.0.1:8000/notification-management/"
+          `${config?.apiUrl}/notification-management/`
         );
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;

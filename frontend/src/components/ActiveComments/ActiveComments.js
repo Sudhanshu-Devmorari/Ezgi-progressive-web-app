@@ -20,6 +20,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -122,7 +123,7 @@ const ActiveComments = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : `http://127.0.0.1:8000${profileData?.profile_pic}`
+                    : `${config?.apiUrl}${profileData?.profile_pic}`
                 }
                 width={100}
                 height={100}

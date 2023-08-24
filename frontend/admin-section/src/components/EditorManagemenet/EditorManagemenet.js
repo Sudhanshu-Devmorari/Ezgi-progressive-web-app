@@ -22,6 +22,7 @@ import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRe
 import moment from "moment";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 
 const EditorManagemenet = (props) => {
@@ -31,9 +32,8 @@ const EditorManagemenet = (props) => {
   const handleDeactive = async (id) => {
     try {
       const res = await axios.delete(
-        `http://127.0.0.1:8000/editor-management/${id}/`
+        `${config?.apiUrl}/editor-management/${id}/`
       );
-      console.log("API Response: ,IIIIIIIIIIIIIII", res);
       if (res.status === 404) {
         Swal.fire({
           title: "Success",
@@ -148,7 +148,7 @@ const EditorManagemenet = (props) => {
     const id = 1;  // temp
     try {
       const response = await axios.patch(
-        `http://127.0.0.1:8000/editor-management/${id}/`,
+        `${config?.apiUrl}/editor-management/${id}/`,
         formData
       );
 
@@ -192,10 +192,9 @@ const EditorManagemenet = (props) => {
     formData.append("age", addUser.age);
     try {
       const response = await axios.patch(
-        `http://127.0.0.1:8000/editor-management/${id}/`,
+        `${config?.apiUrl}/editor-management/${id}/`,
         formData
       );
-      console.log(response, "iiiiiiiii");
       if (response.status === 200) {
         Swal.fire({
           title: "Success",
@@ -215,7 +214,7 @@ const EditorManagemenet = (props) => {
   const handleEditorFiltor = async () => {
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/filter-editors/`,
+        `${config?.apiUrl}/filter-editors/`,
         {
           lavel: selectedLevelFilter,
           sucess_rate: selectedSuccessRateFilter,
@@ -635,7 +634,7 @@ const EditorManagemenet = (props) => {
     }
     setScorePointFilterDropDown(!scorePointFilterDropDown);
   };
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   return (
     <>

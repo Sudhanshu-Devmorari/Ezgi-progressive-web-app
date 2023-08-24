@@ -4,6 +4,7 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import { useFormik } from "formik";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const NotificationModel = () => {
   const userTypeOptions = ["Standard", "Commentator", "Sub User"];
@@ -28,7 +29,7 @@ const NotificationModel = () => {
       try {
         // console.log(values);
         const res = await axios.post(
-          "http://127.0.0.1:8000/notification-management/",
+          `${config?.apiUrl}/notification-management/`,
           values
         );
         // console.log(res,"========================MMMM");

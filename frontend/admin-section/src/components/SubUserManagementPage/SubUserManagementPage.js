@@ -17,6 +17,7 @@ import SubUsesTimeLine from "../SubUsesTimeLine/SubUsesTimeLine";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const SubUserManagementPage = () => {
   const users = [
@@ -38,7 +39,7 @@ const SubUserManagementPage = () => {
     async function getSubUsers() {
       try {
         const res = await axios.get(
-          "http://127.0.0.1:8000/subuser-management/"
+          `${config?.apiUrl}/subuser-management/`
         );
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
@@ -73,7 +74,7 @@ const SubUserManagementPage = () => {
   const handleDeleteUser = async (e) => {
     try {
       const res = await axios.delete(
-        `http://127.0.0.1:8000/subuser-management/${e}`
+        `${config?.apiUrl}/subuser-management/${e}`
       );
       // console.log(res.data);
       if (res.data.status === 200) {
@@ -162,7 +163,7 @@ const SubUserManagementPage = () => {
                                 objectFit: "cover",
                                 borderRadius: "50%",
                               }}
-                              src={`http://127.0.0.1:8000${res.profile_pic}`}
+                              src={`${config?.apiUrl}${res.profile_pic}`}
                               alt=""
                               height={45}
                               width={45}

@@ -14,6 +14,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import VerificationModal from "../VerificationModal/VerificationModal";
+import config from "../../config";
 
 const AccountStatus = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -22,7 +23,7 @@ const AccountStatus = () => {
 
   const handleVerification = () => {
     axios
-      .get(`http://127.0.0.1:8000/verify/${userId}`)
+      .get(`${config?.apiUrl}/verify/${userId}`)
       .then((res) => {
         console.log(res, "===>>>>res");
       })

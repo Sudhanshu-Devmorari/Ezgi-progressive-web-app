@@ -18,6 +18,7 @@ import Selectedcheckbox from "../../assets/Group 320.svg";
 import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
+import config from "../../config";
 
 import Swal from "sweetalert2";
 
@@ -28,12 +29,10 @@ const Home = (props) => {
     // console.log(":::::::: ", file?.path);
   };
   const handleDeactive = async (id) => {
-    console.log(id,"=============>>id");
     try {
       const res = await axios.delete(
-        `http://127.0.0.1:8000/user-management/${id}/`
+        `${config?.apiUrl}/user-management/${id}/`
       );
-      console.log("API Response: ", res);
       if (res.status === 200){
         Swal.fire({
           title: "Success",
@@ -114,7 +113,7 @@ const Home = (props) => {
   const handleShow = async () => {
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/filter-user-management/`,
+        `${config?.apiUrl}/filter-user-management/`,
         {
           user_type: selectedUserTypeFilter,
           city: selectedCityFilter,
@@ -156,7 +155,7 @@ const Home = (props) => {
     formData.append("level", addUser.level);
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/user-management/`,
+        `${config?.apiUrl}/user-management/`,
         formData
       );
       // console.log("API Response:", response.data);
@@ -182,7 +181,7 @@ const Home = (props) => {
     formData.append("level", addUser.level);
     try {
       const response = await axios.patch(
-        `http://127.0.0.1:8000/user-management/${id}/`,
+        `${config?.apiUrl}/user-management/${id}/`,
         formData
       );
 
@@ -216,7 +215,7 @@ const Home = (props) => {
 
   // console.log("Cities:", cities);
 
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
   const [profile, setprofile] = useState(false);
   const [showTransactionHistory, setshowTransactionHistory] = useState(1);
   const [password, setPassword] = useState("");

@@ -3,6 +3,7 @@ import axios from "axios";
 import upload from "../../assets/upload.svg";
 import "./LevelRules.css";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const LevelRules = (props) => {
   const getRuleForLevel = props?.getRuleForLevel || {};
@@ -28,7 +29,7 @@ const LevelRules = (props) => {
       }
     }
     const res = await axios.post(
-      `http://127.0.0.1:8000/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+      `${config?.apiUrl}/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       formData
     );
     // console.log("res========>>>", res);
@@ -142,7 +143,7 @@ const LevelRules = (props) => {
                     src={
                       previewIcon
                         ? previewIcon
-                        : `http://127.0.0.1:8000${getRuleForLevel.level_icon}`
+                        : `${config?.apiUrl}${getRuleForLevel.level_icon}`
                     }
                     alt=""
                     height={22}

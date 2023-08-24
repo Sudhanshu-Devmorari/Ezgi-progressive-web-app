@@ -16,6 +16,7 @@ import perIcon from "../../assets/per.svg";
 import "./SalesManagementPage.css";
 import axios from "axios";
 import Export from "../Export/Export";
+import config from "../../config";
 
 const SalesManagementPage = () => {
   const salesArray = [
@@ -58,7 +59,7 @@ const SalesManagementPage = () => {
   useEffect(() => {
     async function getSalesData() {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/sales-management");
+        const res = await axios.get(`${config?.apiUrl}/sales-management`);
         // console.log("res====>>>>", res?.data);
       } catch (error) {
         console.log(error);

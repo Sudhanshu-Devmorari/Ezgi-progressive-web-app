@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const SalesMembershipSettings = (props) => {
   const getMembershipData = props.getMembershipData || {};
@@ -14,7 +15,7 @@ const SalesMembershipSettings = (props) => {
   //  Update Membership Setting
   const UpdateMembershipSettings = async () => {
     const res = await axios.post(
-      `http://127.0.0.1:8000/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+      `${config?.apiUrl}/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       getMembershipData
     );
     // console.log("res========>>>", res);

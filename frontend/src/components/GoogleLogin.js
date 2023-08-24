@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import google from "../assets/googleLogo.png";
+import config from "../config";
 
 const GoogleLogin = () => {
   const [user, setUser] = useState([]);
@@ -35,7 +36,7 @@ const GoogleLogin = () => {
             formData.append("email", res.data.email);
             formData.append("name", res.data.name);
             formData.append("username", username);
-            return axios.post("http://127.0.0.1:8000/google-login/", formData);
+            return axios.post(`${config?.apiUrl}/google-login/`, formData);
           } catch (e) {
             throw e;
           }

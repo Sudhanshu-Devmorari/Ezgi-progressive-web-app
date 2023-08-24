@@ -8,7 +8,7 @@ import commentsIcon from "../../assets/Group 59.svg";
 import winner from "../../assets/Group 73.svg";
 import lose from "../../assets/Group 74.svg";
 import axios from "axios";
-
+import config from "../../config";
 
 const CommentsManagementPage = () => {
   const [data, setData] = useState({});
@@ -18,7 +18,7 @@ const CommentsManagementPage = () => {
   const commentManagementApiData = async () => {
     // console.log(data)
     await axios
-      .get(`http://127.0.0.1:8000/comments-management/`)
+      .get(`${config?.apiUrl}/comments-management/`)
       .then((res) => {
         // console.log("=-=-=-=-=-=-=> ", res.data)
         setData(res.data);

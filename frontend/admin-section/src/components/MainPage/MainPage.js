@@ -15,6 +15,7 @@ import Home from "../Home/Home";
 import DailySalesArray from "../DailySalesArray/DailySalesArray";
 import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 import axios from "axios";
+import config from "../../config";
 
 
 const MainPage = () => {
@@ -23,7 +24,7 @@ const MainPage = () => {
 
   const adminHomeApiData = async (user_id) => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/home/`)
+      .get(`${config?.apiUrl}/home/`)
       .then((res) => {
         setData(res?.data);
         setUsers(res?.data?.users_list)

@@ -25,6 +25,7 @@ import "react-circular-progressbar/dist/styles.css";
 import CommentsManagementFilter from "../CommentsManagementFilter/CommentsManagementFilter";
 import moment from "moment";
 import axios from "axios";
+import config from "../../config";
 
 const CommentsManagement = (props) => {
   const [fData, setFdata] = useState({});
@@ -53,7 +54,7 @@ const CommentsManagement = (props) => {
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("user-id");
     await axios
-      .post(`http://127.0.0.1:8000/filter-comments/${user_id}/`, {
+      .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
         country: selectedCountry,
         league: selectedLeague,
@@ -105,7 +106,7 @@ const CommentsManagement = (props) => {
   const handleStatus = async (id, status) => {
     try {
       const res = await axios.patch(
-        `http://127.0.0.1:8000/comments-management/${id}/`,
+        `${config?.apiUrl}/comments-management/${id}/`,
         { status: `${status}` }
       );
     } catch (error) {
@@ -385,7 +386,7 @@ const CommentsManagement = (props) => {
       status: circle_check,
     },
   ];
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
   return (
     <>
       <div className="dark-mode p-2 m-2 mb-0 home-height">
