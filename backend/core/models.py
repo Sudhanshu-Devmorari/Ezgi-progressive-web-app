@@ -58,6 +58,7 @@ class User(AbstractBaseUser):
     is_sales_export = models.BooleanField(default=False)
     is_all_permission = models.BooleanField(default=False)
     is_delete = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

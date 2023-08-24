@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import OTPInput from "react-otp-input";
 import "./OtpModal.css";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const OtpModal = (props) => {
   const [otp, setOtp] = useState("");
@@ -29,7 +31,31 @@ const OtpModal = (props) => {
   const handleResendClick = () => {
     setTimer(30);
     setIsTimerVisible(true);
+    handleOtpVerify()
   };
+  const [errorMessage, setErrorMessage] = useState("");
+  function handleOtpVerify() {
+    axios
+      .post(`http://127.0.0.1:8000/otp-verify/`, { otp: otp })
+      .then((res) => {
+        console.log(res);
+        if (res.data.status === 200) {
+          props?.setShowModal(3);
+        } else if (res.data.status === 400 || res.data.status === 500) {
+          // Swal.fire({
+          //   title: "Error",
+          //   text: res.data.error,
+          //   icon: "error",
+          //   backdrop: false,
+          //   customClass: "dark-mode-alert",
+          // });
+          setErrorMessage(res.data.error);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   return (
     <>
@@ -71,10 +97,15 @@ const OtpModal = (props) => {
             Again Send
           </span>
         </div>
+        {errorMessage && (
+          <div className="error text-danger mt-1">{errorMessage}</div>
+        )}
       </div>
       <div className="d-flex flex-column align-items-center mt-3 font">
         <button
-          onClick={() => props?.setShowModal(3)}
+          // onClick={() => props?.setShowModal(3)}
+          
+          onClick={handleOtpVerify}
           style={{
             color: "#D2DB08",
             border: "1px solid #D2DB08",

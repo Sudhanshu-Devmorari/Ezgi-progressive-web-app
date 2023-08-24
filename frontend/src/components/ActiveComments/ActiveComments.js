@@ -39,50 +39,58 @@ const ActiveComments = (props) => {
 
   const profileData = props.profileData;
 
-  // function handleChangeProfilePic(e) {
-  //   setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-  //   setEditProfile(false);
-  //   const formData = new FormData();
-  //   formData.append("file", e.target.files[0]);
-  //   const res = axios.post(`${config?.apiUrl}/profile/${userId}`, formData);
-  //   console.log("res: ", res);
-  // }
-
   async function handleChangeProfilePic(e) {
     try {
-      setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-      setEditProfile(false);
-      const formData = new FormData();
-      formData.append("file", e.target.files[0]);
-
-      const res = await axios.post(
-        `${config?.apiUrl}/profile/${userId}`,
-        formData
-      );
-      console.log("res: ", res);
-      console.log("res: ", res.status);
-      if (res.status === 200) {
-        Swal.fire({
-          title: "Success",
-          text: "Profile Updated!",
-          icon: "success",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
-      } else if (res.status === 400) {
-        Swal.fire({
-          title: "Error",
-          text: "Failed",
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
+      const file = e.target.files[0];
+      if (file) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (allowedTypes.includes(file.type)) {
+          setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+          setEditProfile(false);
+          const formData = new FormData();
+          formData.append("file", e.target.files[0]);
+          const res = await axios.post(
+            `http://127.0.0.1:8000/profile/${userId}`,
+            formData
+          );
+          // console.log("res: ", res);
+          // console.log("res: ", res.status);
+          if (res.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Profile Updated!",
+              icon: "success",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          } else if (res.status === 400) {
+            Swal.fire({
+              title: "Error",
+              text: "Failed",
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Invalid file type. Please select a valid image file.",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+          e.target.value = "";
+        }
       }
-    } catch (error) {
-      // Handle errors
-    }
+    } catch (error) {}
   }
 
   return (
@@ -164,6 +172,7 @@ const ActiveComments = (props) => {
                 name=""
                 id="camera-icon"
                 className="d-none"
+                accept=".jpg, .jpeg, .png"
                 onChange={handleChangeProfilePic}
               />
             </div>
@@ -394,12 +403,16 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="flex-grow-1">Category</div>
-          {profileData?.category.some(categoryItem => categoryItem.includes("Basketball")) && (
+          {profileData?.category.some((categoryItem) =>
+            categoryItem.includes("Basketball")
+          ) && (
             <div className="">
               <img src={basketball} alt="" height={45} width={45} />
             </div>
           )}
-          {profileData?.category.some(categoryItem => categoryItem.includes("Football")) && (
+          {profileData?.category.some((categoryItem) =>
+            categoryItem.includes("Football")
+          ) && (
             <div className="">
               <img src={football} alt="" height={45} width={45} />
             </div>
