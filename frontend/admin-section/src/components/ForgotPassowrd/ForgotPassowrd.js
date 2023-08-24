@@ -4,9 +4,13 @@ import * as Yup from "yup";
 import cross from "../../assets/Group 81.svg";
 import OtpModal from "../OtpModal/OtpModal";
 import NewPassword from "../NewPassword/NewPassword";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const ForgotPassowrd = () => {
   const [showModal, setShowModal] = useState(1);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [phone, setPhone] = useState('');
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone is required")
@@ -18,7 +22,37 @@ const ForgotPassowrd = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      setPhone(values.phone)
+      axios
+        .post("http://127.0.0.1:8000/otp-resend/", {
+          phone: values.phone,
+          is_admin: true,
+        })
+        .then((res) => {
+          console.log(res.data);
+          if ((res.data.status === 500) || res.data.status === 404) {
+            // Swal.fire({
+            //   title: "Error",
+            //   text: res.data.error || res.data.data,
+            //   icon: "error",
+            //   backdrop: false,
+            //   customClass: "dark-mode-alert",
+            // });
+            setErrorMessage(res.data.error || res.data.data)
+          } else if (res.data.status === 200) {
+            setShowModal(2)
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          Swal.fire({
+            title: "Error",
+            text: error.message,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        });
     },
   });
   return (
@@ -63,9 +97,10 @@ const ForgotPassowrd = () => {
                       {formik.errors.phone}
                     </div>
                   ) : null}
+                  {errorMessage && <div className="error text-danger mt-1">{errorMessage}</div>}
                   <div className="d-flex justify-content-center mt-4">
                     <input
-                      onClick={() => setShowModal(2)}
+                      // onClick={() => setShowModal(2)}
                       type="submit"
                       value="Continue"
                       style={{
@@ -80,9 +115,10 @@ const ForgotPassowrd = () => {
                 </form>
               )}
               {showModal === 2 && <OtpModal setShowModal={setShowModal} />}
-              {showModal === 3 && <NewPassword />}
+              {showModal === 3 && <NewPassword phone={phone}/>}
             </div>
             <img
+              onClick={()=>setShowModal(1)}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

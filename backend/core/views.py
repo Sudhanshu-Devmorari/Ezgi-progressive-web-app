@@ -90,7 +90,10 @@ class OtpReSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
         phone = request.data['phone']
         try:
-            user = User.objects.get(phone=phone)
+            if 'is_admin' in request.data:
+                user = User.objects.get(phone=phone,is_admin=True)
+            else:
+                user = User.objects.get(phone=phone)
             otp = totp.now()
             # print('otp: ', otp)
             # res = sms_send(phone, otp)  
@@ -110,7 +113,11 @@ class LoginView(APIView):
         phone = request.data['phone']
         password = request.data['password']
         try:
-            user_phone = User.objects.get(phone=phone, is_delete=False)
+            if 'is_admin' in request.data:
+                user_phone = User.objects.get(phone=phone, is_delete=False,is_admin=True)
+            else:
+                user_phone = User.objects.get(phone=phone, is_delete=False)
+                
             if user_phone.password == password:
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
             else:

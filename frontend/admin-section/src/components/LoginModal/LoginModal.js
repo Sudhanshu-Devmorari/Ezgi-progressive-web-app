@@ -3,6 +3,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import "./LoginModal.css";
 import ForgotPassowrd from "../ForgotPassowrd/ForgotPassowrd";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const LoginModal = () => {
   const validationSchema = Yup.object({
@@ -25,7 +27,31 @@ const LoginModal = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       console.log(values);
-    localStorage.setItem("admin-user-id", 1);
+      axios
+        .post("http://127.0.0.1:8000/login/", {
+          phone: values.phone,
+          password: values.password,
+          is_admin: true,
+        })
+        .then((res) => {
+          // console.log(res);
+          if ((res.data.status === 400) || res.data.status === 404) {
+            Swal.fire({
+              title: "Error",
+              text: res.data.data,
+              icon: "error",
+              backdrop: false,
+              customClass: "dark-mode-alert",
+            });
+          } else if (res.data.status === 200) {
+            const userId = res.data.userId
+            localStorage.setItem("admin-user-id", userId);
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   });
 

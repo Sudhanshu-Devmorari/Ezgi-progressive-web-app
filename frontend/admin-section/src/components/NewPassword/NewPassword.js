@@ -2,8 +2,10 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import axios from "axios";
+import Swal from "sweetalert2";
 
-const NewPassword = () => {
+const NewPassword = (props) => {
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -15,7 +17,26 @@ const NewPassword = () => {
         .required("Password is required"),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      axios
+        .post("http://127.0.0.1:8000/password-reset/", {
+          new_ps: values.password,
+          phone: props?.phone,
+        })
+        .then((res) => {
+          //   console.log(res);
+          if (res.data.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Password changed successfully",
+              icon: "success",
+              backdrop: false,
+              customClass: "dark-mode-alert",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   });
 
@@ -53,14 +74,21 @@ const NewPassword = () => {
               }}
             >
               {formik.values.showPassword ? (
-                <AiOutlineEyeInvisible fontSize={"1.4rem"}  style={{color: "#E6E6E6"}}/>
+                <AiOutlineEyeInvisible
+                  fontSize={"1.4rem"}
+                  style={{ color: "#E6E6E6" }}
+                />
               ) : (
-                <AiOutlineEye fontSize={"1.4rem"}  style={{color: "#E6E6E6"}}/>
+                <AiOutlineEye
+                  fontSize={"1.4rem"}
+                  style={{ color: "#E6E6E6" }}
+                />
               )}
             </button>
           </div>
           <div className="d-flex flex-column align-items-center my-4">
             <button
+              data-bs-dismiss="modal"
               type="submit"
               style={{
                 color: "#D2DB08",
@@ -80,5 +108,3 @@ const NewPassword = () => {
 };
 
 export default NewPassword;
-
-
