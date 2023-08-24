@@ -11,23 +11,31 @@ import NotificationManagementPage from "./components/NotificationManagementPage/
 import AdsManagementPage from "./components/AdsManagementPage/AdsManagementPage";
 import SettingsPage from "./components/SettingsPage/SettingsPage";
 import EditorSettingsPage from "./components/EditorSettingsPage/EditorSettingsPage";
+import LoginModal from "./components/LoginModal/LoginModal";
 
 function App() {
+  const isAuthenticated = localStorage.getItem("admin-user-id");
   return (
     <>
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/users" element={<UserManagementPage />} />
-        <Route path="comments" element={<CommentsManagementPage />} />
-        <Route path="editors" element={<EditorManagementPage />} />
-        <Route path="withdrawal" element={<WithdrawalManagementPage />} />
-        <Route path="sales" element={<SalesManagementPage />} />
-        <Route path="support" element={<SupportManagementPage />} />
-        <Route path="subuser" element={<SubUserManagementPage />} />
-        <Route path="notification" element={<NotificationManagementPage />} />
-        <Route path="ads" element={<AdsManagementPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route path="editorSettings" element={<EditorSettingsPage />} />
+        {!isAuthenticated ? (
+          <Route path="/" element={<LoginModal />} />
+        ) : (
+          <>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/users" element={<UserManagementPage />} />
+            <Route path="comments" element={<CommentsManagementPage />} />
+            <Route path="editors" element={<EditorManagementPage />} />
+            <Route path="withdrawal" element={<WithdrawalManagementPage />} />
+            <Route path="sales" element={<SalesManagementPage />} />
+            <Route path="support" element={<SupportManagementPage />} />
+            <Route path="subuser" element={<SubUserManagementPage />} />
+            <Route path="notification" element={<NotificationManagementPage />} />
+            <Route path="ads" element={<AdsManagementPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="editorSettings" element={<EditorSettingsPage />} />
+          </>
+        )}
       </Routes>
     </>
   );

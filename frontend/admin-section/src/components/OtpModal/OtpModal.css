@@ -1,0 +1,13 @@
+.otpinputdesign-dark-mode{
+    width: 2.5rem !important;
+    height: 2.9rem;
+    margin: 0 0.2rem;
+    font-size: 2rem;
+    background-color: transparent !important;
+    border: 1px solid #E6E6E6 !important;
+    color: #E6E6E6;
+    border-radius: 3px;
+}
+.otpinputdesign-dark-mode:focus{
+    outline: none !important;
+}
