@@ -17,6 +17,7 @@ import sqr from "../../assets/Rectangle 2682.svg";
 import SelectedSqr from "../../assets/Group 317.svg";
 import Swal from "sweetalert2";
 import "./CreateSubUser.css";
+import config from "../../config";
 
 const CreateSubUser = (props) => {
   const [isTransactionSelected, setIsTransactionSelected] = useState(false);
@@ -170,7 +171,7 @@ const CreateSubUser = (props) => {
         formData.append("is_price_update", "true");
       }
       const res = await axios.post(
-        "http://127.0.0.1:8000/subuser-management/",
+        `${config?.apiUrl}/subuser-management/`,
         formData
       );
       // console.log(res);
@@ -182,7 +183,7 @@ const CreateSubUser = (props) => {
   useEffect(() => {
     async function editUser() {
       const res = await axios.patch(
-        `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`
+        `${config?.apiUrl}/subuser-management/${props.editUserId}/`
       );
       console.log(res.data);
       setName(res?.data.data.name);
@@ -215,7 +216,7 @@ const CreateSubUser = (props) => {
     try {
       // console.log("props.editUserId=>>>", props.editUserId);
       const res = await axios.patch(
-        `http://127.0.0.1:8000/subuser-management/${props.editUserId}/`,
+        `${config?.apiUrl}/subuser-management/${props.editUserId}/`,
         {
           name: Name,
           phone: Phone,
@@ -319,7 +320,7 @@ const CreateSubUser = (props) => {
                     <img
                       src={
                         preveiwProfilePic === null
-                          ? `http://127.0.0.1:8000${userProfile}`
+                          ? `${config?.apiUrl}${userProfile}`
                           : preveiwProfilePic
                       }
                       alt=""
@@ -357,7 +358,7 @@ const CreateSubUser = (props) => {
                     <img
                       src={
                         preveiwProfilePic === null
-                          ? `http://127.0.0.1:8000${userProfile}`
+                          ? `${config?.apiUrl}${userProfile}`
                           : preveiwProfilePic
                       }
                       alt=""

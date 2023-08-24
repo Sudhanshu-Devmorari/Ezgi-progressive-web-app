@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SalesSubscriptionSettings from "../SalesSubscriptionSettings/SalesSubscriptionSettings";
 import axios from "axios";
+import config from "../../config";
 
 const EditorsubscriptionSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Journeyman");
@@ -11,7 +12,7 @@ const EditorsubscriptionSettings = () => {
     async function getData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/subscription-setting/?commentator_level=${selectLevel.toLowerCase()}`
+          `${config?.apiUrl}/subscription-setting/?commentator_level=${selectLevel.toLowerCase()}`
         );
         // console.log("res==>>", res.data[0]);
         setSubscriptionSettingsData(res.data[0]);

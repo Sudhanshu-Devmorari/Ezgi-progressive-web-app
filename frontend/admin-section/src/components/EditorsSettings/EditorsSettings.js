@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./EditorsSettings.css";
 import LevelRules from "../LevelRules/LevelRules";
 import axios from "axios";
+import config from "../../config";
 
 const EditorsSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Apprentice");
@@ -12,7 +13,7 @@ const EditorsSettings = () => {
     async function getData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/level-rule/?commentator_level=${selectLevel.toLowerCase()}`
+          `${config?.apiUrl}/level-rule/?commentator_level=${selectLevel.toLowerCase()}`
         );
         setGetRuleForLevel(res.data[0]);
       } catch (error) {

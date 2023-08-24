@@ -5,6 +5,7 @@ import cross from "../../assets/Group 81.svg";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import config from "../../config";
 
 const SalesManagementFilter = () => {
   const DateOptions = ["option 1", "option 2"];
@@ -76,7 +77,7 @@ const SalesManagementFilter = () => {
     };
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/sales-management/",
+        `${config?.apiUrl}/sales-management/`,
         payload
       );
       // console.log(res.data, "====>>>>>res");

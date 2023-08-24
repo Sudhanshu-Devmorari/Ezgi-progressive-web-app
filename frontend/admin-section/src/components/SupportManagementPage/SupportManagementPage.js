@@ -17,6 +17,7 @@ import SupportHistory from "../SupportHistory/SupportHistory";
 import axios from "axios";
 import Export from "../Export/Export";
 import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
+import config from "../../config";
 
 const SupportManagementPage = () => {
   // Support management API
@@ -47,7 +48,7 @@ const SupportManagementPage = () => {
   useEffect(() => {
     async function getSupportData() {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/support-management");
+        const res = await axios.get(`${config?.apiUrl}/support-management`);
         // console.log("res====>>>>", res?.data);
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);
@@ -209,7 +210,7 @@ const SupportManagementPage = () => {
                                 objectFit: "cover",
                                 borderRadius: "50%",
                               }}
-                              src={`http://127.0.0.1:8000${res?.user?.profile_pic}`}
+                              src={`${config?.apiUrl}${res?.user?.profile_pic}`}
                               alt=""
                               height={45}
                               width={45}

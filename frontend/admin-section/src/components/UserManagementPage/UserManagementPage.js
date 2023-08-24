@@ -12,6 +12,7 @@ import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import axios from "axios";
+import config from "../../config";
 
 const UserManagementPage = () => {
   const [data, setData] = useState([]);
@@ -20,7 +21,7 @@ const UserManagementPage = () => {
 
   const userManagementApiData = async () => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/user-management/`)
+      .get(`${config?.apiUrl}/user-management/`)
       .then((res) => {
         setData(res?.data);
         setUsers(res?.data?.users_list)

@@ -2,6 +2,7 @@ import React from "react";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
 import './SupportHistory.css'
+import config from "../../config";
 
 const SupportHistory = (props) => {
   const users = [
@@ -46,7 +47,7 @@ const SupportHistory = (props) => {
             style={{ borderBottom: "0.2px solid #E6E6E6" }}
           >
             <div>
-              <img style={{objectFit:"cover", borderRadius:"50%"}} src={`http://127.0.0.1:8000${res?.user?.profile_pic}`} alt="" height={45} width={45} />
+              <img style={{objectFit:"cover", borderRadius:"50%"}} src={`${config?.apiUrl}${res?.user?.profile_pic}`} alt="" height={45} width={45} />
             </div>
             <div className=" flex-grow-1 d-flex flex-column">
               <div className="d-flex justify-content-between">

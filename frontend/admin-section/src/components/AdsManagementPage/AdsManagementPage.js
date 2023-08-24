@@ -16,6 +16,7 @@ import cross from "../../assets/Group 81.svg";
 import upload from "../../assets/upload.svg";
 import axios from "axios";
 import CreateAdsModal from "../CreateAdsModal/CreateAdsModal";
+import config from "../../config";
 
 const AdsManagementPage = () => {
   const [editTrue, setEditTrue] = useState(false);
@@ -49,7 +50,7 @@ const AdsManagementPage = () => {
   useEffect(() => {
     async function getAdsData() {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/ads-management/");
+        const res = await axios.get(`${config?.apiUrl}/ads-management/`);
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setBanners(data.Banners);

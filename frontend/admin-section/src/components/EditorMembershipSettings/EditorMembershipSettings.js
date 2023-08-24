@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SalesMembershipSettings from "../SalesMembershipSettings/SalesMembershipSettings";
 import axios from "axios";
+import config from "../../config";
 
 const EditorMembershipSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Apprentice");
@@ -10,7 +11,7 @@ const EditorMembershipSettings = () => {
     async function getData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/membership-setting/?commentator_level=${selectLevel.toLowerCase()}`
+          `${config?.apiUrl}/membership-setting/?commentator_level=${selectLevel.toLowerCase()}`
         );
         setGetMembershipData(res.data[0]);
       } catch (error) {

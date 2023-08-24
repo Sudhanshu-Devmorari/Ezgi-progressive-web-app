@@ -5,6 +5,7 @@ import cross from "../../assets/Group 81.svg";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import config from "../../config";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
@@ -28,7 +29,7 @@ const TicketReplyModal = (props) => {
   const toggleSubUserDropDown = () => {
     // Get all subusers
     axios
-      .post("http://127.0.0.1:8000/retrieve-redirect-user/", {
+      .post(`${config?.apiUrl}/retrieve-redirect-user/`, {
         department: tickeview?.department,
       })
       .then((res) => {
@@ -69,7 +70,7 @@ const TicketReplyModal = (props) => {
         });
       } else if (ticketRepltOrRedirect.reply !== "") {
         axios
-          .post(`http://127.0.0.1:8000/support-management/${38}/`, {
+          .post(`${config?.apiUrl}/support-management/${38}/`, {
             message: ticketRepltOrRedirect.reply,
             ticket_id: tickeview?.id,
           })
@@ -107,33 +108,20 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else {
-        const selectedId = subUsersOptions.find(
-          (subUser) => subUser.name === selectedSubUser.name
-        )?.id;
-        console.log(selectedId);
-        if (selectedId) {
-          axios
-            .post(
-              `http://127.0.0.1:8000/redirect-ticket/${38}/${tickeview?.id}`,
-              {
-                note: ticketRepltOrRedirect.note,
-                id: selectedId, // sub user id
-              }
-            )
-            .then((res) => {
-              console.log(res);
-              if (res.status === 200) {
-                Swal.fire({
-                  title: "Success",
-                  text: "Ticket Redirected Successfully",
-                  icon: "success",
-                  backdrop: false,
-                  customClass: "dark-mode-alert",
-                });
-              }
-            })
-            .catch((error) => {
-              console.log(error);
+        axios
+        .post(`${config?.apiUrl}/redirect-ticket/${38}/${tickeview?.id}`, {
+          note: ticketRepltOrRedirect.redirect,
+          id: tickeview?.id,    // sub user id
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Reply sent successfully",
+              icon: "success",
+              backdrop: false,
+              customClass: "dark-mode-alert",
             });
         }
       }
@@ -159,7 +147,7 @@ const TicketReplyModal = (props) => {
                 <div className="col position-relative d-flex gap-2">
                   <img
                     style={{ borderRadius: "50%", objectFit: "cover" }}
-                    src={`http://127.0.0.1:8000${tickeview?.user?.profile_pic}`}
+                    src={`${config?.apiUrl}${tickeview?.user?.profile_pic}`}
                     alt=""
                     height={100}
                     width={100}

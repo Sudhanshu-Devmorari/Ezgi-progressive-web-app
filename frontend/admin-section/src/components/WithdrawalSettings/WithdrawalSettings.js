@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import config from "../../config";
 
 const WithdrawalSettings = (props) => {
     const WithdrawalSettingData = props?.WithdrawalSettingData || {};
@@ -14,7 +15,7 @@ const WithdrawalSettings = (props) => {
     //  Update Withdrawal Setting
     const UpdateWithdrawalSettings = async () => {
     //   const res = await axios.post(
-    //     `http://127.0.0.1:8000/highlight-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+    //     `${config?.apiUrl}/highlight-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
     //     WithdrawalSettingData
     //   );
     //   console.log("res========>>>", res);

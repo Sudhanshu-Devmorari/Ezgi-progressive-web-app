@@ -11,6 +11,7 @@ import Top10 from "../Top10/Top10";
 import EditorAccountStatus from "../EditorAccountStatus/EditorAccountStatus";
 import LevelCount from "../LevelCount/LevelCount";
 import axios from "axios";
+import config from "../../config";
 
 
 const EditorManagementPage = () => {
@@ -23,7 +24,7 @@ const EditorManagementPage = () => {
   const editorManagementApiData =  () => {
     // console.log(data)
     axios
-      .get(`http://127.0.0.1:8000/editor-management/`)
+      .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
         // console.log("%%%%%%%%%", res.data)
         setData(res.data);

@@ -6,9 +6,10 @@ import user4 from "../../assets/user4.png";
 import user5 from "../../assets/user5.png";
 import user6 from "../../assets/user6.png";
 import "./UserTimeLine.css";
+import config from "../../config";
 
 const UserTimeLine = (props) => {
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   // const notification = [
   //   {

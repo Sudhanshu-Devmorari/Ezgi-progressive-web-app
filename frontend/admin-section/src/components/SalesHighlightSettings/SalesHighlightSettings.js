@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import upload from "../../assets/upload.svg";
+import config from "../../config";
 
 const SalesHighlightSettings = (props) => {
   const highlightssettingData = props?.highlightssettingData || {};
@@ -27,7 +28,7 @@ const SalesHighlightSettings = (props) => {
       }
     }
     const res = await axios.post(
-      `http://127.0.0.1:8000/highlight-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+      `${config?.apiUrl}/highlight-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
       formData
     );
     // console.log("res========>>>", res);
@@ -98,7 +99,7 @@ const SalesHighlightSettings = (props) => {
                     src={
                       previewIcon
                         ? previewIcon
-                        : `http://127.0.0.1:8000${highlightssettingData.highlight_icon}`
+                        : `${config?.apiUrl}${highlightssettingData.highlight_icon}`
                     }
                     alt=""
                     height={22}

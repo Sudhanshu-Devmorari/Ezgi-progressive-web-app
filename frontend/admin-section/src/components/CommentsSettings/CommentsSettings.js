@@ -6,6 +6,7 @@ import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from 'sweetalert2'
+import config from "../../config";
 
 const CommentsSettings = () => {
   const headers = {
@@ -148,7 +149,7 @@ const CommentsSettings = () => {
 
   const onSubmit = async (values) => {
     // console.log(values);
-    const res = await axios.post(`http://127.0.0.1:8000/comment-setting/`, {
+    const res = await axios.post(`${config?.apiUrl}/comment-setting/`, {
       editor: values.editor,
       country: selectedCountry,
       league: selectedLeague,

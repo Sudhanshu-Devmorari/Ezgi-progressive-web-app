@@ -2,6 +2,7 @@ import React from "react";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import facebook from "../assets/FacebookLogo.png";
 import axios from "axios";
+import config from "../config";
 
 const FacebookLogin = () => {
   const login = (response) => {
@@ -13,7 +14,7 @@ const FacebookLogin = () => {
     formData.append("name", response.data.name);
     formData.append("username", username);
     axios
-      .post("http://127.0.0.1:8000/facebook-login/", formData)
+      .post(`${config?.apiUrl}/facebook-login/`, formData)
       .then((response) => {
         // console.log(response.data, "====BE");
         localStorage.setItem("user-role", response.data.userRole);

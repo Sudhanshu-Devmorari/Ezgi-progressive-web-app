@@ -9,6 +9,7 @@ import likeIcon from "../../assets/heart.png";
 import starIcon from "../../assets/star.png";
 import clapIcon from "../../assets/clap-svgrepo-com.png";
 import "./MostLiked.css";
+import config from "../../config";
 
 const MostLiked = (props) => {
   // console.log("********", props?.mostLike)
@@ -70,7 +71,7 @@ const MostLiked = (props) => {
       level: "Expert",
     },
   ];
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   return (
     <div className="dark-mode p-2 mt-2 home-height" style={{ height: "64vh" }}>

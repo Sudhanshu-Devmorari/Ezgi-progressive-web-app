@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
@@ -32,7 +33,7 @@ const CreateAdsModal = (props) => {
       formData.append("file", values.profile);
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/ads-management/",
+        `${config?.apiUrl}/ads-management/`,
         formData
       );
 
@@ -58,7 +59,7 @@ const CreateAdsModal = (props) => {
   // Update Ads
   const updateAds = async () => {
     try{
-      const res = await axios.patch("http://127.0.0.1:8000/ads-management/",)
+      const res = await axios.patch(`${config?.apiUrl}/ads-management/`,)
     } catch (error){}
   }
 

@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from "react";
 import axios from "axios";
+import config from "../../config";
 
 
 const DeactivationRequestsBtns = (props) => {
@@ -9,7 +10,7 @@ const DeactivationRequestsBtns = (props) => {
     // console.log("::::::::::::;>>>>>>",props.id, "^^^^", status)
     try {
       const res = await axios.patch(
-        `http://127.0.0.1:8000/user-management/${props.id}/`,
+        `${config?.apiUrl}/user-management/${props.id}/`,
         {
           deactivate_commentator:status
         }

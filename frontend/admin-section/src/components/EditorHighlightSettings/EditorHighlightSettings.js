@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import SalesHighlightSettings from "../SalesHighlightSettings/SalesHighlightSettings";
+import config from "../../config";
 
 const EditorHighlightSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Journeyman");
@@ -11,7 +12,7 @@ const EditorHighlightSettings = () => {
     async function getData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
+          `${config?.apiUrl}/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
         );
         // console.log("res==>>", res.data[0]);
         setHighlightssettingData(res.data[0]);

@@ -21,6 +21,7 @@ import { LeagueAPI } from "../GetLeagueAPI";
 import { DateAPI } from "../GetDateAPI";
 import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const AddCommentModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
@@ -300,10 +301,9 @@ const AddCommentModal = (props) => {
       setCommentError("Required*");
     }
     if (selectCheckBox) {
-      console.log(toggleInput, "========================toggleInput");
       try {
         const res = await axios.post(
-          `http://127.0.0.1:8000/post-comment/${userId}`,
+          `${config?.apiUrl}/post-comment/${userId}`,
           {
             category: selectedCategory,
             country: selectedCountry,
