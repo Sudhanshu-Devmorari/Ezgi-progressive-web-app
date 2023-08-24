@@ -178,6 +178,10 @@ const SideBar = (props) => {
         </div>
         <div className="">
           <img
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
             className="cursor icons-responsive-size"
             src={logout}
             alt=""
