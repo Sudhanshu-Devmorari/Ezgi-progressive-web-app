@@ -6,6 +6,7 @@ import "./MySubscribers.css";
 import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
 import { userId } from "../GetUser";
+import config from "../../config";
 
 const MySubscribers = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -33,7 +34,7 @@ const MySubscribers = (props) => {
     async function getSubscriptions() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`
+          `${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`
         );
         // console.log("res", res.data);
         setSubscriptiosData(res.data.data);
@@ -206,7 +207,7 @@ const MySubscribers = (props) => {
                     />
                   </div>
                   <img
-                    src={`http://127.0.0.1:8000${sub?.commentator_user.profile_pic}`}
+                    src={`${config?.apiUrl}${sub?.commentator_user.profile_pic}`}
                     alt=""
                     height={38}
                     width={38}

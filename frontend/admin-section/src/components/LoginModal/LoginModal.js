@@ -5,6 +5,7 @@ import "./LoginModal.css";
 import ForgotPassowrd from "../ForgotPassowrd/ForgotPassowrd";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../../../src/config";
 
 const LoginModal = () => {
   const validationSchema = Yup.object({
@@ -28,7 +29,7 @@ const LoginModal = () => {
     onSubmit: (values) => {
       console.log(values);
       axios
-        .post("http://127.0.0.1:8000/login/", {
+        .post(`${config?.apiUrl}/login/`, {
           phone: values.phone,
           password: values.password,
           is_admin: true,

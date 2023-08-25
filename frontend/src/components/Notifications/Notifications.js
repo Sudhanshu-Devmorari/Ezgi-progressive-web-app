@@ -3,6 +3,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png"
 import axios from "axios";
 import { userId } from "../GetUser";
+import config from "../../config";
 
 const Notifications = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -35,7 +36,7 @@ const Notifications = () => {
   // Notification API
   // useEffect(() => {
   //   async function getNotifications(){
-  //     const res = await axios.get(`http://127.0.0.1:8000/notification/${userId}`)
+  //     const res = await axios.get(`${config?.apiUrl}/notification/${userId}`)
   //     console.log(res,"==>>>>>>>>>");
   //   }
   //   getNotifications()

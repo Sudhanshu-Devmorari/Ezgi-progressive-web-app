@@ -25,15 +25,16 @@ import world_check_light from "../../assets/world-check.png";
 import clapLight from "../../assets/Path 4537.png";
 import axios from "axios";
 import starDarkLogin from "../../assets/star-1.png";
+import config from "../../config";
 
 const CommentsContentSection = (props) => {
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   const activeResolved = async (user_id) => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/active-resolved-comment/${user_id}`)
+      .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
       .then((res) => {
         // console.log("activeResolved: ", res);
         setActive(res.data?.active_comments);
@@ -46,7 +47,7 @@ const CommentsContentSection = (props) => {
   const handleCommentReaction = async (id, reaction) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
+      `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
       {
         reaction_type: `${reaction}`,
       }
@@ -189,7 +190,7 @@ const CommentsContentSection = (props) => {
                             <span></span>
                           </div>
                           <div className="d-flex justify-content-center">
-                            <span className="mt-2 pt-1">Antalyaspor</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[0]}</span>
                             <div
                               className="px-2"
                               style={{
@@ -216,7 +217,7 @@ const CommentsContentSection = (props) => {
                                 })}
                               />
                             </div>
-                            <span className="mt-2 pt-1">Başakşehir</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[1]}</span>
                           </div>
                           <div className="text-end mt-3 mb-2">
                             <span
@@ -427,7 +428,7 @@ const CommentsContentSection = (props) => {
                             <span></span>
                           </div>
                           <div className="d-flex justify-content-center">
-                            <span className="mt-2 pt-1">Antalyaspor</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[0]}</span>
                             <div
                               className="px-2"
                               style={{
@@ -454,7 +455,7 @@ const CommentsContentSection = (props) => {
                                 })}
                               />
                             </div>
-                            <span className="mt-2 pt-1">Başakşehir</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[1]}</span>
                           </div>
                           <div className="text-end mt-3 mb-2 align-items-center">
                             <span
@@ -706,7 +707,7 @@ const CommentsContentSection = (props) => {
                     <span></span>
                   </div>
                   <div className="d-flex justify-content-center align-items-center">
-                    <span>Antalyaspor</span>
+                    <span>{res?.match_detail.split(' - ')[0]}</span>
                     <div
                       className="px-2"
                       style={{
@@ -744,7 +745,7 @@ const CommentsContentSection = (props) => {
                         })}
                       />
                     </div>
-                    <span>Başakşehir</span>
+                    <span>{res?.match_detail.split(' - ')[1]}</span>
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
                     <span

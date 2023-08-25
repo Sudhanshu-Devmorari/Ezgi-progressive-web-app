@@ -15,14 +15,14 @@ import radioYellowSelected from "../../assets/Group 505.svg";
 import DarkradioYellowSelected from "../../assets/Group 505 (1).svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
-
+import config from "../../config";
 
 const CommentsPageModal = (props) => {
   const handleShowButtonClick = async () => {
     const user_id = localStorage.getItem("user-id");
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8000/filter-comments/${user_id}/`,
+        `${config?.apiUrl}/filter-comments/${user_id}/`,
         {
           category: [categoryData],
           country: countryData,

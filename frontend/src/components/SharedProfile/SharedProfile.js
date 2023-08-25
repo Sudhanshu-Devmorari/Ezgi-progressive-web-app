@@ -10,11 +10,12 @@ import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import startDarkIcon from "../../assets/star.svg";
 import axios from "axios";
+import config from "../../config";
 
 const SharedProfile = ({ data, setSelectContent }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -24,7 +25,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
   const favEditor = async (id) => {
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/fav-editor/',
+        `${config?.apiUrl}/fav-editor/`,
         {
           id:id
         }

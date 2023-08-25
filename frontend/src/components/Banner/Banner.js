@@ -2,11 +2,12 @@ import React, { useContext } from "react";
 import bannerimg from "../../assets/bannerimg.png";
 import "./Banner.css";
 import CurrentTheme from "../../context/CurrentTheme";
+import config from "../../config";
 
 const Banner = ({ data }) => {
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
   return (
     <>
       <div className={`row g-0 mt-2 mb-1 bannerText`}>

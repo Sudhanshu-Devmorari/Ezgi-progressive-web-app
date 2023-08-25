@@ -781,7 +781,7 @@ const CommentsManagement = (props) => {
                   )}
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">Galatasaray FC</span>
+                  <span className="mt-2 pt-1">{currentData.match_detail.split(' - ')[0]}</span>
                   <div
                     className="px-2"
                     style={{
@@ -803,7 +803,7 @@ const CommentsManagement = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">Real Madrid</span>
+                  <span className="mt-2 pt-1">{currentData.match_detail.split(' - ')[1]}</span>
                 </div>
                 <div className="text-end mt-3 mb-2">
                   <span

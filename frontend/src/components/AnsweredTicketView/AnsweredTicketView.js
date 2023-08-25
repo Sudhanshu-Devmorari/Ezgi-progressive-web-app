@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import moment from "moment";
 import { userId } from "../GetUser";
 import axios from "axios";
+import config from "../../config";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -12,7 +13,7 @@ const AnsweredTicketView = (props) => {
 
   const handleResolvedTicket = () => {
     axios
-      .post(`http://127.0.0.1:8000/resolved-ticket/${userId}`, {
+      .post(`${config?.apiUrl}/resolved-ticket/${userId}`, {
         ticket_id: ticketData?.id,
       })
       .then((res) => {

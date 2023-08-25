@@ -4,6 +4,7 @@ import { userId } from "../GetUser";
 import CurrentTheme from "../../context/CurrentTheme";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import Form from "react-bootstrap/Form";
+import config from "../../config";
 
 const CreateNewTicket = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -35,7 +36,7 @@ const CreateNewTicket = (props) => {
     } else if (message === "") {
       setMessageError("Message is required.");
     } else {
-      const res = await axios.post(`http://127.0.0.1:8000/support/${userId}`, {
+      const res = await axios.post(`${config?.apiUrl}/support/${userId}`, {
         department: selectedMatchDetails,
         subject: subject,
         message: message,

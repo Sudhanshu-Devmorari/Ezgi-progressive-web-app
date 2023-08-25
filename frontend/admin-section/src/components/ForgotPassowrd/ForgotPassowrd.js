@@ -6,6 +6,7 @@ import OtpModal from "../OtpModal/OtpModal";
 import NewPassword from "../NewPassword/NewPassword";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../../../src/config";
 
 const ForgotPassowrd = () => {
   const [showModal, setShowModal] = useState(1);
@@ -24,7 +25,7 @@ const ForgotPassowrd = () => {
     onSubmit: (values) => {
       setPhone(values.phone)
       axios
-        .post("http://127.0.0.1:8000/otp-resend/", {
+        .post(`${config?.apiUrl}/otp-resend/`, {
           phone: values.phone,
           is_admin: true,
         })

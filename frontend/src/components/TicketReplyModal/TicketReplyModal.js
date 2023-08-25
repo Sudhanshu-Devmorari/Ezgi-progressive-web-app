@@ -4,6 +4,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import Swal from "sweetalert2";
 import moment from "moment";
+import config from "../../config";
 
 const TicketReplyModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -24,7 +25,7 @@ const TicketReplyModal = (props) => {
     } else if (replyMessage !== "") {
       axios
         .post(
-          `http://127.0.0.1:8000/reply-ticket/${ticketData?.user?.id}/${ticketData?.id}/`,
+          `${config?.apiUrl}/reply-ticket/${ticketData?.user?.id}/${ticketData?.id}/`,
           {
             message: replyMessage,
             admin_id: ticketData?.admin_response?.user?.id,

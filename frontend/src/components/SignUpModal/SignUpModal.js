@@ -18,6 +18,7 @@ import PasswordReset from "../PasswordReset/PasswordReset";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
 import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
+import config from "../../config";
 
 const SignUpModal = (props) => {
   // THEME
@@ -113,7 +114,7 @@ const SignUpModal = (props) => {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
       const response = await axios.post(
-        "http://127.0.0.1:8000/signup/",
+        `${config?.apiUrl}/signup/`,
         signUpData
       );
       // console.log("response: ", response.data);

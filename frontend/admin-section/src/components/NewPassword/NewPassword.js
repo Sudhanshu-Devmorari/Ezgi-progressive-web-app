@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../../../src/config";
 
 const NewPassword = (props) => {
   const formik = useFormik({
@@ -18,7 +19,7 @@ const NewPassword = (props) => {
     }),
     onSubmit: (values) => {
       axios
-        .post("http://127.0.0.1:8000/password-reset/", {
+        .post(`${config?.apiUrl}/password-reset/`, {
           new_ps: values.password,
           phone: props?.phone,
         })

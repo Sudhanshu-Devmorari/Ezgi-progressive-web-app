@@ -20,6 +20,7 @@ import "./ContentSection.css";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
+import config from "../../config";
 
 const ContentSection = ({
   data,
@@ -35,13 +36,13 @@ const ContentSection = ({
 
   // const userPhone = localStorage.getItem("userPhone");
 
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config?.apiUrl}`;
 
   const followCommentator = async (commentator_id) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios
       .get(
-        `http://127.0.0.1:8000/follow-commentator/${user_id}?id=${commentator_id}`
+        `${config?.apiUrl}/follow-commentator/${user_id}?id=${commentator_id}`
       )
       .then((res) => {
         // console.log(res);
@@ -54,7 +55,7 @@ const ContentSection = ({
   const handleCommentReaction = async (id, reaction) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
+      `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
       {
         reaction_type: `${reaction}`,
       }
@@ -243,7 +244,7 @@ const ContentSection = ({
                 </span>
               </div>
               <div className="d-flex justify-content-center">
-                <span className="mt-2 pt-1">Antalyaspor</span>
+                <span className="mt-2 pt-1">{data?.value.match_detail.split(' - ')[0]}</span>
                 <div
                   className="px-2"
                   style={{
@@ -266,7 +267,7 @@ const ContentSection = ({
                     })}
                   />
                 </div>
-                <span className="mt-2 pt-1">Başakşehir</span>
+                <span className="mt-2 pt-1">{data?.value.match_detail.split(' - ')[1]}</span>
               </div>
               <div className="text-end mt-3 mb-2">
                 <span

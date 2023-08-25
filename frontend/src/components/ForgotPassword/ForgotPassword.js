@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
+import config from "../../config";
 
 const ForgotPassword = (props) => {
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
@@ -18,7 +19,7 @@ const ForgotPassword = (props) => {
     if (!phoneReg.test(phone)) {
       setPhoneError("Invalid phone number");
     } else {
-      const res = await axios.post("http://127.0.0.1:8000/otp-resend/", {
+      const res = await axios.post(`${config?.apiUrl}/otp-resend/`, {
         phone: phone,
       });
       // console.log("response: FP : ", res.data);

@@ -3,6 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import OTPInput from "react-otp-input";
 import axios from "axios";
+import config from "../../config";
 
 const OTPModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -33,7 +34,7 @@ const OTPModal = (props) => {
 
   // OTP verify API
   const handleOTPVerification = async () => {
-    const res = await axios.post("http://127.0.0.1:8000/otp-verify/", {
+    const res = await axios.post(`${config?.apiUrl}/otp-verify/`, {
       otp: otp,
     });
     // console.log(res.data, "======>>otp res");
@@ -52,7 +53,7 @@ const OTPModal = (props) => {
     setOtp("");
     setOtpError("");
     setSeconds(30);
-    const res = await axios.post("http://127.0.0.1:8000/otp-resend/", {
+    const res = await axios.post(`${config?.apiUrl}/otp-resend/`, {
       phone: props.forgotPsPhone,
     });
     // console.log(res.data, "======>>otp resend");

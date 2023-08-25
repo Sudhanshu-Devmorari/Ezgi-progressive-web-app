@@ -35,7 +35,7 @@ const SupportManagementPage = () => {
   const [tickeview, setTickeview] = useState([]);
 
   function getTicketsLatestData(e){
-    axios.get(`http://127.0.0.1:8000/show-ticket-data/${e}/`)
+    axios.get(`${config?.apiUrl}/show-ticket-data/${e}/`)
     .then((res) => {
       console.log(res.data);
       setTickeview(res.data)

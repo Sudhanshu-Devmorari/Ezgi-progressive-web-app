@@ -6,6 +6,7 @@ import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import yellowStarIcon from '../../assets/star-1 (1).svg'
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import config from "../../config";
 
 const FavEditor = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -59,7 +60,7 @@ const FavEditor = (props) => {
                 />
               </div>
               <img
-                src={`http://127.0.0.1:8000${res?.data?.commentator_user?.profile_pic}`}
+                src={`${config?.apiUrl}${res?.data?.commentator_user?.profile_pic}`}
                 width={75}
                 height={75}
                 alt=""

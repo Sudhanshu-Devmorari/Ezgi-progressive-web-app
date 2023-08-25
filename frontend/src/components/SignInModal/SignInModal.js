@@ -6,6 +6,7 @@ import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
 import "./SignInModal.css";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -27,7 +28,7 @@ const SignInModal = (props) => {
       if (!phoneReg.test(phone)) {
         setPhoneError("Invalid phone number");
       }
-      const res = await axios.post("http://127.0.0.1:8000/login/", {
+      const res = await axios.post(`${config?.apiUrl}/login/`, {
         password: password,
         phone: phone,
       });

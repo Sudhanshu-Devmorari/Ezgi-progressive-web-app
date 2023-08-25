@@ -18,6 +18,7 @@ import world_check_light from "../../assets/world-check.png";
 import world_check from "../../assets/world-check.svg";
 import axios from "axios";
 import { userId } from "../GetUser";
+import config from "../../config";
 
 const FavComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -27,7 +28,7 @@ const FavComments = (props) => {
   // Follow commentator
     // const followCommentator = () =>{
     //   try {
-      //  const res = await axios.get(`http://127.0.0.1:8000/follow-commentator/${userId}/?id=${}`)
+      //  const res = await axios.get(`${config?.apiUrl}/follow-commentator/${userId}/?id=${}`)
     //    console.log(res);
     //   } catch (error) {
     //     console.log(error);

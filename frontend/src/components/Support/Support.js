@@ -6,6 +6,7 @@ import { userId } from "../GetUser";
 import CreateNewTicket from "../CreateNewTicket/CreateNewTicket";
 import AnsweredTicketView from "../AnsweredTicketView/AnsweredTicketView";
 import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal";
+import config from "../../config";
 
 const Support = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -36,7 +37,7 @@ const Support = () => {
   const [ticketsData, setTicketsData] = useState([]);
   useEffect(() => {
     async function getTicketsData() {
-      const res = await axios.get(`http://127.0.0.1:8000/support/${userId}`);
+      const res = await axios.get(`${config?.apiUrl}/support/${userId}`);
       // console.log("res----------", res.data);
       setTicketsData(res.data);
     }
@@ -54,7 +55,7 @@ const Support = () => {
   function getData(e) {
     try {
       axios
-        .get(`http://127.0.0.1:8000/subuser-answer-ticket/${userId}/${e}/`)
+        .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
           console.log(res.data, "=================>>>>res");
           setTicketData(res.data);
