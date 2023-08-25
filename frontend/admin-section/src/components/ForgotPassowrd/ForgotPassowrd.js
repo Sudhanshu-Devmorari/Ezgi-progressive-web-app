@@ -6,7 +6,7 @@ import OtpModal from "../OtpModal/OtpModal";
 import NewPassword from "../NewPassword/NewPassword";
 import axios from "axios";
 import Swal from "sweetalert2";
-import config from "../../../../src/config";
+import config from "../../config";
 
 const ForgotPassowrd = () => {
   const [showModal, setShowModal] = useState(1);

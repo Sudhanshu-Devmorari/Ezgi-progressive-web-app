@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import axios from "axios";
 import Swal from "sweetalert2";
-import config from "../../../../src/config";
+import config from "../../config";
 
 const NewPassword = (props) => {
   const formik = useFormik({

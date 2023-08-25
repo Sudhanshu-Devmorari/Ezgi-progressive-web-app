@@ -3,7 +3,7 @@ import OTPInput from "react-otp-input";
 import "./OtpModal.css";
 import axios from "axios";
 import Swal from "sweetalert2";
-import config from "../../../../src/config";
+import config from "../../config";
 
 const OtpModal = (props) => {
   const [otp, setOtp] = useState("");

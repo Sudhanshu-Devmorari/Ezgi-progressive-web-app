@@ -1,5 +1,6 @@
 {
   "name": "admin-section",
+  "homepage": "https://admin.motiwy.com/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

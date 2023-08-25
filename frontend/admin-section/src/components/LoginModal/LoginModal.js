@@ -5,7 +5,7 @@ import "./LoginModal.css";
 import ForgotPassowrd from "../ForgotPassowrd/ForgotPassowrd";
 import axios from "axios";
 import Swal from "sweetalert2";
-import config from "../../../../src/config";
+import config from "../../config";
 
 const LoginModal = () => {
   const validationSchema = Yup.object({
