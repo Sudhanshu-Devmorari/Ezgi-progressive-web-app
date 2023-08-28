@@ -124,10 +124,10 @@ const TicketReplyModal = (props) => {
               customClass: "dark-mode-alert",
             });
         }
-      }
+      })
     }
-  };
-
+  }
+  }
   return (
     <>
       <div

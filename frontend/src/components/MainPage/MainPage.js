@@ -18,6 +18,7 @@ import DashboardSU from "../DashboardSU/DashboardSU";
 import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
 import config from "../../config";
+import BecomeEditor from "../BecomeEditor/BecomeEditor";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -282,7 +283,7 @@ const MainPage = () => {
       <div className="landing-page">
         <LandingPage />
       </div>
-      <div className="container-fluid mt-3 mobile-view">
+      <div className={`container-fluid mt-3 mobile-view ${selectContent === "become-editor" && 'p-0'}`}>
         <div
           style={{ marginBottom: "66px" }}
         >
@@ -316,7 +317,7 @@ const MainPage = () => {
                       ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
                     }
                   />
-                  <EditorBanner />
+                  <EditorBanner setSelectContent={setSelectContent}/>
                 </>
               )}
               {selectContent === "home" &&
@@ -514,6 +515,9 @@ const MainPage = () => {
                   setDashboardSUser={setDashboardSUser}
                 />
               )}
+              {(selectContent === "become-editor" ) && (
+                <BecomeEditor />
+              ) }
             </>
           )}
         </div>
