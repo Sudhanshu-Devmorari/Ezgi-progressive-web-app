@@ -1,42 +1,83 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import camera from "../../assets/camera-plus.svg";
 import { BsArrowLeft } from "react-icons/bs";
 import "./ProfileSU.css";
+import axios from "axios";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [editProfile, setEditProfile] = useState(false);
 
-  const EditButtonStyle = {
-    border: editProfile
-      ? currentTheme === "dark"
-        ? "1px solid #4DD5FF"
-        : "1px solid #007BF6"
-      : currentTheme === "dark"
-      ? "1px solid #E6E6E6"
-      : "1px solid #0D2A53",
-    color: editProfile
-      ? currentTheme === "dark"
-        ? "#4DD5FF"
-        : "#007BF6"
-      : currentTheme === "dark"
-      ? "#E6E6E6"
-      : "#0D2A53",
-    backgroundColor: "transparent",
-    borderRadius: "18px",
-    padding: "0.1rem 2.2rem",
-    fontSize: "13px",
-  };
-  const cameraImageStyles = {
-    display: editProfile ? "block" : "none",
-    position: "absolute",
-    backgroundColor: "#",
-    top: "4.4rem",
-    left: "2.3rem",
-  };
+  // PROFILE API
+  const [progileData, setProgileData] = useState();
+  useEffect(() => {
+    async function getProfileData() {
+      const res = await axios.get(`http://127.0.0.1:8000/profile/${userId}`);
+      setProgileData(res.data);
+    }
+    getProfileData();
+  }, []);
+
+  // UPDATE PROFILE PIC
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  async function handleChangeProfilePic(e) {
+    try {
+      const file = e.target.files[0];
+      if (file) {
+        const allowedTypes = ["image/jpeg", "image/png"]; 
+        if (allowedTypes.includes(file.type)) {
+          setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+          setEditProfile(false);
+          const formData = new FormData();
+          formData.append("file", e.target.files[0]);
+          const res = await axios.post(
+            `http://127.0.0.1:8000/profile/${userId}`,
+            formData
+          );
+          // console.log("res: ", res);
+          // console.log("res: ", res.status);
+          if (res.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Profile Updated!",
+              icon: "success",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          } else if (res.status === 400) {
+            Swal.fire({
+              title: "Error",
+              text: "Failed",
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Invalid file type. Please select a valid image file.",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+          e.target.value = "";
+        }
+      }
+    } catch (error) {}
+  }
 
   return (
     <>
@@ -58,11 +99,17 @@ const ProfileSU = (props) => {
           <div className="col pe-0 d-flex">
             <div className="position-relative">
               <img
-                src={profile}
+                src={
+                  preveiwProfilePic
+                    ? preveiwProfilePic
+                    : `http://127.0.0.1:8000${progileData?.profile_pic}`
+                }
                 width={100}
                 height={100}
                 alt=""
                 style={{
+                  objectFit: "cover",
+                  borderRadius: "50%",
                   opacity: editProfile
                     ? currentTheme === "dark"
                       ? "0.4"
@@ -72,20 +119,35 @@ const ProfileSU = (props) => {
               />
             </div>
             <div className="">
-              <label htmlFor="camera-icon">
-                <img
-                  src={camera}
-                  alt=""
-                  style={cameraImageStyles}
-                  height={40}
-                  width={40}
-                />
-              </label>
-              <input type="file" name="" id="camera-icon" className="d-none" />
+              {(preveiwProfilePic || editProfile) && (
+                <label htmlFor="camera-icon">
+                  <img
+                    src={camera}
+                    alt=""
+                    style={{
+                      display: editProfile ? "block" : "none",
+                      position: "absolute",
+                      backgroundColor: "#",
+                      top: "4.4rem",
+                      left: "2.3rem",
+                    }}
+                    height={40}
+                    width={40}
+                  />
+                </label>
+              )}
+              <input
+                type="file"
+                name=""
+                id="camera-icon"
+                className="d-none"
+                accept=".jpg, .jpeg, .png"
+                onChange={handleChangeProfilePic}
+              />
             </div>
             <div className="d-flex flex-column ps-1">
               <div className="blueTick-responsive align-items-center mt-4 responsive-username">
-                melih1905
+                {progileData?.username}
               </div>
               <div
                 style={{
@@ -93,7 +155,7 @@ const ProfileSU = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                Ankara/Turkiye
+                {progileData && progileData?.city}
               </div>
               <div
                 style={{
@@ -106,9 +168,11 @@ const ProfileSU = (props) => {
             </div>
           </div>
           <div className="col">
-            <div className="d-flex justify-content-end gap-2 me-3">
+            <div className="d-flex justify-content-end gap-2 me-3 text-center">
               <div className="flex-column d-flex ">
-                <span style={{ fontSize: "1.2rem" }}>256</span>
+                <span style={{ fontSize: "1.2rem" }}>
+                  {progileData?.Subscription_Count}
+                </span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -120,7 +184,9 @@ const ProfileSU = (props) => {
               </div>
 
               <div className="flex-column d-flex ">
-                <span style={{ fontSize: "1.2rem" }}>256</span>
+                <span style={{ fontSize: "1.2rem" }}>
+                  {progileData?.Follow_Up_Count}
+                </span>
                 <span
                   style={{
                     fontSize: "12px",
@@ -135,7 +201,26 @@ const ProfileSU = (props) => {
               <button
                 onClick={() => setEditProfile(!editProfile)}
                 className="edit-profile-btn"
-                style={EditButtonStyle}
+                style={{
+                  border: editProfile
+                    ? currentTheme === "dark"
+                      ? "1px solid #4DD5FF"
+                      : "1px solid #007BF6"
+                    : currentTheme === "dark"
+                    ? "1px solid #E6E6E6"
+                    : "1px solid #0D2A53",
+                  color: editProfile
+                    ? currentTheme === "dark"
+                      ? "#4DD5FF"
+                      : "#007BF6"
+                    : currentTheme === "dark"
+                    ? "#E6E6E6"
+                    : "#0D2A53",
+                  backgroundColor: "transparent",
+                  borderRadius: "18px",
+                  padding: "0.1rem 2.2rem",
+                  fontSize: "13px",
+                }}
               >
                 Edit Profile
               </button>

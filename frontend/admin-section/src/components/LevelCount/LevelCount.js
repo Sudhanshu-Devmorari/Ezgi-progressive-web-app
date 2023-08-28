@@ -10,22 +10,22 @@ const LevelCount = (props) => {
     {
       name: "Apprentice",
       img: apprenticeCrown,
-      count: "127",
+      count: `${props?.data?.apprentice_count}`,
     },
     {
       name: "Journeyman",
       img: journeymanCrown,
-      count: "127",
+      count: `${props?.data?.journeyman_count}`,
     },
     {
       name: "Expert",
       img: expertCrown,
-      count: "127",
+      count: `${props?.data?.master_count}`,
     },
     {
       name: "Grandmaster",
       img: grandMasterCrown,
-      count: "127",
+      count: `${props?.data?.grandmaster_count}`,
     },
   ];
 
@@ -40,13 +40,13 @@ const LevelCount = (props) => {
               className="crown-level-img"
               src={res.img}
               alt=""
-              height={45}
-              width={45}
+              height={40}
+              width={40}
             />
-            <span className="level-font" style={{ fontSize: "1.2rem" }}>
+            <span className="heading">
               {res.name}
             </span>
-            <span className="level-count-font" style={{ fontSize: "1.6rem" }}>
+            <span className="number">
               {res.count}
             </span>
           </div>

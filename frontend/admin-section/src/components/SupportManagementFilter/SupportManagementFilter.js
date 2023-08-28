@@ -1,47 +1,60 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
+import "./SupportManagementFilter.css";
 
-const SupportManagementFilter = () => {
-  const [AllDropdown, setAllDropdown] = useState(false);
+const SupportManagementFilter = (props) => {
+  const options = ["All", "Pendings", "Resolved", "Redirected"];
+
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleOptionClick = (option) => {
+    props?.setSelectedOption(option);
+    setShowDropdown(false);
+  };
+
   return (
     <>
-      <div className="d-flex p-2" style={{ fontSize: "1.1rem" }}>
+      <div className="d-flex p-2">
         <div className="p-2 flex-grow-1">
-          <div class="input-group w-50">
-            <span class="input-group-text search-icon-dark" id="basic-addon1">
+          <div className="input-group w-50">
+            <span className="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" />
+            <input
+              onChange={(e) => props.filteredData(e.target.value)}
+              type="text"
+              className="input-field-dark"
+            />
           </div>
         </div>
         <div className="p-2 position-relative">
           <button
-            onClick={() => setAllDropdown(!AllDropdown)}
+            onClick={() => setShowDropdown(!showDropdown)}
             style={{
               backgroundColor: "transparent",
               borderRadius: "3px",
               border: "1px solid #E6E6E6",
               color: "#E6E6E6",
               width: "7.5rem",
-              borderBottom: AllDropdown
+              borderBottom: showDropdown
                 ? "1px solid #0D2A53"
                 : "1px solid #E6E6E6",
-              borderLeft: AllDropdown
+              borderLeft: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
-              borderRight: AllDropdown
+              borderRight: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
-              borderTop: AllDropdown
+              borderTop: showDropdown
                 ? "1px solid #E6E6E6"
                 : "1px solid #E6E6E6",
             }}
           >
-            All
+            {props?.selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
-              AllDropdown ? "d-block" : "d-none"
+              showDropdown ? "d-block" : "d-none"
             }`}
             style={{
               backgroundColor: "#0B2447",
@@ -50,30 +63,24 @@ const SupportManagementFilter = () => {
               borderTop: "none",
             }}
           >
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Pendings
-            </span>
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Resolved
-            </span>
-            <span
-              className="m-1 px-2 py-1 text-center"
-              style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-            >
-              Redirected
-            </span>
+            {options
+              .filter((option) => option !== props?.selectedOption)
+              .map((option) => (
+                <span
+                  key={option}
+                  className="m-1 px-2 py-1 text-center cursor"
+                  style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
+                  onClick={() => handleOptionClick(option)}
+                >
+                  {option}
+                </span>
+              ))}
           </div>
         </div>
         <div className="p-2">
           <button
             data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
+            data-bs-target="#exportModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",

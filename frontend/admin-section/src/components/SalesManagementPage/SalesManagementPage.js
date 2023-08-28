@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import subscriptionIcon from "../../assets/Group 67.svg";
@@ -13,7 +13,10 @@ import user3 from "../../assets/user1.png";
 import user4 from "../../assets/user6.png";
 import adsIcon from "../../assets/badge-ad.svg";
 import perIcon from "../../assets/per.svg";
-import './SalesManagementPage.css'
+import "./SalesManagementPage.css";
+import axios from "axios";
+import Export from "../Export/Export";
+import config from "../../config";
 
 const SalesManagementPage = () => {
   const salesArray = [
@@ -51,6 +54,20 @@ const SalesManagementPage = () => {
     { icon: adsIcon, name: "Ads Revenues" },
     { icon: perIcon, name: "Ads Revenues" },
   ];
+
+  // Sales management API
+  useEffect(() => {
+    async function getSalesData() {
+      try {
+        const res = await axios.get(`${config?.apiUrl}/sales-management`);
+        // console.log("res====>>>>", res?.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getSalesData();
+  }, []);
+
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -68,25 +85,23 @@ const SalesManagementPage = () => {
                       <div
                         className={`dark-mode p-2 ${
                           res.name === "Plan Sales" ? "mx-2" : "me-2"
-                        }`}
+                        } d-flex flex-column align-items-center justify-content-center`}
                         style={{ height: "25vh" }}
                       >
-                        <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                          <img src={res.icon} alt="" height={45} width={45} />
-                          <span style={{ fontSize: "1.2rem" }}>{res.name}</span>
-                          <span style={{ fontSize: "1.6rem" }}>
-                            12.860 <small>₺</small>
-                          </span>
-                        </div>
-                        <div className="d-flex align-items-end mt-3 p-2">
-                          <span className="" style={{ fontSize: "1rem" }}>
+                        <img className="icon" src={res.icon} alt="" />
+                        <span className="heading">{res.name}</span>
+                        <span className="number">
+                          12.860 <small>₺</small>
+                        </span>
+                        <div className="w-100">
+                          <span className="rate-font">
                             <span
-                              className=""
-                              style={{ color: "#58DEAA", fontSize: "1.2rem" }}
+                              className="rate-font"
+                              style={{ color: "#58DEAA" }}
                             >
                               %22
                               <HiArrowSmUp
-                                fontSize={"1.4rem"}
+                                className="arrow"
                                 style={{ marginBottom: "0.1rem" }}
                               />
                             </span>
@@ -97,9 +112,7 @@ const SalesManagementPage = () => {
                     </div>
                   ))}
                 </div>
-                <div
-                  className="dark-mode p-2 m-2 mb-0 home-height"
-                >
+                <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SalesManagementFilter />
                   {users.map((res, index) => (
                     <MainDiv>
@@ -108,10 +121,11 @@ const SalesManagementPage = () => {
                           <span>#0001</span>
                           <span className="px-2">
                             <img
+                              className="user-profile"
                               src={res.profile}
                               alt=""
-                              height={50}
-                              width={50}
+                              height={45}
+                              width={45}
                             />
                           </span>
                           <span>johndoe</span>
@@ -147,6 +161,7 @@ const SalesManagementPage = () => {
                           {res.plan === "johndoe" ? (
                             <>
                               <img
+                                className="user-profile"
                                 src={res.profile}
                                 alt=""
                                 srcset=""
@@ -195,24 +210,22 @@ const SalesManagementPage = () => {
               </div>
               <div className="col-4">
                 <div className="row g-0 gap-2" style={{ height: "25vh" }}>
-                  <div className="col dark-mode d-flex align-items-center justify-content-center flex-column">
-                    <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                      <span style={{ fontSize: "1.2rem", color: "#58DEAA" }}>
-                        Daily Total
-                      </span>
-                      <span style={{ fontSize: "1.6rem" }}>
-                        12.700 <small>₺</small>
-                      </span>
-                    </div>
-                    <div className="d-flex text-start mt-3 p-2 pb-0">
-                      <span className="" style={{ fontSize: "1rem" }}>
+                  <div className="col dark-mode d-flex align-items-center justify-content-center flex-column pt-3 p-2">
+                    <span className="heading" style={{ color: "#58DEAA" }}>
+                      Daily Total
+                    </span>
+                    <span className="number">
+                      12.700 <small>₺</small>
+                    </span>
+                    <div className="w-100 pt-3">
+                      <span className="rate-font">
                         <span
-                          className=""
-                          style={{ color: "#58DEAA", fontSize: "1.2rem" }}
+                          className="rate-font"
+                          style={{ color: "#58DEAA" }}
                         >
                           %22
                           <HiArrowSmUp
-                            fontSize={"1.4rem"}
+                            className="arrow"
                             style={{ marginBottom: "0.1rem" }}
                           />
                         </span>
@@ -220,14 +233,11 @@ const SalesManagementPage = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="col d-flex align-items-center justify-content-center dark-mode flex-column">
-                    <span
-                      className=""
-                      style={{ fontSize: "1.2rem", color: "#D2DB08" }}
-                    >
+                  <div className="col d-flex align-items-center justify-content-center dark-mode flex-column ">
+                    <span className="heading" style={{ color: "#D2DB08" }}>
                       All Time Total
                     </span>
-                    <span className="" style={{ fontSize: "1.6rem" }}>
+                    <span className="number">
                       12.860 <small>₺</small>
                     </span>
                   </div>
@@ -235,32 +245,28 @@ const SalesManagementPage = () => {
                 <div className="row g-0 gap-2 my-2" style={{ height: "30vh" }}>
                   {adsArray.map((res, index) => (
                     <div className="col dark-mode d-flex align-items-center justify-content-center flex-column">
-                      <img src={res.icon} alt="" height={45} width={45} />
-                      <span style={{ fontSize: "1.2rem" }}>{res.name}</span>
-                      <span style={{ fontSize: "1.6rem" }}>
+                      <img src={res.icon} alt="" className="icon" />
+                      <span className="heading">{res.name}</span>
+                      <span className="number">
                         12.645 <small>₺</small>
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="dark-mode d-flex align-items-center justify-content-center flex-column height-Net-Revenue" style={{height:"33vh"}}>
-                  <div className="mt-2 d-flex flex-column align-items-center justify-content-center p-2">
-                    <span style={{ fontSize: "1.2rem"}}>
-                      Net Revenue
-                    </span>
-                    <span style={{ fontSize: "1.6rem" }}>
-                      12.645 <small>₺</small>
-                    </span>
-                  </div>
-                  <div className="mt-3 p-2 pb-0 per-block">
-                    <span className="" style={{ fontSize: "1rem" }}>
-                      <span
-                        className=""
-                        style={{ color: "#58DEAA", fontSize: "1.2rem" }}
-                      >
+                <div
+                  className="dark-mode d-flex align-items-center justify-content-center flex-column block-height p-2"
+                  style={{ height: "33vh" }}
+                >
+                  <span className="heading">Net Revenue</span>
+                  <span className="number">
+                    12.645 <small>₺</small>
+                  </span>
+                  <div className="w-100 pt-5">
+                    <span className="rate-font">
+                      <span className="rate-font" style={{ color: "#58DEAA" }}>
                         %22
                         <HiArrowSmUp
-                          fontSize={"1.4rem"}
+                          className="arrow"
                           style={{ marginBottom: "0.1rem" }}
                         />
                       </span>
@@ -273,6 +279,7 @@ const SalesManagementPage = () => {
           </div>
         </div>
       </div>
+      <Export />
     </>
   );
 };

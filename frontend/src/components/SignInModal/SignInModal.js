@@ -2,8 +2,10 @@ import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
-import facebook from "../../assets/FacebookLogo.png";
-import google from "../../assets/googleLogo.png";
+import GoogleLogin from "../GoogleLogin";
+import FacebookLogin from "../FacebookLogin";
+import "./SignInModal.css";
+import Swal from "sweetalert2";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -31,15 +33,30 @@ const SignInModal = (props) => {
       });
       console.log("response login: ", res.data);
       if (res.data.status === 200) {
-        localStorage.setItem("userPhone", phone);
+        localStorage.setItem("user-role", res.data.userRole);
+        localStorage.setItem("user-id", res.data.userId);
         window.location.reload();
       } else if (res.data.status === 400) {
-        setpasswordError(res.data.data);
+        // setpasswordError(res.data.data);
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       } else if (res.data.status === 404) {
-        alert(res.data.data);
+        Swal.fire({
+          title: "Error",
+          text: res.data.data,
+          icon: "error",
+          backdrop: false,
+          customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
   };
+
   return (
     <>
       <div className="">
@@ -111,9 +128,20 @@ const SignInModal = (props) => {
                 id="password"
               />
             </div>
-            <small className="text-danger m-2" style={{ fontSize: "0.71rem" }}>
+            {/* <small className="text-danger m-2" style={{ fontSize: "0.71rem" }}>
               {passwordError}
-            </small>
+            </small> */}
+            {/* {showErrorAlert && (
+              <SweetAlert
+                error
+                title="Error"
+                onConfirm={() => {
+                  setShowErrorAlert(false); // Hide the SweetAlert
+                }}
+              >
+                {passwordError}{" "}
+              </SweetAlert>
+            )} */}
           </div>
           <div className="d-flex flex-column align-items-center my-3">
             <button
@@ -129,9 +157,9 @@ const SignInModal = (props) => {
             <div className="text-center my-3">
               --------------------- or ---------------------{" "}
             </div>
-            <div className="">
-              <img className="mx-3" src={google} alt="" height={50} />
-              <img className="mx-3" src={facebook} alt="" height={50} />
+            <div className="d-flex">
+              <GoogleLogin />
+              <FacebookLogin />
             </div>
             <div className="mt-3">
               You don't have Account?{" "}

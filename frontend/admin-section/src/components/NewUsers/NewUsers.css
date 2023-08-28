@@ -3,3 +3,48 @@
         height: 26vh!important;
     }
 }
+.heading{
+    font-size: 1.1rem;
+}
+.number{
+    font-size: 1.4rem;
+}
+.icon{
+    height: 40px;
+    width: 40px;
+}
+.arrow{
+    font-size: 1.3rem;
+}
+.rate-font{
+    font-size: 1rem;
+}
+
+@media (min-height: 600px) and (max-height: 768px) {
+    .heading{
+        font-size: 1rem;
+    }
+    .number{
+        font-size: 1.2rem;
+    }
+    .icon{
+        height: 36px;
+        width: 36px;
+    }
+    .arrow{
+        font-size: 1.2rem;
+    }
+    .rate-font{
+        font-size: 0.9rem;
+    }
+  }
+  /* @media (min-height: 651px) and (max-height: 725px) {
+    .home-height{
+        height: 62vh;
+    }
+}
+  @media (min-height: 726px) and (max-height: 750px) {
+    .home-height{
+        height: 63.5vh;
+    }
+} */

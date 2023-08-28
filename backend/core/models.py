@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractBaseUser
 USER_ROLE_CHOISE = (
         ('standard','Standard'),
         ('commentator','Commentator'),
+        ('sub_user','Sub_User'),
     )
 
 COMMENTATOR_ROLE_CHOISE = (
@@ -31,18 +32,33 @@ EDITOR_STATUS = (
 class User(AbstractBaseUser):
     name = models.CharField(max_length=150)
     username = models.CharField(max_length=150)
-    phone = models.CharField(max_length=15)
-    password = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, null=True, blank=True)
+    logged_in_using = models.CharField(max_length=255, null=True, blank=True)
+    phone = models.CharField(max_length=15,null=True, blank=True)
+    password = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=50, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
-    gender  = models.CharField(max_length=30)
-    age = models.CharField(max_length=12)
+    gender  = models.CharField(max_length=30, null=True, blank=True)
+    age = models.CharField(max_length=12, null=True, blank=True)
+    about = models.CharField(max_length=250, null=True, blank=True)
     category = ArrayField(models.CharField(null=True, blank=True), default=list)
     profile_pic = models.ImageField(upload_to='profile_pic', null=True, blank=True)
     user_role = models.CharField(max_length = 20, choices = USER_ROLE_CHOISE, default='standard')
     commentator_level = models.CharField(max_length = 20, choices = COMMENTATOR_ROLE_CHOISE, null=True, blank=True)
     deactivate_commentator = models.CharField(max_length = 20, choices = DEACTIVATE_STATUS, null=True, blank=True)
     commentator_status = models.CharField(max_length = 20, choices = EDITOR_STATUS, null=True, blank=True)
+    authorization_type = models.CharField(max_length=100,null=True, blank=True)
+    department = models.CharField(max_length=100,null=True, blank=True)
+    is_transaction = models.BooleanField(default=False)
+    is_view_only = models.BooleanField(default=False)
+    is_process_withdrawal_request = models.BooleanField(default=False)
+    is_rule_update = models.BooleanField(default=False)
+    is_price_update = models.BooleanField(default=False)
+    is_withdrawal_export = models.BooleanField(default=False)
+    is_sales_export = models.BooleanField(default=False)
+    is_all_permission = models.BooleanField(default=False)
+    is_delete = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -66,7 +82,7 @@ NEW_COMMENT_CHOISE = (
         ('reject','Reject'),
     )
 class Comments(models.Model):
-    commentator_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     category = ArrayField(models.CharField(null=True, blank=True), default=list)
     country = models.CharField(max_length=50)
     league = models.CharField(max_length=120)
@@ -92,7 +108,7 @@ class Subscription(models.Model):
     money = models.FloatField()
     subscription = models.BooleanField()
     duration = models.CharField(max_length=20)
-    start_date = models.DateTimeField(default=datetime.now())
+    start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     status = models.CharField(max_length = 20, choices = SUBSCRIPTION_STATUS)
     created = models.DateTimeField(auto_now_add=True)
@@ -100,8 +116,11 @@ class Subscription(models.Model):
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True, blank=True)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', null=True, blank=True)
+    subject = models.CharField(max_length = 100)
     status = models.BooleanField()
+    date = models.DateField()
     context = models.CharField(max_length = 100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -114,7 +133,7 @@ class Notification(models.Model):
 #     )
 class CommentReaction(models.Model):
     comment = models.ForeignKey(Comments, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     # reaction = models.CharField(max_length = 20, choices = REACTION_STATUS)
     like = models.IntegerField(null=True, blank=True)
     favorite = models.IntegerField(null=True, blank=True)
@@ -141,7 +160,6 @@ class TicketSupport(models.Model):
     subject = models.CharField(max_length = 100)
     message = models.TextField()
     status = models.CharField(max_length = 20, choices = SUPPORT_STATUS, default='pending')
-    # chat = ArrayField(models.JSONField(null=True, blank=True))
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -150,6 +168,25 @@ class ResponseTicket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ticket = models.ForeignKey(TicketSupport, on_delete=models.CASCADE)
     response = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+TICKET_HISTORY_STATUS = (
+        ('create','Create'),
+        ('comment_by_user','Comment_by_user'),
+        ('request_for_update','Request_for_update'),
+        ('redirect','Redirect'),
+    )
+class TicketHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ticket_create', null=True, blank=True)
+    ticket_support = models.ForeignKey(TicketSupport, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = TICKET_HISTORY_STATUS, default='pending', null=True, blank=True)
+    response_ticket = models.ForeignKey(ResponseTicket, on_delete=models.CASCADE, null=True, blank=True)
+    request_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ticket_request', null=True, blank=True)
+    redirect_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='redirect_ticket', null=True, blank=True)
+    note = models.CharField(max_length = 500, null=True, blank=True)
+    message = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -180,5 +217,121 @@ class Highlight(models.Model):
 class MatchDetail(models.Model):
     comment = models.ForeignKey(Comments, on_delete=models.CASCADE)
     start_date = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+ADVERTISEMENT_STATUS = (
+        ('active','Active'),
+        ('pending','Pending'),
+        ('end','End'),
+    )
+class Advertisement(models.Model):
+    picture = models.ImageField(upload_to='advertisement_pic', null=True, blank=True)
+    ads_space = models.CharField(max_length=100,null=True, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    company_name = models.CharField(max_length=100,null=True, blank=True)
+    link = models.CharField(max_length=100,null=True, blank=True)
+    ads_budget = models.FloatField()
+    status = models.CharField(max_length = 20, choices = ADVERTISEMENT_STATUS, default='pending')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class CommentatorLevelRule(models.Model):
+    commentator_level = models.CharField(max_length = 20, choices = COMMENTATOR_ROLE_CHOISE, null=True, blank=True)
+    daily_match_limit = models.IntegerField()
+    monthly_min_limit = models.IntegerField()
+    ods_limit = models.CharField(max_length=50,null=True, blank=True)
+    winning_limit = models.IntegerField()
+    sucess_rate = models.CharField(max_length=50,null=True, blank=True)
+    subscriber_limit = models.CharField(max_length=50,null=True, blank=True)
+    level_icon = models.ImageField(upload_to='level_icon', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class MembershipSetting(models.Model):
+    commentator_level = models.CharField(max_length = 20, choices = COMMENTATOR_ROLE_CHOISE, null=True, blank=True)
+    plan_price = models.FloatField()
+    commission_rate = models.CharField(max_length=50,null=True, blank=True)
+    promotion_rate = models.CharField(max_length=50,null=True, blank=True)
+    promotion_duration = models.CharField(max_length=50,null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+SUBSCRIPTION_ROLE_CHOISE = (
+        ('journeyman','Journeyman'),
+        ('master','Master'),
+        ('grandmaster','Grandmaster'),
+    )
+class SubscriptionSetting(models.Model):
+    commentator_level = models.CharField(max_length = 20, choices = SUBSCRIPTION_ROLE_CHOISE, null=True, blank=True)
+    duration = models.CharField(max_length=50,null=True, blank=True)
+    month_1 = models.FloatField()
+    month_3 = models.FloatField()
+    month_6 = models.FloatField()
+    year_1 = models.FloatField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class HighlightSetting(models.Model):
+    commentator_level = models.CharField(max_length = 20, choices = SUBSCRIPTION_ROLE_CHOISE, null=True, blank=True)
+    week_1 = models.FloatField()
+    week_2 = models.FloatField()
+    month_1 = models.FloatField()
+    highlight_icon = models.ImageField(upload_to='highlight_icon', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class OtpDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp_secret = models.CharField(max_length=16)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+COMMENTATOR_STATUS = (
+        ('active','Active'),
+        ('pending','Pending'),
+        ('deactive','Deactive'),
+    )
+class BecomeCommentator(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    duration = models.CharField(max_length=20)
+    money = models.FloatField(null=True, blank=True)
+    commentator = models.BooleanField()
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField()
+    status = models.CharField(max_length = 20, choices = COMMENTATOR_STATUS)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+BLUETICK_CHOISE = (
+        ('pending','Pending'),
+        ('approve','Approve'),
+        ('reject','Reject'),
+    )
+class BlueTick(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length = 20, choices = BLUETICK_CHOISE, default='pending')
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class DataCount(models.Model):
+    user = models.IntegerField(default=0)
+    editor = models.IntegerField(default=0)
+    subscription = models.IntegerField(default=0)
+    comment = models.IntegerField(default=0)
+    highlight = models.IntegerField(default=0)
+    advertisement = models.IntegerField(default=0)
+    ticket = models.IntegerField(default=0)
+    comment_win = models.IntegerField(default=0)
+    comment_lose = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

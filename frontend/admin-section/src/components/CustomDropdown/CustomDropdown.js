@@ -1,5 +1,6 @@
 import './CustomDropdown.css'
 export const CustomDropdown = ({
+  name,
   label,
   options,
   selectedOption,
@@ -20,21 +21,28 @@ export const CustomDropdown = ({
         className={`customDropdown-content-dark-mode p-2 flex-column d-flex text-center ${isOpen ? "d-block" : "d-none"}`}
         style={{
           width:
-            label === "Match Details" ||
-            label === "Country" ||
-            label === "City" 
-            // label === "Age" ||
-            // label === "Gender"
-              ? "100%"
-              : "45%",
+          ([" "].includes(label) &&
+              "20%") ||
+          ([ "Type", "Status", "Duration"].includes(label) &&
+              "43.5%") ||
+            (["Country", "City", "Match Details"].includes(label) &&
+              "100%") || "45%" ,
+            // label === "Match Details" ||
+            // label === "Country" ||
+            // label === "City" 
+            // // label === "Age" ||
+            // // label === "Gender"
+            //   ? "100%"
+            //   : "45%",
         }}
       >
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <span
+          style={{fontSize: label === " " && "12px"}}
             className="dpcontent-dark-mode my-1 p-2"
             key={index}
             onClick={() => {
-              onSelectOption(option);
+              onSelectOption(name,option);
               toggleDropdown();
             }}
           >

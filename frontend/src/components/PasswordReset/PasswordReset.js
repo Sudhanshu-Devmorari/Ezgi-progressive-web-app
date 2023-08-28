@@ -3,6 +3,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const PasswordReset = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -15,12 +16,24 @@ const PasswordReset = (props) => {
   const handlePasswordReset = async () => {
     if (password !== "") {
       const res = await axios.post("http://127.0.0.1:8000/password-reset/", {
-        password: password,
+        new_ps: password,
         phone: props.forgotPsPhone,
       });
-      console.log("res password reset ", res.data);
+      // console.log("res password reset ", res.data);
       if (res.data.status === 200) {
-        props.hide();
+        Swal.fire({
+          title: "Success",
+          text: res.data.data,
+          icon: "success",
+          backdrop: false,
+          customClass: `${
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+          }`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            props.hide();
+          }
+        });
       }
     } else {
       setPasswordError("Please enter a valid password.");

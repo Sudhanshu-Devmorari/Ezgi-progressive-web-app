@@ -4,27 +4,27 @@ import pending from "../../assets/Group 67.svg";
 import deactive from "../../assets/Group 68.svg";
 import "./EditorAccountStatus.css";
 
-const EditorAccountStatus = () => {
+const EditorAccountStatus = (props) => {
   const levelArray = [
     {
       name: "Active",
       img: active,
-      count: "127",
+      count: `${props?.active_editor}`,
     },
     {
       name: "Pending",
       img: pending,
-      count: "127",
+      count: `${props?.pending_editor}`,
     },
     {
       name: "Deactive",
       img: deactive,
-      count: "127",
+      count: `${props?.deactivate_editor}`,
     },
   ];
   return (
     <>
-      <div className={`${"dark-mode my-2"}`} style={{height:"31vh"}}>
+      <div className={`${"dark-mode my-2"} block-height`} style={{height:"31vh"}}>
         <div className="p-2" style={{ fontSize: "1.1rem" }}>
           Editor Account Status
         </div>
@@ -32,16 +32,16 @@ const EditorAccountStatus = () => {
         {levelArray.map((res, index) => (
             <div className="d-flex flex-column align-items-center mt-4">
               <img
-                className="user-icon"
+                className="icon"
                 src={res.img}
                 alt=""
                 height={45}
                 width={45}
               />
-              <span style={{ fontSize: "1.2rem" }}>
+              <span className="heading">
                 {res.name}
               </span>
-              <span style={{ fontSize: "1.6rem" }}>
+              <span className="number">
                 {res.count}
               </span>
             </div>

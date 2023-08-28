@@ -3,9 +3,11 @@ import CurrentTheme from "../../context/CurrentTheme";
 import "./EditorBanner.css"
 import football from '../../assets/Profile Card Football.svg'
 import basketball from '../../assets/Profile Card Basketball.svg'
+import { useNavigate } from "react-router-dom";
 
-export const EditorBanner = () => {
+export const EditorBanner = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const navigate = useNavigate();
   return (
     <>
       <div className={`row g-0 bannerText font-responsive`}>
@@ -40,6 +42,7 @@ export const EditorBanner = () => {
           </div>
         </div>
         <div
+          onClick={()=>props.setSelectContent('become-editor')}
           className={`col-6 d-flex align-items-center justify-content-center ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}

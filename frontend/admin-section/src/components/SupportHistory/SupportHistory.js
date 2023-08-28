@@ -2,8 +2,9 @@ import React from "react";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
 import './SupportHistory.css'
+import config from "../../config";
 
-const SupportHistory = () => {
+const SupportHistory = (props) => {
   const users = [
     {
       profile: user1,
@@ -39,21 +40,22 @@ const SupportHistory = () => {
         <div className="" style={{ fontSize: "1.2rem" }}>
           Support History
         </div>
-        {users.map((res, index) => (
+        {props?.supportHistory.map((res, index) => (
           <div
+          key={index}
             className="d-flex gap-1 my-2 pb-2"
             style={{ borderBottom: "0.2px solid #E6E6E6" }}
           >
             <div>
-              <img src={res.profile} alt="" height={45} width={45} />
+              <img style={{objectFit:"cover", borderRadius:"50%"}} src={`${config?.apiUrl}${res?.user?.profile_pic}`} alt="" height={45} width={45} />
             </div>
             <div className=" flex-grow-1 d-flex flex-column">
               <div className="d-flex justify-content-between">
-                <span>johndoe</span>
+                <span className="username">{res?.user?.username}</span>
                 <span className="support-history-fonts" style={{ fontSize: "0.8rem" }}>10 min ago</span>
               </div>
               <span className="support-history-fonts" style={{ fontSize: "0.8rem" }}>
-                {formatContent(res.content)}
+                {formatContent('responded to the request for financial support from @johndoe')}
               </span>
             </div>
           </div>

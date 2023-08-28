@@ -1,52 +1,26 @@
-@media (min-width: 1024px) and (max-width: 1246px){
+@media (min-width: 1024px) and (max-width: 1246px) and (min-height: 600px) and (max-height: 650px) {
     .top-1-img{
-        height: 60px;
-        width: 60px;
+        height: 50px!important;
+        width: 50px!important;
     }
     .top-2-img{
-        height: 41px;
-        width: 41px;
+        height: 39px!important;
+        width: 39px!important;
     }
     .all-user-img{
-        height: 36px;
-        width: 36px;
-    }
-    .text-top10{
-        font-size: 0.7rem!important;
-    }
-    .all-user-text{
-        font-size: 0.6rem!important;
-    }
-    .all-users-gap{
-        gap: 0.4rem!important;
+        height: 34px!important;
+        width: 34px!important;
     }
 }
-/* @media (min-width: 1025px) and (max-width: 1440px){
-    .top-1-img{
-        height: 80px;
-        width: 80px;
-    }
-    .top-2-img{
-        height: 57px;
-        width: 57px;
-    }
-    .all-user-img{
-        height: 51px;
-        width: 51px;
-    }
-    .text-top10{
-        font-size: 0.7rem!important;
-    }
-    .all-user-text{
-        font-size: 0.6rem!important;
-    }
-    .all-users-gap{
-        gap: 0.4rem!important;
-    }
-    .heading-top-10{
-        margin: 0.8rem;
-    }
-    .padding-all-users{
-        padding-left: 0.19rem;
-    }
-} */
+.top-1-img{
+    height: 60px;
+    width: 60px;
+}
+.top-2-img{
+    height: 41px;
+    width: 41px;
+}
+.all-user-img{
+    height: 36px;
+    width: 36px;
+}

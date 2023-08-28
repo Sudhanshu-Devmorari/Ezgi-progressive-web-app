@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoSearch } from "react-icons/go";
 import gender_female from "../../assets/gender-female.png";
 import gender_male from "../../assets/gender-male.png";
@@ -19,56 +19,278 @@ import circle_check from "../../assets/circle-check-1.png";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
 import DeactivationRequestsBtns from "../DeactivationRequestsBtns/DeactivationRequestsBtns";
+import moment from "moment";
+import axios from "axios";
+import Swal from "sweetalert2";
+import config from "../../config";
+
 
 const EditorManagemenet = (props) => {
+  const [partialData, setPartialData] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const handleDeactive = async (id) => {
+    try {
+      const res = await axios.delete(
+        `${config?.apiUrl}/editor-management/${id}/`
+      );
+      if (res.status === 404) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor account Deactived!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  const cityApiData1 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=1",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  const cityApiData2 = async () => {
+    const headers = {
+      Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+    };
+    try {
+      const res = await axios.get(
+        "https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=2",
+        { headers }
+      );
+      const cityData = res?.data.data.map((item) => item.country);
+      return cityData;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data1 = await cityApiData1();
+      const data2 = await cityApiData2();
+      const combinedCities = [...data1, ...data2];
+      setCities(combinedCities);
+    };
+
+    fetchData();
+  }, []);
+
+  // console.log("deactiveRqst----->: ", props?.deactiveRqst)
+  // console.log("deactivateUser----->: ", props?.deactivateUser)
+  // console.log("users----->: ", props?.users)
+  const [displayUser, setDisplayUser] = useState(props?.users);
+  // console.log("displayUser----->: ", displayUser)
+
+  const [addUser, setAddUser] = useState({});
+  const submitEditorData = (e, val) => {
+    let name, value;
+    name = e.target.name;
+    value = val ? val : e.target.value;
+    setAddUser({ ...addUser, [name]: value });
+  };
+  // console.log("+++++++", addUser)
+
+  useEffect(() => {
+    if (props?.deactiveRqst) {
+      setDisplayUser(props?.deactivateUser);
+    } else {
+      setDisplayUser(props?.users == undefined ? [] : props?.users);
+    }
+    // setDisplayUser(props?.users==undefined?[]:props?.users)
+  }, [props]);
+
+  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(false);
+
+  function handleAddProfile(e) {
+    const imageFile = e.target.files[0];
+    // console.log("SDDD",e.target.files[0])
+    setPreveiwProfilePic(URL.createObjectURL(imageFile));
+    setSelectedImage(imageFile);
+  }
+
+  const handleNewEditor = async () => {
+    // console.log("_____: ", addUser)
+    const formData = new FormData();
+    formData.append("file", selectedImage);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("about", addUser.about);
+    formData.append("country", addUser.country);
+    formData.append("city", addUser.city);
+    formData.append("category", `{"${addUser.category}"}`);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    formData.append("level", addUser.level);
+    const id = 1;  // temp
+    try {
+      const response = await axios.patch(
+        `${config?.apiUrl}/editor-management/${id}/`,
+        formData
+      );
+
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor Created!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+
+      // setDisplayUser(response.data);
+
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
+  const [updateEditor, setUpdateEditor] = useState({});
+  const submitUpadteEditorData = (e, val) => {
+    let name, value;
+    name = e.target.name;
+    value = val ? val : e.target.value;
+    setUpdateEditor({ ...updateEditor, [name]: value });
+  };
+  const handleUpdateEditor = async (id) => {
+    const formData = new FormData();
+    selectedImage != false && formData.append("profile_pic", selectedImage);
+    formData.append("name", addUser.name);
+    formData.append("username", addUser.username);
+    formData.append("phone", addUser.phone);
+    formData.append("password", addUser.password);
+    formData.append("about", addUser.about);
+    formData.append("country", addUser.country);
+    formData.append("city", addUser.city);
+    formData.append("category", addUser.category);
+    formData.append("gender", addUser.gender);
+    formData.append("age", addUser.age);
+    try {
+      const response = await axios.patch(
+        `${config?.apiUrl}/editor-management/${id}/`,
+        formData
+      );
+      if (response.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: "Editor Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+      // setDisplayUser(response.data);
+      // console.log('API Response:', response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
+  const handleEditorFiltor = async () => {
+    try {
+      const response = await axios.post(
+        `${config?.apiUrl}/filter-editors/`,
+        {
+          lavel: selectedLevelFilter,
+          sucess_rate: selectedSuccessRateFilter,
+          score_point: selectedScorePointFilter,
+          city: selectedCityFilter,
+          age: selectedAgeFilter,
+          gender: selectedGenderFilter,
+        }
+      );
+      setDisplayUser(response.data);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
   const [isExpertSelected, setIsExpertSelected] = useState(false);
   const [isGrandmasterSelected, setIsGrandmasterSelected] = useState(false);
-  const users = [
-    {
-      sr: "#0001",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "25 - 34",
-      country: "Ankara",
-      date: "15-06-.2023 - 16:37",
-      role: "Journeyman",
-      profile: profile,
-    },
-    {
-      sr: "#0002",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "18 - 24",
-      country: "İstanbul",
-      date: "15-06-.2023 - 16:37",
-      profile: user1,
-    },
-    {
-      sr: "#0003",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_female,
-      age: "35 - 44",
-      country: "İzmir",
-      date: "15-06-.2023 - 16:37",
-      role: "Expert",
-      profile: profile,
-    },
-    {
-      sr: "#0004",
-      name: "John Doe",
-      username: "johndoe",
-      gender: gender_male,
-      age: "25 - 34",
-      country: "Bursa",
-      date: "15-06-.2023 - 16:37",
-      role: "Apprentice",
-      profile: profile,
-    },
-  ];
+
+  const filteredData = (e) => {
+    // props.setFilterData(null)
+    const val = e.target.value;
+    const filteredArray = props?.users.filter(
+      (obj) =>
+        obj?.editor_data?.username
+          ?.toLowerCase()
+          .startsWith(val.toLowerCase()) ||
+        obj?.editor_data?.name?.toLowerCase().startsWith(val.toLowerCase())
+    );
+    setDisplayUser(filteredArray);
+  };
+  // const users = [
+  //   {
+  //     sr: "#0001",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_female,
+  //     age: "25 - 34",
+  //     country: "Ankara",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Journeyman",
+  //     profile: profile,
+  //   },
+  //   {
+  //     sr: "#0002",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_male,
+  //     age: "18 - 24",
+  //     country: "İstanbul",
+  //     date: "15-06-.2023 - 16:37",
+  //     profile: user1,
+  //   },
+  //   {
+  //     sr: "#0003",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_female,
+  //     age: "35 - 44",
+  //     country: "İzmir",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Expert",
+  //     profile: profile,
+  //   },
+  //   {
+  //     sr: "#0004",
+  //     name: "John Doe",
+  //     username: "johndoe",
+  //     gender: gender_male,
+  //     age: "25 - 34",
+  //     country: "Bursa",
+  //     date: "15-06-.2023 - 16:37",
+  //     role: "Apprentice",
+  //     profile: profile,
+  //   },
+  // ];
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [countryDropDown, setCountryDropDown] = useState(false);
@@ -84,8 +306,10 @@ const EditorManagemenet = (props) => {
 
   const [showHistory, setshowHistory] = useState(false);
 
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
+  const handleCountrySelection = (name, value) => {
+    setSelectedCountry(value);
+    // console.log("---", name,"----",value)
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCountryDropdown = () => {
@@ -104,8 +328,9 @@ const EditorManagemenet = (props) => {
     setCountryDropDown(!countryDropDown);
   };
 
-  const handleCitySelection = (city) => {
-    setSelectedCity(city);
+  const handleCitySelection = (name, value) => {
+    setSelectedCity(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCityDropdown = () => {
@@ -124,8 +349,9 @@ const EditorManagemenet = (props) => {
     setCityDropDown(!cityDropDown);
   };
 
-  const handleGenderSelection = (gender) => {
-    setSelectedGender(gender);
+  const handleGenderSelection = (name, value) => {
+    setSelectedGender(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleGenderDropdown = () => {
@@ -147,8 +373,9 @@ const EditorManagemenet = (props) => {
     setGenderDropDown(!genderDropDown);
   };
 
-  const handleAgeSelection = (age) => {
-    setSelectedAge(age);
+  const handleAgeSelection = (name, value) => {
+    setSelectedAge(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleAgeDropdown = () => {
@@ -167,8 +394,9 @@ const EditorManagemenet = (props) => {
     setAgeDropDown(!ageDropDown);
   };
 
-  const handleCategorySelection = (category) => {
-    setSelectedCategory(category);
+  const handleCategorySelection = (name, value) => {
+    setSelectedCategory(value);
+    setAddUser({ ...addUser, [name]: value });
   };
 
   const toggleCategoryDropdown = () => {
@@ -187,19 +415,27 @@ const EditorManagemenet = (props) => {
     setCategoryDropdown(!categoryDropdown);
   };
 
-  const countryOptions = [
-    "India",
-    "Turkey",
-    "Paris",
-    "Japan",
-    "Germany",
-    "USA",
-    "UK",
+  const countryOptions = cities;
+  const cityOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Mersin",
+    "Diyarbakır",
+    "Kayseri",
+    "Eskişehir",
+    "Trabzon",
+    "Samsun",
+    "Denizli",
   ];
-  const cityOptions = ["Surat", "Baroda"];
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const categoryOptions = ["Category 1", "Category 2", "Category 3"];
+  const categoryOptions = ["Football", "Basketball"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
 
@@ -224,12 +460,28 @@ const EditorManagemenet = (props) => {
     { id: "#0004", plan: "Highlight Plan 2 Week" },
   ];
 
-  const GenderFilterOptions = ["option 1", "option 2"];
-  const LevelOptions = ["option 1", "option 2"];
-  const CityFilterOptions = ["option 1", "option 2"];
-  const ageFilterOptions = ["option 1", "option 2"];
-  const SuccessRateFilterOptions = ["option 3", "option 4"];
-  const ScorePointFilterOptions = ["option 5", "option 6"];
+  const GenderFilterOptions = ["Male", "Female", "I don't want to specify"];
+  const LevelOptions = ["Apprentice", "Journeyman", "Expert", "Grandmaster"];
+  const CityFilterOptions = [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Gaziantep",
+    "Konya",
+    "Mersin",
+    "Diyarbakır",
+    "Kayseri",
+    "Eskişehir",
+    "Trabzon",
+    "Samsun",
+    "Denizli",
+  ];
+  const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
+  const SuccessRateFilterOptions = ["option 3SR", "option 41"];
+  const ScorePointFilterOptions = ["option 5SP", "option 61"];
 
   const [selectedSuccessRateFilter, setSelectedSuccessRateFilter] =
     useState("Select");
@@ -382,19 +634,22 @@ const EditorManagemenet = (props) => {
     }
     setScorePointFilterDropDown(!scorePointFilterDropDown);
   };
+  const server_url = `${config?.apiUrl}`;
 
   return (
     <>
-      <div
-        className="dark-mode p-2 m-2 mb-0 home-height"
-      >
+      <div className="dark-mode p-2 m-2 mb-0 home-height">
         <div className="d-flex p-2">
           <div className="p-2 flex-grow-1">
             <div class="input-group w-50">
               <span class="input-group-text search-icon-dark" id="basic-addon1">
                 <GoSearch style={{ color: "#FFFFFF" }} />
               </span>
-              <input type="text" className="input-field-dark" />
+              <input
+                onChange={filteredData}
+                type="text"
+                className="input-field-dark"
+              />
             </div>
           </div>
           <div className="p-2">
@@ -414,6 +669,10 @@ const EditorManagemenet = (props) => {
           </div>
           <div className="p-2">
             <button
+              onClick={() => {
+                props.setupdateProfile(1);
+                setAddUser({});
+              }}
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
               className="px-2"
@@ -423,24 +682,50 @@ const EditorManagemenet = (props) => {
                 border: "1px solid #5BDEAA",
                 color: "#5BDEAA",
               }}
+              // onClick={() => setAddUser({})}
             >
               Create Editor
             </button>
           </div>
         </div>
-        {users.map((res, index) => (
+        {displayUser?.map((res, index) => (
           <div
-            className="px-2 py-1 mb-2 editor-section-fonts"
+            // onClick={() => props.setupdateProfile(2)}
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+            onClick={() => {
+              props.setupdateProfile(2);
+              console.log("LLLL");
+              console.log(res, "NEha");
+              setPartialData(res);
+              setAddUser(res.editor_data);
+            }}
+            className="px-2 py-1 mb-2 row-fonts cursor"
             style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
           >
             <div className="row g-0 d-flex justify-content-between align-items-center">
-              <div className="col-3">
+              <div
+                className="col-3"
+
+                // data-bs-toggle="modal"
+                // onClick={() => {
+                //   props.setupdateProfile(2);
+                //   console.log("LLLL");
+                //   console.log(res,"NEha");
+                //   setPartialData(res);
+                //   setAddUser(res.editor_data);
+                // }}
+                // data-bs-target="#exampleModal"
+
+              >
                 <div className="d-flex align-items-center">
-                  <span className="pe-1">{res.sr}</span>
+                  <span className="pe-1">{`# ${res?.editor_data?.id
+                    .toString()
+                    .padStart(4, "0")}`}</span>
                   <div className="position-relative">
                     <img
-                      className="profile-icon"
-                      src={res.profile}
+                      className="rounded-circle profile-icon"
+                      src={`${server_url + res?.editor_data?.profile_pic}`}
                       alt=""
                       height={42}
                       width={42}
@@ -463,23 +748,32 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                   </div>
-                  <span className="ps-1">{res.name}</span>
+                  <span className="ps-1">{res?.editor_data?.name}</span>
                 </div>
               </div>
               <div className="d-flex gap-2 align-items-center col-1">
-                <div>{res.username}</div>
+                <div>{res?.editor_data?.username}</div>
               </div>
               <div
                 className="d-flex align-items-center block-width col-3 gap-1"
                 style={{ minWidth: "7.5rem" }}
               >
                 <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>%62</span>
-                <img src={res.gender} alt="" height={28} width={28} />
-                <span>{res.age}</span>
-                <div className="">{res.country}</div>
+                {res?.editor_data?.gender == "Male" && (
+                  <img src={gender_male} alt="" height={23} width={23} />
+                )}
+                {res?.editor_data?.gender == "Female" && (
+                  <img src={gender_female} alt="" height={23} width={23} />
+                )}
+                <span>{res?.editor_data?.age}</span>
+                <div className="">{res?.editor_data?.country}</div>
               </div>
               <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
-                <span>{res.date}</span>
+                <span>
+                  {moment(res?.editor_data?.created).format(
+                    "DD-MM.YYYY - HH:mm"
+                  )}
+                </span>
                 <img
                   className="icons-edit-eye"
                   src={circle_check}
@@ -496,11 +790,12 @@ const EditorManagemenet = (props) => {
                 />
               </div>
             </div>
-            {props?.verifyRqst && (
-              <VerificationRequestsBtns/>
-            )}
+            {props?.verifyRqst && <VerificationRequestsBtns />}
             {props?.deactiveRqst && (
-              <DeactivationRequestsBtns/>
+              <DeactivationRequestsBtns
+                id={res?.editor_data?.id}
+                editorManagementApiData={props.editorManagementApiData}
+              />
             )}
           </div>
         ))}
@@ -518,25 +813,49 @@ const EditorManagemenet = (props) => {
           <div class="modal-content">
             <div class="modal-body dark-mode p-3">
               <div className="d-flex position-relative my-2">
-                <div
-                  className="my-1"
+                <label
+                  htmlFor="camera"
                   style={{
-                    backgroundColor: "#E6E6E6",
-                    borderRadius: "50%",
-                    height: "7rem",
-                    width: "7rem",
+                    display: displaySelectedImg ? "none" : "block",
                   }}
                 >
-                  <img
+                  <div
+                    className="my-1 cursor"
                     style={{
-                      position: "absolute",
-                      top: "2rem",
-                      left: "1.9rem",
+                      backgroundColor: "#E6E6E6",
+                      borderRadius: "50%",
+                      height: "8rem",
+                      width: "8rem",
                     }}
-                    src={camera}
-                    alt=""
-                  />
-                </div>
+                  >
+                    <img
+                      style={{
+                        position: "absolute",
+                        top: "2.34rem",
+                        left: "2.4rem",
+                      }}
+                      src={camera}
+                      alt=""
+                    />
+                  </div>
+                </label>
+                <img
+                  src={preveiwProfilePic}
+                  alt=""
+                  height={135}
+                  width={135}
+                  style={{
+                    display: displaySelectedImg ? "block" : "none",
+                    objectFit: "cover",
+                    borderRadius: "50%  ",
+                  }}
+                />
+                <input
+                  type="file"
+                  className="d-none"
+                  id="camera"
+                  onChange={(e) => handleAddProfile(e)}
+                />
                 <div
                   className="position-absolute d-flex justify-content-center align-items-center"
                   style={{
@@ -571,7 +890,13 @@ const EditorManagemenet = (props) => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          Expert
+                          {partialData.editor_data.commentator_level
+                            .charAt(0)
+                            .toUpperCase() +
+                            partialData.editor_data.commentator_level
+
+                              .slice(1)
+                              .toLowerCase()}
                         </button>
                       </div>
                     )}
@@ -619,19 +944,19 @@ const EditorManagemenet = (props) => {
                     <div className="d-flex gap-4 justify-content-end my-2">
                       <div className="d-flex flex-column text-center">
                         <span>Subscribers</span>
-                        <span>1.236</span>
+                        <span>{partialData.Subscriber_Count}</span>
                       </div>
                       <div className="d-flex flex-column text-center">
-                        <span>Subscribers</span>
-                        <span>1.236</span>
+                        <span>Subscriptions</span>
+                        <span>{partialData.Subscription_Count}</span>
                       </div>
                       <div className="d-flex flex-column text-center">
-                        <span>Subscribers</span>
-                        <span>1.236</span>
+                        <span>Followers</span>
+                        <span>{partialData.Follower_Count}</span>
                       </div>
                       <div className="d-flex flex-column text-center">
-                        <span>Subscribers</span>
-                        <span>1.236</span>
+                        <span>Following</span>
+                        <span>{partialData.Following_Count}</span>
                       </div>
                     </div>
                   </div>
@@ -770,6 +1095,9 @@ const EditorManagemenet = (props) => {
                     <div className="col d-flex flex-column">
                       <span>Name Surname</span>
                       <input
+                        onChange={submitEditorData}
+                        name="name"
+                        value={addUser.name}
                         type="text"
                         className="darkMode-input form-control"
                       />
@@ -777,6 +1105,9 @@ const EditorManagemenet = (props) => {
                     <div className="col d-flex flex-column">
                       <span>Username</span>
                       <input
+                        onChange={submitEditorData}
+                        name="username"
+                        value={addUser.username}
                         type="text"
                         className="darkMode-input form-control"
                       />
@@ -792,6 +1123,9 @@ const EditorManagemenet = (props) => {
                           +90
                         </span>
                         <input
+                          onChange={submitEditorData}
+                          name="phone"
+                          value={addUser.phone}
                           type="text"
                           class="form-control darkMode-input"
                           aria-label="Username"
@@ -804,20 +1138,23 @@ const EditorManagemenet = (props) => {
                     <div className="col d-flex flex-column">
                       <span>Password</span>
                       <input
+                        onChange={submitEditorData}
+                        name="password"
+                        value={addUser.password}
                         // style={{-webkit-text-security: square;}}
-                        style={{ webkitTextSecurity: "circle" }}
+                        // style={{ webkitTextSecurity: "circle" }}
                         className="darkMode-input form-control"
                         type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        // value={password}
+                        // onChange={(e) => setPassword(e.target.value)}
                       />
                       {showPassword ? (
                         <AiOutlineEyeInvisible
                           fontSize={"1.5rem"}
                           style={{
                             position: "absolute",
-                            right: "1.6rem",
-                            top: "11rem",
+                            top: "16.6rem",
+                            left: "14rem",
                           }}
                           onClick={() => setShowPassword(!showPassword)}
                         />
@@ -826,8 +1163,8 @@ const EditorManagemenet = (props) => {
                           fontSize={"1.5rem"}
                           style={{
                             position: "absolute",
-                            right: "1.6rem",
-                            top: "12rem",
+                            top: "16.6rem",
+                            left: "14rem",
                           }}
                           onClick={() => setShowPassword(!showPassword)}
                         />
@@ -835,9 +1172,14 @@ const EditorManagemenet = (props) => {
                     </div>
                     <div className="col">
                       <Dropdownmodal
+                        onChange={submitEditorData}
+                        name="country"
+                        value={addUser.selectedCountry}
                         label="Country"
                         options={countryOptions}
-                        selectedOption={selectedCountry}
+                        selectedOption={
+                          addUser.country ? addUser.country : selectedCountry
+                        }
                         onSelectOption={handleCountrySelection}
                         isOpen={countryDropDown}
                         toggleDropdown={toggleCountryDropdown}
@@ -845,9 +1187,14 @@ const EditorManagemenet = (props) => {
                     </div>
                     <div className="col">
                       <Dropdownmodal
+                        onChange={submitEditorData}
+                        name="city"
+                        value={addUser.selectedCity}
                         label="City"
                         options={cityOptions}
-                        selectedOption={selectedCity}
+                        selectedOption={
+                          addUser.city ? addUser.city : selectedCity
+                        }
                         onSelectOption={handleCitySelection}
                         isOpen={cityDropDown}
                         toggleDropdown={toggleCityDropdown}
@@ -857,9 +1204,14 @@ const EditorManagemenet = (props) => {
                   <div className="row gap-3 g-0 my-2">
                     <div className="col">
                       <Dropdownmodal
+                        onChange={submitEditorData}
+                        name="category"
+                        value={addUser.selectedCategory}
                         label="Category"
                         options={categoryOptions}
-                        selectedOption={selectedCategory}
+                        selectedOption={
+                          addUser.category ? addUser.category : selectedCategory
+                        }
                         onSelectOption={handleCategorySelection}
                         isOpen={categoryDropdown}
                         toggleDropdown={toggleCategoryDropdown}
@@ -867,9 +1219,14 @@ const EditorManagemenet = (props) => {
                     </div>
                     <div className="col">
                       <Dropdownmodal
+                        onChange={submitEditorData}
+                        name="gender"
+                        value={addUser.selectedGender}
                         label="Gender"
                         options={genderOptions}
-                        selectedOption={selectedGender}
+                        selectedOption={
+                          addUser.gender ? addUser.gender : selectedGender
+                        }
                         onSelectOption={handleGenderSelection}
                         isOpen={genderDropDown}
                         toggleDropdown={toggleGenderDropdown}
@@ -877,9 +1234,12 @@ const EditorManagemenet = (props) => {
                     </div>
                     <div className="col">
                       <Dropdownmodal
+                        onChange={submitEditorData}
+                        name="age"
+                        value={addUser.selectedAge}
                         label="Age"
                         options={ageOptions}
-                        selectedOption={selectedAge}
+                        selectedOption={addUser.age ? addUser.age : selectedAge}
                         onSelectOption={handleAgeSelection}
                         isOpen={ageDropDown}
                         toggleDropdown={toggleAgeDropdown}
@@ -893,6 +1253,9 @@ const EditorManagemenet = (props) => {
                         <span></span>
                         <div class="form-floating">
                           <textarea
+                            onChange={submitEditorData}
+                            name="about"
+                            value={addUser.about}
                             style={{ height: "100px" }}
                             className="darkMode-input form-control"
                           ></textarea>
@@ -902,45 +1265,68 @@ const EditorManagemenet = (props) => {
                         </span>
                       </div>
                     </div>
-                    <div className="col-4 d-flex flex-column justify-content-center gap-2">
-                      <div className="">
-                        <img
-                          height={30}
-                          width={30}
-                          onClick={() =>
-                            setIsJourneymanSelected(!isJourneymanSelected)
-                          }
-                          src={isJourneymanSelected ? selectedRadio : Radio}
-                          alt=""
-                          style={{ cursor: "pointer" }}
-                        />
-                        <span className="px-2">Jouneyman</span>
+                    {props.updateProfile !== 2 && (
+                      <div className="col-4 d-flex flex-column justify-content-center gap-2">
+                        <div className="">
+                          <img
+                            name="level"
+                            value="jouneyman"
+                            height={30}
+                            width={30}
+                            onClick={(e) => {
+                              setIsJourneymanSelected(!isJourneymanSelected);
+                              submitEditorData(e, "jouneyman");
+                            }}
+                            src={
+                              addUser.level == "jouneyman"
+                                ? selectedRadio
+                                : Radio
+                            }
+                            alt=""
+                            style={{ cursor: "pointer" }}
+                          />
+                          <span className="px-2">Jouneyman</span>
+                        </div>
+                        <div className="">
+                          <img
+                            name="level"
+                            value="master"
+                            height={30}
+                            width={30}
+                            onClick={(e) => {
+                              setIsExpertSelected(!isExpertSelected);
+                              submitEditorData(e, "master");
+                            }}
+                            src={
+                              addUser.level == "master" ? selectedRadio : Radio
+                            }
+                            alt=""
+                            style={{ cursor: "pointer" }}
+                          />
+                          <span className="px-2">Expert</span>
+                        </div>
+                        <div className="">
+                          <img
+                            name="level"
+                            value="grandmaster"
+                            height={30}
+                            width={30}
+                            onClick={(e) => {
+                              setIsGrandmasterSelected(!isGrandmasterSelected);
+                              submitEditorData(e, "grandmaster");
+                            }}
+                            src={
+                              addUser.level == "grandmaster"
+                                ? selectedRadio
+                                : Radio
+                            }
+                            alt=""
+                            style={{ cursor: "pointer" }}
+                          />
+                          <span className="px-2">Grandmaster</span>
+                        </div>
                       </div>
-                      <div className="">
-                        <img
-                          height={30}
-                          width={30}
-                          onClick={() => setIsExpertSelected(!isExpertSelected)}
-                          src={isExpertSelected ? selectedRadio : Radio}
-                          alt=""
-                          style={{ cursor: "pointer" }}
-                        />
-                        <span className="px-2">Expert</span>
-                      </div>
-                      <div className="">
-                        <img
-                          height={30}
-                          width={30}
-                          onClick={() =>
-                            setIsGrandmasterSelected(!isGrandmasterSelected)
-                          }
-                          src={isGrandmasterSelected ? selectedRadio : Radio}
-                          alt=""
-                          style={{ cursor: "pointer" }}
-                        />
-                        <span className="px-2">Jouneyman</span>
-                      </div>
-                    </div>
+                    )}
 
                     <div
                       className={`d-flex justify-content-center my-2 ${
@@ -950,6 +1336,22 @@ const EditorManagemenet = (props) => {
                       {props.updateProfile === 2 ? (
                         <>
                           <button
+                            data-bs-dismiss="modal"
+                            onClick={() => {
+                              props.setupdateProfile(1);
+                              setAddUser({
+                                name: "",
+                                username: "",
+                                phone: "",
+                                password: "",
+                                country: "",
+                                city: "",
+                                category: "",
+                                gender: "",
+                                age: "",
+                                about: "",
+                              });
+                            }}
                             className="px-3 py-1"
                             style={{
                               color: "#FF5757",
@@ -961,6 +1363,23 @@ const EditorManagemenet = (props) => {
                             Remove
                           </button>
                           <button
+                            onClick={() => {
+                              handleDeactive(partialData.editor_data?.id);
+                              props.setupdateProfile(1);
+                              setAddUser({
+                                name: "",
+                                username: "",
+                                phone: "",
+                                password: "",
+                                country: "",
+                                city: "",
+                                category: "",
+                                gender: "",
+                                age: "",
+                                about: "",
+                              });
+                            }}
+                            data-bs-dismiss="modal"
                             className="px-3 py-1"
                             style={{
                               color: "#FF9100",
@@ -972,6 +1391,23 @@ const EditorManagemenet = (props) => {
                             Deactive
                           </button>
                           <button
+                            onClick={() => {
+                              handleUpdateEditor(partialData.editor_data?.id);
+                              props.setupdateProfile(1);
+                              setAddUser({
+                                name: "",
+                                username: "",
+                                phone: "",
+                                password: "",
+                                country: "",
+                                city: "",
+                                category: "",
+                                gender: "",
+                                age: "",
+                                about: "",
+                              });
+                            }}
+                            data-bs-dismiss="modal"
                             className="px-3 py-1"
                             style={{
                               color: "#D2DB08",
@@ -983,7 +1419,23 @@ const EditorManagemenet = (props) => {
                             Update
                           </button>
                           <button
+                            onClick={() => {
+                              setAddUser({
+                                name: "",
+                                username: "",
+                                phone: "",
+                                password: "",
+                                country: "",
+                                city: "",
+                                category: "",
+                                gender: "",
+                                age: "",
+                                about: "",
+                              });
+                              props.setupdateProfile(1);
+                            }}
                             className="px-3 py-1"
+                            data-bs-dismiss="modal"
                             style={{
                               color: "#E6E6E6",
                               backgroundColor: "transparent",
@@ -996,6 +1448,8 @@ const EditorManagemenet = (props) => {
                         </>
                       ) : (
                         <button
+                          onClick={handleNewEditor}
+                          data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
                             color: "#D2DB08",
@@ -1012,6 +1466,21 @@ const EditorManagemenet = (props) => {
                 </>
               )}
               <img
+                onClick={() => {
+                  props.setupdateProfile(1);
+                  setAddUser({
+                    name: "",
+                    username: "",
+                    phone: "",
+                    password: "",
+                    country: "",
+                    city: "",
+                    category: "",
+                    gender: "",
+                    age: "",
+                    about: "",
+                  });
+                }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
@@ -1131,6 +1600,8 @@ const EditorManagemenet = (props) => {
               </div>
               <div className="d-flex justify-content-center my-2">
                 <button
+                  data-bs-dismiss="modal"
+                  onClick={() => handleEditorFiltor()}
                   className="px-3 py-1"
                   style={{
                     color: "#D2DB08",

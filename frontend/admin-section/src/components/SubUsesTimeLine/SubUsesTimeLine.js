@@ -37,12 +37,12 @@ const SubUsesTimeLine = () => {
     );
   };
   return (
-    <div className="dark-mode p-2" style={{ height: "90vh" }}>
-      <div className="" style={{ fontSize: "1.1rem" }}>
+    <div className="dark-mode p-2 sidebar-height" style={{ height: "90vh" }}>
+      <div className="" style={{ fontSize: "1.2rem" }}>
         User Timeline
       </div>
       {users.map((res, index) => (
-        <div
+        <div key={index}
           className="d-flex gap-1 my-2 pb-2"
           style={{ borderBottom: "0.2px solid #E6E6E6" }}
         >
@@ -50,8 +50,8 @@ const SubUsesTimeLine = () => {
             <img src={res.profile} alt="" height={45} width={45} />
           </div>
           <div className=" flex-grow-1 d-flex flex-column">
-            <div className="d-flex gap-2">
-              <div>johndoe</div>
+            <div className="d-flex gap-2 align-items-center">
+              <div className="username">johndoe</div>
               <div>
                 <button
                   style={{

@@ -44,16 +44,16 @@
         padding-left: 1rem!important;
     }
 }
-.b{
-  animation: moving-bars 4s linear infinite;
-}
-@keyframes moving-bars {
-  0%  { transform: translateY( 100% ); }
-  15% { transform: translateY( 0 ); }
+
+dl{ position: relative ; }
+dl{ position: relative ; height: 94px ; }
+dt,dd{ position: absolute ; }
+dd{ 
+    bottom: 10px ; 
+    animation: animate-bar 0.75s 1 linear; 
 }
 
-#my-chart.column {
-  height: 200px;
-  max-width: 300px;
-  margin: 0 auto;
+dt{ bottom: 0 ; }
+@keyframes animate-bar{
+    0% {height: 0% ; }
 }

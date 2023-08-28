@@ -32,11 +32,10 @@ const SideBar = (props) => {
   const [showDetails, setshowDetails] = useState("home");
 
   const location = useLocation();
-  const path = location.pathname; 
+  const path = location.pathname;
   useEffect(() => {
-    setshowDetails(path)
-  }, [path])
-  
+    setshowDetails(path);
+  }, [path]);
 
   return (
     <>
@@ -179,6 +178,10 @@ const SideBar = (props) => {
         </div>
         <div className="">
           <img
+            onClick={() => {
+              localStorage.clear();
+              window.location.reload();
+            }}
             className="cursor icons-responsive-size"
             src={logout}
             alt=""

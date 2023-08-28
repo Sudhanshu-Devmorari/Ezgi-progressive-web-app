@@ -4,12 +4,14 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from django.db.models.functions import TruncDate
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import Case, When, IntegerField
 from core.models import COMMENTATOR_ROLE_CHOISE
-import math
+import math, random
+import pyotp
 
 # From rest_framework 
 from rest_framework.views import APIView
@@ -20,50 +22,65 @@ from rest_framework.exceptions import NotFound, ParseError, APIException
 
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
-                          FavEditors, TicketSupport, ResponseTicket, Highlight)
+                          FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
+                          MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
+                          TicketHistory)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
-                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer)
+                             TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
+                             SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
+                             TicketHistorySerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
-totp = pyotp.TOTP('base32secret3232', interval=45)
 class SignupView(APIView):
     def post(self, request, format=None):
+        # print('request.data: ', request.data)
         serializer = UserSerializer(data=request.data)
         if not serializer.is_valid():
-            print(serializer.errors)
+            # print(serializer.errors)
             return Response({
                 'message': 'Error',
                 'data' : serializer.errors,
                'status' : status.HTTP_400_BAD_REQUEST
                 })
         else:
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
             serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.user += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(user=1)
+            if User.objects.filter(phone=request.data['phone']).exists():
+                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            else:
+                serializer.save()
+            serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.user += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(user=1)
             return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
-            # otp = totp.now()
-            # print()
-            # print('otp: ', otp)
-            # print()
-            # res = sms_send(request.data['phone'],f"Your OTP verification code is {otp}")
-            # print('res: ', res)
-            # if res == 'Success':
-            #     return Response(data={'success': 'Otp successfully sent.', 'status' : status.HTTP_200_OK})
-            # else:
-            #     return Response(data={'error': 'Otp not sent. Try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             otp = request.data.get('otp')
-            print('otp: ', otp)
+            # print('otp: ', otp)
             verification_result = totp.verify(otp)
-            print('verification_result: ', verification_result)
+            # print('verification_result: ', verification_result)
 
             if verification_result:
-                return Response(data={'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
+                return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
             else:
                 return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
         except Exception as e:
@@ -73,13 +90,16 @@ class OtpReSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
         phone = request.data['phone']
         try:
-            user = User.objects.get(phone=phone)
+            if 'is_admin' in request.data:
+                user = User.objects.get(phone=phone,is_admin=True)
+            else:
+                user = User.objects.get(phone=phone)
             otp = totp.now()
-            print('otp: ', otp)
+            # print('otp: ', otp)
             # res = sms_send(phone, otp)  
             res = "Success"
             if res == 'Success':
-                return Response(data={'success': 'Otp successfully sent.','status' : status.HTTP_200_OK})
+                return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
             else:
                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
         except User.DoesNotExist:
@@ -92,11 +112,14 @@ class LoginView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
         password = request.data['password']
-        print('password: ', password)
         try:
-            user_phone = User.objects.get(phone=phone)
+            if 'is_admin' in request.data:
+                user_phone = User.objects.get(phone=phone, is_delete=False,is_admin=True)
+            else:
+                user_phone = User.objects.get(phone=phone, is_delete=False)
+                
             if user_phone.password == password:
-                return Response({'data' : "Login successfull!", 'status' : status.HTTP_200_OK})
+                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
         except User.DoesNotExist:
@@ -105,58 +128,199 @@ class LoginView(APIView):
                 'status' : status.HTTP_404_NOT_FOUND
             })
 
+class GoogleLoginview(APIView):
+    def post(self, request, format=None):
+        # print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
+            print("Email already exists")
+        except User.DoesNotExist:
+            # print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='google',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+        
+class FacebookLoginview(APIView):
+    def post(self, request, format=None):
+        # print(request.data, "=============================================request.data")
+        email = request.data.get('email')
+        # print('email: ', email)
+        try: 
+            user = User.objects.get(Q(email=email) & Q(logged_in_using='facebook'))
+            # print("Email already exists")
+        except User.DoesNotExist:
+            # print(request.data, "=============================================request.data")
+            user = User.objects.create(
+                email=email,
+                name=request.data.get('name'),
+                username=request.data.get('username'),
+                logged_in_using='facebook',
+            )
+        return Response({
+            'data' : "Login successfull!", 
+            'userRole' : user.user_role, 
+            'userId' : user.id, 
+            'status' : status.HTTP_200_OK
+            }) 
+
+
 class PasswordResetView(APIView):
     def post(self, request, format=None):   
         phone = request.data['phone']
         new_ps = request.data['new_ps']
-        user = User.objects.get(phone=phone)
+        user = User.objects.get(phone=phone, is_delete=False)
         user.password = new_ps
         user.save()
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
-class RetrieveCommentatorView(APIView): # for Home page:
+
+class RetrieveCommentatorView(APIView):
+    """
+    for Home page:
+    """
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
+        unique_comment_ids = set()
         
+        # retrieve commentator list:
         try:
-            all_commentator = User.objects.filter(user_role='commentator')
+            user_detail = []
+            all_commentator = User.objects.filter(user_role='commentator').order_by('-created')
+            for obj in all_commentator:
+                detail = {}
+                count = Subscription.objects.filter(commentator_user=obj).count()
+                detail['user'] = UserSerializer(obj).data
+                detail['subscriber_count'] = count
+                user_detail.append(detail)
 
             # if user already follows a commentator, that commentator is not shown again to the user.
             # all_commentator = [commentator for commentator in all_commentator if not FollowCommentator.objects.filter(commentator_user=commentator, standard_user=request.user).exists()]
 
-            serializer = UserSerializer(all_commentator, many=True)
-            data_list['Commentator'] = serializer.data
+            # serializer = UserSerializer(all_commentator, many=True)
+            data_list['Commentator'] = user_detail
         except ObjectDoesNotExist:
             return Response(data={'error': 'No commentator found.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            # for retrieving public comments:
-            all_comments = Comments.objects.filter(status='approve', public_content=True)
-            serializer1 = CommentsSerializer(all_comments, many=True)
-            data_list['Public_Comments'] = serializer1.data
+            all_comments = Comments.objects.filter(status='approve', public_content=True).order_by('-created')
+            data_list['Public_Comments'] = []
+
+            for comment in all_comments:
+                comment_data = CommentsSerializer(comment).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+        
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+
+                # Fetch comment reactions and calculate the total count of reactions
+                comment_reactions = CommentReaction.objects.filter(comment=comment)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                if comment.id not in unique_comment_ids:
+                    unique_comment_ids.add(comment.id)
+                    data_list['Public_Comments'].append(comment_data)
+
         except ObjectDoesNotExist:
             data_list['Public_Comments'] = []
 
         try:
-            # for retrieving subscription comments:
-            subscribe_comment = []
-            # s = User.objects.get(id=6)
-            # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
-            subscription_obj = Subscription.objects.filter(standard_user=request.user, end_date__gte=datetime.now(), status='approve')
+            if request.query_params.get('id') != 'null':
+                user = User.objects.get(id=request.query_params.get('id'))
 
-            for obj in subscription_obj:
-                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
-                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve')
-                    for obj in subscription_comment:
-                        subscribe_comment.append(obj)
-                        # serializer2 = CommentsSerializer(subscription_comment)
-                        # print("data: ", serializer2.data)
-                        # subscribe_comment.append(serializer2.data)
+                # for retrieving subscription comments:
+                data_list['Subscription_Comments'] = []
+                # s = User.objects.get(id=6)
+                # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
+                # if Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve').exists():
+                subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='active').order_by('-created')
 
-            serializer2 = CommentsSerializer(subscribe_comment, many=True)
-            data_list['Subscription_Comments'] = serializer2.data
+
+                for obj in subscription_obj:
+                    if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
+                        subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').order_by('-created')
+
+                        for comment in subscription_comment:
+                            comment_data = CommentsSerializer(comment).data
+                            date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+        
+                            # Format the datetime object as desired (DD.MM.YYYY)
+                            formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                            comment_data['date'] = formatted_date 
+
+                            comment_reactions = CommentReaction.objects.filter(comment=comment)
+                            total_reactions = comment_reactions.aggregate(
+                                total_likes=Sum('like'),
+                                total_favorite=Sum('favorite'),
+                                total_clap=Sum('clap')
+                            )
+                            
+                            comment_data['total_reactions'] = {
+                                'total_likes': total_reactions['total_likes'] or 0,
+                                'total_favorite': total_reactions['total_favorite'] or 0,
+                                'total_clap': total_reactions['total_clap'] or 0
+                            }
+                            # subscribe_comment.append(obj)
+                            # serializer2 = CommentsSerializer(subscription_comment)
+                            # print("data: ", serializer2.data)
+                            # subscribe_comment.append(serializer2.data)
+                            if comment.id not in unique_comment_ids:
+                                unique_comment_ids.add(comment.id)
+                                data_list['Subscription_Comments'].append(comment_data)
+
+                # serializer2 = CommentsSerializer(subscribe_comment, many=True)
+                # data_list['Subscription_Comments'] = serializer2.data
+            else:
+                data_list['Subscription_Comments'] = []
         except ObjectDoesNotExist:
             data_list['Subscription_Comments'] = []
+
+        try:
+            # for retrieving Highlights:
+            all_highlights = Highlight.objects.filter(status='active').order_by('-created')
+            data_list['highlights'] = []
+            for obj in all_highlights:
+                highlighted_data = HighlightSerializer(obj).data
+                user_data = highlighted_data['user']
+        
+                count = Subscription.objects.filter(commentator_user=user_data['id']).count()
+
+                highlighted_data['subscriber_count'] = count
+
+                data_list['highlights'].append(highlighted_data)
+
+        except ObjectDoesNotExist:
+            data_list['highlights'] = []
+
+        try:
+            ads = Advertisement.objects.all()
+            serializer = AdvertisementSerializer(ads, many=True)
+            data = serializer.data
+            data_list['ads'] = data
+        except ObjectDoesNotExist:
+            data_list['ads'] = []
 
         return Response(data=data_list, status=status.HTTP_200_OK)
 
@@ -164,20 +328,30 @@ class RetrieveCommentatorView(APIView): # for Home page:
 class FollowCommentatorView(APIView):
     # permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
+        user = User.objects.get(id=id)
+        # user = request.user
         try:
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
                 follow_commentator_obj = FollowCommentator.objects.create(
-                    commentator_user=commentator_obj, standard_user=request.user
+                    commentator_user=commentator_obj, standard_user=user
                 )
                 # send follow notification:
-                notification_obj = Notification.objects.create(user=commentator_obj, status=False, context=f'{request.user.username} stated following you.')
+                notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
 
                 serializer = FollowCommentatorSerializer(follow_commentator_obj)
                 data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
+                # else:
+                #     return Response(
+                #         create_response(
+                #             status.HTTP_400_BAD_REQUEST,
+                #             "You already follow that commentator."
+                #         ),
+                #         status=status.HTTP_400_BAD_REQUEST
+                #     )
             else:
                 return Response(
                     create_response(
@@ -209,10 +383,11 @@ class CommentView(APIView):
     #     return Response(serializer.errors)
 
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            user = User.objects.get(id=1)
+            # user = request.user
+            user = User.objects.get(id=id)
+            # print('user: ', user)
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -226,44 +401,49 @@ class CommentView(APIView):
                 comments_today_count = comments_today.count()
                 comments_this_month_count = comments_this_month.count()
 
-
+                lavel_rule = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
                 if user.commentator_level == 'apprentice':
-                    if comments_today_count >= 5:
+                    if comments_today_count >= lavel_rule.daily_match_limit:
                         return Response({"error": "Daily limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
-                    if comments_this_month_count >= 30:
+                    if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
                     
                 if user.commentator_level == 'journeyman':
-                    if comments_today_count >= 10:
+                    if comments_today_count >= lavel_rule.daily_match_limit:
                         return Response({"error": "Daily limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
-                    if comments_this_month_count >= 50:
+                    if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
                 
                 if user.commentator_level == 'master':
-                    if comments_today_count >= 15:
+                    if comments_today_count >= lavel_rule.daily_match_limit:
                         return Response({"error": "Daily limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
-                    if comments_this_month_count >= 50:
+                    if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
                     
                 if user.commentator_level == 'grandmaster':
-                    if comments_today_count >= 25:
+                    if comments_today_count >= lavel_rule.daily_match_limit:
                         return Response({"error": "Daily limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
-                    if comments_this_month_count >= 50:
+                    if comments_this_month_count >= lavel_rule.monthly_min_limit:
                         return Response({"error": "Monthly limit reached for post new comment."}, status=status.HTTP_404_NOT_FOUND)
 
-
+                # print("-----------")
                 category = request.data.get('category')
+                # category = request.data['category']
+                # print('category: ', category)
                 country = request.data.get('country')
                 league = request.data.get('league')
                 date = request.data.get('date')
                 match_detail = request.data.get('match_detail')
                 prediction_type = request.data.get('prediction_type')
                 prediction = request.data.get('prediction')
+                # print('prediction: ', prediction)
                 if user.commentator_level == 'apprentice':
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
+                    print('public_content: ', public_content)
                 comment = request.data.get('comment')
+                # print('comment: ', comment)
 
                 if not category:
                     raise NotFound("Category not found.")
@@ -283,9 +463,8 @@ class CommentView(APIView):
                     raise NotFound("Public Content not found.")
                 if not comment:
                     raise NotFound("Comment not found.")
-
                 comment_obj = Comments.objects.create(
-                    commentator_user=request.user,
+                    commentator_user=user,
                     category=category,
                     country=country,
                     league=league,
@@ -296,11 +475,19 @@ class CommentView(APIView):
                     public_content=public_content,
                     comment=comment
                 )
+
+                if comment_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.comment += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(comment=1)
                 # send new Comment notification:
-                subscription_obj = Subscription.objects.filter(commentator_user=request.user)
+                subscription_obj = Subscription.objects.filter(commentator_user=user)
                 for obj in subscription_obj:
                     # user = obj.standard_user
-                    notification_obj = Notification.objects.create(user=obj.standard_user, status=False, context=f'{request.user.username} upload a new Comment.')
+                    notification_obj = Notification.objects.create(sender=user,receiver=obj.standard_user,date=datetime.today().date(), status=False, context=f'{user.username} upload a new Comment.')
 
                 serializer = CommentsSerializer(comment_obj)
                 data = serializer.data
@@ -350,7 +537,8 @@ class SubscriptionView(APIView):
         """
         Subscription purchase logic here, if purchase is successful, below code runs.
         """
-        if request.user.user_role == 'standard':
+        user = request.user
+        if user.user_role == 'standard':
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
             duration = request.data.get('duration')
             start_date = datetime.now()
@@ -368,7 +556,14 @@ class SubscriptionView(APIView):
             Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=request.user, duration=duration, 
                                                            start_date=start_date, end_date=end_date, status='active', money=money)
             # send Subscription notification:
-            notification_obj = Notification.objects.create(user=commentator, status=False, context=f'{request.user.username} Subscribe you.')
+            notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{request.user.username} Subscribe you.')
+            if Subscription_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.subscription += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(subscription=1)
 
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
@@ -383,8 +578,12 @@ class SubscriptionView(APIView):
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
     def get(self, request, format=None, *args, **kwargs):
+        # user = request.user
+        user = User.objects.get(id = 2)
         try:
-            notification_obj = Notification.objects.filter(user=request.user, status=False)
+            ten_days_ago = timezone.now() - timedelta(days=10)
+            notification_obj = Notification.objects.filter(user=id, status=False)
+            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -397,9 +596,10 @@ class NotificationView(APIView):
             )
         
     def post(self, request, format=None, *args, **kwargs):
+        user = request.user
         try:
             if request.data:
-                notification_obj = Notification.objects.get(user=request.user, id=request.data.get("id"))
+                notification_obj = Notification.objects.get(receiver=user, id=request.data.get("id"))
                 notification_obj.status = True
                 notification_obj.save()
                 serializer = NotificationSerializer(notification_obj)
@@ -414,14 +614,16 @@ class NotificationView(APIView):
 
 
 class CommentReactionView(APIView):
-    def post(self, request, comment_id, format=None, *args, **kwargs):
+    def post(self, request, comment_id, id, format=None, *args, **kwargs):
+        # print("------- ",comment_id,"====", id)
+
         try:
             comment = Comments.objects.get(id=comment_id)
         except Comments.DoesNotExist:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
 
         # user = request.user
-        user = User.objects.get(id=2)
+        user = User.objects.get(id=id)
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
         if reaction_type not in ('like', 'favorite', 'clap'):
             return Response({'error': 'Invalid reaction type'}, status=status.HTTP_400_BAD_REQUEST)
@@ -456,26 +658,26 @@ class CommentReactionView(APIView):
         
 
 class ProfileView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=request.user.id)
+            user_obj = User.objects.get(id=id)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if request.user.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=request.user).count()
+            if user_obj.user_role == 'commentator':
+                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=request.user).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=request.user).count()
+                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
                 data['Comment_Count'] = comment_obj
             else:
-                subscription_obj = Subscription.objects.filter(standard_user=request.user).count()
+                subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
                 data['Subscription_Count'] = subscription_obj
 
-                following_obj = FollowCommentator.objects.filter(standard_user=request.user).count()
+                following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
                 data['Follow_Up_Count'] = following_obj
 
             return Response(data=data, status=status.HTTP_200_OK)
@@ -488,14 +690,14 @@ class ProfileView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
+            user = User.objects.get(id=id)
         except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
         if 'file' not in request.data:
-            return Response({'error': 'No file found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
 
         profile_pic = request.data['file']
 
@@ -503,7 +705,7 @@ class ProfileView(APIView):
         user.save()
 
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
         
 
 class FavEditorsCreateView(APIView):
@@ -512,15 +714,24 @@ class FavEditorsCreateView(APIView):
             if request.data:
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+                # print("******* ", request.data.get("id"))
                 comment = User.objects.get(id=request.data.get("id"))
-                # user = User.objects.get(id=6)
-                user = request.user
+                user = User.objects.get(id=13)
+                # user = request.user
 
-                editor_obj = FavEditors.objects.create(commentator_user=comment, standard_user=user)
-                serializer = FavEditorsSerializer(editor_obj)
-                data = serializer.data
-                return Response(data, status=status.HTTP_200_OK)
+                if not FavEditors.objects.filter(commentator_user=comment, standard_user=user).exists():
+                    editor_obj = FavEditors.objects.create(commentator_user=comment, standard_user=user)
+                    serializer = FavEditorsSerializer(editor_obj)
+                    data = serializer.data
+                    return Response(data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        create_response(
+                            status.HTTP_400_BAD_REQUEST,
+                            "In your favorite editor, this editor is already present."
+                        ),
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
             else:
                 return Response({'error': 'Request Data not found'}, status=status.HTTP_404_NOT_FOUND)
         except ObjectDoesNotExist as e:
@@ -530,40 +741,80 @@ class FavEditorsCreateView(APIView):
         
 
 class RetrieveFavEditorsAndFavComment(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         data_list = {}
         fav_editor_list = []
         fav_comment_list = []
 
-        user = request.user
-        # user = User.objects.get(id=6)
+        # user = request.user
+        user = User.objects.get(id=id)
 
         try:
+            editor = []
             editor_obj = FavEditors.objects.filter(standard_user=user)
             for obj in editor_obj:
-                fav_editor_list.append(obj.commentator_user)
-            serializer = UserSerializer(fav_editor_list, many=True)
-            data_list['fav-editors'] = serializer.data
+                details = {}
+                # print("********** ", obj.commentator_user.username)
+
+                count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
+                # print("********** ", count)
+
+                serializer = FavEditorsSerializer(obj)
+                data = serializer.data
+                details['data'] = data
+                details['subscriber_count'] = count
+
+                editor.append(details)
+
+
+            # serializer = UserSerializer(fav_editor_list, many=True)
+            data_list['favEditors'] = editor
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        # print("========== ", data_list)
+
         try:
-            comment_obj = CommentReaction.objects.filter(user=user, reaction='favorite')
+            comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
+            details = []
             for obj in comment_obj:
-                fav_comment_list.append(obj.comment)
-            serializer1 = CommentsSerializer(fav_comment_list, many=True)
-            data_list['fav-comments'] = serializer1.data
+                comment_data = CommentsSerializer(obj.comment).data
+
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+                # fav_comment_list.append(obj.comment)
+                comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+
+                details.append(comment_data)
+
+
+            # serializer1 = CommentsSerializer(fav_comment_list, many=True)
+            data_list['favComments'] = details
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=data_list, status=status.HTTP_200_OK)
-        
+        return Response(data=data_list, status=status.HTTP_200_OK)       
+
 class SupportView(APIView):
     # for retrieve login user all tickets:
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            user = User.objects.get(id=id)
 
             support_obj = TicketSupport.objects.filter(user=user)
             serializer = TicketSupportSerializer(support_obj, many=True)
@@ -573,20 +824,29 @@ class SupportView(APIView):
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # for create new ticket:
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
+            # print(request.data)
             if request.data:
                 if 'department' not in request.data:
-                        return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Department not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'subject' not in request.data:
-                        return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({'error': 'Subject not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'message' not in request.data:
-                        return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                user = request.user
-                # user = User.objects.get(id=1)
+                        return Response({'error': 'Message not found.', 'status' : status.HTTP_400_BAD_REQUEST})
+                # user = request.user
+                user = User.objects.get(id=id)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
-                
+                if support_obj != None:
+                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                if support_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.ticket += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(ticket=1)
                 serializer = TicketSupportSerializer(support_obj)
                 data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
@@ -596,8 +856,78 @@ class SupportView(APIView):
             return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+class ShowTicketData(APIView):
+     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response(data={"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            support_obj = TicketSupport.objects.get(id=ticket_id)
+        except TicketSupport.DoesNotExist:
+            return Response(data={"error": "TicketSupport not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            ticket_history = TicketHistory.objects.filter(ticket_support=support_obj, status='comment_by_user').latest('created')
+        except TicketHistory.DoesNotExist:
+            ticket_history = None
+        
+        if TicketHistory.objects.filter(ticket_support=support_obj, status='request_for_update').exists():
+            history_obj = TicketHistory.objects.filter(ticket_support=support_obj, status='request_for_update').latest('created')
+            serializer = TicketSupportSerializer(support_obj).data
+            serializer['message'] = history_obj.message
+        else:
+            serializer = TicketSupportSerializer(support_obj).data
+        # serializer['admin_response'] = TicketHistorySerializer(ticket_history).data if ticket_history else None
+        serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
+        return Response(data=serializer, status=status.HTTP_200_OK)
+
+
+class ReplyTicketView(APIView):
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+            ticket_obj = get_object_or_404(TicketSupport, id=ticket_id)
+            
+            if 'message' not in request.data:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if 'admin_id' not in request.data:
+                return Response({'error': 'Admin id not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            admin_id = request.data.get('admin_id')
+            admin_obj = get_object_or_404(User, id=admin_id)
+            
+            ticket_history = TicketHistory.objects.create(
+                user=user,
+                ticket_support=ticket_obj,
+                status='request_for_update',
+                message=request.data.get('message'),
+                request_to=admin_obj
+            )
+            if ticket_history != None:
+                ticket_obj.status = 'pending'
+                ticket_obj.save()
+
+            serializer = TicketHistorySerializer(ticket_history)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+        
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except TicketSupport.DoesNotExist:
+            return Response({'error': 'Ticket support not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
 class UpdateTicketMessageView(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
+        """
+        Admin or Sub_user answer the user ticket.
+        """
         try:
             if request.data:
                 if 'ticket_id' not in request.data:
@@ -605,8 +935,8 @@ class UpdateTicketMessageView(APIView):
                 if 'message' not in request.data:
                     return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
-                user = request.user
-                # user = User.objects.get(id=1)
+                # user = request.user
+                user = User.objects.get(id=id)
 
                 ticket_id = request.data.get('ticket_id')
                 ticket_obj = TicketSupport.objects.get(id=ticket_id)
@@ -616,6 +946,9 @@ class UpdateTicketMessageView(APIView):
                 serializer = ResponseTicketSerializer(result_obj)
                 data = serializer.data
 
+                if result_obj != None:
+                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_obj, status='comment_by_user',
+                                                              response_ticket=result_obj)
                 return Response(data=data, status=status.HTTP_200_OK)
 
         except TicketSupport.DoesNotExist:
@@ -626,10 +959,10 @@ class UpdateTicketMessageView(APIView):
 
 
 class ResolvedTicket(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = request.user
-            # user = User.objects.get(id=1)
+            # user = request.user
+            user = User.objects.get(id=id)
 
             if request.data:
                 if 'ticket_id' not in request.data:
@@ -660,21 +993,68 @@ class ResolvedTicket(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ActiveResolvedCommentRetrieveView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
+        # print("--===--", id)
+        user = User.objects.get(id=id)
         data_list = {}
-        user = request.user
 
         try:
+            details =[]
             all_active_comment = Comments.objects.filter(commentator_user=user, date__gt=datetime.now().date())
-            serializer = CommentsSerializer(all_active_comment, many=True)
-            data_list['active_comments'] = serializer.data
+            for obj in all_active_comment:
+                comment_data = CommentsSerializer(obj).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+
+                comment_reactions = CommentReaction.objects.filter(comment=obj)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                details.append(comment_data)
+            # serializer = CommentsSerializer(all_active_comment, many=True)
+            data_list['active_comments'] = details
         except Comments.DoesNotExist:
             data_list['active_comments'] = []
 
         try:
+            details =[]
             all_resolved_comment = Comments.objects.filter(commentator_user=user, date__lt=datetime.now().date())
-            serializer1 = CommentsSerializer(all_resolved_comment, many=True)
-            data_list['resolved_comments'] = serializer1.data
+            for obj in all_resolved_comment:
+                comment_data = CommentsSerializer(obj).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                # Format the datetime object as desired (DD.MM.YYYY)
+                formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                comment_data['date'] = formatted_date 
+
+                comment_reactions = CommentReaction.objects.filter(comment=obj)
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                details.append(comment_data)
+            # serializer1 = CommentsSerializer(all_resolved_comment, many=True)
+            data_list['resolved_comments'] = details
         except Comments.DoesNotExist:
             data_list['resolved_comments'] = []
 
@@ -682,53 +1062,54 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
-        user = User.objects.get(id=4)
+        user = User.objects.get(id=id)
         data_list = {}
         subscribers = []
         subscription = []
-
         try:
             if user.user_role == 'commentator':
                 if Subscription.objects.filter(commentator_user=user).exists():
                     my_subscribers = Subscription.objects.filter(commentator_user=user)
-                    for obj in my_subscribers:
-                        subscribers.append(obj.standard_user)
-                    serializer = UserSerializer(subscribers, many=True)
-                    data_list['subscribers'] = serializer.data
+                    # for obj in my_subscribers:
+                    #     subscribers.append(obj.standard_user)
+                    serializer = SubscriptionSerializer(my_subscribers, many=True)
+                    data_list['subscribers'] = serializer.data 
 
                 if Subscription.objects.filter(standard_user=user).exists():
                     my_subscription = Subscription.objects.filter(standard_user=user)
-                    for obj in my_subscription:
-                        subscription.append(obj.commentator_user)
-                    serializer1 = UserSerializer(subscription, many=True)
+                    # for obj in my_subscription:
+                    #     subscription.append(obj.commentator_user)
+                    serializer1 = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer1.data
             else:
                 if Subscription.objects.filter(standard_user=user).exists():
                     my_subscription = Subscription.objects.filter(standard_user=user)
-                    for obj in my_subscription:
-                        subscription.append(obj.commentator_user)
-                    serializer = UserSerializer(subscription, many=True)
+                    # for obj in my_subscription:
+                    #     subscription.append(obj.commentator_user)
+                    serializer = SubscriptionSerializer(my_subscription, many=True)
                     data_list['subscription'] = serializer.data
-
-            return Response(data=data_list, status=status.HTTP_200_OK)
-
+                   
+            return Response(data=data_list, status=status.HTTP_200_OK) 
+             
         except ObjectDoesNotExist as e:
             error_message = {"error": "Object does not exist."}
             return Response(data=error_message, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
             error_message = {"error": "An unexpected error occurred."}
-            return Response(data=error_message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data=e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 class DeactivateProfile(APIView):
     def get(self, request, format=None, *args, **kwargs):
-        user = User.objects.get(id=8)
-        # user = request.user
+        # user = User.objects.get(id=8)
+        user = request.user
         if user.user_role == 'standard':
-            user.delete()
+            # user.delete()
+            user.is_delete = True
+            user.save()
             message = {"success": "User profile Deactivate sucessfully."}
             return Response(data=message, status=status.HTTP_200_OK)
         else:
@@ -768,6 +1149,13 @@ class HighlightPurchaseView(APIView):
                     end_date = start_date + timezone.timedelta(days=30)
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
+                if highlight_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.highlight += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(highlight=1)
                 serializer = HighlightSerializer(highlight_obj)
                 data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
@@ -826,11 +1214,68 @@ class CommentFilterView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class VerifyUserView(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        user = User.objects.get(id=id)
+        try:
+            subscribers = Subscription.objects.filter(commentator_user=user)
+
+            commentator_membership = BecomeCommentator.objects.get(user=user, status='active')
+            start_date = commentator_membership.start_date
+            end_date = commentator_membership.end_date
+
+            # Calculate the membership duration
+            membership_duration = end_date - start_date
+            if membership_duration >= timedelta(days=90):  # At least 3 months
+                if subscribers.count() >= 250:
+                    obj = BlueTick.objects.create(user=user)
+                    serializer = BlueTickSerializer(obj).data
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                    # return Response({'message': 'This request has been processed and it has been forwarded to the manager for review.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'message': 'There are fewer than 250 subscribers for the user.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'message': 'User does not have active membership for at least 3 months.'}, status=status.HTTP_200_OK)
+
+        except BecomeCommentator.DoesNotExist:
+            return Response({'message': 'User does not have an active membership.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'message': 'An error occurred while processing the request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class AdminMainPage(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
+        previous_24_hours = timezone.now() - timedelta(hours=24)
 
         try:
+            """user percentage"""
+            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+            data_list['new_user_percentage'] = user_percentage
+            
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+
             new_user = User.objects.all().count()
             data_list['new_user'] = new_user
 
@@ -857,8 +1302,39 @@ class AdminMainPage(APIView):
 class UserManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
+        # print("previous_24_hours********", previous_24_hours)
+
 
         try:
+            """user percentage"""
+            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+            data_list['new_user_percentage'] = user_percentage
+
+            
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+
             new_user = User.objects.all().count()
             data_list['new_user'] = new_user
 
@@ -888,7 +1364,7 @@ class UserManagement(APIView):
         Create new User.
         """
         try:
-            profile = request.data.get('file')
+            profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
@@ -901,7 +1377,11 @@ class UserManagement(APIView):
             if subscription:
                 duration = request.data.get('duration')
                 role = 'commentator'
-                level = request.data.get('level').lower()
+                if request.data.get('level').lower() == 'expert':
+                    level = 'master'
+                else:
+                    level = request.data.get('level').lower()
+
 
             # Any additional validations or processing can be done here
 
@@ -912,8 +1392,37 @@ class UserManagement(APIView):
             )
             user_obj.set_password(password)
             user_obj.save()
+            if user_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.user += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(user=1)
             serializer = UserSerializer(user_obj)
             data = serializer.data
+
+            if subscription and user_obj != None:
+                start_date = datetime.now()
+                if duration == "1 Month":
+                    end_date = start_date + timedelta(days=30)
+                if duration == "3 Month":
+                    end_date = start_date + timedelta(days=90)
+                if duration == "6 Month":
+                    end_date = start_date + timedelta(days=180)
+                
+                editor_obj = BecomeCommentator.objects.create(user=user_obj, duration=duration, status='active', commentator=True, end_date=end_date)
+                editor_obj.save()
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
+                serializer = BecomeCommentatorSerializer(editor_obj)
+                data = serializer.data
+                return Response(data=data, status=status.HTTP_200_OK)
+
             return Response(data=data, status=status.HTTP_200_OK)
 
         except KeyError as e:
@@ -937,15 +1446,39 @@ class UserManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(serializer.data)
+        if request.data.get('subscription') == 'undefined':
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                try:
+                    serializer.save()
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            duration = request.data.get('duration')
+            start_date = datetime.now()
+            if duration == "1 Month":
+                end_date = start_date + timedelta(days=30)
+            if duration == "3 Month":
+                end_date = start_date + timedelta(days=90)
+            if duration == "6 Month":
+                end_date = start_date + timedelta(days=180)
+            
+            editor_obj = BecomeCommentator.objects.create(user=user, duration=duration, status='active', commentator=True, end_date=end_date)
+            editor_obj.save()
+            if editor_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
+            serializer = BecomeCommentatorSerializer(editor_obj)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
             
     def delete(self, request, pk, format=None, *args, **kwargs):
         """
@@ -953,15 +1486,71 @@ class UserManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            user.delete()
+            if user.user_role == "standard":
+                # user.delete()
+                user.is_delete = True
+                user.save()
+                message = {"success": "User profile Deactivate sucessfully."}
+                return Response(data=message, status=status.HTTP_200_OK)
+            else:
+                # user.deactivate_commentator = 'pending'
+                user.is_delete = True
+                user.save()
+                message = {"success": "User profile Deactivate sucessfully."}
+                return Response(data=message, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+
+class FilterUserManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = {}
+        try:
+            filters = {}
+            if request.data:
+                if 'user_type' in request.data and request.data.get('user_type') != None and request.data.get('user_type') != "Select":
+                    filters['user_role'] = request.data.get('user_type').lower()
+
+                if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
+                    filters['city'] = request.data.get('city')
+
+                if 'gender' in request.data and request.data.get('gender') != None and request.data.get('gender') != "Select":
+                    filters['gender'] = request.data.get('gender')
+
+                if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
+                    filters['age'] = request.data.get('age')
+
+                # print("****", filters)
+                query_filters = Q(**filters)
+                filtered_user = User.objects.filter(query_filters)
+                serializer = UserSerializer(filtered_user, many=True)
+                data = serializer.data
+
+                # data_list['']
+
+                # serializer = UserSerializer(filtered_comments, many=True)
+                # data = serializer.data
+                return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                return Response(data={'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CommentsManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         management = {}
         commentator = []
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
+        
+        """Comments percentage"""
+        status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+        new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+        comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+        count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+        comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+        management['comments_percentage'] = comments_percentage
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -976,37 +1565,38 @@ class CommentsManagement(APIView):
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:
             if i:
-                commentator_of_most_liked_comment = i.commentator_user
+                if i.commentator_user:
+                    commentator_of_most_liked_comment = i.commentator_user
 
-                # Get the total likes for the comment object
-                total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
+                    # Get the total likes for the comment object
+                    total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
 
-                # Get the total favorites for the comment object
-                total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
+                    # Get the total favorites for the comment object
+                    total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
 
-                # Get the total claps for the comment object
-                total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
+                    # Get the total claps for the comment object
+                    total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
 
-                # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
-                total_likes = total_likes or 0
-                total_favorites = total_favorites or 0
-                total_claps = total_claps or 0
+                    # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
+                    total_likes = total_likes or 0
+                    total_favorites = total_favorites or 0
+                    total_claps = total_claps or 0
 
-                # print("Posted by commentator:", commentator_of_most_liked_comment.username)
-                user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
-                serializer = UserSerializer(user_obj)
-                data = serializer.data
+                    # print("Posted by commentator:", commentator_of_most_liked_comment.username)
+                    user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
+                    serializer = UserSerializer(user_obj)
+                    data = serializer.data
 
-                comment_serializer = CommentsSerializer(i)
+                    comment_serializer = CommentsSerializer(i)
 
-                details = {
-                    "user":data,
-                    "comment_data":comment_serializer.data,
-                    "total_likes":total_likes,
-                    "total_favorites":total_favorites,
-                    "total_clap":total_claps,
-                }
-                commentator.append(details)
+                    details = {
+                        "user":data,
+                        "comment_data":comment_serializer.data,
+                        "total_likes":total_likes,
+                        "total_favorites":total_favorites,
+                        "total_clap":total_claps,
+                    }
+                    commentator.append(details)
             else:
                 return Response({"error": "No comments with likes found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1029,6 +1619,7 @@ class CommentsManagement(APIView):
         if serializer.is_valid():
             try:
                 serializer.save()
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(serializer.data)
@@ -1036,52 +1627,128 @@ class CommentsManagement(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class FilterComments(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request,id, format=None, *args, **kwargs):
         data_list = []
         filters = {}
+        user = User.objects.get(id=id)
         try:
-            if 'category' in request.data:
+            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
                 filters['category__contains'] = request.data.get('category')
 
-            if 'country' in request.data:
+            if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')
 
-            if 'league' in request.data:
+            if 'league' in request.data  and request.data.get('league') != None and request.data.get('league') != "" and request.data.get('league') != "Select":
                 filters['league'] = request.data.get('league')
 
-            if 'match_detail' in request.data:
+            if 'match_detail' in request.data  and request.data.get('match_detail') != None and request.data.get('match_detail') != "Select" and request.data.get('match_detail') != "Select":
                 filters['match_detail'] = request.data.get('match_detail')
 
-            if 'prediction_type' in request.data:
+            if 'prediction_type' in request.data  and request.data.get('prediction_type') != None and request.data.get('prediction_type') != "Select" and request.data.get('prediction_type') != "Select":
                 filters['prediction_type'] = request.data.get('prediction_type')
 
-            if 'prediction' in request.data:
+            if 'prediction' in request.data  and request.data.get('prediction') != None and request.data.get('prediction') != "" and request.data.get('prediction') != "Select":
                 filters['prediction'] = request.data.get('prediction')
 
-            if 'status' in request.data:
+            if 'status' in request.data  and request.data.get('status') != None and request.data.get('status') != "" and request.data.get('status') != "Select":
                 filters['status'] = request.data.get('status')
 
-            if 'date' in request.data:
+            if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "" and request.data.get('date') != "Select":
                 filters['date'] = request.data.get('date')
 
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
-            if filter_type in ('public_content', 'finished', 'winning'):
+            if filter_type in ('public_content', 'finished', 'winning', 'published'):
 
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
                     all_comments = Comments.objects.filter(status='approve', public_content=True,**filters)
-                    serializer11 = CommentsSerializer(all_comments, many=True)
-                    data0 = serializer11.data
-                    data_list.append(data0)
+                    # data_list['Public_Comments'] = []
+
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer11 = CommentsSerializer(all_comments, many=True)
+                    # data0 = serializer11.data
+                    # data_list.append(data0)
                     # return Response(data=data0, status=status.HTTP_200_OK)
                 
                 if filter_type == "finished":
-                    all_resolved_comment = Comments.objects.filter(commentator_user=request.user, date__lt=datetime.now().date(),**filters)
-                    serializer4 = CommentsSerializer(all_resolved_comment, many=True)
-                    data0 = serializer4.data
-                    data_list.append(data0)
+                    # all_resolved_comment = Comments.objects.filter(commentator_user=request.user, date__lt=datetime.now().date(),**filters)
+                    all_resolved_comment = Comments.objects.filter(date__lt=datetime.now().date(),**filters)
+                    for comment in all_resolved_comment:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer4 = CommentsSerializer(all_resolved_comment, many=True)
+                    # data0 = serializer4.data
+                    # data_list.append(data0)
 
                     # return Response(data=data0, status=status.HTTP_200_OK)
+
+                if filter_type == "published":
+                    all_comments = Comments.objects.filter(status='approve',**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
 
                 if filter_type == "winning":
                     """
@@ -1091,31 +1758,104 @@ class FilterComments(APIView):
                     # return Response(data=data0, status=status.HTTP_200_OK)
 
             filter_type0 = request.data.get('filter_type0') # This will contain 'only_subscriber', 'not_stated', 'finished'
-            if filter_type0 in ('only_subscriber', 'not_stated', 'finished'):
+            if filter_type0 in ('only_subscriber', 'not_stated', 'lose', 'pending'):
 
                 if filter_type0 == "only_subscriber":
                     subscribe_comment = []
                     # s = User.objects.get(id=6)
                     # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
-                    subscription_obj = Subscription.objects.filter(standard_user=request.user, end_date__gte=datetime.now(), status='approve')
+                    subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve')
 
                     for obj in subscription_obj:
                         if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
                             subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user,**filters)
-                            for obj in subscription_comment:
-                                subscribe_comment.append(obj)
+                            # for obj in subscription_comment:
+                            #     subscribe_comment.append(obj)
+                            for comment in subscription_comment:
+                                comment_data = CommentsSerializer(comment).data
+                                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                        
+                                # Format the datetime object as desired (DD.MM.YYYY)
+                                formatted_date = date_obj.strftime("%d.%m.%Y")
 
-                    serializer2 = CommentsSerializer(subscribe_comment, many=True)
-                    data1 = serializer2.data
-                    data_list.append(data1)
+                                comment_data['date'] = formatted_date 
+
+                                # Fetch comment reactions and calculate the total count of reactions
+                                comment_reactions = CommentReaction.objects.filter(comment=comment)
+                                total_reactions = comment_reactions.aggregate(
+                                    total_likes=Sum('like'),
+                                    total_favorite=Sum('favorite'),
+                                    total_clap=Sum('clap')
+                                )
+                                
+                                comment_data['total_reactions'] = {
+                                    'total_likes': total_reactions['total_likes'] or 0,
+                                    'total_favorite': total_reactions['total_favorite'] or 0,
+                                    'total_clap': total_reactions['total_clap'] or 0
+                                }
+                                data_list.append(comment_data)
+
+                    # serializer2 = CommentsSerializer(subscribe_comment, many=True)
+                    # data1 = serializer2.data
+                    # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
 
                 if filter_type0 == "not_stated":
-                    all_active_comment = Comments.objects.filter(commentator_user=request.user, date__gt=datetime.now().date(),**filters)
-                    serializer3 = CommentsSerializer(all_active_comment, many=True)
-                    data1 = serializer3.data
-                    data_list.append(data1)
+                    # all_active_comment = Comments.objects.filter(commentator_user=request.user, date__gt=datetime.now().date(),**filters)
+                    all_active_comment = Comments.objects.filter(date__gt=datetime.now().date(),**filters)
+                    for comment in all_active_comment:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
+                    # serializer3 = CommentsSerializer(all_active_comment, many=True)
+                    # data1 = serializer3.data
+                    # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
+
+                if filter_type0 == "pending":
+                    all_comments = Comments.objects.filter(status='pending',**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
 
                 if filter_type == "lose":
                     """
@@ -1123,14 +1863,37 @@ class FilterComments(APIView):
                     """
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
-                
-            if filter_type == None and filter_type0 == None:
+            if filter_type == "" and filter_type0 == "":
 
                 query_filters = Q(**filters)
                 filtered_comments = Comments.objects.filter(query_filters)
-                serializer = CommentsSerializer(filtered_comments, many=True)
-                data = serializer.data
-                data_list.append(data)
+                for comment in filtered_comments:
+                    comment_data = CommentsSerializer(comment).data
+                    date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+            
+                    # Format the datetime object as desired (DD.MM.YYYY)
+                    formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                    comment_data['date'] = formatted_date 
+
+                    # Fetch comment reactions and calculate the total count of reactions
+                    comment_reactions = CommentReaction.objects.filter(comment=comment)
+                    total_reactions = comment_reactions.aggregate(
+                        total_likes=Sum('like'),
+                        total_favorite=Sum('favorite'),
+                        total_clap=Sum('clap')
+                    )
+                    
+                    comment_data['total_reactions'] = {
+                        'total_likes': total_reactions['total_likes'] or 0,
+                        'total_favorite': total_reactions['total_favorite'] or 0,
+                        'total_clap': total_reactions['total_clap'] or 0
+                    }
+                    data_list.append(comment_data)
+                # serializer = CommentsSerializer(filtered_comments, many=True)
+                # data = serializer.data
+                # data_list.append(data)
+            
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:
@@ -1139,10 +1902,20 @@ class FilterComments(APIView):
 class EditorManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
-        
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """editor percentage"""
+            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+            data_list['new_editor_percentage'] = editor_percentage
+
+
             editor_list = []
-            commentator = User.objects.filter(user_role='commentator')
+            commentator = User.objects.filter(user_role='commentator').order_by('created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -1197,10 +1970,31 @@ class EditorManagement(APIView):
                     output_field=IntegerField(),
                 ),
             ).order_by('-priority', '-created')[:10]
+            top_ten_commentators_list = []
 
-            serializer1 = UserSerializer(top_ten_commentators, many=True)
-            data1 = serializer1.data
-            data_list['top_ten'] = data1
+
+            for obj in top_ten_commentators:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                top_ten_commentators_list.append(detail)
+
+            # serializer1 = UserSerializer(top_ten_commentators, many=True)
+            # data1 = serializer1.data
+            data_list['top_ten'] = top_ten_commentators_list
 
 
             active_editor = User.objects.filter(user_role='commentator', commentator_status='active').count()
@@ -1213,8 +2007,51 @@ class EditorManagement(APIView):
             data_list['deactivate_editor'] = deactivate_editor
 
 
-            deactivation_request = User.objects.filter(deactivate_commentator='pending').count()
-            data_list['deactivation_request'] = deactivation_request
+            deactivation_request = User.objects.filter(deactivate_commentator='pending')
+            deactivation_request_user = []
+            for obj in deactivation_request:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                deactivation_request_user.append(detail)
+            data_list['deactivat_user'] = deactivation_request_user
+            data_list['deactivation_request'] = deactivation_request.count()
+
+            verify_obj = BlueTick.objects.filter(status='pending')
+            verify_obj_user = []
+            for obj in verify_obj:
+                detail = {}
+                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Follower_Count'] = follow_obj
+
+                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Following_Count'] = follow_obj
+
+                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscriber_Count'] = subscriber_obj
+
+                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+                detail['Subscription_Count'] = subscriber_obj
+
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+
+                verify_obj_user.append(detail)
+            data_list['verify_user'] = verify_obj_user
+            data_list['verify_request_count'] = verify_obj.count()
 
             return Response(data=data_list, status=status.HTTP_200_OK)
         
@@ -1228,8 +2065,9 @@ class EditorManagement(APIView):
         """
         Create new commentator User.
         """
+        # print("+++++", request.data)
         try:
-            profile = request.data.get('file')
+            profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
@@ -1241,7 +2079,9 @@ class EditorManagement(APIView):
             city = request.data['city']
             category = request.data['category']
             role = 'commentator'
-            commentator_level = request.data['level']
+            commentator_level = request.data['level'].lower()
+            if commentator_level == "expert":
+                commentator_level = 'master'
 
 
             # Any additional validations or processing can be done here
@@ -1254,6 +2094,13 @@ class EditorManagement(APIView):
             )
             user_obj.set_password(password)
             user_obj.save()
+            if user_obj != None:
+                if DataCount.objects.filter(id=1).exists():
+                    obj = DataCount.objects.get(id=1)
+                    obj.editor += 1
+                    obj.save()
+                else:
+                    obj = DataCount.objects.create(editor=1)
             serializer = UserSerializer(user_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -1292,10 +2139,29 @@ class EditorManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            user.deactivate_commentator = 'pending'
+            # user.deactivate_commentator = 'pending'
+            user.is_delete = True
             user.save()
+            return Response({"success": "The deactivation request for a user has been processed successfully."}, status=status.HTTP_404_NOT_FOUND)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class UpdateStatusForVerifyRequest(APIView):
+    def post(self, request, id, format=None, *args, **kwargs):
+        try:
+            if 'status' not in request.data:
+                    return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            obj_status = request.data.get('status')
+            obj = BlueTick.objects.get(id=id)
+            obj.status = obj_status
+            obj.save()
+            serializer = BlueTickSerializer(obj).data
+            return Response(data=serializer, status=status.HTTP_200_OK)
+        except BlueTick.DoesNotExist:
+            return Response(data={'error': 'BlueTick object not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class EditorSubscriptionDetails(APIView):
     def get(self, request, format=None, *args, **kwargs):
@@ -1331,33 +2197,48 @@ class EditorSubscriptionDetails(APIView):
 
 class FilterEditors(APIView):
     def post(self, request, format=None, *args, **kwargs):
+        data_list = {}
         try:
             filters = {}
             if request.data:
-                if 'lavel' in request.data:
-                    filters['commentator_level'] = request.data.get('lavel')
+                if 'lavel' in request.data and request.data.get('lavel') != None and request.data.get('lavel') != "Select":
+                    filters['commentator_level'] = request.data.get('lavel').lower()
 
-                if 'sucess_rate' in request.data:
+                if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "Select":
+                    filters['category__contains'] = request.data.get('category')
+
+                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None and request.data.get('sucess_rate') != "Select":
                     filters['sucess_rate'] = request.data.get('sucess_rate')
 
-                if 'score_point' in request.data:
+                if 'score_point' in request.data and request.data.get('score_point') != None and request.data.get('score_point') != "Select":
                     filters['score_point'] = request.data.get('score_point')
 
-                if 'city' in request.data:
+                if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
                     filters['city'] = request.data.get('city')
 
-                if 'age' in request.data:
+                if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
 
-                if 'gender' in request.data:
+                if 'gender' in request.data and request.data.get('gender') != None and request.data.get('gender') != "Select":
                     filters['gender'] = request.data.get('gender')
 
                 filters['user_role'] = 'commentator'
 
                 query_filters = Q(**filters)
                 filtered_comments = User.objects.filter(query_filters)
-                serializer = UserSerializer(filtered_comments, many=True)
-                data = serializer.data
+                data = []
+                for obj in filtered_comments:
+                    details = {}
+                    count = Subscription.objects.filter(commentator_user=obj).count()
+                    serializer = UserSerializer(obj)
+                    details['editor_data'] = serializer.data
+                    details['subscriber_count'] = count
+                    data.append(details)
+
+                # data_list['']
+
+                # serializer = UserSerializer(filtered_comments, many=True)
+                # data = serializer.data
                 return Response(data=data, status=status.HTTP_200_OK)
             else:
                 return Response(data={'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1400,7 +2281,25 @@ class SalesManagement(APIView):
         """
         Plan sale logic here.
         """
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """Subscribers percentage"""
+            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+
+            """Highlights percentage"""
+            highlights_status_changed_to_pending = Highlight.objects.annotate(date_updated=TruncDate('updated')).filter(status='pending', date_updated__gte=previous_24_hours).count()
+            highlights_purchased = Highlight.objects.annotate(date_created=TruncDate('created')).filter(status='active', highlight=True, date_created__gte=previous_24_hours).count()
+            highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
+            highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
+            data_list['new_subscriptions_percentage'] = highlights_percentage
+
             # Subscription objects handling
             subscription_obj = Subscription.objects.filter(subscription=True)
             subscription_cal = 0
@@ -1438,8 +2337,9 @@ class SalesManagement(APIView):
         filters = {}
         try:
             if request.data:
-                if 'type' not in request.data:
-                    return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                # if 'type' not in request.data:
+                    # type = request.data.get('type')
+                    # return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 if 'date' in request.data:
                     filters['start_date__contains'] = request.data.get('date')
@@ -1448,7 +2348,12 @@ class SalesManagement(APIView):
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
-                type = request.data.get('type')
+
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
+
                 query_filters = Q(**filters)
 
                 if type == 'subscription':
@@ -1461,7 +2366,16 @@ class SalesManagement(APIView):
                     serializer1 = HighlightSerializer(highlight_obj, many=True)
                     data_list.append(serializer1.data)
                 else:
-                    return Response({'error': 'Invalid type'}, status=status.HTTP_400_BAD_REQUEST)
+                    details = {}
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    details['subscription'] = serializer.data
+
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    details['highlight'] = serializer1.data
+
+                    data_list.append(details)
 
                 return Response(data=data_list, status=status.HTTP_200_OK)
             else:
@@ -1471,10 +2385,69 @@ class SalesManagement(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+class FilterSalesManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = []
+        try:
+            filters = {}
+            if request.data:
+                if 'date' in request.data and request.data.get('date') != None and request.data.get('date') != "Select":
+                    filters['start_date__contains'] = request.data.get('date')
+
+                if 'status' in request.data and request.data.get('status') != None and request.data.get('status') != "Select":
+                    filters['status'] = request.data.get('status')
+
+                if 'duration' in request.data and request.data.get('duration') != None and request.data.get('duration') != "Select":
+                    filters['duration'] = request.data.get('duration')
+
+                if request.data.get('type'):
+                    type = request.data.get('type').lower()
+                else:
+                    type = ''
+                query_filters = Q(**filters)
+
+                if type == 'subscription':
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    data_list.append(serializer.data)
+
+                elif type == 'highlights':
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    data_list.append(serializer1.data)
+                else:
+                    details = {}
+                    subscription_obj = Subscription.objects.filter(query_filters)
+                    serializer = SubscriptionSerializer(subscription_obj, many=True)
+                    details['subscription'] = serializer.data
+
+                    highlight_obj = Highlight.objects.filter(query_filters)
+                    serializer1 = HighlightSerializer(highlight_obj, many=True)
+                    details['highlight'] = serializer1.data
+
+                    data_list.append(details)
+
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
 class SupportManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         all_data = {}
+        now = timezone.now()
+        previous_24_hours = now - timedelta(hours=24)
         try:
+            """Ticket percentage"""
+            status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
+            new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='progress', date_created__gte=previous_24_hours).count()
+            tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (tickets_before_24_hours - status_changed_to_resolved) + new_tickets_progress
+            tickets_percentage = ((count-tickets_before_24_hours)/tickets_before_24_hours) * 100
+            all_data['new_user_percentage'] = tickets_percentage
+
             current_datetime = timezone.now()
 
             twenty_four_hours_ago = current_datetime - timedelta(hours=24)
@@ -1491,11 +2464,744 @@ class SupportManagement(APIView):
             all_ticket = TicketSupport.objects.all()
             all_data['total'] = all_ticket.count()
 
+            # pending_tickets = TicketSupport.objects.filter(status='pending')
+            # serializer = TicketSupportSerializer(pending_tickets, many=True)
             serializer = TicketSupportSerializer(all_ticket, many=True)
             all_data['tickets'] = serializer.data
+
+            support_history = TicketHistory.objects.all()
+            serializer11 = TicketHistorySerializer(support_history, many=True)
+            all_data['support_history'] = serializer11.data
+
+            sub_users = User.objects.filter(user_role='sub_user')
+            serializer12 = UserSerializer(sub_users, many=True)
+            all_data['sub_users'] = serializer12.data
 
             return Response(data=all_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def post(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+            ticket_id = request.data.get('ticket_id')
 
+            message = request.data.get('message')
+
+
+            if not message:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket_support = None
+            try:
+                ticket_support = TicketSupport.objects.get(pk=ticket_id)
+            except TicketSupport.DoesNotExist:
+                return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            print('res_obj: ', res_obj)
+            if res_obj != None:
+                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                                                            response_ticket=res_obj)
+                ticket_support.status = 'progress'
+                ticket_support.save()
+
+            serializer = ResponseTicketSerializer(res_obj)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SubUserShowTicketData(APIView):
+    def get(self, request, ticket_id, format=None, *args, **kwargs):
+        try:
+            ticket_obj = TicketSupport.objects.get(id=ticket_id)
+            try:
+                history = TicketHistory.objects.filter(ticket_support=ticket_obj).latest('created')
+                if history.message is None:
+                    serializer = TicketSupportSerializer(ticket_obj).data
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                else:
+                    serializer = TicketSupportSerializer(ticket_obj).data
+                    serializer['updated_ticket_message'] = history.message
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+            except TicketHistory.DoesNotExist:
+                serializer = TicketSupportSerializer(ticket_obj).data
+                return Response(data=serializer, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(data={"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class RetrieveSubUserView(APIView):
+    # Retrieve the sub user as per department.
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            department = request.data.get('department')
+            print('department: ', department)
+            if not department:
+                return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            sub_users = User.objects.filter(department=department, user_role='sub_user')
+            print('sub_users: ', sub_users)
+            serializer = UserSerializer(sub_users, many=True)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class TicketRedirectView(APIView):
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        """
+        store history for which admin user assign the ticket to sub user.
+        """
+        try:
+            admin_user = User.objects.get(id=id)
+            ticket = TicketSupport.objects.get(id=ticket_id)
+            note = request.data.get('note')
+            print('note: ', note)
+            user_id = request.data.get('id')  # sub user id
+            print('user_id: ', user_id)
+            
+            if user_id is None:
+                return Response({'error': 'User-Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                user_obj = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            ticket_redirect_history = TicketHistory.objects.create(user=admin_user, ticket_support=ticket, status='redirect',
+                                                                   redirect_to=user_obj, note=note)
+            if ticket_redirect_history != None:
+                ticket.status = 'progress'
+                ticket.save()
+            serializer = TicketHistorySerializer(ticket_redirect_history)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except TicketSupport.DoesNotExist:
+            return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class SubUserSupportTicket(APIView):
+    """show Sub user's assign tickets."""
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            data_list = []
+            user = User.objects.get(id=id)  # sub user
+
+            try:
+                ticket_obj = TicketHistory.objects.filter(redirect_to=user)
+                for obj in ticket_obj:
+                    serializer = TicketSupportSerializer(obj.ticket_support).data
+                    data_list.append(serializer)
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            except TicketHistory.DoesNotExist:
+                return Response(data={"detail": "No ticket history found for this user."},
+                                status=status.HTTP_404_NOT_FOUND)
+        except User.DoesNotExist:
+            return Response(data={"detail": "User not found."},
+                            status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RedirectAnswerView(APIView):
+    """Sub user open perticular ticket."""
+    def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+        details = {}
+        
+        try:
+            user = get_object_or_404(User, id=id)  # sub user
+            ticket = get_object_or_404(TicketSupport, id=ticket_id)
+            
+            ticket_serializer = TicketSupportSerializer(ticket).data
+            details['ticket'] = ticket_serializer
+
+            ticket_history = TicketHistory.objects.filter(ticket_support=ticket, status='redirect').latest('created')
+            admin_serializer = UserSerializer(ticket_history.user).data
+            details['admin_user'] = admin_serializer
+            details['note'] = ticket_history.note
+
+            return Response(data=details, status=status.HTTP_200_OK)
+        except (User.DoesNotExist, TicketSupport.DoesNotExist, TicketHistory.DoesNotExist):
+            return Response(data={'error': 'Resource not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    """Sub user answer the ticket."""
+    def post(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id) # sub user
+            message = request.data.get('message') # ticket answer
+
+            if not message:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            ticket_support = None
+            try:
+                ticket_support = TicketSupport.objects.get(id=ticket_id)
+            except TicketSupport.DoesNotExist:
+                return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            if res_obj != None:
+                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                                                            response_ticket=res_obj)
+                ticket_support.status = 'progress'
+                ticket_support.save()
+
+            serializer = ResponseTicketSerializer(res_obj)
+            data = serializer.data
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class NotificationManagement(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            data = {}
+
+            # Count the number of notifications with status=False
+            viewed = Notification.objects.filter(status=False).count()
+            data['viewed'] = viewed
+
+            # Count the number of notifications with status=True
+            pending = Notification.objects.filter(status=True).count()
+            data['pending'] = pending
+
+            # Retrieve all notification objects
+            notification_obj = Notification.objects.all()
+
+            # Serialize the notification objects
+            serializer = NotificationSerializer(notification_obj, many=True)
+
+            # Add data to the response
+            data['notification_count'] = notification_obj.count()
+            data['notification'] = serializer.data
+
+            # Return the response
+            return Response(data=data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # Handle any exceptions that might occur
+            error_data = {'error': str(e)}
+            return Response(data=error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def post(self, request, format=None, *args, **kwargs):
+        # print('request.data: ', request.data)
+        try:
+            subject = request.data.get('subject')
+            user_type = request.data.get('user_type')
+            to = request.data.get('to')  # need receiver user id
+            sending_type = request.data.get('sending_type')
+            date = request.data.get('date')
+            message = request.data.get('message')
+
+            if not subject:
+                return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if not to:
+                return Response({'error': 'Receiver User not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if not date:
+                return Response({'error': 'Date not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            if not message:
+                return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                user = User.objects.get(id=to)
+                # print('user: ', user)
+            except User.DoesNotExist:
+                return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            """sender and receiver baki.."""
+
+            notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message)
+
+            serializer = NotificationSerializer(notification_obj)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
+
+        except Exception as e:
+            return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SubUserManagement(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        data_list = {}
+
+        try:
+            subuser_count = User.objects.filter(user_role='sub_user')
+            data_list['subuser_count'] = subuser_count.count()
+            serializer = UserSerializer(subuser_count, many=True)
+            data_list['subuser_list'] = serializer.data
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            """
+            Transactions count logic here.
+            """
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            notification_count = Notification.objects.all().count()
+            data_list['notification_count'] = notification_count
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            all_notification = Notification.objects.filter(Q(subject__icontains='subscription') | Q(subject__icontains='highlights')).order_by('-created')
+            # all_notification = Notification.objects.all().order_by('-created')
+            serializer1 = NotificationSerializer(all_notification, many=True)
+            data_list['user_timeline'] = serializer1.data
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(data=data_list, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            if request.data:
+                # print('request.data: ', request.data)
+                role = 'sub_user'
+                
+                # required_fields = ['file', 'name', 'phone', 'password', 'authorization_type', 'department', 'permission']
+                # for field in required_fields:
+                #     if field not in request.data:
+                #         return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                password = request.data.get('password')
+                # print('password: ', password)
+
+                permission_type = request.data.get('permission')
+                # print('permission_type: ', permission_type)
+                if permission_type == 'transaction':
+                    transaction = True
+                    all_permission = request.data.get('all_permission')
+                    # print('all_permission: ', all_permission)
+                    
+                    if all_permission and all_permission.lower() == 'true':
+                        process_withdrawal = True
+                        rule_update = True
+                        price_update = True
+                        withdrawal_export = True
+                        sales_export = True
+                    else:
+                        process_withdrawal = request.data.get('process_withdrawal')
+                        # print('process_withdrawal: ', process_withdrawal)
+                        rule_update = request.data.get('rule_update')
+                        price_update = request.data.get('price_update')
+                        withdrawal_export = request.data.get('withdrawal_export')
+                        sales_export = request.data.get('sales_export')
+                        all_permission = False
+
+                    # print("================================")
+                    # print("================================", request.data.get('file'))
+                    # print("================================request.data.get('name')", request.data.get('name'))
+                    # print("================================request.data.get('phone')", request.data.get('phone'))
+                    # print("================================request.data.get('authorization_type')", request.data.get('authorization_type'))
+                    # print("================================request.data.get('department')", request.data.get('department'))
+
+                    sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
+                                                       password=password, authorization_type=request.data.get('authorization_type'),
+                                                       department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
+                                                       is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
+                                                       is_sales_export=sales_export, is_all_permission=all_permission)
+                    # print(sub_user_obj,"===================sub_user_obj")
+                elif permission_type == 'only_view':
+                    view_only = True
+                    process_withdrawal = False
+                    rule_update = False
+                    price_update = False
+                    withdrawal_export = False
+                    sales_export = False
+                    all_permission = False
+                    sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
+                                                       password=password, authorization_type=request.data.get('authorization_type'),
+                                                       department=request.data.get('department'), is_view_only=view_only, is_process_withdrawal_request=process_withdrawal,
+                                                       is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
+                                                       is_sales_export=sales_export, is_all_permission=all_permission)
+
+                # print("***************************")
+                sub_user_obj.set_password(password)
+                sub_user_obj.save()
+                # if sub_user_obj != None:
+                #     if DataCount.objects.filter(id=1).exists():
+                #         obj = DataCount.objects.get(id=1)
+                #         obj.user += 1
+                #         obj.save()
+                #     else:
+                #         obj = DataCount.objects.create(user=1)
+                serializer = UserSerializer(sub_user_obj)
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def patch(self, request, pk, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = request.data.copy()
+        if data.get('is_view_only'):
+            data['is_process_withdrawal_request'] = False
+            data['is_rule_update'] = False
+            data['is_price_update'] = False
+            data['is_withdrawal_export'] = False
+            data['is_sales_export'] = False
+            data['is_all_permission'] = False
+
+        if data.get('is_all_permission'):
+            data['is_process_withdrawal_request'] = True
+            data['is_rule_update'] = True
+            data['is_price_update'] = True
+            data['is_withdrawal_export'] = True
+            data['is_sales_export'] = True
+            data['is_all_permission'] = True
+
+        serializer = UserSerializer(user, data=data, partial=True)
+        # print('erializer.is_valid: ', serializer.is_valid)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
+        else:
+            # print('serializer.errors: ', serializer.errors)
+            return Response({'data' : serializer.errors, 'status' : status.HTTP_400_BAD_REQUEST})
+        
+    def delete(self, request, pk, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=pk)
+            # user.delete()
+            user.is_delete = True
+            user.save()
+            return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+class AdvertisementManagement(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        data_list = {}
+
+        try:
+            ads_count = Advertisement.objects.all()
+            data_list['ads_count'] = ads_count.count()
+            serializer = AdvertisementSerializer(ads_count, many=True)
+            data_list['ads'] = serializer.data
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            active = Advertisement.objects.filter(status='active').count()
+            data_list['active'] = active
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            pending = Advertisement.objects.filter(status='pending').count()
+            data_list['pending'] = pending
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            end = Advertisement.objects.filter(status='end').count()
+            data_list['end'] = end
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            banners = Advertisement.objects.filter(ads_space='Banners').count()
+            data_list['Banners'] = banners
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            popups = Advertisement.objects.filter(ads_space='Pop ups').count()
+            data_list['pop_ups'] = popups
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(data=data_list, status=status.HTTP_200_OK)
+    
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            if request.data:
+                # print('request.data:: ', request.data)
+                required_fields = ['file', 'ads_space', 'start_date', 'end_date', 'company_name', 'link', 'ads_budget']
+                for field in required_fields:
+                    if field not in request.data:
+                        return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
+                # if request.data.get('start_date') == str(datetime.today().date()):
+                #     status_string='active'
+                #     ads_obj = Advertisement.objects.create(picture=request.data.get('file'), ads_space=request.data.get('ads_space'),
+                #                                     start_date=request.data.get('start_date'), end_date=request.data.get('end_date'),
+                #                                     company_name=request.data.get('company_name'), link=request.data.get('link'),
+                #                                     ads_budget = request.data.get('ads_budget'), status=status_string)
+                # else:
+                ads_obj = Advertisement.objects.create(picture=request.data.get('file'), ads_space=request.data.get('ads_space'),
+                                                start_date=request.data.get('start_date'), end_date=request.data.get('end_date'),
+                                                company_name=request.data.get('company_name'), link=request.data.get('link'),
+                                                ads_budget = request.data.get('ads_budget'))
+                if ads_obj != None:
+                    if DataCount.objects.filter(id=1).exists():
+                        obj = DataCount.objects.get(id=1)
+                        obj.advertisement += 1
+                        obj.save()
+                    else:
+                        obj = DataCount.objects.create(advertisement=1)
+                
+                serializer = AdvertisementSerializer(ads_obj)
+                return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self, request, pk, format=None, *args, **kwargs):
+        try:
+            user = Advertisement.objects.get(pk=pk)
+        except Advertisement.DoesNotExist:
+            return Response({"error": "Advertisement not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = AdvertisementSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class LevelRule(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            level = request.query_params.get('commentator_level')
+            
+            if not level:
+                return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            level_obj = CommentatorLevelRule.objects.filter(commentator_level=level)
+            
+            if not level_obj.exists():
+                return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = CommentatorLevelRuleSerializer(level_obj, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, format=None, *args, **kwargs):
+        commentator_level = request.query_params.get('commentator_level')
+        # commentator_level = request.data.get('commentator_level')
+        existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
+
+        if existing_record:
+            serializer = CommentatorLevelRuleSerializer(existing_record, data=request.data,  partial=True)
+        else:
+            serializer = CommentatorLevelRuleSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class MembershipSettingView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            level = request.query_params.get('commentator_level')
+            
+            if not level:
+                return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            level_obj = MembershipSetting.objects.filter(commentator_level=level)
+            
+            if not level_obj.exists():
+                return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = MembershipSettingSerializer(level_obj, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, format=None, *args, **kwargs):
+        commentator_level = request.data.get('commentator_level')
+        existing_record = MembershipSetting.objects.filter(commentator_level=commentator_level).first()
+
+        if existing_record:
+            serializer = MembershipSettingSerializer(existing_record, data=request.data, partial=True)
+        else:
+            serializer = MembershipSettingSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+    
+
+class SubscriptionSettingView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            level = request.query_params.get('commentator_level')
+            
+            if not level:
+                return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            level_obj = SubscriptionSetting.objects.filter(commentator_level=level)
+            
+            if not level_obj.exists():
+                return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = SubscriptionSettingSerializer(level_obj, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, format=None, *args, **kwargs):
+        commentator_level = request.data.get('commentator_level')
+        existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
+
+        if existing_record:
+            serializer = SubscriptionSettingSerializer(existing_record, data=request.data, partial=True)
+        else:
+            serializer = SubscriptionSettingSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class HighlightSettingView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            level = request.query_params.get('commentator_level')
+            
+            if not level:
+                return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            level_obj = HighlightSetting.objects.filter(commentator_level=level)
+            
+            if not level_obj.exists():
+                return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = HighlightSettingSerializer(level_obj, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, format=None, *args, **kwargs):
+        commentator_level = request.data.get('commentator_level')
+        existing_record = HighlightSetting.objects.filter(commentator_level=commentator_level).first()
+
+        if existing_record:
+            serializer = HighlightSettingSerializer(existing_record, data=request.data, partial=True)
+        else:
+            serializer = HighlightSettingSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.highlight += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(highlight=1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class CommentSetting(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data = request.data.copy() 
+        # print('data: ', data)
+        data['status'] = 'approve'  # Set the status to 'approve'
+
+        comment_serializer = CommentsSerializer(data=data)
+        if comment_serializer.is_valid():
+            comment = comment_serializer.save()
+            if DataCount.objects.filter(id=1).exists():
+                obj = DataCount.objects.get(id=1)
+                obj.comment += 1
+                obj.save()
+            else:
+                obj = DataCount.objects.create(comment=1)
+
+            # Extract favorite and clap counts from request data
+            favorite_count = data.get('favorite', 0)
+            clap_count = data.get('clap', 0)
+            like_count = data.get('like', 0)
+
+            # Create CommentReaction instance with associated comment
+            comment_reaction_data = {
+                'comment': comment.id,
+                'favorite': favorite_count,
+                'clap': clap_count,
+                'like':like_count,
+            }
+            
+            comment_reaction_serializer = CommentReactionSerializer(data=comment_reaction_data)
+            if comment_reaction_serializer.is_valid():
+                comment_reaction_serializer.save()
+
+                response_data = {
+                    'comment': comment_serializer.data,
+                    'comment_reaction': comment_reaction_serializer.data,
+                }
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        # print("==========")
+        # print('comment_serializer.errors: ', comment_serializer.errors)
+        return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+totp = pyotp.TOTP('base32secret3232', interval=45)
+class OtpSend(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            user = request.user
+            password = request.data.get('password')
+
+            if user.check_password(password):
+                otp = totp.now()
+                res = sms_send(user.phone, otp)
+                if res == 'Success':
+                    return Response(data={'success': 'Otp successfully sent.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response(data={'error': 'Otp not sent. Try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response(data={'error': 'Wrong password. Try again.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class OtpVerify(APIView):
+#     def post(self, request, format=None, *args, **kwargs):
+#         try:
+#             otp = request.data.get('otp')
+#             verification_result = totp.verify(otp)
+
+#             if verification_result:
+#                 return Response(data={'success': 'Otp successfully verified.'}, status=status.HTTP_200_OK)
+#             else:
+#                 return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

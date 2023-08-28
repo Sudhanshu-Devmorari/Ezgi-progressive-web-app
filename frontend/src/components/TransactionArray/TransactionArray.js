@@ -1,6 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import './TransactionArray.css'
+import axios from "axios";
+import { userId } from "../GetUser";
 
 const TransactionArray = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -68,6 +70,15 @@ const TransactionArray = (props) => {
       total: "485.00₺",
     },
   ];
+    // // Subscription API
+    // const [transactionsData, setTransactionsData] = useState([]);
+    // useEffect(() => {
+    //   async function getSubscriptions(){
+    //     const res = await axios.get(`http://127.0.0.1:8000/retrieve-subscribers-subscription/${userId}`)
+    //     console.log("resL ",res.data);
+    //   }
+    //   getSubscriptions();
+    // }, [])
   return (
     <>
       {props.user !== "standard user" &&

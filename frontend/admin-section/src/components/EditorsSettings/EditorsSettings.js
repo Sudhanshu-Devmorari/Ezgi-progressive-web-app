@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./EditorsSettings.css";
+import LevelRules from "../LevelRules/LevelRules";
+import axios from "axios";
+import config from "../../config";
 
 const EditorsSettings = () => {
+  const [selectLevel, setSelectLevel] = useState("Apprentice");
+
+  // Level - Rule API
+  const [getRuleForLevel, setGetRuleForLevel] = useState([]);
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `${config?.apiUrl}/level-rule/?commentator_level=${selectLevel.toLowerCase()}`
+        );
+        setGetRuleForLevel(res.data[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getData();
+  }, [selectLevel]);
+
   return (
     <>
       <div className="p-2 m-2 fonts-block">
@@ -10,59 +31,40 @@ const EditorsSettings = () => {
         </div>
         <div className="m-3">
           <div className="my-2 mt-3">
-            <span className="p-2 ps-0" style={{ color: "#FFEE7D" }}>
+            <span
+              className="p-2 cursor ps-0"
+              style={{ color: selectLevel === "Apprentice" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Apprentice")}
+            >
               Apprentice
             </span>
-            <span className="p-2">Journeyman</span>
-            <span className="p-2">Expert</span>
-            <span className="p-2">Grandmaster</span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Journeyman" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Journeyman")}
+            >
+              Journeyman
+            </span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Expert" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Expert")}
+            >
+              Expert
+            </span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Grandmaster" && "#FFEE7D" }}
+              onClick={() => setSelectLevel("Grandmaster")}
+            >
+              Grandmaster
+            </span>
           </div>
-          <div className="my-2 mt-3 d-flex gap-3">
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Daily Match Limit</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Monthly Min.Content</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Odds Limit</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-          </div>
-          <div className="my-2 mt-3 d-flex gap-3">
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Winning Limit</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Success Rate</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Subscriber Limit</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Level Icon & Color</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-          </div>
+          <LevelRules
+            getRuleForLevel={getRuleForLevel}
+            selectLevel={selectLevel}
+            setGetRuleForLevel={setGetRuleForLevel}
+          />
         </div>
       </div>
     </>

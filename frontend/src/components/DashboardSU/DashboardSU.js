@@ -13,23 +13,49 @@ import FavComments from "../FavComments/FavComments";
 import NotificationsAndSupportSelection from "../NotificationsAndSupportSelection/NotificationsAndSupportSelection";
 import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
+import axios from "axios";
+import { userId } from "../GetUser";
 
 const DashboardSU = (props) => {
   const [content, setContent] = useState("subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");
-  
+
   useEffect(() => {
-    if (props.selectContent === "notifications")  {
-      setContent("notifications")
+    if (props.selectContent === "notifications") {
+      setContent("notifications");
     } else if (props.selectContent === "fav") {
-      setContent("fav")
+      setContent("fav");
     }
-  }, [props.selectContent])
-  
+  }, [props.selectContent]);
+
+  // Fav Editor & Comments API
+  const [favEditorData, setFavEditorData] = useState([]);
+  const [favCommentData, setFavCommentData] = useState([]);
+  useEffect(() => {
+    async function getFavData() {
+      try {
+        const res = await axios.get(
+          `http://127.0.0.1:8000/fav-editor-comment/${userId}`
+        );
+        // console.log("=>>>", res.data);
+        setFavEditorData(res.data.favEditors);
+        setFavCommentData(res.data.favComments);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (content === "fav") {
+      getFavData();
+    }
+  }, [content]);
+
   return (
     <>
-      <ProfileSU setSelectContent={props.setSelectContent} setDashboardSUser={props.setDashboardSUser}/>
+      <ProfileSU
+        setSelectContent={props.setSelectContent}
+        setDashboardSUser={props.setDashboardSUser}
+      />
       <CommentatorIcons
         setContent={setContent}
         content={content}
@@ -49,33 +75,28 @@ const DashboardSU = (props) => {
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } my-2 p-2`}
           >
-            <TransactionArray user={"standard user"}/>
+            <TransactionArray user={"standard user"} />
           </div>
         </>
       )}
       {content === "fav" && (
         <>
-        <FavoriteSelection setFavSelection={setFavSelection} favSelection={favSelection}/>
-            {favSelection === "fav editor" && (
-              <FavEditor/>
-            )}
-            {favSelection === "fav comments" && (
-              <FavComments/>
-            )}
+          <FavoriteSelection
+            setFavSelection={setFavSelection}
+            favSelection={favSelection}
+          />
+          {favSelection === "fav editor" && <FavEditor favEditorData={favEditorData} />}
+          {favSelection === "fav comments" && <FavComments favCommentData={favCommentData} />}
         </>
       )}
       {(content === "notifications" || content === "support") && (
-          <>
-            <NotificationsAndSupportSelection content={content}/>
+        <>
+          <NotificationsAndSupportSelection content={content} />
 
-            { content === "notifications" && (
-              <Notifications/>
-            ) }
-            { content === "support" && (
-              <Support/>
-            ) }
-          </>
-        )}
+          {content === "notifications" && <Notifications />}
+          {content === "support" && <Support />}
+        </>
+      )}
     </>
   );
 };

@@ -6,6 +6,7 @@ import EditorsSettings from "../EditorsSettings/EditorsSettings";
 import EditorSalesSettings from "../EditorSalesSettings/EditorSalesSettings";
 import EditorWithdrawalSettings from "../EditorWithdrawalSettings/EditorWithdrawalSettings";
 import EditorCommentsSettings from "../EditorCommentsSettings/EditorCommentsSettings";
+import './EditorSettingsPage.css'
 
 const EditorSettingsPage = () => {
   const [selectEditorSetting, setSelectEditorSetting] =
@@ -25,7 +26,7 @@ const EditorSettingsPage = () => {
                 setSelectEditorSetting={setSelectEditorSetting}
               />
             </div>
-            <div className="mt-2 dark-mode ms-2" style={{ height: "77vh" }}>
+            <div className="mt-2 dark-mode ms-2 setting">
               {selectEditorSetting === "Editors Settings" && (
                 <EditorsSettings />
               )}
@@ -39,45 +40,6 @@ const EditorSettingsPage = () => {
                 <EditorCommentsSettings />
               )}
             </div>
-            {selectEditorSetting === "Comment Settings" ? (
-            <div lassName="my-3 d-flex justify-content-center">
-              <div
-                class="fixed-bottom  d-flex justify-content-center"
-                style={{ marginBottom: "200px" }}
-              >
-                <button
-                  className="py-1 px-3"
-                  style={{
-                    color: "#D2DB08",
-                    border: "1px solid #D2DB08",
-                    borderRadius: "3px",
-                    backgroundColor: "transparent",
-                  }}
-                >
-                  Create
-                </button>
-              </div>
-            </div>
-            ) : (
-              <div lassName="my-3 d-flex justify-content-center">
-              <div
-                class="fixed-bottom  d-flex justify-content-center"
-                style={{ marginBottom: "200px" }}
-              >
-                <button
-                  className="py-1 px-3"
-                  style={{
-                    color: "#D2DB08",
-                    border: "1px solid #D2DB08",
-                    borderRadius: "3px",
-                    backgroundColor: "transparent",
-                  }}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-            )}
           </div>
         </div>
       </div>

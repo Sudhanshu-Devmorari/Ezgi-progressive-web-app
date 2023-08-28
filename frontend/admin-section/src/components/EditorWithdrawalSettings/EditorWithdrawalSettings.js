@@ -1,6 +1,27 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import WithdrawalSettings from "../WithdrawalSettings/WithdrawalSettings";
+import config from "../../config";
 
 const EditorWithdrawalSettings = () => {
+  const [selectLevel, setSelectLevel] = useState("Journeyman");
+
+  // Withdrawal Settings API
+  const [WithdrawalSettingData, setWithdrawalSettingData] = useState();
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `${config?.apiUrl}/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
+        );
+        // console.log("res==>>", res.data[0]);
+        setWithdrawalSettingData(res.data[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    // getData();
+  }, [selectLevel]);
   return (
     <>
       <div className="p-2 m-2 fonts-block">
@@ -9,26 +30,33 @@ const EditorWithdrawalSettings = () => {
         </div>
         <div className="m-3">
           <div className="my-2 mt-3">
-            <span className="p-2 ps-0" style={{ color: "#4DD5FF" }}>
+            <span
+              className="p-2 ps-0 cursor"
+              style={{ color: selectLevel === "Journeyman" && "#4DD5FF" }}
+              onClick={() => setSelectLevel("Journeyman")}
+            >
               Journeyman
             </span>
-            <span className="p-2">Expert</span>
-            <span className="p-2">Grandmaster</span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Expert" && "#4DD5FF" }}
+              onClick={() => setSelectLevel("Expert")}
+            >
+              Expert
+            </span>
+            <span
+              className="p-2 cursor"
+              style={{ color: selectLevel === "Grandmaster" && "#4DD5FF" }}
+              onClick={() => setSelectLevel("Grandmaster")}
+            >
+              Grandmaster
+            </span>
           </div>
-          <div className="my-2 mt-3 d-flex gap-3">
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Minimum Amount</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-            <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Income Blocked Days</span>
-                <input type="text" className="darkMode-input form-control" />
-              </div>
-            </div>
-          </div>
+          <WithdrawalSettings
+            WithdrawalSettingData={WithdrawalSettingData}
+            setWithdrawalSettingData={setWithdrawalSettingData}
+            selectLevel={selectLevel}
+          />
         </div>
       </div>
     </>

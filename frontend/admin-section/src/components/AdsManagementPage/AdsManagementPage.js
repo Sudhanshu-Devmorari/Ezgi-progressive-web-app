@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import ad1 from "../../assets/ad-1.svg";
@@ -14,15 +14,14 @@ import edit from "../../assets/Group 75.svg";
 import { MainDiv } from "../CommonBgRow";
 import cross from "../../assets/Group 81.svg";
 import upload from "../../assets/upload.svg";
+import axios from "axios";
+import CreateAdsModal from "../CreateAdsModal/CreateAdsModal";
+import config from "../../config";
 
 const AdsManagementPage = () => {
   const [editTrue, setEditTrue] = useState(false);
-  const requestArray = [
-    { img: ad3, name: "Active" },
-    { img: ad4, name: "Pending" },
-    { img: ad5, name: "Ended" },
-  ];
-  const ads = [
+
+  const adsArray = [
     {
       page: "Main",
       img: img1,
@@ -32,6 +31,42 @@ const AdsManagementPage = () => {
       img: img2,
     },
   ];
+
+  const [banners, setBanners] = useState(0);
+  const [active, setActive] = useState(0);
+  const [ads, setAds] = useState([]);
+  const [adsCount, setAdsCount] = useState(0);
+  const [end, setEnd] = useState(0);
+  const [pending, setPending] = useState(0);
+  const [popUps, setPopUps] = useState(0);
+
+  const AdsArray = [
+    { img: ad3, name: "Active", count: active },
+    { img: ad4, name: "Pending", count: pending },
+    { img: ad5, name: "Ended", count: end },
+  ];
+
+  // Get Ads data API
+  useEffect(() => {
+    async function getAdsData() {
+      try {
+        const res = await axios.get(`${config?.apiUrl}/ads-management/`);
+        // console.log(res.data, "==========>>>res sub users");
+        const data = res.data;
+        setBanners(data.Banners);
+        setActive(data.active);
+        setAds(data.ads);
+        setAdsCount(data.ads_count);
+        setEnd(data.end);
+        setPending(data.pending);
+        setPopUps(data.pop_ups);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getAdsData();
+  }, []);
+
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -43,24 +78,21 @@ const AdsManagementPage = () => {
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>
               <div className="d-flex flex-column align-items-center justify-content-center col-2 dark-mode mx-2">
-                <img src={ad1} alt="" height={45} width={45} />
-                <span className="name-fonts" style={{ fontSize: "1.2rem" }}>
-                  Advertisements
-                </span>
-                <span style={{ fontSize: "1.6rem" }}>127</span>
+                <img src={ad1} alt=""  className="icon" />
+                <span className="heading">Advertisements</span>
+                <span className="number">{adsCount}</span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
-                  {requestArray.map((res, index) => (
+                  {AdsArray.map((res, index) => (
                     <div className="d-flex flex-column align-items-center justify-content-center col">
-                      <img src={res.img} alt="" height={45} width={45} />
+                      <img src={res.img} alt="" className="icon" />
                       <span
-                        className="name-fonts"
-                        style={{ fontSize: "1.2rem" }}
+                        className="heading"
                       >
                         {res.name}
                       </span>
-                      <span style={{ fontSize: "1.6rem" }}>127</span>
+                      <span className="number">{res.count}</span>
                     </div>
                   ))}
                 </div>
@@ -69,25 +101,23 @@ const AdsManagementPage = () => {
                 <div className="" style={{ fontSize: "1.2rem" }}>
                   Advertisements Spaces
                 </div>
-                <div className="row g-0 h-100">
+                <div className="row g-0 pt-3">
                   <div className="col d-flex flex-column align-items-center justify-content-center">
-                    <span style={{ fontSize: "1.2rem" }}>Banners</span>
-                    <span style={{ fontSize: "1.6rem" }}>127</span>
+                    <span className="heading">Banners</span>
+                    <span className="number">{banners}</span>
                   </div>
                   <div className="col d-flex flex-column align-items-center justify-content-center">
-                    <span style={{ fontSize: "1.2rem" }}>Pop ups</span>
-                    <span style={{ fontSize: "1.6rem" }}>127</span>
+                    <span className="heading">Pop ups</span>
+                    <span style={{ fontSize: "1.6rem" }}>{popUps}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div
-              className="dark-mode p-2 m-2 mb-0 home-height"
-            >
+            <div className="dark-mode p-2 m-2 mb-0 home-height">
               <div className="my-2 d-flex justify-content-end">
                 <button
                   data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
+                  data-bs-target="#CreateAds"
                   className="px-2"
                   style={{
                     border: "1px solid #D2DB08",
@@ -111,11 +141,11 @@ const AdsManagementPage = () => {
                 </button>
               </div>
 
-              {ads.map((res, index) => (
+              {adsArray.map((res, index) => (
                 <MainDiv>
                   <>
                     <div className="col-2 d-flex justify-content-center">
-                      <img src={res.img} alt="" height={120} width={120}/>
+                      <img src={res.img} alt="" height={100} width={100} />
                     </div>
 
                     <div className="col-4">
@@ -264,7 +294,7 @@ const AdsManagementPage = () => {
                           onClick={() => setEditTrue(true)}
                           className="cursor"
                           data-bs-toggle="modal"
-                          data-bs-target="#exampleModal"
+                          data-bs-target="#CreateAds"
                           src={edit}
                           alt=""
                           height={25}
@@ -281,129 +311,7 @@ const AdsManagementPage = () => {
       </div>
 
       {/* <!-- Modal --> */}
-      <div
-        className="modal fade"
-        id="exampleModal"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabindex="-1"
-        aria-labelledby="staticBackdropLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-body p-3 dark-mode">
-              <div className="mx-2 my-3">
-                {editTrue && <img src={img1} alt="" srcset="" />}
-                <span
-                  className="py-1 mb-2 px-3 m-1"
-                  style={{
-                    backgroundColor: "#0B2447",
-                    borderRadius: "2px",
-                  }}
-                >
-                  <img
-                    className="mb-1"
-                    src={upload}
-                    alt=""
-                    height={20}
-                    width={20}
-                  />
-                  <span className="ps-2">Upload</span>
-                </span>
-              </div>
-              <div className="row g-0 p-2 gap-3">
-                <div className="col d-flex flex-column">
-                  <span>Ads Space</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-                <div className="col d-flex flex-column">
-                  <span>Start Date</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-                <div className="col d-flex flex-column">
-                  <span>End Date</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-              </div>
-              <div className="row g-0 p-2 gap-3">
-                <div className="col-4 d-flex flex-column">
-                  <span>Company Name</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-                <div className="col d-flex flex-column">
-                  <span>Link</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-              </div>
-              <div className="col-4 p-2">
-                <div className="col d-flex flex-column">
-                  <span>Add Budget</span>
-                  <input type="text" className="darkMode-input form-control" />
-                </div>
-              </div>
-              <div className="my-3 d-flex justify-content-center gap-3">
-                {editTrue ? (
-                  <>
-                    <div className="">
-                      <button
-                        className="px-3 py-1"
-                        style={{
-                          color: "#FF5757",
-                          backgroundColor: "transparent",
-                          border: "1px solid #FF5757",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Deactive
-                      </button>
-                    </div>
-                    <div className="">
-                      <button
-                        className="px-3 py-1"
-                        style={{
-                          color: "#D2DB08",
-                          backgroundColor: "transparent",
-                          border: "1px solid #D2DB08",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <button
-                    className="px-3 py-1"
-                    style={{
-                      color: "#D2DB08",
-                      backgroundColor: "transparent",
-                      border: "1px solid #D2DB08",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Create
-                  </button>
-                )}
-              </div>
-            </div>
-            <img
-              onClick={() => setEditTrue(false)}
-              data-bs-dismiss="modal"
-              src={cross}
-              alt=""
-              style={{
-                position: "absolute",
-                top: "-1rem",
-                right: "-1.1rem",
-                cursor: "pointer",
-              }}
-              height={45}
-              width={45}
-            />
-          </div>
-        </div>
-      </div>
+      <CreateAdsModal setEditTrue={setEditTrue} editTrue={editTrue} />
     </>
   );
 };

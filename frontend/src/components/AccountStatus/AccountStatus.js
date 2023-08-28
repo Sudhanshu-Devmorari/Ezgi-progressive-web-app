@@ -10,10 +10,41 @@ import RadialSeparators from "../RadialSeparators";
 import "./AccountStatus.css";
 import buletick from "../../assets/blueTick.png";
 import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
+import axios from "axios";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
+import VerificationModal from "../VerificationModal/VerificationModal";
+import config from "../../config";
 
 const AccountStatus = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
+  const [verifyShow, setVerifyShow] = React.useState(false);
+
+  const handleVerification = () => {
+    axios
+      .get(`${config?.apiUrl}/verify/${userId}`)
+      .then((res) => {
+        console.log(res, "===>>>>res");
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log(err.response);
+        if (err.response.status === 404) {
+          Swal.fire({
+            title: "Error",
+            text: err.response.data.message,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        } else if (err.response.status === 200) {
+          setVerifyShow(true)
+        }
+      });
+  };
+
   return (
     <>
       <div
@@ -110,7 +141,12 @@ const AccountStatus = () => {
                 <div className="d-flex justify-content-between">
                   <span className="font-res">
                     Commmision Rate{" "}
-                    <span className="fw-bold" style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6", }}>
+                    <span
+                      className="fw-bold"
+                      style={{
+                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                      }}
+                    >
                       %25
                     </span>
                   </span>
@@ -241,6 +277,8 @@ const AccountStatus = () => {
                 <span>Unverified Account</span>
                 <span>
                   <button
+                    onClick={handleVerification}
+                    // onClick={() => setVerifyShow(true)}
                     className="px-2 py-1 font-respo"
                     style={{
                       color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
@@ -299,6 +337,10 @@ const AccountStatus = () => {
       <SubscribeRenewModal
         show={modalShow}
         onHide={() => setModalShow(false)}
+      />
+      <VerificationModal
+        show={verifyShow}
+        onHide={() => setVerifyShow(false)}
       />
     </>
   );
