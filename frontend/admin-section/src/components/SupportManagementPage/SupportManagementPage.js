@@ -96,7 +96,9 @@ const SupportManagementPage = () => {
     const filteredArray = tickets.filter(
       (obj) =>
         obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
-        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
+        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase()) ||
+        obj?.user?.username?.toLowerCase().includes(value.toLowerCase()) ||
+        obj?.user?.name?.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredArray(filteredArray);
   };

@@ -32,6 +32,8 @@ const CommentsManagement = (props) => {
   const [fData, setFdata] = useState({});
   const [status, setStatus] = useState("");
   const [secondStatus, setSecondStatus] = useState("");
+  const [thirdStatus, setThirdStatus] = useState("");
+  const [fourthStatus, setFourthStatus] = useState("");
 
   const [currentData, setCurrentData] = useState([]);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
@@ -44,18 +46,17 @@ const CommentsManagement = (props) => {
   // Get League / Date / Match details
   const [LeagueValue, setLeagueValue] = useState([]);
   const [DateValue, setDateValue] = useState([]);
-  const [MatchdetailsValue, setMatchdetailsValue] = useState("");
+  const [MatchdetailsValue, setMatchdetailsValue] = useState([]);
 
   const [displayUser, setDisplayUser] = useState(props?.commentData);
   useEffect(() => {
     setDisplayUser(props?.commentData);
   }, [props?.commentData]);
 
-
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("user-id");
     await axios
-      .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
+      .post(`${config?.apiUrl}/filter-comments/`, {
         category: selectedCategory,
         country: selectedCountry,
         league: selectedLeague,
@@ -67,6 +68,7 @@ const CommentsManagement = (props) => {
         filter_type0: secondStatus,
       })
       .then((res) => {
+        console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
       })
@@ -207,88 +209,84 @@ const CommentsManagement = (props) => {
     getCountryOptions();
   }, [selectedCategory]);
 
+  const headers = {
+    Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+  };
+
   useEffect(() => {
     async function getLeague() {
-      if (selectedCountry !== "Select") {
-        try {
-          const headers = {
-            Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
-          };
-          // contriesAPi(categoryType, selectedCountry);
-          const res = await axios.get(
-            `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
-            { headers }
-          );
-          const leagueValue = res.data.data.map((item) => item.league);
-          setLeagueValue(leagueValue);
-          if (selectedLeague !== "Select") {
-            const res = await axios.get(
-              `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
-              { headers }
-            );
-            setDateValue(res?.data?.data.map((item) => item.date));
-            if (selectedDate !== "Select") {
-              const res1 = await axios.get(
-                `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
-                { headers }
-              );
-              setMatchdetailsValue(res1?.data?.data?.map((item) => item.takimlar));
-              // setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
-            }
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      try {
+        const res = await axios.get(
+          `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
+          { headers }
+        );
+        const leagueValue = res.data.data.map((item) => item.league);
+        setLeagueValue(leagueValue);
+      } catch (e) {}
     }
     getLeague();
-  }, [selectedCountry, selectedLeague, selectedDate]);
+  }, [selectedCountry]);
+  useEffect(() => {
+    async function getDate() {
+      try {
+        const res = await axios.get(
+          `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
+          { headers }
+        );
+        setDateValue(res?.data?.data.map((item) => item.date));
+      } catch (e) {}
+    }
+    getDate();
+  }, [selectedLeague]);
+  useEffect(() => {
+    async function getMatch() {
+      try {
+        const res = await axios.get(
+          `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
+          { headers }
+        );
+        setMatchdetailsValue(res?.data?.data?.map((item) => item.takimlar));
+      } catch (e) {}
+    }
+    getMatch();
+  }, [selectedDate]);
 
-  const handleCategorySelection = (name, category) => {
+  const handleCategorySelection = (category) => {
     setSelectedCategory(category);
   };
   const toggleCategoryDropdown = () => {
-    if (countryDropDown) {
-      setCountryDropDown(false);
-    }
-    if (leagueDropdown) {
-      setLeagueDropdown(false);
-    }
-    if (dateDropdown) {
-      setDateDropdown(false);
-    }
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setDateDropdown(false);
+    setMatchDetailsDropdown(false);
+    setPredictionDropdown(false);
+    setPredictionTypeDropdown(false);
     setCategoryDropdown(!categoryDropdown);
   };
 
-  const handleDateSelection = (name, date) => {
+  const handleDateSelection = (date) => {
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
-    if (countryDropDown) {
-      setCountryDropDown(false);
-    }
-    if (leagueDropdown) {
-      setLeagueDropdown(false);
-    }
-    if (categoryDropdown) {
-      setCategoryDropdown(false);
-    }
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setMatchDetailsDropdown(false);
+    setPredictionDropdown(false);
+    setPredictionTypeDropdown(false);
+    setCategoryDropdown(false);
     setDateDropdown(!dateDropdown);
   };
 
-  const handleLeagueSelection = (name, league) => {
+  const handleLeagueSelection = (league) => {
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {
-    if (countryDropDown) {
-      setCountryDropDown(false);
-    }
-    if (dateDropdown) {
-      setDateDropdown(false);
-    }
-    if (categoryDropdown) {
-      setCategoryDropdown(false);
-    }
+    setCountryDropDown(false);
+    setMatchDetailsDropdown(false);
+    setPredictionDropdown(false);
+    setPredictionTypeDropdown(false);
+    setCategoryDropdown(false);
+    setDateDropdown(false);
     setLeagueDropdown(!leagueDropdown);
   };
   const matchDetailsOptions = [
@@ -297,47 +295,51 @@ const CommentsManagement = (props) => {
     "Match Details 3",
   ];
   const predictionTypeOptions = [
-    "Prediction Type 1",
-    "Prediction Type 2",
-    "Prediction Type 3",
+    "Match Result",
+    "Handicap Match Result",
+    "First Half / Match Result",
+    "Total Goal Over/Under",
+    "Both Teams to Score",
+    "Home Team Total Goals",
+    "Away Team Total Goals",
   ];
-  const predictionOptions = ["Prediction 1", "Prediction 2", "Prediction 3"];
+  const predictionOptions = ["Journeyman", "Expert", "Grandmaster"];
 
-  const handleMatchDetailsSelection = (name, matchDetails) => {
+  const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
   };
   const toggleMatchDetailsDropdown = () => {
-    if (predictionTypeDropdown) {
-      setPredictionTypeDropdown(false);
-    }
-    if (predictionDropdown) {
-      setPredictionDropdown(false);
-    }
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setPredictionDropdown(false);
+    setPredictionTypeDropdown(false);
+    setCategoryDropdown(false);
+    setDateDropdown(false);
     setMatchDetailsDropdown(!matchDetailsDropdown);
   };
-  const handlePredictionTypeSelection = (name, predictionType) => {
+  const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
   };
   const togglePredictionTypeDropdown = () => {
-    if (matchDetailsDropdown) {
-      setMatchDetailsDropdown(false);
-    }
-    if (predictionDropdown) {
-      setPredictionDropdown(false);
-    }
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setMatchDetailsDropdown(false);
+    setPredictionDropdown(false);
+    setCategoryDropdown(false);
+    setDateDropdown(false);
     setPredictionTypeDropdown(!predictionTypeDropdown);
   };
 
-  const handlePredictionSelection = (name, prediction) => {
+  const handlePredictionSelection = (prediction) => {
     setSelectedPrediction(prediction);
   };
   const togglePredictionDropdown = () => {
-    if (predictionTypeDropdown) {
-      setPredictionTypeDropdown(false);
-    }
-    if (matchDetailsDropdown) {
-      setMatchDetailsDropdown(false);
-    }
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setMatchDetailsDropdown(false);
+    setPredictionTypeDropdown(false);
+    setCategoryDropdown(false);
+    setDateDropdown(false);
     setPredictionDropdown(!predictionDropdown);
   };
 
@@ -409,8 +411,11 @@ const CommentsManagement = (props) => {
               <div className="position-relative">
                 <img
                   className="rounded-circle profile-icon"
-                  src={`${res.commentator_user?.profile_pic ? server_url + res.commentator_user?.profile_pic : initialProfile}`}
-
+                  src={`${
+                    res.commentator_user?.profile_pic
+                      ? server_url + res.commentator_user?.profile_pic
+                      : initialProfile
+                  }`}
                   alt=""
                   height={45}
                   width={45}
@@ -470,20 +475,22 @@ const CommentsManagement = (props) => {
       </div>
 
       <div
-        class="modal fade"
+        className="modal fade"
         id="exampleModal"
         tabindex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
       >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body dark-mode">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body dark-mode">
               <div
                 className="row g-0 my-3 gap-3 position-relative"
                 style={{ fontSize: "15px" }}
               >
-                <div className="col">
+                <div className="col cursor">
                   <CustomDropdown
                     label="Category"
                     options={categoryOptions}
@@ -493,7 +500,7 @@ const CommentsManagement = (props) => {
                     toggleDropdown={toggleCategoryDropdown}
                   />
                 </div>
-                <div className="col">
+                <div className="col cursor">
                   <div className="my-2">
                     <span>Country</span>
                     <div
@@ -533,7 +540,7 @@ const CommentsManagement = (props) => {
                 style={{ fontSize: "15px" }}
               >
                 {/* <div className="row my-3" style={{ fontSize: "15px" }}> */}
-                <div className="col">
+                <div className="col cursor">
                   <CustomDropdown
                     label="League"
                     options={leagueOptions}
@@ -543,7 +550,7 @@ const CommentsManagement = (props) => {
                     toggleDropdown={toggleLeagueDropdown}
                   />
                 </div>
-                <div className="col">
+                <div className="col cursor">
                   <CustomDropdown
                     label="Date"
                     options={dateOptions}
@@ -555,12 +562,12 @@ const CommentsManagement = (props) => {
                 </div>
               </div>
               <div
-                className="my-3 position-relative"
+                className="my-3 position-relative cursor"
                 style={{ fontSize: "14px" }}
               >
                 <CustomDropdown
                   label="Match Details"
-                  options={matchDetailsOptions}
+                  options={MatchdetailsValue}
                   selectedOption={selectedMatchDetails}
                   onSelectOption={handleMatchDetailsSelection}
                   isOpen={matchDetailsDropdown}
@@ -571,7 +578,7 @@ const CommentsManagement = (props) => {
                 className="row g-0 my-3 gap-3 position-relative"
                 style={{ fontSize: "14px" }}
               >
-                <div className="col">
+                <div className="col cursor">
                   <CustomDropdown
                     label="Level"
                     options={predictionOptions}
@@ -581,7 +588,7 @@ const CommentsManagement = (props) => {
                     toggleDropdown={togglePredictionDropdown}
                   />
                 </div>
-                <div className="col">
+                <div className="col cursor">
                   <CustomDropdown
                     label="Prediction Type"
                     options={predictionTypeOptions}
@@ -611,10 +618,10 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsSubscriberSelected(!isSubscriberSelected);
-                        setSecondStatus("only_subscriber");
+                        setStatus("only_subscriber");
                       }}
                       src={
-                        secondStatus == "only_subscriber"
+                        status == "only_subscriber"
                           ? selectedRadio
                           : Radio
                       }
@@ -628,9 +635,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsWinningSelected(!isWinningSelected);
-                        setStatus("winning");
+                        setSecondStatus("winning");
                       }}
-                      src={status == "winning" ? selectedRadio : Radio}
+                      src={secondStatus == "winning" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -654,9 +661,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPublishedSelected(!isPublishedSelected);
-                        setStatus("published");
+                        setThirdStatus("published");
                       }}
-                      src={status == "published" ? selectedRadio : Radio}
+                      src={thirdStatus == "published" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -667,9 +674,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPendingSelected(!isPendingSelected);
-                        setSecondStatus("pending");
+                        setThirdStatus("pending");
                       }}
-                      src={secondStatus == "pending" ? selectedRadio : Radio}
+                      src={thirdStatus == "pending" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -680,9 +687,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsFinishedSelected(!isFinishedSelected);
-                        setStatus("finished");
+                        setFourthStatus("finished");
                       }}
-                      src={status == "finished" ? selectedRadio : Radio}
+                      src={fourthStatus == "finished" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -693,9 +700,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsNotStartedSelected(!isNotStartedSelected);
-                        setSecondStatus("not_stated");
+                        setFourthStatus("not_stated");
                       }}
-                      src={secondStatus == "not_stated" ? selectedRadio : Radio}
+                      src={fourthStatus == "not_stated" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -718,6 +725,19 @@ const CommentsManagement = (props) => {
                 </div>
               </div>
               <img
+                onClick={() => {
+                  setCategoryDropdown(false);
+                  setCountryDropDown(false);
+                  setLeagueDropdown(false);
+                  setDateDropdown(false);
+                  setMatchDetailsDropdown(false);
+                  setPredictionDropdown(false);
+                  setPredictionTypeDropdown(false);
+                  setStatus("")
+                  setSecondStatus("")
+                  setThirdStatus("")
+                  setFourthStatus("")
+                }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
@@ -737,7 +757,7 @@ const CommentsManagement = (props) => {
 
       {/* <!-- Modal --> */}
       <div
-        class="modal fade"
+        className="modal fade"
         id="filter"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
@@ -745,9 +765,9 @@ const CommentsManagement = (props) => {
         aria-labelledby="filterLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body dark-mode p-3">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body dark-mode p-3">
               <div
                 className="p-1"
                 style={{

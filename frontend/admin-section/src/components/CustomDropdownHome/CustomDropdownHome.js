@@ -1,5 +1,6 @@
-import './CustomDropdown.css'
-export const CustomDropdown = ({
+import './CustomDropdownHome.css'
+export const CustomDropdownHome = ({
+  name,
   label,
   options,
   selectedOption,
@@ -7,7 +8,9 @@ export const CustomDropdown = ({
   isOpen,
   toggleDropdown,
 }) => {
+  
   return (
+
     <div className="my-2">
       <span>{label}</span>
       <div
@@ -41,7 +44,7 @@ export const CustomDropdown = ({
             className="dpcontent-dark-mode my-1 p-2"
             key={index}
             onClick={() => {
-              onSelectOption(option);
+              onSelectOption(name,option);
               toggleDropdown();
             }}
           >

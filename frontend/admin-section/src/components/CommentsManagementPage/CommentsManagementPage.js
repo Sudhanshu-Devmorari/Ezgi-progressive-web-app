@@ -20,7 +20,7 @@ const CommentsManagementPage = () => {
     await axios
       .get(`${config?.apiUrl}/comments-management/`)
       .then((res) => {
-        // console.log("=-=-=-=-=-=-=> ", res.data)
+        console.log("=-=-=-=-=-=-=> ", res.data)
         setData(res.data);
         setMostLike(res?.data?.most_like)
         setCommentData(res.data.all_comment)

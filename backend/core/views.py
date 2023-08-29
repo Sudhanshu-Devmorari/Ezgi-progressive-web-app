@@ -621,7 +621,7 @@ class NotificationView(APIView):
 class CommentReactionView(APIView):
     def post(self, request, comment_id, id, format=None, *args, **kwargs):
         # print("------- ",comment_id,"====", id)
-
+        
         try:
             comment = Comments.objects.get(id=comment_id)
         except Comments.DoesNotExist:
@@ -640,12 +640,15 @@ class CommentReactionView(APIView):
                 setattr(comment_reaction, reaction_type, None)
                 if comment_reaction.like is None and comment_reaction.favorite is None and comment_reaction.clap is None:
                     comment_reaction.delete()
-                    return Response({'message': 'Reaction removed successfully'})
+                    total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
+                    return Response({'message': 'Reaction removed successfully', 'new_total_clap': total_clap})
             else:
                 # User clicked a different button, update the reaction
                 setattr(comment_reaction, reaction_type, 1)
                 comment_reaction.save()
-                return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
+                total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
+
+                return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'new_total_clap': total_clap})
 
             comment_reaction.save()
         except CommentReaction.DoesNotExist:
@@ -655,13 +658,14 @@ class CommentReactionView(APIView):
             serializer = CommentReactionSerializer(data=reaction_data)
             if serializer.is_valid():
                 serializer.save()
-                return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
+                total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
+
+                return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'new_total_clap': total_clap})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': f'Reaction "{reaction_type}" saved successfully'})
-        
-
+        return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'hgf' : 'gdh'})
+   
 class ProfileView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -1566,6 +1570,7 @@ class CommentsManagement(APIView):
 
         # Next, get the comment with the most likes
         comment_with_most_likes = comments_with_likes.order_by('-like_count')
+        print('comment_with_most_likes: ', comment_with_most_likes)
 
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:

@@ -12,6 +12,7 @@ import selectedRadio from "../../assets/Group 316.svg";
 import Radio from "../../assets/Group 314.svg";
 import leftArrow from "../../assets/Group 271.svg";
 import circle_check from "../../assets/circle-check-1.png";
+import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const CreateAndUpdateEditor = (props) => {
   const [isJourneymanSelected, setIsJourneymanSelected] = useState(false);
@@ -535,7 +536,7 @@ const CreateAndUpdateEditor = (props) => {
                       )}
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownHome
                         label="Country"
                         options={countryOptions}
                         selectedOption={selectedCountry}
@@ -545,7 +546,7 @@ const CreateAndUpdateEditor = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownHome
                         label="City"
                         options={cityOptions}
                         selectedOption={selectedCity}
@@ -557,7 +558,7 @@ const CreateAndUpdateEditor = (props) => {
                   </div>
                   <div className="row gap-3 g-0 my-2">
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownHome
                         label="Category"
                         options={categoryOptions}
                         selectedOption={selectedCategory}
@@ -567,7 +568,7 @@ const CreateAndUpdateEditor = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownHome
                         label="Gender"
                         options={genderOptions}
                         selectedOption={selectedGender}
@@ -577,7 +578,7 @@ const CreateAndUpdateEditor = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownHome
                         label="Age"
                         options={ageOptions}
                         selectedOption={selectedAge}

@@ -1,5 +1,4 @@
 export const Dropdownmodal = ({
-  name,
   label,
   options,
   selectedOption,
@@ -28,7 +27,7 @@ export const Dropdownmodal = ({
             className="dpcontent-dark-mode my-1 p-2"
             key={index}
             onClick={() => {
-              onSelectOption(name,option);
+              onSelectOption(option);
               toggleDropdown();
             }}
           >

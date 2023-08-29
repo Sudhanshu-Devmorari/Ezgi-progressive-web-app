@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
 import user3 from "../../assets/user3.png";
@@ -10,28 +10,17 @@ import starIcon from "../../assets/star.png";
 import clapIcon from "../../assets/clap-svgrepo-com.png";
 import "./MostLiked.css";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 const MostLiked = (props) => {
   // console.log("********", props?.mostLike)
   const [displayUser, setDisplayUser] = useState([]);
-  
+
   useEffect(() => {
     setDisplayUser(props?.mostLike);
   }, [props?.mostLike]);
-  
+
   // console.log("********", displayUser)
-
-
-const MostLiked = (props) => {
-  // console.log("********", props?.mostLike)
-  const [displayUser, setDisplayUser] = useState([]);
-  
-  useEffect(() => {
-    setDisplayUser(props?.mostLike);
-  }, [props?.mostLike]);
-  
-  // console.log("********", displayUser)
-
 
   const notification = [
     {
@@ -81,26 +70,35 @@ const MostLiked = (props) => {
       {displayUser?.map((res, index) => (
         <div className="card py-1 my-2 rounded-0 dark-mode border-0 neha">
           <div className="d-flex">
-
             <img
               className="profile-mostLiked user-profile"
-              src={res.profile}
+              src={
+                res.comment_data.commentator_user.profile_pic
+                  ? server_url + res.comment_data.commentator_user.profile_pic
+                  : initialProfile
+              }
               alt=""
               height={45}
               width={45}
             />
             <div className="d-flex flex-column mt-2 ps-1">
               <span className="username" style={{ fontSize: "0.9rem" }}>
-              {res.comment_data.commentator_user.name}{" "}
-
+                {res.comment_data.commentator_user.username}{" "}
                 <button
-                  className="px-2 level-btn"
+                  className="px-2 level-btn text-capitalize"
                   style={{
                     border:
-                      res.level === "Expert"
-                        ? "1px solid #FF9100"
-                        : "1px solid #0CC6FF",
-                    color: res.level === "Expert" ? "#FF9100" : "#0CC6FF",
+                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "expert" && "1px solid #FF9100")  || 
+                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "apprentice" && "1px solid #FFEE7D") || 
+                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "journeyman" && "1px solid #0CC6FF") || 
+                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "grandmaster" && "1px solid #D2DB08") ||
+                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "master" && "1px solid #FF9100") ,
+                    color:
+                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "expert" && " #FF9100")  || 
+                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "apprentice" && " #FFEE7D") || 
+                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "journeyman" && " #0CC6FF") || 
+                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "grandmaster" && " #D2DB08") ||
+                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "master" && " #FF9100") ,
                     backgroundColor: "transparent",
                     borderRadius: "18px",
                     fontSize: "0.7rem",
@@ -111,7 +109,8 @@ const MostLiked = (props) => {
               </span>
 
               <span className="content-font1" style={{ fontSize: "0.7rem" }}>
-                {res.content}
+                {/* {res.content} */}
+                {res.comment_data.league}
               </span>
             </div>
             <div
@@ -126,7 +125,7 @@ const MostLiked = (props) => {
                   height={22}
                   width={22}
                 />
-                238
+                {res?.total_likes}
               </span>
               <span className="px-2 padding">
                 <img
@@ -136,7 +135,7 @@ const MostLiked = (props) => {
                   height={22}
                   width={22}
                 />
-                238
+                {res?.total_favorites}
               </span>
               <span>
                 <img
@@ -146,9 +145,8 @@ const MostLiked = (props) => {
                   height={18}
                   width={18}
                 />
-                238
+                {res?.total_clap}
               </span>
-
             </div>
           </div>
         </div>
@@ -156,5 +154,4 @@ const MostLiked = (props) => {
     </div>
   );
 };
-}
 export default MostLiked;

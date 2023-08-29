@@ -45,10 +45,12 @@ const MainPage = () => {
   const highlightCount = 5;
 
 
-  const homeApiData = async (user_id) => {
-    const res = await axios
+  function homeApiData (user_id)  {
+    console.log("======>>>> test");
+    axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
+        console.log(res.data);
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
         setHighlights(res.data.highlights);
@@ -348,6 +350,7 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                            homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}
@@ -411,6 +414,7 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                            homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}
@@ -464,7 +468,8 @@ const MainPage = () => {
                                 }
                               />
                             ) : null}
-                            <ContentSection
+                           <ContentSection
+                            homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}

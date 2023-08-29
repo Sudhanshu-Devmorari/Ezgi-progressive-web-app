@@ -24,6 +24,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
+import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
+import { CustomDropdownEditor } from "../CustomDropdownEditor";
 
 
 const EditorManagemenet = (props) => {
@@ -236,14 +238,11 @@ const EditorManagemenet = (props) => {
   const [isGrandmasterSelected, setIsGrandmasterSelected] = useState(false);
 
   const filteredData = (e) => {
-    // props.setFilterData(null)
-    const val = e.target.value;
-    const filteredArray = props?.users.filter(
-      (obj) =>
-        obj?.editor_data?.username
-          ?.toLowerCase()
-          .startsWith(val.toLowerCase()) ||
-        obj?.editor_data?.name?.toLowerCase().startsWith(val.toLowerCase())
+    const val = e.target.value.toLowerCase();
+  
+    const filteredArray = props?.users?.filter((obj) =>
+      obj?.editor_data?.username?.toLowerCase().startsWith(val) ||
+      obj?.editor_data?.name?.toLowerCase().includes(val) 
     );
     setDisplayUser(filteredArray);
   };
@@ -1172,7 +1171,7 @@ const EditorManagemenet = (props) => {
                       )}
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="country"
                         value={addUser.selectedCountry}
@@ -1187,7 +1186,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="city"
                         value={addUser.selectedCity}
@@ -1204,7 +1203,7 @@ const EditorManagemenet = (props) => {
                   </div>
                   <div className="row gap-3 g-0 my-2">
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="category"
                         value={addUser.selectedCategory}
@@ -1219,7 +1218,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="gender"
                         value={addUser.selectedGender}
@@ -1234,7 +1233,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="age"
                         value={addUser.selectedAge}

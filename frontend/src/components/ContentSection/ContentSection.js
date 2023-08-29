@@ -22,6 +22,7 @@ import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
+import { userId } from "../GetUser";
 
 const ContentSection = ({
   data,
@@ -29,24 +30,29 @@ const ContentSection = ({
   selectContent,
   userComments,
   SelectComment,
+  homeApiData,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const userPhone = localStorage.getItem("user-id");
+
+  console.log(data,"=================>>>data");
   // console.log("FavData", props?.FavData);
 
   // const userPhone = localStorage.getItem("userPhone");
 
   const server_url = "http://127.0.0.1:8000";
 
+  const [followLabel, setFollowLabel] = useState("Follow");
+
   const followCommentator = async (commentator_id) => {
-    const user_id = localStorage.getItem("user-id");
     const res = await axios
-      .get(
-        `${config.apiUrl}/follow-commentator/${user_id}?id=${commentator_id}`
-      )
+      .get(`${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`)
       .then((res) => {
-        // console.log(res);
+        if (res.statusText === "OK") {
+          console.log("Follow Response------", res);
+          setFollowLabel((prevLabel) => "Followed");
+        }
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -54,14 +60,15 @@ const ContentSection = ({
   };
 
   const handleCommentReaction = async (id, reaction) => {
-    const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `${config.apiUrl}/comment-reaction/${id}/${user_id}`,
+      `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
       {
         reaction_type: `${reaction}`,
       }
     );
-    // console.log(res);
+    if (res.status === 200) {
+      homeApiData(userId);
+    }
   };
 
   return (
@@ -92,8 +99,11 @@ const ContentSection = ({
               />
               <div className="col">
                 <img
-                  src={`${ data?.value.commentator_user?.profile_pic ?
-                    config.apiUrl + data?.value.commentator_user?.profile_pic : initialProfile
+                  src={`${
+                    data?.value.commentator_user?.profile_pic
+                      ? config.apiUrl +
+                        data?.value.commentator_user?.profile_pic
+                      : initialProfile
                   }`}
                   className="rounded-circle"
                   width={75}
@@ -111,7 +121,10 @@ const ContentSection = ({
               {(selectContent === "for you" ||
                 userComments ||
                 selectContent === "comments") && (
-                <div className="d-flex justify-content-end pe-2 mt-3" style={{height:"24.69px"}}>
+                <div
+                  className="d-flex justify-content-end pe-2 mt-3"
+                  style={{ height: "24.69px" }}
+                >
                   {userPhone ? (
                     <button
                       onClick={() => {
@@ -129,7 +142,7 @@ const ContentSection = ({
                         fontSize: "13px",
                       }}
                     >
-                      Follow
+                      {followLabel}
                     </button>
                   ) : (
                     <button
@@ -145,7 +158,7 @@ const ContentSection = ({
                         fontSize: "13px",
                       }}
                     >
-                      Follow
+                      {followLabel}
                     </button>
                   )}
                 </div>

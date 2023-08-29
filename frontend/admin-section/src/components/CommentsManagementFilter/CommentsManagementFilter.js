@@ -14,10 +14,11 @@ const CommentsManagementFilter = (props) => {
     setShowDropdown(false);
   };
   const filterCommentData = (e) => {
-    const val = e.target.value;
+    const val = e.target.value.toLowerCase();
     const filteredArray = props?.commentData.filter(
       (obj) =>
-        obj?.commentator_user?.name?.toLowerCase().startsWith(val.toLowerCase())
+        obj?.commentator_user?.name?.toLowerCase().startsWith(val) ||
+        obj?.commentator_user?.name?.toLowerCase().includes(val) 
     );
     props.setDisplayUser(val == "" ? props?.commentData :filteredArray);
   };

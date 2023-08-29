@@ -22,6 +22,7 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 
 import Swal from "sweetalert2";
+import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const Home = (props) => {
   const handleFile = async (e) => {
@@ -381,15 +382,16 @@ const Home = (props) => {
   };
 
   const filterData = (e) => {
-    const val = e.target.value;
+    const val = e.target.value.toLowerCase();
     const filteredArray = props.users.filter(
       (obj) =>
-        obj?.name?.toLowerCase().startsWith(val.toLowerCase()) ||
-        obj?.username?.toLowerCase().startsWith(val.toLowerCase())
+        obj?.name?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().includes(val) ||
+        obj?.name?.toLowerCase().includes(val)
     );
     setDisplayUser(filteredArray);
   };
-
   const monthOptions = ["1 Month", "3 Month", "6 Month"];
   const [selectedMonth, setSelectedMonth] = useState("Select");
   const [monthDropDown, setMonthDropDown] = useState(false);
@@ -827,7 +829,7 @@ const Home = (props) => {
               </div>
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdownHome
                     onChange={submitUserData}
                     name="gender"
                     value={addUser.selectedGender}
@@ -842,7 +844,7 @@ const Home = (props) => {
                   />
                 </div>
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdownHome
                     onChange={submitUserData}
                     name="age"
                     value={addUser.selectedAge}
