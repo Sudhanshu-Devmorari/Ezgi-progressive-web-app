@@ -35,13 +35,12 @@ const SubUserManagementPage = () => {
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
 
-  useEffect(() => {
     async function getSubUsers() {
       try {
         const res = await axios.get(
           `${config?.apiUrl}/subuser-management/`
         );
-        // console.log(res.data, "==========>>>res sub users");
+        console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotificationCount(data.notification_count);
         setSubuserCount(data.subuser_count);
@@ -52,7 +51,11 @@ const SubUserManagementPage = () => {
       }
     }
     getSubUsers();
-  }, []);
+
+  useEffect(() => {
+    getSubUsers();
+  }, [])
+  
 
   const [editProfileModal, seteditProfileModal] = useState(1);
   const [editUserId, setEditUserId] = useState("");
@@ -78,6 +81,7 @@ const SubUserManagementPage = () => {
       );
       // console.log(res.data);
       if (res.data.status === 200) {
+        getSubUsers();
         Swal.fire({
           title: "Success",
           text: res.data.data,
@@ -178,9 +182,11 @@ const SubUserManagementPage = () => {
                               backgroundColor: "transparent",
                               borderRadius: "4px",
                               border:
-                                (res.department === "Support Supervisor" &&
+                                (res.department === "Support" &&
                                   "1px solid #FF9100") ||
-                                (res.department === "Financial Supervisor" &&
+                                (res.department === "Financial" &&
+                                  "1px solid #58DEAA") ||
+                                (res.department === "Technical" &&
                                   "1px solid #58DEAA") ||
                                 (res.department === "IT Supervisor" &&
                                   "1px solid #4DD5FF") ||
@@ -189,9 +195,11 @@ const SubUserManagementPage = () => {
                                 (res.department === "Director Manager" &&
                                   "1px solid #FF33E4"),
                               color:
-                                (res.department === "Support Supervisor" &&
+                                (res.department === "Support" &&
                                   "#FF9100") ||
-                                (res.department === "Financial Supervisor" &&
+                                (res.department === "Financial" &&
+                                  "#58DEAA") ||
+                                (res.department === "Technical" &&
                                   "#58DEAA") ||
                                 (res.department === "IT Supervisor" &&
                                   "#4DD5FF") ||

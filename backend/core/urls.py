@@ -75,6 +75,7 @@ urlpatterns = [
     path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
+    path('verify-user/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
     path('verify-user/<int:id>/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
     path('show-ticket-data/<int:ticket_id>/', SubUserShowTicketData.as_view(), name='Show-Ticket-Data'),
 ]

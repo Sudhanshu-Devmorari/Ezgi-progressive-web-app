@@ -9,7 +9,7 @@ export const DateAPI = async (categoryType, selectedLeague) => {
         `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
       { headers }
     );
-    console.log(res,"MMM");
+    // console.log(res,"MMM");
     return res.data;
   } catch (error) {}
 };

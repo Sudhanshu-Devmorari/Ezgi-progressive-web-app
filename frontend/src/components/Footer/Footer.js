@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import selectedHomeIcon from "../../assets/Main Page Selected.svg";
 import HomeIcon from "../../assets/Main Page.svg";
 import EditorIcon from "../../assets/Editors Page (1).svg";
@@ -9,8 +9,10 @@ import startFooter from "../../assets/Favorite Page (1).svg";
 import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
 import logout from "../../assets/logout icon (1).svg";
 import { userId } from "../GetUser";
+import SignUpModal from "../SignUpModal/SignUpModal";
 
 export const Footer = (props) => {
+  const [showSignup, setShowSignup] = useState(false);
   return (
     <>
       <nav
@@ -65,8 +67,12 @@ export const Footer = (props) => {
               height={38}
               width={38}
               onClick={() => {
-                props.setSelectContent("fav");
-                props.setDashboardSUser(true);
+                if (!userId) {
+                  setShowSignup(true)
+                } else {
+                  props.setSelectContent("fav");
+                  props.setDashboardSUser(true);
+                }
               }}
             />
           </div>
@@ -86,6 +92,11 @@ export const Footer = (props) => {
           )}
         </div>
       </nav>
+      <SignUpModal
+        show={showSignup}
+        onHide={() => setShowSignup(false)}
+        // ShowModal={ShowModal}
+      />
     </>
   );
 };

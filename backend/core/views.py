@@ -47,29 +47,32 @@ class SignupView(APIView):
                'status' : status.HTTP_400_BAD_REQUEST
                 })
         else:
-            if User.objects.filter(phone=request.data['phone']).exists():
+            if User.objects.filter(phone=request.data['phone'],is_admin=False).exists():
                 return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
             else:
-                serializer.save()
-            serializer.save()
-            if DataCount.objects.filter(id=1).exists():
-                obj = DataCount.objects.get(id=1)
-                obj.user += 1
-                obj.save()
-            else:
-                obj = DataCount.objects.create(user=1)
-            if User.objects.filter(phone=request.data['phone']).exists():
-                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
-            else:
-                serializer.save()
-            serializer.save()
-            if DataCount.objects.filter(id=1).exists():
-                obj = DataCount.objects.get(id=1)
-                obj.user += 1
-                obj.save()
-            else:
-                obj = DataCount.objects.create(user=1)
-            return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
+                data = serializer.save()
+                user_serializer = UserSerializer(data)
+                serialized_user = user_serializer.data
+                return Response({'data' : 'User Added', 'user' : serialized_user, 'userId' : '', 'status' : status.HTTP_200_OK})
+            # serializer.save()
+            # if DataCount.objects.filter(id=1).exists():
+            #     obj = DataCount.objects.get(id=1)
+            #     obj.user += 1
+            #     obj.save()
+            # else:
+            #     obj = DataCount.objects.create(user=1)
+            # if User.objects.filter(phone=request.data['phone']).exists():
+            #     return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            # else:
+            #     serializer.save()
+            # # serializer.save()
+            # if DataCount.objects.filter(id=1).exists():
+            #     obj = DataCount.objects.get(id=1)
+            #     obj.user += 1
+            #     obj.save()
+            # else:
+            #     obj = DataCount.objects.create(user=1)
+            # return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
@@ -93,11 +96,12 @@ class OtpReSend(APIView):
             if 'is_admin' in request.data:
                 user = User.objects.get(phone=phone,is_admin=True)
             else:
-                user = User.objects.get(phone=phone)
+                user = User.objects.get(phone=phone,is_admin=False)
+            print('user: ', user)
             otp = totp.now()
-            # print('otp: ', otp)
-            # res = sms_send(phone, otp)  
-            res = "Success"
+            print('otp: ', otp)
+            res = sms_send(phone, otp)  
+            # res = "Success"
             if res == 'Success':
                 return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
             else:
@@ -114,9 +118,9 @@ class LoginView(APIView):
         password = request.data['password']
         try:
             if 'is_admin' in request.data:
-                user_phone = User.objects.get(phone=phone, is_delete=False,is_admin=True)
+                user_phone = User.objects.get(phone=phone,is_admin=True)
             else:
-                user_phone = User.objects.get(phone=phone, is_delete=False)
+                user_phone = User.objects.get(phone=phone)
                 
             if user_phone.password == password:
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
@@ -459,13 +463,13 @@ class CommentView(APIView):
                     raise NotFound("Prediction Type not found.")
                 if not prediction:
                     raise NotFound("Prediction not found.")
-                if not public_content:
-                    raise NotFound("Public Content not found.")
+                # if not public_content:
+                #     raise NotFound("Public Content not found.")
                 if not comment:
                     raise NotFound("Comment not found.")
                 comment_obj = Comments.objects.create(
                     commentator_user=user,
-                    category=category,
+                    category=[category],
                     country=country,
                     league=league,
                     date=date,
@@ -476,6 +480,7 @@ class CommentView(APIView):
                     comment=comment
                 )
 
+                print('comment_obj: ', comment_obj)
                 if comment_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1288,7 +1293,7 @@ class AdminMainPage(APIView):
             new_comment = Comments.objects.filter(status='approve').count()
             data_list['new_comment'] = new_comment
 
-            all_user = User.objects.all().order_by('-created')
+            all_user = User.objects.filter(is_delete=False, is_admin=False).order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -1344,7 +1349,7 @@ class UserManagement(APIView):
             new_subscriber = Subscription.objects.all().count()
             data_list['new_subscriber'] = new_subscriber
 
-            all_user = User.objects.all().order_by('-created')
+            all_user = User.objects.filter(is_delete=False).order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -2032,30 +2037,31 @@ class EditorManagement(APIView):
 
             verify_obj = BlueTick.objects.filter(status='pending')
             verify_obj_user = []
-            for obj in verify_obj:
-                detail = {}
-                follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
-                detail['Follower_Count'] = follow_obj
+            # for obj in verify_obj:
+            #     detail = {}
+            #     follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
+            #     detail['Follower_Count'] = follow_obj
 
-                follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
-                detail['Following_Count'] = follow_obj
+            #     follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
+            #     detail['Following_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
-                detail['Subscriber_Count'] = subscriber_obj
+            #     subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
+            #     detail['Subscriber_Count'] = subscriber_obj
 
-                subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
-                detail['Subscription_Count'] = subscriber_obj
+            #     subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
+            #     detail['Subscription_Count'] = subscriber_obj
 
-                serializer = UserSerializer(obj)
-                detail['editor_data'] = serializer.data
+            #     serializer = UserSerializer(obj)
+            #     detail['editor_data'] = serializer.data
 
-                verify_obj_user.append(detail)
-            data_list['verify_user'] = verify_obj_user
+            #     verify_obj_user.append(detail)
+            # data_list['verify_user'] = verify_obj_user
             data_list['verify_request_count'] = verify_obj.count()
 
             return Response(data=data_list, status=status.HTTP_200_OK)
         
         except Exception as e:
+            print(e,"===================>>>>>e")
             # Handle the exception here (e.g., log the error, return a specific error response, etc.)
             return Response(data={'error': 'An error occurred while processing the request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -2148,6 +2154,14 @@ class EditorManagement(APIView):
         
 
 class UpdateStatusForVerifyRequest(APIView):
+    def get(self, request, format=None):
+        try:
+            verification_request_count = BlueTick.objects.filter(status='pending').count()
+            return Response(data={'verification_request_count': verification_request_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             if 'status' not in request.data:
@@ -2739,7 +2753,7 @@ class SubUserManagement(APIView):
         data_list = {}
 
         try:
-            subuser_count = User.objects.filter(user_role='sub_user')
+            subuser_count = User.objects.filter(user_role='sub_user',is_delete=False)
             data_list['subuser_count'] = subuser_count.count()
             serializer = UserSerializer(subuser_count, many=True)
             data_list['subuser_list'] = serializer.data

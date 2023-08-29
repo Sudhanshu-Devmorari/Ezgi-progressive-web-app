@@ -19,10 +19,12 @@ const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
   const [userTimeLine, setUserTimeLine] = useState([]);
 
-  const userManagementApiData = async () => {
+  async function userManagementApiData() {
+    console.log("test");
     const res = await axios
       .get(`${config?.apiUrl}/user-management/`)
       .then((res) => {
+        console.log(res.data);
         setData(res?.data);
         setUsers(res?.data?.users_list)
         setUserTimeLine(res?.data?.user_timeline)
@@ -137,7 +139,7 @@ const UserManagementPage = () => {
                     </div>
                   </div>
                   <div className="">
-                    <Home users={users} setUsers={setUsers}/>
+                    <Home users={users} setUsers={setUsers} adminHomeApiData={userManagementApiData}/>
                   </div>
                 </div>
                 <div className="col-4 h-100">

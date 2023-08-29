@@ -19,9 +19,9 @@ import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 import Swal from "sweetalert2";
-
 
 const Home = (props) => {
   const handleFile = async (e) => {
@@ -33,16 +33,16 @@ const Home = (props) => {
       const res = await axios.delete(
         `${config?.apiUrl}/user-management/${id}/`
       );
-      if (res.status === 200){
+      if (res.status === 200) {
+        props?.adminHomeApiData();
         Swal.fire({
           title: "Success",
-          text: "User Updated!",
+          text: "User profile Delete sucessfully.",
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
         });
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -158,6 +158,7 @@ const Home = (props) => {
         `${config?.apiUrl}/user-management/`,
         formData
       );
+      props?.userManagementApiData();
       // console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -186,7 +187,8 @@ const Home = (props) => {
       );
 
       console.log("API Response:", response);
-      if (response.status === 200){
+      if (response.status === 200) {
+        props?.adminHomeApiData();
         Swal.fire({
           title: "Success",
           text: "User Updated!",
@@ -483,13 +485,17 @@ const Home = (props) => {
           ?.slice()
           .reverse()
           .map((res, index) => (
-            <MainDiv>
+            <MainDiv key={index}>
               <div className="col">
                 <span className="pe-1">{`# ${res?.id
                   .toString()
                   .padStart(4, "0")}`}</span>
                 <img
-                  src={`${server_url + res?.profile_pic}`}
+                  src={`${
+                    res?.profile_pic
+                      ? server_url + res?.profile_pic
+                      : initialProfile
+                  }`}
                   className="rounded-circle"
                   alt=""
                   height={42}
@@ -516,7 +522,6 @@ const Home = (props) => {
                   //   setAddUser(res);
                   //   setPreveiwProfilePic(true);
                   // }}
-
                   >
                     {res.age}
                   </span>
@@ -528,7 +533,7 @@ const Home = (props) => {
                   className="d-flex align-items-center block-width col justify-content-center"
                   style={{ minWidth: "7.5rem" }}
                 >
-                  {res.commentator_level ? (
+                  {(res.commentator_level && res.commentator_level !== "undefined") ? (
                     <button
                       className="btn-user"
                       style={{
@@ -581,7 +586,7 @@ const Home = (props) => {
                   width={25}
                 />
                 <img
-                onClick={()=> handleDeactive(res.id)}
+                  onClick={() => handleDeactive(res.id)}
                   className="cursor"
                   src={trash}
                   alt=""
@@ -1069,7 +1074,6 @@ const Home = (props) => {
                   setprofile(false);
                   setPreveiwProfilePic(null);
                 }}
-
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""

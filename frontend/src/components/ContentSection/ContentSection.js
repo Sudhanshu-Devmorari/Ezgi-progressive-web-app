@@ -20,6 +20,8 @@ import "./ContentSection.css";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
+import initialProfile from "../../assets/profile.png";
+import config from "../../config";
 
 const ContentSection = ({
   data,
@@ -41,7 +43,7 @@ const ContentSection = ({
     const user_id = localStorage.getItem("user-id");
     const res = await axios
       .get(
-        `http://127.0.0.1:8000/follow-commentator/${user_id}?id=${commentator_id}`
+        `${config.apiUrl}/follow-commentator/${user_id}?id=${commentator_id}`
       )
       .then((res) => {
         // console.log(res);
@@ -54,7 +56,7 @@ const ContentSection = ({
   const handleCommentReaction = async (id, reaction) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
+      `${config.apiUrl}/comment-reaction/${id}/${user_id}`,
       {
         reaction_type: `${reaction}`,
       }
@@ -90,8 +92,8 @@ const ContentSection = ({
               />
               <div className="col">
                 <img
-                  src={`${
-                    server_url + data?.value.commentator_user?.profile_pic
+                  src={`${ data?.value.commentator_user?.profile_pic ?
+                    config.apiUrl + data?.value.commentator_user?.profile_pic : initialProfile
                   }`}
                   className="rounded-circle"
                   width={75}

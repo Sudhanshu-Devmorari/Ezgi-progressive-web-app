@@ -18,6 +18,9 @@ import PasswordReset from "../PasswordReset/PasswordReset";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
 import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import config from "../../config";
 
 const SignUpModal = (props) => {
   // THEME
@@ -52,7 +55,14 @@ const SignUpModal = (props) => {
   const passwordReg = /^(?=.*\d)(?=.*[a-z])[\w~@#$%^&*+=`|{}:;!.?"()[\]-]{8,}$/;
   const phonReg = /^\d{10}$/;
 
-  const [signUpData, setSignUpData] = useState({});
+  const [signUpData, setSignUpData] = useState({name: '',
+    username: '',
+    phone: '',
+    password: '',
+    country: '',
+    city: '',
+    gender: '',
+    age: '',});
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
 
@@ -102,23 +112,41 @@ const SignUpModal = (props) => {
   const handleSignUp = async () => {
     if (selectedCity === "Select") {
       setCityError("Please select your city.");
-    } else if (selectedGender === "Select") {
-      setCityError("");
+    }
+    if (selectedGender === "Select") {
       setGenderError("Please select your gender.");
-    } else if (selectedAge === "Select") {
-      setGenderError("");
+    }
+    if (selectedAge === "Select") {
       setAgeError("Please select your age.");
-    } else if (!selectCheckBox) {
-      setAgeError("");
+    }
+    if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
+      setCityError("");
+      setGenderError("");
+      setAgeError("");
+      setCheckboxError("");
+      setSignUpData({
+        name : name,
+        username : username,
+        phone : phone,
+        password : password,
+        country: selectedCountry,
+        city: selectedCity,
+        gender: selectedGender,
+        age: selectedAge,
+      })
       const response = await axios.post(
-        "http://127.0.0.1:8000/signup/",
+        `${config.apiUrl}/signup/`,
         signUpData
       );
       console.log("response: ", response.data);
+      console.log("response: ", response.data.user);
       if (response.data.status === 200) {
-        props.onHide();
+        localStorage.setItem("user-role", response.data.user.user_role);
+        localStorage.setItem("user-id", response.data.user.id);
+        window.location.reload();
+        // props.onHide();
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
       }
@@ -144,6 +172,7 @@ const SignUpModal = (props) => {
 
   const handleCitySelection = (city) => {
     setSelectedCity(city);
+    setCityError("");
   };
 
   const toggleCityDropdown = () => {
@@ -161,6 +190,7 @@ const SignUpModal = (props) => {
 
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
+    setGenderError("");
   };
 
   const toggleGenderDropdown = () => {
@@ -178,6 +208,7 @@ const SignUpModal = (props) => {
 
   const handleAgeSelection = (age) => {
     setSelectedAge(age);
+    setAgeError("");
   };
 
   const toggleAgeDropdown = () => {
@@ -211,6 +242,35 @@ const SignUpModal = (props) => {
 
   const [forgotPsPhone, setForgotPsPhone] = useState("");
 
+  // ===================================== UPDATE CODE ====================================================
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Name is required"),
+    username: Yup.string().required("Username is required"),
+    phone: Yup.string()
+      .required("Phone is required")
+      .matches(/^\d{10}$/, "Phone must be 10 digits"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      username: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      setShowModal(2);
+      setName(values.name);
+      setUsername(values.username);
+      setPassword(values.password);
+      setPhone(values.phone);
+    },
+  });
+
   return (
     <>
       <Modal
@@ -228,7 +288,7 @@ const SignUpModal = (props) => {
         >
           {ShowModal === 1 && (
             <div>
-              <div className="m-2">
+              {/* <div className="m-2">
                 <div className="d-flex justify-content-center">
                   <span>SIGN UP</span>
                   <span>
@@ -381,6 +441,154 @@ const SignUpModal = (props) => {
                     </span>
                   </div>
                 </div>
+              </div> */}
+              <div className="m-2">
+                <div className="d-flex justify-content-center">
+                  <span>SIGN UP</span>
+                  <span>
+                    <RxCross2
+                      onClick={props.onHide}
+                      fontSize={"1.8rem"}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
+                    />
+                  </span>
+                </div>
+                <div className="">
+                  <form onSubmit={formik.handleSubmit}>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="name">Name Surname</label>
+                      <input
+                        // value={name}
+                        // onChange={(e)=>{setName(e.target.value); console.log(e.target.value,"=>>>>>");}}
+                        id="name"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        {...formik.getFieldProps("name")}
+                      />
+                      {formik.touched.name && formik.errors.name ? (
+                        <small className="text-danger">
+                          {formik.errors.name}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="username">Username</label>
+                      <input
+                        value={username}
+                        onChange={(e)=>setUsername(e.target.value)}
+                        id="username"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        {...formik.getFieldProps("username")}
+                      />
+                      {formik.touched.username && formik.errors.username ? (
+                        <small className="text-danger">
+                          {formik.errors.username}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="phone">Phone</label>
+                      <div className="input-group">
+                        <span
+                          className={`input-group-text ${
+                            currentTheme === "dark"
+                              ? "darkMode-input"
+                              : "lightMode-input"
+                          }`}
+                          id="basic-addon1"
+                          style={{ padding: ".375rem 0 .375rem .5rem" }}
+                        >
+                          +90
+                        </span>
+                        <input
+                          value={phone}
+                          onChange={(e)=>setPhone(e.target.value)}
+                          id="phone"
+                          type="text"
+                          className={`${
+                            currentTheme === "dark"
+                              ? "darkMode-input"
+                              : "lightMode-input"
+                          } form-control`}
+                          aria-label="Username"
+                          aria-describedby="basic-addon1"
+                          {...formik.getFieldProps("phone")}
+                        />
+                      </div>
+                      {formik.touched.phone && formik.errors.phone ? (
+                        <small className="text-danger">
+                          {formik.errors.phone}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="password">Password</label>
+                      <input
+                        value={password}
+                        onChange={(e)=>setPassword(e.target.value)}
+                        id="password"
+                        type="password"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        {...formik.getFieldProps("password")}
+                      />
+                      {formik.touched.password && formik.errors.password ? (
+                        <small className="text-danger">
+                          {formik.errors.password}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column align-items-center my-3">
+                      <button
+                        type="submit"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-btn"
+                            : "lightMode-btn"
+                        } px-3 py-1`}
+                      >
+                        Continue
+                      </button>
+                      <div className="text-center my-3">
+                        --------------------- or ---------------------
+                      </div>
+                      <div className="d-flex">
+                        <GoogleLogin />
+                        <FacebookLogin />
+                      </div>
+                      <div className="mt-3">
+                        Already have an account?{" "}
+                        <span
+                          style={{
+                            color:
+                              currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                          }}
+                          onClick={() => {
+                            setShowModal(4);
+                          }}
+                        >
+                          Sign In
+                        </span>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           )}
@@ -416,12 +624,6 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={() => {
                         props.onHide();
-                        setpasswordError("");
-                        setPhoneError("");
-                        setGenderError("");
-                        setCityError("");
-                        setAgeError("");
-                        setCheckboxError("");
                       }}
                       fontSize={"1.8rem"}
                       className={`${

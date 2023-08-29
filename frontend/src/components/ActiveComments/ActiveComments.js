@@ -21,6 +21,7 @@ import { userId } from "../GetUser";
 import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
 import config from "../../config";
+import initialProfile from '../../assets/profile.png'
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -50,7 +51,7 @@ const ActiveComments = (props) => {
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
           const res = await axios.post(
-            `http://127.0.0.1:8000/profile/${userId}`,
+            `${config.apiUrl}/profile/${userId}`,
             formData
           );
           // console.log("res: ", res);
@@ -123,7 +124,7 @@ const ActiveComments = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : `${config?.apiUrl}${profileData?.profile_pic}`
+                    : profileData?.profile_pic ? `${config?.apiUrl}${profileData?.profile_pic}` : initialProfile
                 }
                 width={100}
                 height={100}

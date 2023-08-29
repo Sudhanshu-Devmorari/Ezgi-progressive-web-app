@@ -695,7 +695,6 @@ const CreateSubUser = (props) => {
                 )}
                 {props?.editProfileModal === 1 && (
                   <button
-                    data-bs-dismiss="modal"
                     onClick={handleCreateNewSubUser}
                     className="py-1 px-2"
                     style={{

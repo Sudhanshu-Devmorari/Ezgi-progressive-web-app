@@ -17,7 +17,6 @@ import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 import axios from "axios";
 import config from "../../config";
 
-
 const MainPage = () => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
@@ -26,8 +25,9 @@ const MainPage = () => {
     const res = await axios
       .get(`${config?.apiUrl}/home/`)
       .then((res) => {
+        console.log(res, "=====>>>>res.data");
         setData(res?.data);
-        setUsers(res?.data?.users_list)
+        setUsers(res?.data?.users_list);
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -79,52 +79,6 @@ const MainPage = () => {
     },
   ];
 
-  // const users = [
-  //   {
-  //     sr: "#0001",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_female,
-  //     age: "25 - 34",
-  //     country: "Ankara",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Journeyman",
-  //     profile: profile,
-  //   },
-  //   {
-  //     sr: "#0002",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_male,
-  //     age: "18 - 24",
-  //     country: "İstanbul",
-  //     date: "15-06-.2023 - 16:37",
-  //     profile: user1,
-  //   },
-  //   {
-  //     sr: "#0003",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_female,
-  //     age: "35 - 44",
-  //     country: "İzmir",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Expert",
-  //     profile: profile,
-  //   },
-  //   {
-  //     sr: "#0004",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_male,
-  //     age: "25 - 34",
-  //     country: "Bursa",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Apprentice",
-  //     profile: profile,
-  //   },
-  // ];
-
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -138,7 +92,7 @@ const MainPage = () => {
               <div className="col-8">
                 <div className="row g-0">
                   <div className="col-4">
-                    <NewUsers array={newUsersArray}/>
+                    <NewUsers array={newUsersArray} />
                     {/* <NewUsers total_user={data?.new_user} /> */}
                   </div>
                   <div className="col-4">
@@ -155,7 +109,7 @@ const MainPage = () => {
             </div>
             <div className="row g-0">
               <div className="col-8">
-                <Home users={users} />
+                <Home users={users} adminHomeApiData={adminHomeApiData}/>
               </div>
               <div className="col-4">
                 <DailySalesArray />

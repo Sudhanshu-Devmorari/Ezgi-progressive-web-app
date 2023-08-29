@@ -26,6 +26,7 @@ import CommentsManagementFilter from "../CommentsManagementFilter/CommentsManage
 import moment from "moment";
 import axios from "axios";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 const CommentsManagement = (props) => {
   const [fData, setFdata] = useState({});
@@ -408,7 +409,7 @@ const CommentsManagement = (props) => {
               <div className="position-relative">
                 <img
                   className="rounded-circle profile-icon"
-                  src={`${server_url + res.commentator_user?.profile_pic}`}
+                  src={`${res.commentator_user?.profile_pic ? server_url + res.commentator_user?.profile_pic : initialProfile}`}
 
                   alt=""
                   height={45}

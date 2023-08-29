@@ -7,6 +7,8 @@ import "./ProfileSU.css";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import initialProfile from '../../assets/profile.png'
+import config from "../../config";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -17,7 +19,8 @@ const ProfileSU = (props) => {
   const [progileData, setProgileData] = useState();
   useEffect(() => {
     async function getProfileData() {
-      const res = await axios.get(`http://127.0.0.1:8000/profile/${userId}`);
+      const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+      console.log(res.data,"===============?>>");
       setProgileData(res.data);
     }
     getProfileData();
@@ -36,7 +39,7 @@ const ProfileSU = (props) => {
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
           const res = await axios.post(
-            `http://127.0.0.1:8000/profile/${userId}`,
+            `${config.apiUrl}/profile/${userId}`,
             formData
           );
           // console.log("res: ", res);
@@ -102,7 +105,7 @@ const ProfileSU = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : `http://127.0.0.1:8000${progileData?.profile_pic}`
+                    : progileData?.profile_pic ? `${config.apiUrl}${progileData?.profile_pic}` : initialProfile
                 }
                 width={100}
                 height={100}

@@ -23,6 +23,7 @@ import moment from "moment";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 
 const EditorManagemenet = (props) => {
@@ -725,7 +726,7 @@ const EditorManagemenet = (props) => {
                   <div className="position-relative">
                     <img
                       className="rounded-circle profile-icon"
-                      src={`${server_url + res?.editor_data?.profile_pic}`}
+                      src={`${res?.editor_data?.profile_pic ? server_url + res?.editor_data?.profile_pic : initialProfile}`}
                       alt=""
                       height={42}
                       width={42}

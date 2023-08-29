@@ -10,6 +10,8 @@ import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import startDarkIcon from "../../assets/star.svg";
 import axios from "axios";
+import initialProfile from "../../assets/profile.png";
+import config from "../../config";
 
 const SharedProfile = ({ data, setSelectContent }) => {
   const [highlightdata, setHighlightData] = useState([]);
@@ -24,7 +26,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
   const favEditor = async (id) => {
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/fav-editor/',
+        `${config.apiUrl}/fav-editor/`,
         {
           id:id
         }
@@ -84,7 +86,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
             </div>
             <img
             style={{objectFit:"cover"}}
-              src={`${server_url + data?.value.user.profile_pic}`}
+              src={`${data?.value.user.profile_pic ? server_url + data?.value.user.profile_pic : initialProfile}`}
               className="rounded-circle"
               width={75}
               height={75}

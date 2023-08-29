@@ -8,6 +8,7 @@ import bell from "../../assets/Header Notification.svg";
 import bellLight from "../../assets/Header Notification (1).svg";
 import darkmode from "../../assets/brightness-up.png";
 import moon from "../../assets/Header Dark Mode.svg";
+import { userId } from "../GetUser";
 
 const NavBar = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -70,15 +71,22 @@ const NavBar = (props) => {
                 height={35}
                 width={35}
                 onClick={() => {
-                  props.setDashboardSUser(true);
-                  props.setSelectContent("notifications");
+                  if (!userId) {
+                    setSignUpModalShow(true);
+                  } else {
+                    props.setDashboardSUser(true);
+                    props.setSelectContent("notifications");
+                  }
                 }}
               />
             </span>
             {userPhone ? (
               <>
                 <span
-                  onClick={() => {props.setDashboardSUser(true); props.setSelectContent("show-all-comments")}}
+                  onClick={() => {
+                    props.setDashboardSUser(true);
+                    props.setSelectContent("show-all-comments");
+                  }}
                   className="py-2 px-3"
                   style={{
                     backgroundColor:
@@ -126,13 +134,6 @@ const NavBar = (props) => {
         show={signUpModalShow}
         onHide={() => setSignUpModalShow(false)}
         ShowModal={ShowModal}
-        // setShowModal={(mode) => {
-        //   debugger;
-        //   setShowModal((preState) => {
-        //     debugger;
-        //     return mode;
-        //   });
-        // }}
       />
       <AddCommentModal
         show={addCommentShow}
