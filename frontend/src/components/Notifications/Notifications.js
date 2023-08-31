@@ -35,7 +35,7 @@ const Notifications = () => {
   // Notification API
   // useEffect(() => {
   //   async function getNotifications(){
-  //     const res = await axios.get(`http://127.0.0.1:8000/notification/${userId}`)
+  //     const res = await axios.get(`${config.apiUrl}/notification/${userId}`)
   //     console.log(res,"==>>>>>>>>>");
   //   }
   //   getNotifications()

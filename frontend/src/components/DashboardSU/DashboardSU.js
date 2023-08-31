@@ -15,6 +15,7 @@ import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
 import axios from "axios";
 import { userId } from "../GetUser";
+import config from "../../config";
 
 const DashboardSU = (props) => {
   const [content, setContent] = useState("subscribers");
@@ -36,7 +37,7 @@ const DashboardSU = (props) => {
     async function getFavData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/fav-editor-comment/${userId}`
+          `${config.apiUrl}/fav-editor-comment/${userId}`
         );
         // console.log("=>>>", res.data);
         setFavEditorData(res.data.favEditors);

@@ -4,12 +4,13 @@ import Modal from "react-bootstrap/Modal";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
+import config from "../../config";
 
 const EditorFilter = (props) => {
   const handleShowButtonClick = async () => {
     try {
       const response = await axios.post(
-        'http://127.0.0.1:8000/filter-editors/',
+        `${config.apiUrl}/filter-editors/`,
         {
           category: [selectedCountry],
           lavel: selectedLevel,

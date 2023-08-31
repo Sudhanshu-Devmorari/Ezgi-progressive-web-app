@@ -18,6 +18,7 @@ import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
 import axios from "axios";
 import { userId } from "../GetUser";
+import config from "../../config";
 
 const CommentatorsCommentsPage = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
@@ -42,7 +43,7 @@ const CommentatorsCommentsPage = (props) => {
     async function getFavData() {
       try {
         const res = await axios.get(
-          `http://127.0.0.1:8000/fav-editor-comment/${userId}`
+          `${config.apiUrl}/fav-editor-comment/${userId}`
         );
         // console.log("=>>>", res.data);
         setFavEditorData(res.data.favEditors);
@@ -60,7 +61,7 @@ const CommentatorsCommentsPage = (props) => {
   const [profileData, setProfileData] = useState();
   useEffect(() => {
     async function getProfileData() {
-      const res = await axios.get(`http://127.0.0.1:8000/profile/${userId}`);
+      const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
       // console.log(res.data,"========>>>");
       setProfileData(res.data);
     }

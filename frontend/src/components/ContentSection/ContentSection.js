@@ -41,7 +41,7 @@ const ContentSection = ({
 
   // const userPhone = localStorage.getItem("userPhone");
 
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config.apiUrl}`;
 
   const [followLabel, setFollowLabel] = useState("Follow");
 

@@ -279,7 +279,6 @@ const AddCommentModal = (props) => {
         setPredictionTypeError("")
         setPredictionError("")
         const res = await axios.post(
-          // `http://127.0.0.1:8000/post-comment/${userId}`,
           `${config?.apiUrl}/post-comment/${userId}`,
           {
             category: selectedCategory,

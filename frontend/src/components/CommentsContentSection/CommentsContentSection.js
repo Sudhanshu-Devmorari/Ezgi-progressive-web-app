@@ -25,15 +25,16 @@ import world_check_light from "../../assets/world-check.png";
 import clapLight from "../../assets/Path 4537.png";
 import axios from "axios";
 import starDarkLogin from "../../assets/star-1.png";
+import config from "../../config";
 
 const CommentsContentSection = (props) => {
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config.apiUrl}`;
 
   const activeResolved = async (user_id) => {
     const res = await axios
-      .get(`http://127.0.0.1:8000/active-resolved-comment/${user_id}`)
+      .get(`${config.apiUrl}/active-resolved-comment/${user_id}`)
       .then((res) => {
         // console.log("activeResolved: ", res);
         setActive(res.data?.active_comments);
@@ -46,7 +47,7 @@ const CommentsContentSection = (props) => {
   const handleCommentReaction = async (id, reaction) => {
     const user_id = localStorage.getItem("user-id");
     const res = await axios.post(
-      `http://127.0.0.1:8000/comment-reaction/${id}/${user_id}`,
+      `${config.apiUrl}/comment-reaction/${id}/${user_id}`,
       {
         reaction_type: `${reaction}`,
       }

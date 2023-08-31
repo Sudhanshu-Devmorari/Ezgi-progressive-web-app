@@ -535,7 +535,8 @@ const Home = (props) => {
                   className="d-flex align-items-center block-width col justify-content-center"
                   style={{ minWidth: "7.5rem" }}
                 >
-                  {(res.commentator_level && res.commentator_level !== "undefined") ? (
+                  {res.commentator_level &&
+                  res.commentator_level !== "undefined" ? (
                     <button
                       className="btn-user"
                       style={{
@@ -1047,6 +1048,7 @@ const Home = (props) => {
                       data-bs-dismiss="modal"
                       onClick={() => {
                         handleAddUser();
+
                         // props.onHide();
                       }}
                       className="px-3 py-1"
@@ -1075,6 +1077,12 @@ const Home = (props) => {
                   });
                   setprofile(false);
                   setPreveiwProfilePic(null);
+                  setAgeDropDown(false);
+                  setGenderDropDown(false);
+                  setMonthDropDown(false)
+                  setNumberDropDown(false)
+                  setLevelDropDown(false)
+                 
                 }}
                 data-bs-dismiss="modal"
                 src={cross}
@@ -1160,6 +1168,9 @@ const Home = (props) => {
                 ))}
               </div>
               <img
+                // onClick={()=>{
+                //   setNumberDropDown(false)
+                // }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
@@ -1285,6 +1296,12 @@ const Home = (props) => {
               </div>
             </div>
             <img
+              onClick={() => {
+                setUserTypeFilterDropDown(false);
+                setCityFilterDropDown(false)
+                setGenderFilterDropDown(false)
+                setAgeFilterDropDown(false)
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

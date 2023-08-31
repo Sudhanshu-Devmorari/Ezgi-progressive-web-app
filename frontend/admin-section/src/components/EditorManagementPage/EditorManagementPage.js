@@ -22,7 +22,7 @@ const EditorManagementPage = () => {
   function editorManagementApiData () {
     // console.log(data)
     axios
-      // .get(`http://127.0.0.1:8000/editor-management/`)
+      // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
         console.log("%%%%%%%%%", res.data)

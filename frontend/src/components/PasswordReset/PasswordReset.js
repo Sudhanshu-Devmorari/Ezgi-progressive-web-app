@@ -4,6 +4,7 @@ import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const PasswordReset = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -15,7 +16,7 @@ const PasswordReset = (props) => {
   // PASSWORD RESET API
   const handlePasswordReset = async () => {
     if (password !== "") {
-      const res = await axios.post("http://127.0.0.1:8000/password-reset/", {
+      const res = await axios.post(`${config.apiUrl}/password-reset/`, {
         new_ps: password,
         phone: props.forgotPsPhone,
       });

@@ -3,6 +3,7 @@ import OTPInput from "react-otp-input";
 import "./OtpModal.css";
 import axios from "axios";
 import Swal from "sweetalert2";
+import config from "../../config";
 
 const OtpModal = (props) => {
   const [otp, setOtp] = useState("");
@@ -36,7 +37,7 @@ const OtpModal = (props) => {
   const [errorMessage, setErrorMessage] = useState("");
   function handleOtpVerify() {
     axios
-      .post(`http://127.0.0.1:8000/otp-verify/`, { otp: otp })
+      .post(`${config.apiUrl}/otp-verify/`, { otp: otp })
       .then((res) => {
         console.log(res);
         if (res.data.status === 200) {

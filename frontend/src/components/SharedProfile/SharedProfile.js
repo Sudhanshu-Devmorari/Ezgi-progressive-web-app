@@ -16,7 +16,7 @@ import config from "../../config";
 const SharedProfile = ({ data, setSelectContent }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const server_url = "http://127.0.0.1:8000";
+  const server_url = `${config.apiUrl}`;
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },

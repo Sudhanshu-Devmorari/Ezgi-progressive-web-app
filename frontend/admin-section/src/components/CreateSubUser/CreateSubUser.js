@@ -710,7 +710,11 @@ const CreateSubUser = (props) => {
               </div>
             </div>
             <img
-              onClick={() => resetFields()}
+              onClick={() => {
+                resetFields()
+                setDepartmentDropDown(false)
+                }
+              }
               data-bs-dismiss="modal"
               src={cross}
               alt=""

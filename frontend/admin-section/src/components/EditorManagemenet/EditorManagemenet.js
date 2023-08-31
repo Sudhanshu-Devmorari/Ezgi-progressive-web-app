@@ -1467,6 +1467,11 @@ const EditorManagemenet = (props) => {
               )}
               <img
                 onClick={() => {
+                  setCountryDropDown(false)
+                  setCityDropDown(false)
+                  setCategoryDropdown(false)
+                  setGenderDropDown(false)
+                  setAgeDropDown(false)
                   props.setupdateProfile(1);
                   setAddUser({
                     name: "",
@@ -1615,6 +1620,16 @@ const EditorManagemenet = (props) => {
               </div>
             </div>
             <img
+            onClick={() => {
+              
+              setLevelFilterDropDown(false)
+              setSuccessRateFilterDropDown(false)
+              setScorePointFilterDropDown(false)
+              setCityFilterDropDown(false)
+              setAgeFilterDropDown(false);
+              setGenderFilterDropDown(false);
+             
+            }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""
