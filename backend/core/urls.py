@@ -11,7 +11,8 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
-                        HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData)
+                        HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
+                        UserStatistics, MonthlySubScriptionChart, BecomeEditorView, BecomeEditorEarnDetailsview)
 
 
 urlpatterns = [
@@ -45,6 +46,8 @@ urlpatterns = [
     path('subuser-tickets/<int:id>/', SubUserSupportTicket.as_view(), name='SubUser-Support-Ticket'),
     path('subuser-redirect-ticket/<int:id>/<int:ticket_id>/', RedirectAnswerView.as_view(), name='Redirect-Answer'),
     path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
+    path('user-statistics/<int:id>/', UserStatistics.as_view(), name='user-statistics'), 
+    path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
 
 
     # Admin Panel's api
@@ -75,7 +78,13 @@ urlpatterns = [
     path('subscription-setting/', SubscriptionSettingView.as_view(), name='Subscription-Setting'),
     path('highlight-setting/', HighlightSettingView.as_view(), name='Highlight-Setting'),
     path('comment-setting/', CommentSetting.as_view(), name='Comment-Setting'),
-    path('verify-user/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
     path('verify-user/<int:id>/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
     path('show-ticket-data/<int:ticket_id>/', SubUserShowTicketData.as_view(), name='Show-Ticket-Data'),
+    # path('become-editor/', BecomeEditorView.as_view(), name='become-editor'),
+    path('become-editor/<int:id>/', BecomeEditorView.as_view(), name='Become-Editor'),
+    path('become-editor-earn-details/<int:subscriber>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
+
+    # path('become-editor-earn-details/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
+    # path('become-editor-earn-details/<int:id>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
+    # path('become-editor-earn-details/<int:id>/<int:subscriber>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
 ]

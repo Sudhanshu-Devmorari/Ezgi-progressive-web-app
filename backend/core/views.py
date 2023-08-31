@@ -12,6 +12,10 @@ from django.db.models import Case, When, IntegerField
 from core.models import COMMENTATOR_ROLE_CHOISE
 import math, random
 import pyotp
+import requests
+from datetime import datetime
+import json
+from django.db import IntegrityError
 
 # From rest_framework 
 from rest_framework.views import APIView
@@ -24,14 +28,14 @@ from rest_framework.exceptions import NotFound, ParseError, APIException
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
-                          TicketHistory)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
-                             TicketHistorySerializer)
+                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -3212,6 +3216,239 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def Statistics(pk):
+    user = User.objects.get(id=pk)
+    data = Comments.objects.filter(commentator_user=pk)
+    correct_prediction = data.filter(is_prediction=True)
+    if len(correct_prediction) >=60:
+        user.commentator_level = "journeyman"
+        print(user.commentator_level)
+        user.save()
+        print("here")
+    incorrect_prediction = data.filter(is_prediction=False)
+    Success = (len(correct_prediction)/len(data))*100
+    Score = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+    Match_result = data.filter(prediction_type="Match Result")
+    Goal_count = data.filter(prediction_type="Goal Count")
+    Halftime = data.filter(prediction_type="Halftime")
+    print(len(Match_result), len(Goal_count), len(Halftime))
+    Match_result_rate = round((len(Match_result)/len(data))*100,2)
+    Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
+    Halftime_rate = round((len(Halftime)/len(data))*100,2)
+    country_leagues = {}
+    avg_odd = 0
+    for i in data:
+        avg_odd += i.average_odds
+        country = i.country
+        league = i.league
+        if country in country_leagues:
+            country_leagues[country].append(league)
+        else:
+            country_leagues[country] = [league]
+    if 0 < Success < 60:
+        user.commentator_level = "apprentice"
+    if 60 < Success< 65:
+        user.commentator_level = "journeyman"
+    if 65 < Success < 70:
+        user.commentator_level = "master"
+    if 70 < Success < 100:
+        user.commentator_level = "grandmaster"
+    avg_odd = avg_odd/len(data)
+    user.save()
+    return Success, Score, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd
+    
+
+class UserStatistics(APIView):
+    def get(self, request, id=id):
+        user = User.objects.get(id=id)
+        Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd= Statistics(id)
+        recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
+        recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
+        recent_success = (len(recent_correct)/30)*100
+        print(len(recent_comments))
+        user_cmt = Comments.objects.filter(commentator_user= id)
+        resolve_comment = user_cmt.filter(is_resolve=True)
+        Active_comment = user_cmt.filter(is_resolve=False)
+        return Response(data={'success': 'successfully sent.', 
+                            'user': user.name, 
+                            'Success_Rate': f'{Success_Rate}%', 
+                            'Score_Points': Score_Points, 
+                            'recent_success_rate': recent_success, 
+                            'Countries_Leagues': Countries_Leagues,
+                            'Match_result_rate': Match_result_rate, 
+                            'Goal_count_rate': Goal_count_rate, 
+                            'Halftime_rate': Halftime_rate,
+                            'avg_odd': round(avg_odd, 2),
+                            'resolve_comment': resolve_comment.values(),
+                            'Active_comment': Active_comment.values(),
+                            }, status=status.HTTP_200_OK)
+
+
+class MonthlySubScriptionChart(APIView):
+    def get(self,request, id):
+        user = User.objects.get(id=id)
+        commentator_user = FollowCommentator.objects.filter(commentator_user=user.id)
+        months_dict = {
+                '1': [],
+                '2': [],
+                '3': [],
+                '4': [],
+                '5': [],
+                '6': [],
+                '7': [],
+                '8': [],
+                '9': [],
+                '10': [],
+                '11': [],
+                '12': [],
+            }
+        for i in commentator_user:
+            months_dict[str(i.created.month)].append(i.standard_user.name)
+        return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
+
+
+"""class BecomeEditorView(APIView):
+    
+    # def get(self, request):
+    #     data = BecomeEditor.objects.all() 
+    #     serializer = BecomeEditorSerializer(data, many=True)
+    #     return Response(serializer.data)
+
+    def get(self, request, id=None):
+        if id is not None:
+            try:
+                data = BecomeEditor.objects.get(id=id)
+                serializer = BecomeEditorSerializer(data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except BecomeEditor.DoesNotExist:
+                return Response({"msg": "DoesNotExist"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            data = BecomeEditor.objects.all() 
+            serializer = BecomeEditorSerializer(data, many=True)
+            return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BecomeEditorSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, id):
+        try:
+            data_update = BecomeEditor.objects.get(id=id)
+            serializer = BecomeEditorSerializer(instance=data_update, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+            print(data_update)
+            return Response(status=status.HTTP_200_OK)
+        except BecomeEditor.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)
+        
+    def delete(self, request, id):
+        try:
+            data_delete = BecomeEditor.objects.get(id=id)
+            data_delete.delete()
+            return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
+        except BecomeEditor.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)"""
+        
+
+"""class BecomeEditorEarnDetailsview(APIView):
+
+    def get(self, request, id=None, subscriber=None):
+        if id is not None and subscriber is not None:
+            data = BecomeEditorEarnDetails.objects.get(id=id)
+            total_earning = (float(data.earn_amount) * int(subscriber))/int(data.threshold_subscriber)
+            return Response({"total_earning": round(total_earning, 2)})
+        if id is not None:
+            try:
+                data = BecomeEditorEarnDetails.objects.get(id=id)
+                serializer = BecomeEditorEarnDetailsSerializer(data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except BecomeEditorEarnDetails.DoesNotExist:
+                return Response({"msg": "DoesNotExist"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            data = BecomeEditorEarnDetails.objects.all()
+            serializer = BecomeEditorEarnDetailsSerializer(data, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    def post(self, request):
+        try:
+            serializer = BecomeEditorEarnDetailsSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except IntegrityError as e:
+            return Response({"error": "subscription_type already exists"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, id):
+        try:
+            data_update = BecomeEditorEarnDetails.objects.get(id=id)
+            serializer = BecomeEditorEarnDetailsSerializer(instance=data_update, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            print(data_update)
+            return Response(status=status.HTTP_200_OK)
+        except BecomeEditorEarnDetails.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)
+        
+    def delete(self, request, id):
+        try:
+            data_delete = BecomeEditorEarnDetails.objects.get(id=id)
+            data_delete.delete()
+            return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
+        except BecomeEditorEarnDetails.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)"""
+
+
+
+class BecomeEditorEarnDetailsview(APIView):
+    def get(self, request, subscriber, format=None, *args, **kwargs):
+        try:
+            type = request.query_params.get('type')
+            value = SubscriptionSetting.objects.get(commentator_level=type)
+            try:
+                data = BecomeEditorEarnDetails.objects.get(subscription_type=type)
+                total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
+                return Response({"total_earning": round(total_earning, 2)})
+            except ObjectDoesNotExist:
+                data = BecomeEditorEarnDetails.objects.create(subscription_type=type, threshold_subscriber=1, earn_amount=value.month_1)
+                total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
+                return Response({"total_earning": round(total_earning, 2)})
+        except SubscriptionSetting.DoesNotExist:
+            return Response({"error": "SubscriptionSetting not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BecomeEditorView(APIView):
+    def patch(self, request, id, format=None, *args, **kwargs):
+        """
+        Payment gateway code here.
+        After sucessfully payment below code execute.
+        """
+        user = User.objects.get(id=id)
+        if user.user_role == "standard":
+            if user.profile_pic == "":
+                if 'profile_pic' not in request.data:
+                    return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.user_role = "commentator"
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                try:
+                    serializer.save()
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error':"You are not Standard user."},status=status.HTTP_404_NOT_FOUND)
 # class OtpVerify(APIView):
 #     def post(self, request, format=None, *args, **kwargs):
 #         try:

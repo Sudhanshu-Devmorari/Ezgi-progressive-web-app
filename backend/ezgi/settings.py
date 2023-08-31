@@ -139,7 +139,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
 
 CRONJOBS = [
-    ('0 0 * * *', 'core.cron.subscriptionstatus')
+    ('0 0 * * *', 'core.cron.subscriptionstatus'),
+    ('*/10 * * * *', 'core.cron.Userst')
 ]
 
 CORS_ALLOWED_ORIGINS = [

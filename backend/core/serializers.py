@@ -3,10 +3,11 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
                           SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
-                          TicketHistory)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -161,3 +162,77 @@ class TicketHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketHistory
         fields = '__all__'
+
+
+class BecomeEditorSerializer(serializers.Serializer):
+    question = serializers.CharField(required=True)
+    answer = serializers.CharField(required=True)
+
+    class Meta:
+        model = BecomeEditor
+        fields = '__all__'
+        REQUIRED_FIELDS = '__all__'
+
+    def create(self, validated_data):
+        return BecomeEditor.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.question = validated_data.get('question', instance.question)
+        instance.answer = validated_data.get('answer', instance.answer)
+        instance.save()
+        return instance
+    
+
+class BecomeEditorEarnDetailsSerializer(serializers.Serializer):
+    SUBSCRIPTION_ROLE_CHOICES = (
+        ('journeyman','Journeyman'),
+        ('master','Master'),
+        ('grandmaster','Grandmaster'),
+    )
+    subscription_type = serializers.ChoiceField(choices=SUBSCRIPTION_ROLE_CHOICES, allow_blank=False)
+    threshold_subscriber = serializers.IntegerField(required=True)
+    earn_amount = serializers.FloatField(required=True)
+
+
+    class Meta:
+        model = BecomeEditorEarnDetails
+        fields = '__all__'
+        REQUIRED_FIELDS = '__all__'
+
+    def create(self, validated_data):
+        return BecomeEditorEarnDetails.objects.create(**validated_data)
+    
+    def update(self, instance, validated_data):
+        instance.subscription_type = validated_data.get('subscription_type', instance.subscription_type)
+        instance.threshold_subscriber = validated_data.get('threshold_subscriber', instance.threshold_subscriber)
+        instance.earn_amount = validated_data.get('earn_amount', instance.earn_amount)
+        instance.save()
+        return instance
+    
+
+class UpdateUserRoleSerializer(serializers.Serializer):
+    EXPERIENCE = (
+        ('1-2 years', '1-2 years'),
+        ('3-4 years', '3-4 years'),
+        ('5+ years', '5+ years'),
+        ('10+ years', '10+ years'),
+    )
+    CATEGORY = (
+        ('football', 'football'),
+        ('basketball', 'basketball'),
+        ('both', 'both')
+    )
+    profile_pic = serializers.ImageField()
+    category = serializers.ListField(child=serializers.ChoiceField(choices=CATEGORY))
+    experience = serializers.ChoiceField(choices= EXPERIENCE)
+    class Meta:
+        model = User
+        fields = ['category', 'experience', 'profile_pic']
+        REQUIRED_FIELDS = ['category', 'experience', 'profile_pic']
+
+    def update(self, instance, validated_data):
+        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
+        instance.category = validated_data.get('category', instance.category)
+        instance.experience = validated_data.get('experience', instance.experience)
+        instance.save()
+        return instance
