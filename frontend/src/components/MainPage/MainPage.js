@@ -292,6 +292,7 @@ const MainPage = () => {
           <NavBar
             setDashboardSUser={setDashboardSUser}
             setSelectContent={setSelectContent}
+            selectContent={selectContent}
           />
 
           {dashboardSUser ? (

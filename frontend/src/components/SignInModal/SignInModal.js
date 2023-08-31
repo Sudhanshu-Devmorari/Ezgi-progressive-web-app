@@ -81,15 +81,16 @@ const SignInModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      // console.log(values);
       const res = await axios.post(`${config.apiUrl}/login/`, {
         password: values.password,
         phone: values.phone,
       });
-      console.log("response login: ", res.data);
+      console.log("response login: ", res);
       if (res.data.status === 200) {
         localStorage.setItem("user-role", res.data.userRole);
         localStorage.setItem("user-id", res.data.userId);
+        localStorage.setItem("username", res.data.username);
         window.location.reload();
       } else if (res.data.status === 400) {
         // setpasswordError(res.data.data);

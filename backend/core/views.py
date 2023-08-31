@@ -127,7 +127,7 @@ class LoginView(APIView):
                 user_phone = User.objects.get(phone=phone)
                 
             if user_phone.password == password:
-                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'status' : status.HTTP_200_OK})
+                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
         except User.DoesNotExist:
@@ -3433,6 +3433,7 @@ class BecomeEditorView(APIView):
         After sucessfully payment below code execute.
         """
         user = User.objects.get(id=id)
+        print(request.data)
         if user.user_role == "standard":
             if user.profile_pic == "":
                 if 'profile_pic' not in request.data:

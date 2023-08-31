@@ -145,6 +145,7 @@ const SignUpModal = (props) => {
       if (response.data.status === 200) {
         localStorage.setItem("user-role", response.data.user.user_role);
         localStorage.setItem("user-id", response.data.user.id);
+        localStorage.setItem("username", response.data.user.username);
         window.location.reload();
         // props.onHide();
       } else if (response.data.status === 400) {

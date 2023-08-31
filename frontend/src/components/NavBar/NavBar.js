@@ -37,7 +37,7 @@ const NavBar = (props) => {
       <nav
         className={`navbar navbar-expand-lg ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
-        }`}
+        } ${props?.selectContent === "become-editor" && "mx-2"}`}
       >
         <div className="container-fluid justify-content-end">
           <div className="">

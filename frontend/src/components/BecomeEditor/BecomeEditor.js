@@ -57,9 +57,7 @@ const BecomeEditor = () => {
           Editör Profilini Oluştur
         </button>
       </div>
-      <div className="">
-        <FAQEditor />
-      </div>
+      <FAQEditor />
       <BecomeAEditorModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
