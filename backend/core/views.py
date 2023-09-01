@@ -24,6 +24,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ParseError, APIException
 
+from collections import Counter
+
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
@@ -3305,6 +3307,63 @@ class MonthlySubScriptionChart(APIView):
         for i in commentator_user:
             months_dict[str(i.created.month)].append(i.standard_user.name)
         return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
+
+
+class SportsStatisticsView(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        datalist = []
+
+        try:
+            details = {}
+            Comments_Journey_basketball = []
+            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball').order_by('-created')[:30]
+            for obj in recent_30_comments:
+                Comments_Journey_basketball.append(obj.is_prediction)
+            details['Comments_Journey_basketball'] = Comments_Journey_basketball
+
+            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketball').order_by('-created')[:30]
+
+            basketball_calculation = (len(correct_prediction_basketball)/30)*100
+            details['basketball_calculation'] = basketball_calculation
+
+            basketball_Leagues = []
+            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
+            for obj in Countries_Leagues_basketball:
+                basketball_Leagues.append(obj.league)
+
+            basketball_counter = Counter(basketball_Leagues)
+            basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
+            details['basketball_Leagues'] = basketball_most_common_duplicates
+            datalist.append(details)
+        except Comments.DoesNotExist:
+            datalist.append({})  # Append an empty dictionary
+
+        try:
+            Fb_details = {}
+            Comments_Journey_football = []
+            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Football').order_by('-created')[:30]
+            for obj in fb_recent_30_comments:
+                Comments_Journey_football.append(obj.is_prediction)
+            Fb_details['Comments_Journey_football'] = Comments_Journey_football
+
+            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Football').order_by('-created')[:30]
+
+            football_calculation = (len(correct_prediction_football)/30)*100
+            Fb_details['football_calculation'] = football_calculation
+
+            football_Leagues = []
+            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
+            for obj in Countries_Leagues_football:
+                football_Leagues.append(obj.league)
+
+            football_counter = Counter(football_Leagues)
+            football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
+            Fb_details['football_Leagues'] = football_most_common_duplicates
+            datalist.append(Fb_details)
+        except Comments.DoesNotExist:
+            datalist.append({})  # Append an empty dictionary
+
+        return Response(data=datalist, status=status.HTTP_200_OK)
 
 
 """class BecomeEditorView(APIView):

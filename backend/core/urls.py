@@ -2,7 +2,7 @@ from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
-                         TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData,
+                         TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView)
@@ -48,6 +48,7 @@ urlpatterns = [
     path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
     path('user-statistics/<int:id>/', UserStatistics.as_view(), name='user-statistics'), 
     path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
+    path('sports-statistics/<int:id>/', SportsStatisticsView.as_view(), name='Sports-State'), 
 
 
     # Admin Panel's api
