@@ -1,9 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Accordion from "react-bootstrap/Accordion";
 import "./FAQEditor.css";
 import CurrentTheme from "../../context/CurrentTheme";
 import { Range, getTrackBackground } from "react-range";
 import { useState } from "react";
+import axios from "axios";
+import config from "../../config";
+import Swal from "sweetalert2";
 
 const FAQEditor = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -154,7 +157,7 @@ const FAQEditor = () => {
 
   const STEP = 1;
   const MIN = 0;
-  const MAX = (selectSub === "KALFA" && 100) || (selectSub === "USTA" && 1000) || (selectSub === "ÜSTAD" && 10000) || 100;
+  const MAX = 1000;
 
   const [openAccordionIndex, setOpenAccordionIndex] = useState(null);
 
@@ -165,6 +168,46 @@ const FAQEditor = () => {
       setOpenAccordionIndex(index);
     }
   };
+
+  // Editor earning API
+  const [earnings, setEarnings] = useState(0);
+  function getEarnings() {
+    const type =
+      (selectSub === "KALFA" && "journeyman") ||
+      (selectSub === "USTA" && "expert") ||
+      (selectSub === "büyük usta" && "grandmaster");
+    if (type) {
+      axios
+        .get(
+          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${type}`
+        )
+        .then((res) => {
+          // console.log(res);
+          if (res.status === 200) {
+            setEarnings(res.data.total_earning);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.status === 404 || error.response.status === 500) {
+            Swal.fire({
+              title: "Error",
+              text: error.response.data.error,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        });
+    }
+  }
+
+  useEffect(() => {
+    getEarnings();
+  }, [selectSub]);
 
   return (
     <>
@@ -182,13 +225,13 @@ const FAQEditor = () => {
               <button
                 onClick={() => handleAccordionClick(index)}
                 style={{ fontSize: "15px" }}
-                className={`accordion-button collapsed ${
+                className={`accordion-button  ${
                   currentTheme === "dark" ? "staticClass" : ""
                 } font-poppins ${
                   currentTheme === "dark"
                     ? "accordian-dark-mode"
                     : "accordian-light-mode"
-                }`}
+                } ${openAccordionIndex === index ? "collapsed" : ""}`}
                 type="button"
                 data-bs-toggle="collapse"
                 data-bs-target={`#flush-collapse-${index}`}
@@ -200,7 +243,6 @@ const FAQEditor = () => {
             </h2>
             <div
               id={`flush-collapse-${index}`}
-              // className="accordion-collapse collapse"
               className={`accordion-collapse collapse ${
                 openAccordionIndex === index ? "show" : ""
               }`}
@@ -278,29 +320,33 @@ const FAQEditor = () => {
                       </span>
                       <span
                         className="cursor text-center"
-                        onClick={() => setSelectSub("ÜSTAD")}
+                        onClick={() => setSelectSub("büyük usta")}
+                        // onClick={() => setSelectSub("ÜSTAD")}
                         style={{
                           backgroundColor:
-                            currentTheme === "dark" && selectSub === "ÜSTAD"
+                            currentTheme === "dark" &&
+                            selectSub === "büyük usta"
                               ? "#FF9100"
-                              : currentTheme !== "dark" && selectSub === "ÜSTAD"
+                              : currentTheme !== "dark" &&
+                                selectSub === "büyük usta"
                               ? "#007BF6"
                               : currentTheme === "dark"
                               ? "#0D2A53"
                               : "#E6E6E6",
                           color:
-                            (selectSub === "ÜSTAD" &&
+                            (selectSub === "büyük usta" &&
                               currentTheme === "dark" &&
                               "#0B2447") ||
-                            (selectSub === "ÜSTAD" &&
+                            (selectSub === "büyük usta" &&
                               currentTheme !== "dark" &&
                               "#F6F6F6"),
                           borderRadius: "3px",
                           padding: "0.2rem 0",
-                          width: "3.5rem",
+                          // width: "3.5rem",
+                          width: "5.3rem",
                         }}
                       >
-                        ÜSTAD
+                        büyük usta
                       </span>
                     </div>
                     <div
@@ -316,7 +362,11 @@ const FAQEditor = () => {
                         step={STEP}
                         min={MIN}
                         max={MAX}
-                        onChange={(newValues) => setValues(newValues)}
+                        // onChange={(newValues) => getEarnings()}
+                        onChange={(newValues) => {
+                          setValues(newValues);
+                          getEarnings();
+                        }}
                         renderTrack={({ props, children }) => {
                           return (
                             <div
@@ -380,7 +430,7 @@ const FAQEditor = () => {
                         </div>
                         <div className="col d-flex flex-column text-center">
                           <span>Tahmini Kazanç</span>
-                          <span className="fw-bold">36.258 ₺</span>
+                          <span className="fw-bold">{earnings} ₺</span>
                         </div>
                       </div>
                     </div>
@@ -390,91 +440,6 @@ const FAQEditor = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      <div class="accordion accordion-flush" id="accordionFlushExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingOne">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseOne"
-              aria-expanded="false"
-              aria-controls="flush-collapseOne"
-            >
-              Accordion Item #1
-            </button>
-          </h2>
-          <div
-            id="flush-collapseOne"
-            class="accordion-collapse collapse"
-            aria-labelledby="flush-headingOne"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <div class="accordion-body">
-              Placeholder content for this accordion, which is intended to
-              demonstrate the <code>.accordion-flush</code> class. This is the
-              first item's accordion body.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingTwo">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseTwo"
-              aria-expanded="false"
-              aria-controls="flush-collapseTwo"
-            >
-              Accordion Item #2
-            </button>
-          </h2>
-          <div
-            id="flush-collapseTwo"
-            class="accordion-collapse collapse"
-            aria-labelledby="flush-headingTwo"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <div class="accordion-body">
-              Placeholder content for this accordion, which is intended to
-              demonstrate the <code>.accordion-flush</code> class. This is the
-              second item's accordion body. Let's imagine this being filled with
-              some actual content.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingThree">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseThree"
-              aria-expanded="false"
-              aria-controls="flush-collapseThree"
-            >
-              Accordion Item #3
-            </button>
-          </h2>
-          <div
-            id="flush-collapseThree"
-            class="accordion-collapse collapse"
-            aria-labelledby="flush-headingThree"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <div class="accordion-body">
-              Placeholder content for this accordion, which is intended to
-              demonstrate the <code>.accordion-flush</code> class. This is the
-              third item's accordion body. Nothing more exciting happening here
-              in terms of content, but just filling up the space to make it
-              look, at least at first glance, a bit more representative of how
-              this would look in a real-world application.
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );
