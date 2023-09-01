@@ -190,7 +190,7 @@ const CommentsContentSection = (props) => {
                             <span></span>
                           </div>
                           <div className="d-flex justify-content-center">
-                            <span className="mt-2 pt-1">Antalyaspor</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[0]}</span>
                             <div
                               className="px-2"
                               style={{
@@ -217,7 +217,7 @@ const CommentsContentSection = (props) => {
                                 })}
                               />
                             </div>
-                            <span className="mt-2 pt-1">Başakşehir</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[1]}</span>
                           </div>
                           <div className="text-end mt-3 mb-2">
                             <span
@@ -428,7 +428,7 @@ const CommentsContentSection = (props) => {
                             <span></span>
                           </div>
                           <div className="d-flex justify-content-center">
-                            <span className="mt-2 pt-1">Antalyaspor</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[0]}</span>
                             <div
                               className="px-2"
                               style={{
@@ -455,7 +455,7 @@ const CommentsContentSection = (props) => {
                                 })}
                               />
                             </div>
-                            <span className="mt-2 pt-1">Başakşehir</span>
+                            <span className="mt-2 pt-1">{val?.match_detail.split(' - ')[1]}</span>
                           </div>
                           <div className="text-end mt-3 mb-2 align-items-center">
                             <span
@@ -707,7 +707,7 @@ const CommentsContentSection = (props) => {
                     <span></span>
                   </div>
                   <div className="d-flex justify-content-center align-items-center">
-                    <span>Antalyaspor</span>
+                    <span>{res?.match_detail.split(' - ')[0]}</span>
                     <div
                       className="px-2"
                       style={{
@@ -745,7 +745,7 @@ const CommentsContentSection = (props) => {
                         })}
                       />
                     </div>
-                    <span>Başakşehir</span>
+                    <span>{res?.match_detail.split(' - ')[1]}</span>
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
                     <span

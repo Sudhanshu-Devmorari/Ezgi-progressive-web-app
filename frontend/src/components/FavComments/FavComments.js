@@ -180,7 +180,7 @@ const FavComments = (props) => {
                   </span>
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">Antalyaspor</span>
+                  <span className="mt-2 pt-1">{res?.match_detail.split(' - ')[0]}</span>
                   <div
                     className="px-2"
                     style={{
@@ -203,7 +203,7 @@ const FavComments = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">Başakşehir</span>
+                  <span className="mt-2 pt-1">{res?.match_detail.split(' - ')[1]}</span>
                 </div>
                 <div className="text-end mt-3 mb-2">
                   <span
