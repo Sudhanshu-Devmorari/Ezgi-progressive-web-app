@@ -3220,16 +3220,23 @@ class OtpSend(APIView):
 
 def Statistics(pk):
     user = User.objects.get(id=pk)
+    
     data = Comments.objects.filter(commentator_user=pk)
     correct_prediction = data.filter(is_prediction=True)
+    incorrect_prediction = data.filter(is_prediction=False)
+
+    Success_rate = (len(correct_prediction)/len(data))*100
+
+    Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+    win_count = correct_prediction.count()
+    lose_count = incorrect_prediction.count()
+
     if len(correct_prediction) >=60:
         user.commentator_level = "journeyman"
         print(user.commentator_level)
         user.save()
         print("here")
-    incorrect_prediction = data.filter(is_prediction=False)
-    Success = (len(correct_prediction)/len(data))*100
-    Score = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
     Match_result = data.filter(prediction_type="Match Result")
     Goal_count = data.filter(prediction_type="Goal Count")
     Halftime = data.filter(prediction_type="Halftime")
@@ -3247,23 +3254,23 @@ def Statistics(pk):
             country_leagues[country].append(league)
         else:
             country_leagues[country] = [league]
-    if 0 < Success < 60:
+    if 0 < Success_rate < 60:
         user.commentator_level = "apprentice"
-    if 60 < Success< 65:
+    if 60 < Success_rate< 65:
         user.commentator_level = "journeyman"
-    if 65 < Success < 70:
+    if 65 < Success_rate < 70:
         user.commentator_level = "master"
-    if 70 < Success < 100:
+    if 70 < Success_rate < 100:
         user.commentator_level = "grandmaster"
     avg_odd = avg_odd/len(data)
     user.save()
-    return Success, Score, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd
+    return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
     
 
 class UserStatistics(APIView):
     def get(self, request, id=id):
         user = User.objects.get(id=id)
-        Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd= Statistics(id)
+        Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd, win_count, lose_count= Statistics(id)
         recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
         recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
         recent_success = (len(recent_correct)/30)*100
@@ -3329,11 +3336,21 @@ class SportsStatisticsView(APIView):
             basketball_Leagues = []
             Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
             for obj in Countries_Leagues_basketball:
-                basketball_Leagues.append(obj.league)
+                data = {
+                    "country":obj.country,
+                    "league":obj.league,
+                }
+                basketball_Leagues.append(data)
+                # basketball_Leagues.append(obj.league)
+            frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
+            counter = Counter(frozen_dicts)
+            most_common_duplicates = counter.most_common(8)
+            result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
 
-            basketball_counter = Counter(basketball_Leagues)
-            basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
-            details['basketball_Leagues'] = basketball_most_common_duplicates
+
+            # basketball_counter = Counter(basketball_Leagues)
+            # basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
+            details['basketball_Leagues'] = result
             datalist.append(details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary
@@ -3354,11 +3371,19 @@ class SportsStatisticsView(APIView):
             football_Leagues = []
             Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
             for obj in Countries_Leagues_football:
-                football_Leagues.append(obj.league)
-
-            football_counter = Counter(football_Leagues)
-            football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
-            Fb_details['football_Leagues'] = football_most_common_duplicates
+                # football_Leagues.append(obj.league)
+                data = {
+                    "country":obj.country,
+                    "league":obj.league,
+                }
+                football_Leagues.append(data)
+            fb_frozen_dicts = [frozenset(d.items()) for d in football_Leagues]
+            fb_counter = Counter(fb_frozen_dicts)
+            fb_most_common_duplicates = fb_counter.most_common(8)
+            fb_result = [dict(frozenset_pair) for frozenset_pair, count in fb_most_common_duplicates]
+            # football_counter = Counter(football_Leagues)
+            # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
+            Fb_details['football_Leagues'] = fb_result
             datalist.append(Fb_details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary

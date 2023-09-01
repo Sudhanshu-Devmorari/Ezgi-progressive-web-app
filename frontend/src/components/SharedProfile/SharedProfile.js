@@ -86,7 +86,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
             </div>
             <img
             style={{objectFit:"cover"}}
-              src={`${data?.value.user.profile_pic ? server_url + data?.value.user.profile_pic : initialProfile}`}
+              src={`${data?.value?.user?.profile_pic ? server_url + data?.value?.user?.profile_pic : initialProfile}`}
               className="rounded-circle"
               width={75}
               height={75}
@@ -104,8 +104,8 @@ const SharedProfile = ({ data, setSelectContent }) => {
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value.user.commentator_level.charAt(0).toUpperCase() +
-                    data?.value.user.commentator_level.substring(1)}
+                  {data?.value?.user?.commentator_level?.charAt(0).toUpperCase() +
+                    data?.value?.user?.commentator_level?.substring(1)}
                 </button>
               </div>
               <div
