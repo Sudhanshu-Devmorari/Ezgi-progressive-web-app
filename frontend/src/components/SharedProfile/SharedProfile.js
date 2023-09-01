@@ -104,8 +104,8 @@ const SharedProfile = ({ data, setSelectContent }) => {
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value?.user?.commentator_level?.charAt(0).toUpperCase() +
-                    data?.value?.user?.commentator_level?.substring(1)}
+                  {data?.value.user.commentator_level?.charAt(0)?.toUpperCase() +
+                    data?.value.user.commentator_level?.substring(1)}
                 </button>
               </div>
               <div

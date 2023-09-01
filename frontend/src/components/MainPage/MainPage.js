@@ -46,11 +46,10 @@ const MainPage = () => {
 
 
   function homeApiData (user_id)  {
-    console.log("======>>>> test");
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
         setHighlights(res.data.highlights);

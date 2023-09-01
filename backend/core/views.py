@@ -41,6 +41,8 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
 import pyotp
 from django.contrib.auth import authenticate
 
+from translate import Translator
+
 class SignupView(APIView):
     def post(self, request, format=None):
         # print('request.data: ', request.data)
@@ -3402,8 +3404,11 @@ class SportsStatisticsView(APIView):
             Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
             for obj in Countries_Leagues_football:
                 # football_Leagues.append(obj.league)
+                translator= Translator(from_lang="turkish",to_lang="english")
+                translation_coutry = translator.translate(obj.country)
+                print (translation_coutry)
                 data = {
-                    "country":obj.country,
+                    "country":translation_coutry,
                     "league":obj.league,
                 }
                 football_Leagues.append(data)
@@ -3553,6 +3558,7 @@ class BecomeEditorView(APIView):
                 if 'profile_pic' not in request.data:
                     return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
             user.user_role = "commentator"
+            user.commentator_level = "apprentice"
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 try:

@@ -21,6 +21,7 @@ import FacebookLogin from "../FacebookLogin";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignUpModal = (props) => {
   // THEME
@@ -28,6 +29,7 @@ const SignUpModal = (props) => {
     useContext(CurrentTheme);
 
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [selectCheckBox, setSelectCheckBox] = useState(false);
 
@@ -55,14 +57,16 @@ const SignUpModal = (props) => {
   const passwordReg = /^(?=.*\d)(?=.*[a-z])[\w~@#$%^&*+=`|{}:;!.?"()[\]-]{8,}$/;
   const phonReg = /^\d{10}$/;
 
-  const [signUpData, setSignUpData] = useState({name: '',
-    username: '',
-    phone: '',
-    password: '',
-    country: '',
-    city: '',
-    gender: '',
-    age: '',});
+  const [signUpData, setSignUpData] = useState({
+    name: "",
+    username: "",
+    phone: "",
+    password: "",
+    country: "",
+    city: "",
+    gender: "",
+    age: "",
+  });
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
 
@@ -127,19 +131,16 @@ const SignUpModal = (props) => {
       setAgeError("");
       setCheckboxError("");
       setSignUpData({
-        name : name,
-        username : username,
-        phone : phone,
-        password : password,
+        name: name,
+        username: username,
+        phone: phone,
+        password: password,
         country: selectedCountry,
         city: selectedCity,
         gender: selectedGender,
         age: selectedAge,
-      })
-      const response = await axios.post(
-        `${config.apiUrl}/signup/`,
-        signUpData
-      );
+      });
+      const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
       console.log("response: ", response.data);
       console.log("response: ", response.data.user);
       if (response.data.status === 200) {
@@ -289,160 +290,6 @@ const SignUpModal = (props) => {
         >
           {ShowModal === 1 && (
             <div>
-              {/* <div className="m-2">
-                <div className="d-flex justify-content-center">
-                  <span>SIGN UP</span>
-                  <span>
-                    <RxCross2
-                      onClick={() => {
-                        setpasswordError("");
-                        setPhoneError("");
-                        setNamerror("");
-                        setUsernamerror("");
-                        props.onHide();
-                      }}
-                      fontSize={"1.8rem"}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "closeBtn-dark"
-                          : "closeBtn-light"
-                      }`}
-                    />
-                  </span>
-                </div>
-                <div className="">
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="name">Name Surname</label>
-                    <input
-                      required
-                      onChange={(e) => setName(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name="name"
-                      id="name"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {nameError}
-                    </small>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="username">Username</label>
-                    <input
-                      required
-                      onChange={(e) => setUsername(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name="username"
-                      id="username"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {usernameError}
-                    </small>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="phone">Phone</label>
-                    <div className="input-group">
-                      <span
-                        className={`input-group-text ${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        }`}
-                        id="basic-addon1"
-                        style={{ padding: ".375rem 0 .375rem .5rem" }}
-                      >
-                        +90
-                      </span>
-                      <input
-                        onChange={(e) => {
-                          setPhone(e.target.value);
-                        }}
-                        id="phone"
-                        type="text"
-                        className={`${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        } form-control`}
-                        aria-label="Username"
-                        aria-describedby="basic-addon1"
-                      />
-                    </div>
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {phonelError}
-                    </small>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="password">Password</label>
-                    <input
-                      onChange={(e) => setPassword(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="password"
-                      name=""
-                      id="password"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {passwordlError}
-                    </small>
-                  </div>
-                </div>
-                <div className="d-flex flex-column align-items-center my-3">
-                  <button
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
-                    onClick={() => {
-                      hadleValidation();
-                    }}
-                  >
-                    Continue
-                  </button>
-                  <div className="text-center my-3">
-                    --------------------- or ---------------------{" "}
-                  </div>
-                  <div className="d-flex">
-                    <GoogleLogin />
-                    <FacebookLogin />
-                  </div>
-                  <div className="mt-3">
-                    Already Account?{" "}
-                    <span
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}
-                      onClick={() => {
-                        setShowModal(4);
-                      }}
-                    >
-                      Sign In
-                    </span>
-                  </div>
-                </div>
-              </div> */}
               <div className="m-2">
                 <div className="d-flex justify-content-center">
                   <span>SIGN UP</span>
@@ -484,7 +331,7 @@ const SignUpModal = (props) => {
                       <label htmlFor="username">Username</label>
                       <input
                         value={username}
-                        onChange={(e)=>setUsername(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value)}
                         id="username"
                         type="text"
                         className={`${
@@ -516,7 +363,7 @@ const SignUpModal = (props) => {
                         </span>
                         <input
                           value={phone}
-                          onChange={(e)=>setPhone(e.target.value)}
+                          onChange={(e) => setPhone(e.target.value)}
                           id="phone"
                           type="text"
                           className={`${
@@ -535,13 +382,13 @@ const SignUpModal = (props) => {
                         </small>
                       ) : null}
                     </div>
-                    <div className="d-flex flex-column m-2">
+                    <div className="d-flex flex-column m-2 position-relative">
                       <label htmlFor="password">Password</label>
                       <input
                         value={password}
-                        onChange={(e)=>setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         id="password"
-                        type="password"
+                        type={`${showPassword ? "text" : "password"}`}
                         className={`${
                           currentTheme === "dark"
                             ? "darkMode-input"
@@ -549,11 +396,32 @@ const SignUpModal = (props) => {
                         } form-control`}
                         {...formik.getFieldProps("password")}
                       />
-                      {formik.touched.password && formik.errors.password ? (
-                        <small className="text-danger">
-                          {formik.errors.password}
-                        </small>
-                      ) : null}
+                        {formik.touched.password && formik.errors.password ? (
+                          <small className="text-danger">
+                            {formik.errors.password}
+                          </small>
+                        ) : null}
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: ".5rem",
+                            top: "1.7rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: ".5rem",
+                            top: "1.7rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
                     </div>
                     <div className="d-flex flex-column align-items-center my-3">
                       <button

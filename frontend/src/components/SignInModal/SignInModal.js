@@ -9,12 +9,14 @@ import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [passwordError, setpasswordError] = useState("");
   const [phoneError, setPhoneError] = useState("");
@@ -167,7 +169,7 @@ const SignInModal = (props) => {
                   </small>
                 ) : null}
               </div>
-              <div className="d-flex flex-column m-2 mb-0">
+              <div className="d-flex flex-column m-2 mb-0 position-relative">
                 <div className="d-flex justify-content-between">
                   <label htmlFor="password">Password</label>
                   <span
@@ -179,19 +181,40 @@ const SignInModal = (props) => {
                   </span>
                 </div>
                 <input
-                  // onChange={(e) => {
-                  //   setPassword(e.target.value);
-                  // }}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
                   className={`${
                     currentTheme === "dark"
                       ? "darkMode-input"
                       : "lightMode-input"
                   } form-control`}
-                  type="password"
+                  type={`${showPassword ? "text" : "password"}`}
                   name=""
                   id="password"
                   {...formik.getFieldProps("password")}
                 />
+                {showPassword ? (
+                  <AiOutlineEyeInvisible
+                    fontSize={"1.5rem"}
+                    style={{
+                      position: "absolute",
+                      right: ".5rem",
+                      top: "1.56rem",
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <AiOutlineEye
+                    fontSize={"1.5rem"}
+                    style={{
+                      position: "absolute",
+                      right: ".5rem",
+                      top: "1.56rem",
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                )}
                 {formik.touched.password && formik.errors.password ? (
                   <small className="error text-danger">
                     {formik.errors.password}
