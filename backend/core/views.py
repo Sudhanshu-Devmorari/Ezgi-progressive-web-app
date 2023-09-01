@@ -3299,22 +3299,29 @@ def Statistics(pk):
 #                             }, status=status.HTTP_200_OK)
 class UserStatistics(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
-        user = User.objects.get(id=id)
-        serializer = UserSerializer(user).data
-        Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
-        element_counts = Counter(only_leagues)
-        most_common_element, max_count = element_counts.most_common(1)[0]
-        result_list = [most_common_element]
-        data = {
-            "user":serializer,
-            "Success_rate":Success_rate,
-            "Score_point":Score_point,
-            "win_count":win_count,
-            "lose_count":lose_count,
-            "avg_odd":avg_odd,
-            "leagues":result_list
-        }
-        return Response(data=data, status=status.HTTP_200_OK)
+        try:
+            user = get_object_or_404(User, id=id)
+            serializer = UserSerializer(user).data
+            Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
+            user.success_rate = Success_rate
+            user.save()
+            element_counts = Counter(only_leagues)
+            most_common_element, max_count = element_counts.most_common(1)[0]
+            result_list = [most_common_element]
+            data = {
+                "user": serializer,
+                "Success_rate": Success_rate,
+                "Score_point": Score_point,
+                "win_count": win_count,
+                "lose_count": lose_count,
+                "avg_odd": avg_odd,
+                "leagues": result_list
+            }
+            return Response(data=data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(data={"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # class MonthlySubScriptionChart(APIView):
 #     def get(self,request, id):
