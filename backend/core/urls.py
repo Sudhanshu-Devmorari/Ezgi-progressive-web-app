@@ -12,7 +12,7 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
                         HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
-                        UserStatistics, MonthlySubScriptionChart, BecomeEditorView, BecomeEditorEarnDetailsview)
+                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview)
 
 
 urlpatterns = [
@@ -47,7 +47,7 @@ urlpatterns = [
     path('subuser-redirect-ticket/<int:id>/<int:ticket_id>/', RedirectAnswerView.as_view(), name='Redirect-Answer'),
     path('subuser-answer-ticket/<int:id>/<int:ticket_id>/', ShowTicketData.as_view(), name='Show-Ticket-Data'),
     path('user-statistics/<int:id>/', UserStatistics.as_view(), name='user-statistics'), 
-    path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
+    # path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
     path('sports-statistics/<int:id>/', SportsStatisticsView.as_view(), name='Sports-State'), 
 
 

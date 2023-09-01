@@ -1405,7 +1405,7 @@ class UserManagement(APIView):
                 password=password, gender=gender, age=age,
                 user_role=role, commentator_level=level
             )
-            user_obj.set_password(password)
+            # user_obj.set_password(password)
             user_obj.save()
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -2109,7 +2109,7 @@ class EditorManagement(APIView):
                 user_role=role, commentator_level=commentator_level,
                 country=country, city=city, category=category
             )
-            user_obj.set_password(password)
+            # user_obj.set_password(password)
             user_obj.save()
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -2858,7 +2858,7 @@ class SubUserManagement(APIView):
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
 
                 # print("***************************")
-                sub_user_obj.set_password(password)
+                # sub_user_obj.set_password(password)
                 sub_user_obj.save()
                 # if sub_user_obj != None:
                 #     if DataCount.objects.filter(id=1).exists():
@@ -3237,23 +3237,26 @@ def Statistics(pk):
         print(user.commentator_level)
         user.save()
         print("here")
-    Match_result = data.filter(prediction_type="Match Result")
-    Goal_count = data.filter(prediction_type="Goal Count")
-    Halftime = data.filter(prediction_type="Halftime")
-    print(len(Match_result), len(Goal_count), len(Halftime))
-    Match_result_rate = round((len(Match_result)/len(data))*100,2)
-    Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
-    Halftime_rate = round((len(Halftime)/len(data))*100,2)
+    # Match_result = data.filter(prediction_type="Match Result")
+    # Goal_count = data.filter(prediction_type="Goal Count")
+    # Halftime = data.filter(prediction_type="Halftime")
+    # print(len(Match_result), len(Goal_count), len(Halftime))
+    # Match_result_rate = round((len(Match_result)/len(data))*100,2)
+    # Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
+    # Halftime_rate = round((len(Halftime)/len(data))*100,2)
     country_leagues = {}
+    only_leagues = []
     avg_odd = 0
     for i in data:
         avg_odd += i.average_odds
+        only_leagues.append(i.league)
         country = i.country
         league = i.league
         if country in country_leagues:
             country_leagues[country].append(league)
         else:
             country_leagues[country] = [league]
+
     if 0 < Success_rate < 60:
         user.commentator_level = "apprentice"
     if 60 < Success_rate< 65:
@@ -3262,58 +3265,78 @@ def Statistics(pk):
         user.commentator_level = "master"
     if 70 < Success_rate < 100:
         user.commentator_level = "grandmaster"
+
     avg_odd = avg_odd/len(data)
+
     user.save()
-    return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
-    
+    # return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
+    return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
 
+
+# class UserStatistics(APIView):
+#     def get(self, request, id=id):
+#         user = User.objects.get(id=id)
+#         Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd, win_count, lose_count= Statistics(id)
+#         recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
+#         recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
+#         recent_success = (len(recent_correct)/30)*100
+#         print(len(recent_comments))
+#         user_cmt = Comments.objects.filter(commentator_user= id)
+#         resolve_comment = user_cmt.filter(is_resolve=True)
+#         Active_comment = user_cmt.filter(is_resolve=False)
+#         return Response(data={'success': 'successfully sent.', 
+#                             'user': user.name, 
+#                             'Success_Rate': f'{Success_Rate}%', 
+#                             'Score_Points': Score_Points, 
+#                             'recent_success_rate': recent_success, 
+#                             'Countries_Leagues': Countries_Leagues,
+#                             'Match_result_rate': Match_result_rate, 
+#                             'Goal_count_rate': Goal_count_rate, 
+#                             'Halftime_rate': Halftime_rate,
+#                             'avg_odd': round(avg_odd, 2),
+#                             'resolve_comment': resolve_comment.values(),
+#                             'Active_comment': Active_comment.values(),
+#                             }, status=status.HTTP_200_OK)
 class UserStatistics(APIView):
-    def get(self, request, id=id):
+    def get(self, request, id, format=None, *args, **kwargs):
         user = User.objects.get(id=id)
-        Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd, win_count, lose_count= Statistics(id)
-        recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
-        recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
-        recent_success = (len(recent_correct)/30)*100
-        print(len(recent_comments))
-        user_cmt = Comments.objects.filter(commentator_user= id)
-        resolve_comment = user_cmt.filter(is_resolve=True)
-        Active_comment = user_cmt.filter(is_resolve=False)
-        return Response(data={'success': 'successfully sent.', 
-                            'user': user.name, 
-                            'Success_Rate': f'{Success_Rate}%', 
-                            'Score_Points': Score_Points, 
-                            'recent_success_rate': recent_success, 
-                            'Countries_Leagues': Countries_Leagues,
-                            'Match_result_rate': Match_result_rate, 
-                            'Goal_count_rate': Goal_count_rate, 
-                            'Halftime_rate': Halftime_rate,
-                            'avg_odd': round(avg_odd, 2),
-                            'resolve_comment': resolve_comment.values(),
-                            'Active_comment': Active_comment.values(),
-                            }, status=status.HTTP_200_OK)
+        serializer = UserSerializer(user).data
+        Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
+        element_counts = Counter(only_leagues)
+        most_common_element, max_count = element_counts.most_common(1)[0]
+        result_list = [most_common_element]
+        data = {
+            "user":serializer,
+            "Success_rate":Success_rate,
+            "Score_point":Score_point,
+            "win_count":win_count,
+            "lose_count":lose_count,
+            "avg_odd":avg_odd,
+            "leagues":result_list
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
-
-class MonthlySubScriptionChart(APIView):
-    def get(self,request, id):
-        user = User.objects.get(id=id)
-        commentator_user = FollowCommentator.objects.filter(commentator_user=user.id)
-        months_dict = {
-                '1': [],
-                '2': [],
-                '3': [],
-                '4': [],
-                '5': [],
-                '6': [],
-                '7': [],
-                '8': [],
-                '9': [],
-                '10': [],
-                '11': [],
-                '12': [],
-            }
-        for i in commentator_user:
-            months_dict[str(i.created.month)].append(i.standard_user.name)
-        return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
+# class MonthlySubScriptionChart(APIView):
+#     def get(self,request, id):
+#         user = User.objects.get(id=id)
+#         commentator_user = FollowCommentator.objects.filter(commentator_user=user.id)
+#         months_dict = {
+#                 '1': [],
+#                 '2': [],
+#                 '3': [],
+#                 '4': [],
+#                 '5': [],
+#                 '6': [],
+#                 '7': [],
+#                 '8': [],
+#                 '9': [],
+#                 '10': [],
+#                 '11': [],
+#                 '12': [],
+#             }
+#         for i in commentator_user:
+#             months_dict[str(i.created.month)].append(i.standard_user.name)
+#         return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
 
 
 class SportsStatisticsView(APIView):
