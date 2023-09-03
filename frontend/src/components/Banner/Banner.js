@@ -10,7 +10,7 @@ const Banner = ({ data }) => {
   const server_url = `${config.apiUrl}`;
   return (
     <>
-      <div className={`row g-0 mt-2 mb-1 bannerText`}>
+      <div className={`row g-0 mt-2 mb-1 bannerText `} >
         <div className="col-6">
           <img
             src={bannerimg}

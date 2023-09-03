@@ -11,7 +11,7 @@ export const EditorBanner = (props) => {
 
   return (
     <>
-      <div className={`row g-0 bannerText font-responsive`}>
+      <div className={`row g-0 bannerText font-responsive ${userId ? "mb-0" : "mb-2"}`}>
         <div className={`col-3`}>
           <div
             className={`${

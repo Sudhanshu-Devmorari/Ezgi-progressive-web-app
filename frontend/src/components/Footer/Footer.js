@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import selectedHomeIcon from "../../assets/Main Page Selected.svg";
 import HomeIcon from "../../assets/Main Page.svg";
 import EditorIcon from "../../assets/Editors Page (1).svg";
@@ -10,9 +10,12 @@ import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
 import logout from "../../assets/logout icon (1).svg";
 import { userId } from "../GetUser";
 import SignUpModal from "../SignUpModal/SignUpModal";
+import CurrentTheme from "../../context/CurrentTheme";
 
 export const Footer = (props) => {
   const [showSignup, setShowSignup] = useState(false);
+  const { setShowModal } =
+    useContext(CurrentTheme);
   return (
     <>
       <nav
@@ -73,6 +76,7 @@ export const Footer = (props) => {
                   props.setSelectContent("fav");
                   props.setDashboardSUser(true);
                 }
+                setShowModal(4)
               }}
             />
           </div>

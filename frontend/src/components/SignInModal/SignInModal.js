@@ -91,7 +91,18 @@ const SignInModal = (props) => {
         localStorage.setItem("user-role", res.data.userRole);
         localStorage.setItem("user-id", res.data.userId);
         localStorage.setItem("username", res.data.username);
-        window.location.reload();
+        Swal.fire({
+          title: "Success",
+          text: "You have Logged in Successfully!",
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
       } else if (res.data.status === 400) {
         // setpasswordError(res.data.data);
         Swal.fire({

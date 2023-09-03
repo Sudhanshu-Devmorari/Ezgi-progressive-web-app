@@ -54,7 +54,9 @@ class SignupView(APIView):
                 })
         else:
             if User.objects.filter(phone=request.data['phone'],is_admin=False).exists():
-                return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+                return Response({'data' : 'User with the same phone number already exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            elif User.objects.filter(username=request.data['username'], is_admin=False).exists():
+                return Response({'data': 'User with the same username already exists', 'status': status.HTTP_400_BAD_REQUEST})
             else:
                 data = serializer.save()
                 user_serializer = UserSerializer(data)
