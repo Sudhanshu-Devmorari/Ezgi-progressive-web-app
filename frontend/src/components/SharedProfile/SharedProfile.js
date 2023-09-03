@@ -12,8 +12,10 @@ import startDarkIcon from "../../assets/star.svg";
 import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
-const SharedProfile = ({ data, setSelectContent }) => {
+const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const server_url = `${config.apiUrl}`;
@@ -25,15 +27,12 @@ const SharedProfile = ({ data, setSelectContent }) => {
   ];
   const favEditor = async (id) => {
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/fav-editor/`,
-        {
-          id:id
-        }
-      );
+      const response = await axios.post(`${config.apiUrl}/fav-editor/`, {
+        id: id,
+      });
       // console.log('API Response:', response.data);
     } catch (error) {
-      console.error('Error making POST request:', error);
+      console.error("Error making POST request:", error);
     }
     // console.log(".........", id);
   };
@@ -42,7 +41,6 @@ const SharedProfile = ({ data, setSelectContent }) => {
     <>
       {/* {props.data?.highlights?.map((res, index) => ( */}
       <div
-        
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
@@ -68,8 +66,28 @@ const SharedProfile = ({ data, setSelectContent }) => {
             width={22}
           />
         </div>
-        <div className="row" onClick={() => setSelectContent("show-all-comments")}>
-          <div className="col pe-0 d-flex position-relative">
+        <div className="row">
+          <div
+            className="col pe-0 d-flex position-relative"
+            onClick={() => {
+              if (userId) {
+                setSelectContent("show-all-comments");
+                setActiveCommentsshow(data?.value?.user?.id);
+              } else {
+                Swal.fire({
+                  // title: "Success",
+                  text: "You need to become a member to be able to view it.",
+                  // icon: "success",
+                  backdrop: false,
+                  customClass: `${
+                    currentTheme === "dark"
+                      ? "dark-mode-alert"
+                      : "light-mode-alert"
+                  }`,
+                });
+              }
+            }}
+          >
             <div className="position-absolute">
               <img
                 src={crown}
@@ -85,8 +103,12 @@ const SharedProfile = ({ data, setSelectContent }) => {
               />
             </div>
             <img
-            style={{objectFit:"cover"}}
-              src={`${data?.value.user.profile_pic ? server_url + data?.value.user.profile_pic : initialProfile}`}
+              style={{ objectFit: "cover" }}
+              src={`${
+                data?.value?.user?.profile_pic
+                  ? server_url + data?.value?.user?.profile_pic
+                  : initialProfile
+              }`}
               className="rounded-circle"
               width={75}
               height={75}
@@ -104,8 +126,10 @@ const SharedProfile = ({ data, setSelectContent }) => {
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value.user.commentator_level.charAt(0).toUpperCase() +
-                    data?.value.user.commentator_level.substring(1)}
+                  {data?.value.user.commentator_level
+                    ?.charAt(0)
+                    ?.toUpperCase() +
+                    data?.value.user.commentator_level?.substring(1)}
                 </button>
               </div>
               <div

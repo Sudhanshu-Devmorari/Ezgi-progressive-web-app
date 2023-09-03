@@ -41,6 +41,8 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
 import pyotp
 from django.contrib.auth import authenticate
 
+from translate import Translator
+
 class SignupView(APIView):
     def post(self, request, format=None):
         # print('request.data: ', request.data)
@@ -590,13 +592,13 @@ class SubscriptionView(APIView):
 #         data = serializer.data
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
-        user = User.objects.get(id = 2)
+        user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(user=id, status=False)
-            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
+            notification_obj = Notification.objects.filter(receiver=user, status=False)
+            # notification_obj = Notification.objects.filter(receiver=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -769,6 +771,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
         try:
             editor = []
             editor_obj = FavEditors.objects.filter(standard_user=user)
+            print('editor_obj: ', editor_obj)
             for obj in editor_obj:
                 details = {}
                 # print("********** ", obj.commentator_user.username)
@@ -833,7 +836,7 @@ class SupportView(APIView):
         try:
             user = User.objects.get(id=id)
 
-            support_obj = TicketSupport.objects.filter(user=user)
+            support_obj = TicketSupport.objects.filter(user=user).order_by('-created')
             serializer = TicketSupportSerializer(support_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -1407,7 +1410,7 @@ class UserManagement(APIView):
                 password=password, gender=gender, age=age,
                 user_role=role, commentator_level=level
             )
-            user_obj.set_password(password)
+            # user_obj.set_password(password)
             user_obj.save()
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -2111,7 +2114,7 @@ class EditorManagement(APIView):
                 user_role=role, commentator_level=commentator_level,
                 country=country, city=city, category=category
             )
-            user_obj.set_password(password)
+            # user_obj.set_password(password)
             user_obj.save()
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -2488,7 +2491,7 @@ class SupportManagement(APIView):
             resolved_ticket = TicketSupport.objects.filter(status='resolved').count()
             all_data['resolved_request'] = resolved_ticket
 
-            all_ticket = TicketSupport.objects.all()
+            all_ticket = TicketSupport.objects.all().order_by('-created')
             all_data['total'] = all_ticket.count()
 
             # pending_tickets = TicketSupport.objects.filter(status='pending')
@@ -2496,7 +2499,7 @@ class SupportManagement(APIView):
             serializer = TicketSupportSerializer(all_ticket, many=True)
             all_data['tickets'] = serializer.data
 
-            support_history = TicketHistory.objects.all()
+            support_history = TicketHistory.objects.all().order_by('-created')
             serializer11 = TicketHistorySerializer(support_history, many=True)
             all_data['support_history'] = serializer11.data
 
@@ -2860,7 +2863,7 @@ class SubUserManagement(APIView):
                                                        is_sales_export=sales_export, is_all_permission=all_permission)
 
                 # print("***************************")
-                sub_user_obj.set_password(password)
+                # sub_user_obj.set_password(password)
                 sub_user_obj.save()
                 # if sub_user_obj != None:
                 #     if DataCount.objects.filter(id=1).exists():
@@ -3222,93 +3225,130 @@ class OtpSend(APIView):
 
 def Statistics(pk):
     user = User.objects.get(id=pk)
+    
     data = Comments.objects.filter(commentator_user=pk)
     correct_prediction = data.filter(is_prediction=True)
+    incorrect_prediction = data.filter(is_prediction=False)
+
+    Success_rate = (len(correct_prediction)/len(data))*100
+
+    Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+    win_count = correct_prediction.count()
+    lose_count = incorrect_prediction.count()
+
     if len(correct_prediction) >=60:
         user.commentator_level = "journeyman"
         print(user.commentator_level)
         user.save()
         print("here")
-    incorrect_prediction = data.filter(is_prediction=False)
-    Success = (len(correct_prediction)/len(data))*100
-    Score = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
-    Match_result = data.filter(prediction_type="Match Result")
-    Goal_count = data.filter(prediction_type="Goal Count")
-    Halftime = data.filter(prediction_type="Halftime")
-    print(len(Match_result), len(Goal_count), len(Halftime))
-    Match_result_rate = round((len(Match_result)/len(data))*100,2)
-    Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
-    Halftime_rate = round((len(Halftime)/len(data))*100,2)
+    # Match_result = data.filter(prediction_type="Match Result")
+    # Goal_count = data.filter(prediction_type="Goal Count")
+    # Halftime = data.filter(prediction_type="Halftime")
+    # print(len(Match_result), len(Goal_count), len(Halftime))
+    # Match_result_rate = round((len(Match_result)/len(data))*100,2)
+    # Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
+    # Halftime_rate = round((len(Halftime)/len(data))*100,2)
     country_leagues = {}
+    only_leagues = []
     avg_odd = 0
     for i in data:
         avg_odd += i.average_odds
+        only_leagues.append(i.league)
         country = i.country
         league = i.league
         if country in country_leagues:
             country_leagues[country].append(league)
         else:
             country_leagues[country] = [league]
-    if 0 < Success < 60:
+
+    if 0 < Success_rate < 60:
         user.commentator_level = "apprentice"
-    if 60 < Success< 65:
+    if 60 < Success_rate< 65:
         user.commentator_level = "journeyman"
-    if 65 < Success < 70:
+    if 65 < Success_rate < 70:
         user.commentator_level = "master"
-    if 70 < Success < 100:
+    if 70 < Success_rate < 100:
         user.commentator_level = "grandmaster"
+
     avg_odd = avg_odd/len(data)
+
     user.save()
-    return Success, Score, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd
-    
+    # return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
+    return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
 
+
+# class UserStatistics(APIView):
+#     def get(self, request, id=id):
+#         user = User.objects.get(id=id)
+#         Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd, win_count, lose_count= Statistics(id)
+#         recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
+#         recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
+#         recent_success = (len(recent_correct)/30)*100
+#         print(len(recent_comments))
+#         user_cmt = Comments.objects.filter(commentator_user= id)
+#         resolve_comment = user_cmt.filter(is_resolve=True)
+#         Active_comment = user_cmt.filter(is_resolve=False)
+#         return Response(data={'success': 'successfully sent.', 
+#                             'user': user.name, 
+#                             'Success_Rate': f'{Success_Rate}%', 
+#                             'Score_Points': Score_Points, 
+#                             'recent_success_rate': recent_success, 
+#                             'Countries_Leagues': Countries_Leagues,
+#                             'Match_result_rate': Match_result_rate, 
+#                             'Goal_count_rate': Goal_count_rate, 
+#                             'Halftime_rate': Halftime_rate,
+#                             'avg_odd': round(avg_odd, 2),
+#                             'resolve_comment': resolve_comment.values(),
+#                             'Active_comment': Active_comment.values(),
+#                             }, status=status.HTTP_200_OK)
 class UserStatistics(APIView):
-    def get(self, request, id=id):
-        user = User.objects.get(id=id)
-        Success_Rate, Score_Points,Match_result_rate, Goal_count_rate, Halftime_rate,Countries_Leagues, avg_odd= Statistics(id)
-        recent_comments = (Comments.objects.filter(commentator_user=id).order_by('-created'))[:30]
-        recent_correct = Comments.objects.filter(commentator_user=id, is_prediction=True).order_by('-created')[:30]
-        recent_success = (len(recent_correct)/30)*100
-        print(len(recent_comments))
-        user_cmt = Comments.objects.filter(commentator_user= id)
-        resolve_comment = user_cmt.filter(is_resolve=True)
-        Active_comment = user_cmt.filter(is_resolve=False)
-        return Response(data={'success': 'successfully sent.', 
-                            'user': user.name, 
-                            'Success_Rate': f'{Success_Rate}%', 
-                            'Score_Points': Score_Points, 
-                            'recent_success_rate': recent_success, 
-                            'Countries_Leagues': Countries_Leagues,
-                            'Match_result_rate': Match_result_rate, 
-                            'Goal_count_rate': Goal_count_rate, 
-                            'Halftime_rate': Halftime_rate,
-                            'avg_odd': round(avg_odd, 2),
-                            'resolve_comment': resolve_comment.values(),
-                            'Active_comment': Active_comment.values(),
-                            }, status=status.HTTP_200_OK)
-
-
-class MonthlySubScriptionChart(APIView):
-    def get(self,request, id):
-        user = User.objects.get(id=id)
-        commentator_user = FollowCommentator.objects.filter(commentator_user=user.id)
-        months_dict = {
-                '1': [],
-                '2': [],
-                '3': [],
-                '4': [],
-                '5': [],
-                '6': [],
-                '7': [],
-                '8': [],
-                '9': [],
-                '10': [],
-                '11': [],
-                '12': [],
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+            serializer = UserSerializer(user).data
+            Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
+            user.success_rate = Success_rate
+            user.save()
+            element_counts = Counter(only_leagues)
+            most_common_element, max_count = element_counts.most_common(1)[0]
+            result_list = [most_common_element]
+            data = {
+                "user": serializer,
+                "Success_rate": Success_rate,
+                "Score_point": Score_point,
+                "win_count": win_count,
+                "lose_count": lose_count,
+                "avg_odd": avg_odd,
+                "leagues": result_list
             }
-        for i in commentator_user:
-            months_dict[str(i.created.month)].append(i.standard_user.name)
-        return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
+            return Response(data=data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(data={"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class MonthlySubScriptionChart(APIView):
+#     def get(self,request, id):
+#         user = User.objects.get(id=id)
+#         commentator_user = FollowCommentator.objects.filter(commentator_user=user.id)
+#         months_dict = {
+#                 '1': [],
+#                 '2': [],
+#                 '3': [],
+#                 '4': [],
+#                 '5': [],
+#                 '6': [],
+#                 '7': [],
+#                 '8': [],
+#                 '9': [],
+#                 '10': [],
+#                 '11': [],
+#                 '12': [],
+#             }
+#         for i in commentator_user:
+#             months_dict[str(i.created.month)].append(i.standard_user.name)
+#         return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
 
 
 class SportsStatisticsView(APIView):
@@ -3331,11 +3371,21 @@ class SportsStatisticsView(APIView):
             basketball_Leagues = []
             Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
             for obj in Countries_Leagues_basketball:
-                basketball_Leagues.append(obj.league)
+                data = {
+                    "country":obj.country,
+                    "league":obj.league,
+                }
+                basketball_Leagues.append(data)
+                # basketball_Leagues.append(obj.league)
+            frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
+            counter = Counter(frozen_dicts)
+            most_common_duplicates = counter.most_common(8)
+            result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
 
-            basketball_counter = Counter(basketball_Leagues)
-            basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
-            details['basketball_Leagues'] = basketball_most_common_duplicates
+
+            # basketball_counter = Counter(basketball_Leagues)
+            # basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
+            details['basketball_Leagues'] = result
             datalist.append(details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary
@@ -3356,11 +3406,22 @@ class SportsStatisticsView(APIView):
             football_Leagues = []
             Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
             for obj in Countries_Leagues_football:
-                football_Leagues.append(obj.league)
-
-            football_counter = Counter(football_Leagues)
-            football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
-            Fb_details['football_Leagues'] = football_most_common_duplicates
+                # football_Leagues.append(obj.league)
+                translator= Translator(from_lang="turkish",to_lang="english")
+                translation_coutry = translator.translate(obj.country)
+                print (translation_coutry)
+                data = {
+                    "country":translation_coutry,
+                    "league":obj.league,
+                }
+                football_Leagues.append(data)
+            fb_frozen_dicts = [frozenset(d.items()) for d in football_Leagues]
+            fb_counter = Counter(fb_frozen_dicts)
+            fb_most_common_duplicates = fb_counter.most_common(8)
+            fb_result = [dict(frozenset_pair) for frozenset_pair, count in fb_most_common_duplicates]
+            # football_counter = Counter(football_Leagues)
+            # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
+            Fb_details['football_Leagues'] = fb_result
             datalist.append(Fb_details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary
@@ -3500,6 +3561,7 @@ class BecomeEditorView(APIView):
                 if 'profile_pic' not in request.data:
                     return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
             user.user_role = "commentator"
+            user.commentator_level = "apprentice"
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 try:

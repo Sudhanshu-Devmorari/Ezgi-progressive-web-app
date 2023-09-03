@@ -19,8 +19,6 @@ const TicketReplyModal = (props) => {
     name: "Select",
   });
   const [subUserDropDown, setSubUserDropDown] = useState(false);
-  console.log("subUsersOptions: ", subUsersOptions);
-  console.log("selectedSubUser :", selectedSubUser);
 
   const handleSetSelectedSubUser = (name, value) => {
     setSelectedSubUser({ id: name, name: value });
@@ -49,7 +47,7 @@ const TicketReplyModal = (props) => {
     reply: "",
     note: "",
   });
-  console.log(ticketRepltOrRedirect);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTicketRepltOrRedirect((prevDateSelected) => ({
@@ -109,25 +107,34 @@ const TicketReplyModal = (props) => {
         });
       } else {
         axios
-        .post(`${config?.apiUrl}/redirect-ticket/${38}/${tickeview?.id}`, {
-          note: ticketRepltOrRedirect.redirect,
-          id: tickeview?.id,    // sub user id
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            Swal.fire({
-              title: "Success",
-              text: "Reply sent successfully",
-              icon: "success",
-              backdrop: false,
-              customClass: "dark-mode-alert",
-            });
-        }
-      })
+          .post(`${config?.apiUrl}/redirect-ticket/${38}/${tickeview?.id}`, {
+            note: ticketRepltOrRedirect.redirect,
+            id: tickeview?.id, // sub user id
+          })
+          .then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              Swal.fire({
+                title: "Success",
+                text: "Reply sent successfully",
+                icon: "success",
+                backdrop: false,
+                customClass: "dark-mode-alert",
+              });
+            }
+          });
+      }
     }
+  };
+  function resetModalFields() {
+    setTicketRepltOrRedirect({ reply: "", note: "" });
   }
-  }
+
+  const modalElement = document.getElementById("exampleModal");
+  modalElement?.addEventListener("hidden.bs.modal", () => {
+    resetModalFields();
+  });
+
   return (
     <>
       <div
@@ -288,8 +295,8 @@ const TicketReplyModal = (props) => {
                       <div className="my-2">
                         <span>Note</span>
                         <input
-                        onChange={handleChange}
-                        value={ticketRepltOrRedirect?.note}
+                          onChange={handleChange}
+                          value={ticketRepltOrRedirect?.note}
                           type="text"
                           name="note"
                           id=""

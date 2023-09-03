@@ -88,17 +88,17 @@ const MostLiked = (props) => {
                   className="px-2 level-btn text-capitalize"
                   style={{
                     border:
-                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "expert" && "1px solid #FF9100")  || 
-                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "apprentice" && "1px solid #FFEE7D") || 
-                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "journeyman" && "1px solid #0CC6FF") || 
-                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "grandmaster" && "1px solid #D2DB08") ||
-                      (res.comment_data.commentator_user.commentator_level.toLowerCase() === "master" && "1px solid #FF9100") ,
+                      (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "expert" && "1px solid #FF9100")  || 
+                      (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "apprentice" && "1px solid #FFEE7D") || 
+                      (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "journeyman" && "1px solid #0CC6FF") || 
+                      (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "grandmaster" && "1px solid #D2DB08") ||
+                      (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "master" && "1px solid #FF9100") ,
                     color:
-                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "expert" && " #FF9100")  || 
-                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "apprentice" && " #FFEE7D") || 
-                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "journeyman" && " #0CC6FF") || 
-                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "grandmaster" && " #D2DB08") ||
-                    (res.comment_data.commentator_user.commentator_level.toLowerCase() === "master" && " #FF9100") ,
+                    (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "expert" && " #FF9100")  || 
+                    (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "apprentice" && " #FFEE7D") || 
+                    (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "journeyman" && " #0CC6FF") || 
+                    (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "grandmaster" && " #D2DB08") ||
+                    (res.comment_data.commentator_user.commentator_level?.toLowerCase() === "master" && " #FF9100") ,
                     backgroundColor: "transparent",
                     borderRadius: "18px",
                     fontSize: "0.7rem",

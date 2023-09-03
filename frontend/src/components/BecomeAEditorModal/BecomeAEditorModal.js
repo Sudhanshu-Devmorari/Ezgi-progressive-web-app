@@ -108,8 +108,19 @@ const BecomeAEditorModal = (props) => {
         .then((res) => {
           console.log(res, "===========>>>>res");
           if (res.status === 200) {
-            setShowPaymentModal(true);
+            // setShowPaymentModal(true);
+            localStorage.setItem('user-role', res.data.user_role)
             props.onHide();
+            Swal.fire({
+              title: "Success",
+              text: 'User has successfully become a commentator',
+              icon: "success",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
           }
         })
         .catch((error) => {

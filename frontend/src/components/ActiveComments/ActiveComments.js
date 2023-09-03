@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
@@ -38,7 +38,11 @@ const ActiveComments = (props) => {
   const [editProfile, setEditProfile] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
-  const profileData = props.profileData;
+  const profileData = props?.profileData;
+  // console.log(props?.profileData,"===========>>>props.profileData");
+  const user = props?.profile ? props?.activeCommentsshow : userId;
+  // console.log(props?.activeCommentsshow,"=>>>props?.activeCommentsshow");
+  console.log("->>>user0", user);
 
   async function handleChangeProfilePic(e) {
     try {
@@ -51,7 +55,7 @@ const ActiveComments = (props) => {
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
           const res = await axios.post(
-            `${config.apiUrl}/profile/${userId}`,
+            `${config.apiUrl}/profile/${user}`,
             formData
           );
           // console.log("res: ", res);
@@ -94,6 +98,38 @@ const ActiveComments = (props) => {
       }
     } catch (error) {}
   }
+
+  const [userPoints, setUserPoints] = useState({
+    success_rate : '',
+    score_point : '',
+    winning : '',
+    lose : '',
+    avg_odd : '',
+    league : '',
+  });
+
+
+  useEffect(() => {
+    console.log(user,"MMMMM");
+    try {
+      axios
+        .get(`${config.apiUrl}/user-statistics/${user}`)
+        .then((res) => {
+          // console.log(res.data, "========>>>res");
+          setUserPoints({
+            success_rate: res.data.Success_rate,
+            score_point: res.data.Score_point,
+            winning: res.data.win_count,
+            lose: res.data.lose_count,
+            avg_odd: res.data.avg_odd,
+            league: res.data.leagues[0],
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {}
+  }, []);
 
   return (
     <>
@@ -359,7 +395,7 @@ const ActiveComments = (props) => {
             >
               Success Rate
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#D2DB08" }}>%67.6</span>
+            <span style={{ fontSize: "1.1rem", color: "#D2DB08" }}>%{userPoints.success_rate}</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -371,7 +407,7 @@ const ActiveComments = (props) => {
             >
               Score Points
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#FFA200" }}>1.356</span>
+            <span style={{ fontSize: "1.1rem", color: "#FFA200" }}>{userPoints.score_point}</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -383,7 +419,7 @@ const ActiveComments = (props) => {
             >
               Winning
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#37FF80" }}>256</span>
+            <span style={{ fontSize: "1.1rem", color: "#37FF80" }}>{userPoints.winning}</span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -395,7 +431,7 @@ const ActiveComments = (props) => {
             >
               Lose
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#FF5757" }}>256</span>
+            <span style={{ fontSize: "1.1rem", color: "#FF5757" }}>{userPoints.lose}</span>
           </div>
         </div>
         <div
@@ -405,14 +441,14 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="flex-grow-1">Category</div>
-          {profileData?.category.some((categoryItem) =>
+          {profileData?.category?.some((categoryItem) =>
             categoryItem.includes("Basketball")
           ) && (
             <div className="">
               <img src={basketball} alt="" height={45} width={45} />
             </div>
           )}
-          {profileData?.category.some((categoryItem) =>
+          {profileData?.category?.some((categoryItem) =>
             categoryItem.includes("Football")
           ) && (
             <div className="">
@@ -427,7 +463,7 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="py-1">Average Odds</div>
-          <div className="py-1">1.80</div>
+          <div className="py-1">{userPoints?.avg_odd || 0}</div>
         </div>
         <div
           className="d-flex justify-content-between p-2"
@@ -436,7 +472,7 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="py-1">Leagues</div>
-          <div className="py-1">UK Premier League + 3</div>
+          <div className="py-1">{userPoints.league}</div>
         </div>
         {props.profile !== "commentator" && (
           <div

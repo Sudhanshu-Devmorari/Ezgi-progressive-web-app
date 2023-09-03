@@ -10,6 +10,7 @@ const TicketReplyModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const ticketData = props?.ticketData || [];
+  console.log(ticketData,"=============>>>>ticketData");
 
   const [replyMessage, setReplyMessage] = useState("");
 
@@ -66,7 +67,7 @@ const TicketReplyModal = (props) => {
           <span>
             Support -{" "}
             <span style={{ color: "#D2DB08" }}>
-              {ticketData?.admin_response.user?.name}
+              {ticketData?.admin_response?.user?.name}
             </span>
           </span>
           <span className="">
