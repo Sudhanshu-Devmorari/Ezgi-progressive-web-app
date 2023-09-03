@@ -590,13 +590,13 @@ class SubscriptionView(APIView):
 #         data = serializer.data
 #         return Response(data=data, status=status.HTTP_200_OK)
 class NotificationView(APIView):
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
-        user = User.objects.get(id = 2)
+        user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(user=id, status=False)
-            # notification_obj = Notification.objects.filter(user=id, status=False, created__gte=ten_days_ago)
+            notification_obj = Notification.objects.filter(receiver=user, status=False)
+            # notification_obj = Notification.objects.filter(receiver=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -769,6 +769,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
         try:
             editor = []
             editor_obj = FavEditors.objects.filter(standard_user=user)
+            print('editor_obj: ', editor_obj)
             for obj in editor_obj:
                 details = {}
                 # print("********** ", obj.commentator_user.username)
@@ -833,7 +834,7 @@ class SupportView(APIView):
         try:
             user = User.objects.get(id=id)
 
-            support_obj = TicketSupport.objects.filter(user=user)
+            support_obj = TicketSupport.objects.filter(user=user).order_by('-created')
             serializer = TicketSupportSerializer(support_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -2488,7 +2489,7 @@ class SupportManagement(APIView):
             resolved_ticket = TicketSupport.objects.filter(status='resolved').count()
             all_data['resolved_request'] = resolved_ticket
 
-            all_ticket = TicketSupport.objects.all()
+            all_ticket = TicketSupport.objects.all().order_by('-created')
             all_data['total'] = all_ticket.count()
 
             # pending_tickets = TicketSupport.objects.filter(status='pending')
@@ -2496,7 +2497,7 @@ class SupportManagement(APIView):
             serializer = TicketSupportSerializer(all_ticket, many=True)
             all_data['tickets'] = serializer.data
 
-            support_history = TicketHistory.objects.all()
+            support_history = TicketHistory.objects.all().order_by('-created')
             serializer11 = TicketHistorySerializer(support_history, many=True)
             all_data['support_history'] = serializer11.data
 

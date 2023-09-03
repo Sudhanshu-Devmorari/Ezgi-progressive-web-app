@@ -5,6 +5,7 @@ import moment from "moment";
 import { userId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
+import Swal from "sweetalert2";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -18,7 +19,7 @@ const AnsweredTicketView = (props) => {
       })
       .then((res) => {
         console.log(res);
-        if(res.status === 200){
+        if (res.status === 200) {
           props.setShowModal(1);
         }
       })
@@ -93,7 +94,21 @@ const AnsweredTicketView = (props) => {
         <div className="my-3 d-flex justify-content-center gap-2">
           <button
             onClick={() => {
-              props.setShowModal(4);
+              if (!ticketData?.admin_response) {
+                Swal.fire({
+                  // title: "Success",
+                  text: "You cannot reply to your own ticket as admin has not responded yet.",
+                  // icon: "success",
+                  backdrop: false,
+                  customClass: `${
+                    currentTheme === "dark"
+                      ? "dark-mode-alert"
+                      : "light-mode-alert"
+                  }`,
+                });
+              } else {
+                props.setShowModal(4);
+              }
             }}
             className="px-3"
             style={{

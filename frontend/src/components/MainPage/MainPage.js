@@ -279,6 +279,8 @@ const MainPage = () => {
   // console.log("-----user_id-----", user_id)
   
 
+  const [activeCommentsshow, setActiveCommentsshow] = useState(null);
+
   return (
     <>
       <div className="landing-page">
@@ -350,6 +352,7 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                            setActiveCommentsshow={setActiveCommentsshow}
                             homeApiData={homeApiData}
                               data={val}
                               setData={setData}
@@ -375,6 +378,7 @@ const MainPage = () => {
                               />
                             ) : null}
                             <SharedProfile
+                            setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
@@ -414,6 +418,7 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                            setActiveCommentsshow={setActiveCommentsshow}
                             homeApiData={homeApiData}
                               data={val}
                               setData={setData}
@@ -430,6 +435,7 @@ const MainPage = () => {
                               <HighlightMainPage />
                             ) : null}
                             <SharedProfile
+                            setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
@@ -469,6 +475,7 @@ const MainPage = () => {
                               />
                             ) : null}
                            <ContentSection
+                           setActiveCommentsshow={setActiveCommentsshow}
                             homeApiData={homeApiData}
                               data={val}
                               setData={setData}
@@ -485,6 +492,7 @@ const MainPage = () => {
                               <HighlightMainPage />
                             ) : null}
                             <SharedProfile
+                            setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
@@ -515,6 +523,7 @@ const MainPage = () => {
               )}
               {selectContent === "show-all-comments" && (
                 <EditorProfileActiveComments
+                activeCommentsshow={activeCommentsshow}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
                   setDashboardSUser={setDashboardSUser}

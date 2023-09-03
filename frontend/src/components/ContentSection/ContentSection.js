@@ -23,6 +23,7 @@ import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const ContentSection = ({
   data,
@@ -31,12 +32,13 @@ const ContentSection = ({
   userComments,
   SelectComment,
   homeApiData,
+  setActiveCommentsshow
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const userPhone = localStorage.getItem("user-id");
 
-  console.log(data,"=================>>>data");
+  // console.log(data,"=================>>>data");
   // console.log("FavData", props?.FavData);
 
   // const userPhone = localStorage.getItem("userPhone");
@@ -83,7 +85,22 @@ const ContentSection = ({
           <div className="row m-2">
             <div
               className="position-relative col p-0"
-              onClick={() => setSelectContent("show-all-comments")}
+              onClick={() => {
+                if (userId) {
+                  setSelectContent("show-all-comments");
+                  setActiveCommentsshow(data?.value.commentator_user?.id)
+                } else {
+                  Swal.fire({
+                    // title: "Success",
+                    text: "You need to become a member to be able to view it.",
+                    // icon: "success",
+                    backdrop: false,
+                    customClass: `${
+                      currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+                    }`,
+                  })
+                }
+              }}
             >
               <img
                 src={crown}
@@ -202,7 +219,7 @@ const ContentSection = ({
             ) : (
               <>
                 <div
-                  onClick={() => setSelectContent("show-all-comments")}
+                  // onClick={() => setSelectContent("show-all-comments")}
                   className="p-1 my-2 content-font"
                   style={{
                     backgroundColor:
@@ -258,7 +275,9 @@ const ContentSection = ({
                 </span>
               </div>
               <div className="d-flex justify-content-center">
-                <span className="mt-2 pt-1">{data?.value.match_detail.split(' - ')[0]}</span>
+                <span className="mt-2 pt-1">
+                  {data?.value.match_detail.split(" - ")[0]}
+                </span>
                 <div
                   className="px-2"
                   style={{
@@ -281,7 +300,9 @@ const ContentSection = ({
                     })}
                   />
                 </div>
-                <span className="mt-2 pt-1">{data?.value.match_detail.split(' - ')[1]}</span>
+                <span className="mt-2 pt-1">
+                  {data?.value.match_detail.split(" - ")[1]}
+                </span>
               </div>
               <div className="text-end mt-3 mb-2">
                 <span
@@ -400,7 +421,7 @@ const ContentSection = ({
                     (userPhone ? (
                       <button
                         onClick={() => {
-                          setSelectContent("show-all-comments");
+                          // setSelectContent("show-all-comments");
                         }}
                         className="me-2 px-2 py-1"
                         style={{
@@ -418,7 +439,7 @@ const ContentSection = ({
                       </button>
                     ) : (
                       <button
-                        onClick={() => setSelectContent("show-all-comments")}
+                        // onClick={() => setSelectContent("show-all-comments")}
                         className="me-2 px-2 py-1"
                         style={{
                           border:

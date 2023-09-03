@@ -13,7 +13,7 @@ import config from "../../config";
 import { userId } from "../GetUser";
 import { country_code } from "./_data";
 
-const EditorProfileStatisticsSection = () => {
+const EditorProfileStatisticsSection = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SelectSport, setSelectSport] = useState("football");
   const progressBarFootball = [
@@ -35,11 +35,14 @@ const EditorProfileStatisticsSection = () => {
   const [leagueFootballData, setLeagueFootballData] = useState([]);
   const [leagueBasketballData, setLeagueBasketballData] = useState([]);
 
+  // const user = props?.from === "editor" ? props?.activeCommentsshow : userId
+  const user = userId
+
   useEffect(() => {
     axios
-      .get(`${config.apiUrl}/sports-statistics/${userId}/`)
+      .get(`${config.apiUrl}/sports-statistics/${user}/`)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         if (res.status === 200) {
           setBasketballStats(res.data[0]);
           setFootballStats(res.data[1]);
@@ -58,14 +61,14 @@ const EditorProfileStatisticsSection = () => {
                 flagUrl: flagUrl,
               };
             } else {
-              console.log(`Country code not found for ${item.country}`);
+              // console.log(`Country code not found for ${item.country}`);
               return item; // Return the original item if countryCode is not found
             }
           });
 
           // Now, updatedFootball contains the flagUrl for each item
-          console.log(updatedFootball,"::::::::::::::::::::::");
-          setLeagueFootballData(updatedFootball)
+          // console.log(updatedFootball,"::::::::::::::::::::::");
+          setLeagueFootballData(updatedFootball);
         }
       })
       .catch((error) => {
