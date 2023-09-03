@@ -9,14 +9,17 @@ import bellLight from "../../assets/Header Notification (1).svg";
 import darkmode from "../../assets/brightness-up.png";
 import moon from "../../assets/Header Dark Mode.svg";
 import { userId } from "../GetUser";
+import config from "../../config";
+import initialProfile from "../../assets/profile.png"
 
 const NavBar = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
-  const [signUpModalShow, setSignUpModalShow] = React.useState(false);
-  const [addCommentShow, setAddCommentShow] = React.useState(false);
-
+  const [signUpModalShow, setSignUpModalShow] = useState(false);
+  const [addCommentShow, setAddCommentShow] = useState(false);
+  // console.log(props.profileData,"Profile Datata")
+ 
   const handleTheme = (e) => {
     if (e === "dark") {
       localStorage.setItem("CurrentTheme", "dark");
@@ -77,6 +80,7 @@ const NavBar = (props) => {
                     props.setDashboardSUser(true);
                     props.setSelectContent("notifications");
                   }
+                  setShowModal(4)
                 }}
               />
             </span>
@@ -97,7 +101,8 @@ const NavBar = (props) => {
                 </span>
                 <span className="ps-2">
                   <img
-                    src={profile}
+                    src= {`${config.apiUrl}${props.profileData}`}
+                    // src= {props.profileData ?  `${config.apiUrl}${props.profileData}` : initialProfile}
                     alt=""
                     height={45}
                     width={45}

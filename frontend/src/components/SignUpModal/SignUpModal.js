@@ -21,6 +21,8 @@ import FacebookLogin from "../FacebookLogin";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
+import { cityOptions } from './_data';
+import Swal from "sweetalert2";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignUpModal = (props) => {
@@ -34,7 +36,7 @@ const SignUpModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
 
   const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Turkey");
+  // const [selectedCountry, setSelectedCountry] = useState("Turkey");
   const [cityDropDown, setCityDropDown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Select");
   const [genderDropDown, setGenderDropDown] = useState(false);
@@ -95,7 +97,7 @@ const SignUpModal = (props) => {
       username: username,
       phone: phone,
       password: password,
-      country: selectedCountry,
+      // country: selectedCountry,
       city: selectedCity,
       gender: selectedGender,
       age: selectedAge,
@@ -105,7 +107,7 @@ const SignUpModal = (props) => {
     username,
     phone,
     password,
-    selectedCountry,
+    // selectedCountry,
     selectedCity,
     selectedGender,
     selectedAge,
@@ -131,11 +133,11 @@ const SignUpModal = (props) => {
       setAgeError("");
       setCheckboxError("");
       setSignUpData({
-        name: name,
-        username: username,
-        phone: phone,
-        password: password,
-        country: selectedCountry,
+        name : name,
+        username : username,
+        phone : phone,
+        password : password,
+        // country: selectedCountry,
         city: selectedCity,
         gender: selectedGender,
         age: selectedAge,
@@ -147,30 +149,42 @@ const SignUpModal = (props) => {
         localStorage.setItem("user-role", response.data.user.user_role);
         localStorage.setItem("user-id", response.data.user.id);
         localStorage.setItem("username", response.data.user.username);
-        window.location.reload();
-        // props.onHide();
+
+        Swal.fire({
+          title: "Success",
+          text: "User Created Successfully!",
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+        //props.onHide();
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
       }
     }
   };
 
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
-  };
+  // const handleCountrySelection = (country) => {
+  //   setSelectedCountry(country);
+  // };
 
-  const toggleCountryDropdown = () => {
-    if (cityDropDown) {
-      setCityDropDown(false);
-    }
-    if (genderDropDown) {
-      setGenderDropDown(false);
-    }
-    if (ageDropDown) {
-      setAgeDropDown(false);
-    }
-    setCountryDropDown(!countryDropDown);
-  };
+  // const toggleCountryDropdown = () => {
+  //   if (cityDropDown) {
+  //     setCityDropDown(false);
+  //   }
+  //   if (genderDropDown) {
+  //     setGenderDropDown(false);
+  //   }
+  //   if (ageDropDown) {
+  //     setAgeDropDown(false);
+  //   }
+  //   setCountryDropDown(!countryDropDown);
+  // };
 
   const handleCitySelection = (city) => {
     setSelectedCity(city);
@@ -227,18 +241,7 @@ const SignUpModal = (props) => {
   };
 
   const countryOptions = ["Turkey"];
-  const cityOptions = [
-    "Istanbul",
-    "Ankara",
-    "İzmir",
-    "Bursa",
-    "Antalya",
-    "Konya",
-    "Adana",
-    "Gaziantep",
-    "Şanlıurfa",
-    "Mersin",
-  ];
+  
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
@@ -246,11 +249,19 @@ const SignUpModal = (props) => {
 
   // ===================================== UPDATE CODE ====================================================
   const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
-    username: Yup.string().required("Username is required"),
+    name: Yup.string()
+      .required("Name is required")
+      .min(5, "Name must be at least 5 characters")
+      .max(20, "Name must be at most 20 characters"),
+    username: Yup.string()
+      .required("Username is required")
+      .min(5, "Username must be at least 5 characters")
+      .max(15, "Username must be at most 15 characters"),
     phone: Yup.string()
       .required("Phone is required")
-      .matches(/^\d{10}$/, "Phone must be 10 digits"),
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
@@ -265,6 +276,7 @@ const SignUpModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      console.log("======>>>sub")
       setShowModal(2);
       setName(values.name);
       setUsername(values.username);
@@ -505,14 +517,29 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="position-relative">
                   <div className="my-2">
-                    <CustomDropdown
+                    {/* <CustomDropdown
                       label="Country"
                       options={countryOptions}
                       selectedOption={selectedCountry}
                       onSelectOption={handleCountrySelection}
                       isOpen={countryDropDown}
                       toggleDropdown={toggleCountryDropdown}
-                    />
+                    /> */}
+                    <label htmlFor="name">Country</label>
+                   <input
+                        value="Turkey"
+                        id="country"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control text-center p-1 `}
+                        style={{
+                          fontSize: "14px",
+                        }}
+                        disabled
+                      />
                   </div>
 
                   <div className="my-2">

@@ -61,6 +61,7 @@ const ActiveComments = (props) => {
           // console.log("res: ", res);
           // console.log("res: ", res.status);
           if (res.status === 200) {
+            props.getProfileData();
             Swal.fire({
               title: "Success",
               text: "Profile Updated!",

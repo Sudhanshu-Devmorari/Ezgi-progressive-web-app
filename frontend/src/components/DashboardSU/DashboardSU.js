@@ -54,6 +54,7 @@ const DashboardSU = (props) => {
   return (
     <>
       <ProfileSU
+        getProfileData={props?.getProfileData}
         setSelectContent={props.setSelectContent}
         setDashboardSUser={props.setDashboardSUser}
       />

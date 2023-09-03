@@ -19,6 +19,9 @@ import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
 import config from "../../config";
 import BecomeEditor from "../BecomeEditor/BecomeEditor";
+import { userId } from "../GetUser";
+import initialProfile from "../../assets/profile.png"
+import Spinner from 'react-bootstrap/Spinner';
 
 const MainPage = () => {
   // CHANGE THEME
@@ -43,13 +46,26 @@ const MainPage = () => {
   const publicCount = 3;
   const SubscriptionCount = 3;
   const highlightCount = 5;
+  const [profileData, setProfileData] = useState(initialProfile);
+  const [isLoading, setIsLoading] = useState(false);
 
+  async function getProfileData() {
+    setIsLoading(true);
+    const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    console.log(res.data,"===============?>>");
+    setProfileData(res.data.profile_pic);
+    setIsLoading(false);
+  }
+  useEffect(() => {
+    getProfileData();
+  }, []);
+ 
 
   function homeApiData (user_id)  {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        // console.log(res.data);
+        console.log(res.data,"Commentator Data");
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
         setHighlights(res.data.highlights);
@@ -294,21 +310,34 @@ const MainPage = () => {
             setDashboardSUser={setDashboardSUser}
             setSelectContent={setSelectContent}
             selectContent={selectContent}
+            profileData = {profileData}
           />
 
           {dashboardSUser ? (
+             isLoading ? (
+              <>
+              <div className="d-flex justify-content-center align-items-center" style={{height:"75vh"}}>
+                <Spinner as="span" animation="border" size="md" role="status" aria-hidden="true" /> 
+              </div>
+              </>
+            ) : (
             user !== "standard" ? (
               <CommentatorsCommentsPage
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
+                getProfileData={getProfileData}
               />
             ) : (
+             
               <DashboardSU
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
+                getProfileData={getProfileData}
               />
+              
+            )
             )
           ) : (
             <>
