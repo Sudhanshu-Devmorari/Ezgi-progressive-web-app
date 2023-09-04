@@ -74,7 +74,9 @@ class SignupView(APIView):
                 # data = serializer.save()
                 otp = totp.now()
                 print('otp: ', otp)
-                res = sms_send(phone, otp)  
+                # res = sms_send(phone, otp)  
+                res = 'Success'
+                print('res: ', res)
                 # res = "Success"
                 if res == 'Success':
                     return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -135,7 +137,8 @@ class OtpReSend(APIView):
                 user = User.objects.get(phone=phone,is_admin=True)
             elif 'signup' in request.data:
                 otp = totp.now()
-                res = sms_send(phone, otp)  
+                # res = sms_send(phone, otp)  
+                res = 'Success'  
                 if res == 'Success':
                     return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
                 else:
@@ -759,7 +762,28 @@ class ProfileView(APIView):
         
 
 class FavEditorsCreateView(APIView):
-    def post(self, request, id, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
+        data = []
+        try:
+            user = get_object_or_404(User, id=id)
+            editors = request.query_params.get('commentators')
+
+            # for obj in editors.split(","):
+                # try:
+            commentator = get_object_or_404(User, id=editors)
+            faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
+            details = {
+                "id": obj,
+                "is_fav_editor": faveditor_obj
+            }
+            data.append(details)
+                # except User.DoesNotExist:
+                #     continue  # Skip this commentator and continue with the next one
+            return Response(data=data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
                 user = User.objects.get(id=id)

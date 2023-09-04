@@ -14,10 +14,15 @@ import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import { BsStar, BsStarFill } from "react-icons/bs";
 
 const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [showModal, setShowModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(data?.is_favorite || false); // Initialize with the API data
+
   const server_url = `${config.apiUrl}`;
 
   const editorProfile = [
@@ -25,17 +30,34 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
     { name: "adnankeser", rate: "%67.5" },
     { name: "adnankeser", rate: "%67.5" },
   ];
+
+  function getfav(e) {
+    axios
+      .get(`${config.apiUrl}/fav-editor/${userId}/?commentators=${e}`)
+      .then((res) => {
+        console.log(res,"========>>>>>res");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    getfav(data?.value?.user?.id);
+  }, [])
+  
+
   const favEditor = async (id) => {
     const user_id = localStorage.getItem("user-id");
     try {
       const response = await axios.post(`${config.apiUrl}/fav-editor/${user_id}/`, {
         id: id,
       });
-      // console.log('API Response:', response.data);
+      console.log("API Response:", response.data);
+      setIsFavorite(!isFavorite); // Toggle the favorite state
     } catch (error) {
       console.error("Error making POST request:", error);
     }
-    // console.log(".........", id);
   };
 
   return (
@@ -58,14 +80,24 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
             </span>
             Kişi abone oldu
           </span>
-          <img
-            onClick={() => favEditor(data?.value.user.id)}
+          {/* <BsStar style={{ color : isFavorite ? "#0D2A53" : "" }}/> */}
+          {isFavorite ? (
+            <BsStar />
+          ) : (
+            <BsStarFill
+              color={currentTheme === "dark" ? "#FFFFFF" : "#0D2A53"}
+            />
+          )}
+
+          {/* <img
+            // onClick={() => favEditor(data?.value.user.id)}
+            onClick={() => toggleFavorite(data?.value.user.id)}
             className=""
             src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
             alt=""
             height={22}
             width={22}
-          />
+          /> */}
         </div>
         <div className="row">
           <div
@@ -179,6 +211,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
             </div>
             <div className="" style={{ fontSize: "12px" }}>
               <button
+                onClick={() => setShowModal(true)}
                 className="my-2 px-2 py-1"
                 style={{
                   border:
@@ -196,7 +229,8 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
           </div>
         </div>
       </div>
-      {/* ))} */}
+
+      <SubscribeModal show={showModal} onHide={() => setShowModal(false)} />
     </>
   );
 };

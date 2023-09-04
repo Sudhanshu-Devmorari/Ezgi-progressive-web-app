@@ -247,7 +247,7 @@ const SignUpModal = (props) => {
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
   const [forgotPsPhone, setForgotPsPhone] = useState("");
-  console.log(forgotPsPhone,"========")
+  // console.log(forgotPsPhone,"========")
 
   // ===================================== UPDATE CODE ====================================================
   const validationSchema = Yup.object({
@@ -677,7 +677,7 @@ const SignUpModal = (props) => {
                             currentTheme === "dark" ? "#D2DB08" : "#00659D",
                         }}
                         onClick={() => {
-                          props.setShowModal(4);
+                          setShowModal(4);
                         }}
                       >
                         Sign In
