@@ -112,7 +112,7 @@ const FavComments = (props) => {
                   <div className="col">
                     <div className="rate-fonts">Score Points</div>
                     <div style={{ fontSize: "1rem", color: "#FFA200" }}>
-                      256
+                    {res?.commentator_user?.score_points}
                     </div>
                   </div>
                 </div>

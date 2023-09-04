@@ -256,12 +256,12 @@ const ContentSection = ({
                       color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                     }}
                   >
-                    %67.6
+                    %{data?.value?.commentator_user?.success_rate}
                   </div>
                 </div>
                 <div className="col">
                   <div className="rate-fonts">Score Points</div>
-                  <div style={{ fontSize: "1rem", color: "#FFA200" }}>256</div>
+                  <div style={{ fontSize: "1rem", color: "#FFA200" }}>{data?.value?.commentator_user?.score_points}</div>
                 </div>
               </div>
             </div>

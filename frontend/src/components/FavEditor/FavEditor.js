@@ -100,7 +100,7 @@ const FavEditor = (props) => {
                     color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                   }}
                 >
-                  %67.5
+                  %{res?.data?.commentator_user.success_rate}
                 </div>
               </div>
             </div>

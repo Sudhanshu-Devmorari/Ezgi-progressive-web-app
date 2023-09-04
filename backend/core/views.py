@@ -768,22 +768,23 @@ class FavEditorsCreateView(APIView):
             user = get_object_or_404(User, id=id)
             editors = request.query_params.get('commentators')
 
-            # for obj in editors.split(","):
-                # try:
-            commentator = get_object_or_404(User, id=editors)
-            faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
-            details = {
-                "id": obj,
-                "is_fav_editor": faveditor_obj
-            }
-            data.append(details)
-                # except User.DoesNotExist:
-                #     continue  # Skip this commentator and continue with the next one
+            for obj in editors.split(","):
+                try:
+                    commentator = get_object_or_404(User, id=obj)
+                    faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
+                    details = {
+                        "id": obj,
+                        "is_fav_editor": faveditor_obj
+                    }
+                    data.append(details)
+                except User.DoesNotExist:
+                    continue  # Skip this commentator and continue with the next one
             return Response(data=data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
 
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
             if request.data:
                 user = User.objects.get(id=id)
@@ -3520,7 +3521,7 @@ class SportsStatisticsView(APIView):
             correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketball').order_by('-created')[:30]
 
             basketball_calculation = (len(correct_prediction_basketball)/30)*100
-            details['basketball_calculation'] = basketball_calculation
+            details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
             Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
@@ -3591,7 +3592,7 @@ class SportsStatisticsView(APIView):
             correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Football').order_by('-created')[:30]
 
             football_calculation = (len(correct_prediction_football)/30)*100
-            Fb_details['football_calculation'] = football_calculation
+            Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
             Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
