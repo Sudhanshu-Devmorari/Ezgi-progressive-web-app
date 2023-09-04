@@ -5,7 +5,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
-                         GoogleLoginview, FacebookLoginview, VerifyUserView)
+                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView)
 
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
@@ -19,6 +19,7 @@ urlpatterns = [
     path('facebook-login/', FacebookLoginview.as_view(), name='facebook-login'),
     path('google-login/', GoogleLoginview.as_view(), name='google-login'),
     path('signup/', SignupView.as_view(), name='Signup'),
+    path('signup-user-exists/', SignupUserExistsView.as_view(), name='Signup-check-user-exists'),
     path('login/', LoginView.as_view(), name='Login'),
     path('otp-verify/', OtpVerify.as_view(), name='Otp-Verify'),
     path('otp-resend/', OtpReSend.as_view(), name='Otp-Resend'),
@@ -31,7 +32,7 @@ urlpatterns = [
     path('notification/<int:id>', NotificationView.as_view(), name='Notification'),
     path('comment-reaction/<int:comment_id>/<int:id>', CommentReactionView.as_view(), name='Comment-Reaction'),
     path('profile/<int:id>', ProfileView.as_view(), name='Profile'),
-    path('fav-editor/', FavEditorsCreateView.as_view(), name='FavEditors'),
+    path('fav-editor/<int:id>/', FavEditorsCreateView.as_view(), name='FavEditors'),
     path('fav-editor-comment/<int:id>', RetrieveFavEditorsAndFavComment.as_view(), name='FavEditors-FavComment'),
     path('support/<int:id>', SupportView.as_view(), name='Support'),
     path('update-support-ticket/', UpdateTicketMessageView.as_view(), name='Update-Ticket-Message'),

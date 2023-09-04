@@ -18,7 +18,7 @@ const AnsweredTicketView = (props) => {
         ticket_id: ticketData?.id,
       })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 200) {
           props.setShowModal(1);
         }

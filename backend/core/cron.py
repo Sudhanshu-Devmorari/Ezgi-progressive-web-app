@@ -53,29 +53,60 @@ def Userst():
     for individual in all_user:
         user = User.objects.get(id=individual.id)
         data = Comments.objects.filter(commentator_user= user.id)
+
+        correct_prediction = data.filter(is_prediction=True)
+        incorrect_prediction = data.filter(is_prediction=False)
+        Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+        Success_rate = round((len(correct_prediction)/len(data))*100, 2)
+        user.success_rate = Success_rate
+        user.score_points = Score_point
+        if 0 < Success_rate < 60:
+            user.commentator_level = "apprentice"
+        if 60 < Success_rate< 65:
+            user.commentator_level = "journeyman"
+        if 65 < Success_rate < 70:
+            user.commentator_level = "master"
+        if 70 < Success_rate < 100:
+            user.commentator_level = "grandmaster"
+        user.save()
+
         for i in data:
-            print("i", i.commentator_user)
-            print(i.date, i.country, i.match_detail, i.category, i.league, i.status)
-            url = f"https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=1&league={i.league}, İlk Etap&t={i.date}"
+            # print("i", i.commentator_user)
+            # print(i.date, i.country, i.match_detail, i.category, i.league, i.status, i.prediction_type, i.prediction)
+            if (i.category[0].lower()) == 'football':
+                url = f"https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=1&league={i.league}&t={i.date}"
+            else:
+                url = f"https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=2&league={i.league}&t={i.date}"
+
             headers = {
                 "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
             }
             response = requests.get(url, headers=headers)
             json_data = response.json()
             match_data_list = json_data["data"]
+
             for match in match_data_list:
+
                 takimlar = match.get("takimlar")
                 # print("Teams:", takimlar)
                 if takimlar == i.match_detail:
-                    print("i am here")
+
+                    # print("i am here")
                     matchID = match.get("MatchID")
-                    print(matchID, "-------------here")
+                    # print(matchID, "-------------here")
+
                     matchid_url = f"https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}"
+
                     data = requests.get(matchid_url, headers=headers)
+
                     matchID_data = data.json()
                     matchID_data_list = matchID_data["data"]
+
                     for match in matchID_data_list:
+
                         data = match.get("LiveStatus")
+
                         data_2 = match.get("matchResult")
                         for j in data_2:
                             if j['metaName'] == 'msHomeScore':
@@ -87,21 +118,25 @@ def Userst():
                                 else:
                                     i.is_prediction = False
                                     i.save()
+
+                        HomeWin = float(match['HomeWin'])
+                        Draw = float(match['Draw'])
+                        AwayWin = float(match['AwayWin'])
                         GoalUnder = float(match['Under25'])
                         GoalOver = float(match['Over25'])
-                        AwayWin = float(match['AwayWin'])
-                        Draw = float(match['Draw'])
-                        HomeWin = float(match['HomeWin'])
                         avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                        
                         i.average_odds =round(avg, 2)
                         i.save()
-                        if data == 1:
+
+                        if data == 0:
                             if i.date < datetime.now().date():
                                 i.is_resolve = True
                                 i.save()
-                        if data == 0:
+                        if data == 1:
                             i.is_resolve = True
                             i.save()
-                        print(data, "live")
-                print(i.date, i.country, i.match_detail, i.category, i.league, i.status)
-                print(i.match_detail)
+                        # print(data, "live")
+
+                # print(i.date, i.country, i.match_detail, i.category, i.league, i.status)
+                # print(i.match_detail)

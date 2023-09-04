@@ -23,7 +23,7 @@ import config from "../../config";
 const FavComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const favCommentData = props?.favCommentData;
-  console.log(favCommentData);
+  // console.log(favCommentData);
 
   // Follow commentator
   // const followCommentator = () =>{

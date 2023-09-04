@@ -13,6 +13,7 @@ const CommentsPage = ({
   selectContent,
   setSelectContent,
   selectPublicorForYou,
+  setActiveCommentsshow
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   // console.log('&&&&&&&&', mergedResult)
@@ -52,6 +53,7 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <ContentSection
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   selectContent={selectContent}
@@ -71,6 +73,7 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <SharedProfile
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}
@@ -94,6 +97,7 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <ContentSection
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   selectContent={selectContent}
@@ -107,6 +111,7 @@ const CommentsPage = ({
               <>
                 {lastType == "comment" ? <HighlightMainPage /> : null}
                 <SharedProfile
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}

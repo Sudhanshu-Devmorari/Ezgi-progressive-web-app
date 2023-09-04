@@ -40,7 +40,7 @@ const SubUserManagementPage = () => {
         const res = await axios.get(
           `${config?.apiUrl}/subuser-management/`
         );
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotificationCount(data.notification_count);
         setSubuserCount(data.subuser_count);

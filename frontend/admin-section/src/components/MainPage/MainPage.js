@@ -25,7 +25,7 @@ const MainPage = () => {
     const res = await axios
       .get(`${config?.apiUrl}/home/`)
       .then((res) => {
-        console.log(res, "=====>>>>res.data");
+        // console.log(res, "=====>>>>res.data");
         setData(res?.data);
         setUsers(res?.data?.users_list);
       })

@@ -185,7 +185,7 @@ const CreateSubUser = (props) => {
       const res = await axios.patch(
         `${config?.apiUrl}/subuser-management/${props.editUserId}/`
       );
-      console.log(res.data);
+      // console.log(res.data);
       setName(res?.data.data.name);
       setPhone(res?.data.data.phone);
       setPassword(res?.data.data.password);
@@ -206,7 +206,7 @@ const CreateSubUser = (props) => {
         setIsOnlyViewSelected(true);
       }
     }
-    console.log(props.editUserId, "LLLLprops.editUserId");
+    // console.log(props.editUserId, "LLLLprops.editUserId");
     if (props.editUserId !== "") {
       editUser();
     }

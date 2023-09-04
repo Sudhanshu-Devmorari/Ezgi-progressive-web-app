@@ -57,7 +57,7 @@ const Support = () => {
       axios
         .get(`${config.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
-          console.log(res.data, "=================>>>>res");
+          // console.log(res.data, "=================>>>>res");
           setTicketData(res.data);
         })
         .catch((error) => {

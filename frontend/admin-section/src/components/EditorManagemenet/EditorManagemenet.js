@@ -695,8 +695,8 @@ const EditorManagemenet = (props) => {
             data-bs-target="#exampleModal"
             onClick={() => {
               props.setupdateProfile(2);
-              console.log("LLLL");
-              console.log(res, "NEha");
+              // console.log("LLLL");
+              // console.log(res, "NEha");
               setPartialData(res);
               setAddUser(res.editor_data);
             }}

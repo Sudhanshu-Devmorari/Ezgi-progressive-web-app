@@ -52,7 +52,7 @@ const SupportManagementPage = () => {
       try {
         const res = await axios.get(`${config?.apiUrl}/support-management`);
         const formattedPercentage = Math.round(res?.data?.new_user_percentage)
-        console.log("=?????", res.data.support_history);
+        // console.log("=?????", res.data.support_history);
         setPerNewRequest(formattedPercentage);
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);

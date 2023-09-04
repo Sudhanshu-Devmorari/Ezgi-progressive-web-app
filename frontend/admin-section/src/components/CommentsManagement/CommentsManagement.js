@@ -56,7 +56,7 @@ const CommentsManagement = (props) => {
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("user-id");
     await axios
-      .post(`${config?.apiUrl}/filter-comments/`, {
+      .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
         country: selectedCountry,
         league: selectedLeague,
@@ -68,7 +68,7 @@ const CommentsManagement = (props) => {
         filter_type0: secondStatus,
       })
       .then((res) => {
-        console.log(res.data,"=====>>filter");
+        // console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
       })
@@ -181,6 +181,9 @@ const CommentsManagement = (props) => {
   const [selectedLeague, setSelectedLeague] = useState("Select");
   const [leagueDropdown, setLeagueDropdown] = useState(false);
   const [categoryType, setCategoryType] = useState(null);
+  const [matchId, setMatchId] = useState([]);
+  const [predictionType, setPredictionType] = useState([]);
+
   useEffect(() => {
     async function getCountryOptions() {
       if (selectedCategory !== "Select") {
@@ -294,16 +297,8 @@ const CommentsManagement = (props) => {
     "Match Details 2",
     "Match Details 3",
   ];
-  const predictionTypeOptions = [
-    "Match Result",
-    "Handicap Match Result",
-    "First Half / Match Result",
-    "Total Goal Over/Under",
-    "Both Teams to Score",
-    "Home Team Total Goals",
-    "Away Team Total Goals",
-  ];
-  const predictionOptions = ["Journeyman", "Expert", "Grandmaster"];
+  const predictionTypeOptions = predictionType;
+  const predictionOptions = ["Apprentice","Journeyman", "Expert", "Grandmaster"];
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -389,6 +384,52 @@ const CommentsManagement = (props) => {
       status: circle_check,
     },
   ];
+
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      let type;
+      if (selectedMatchDetails !== "Select") {
+        if (selectedCategory === "Futbol") {
+          type = 1;
+        } else if (selectedCategory === "Basketbol") {
+          type = 2;
+        }
+        
+        try {
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          const matchIds = res11?.data?.data.map((item) => item.MatchID);
+          setMatchId(matchIds);
+
+          const predictionsPromises = matchIds.map(async (val) => {
+            const predictions = await axios.get(
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchType?matchID=${val}`,
+              { headers }
+            );
+            return predictions.data.data.gameType; // Assuming you want to return the data from each API call
+          });
+      
+          // Wait for all API calls to complete
+          const predictionsData = await Promise.all(predictionsPromises);
+      
+          // Flatten and remove duplicates from the predictionsData array
+          const uniquePredictions = [...new Set(predictionsData.flat())];
+      
+          // console.log("Unique Predictions:", uniquePredictions);
+          // Now you can work with the uniquePredictions array as needed
+          setPredictionType(uniquePredictions);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, headers]);
+
   const server_url = `${config?.apiUrl}`;
   return (
     <>
@@ -618,10 +659,10 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsSubscriberSelected(!isSubscriberSelected);
-                        setStatus("only_subscriber");
+                        setSecondStatus("only_subscriber");
                       }}
                       src={
-                        status == "only_subscriber"
+                        secondStatus == "only_subscriber"
                           ? selectedRadio
                           : Radio
                       }
@@ -635,9 +676,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsWinningSelected(!isWinningSelected);
-                        setSecondStatus("winning");
+                        setStatus("winning");
                       }}
-                      src={secondStatus == "winning" ? selectedRadio : Radio}
+                      src={status == "winning" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -661,9 +702,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPublishedSelected(!isPublishedSelected);
-                        setThirdStatus("published");
+                        setStatus("published");
                       }}
-                      src={thirdStatus == "published" ? selectedRadio : Radio}
+                      src={status == "published" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -674,9 +715,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPendingSelected(!isPendingSelected);
-                        setThirdStatus("pending");
+                        setSecondStatus("pending");
                       }}
-                      src={thirdStatus == "pending" ? selectedRadio : Radio}
+                      src={secondStatus == "pending" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -687,9 +728,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsFinishedSelected(!isFinishedSelected);
-                        setFourthStatus("finished");
+                        setStatus("finished");
                       }}
-                      src={fourthStatus == "finished" ? selectedRadio : Radio}
+                      src={status == "finished" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -700,9 +741,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsNotStartedSelected(!isNotStartedSelected);
-                        setFourthStatus("not_stated");
+                        setSecondStatus("not_stated");
                       }}
-                      src={fourthStatus == "not_stated" ? selectedRadio : Radio}
+                      src={secondStatus == "not_stated" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -802,7 +843,7 @@ const CommentsManagement = (props) => {
                   )}
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">Galatasaray FC</span>
+                  <span className="mt-2 pt-1">{currentData?.match_detail?.split(' - ')[0]}</span>
                   <div
                     className="px-2"
                     style={{
@@ -824,7 +865,7 @@ const CommentsManagement = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">Real Madrid</span>
+                  <span className="mt-2 pt-1">{currentData?.match_detail?.split(' - ')[1]}</span>
                 </div>
                 <div className="text-end mt-3 mb-2">
                   <span

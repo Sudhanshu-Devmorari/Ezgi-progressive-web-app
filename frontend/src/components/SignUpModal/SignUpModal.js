@@ -21,7 +21,7 @@ import FacebookLogin from "../FacebookLogin";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
-import { cityOptions } from './_data';
+import { cityOptions } from "./_data";
 import Swal from "sweetalert2";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
@@ -133,35 +133,36 @@ const SignUpModal = (props) => {
       setAgeError("");
       setCheckboxError("");
       setSignUpData({
-        name : name,
-        username : username,
-        phone : phone,
-        password : password,
-        // country: selectedCountry,
+        name: name,
+        username: username,
+        phone: phone,
+        password: password,
+        country: 'Turkey',
         city: selectedCity,
         gender: selectedGender,
         age: selectedAge,
       });
       const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
-      console.log("response: ", response.data);
-      console.log("response: ", response.data.user);
+      // console.log("response: ", response.data);
+      // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
-        localStorage.setItem("user-role", response.data.user.user_role);
-        localStorage.setItem("user-id", response.data.user.id);
-        localStorage.setItem("username", response.data.user.username);
+        setShowModal(6)
+        // localStorage.setItem("user-role", response.data.user.user_role);
+        // localStorage.setItem("user-id", response.data.user.id);
+        // localStorage.setItem("username", response.data.user.username);
 
-        Swal.fire({
-          title: "Success",
-          text: "User Created Successfully!",
-          icon: "success",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.reload();
-          }
-        });
+        // Swal.fire({
+        //   title: "Success",
+        //   text: "User Created Successfully!",
+        //   icon: "success",
+        //   backdrop: false,
+        //   customClass:
+        //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        // }).then((result) => {
+        //   if (result.isConfirmed) {
+        //     window.location.reload();
+        //   }
+        // });
         //props.onHide();
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
@@ -241,11 +242,12 @@ const SignUpModal = (props) => {
   };
 
   const countryOptions = ["Turkey"];
-  
+
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
   const [forgotPsPhone, setForgotPsPhone] = useState("");
+  console.log(forgotPsPhone,"========")
 
   // ===================================== UPDATE CODE ====================================================
   const validationSchema = Yup.object({
@@ -276,12 +278,27 @@ const SignUpModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log("======>>>sub")
-      setShowModal(2);
-      setName(values.name);
-      setUsername(values.username);
-      setPassword(values.password);
-      setPhone(values.phone);
+      axios
+        .post(`${config.apiUrl}/signup-user-exists/`, {
+          phone: values.phone,
+          username: values.username,
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.data.status === 400) {
+            setuserExists(res.data?.data);
+          } else if (res.data.status === 200) {
+            setShowModal(2);
+            setuserExists('');
+            setName(values.name);
+            setUsername(values.username);
+            setPassword(values.password);
+            setPhone(values.phone);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   });
 
@@ -318,6 +335,9 @@ const SignUpModal = (props) => {
                   </span>
                 </div>
                 <div className="">
+                  <div className="text-danger text-center text-capitalize">
+                    {userExists}
+                  </div>
                   <form onSubmit={formik.handleSubmit}>
                     <div className="d-flex flex-column m-2">
                       <label htmlFor="name">Name Surname</label>
@@ -408,11 +428,11 @@ const SignUpModal = (props) => {
                         } form-control`}
                         {...formik.getFieldProps("password")}
                       />
-                        {formik.touched.password && formik.errors.password ? (
-                          <small className="text-danger">
-                            {formik.errors.password}
-                          </small>
-                        ) : null}
+                      {formik.touched.password && formik.errors.password ? (
+                        <small className="text-danger">
+                          {formik.errors.password}
+                        </small>
+                      ) : null}
                       {showPassword ? (
                         <AiOutlineEyeInvisible
                           fontSize={"1.5rem"}
@@ -526,20 +546,20 @@ const SignUpModal = (props) => {
                       toggleDropdown={toggleCountryDropdown}
                     /> */}
                     <label htmlFor="name">Country</label>
-                   <input
-                        value="Turkey"
-                        id="country"
-                        type="text"
-                        className={`${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        } form-control text-center p-1 `}
-                        style={{
-                          fontSize: "14px",
-                        }}
-                        disabled
-                      />
+                    <input
+                      value="Turkey"
+                      id="country"
+                      type="text"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control text-center p-1 `}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                      disabled
+                    />
                   </div>
 
                   <div className="my-2">
@@ -681,7 +701,7 @@ const SignUpModal = (props) => {
           )}
 
           {ShowModal === 6 && (
-            <OTPModal hide={props.onHide} forgotPsPhone={forgotPsPhone} />
+            <OTPModal hide={props.onHide} phone={phone} signUpData={signUpData} forgotPsPhone={forgotPsPhone}/>
           )}
 
           {ShowModal === 7 && (

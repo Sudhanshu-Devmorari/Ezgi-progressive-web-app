@@ -4,6 +4,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import OTPInput from "react-otp-input";
 import axios from "axios";
 import config from "../../config";
+import Swal from "sweetalert2";
 
 const OTPModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -12,53 +13,104 @@ const OTPModal = (props) => {
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
 
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(30);
+  const [timer, setTimer] = useState(30);
+  const [isTimerVisible, setIsTimerVisible] = useState(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (minutes > 0 && seconds > 0) {
-        clearInterval(interval);
-      } else if (seconds === 0) {
-        setMinutes(minutes - 1);
-        setSeconds(59);
-      } else {
-        setSeconds(seconds - 1);
-      }
-    }, 1000);
+    let interval;
+
+    if (isTimerVisible) {
+      interval = setInterval(() => {
+        if (timer > 0) {
+          setTimer(timer - 1);
+        } else {
+          setIsTimerVisible(false);
+          clearInterval(interval);
+        }
+      }, 1000);
+    }
 
     return () => {
       clearInterval(interval);
     };
-  }, [minutes, seconds]);
+  }, [timer, isTimerVisible]);
 
   // OTP verify API
   const handleOTPVerification = async () => {
-    const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
-      otp: otp,
-    });
-    // console.log(res.data, "======>>otp res");
-    if (res.data.status === 200) {
-      setShowModal(7);
-      console.log("verified");
-      console.log("object");
-    }
-    if (res.data.status === 400) {
-      setOtpError(res.data.error);
+    const phone = props?.signUpData.phone;
+    if (phone) {
+      const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
+        otp: otp,
+        phone: phone,
+        name: props?.signUpData.name,
+        username: props?.signUpData.username,
+        password: props?.signUpData.password,
+        city: props?.signUpData.city,
+        gender: props?.signUpData.gender,
+        age: props?.signUpData.age,
+        country: "Turkey",
+        signup : 'signup',
+      });
+      if (res.data.status === 200) {
+        localStorage.setItem("user-role", res.data.user.user_role);
+        localStorage.setItem("user-id", res.data.user.id);
+        localStorage.setItem("username", res.data.user.username);
+        Swal.fire({
+          title: "Success",
+          text: "User Created Successfully!",
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+        // props.onHide();
+      }
+      if (res.data.status === 400) {
+        setOtpError(res.data.error);
+      }
+    } else {
+      const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
+        otp: otp,
+      });
+      if (res.data.status === 200) {
+        setShowModal(7);
+      }
+      if (res.data.status === 400) {
+        setOtpError(res.data.error);
+      }
     }
   };
 
   // RESEND OTP API
-  const handleResendOtp = async () => {
+  const handleResendOtp = async ()   => {
     setOtp("");
     setOtpError("");
-    setSeconds(30);
-    const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
-      phone: props.forgotPsPhone,
-    });
-    // console.log(res.data, "======>>otp resend");
-    if (res.data.status === 500) {
-      setOtpError(res.data.error);
+    setTimer(30);
+    console.log(props,"==========>>>>props")
+    const phone = props?.signUpData.phone;
+    if (phone){
+      console.log('isphone')
+      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
+        phone: phone,
+        signup : 'signup'
+      });
+      console.log(res.data, "======>>otp resend");
+      if (res.data.status === 500) {
+        setOtpError(res.data.error);
+      }
+    } else {
+      console.log("==else")
+      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
+        phone: props.forgotPsPhone,
+      });
+      console.log(res.data, "======>>otp resend");
+      if (res.data.status === 500) {
+        setOtpError(res.data.error);
+      }
     }
   };
 
@@ -83,16 +135,16 @@ const OTPModal = (props) => {
           <div className="my-1">
             <div className="d-flex justify-content-between">
               <span>Enter 6 digit code</span>
-              {seconds > 0 && (
-                <span
-                  style={{
-                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                  }}
-                >
-                  {minutes < 10 ? `0${minutes}` : minutes}:
-                  {seconds < 10 ? `0${seconds}` : seconds}
-                </span>
-              )}
+              <span
+                style={{
+                  color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                }}
+              >
+                {isTimerVisible &&
+                  `${String(Math.floor(timer / 60)).padStart(2, "0")}:${String(
+                    timer % 60
+                  ).padStart(2, "0")}`}
+              </span>
             </div>
             <div className="w-100 d-flex justify-content-center">
               <OTPInput

@@ -17,8 +17,10 @@ const SignInModal = (props) => {
 
   const validationSchema = Yup.object({
     phone: Yup.string()
-      .required("Phone is required")
-      .matches(/^\d{10}$/, "Phone must be 10 digits"),
+    .required("Phone is required")
+    .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+    .min(10, "Phone must be 10 digits")
+    .max(10, "Phone must be 10 digits"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
