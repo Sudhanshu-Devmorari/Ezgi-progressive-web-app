@@ -3230,7 +3230,10 @@ def Statistics(pk):
     correct_prediction = data.filter(is_prediction=True)
     incorrect_prediction = data.filter(is_prediction=False)
 
-    Success_rate = (len(correct_prediction)/len(data))*100
+    if len(data) != 0:
+        Success_rate = (len(correct_prediction)/len(data))*100
+    else:
+        Success_rate = 0
 
     Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
 
@@ -3271,12 +3274,14 @@ def Statistics(pk):
     if 70 < Success_rate < 100:
         user.commentator_level = "grandmaster"
 
-    avg_odd = avg_odd/len(data)
+    if len(data) != 0:
+        avg_odd = avg_odd/len(data)
+    else:
+        avg_odd = 0
 
     user.save()
     # return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
     return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
-
 
 # class UserStatistics(APIView):
 #     def get(self, request, id=id):
