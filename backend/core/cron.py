@@ -55,8 +55,12 @@ def Userst():
         data = Comments.objects.filter(commentator_user= user.id)
 
         correct_prediction = data.filter(is_prediction=True)
+        incorrect_prediction = data.filter(is_prediction=False)
+        Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
         Success_rate = round((len(correct_prediction)/len(data))*100, 2)
         user.success_rate = Success_rate
+        user.score_points = Score_point
         if 0 < Success_rate < 60:
             user.commentator_level = "apprentice"
         if 60 < Success_rate< 65:

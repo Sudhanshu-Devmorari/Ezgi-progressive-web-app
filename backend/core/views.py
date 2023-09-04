@@ -384,23 +384,19 @@ class FollowCommentatorView(APIView):
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
-                follow_commentator_obj = FollowCommentator.objects.create(
+                follow_commentator_obj, created = FollowCommentator.objects.get_or_create(
                     commentator_user=commentator_obj, standard_user=user
                 )
-                # send follow notification:
-                notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+                if created:
+                    # send follow notification:
+                    notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+                    serializer = FollowCommentatorSerializer(follow_commentator_obj)
+                    data = serializer.data
+                    return Response(data=data, status=status.HTTP_200_OK)
+                else:
+                    follow_commentator_obj.delete()
+                    return Response(data={"message":f"You unfollowed the {commentator_obj}."}, status=status.HTTP_200_OK)
 
-                serializer = FollowCommentatorSerializer(follow_commentator_obj)
-                data = serializer.data
-                return Response(data=data, status=status.HTTP_200_OK)
-                # else:
-                #     return Response(
-                #         create_response(
-                #             status.HTTP_400_BAD_REQUEST,
-                #             "You already follow that commentator."
-                #         ),
-                #         status=status.HTTP_400_BAD_REQUEST
-                #     )
             else:
                 return Response(
                     create_response(
@@ -418,7 +414,7 @@ class FollowCommentatorView(APIView):
             return Response(
                 create_response(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e)),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )        
+            )   
 
 class CommentView(APIView):
     # permission_classes = [IsAuthenticated]
@@ -763,14 +759,14 @@ class ProfileView(APIView):
         
 
 class FavEditorsCreateView(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
             if request.data:
+                user = User.objects.get(id=id)
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 # print("******* ", request.data.get("id"))
                 comment = User.objects.get(id=request.data.get("id"))
-                user = User.objects.get(id=13)
                 # user = request.user
 
                 if not FavEditors.objects.filter(commentator_user=comment, standard_user=user).exists():
@@ -1054,7 +1050,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_active_comment = Comments.objects.filter(commentator_user=user, date__gt=datetime.now().date())
+            all_active_comment = Comments.objects.filter(commentator_user=user, is_resolve=False)
             for obj in all_active_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1084,7 +1080,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_resolved_comment = Comments.objects.filter(commentator_user=user, date__lt=datetime.now().date())
+            all_resolved_comment = Comments.objects.filter(commentator_user=user, is_resolve=True)
             for obj in all_resolved_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1686,9 +1682,13 @@ class FilterComments(APIView):
         data_list = []
         filters = {}
         user = User.objects.get(id=id)
+        print("----", request.data)
         try:
             if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
-                filters['category__contains'] = request.data.get('category')
+                if request.data.get('category') == "Futbol":
+                    filters['category__contains'] = "Football"
+                if request.data.get('category') == "Basketbol":
+                    filters['category__contains'] = "Basketball"
 
             if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')
@@ -1710,7 +1710,7 @@ class FilterComments(APIView):
 
             if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "" and request.data.get('date') != "Select":
                 filters['date'] = request.data.get('date')
-
+            
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
             if filter_type in ('public_content', 'finished', 'winning', 'published'):
 
@@ -1809,8 +1809,30 @@ class FilterComments(APIView):
                     """
                     winning logic here.
                     """
-                    # data_list.append(data0)
-                    # return Response(data=data0, status=status.HTTP_200_OK)
+                    all_comments = Comments.objects.filter(is_prediction=True,**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
 
             filter_type0 = request.data.get('filter_type0') # This will contain 'only_subscriber', 'not_stated', 'finished'
             if filter_type0 in ('only_subscriber', 'not_stated', 'lose', 'pending'):
@@ -1912,10 +1934,34 @@ class FilterComments(APIView):
                         }
                         data_list.append(comment_data)
 
-                if filter_type == "lose":
+                if filter_type0 == "lose":
                     """
                     lose logic here.
                     """
+                    all_comments = Comments.objects.filter(is_prediction=False,**filters)
+                    for comment in all_comments:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                
+                        # Format the datetime object as desired (DD.MM.YYYY)
+                        formatted_date = date_obj.strftime("%d.%m.%Y")
+
+                        comment_data['date'] = formatted_date 
+
+                        # Fetch comment reactions and calculate the total count of reactions
+                        comment_reactions = CommentReaction.objects.filter(comment=comment)
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+                        data_list.append(comment_data)
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
             if filter_type == "" and filter_type0 == "":
@@ -1948,7 +1994,7 @@ class FilterComments(APIView):
                 # serializer = CommentsSerializer(filtered_comments, many=True)
                 # data = serializer.data
                 # data_list.append(data)
-            
+
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:
@@ -3356,6 +3402,7 @@ class UserStatistics(APIView):
             serializer = UserSerializer(user).data
             Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
             user.success_rate = Success_rate
+            user.score_points = Score_point
             user.save()
             element_counts = Counter(only_leagues)
             most_common_element, max_count = element_counts.most_common(1)[0]

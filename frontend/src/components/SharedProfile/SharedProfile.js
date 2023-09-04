@@ -26,8 +26,9 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
     { name: "adnankeser", rate: "%67.5" },
   ];
   const favEditor = async (id) => {
+    const user_id = localStorage.getItem("user-id");
     try {
-      const response = await axios.post(`${config.apiUrl}/fav-editor/`, {
+      const response = await axios.post(`${config.apiUrl}/fav-editor/${user_id}/`, {
         id: id,
       });
       // console.log('API Response:', response.data);

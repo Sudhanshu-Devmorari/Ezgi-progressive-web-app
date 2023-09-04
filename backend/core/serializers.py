@@ -17,6 +17,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class FollowCommentatorSerializer(serializers.ModelSerializer):
+    commentator_user = UserSerializer()
+    standard_user = UserSerializer()
     class Meta:
         model = FollowCommentator
         fields = '__all__'

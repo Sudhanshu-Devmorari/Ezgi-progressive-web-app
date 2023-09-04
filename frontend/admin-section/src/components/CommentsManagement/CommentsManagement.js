@@ -56,7 +56,7 @@ const CommentsManagement = (props) => {
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("user-id");
     await axios
-      .post(`${config?.apiUrl}/filter-comments/`, {
+      .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
         country: selectedCountry,
         league: selectedLeague,
