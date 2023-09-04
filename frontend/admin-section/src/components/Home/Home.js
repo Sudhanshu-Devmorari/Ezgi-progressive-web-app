@@ -885,7 +885,7 @@ const Home = (props) => {
                 <div className="col-8">
                   <div className="row g-0 gap-2">
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="duration"
                         value={
@@ -900,7 +900,7 @@ const Home = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="month"
                         value={
@@ -915,7 +915,7 @@ const Home = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="level"
                         value={

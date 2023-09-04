@@ -64,25 +64,7 @@ class SignupView(APIView):
                 user_serializer = UserSerializer(data)
                 serialized_user = user_serializer.data
                 return Response({'data' : 'User Added', 'user' : serialized_user, 'userId' : '', 'status' : status.HTTP_200_OK})
-            # serializer.save()
-            # if DataCount.objects.filter(id=1).exists():
-            #     obj = DataCount.objects.get(id=1)
-            #     obj.user += 1
-            #     obj.save()
-            # else:
-            #     obj = DataCount.objects.create(user=1)
-            # if User.objects.filter(phone=request.data['phone']).exists():
-            #     return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
-            # else:
-            #     serializer.save()
-            # # serializer.save()
-            # if DataCount.objects.filter(id=1).exists():
-            #     obj = DataCount.objects.get(id=1)
-            #     obj.user += 1
-            #     obj.save()
-            # else:
-            #     obj = DataCount.objects.create(user=1)
-            # return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
+
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
