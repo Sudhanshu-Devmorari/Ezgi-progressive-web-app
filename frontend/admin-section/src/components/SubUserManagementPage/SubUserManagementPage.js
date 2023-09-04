@@ -50,7 +50,7 @@ const SubUserManagementPage = () => {
         console.log(error);
       }
     }
-    getSubUsers();
+    //getSubUsers();
 
   useEffect(() => {
     getSubUsers();

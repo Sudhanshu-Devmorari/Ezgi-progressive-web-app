@@ -17,7 +17,8 @@ const SelectContentForEditorPage = (props) => {
       props.setFilterData(null)
       const val = e.target.value
       const filteredArray = props.data.filter((obj) =>
-        obj?.value?.user?.username?.toLowerCase().startsWith(val.toLowerCase())
+        obj?.value?.user?.username?.toLowerCase().startsWith(val.toLowerCase()) ||
+        obj?.value?.user?.username?.toLowerCase().includes(val.toLowerCase()) 
       );
       props.setDisplayData(filteredArray);
     }
@@ -26,7 +27,8 @@ const SelectContentForEditorPage = (props) => {
       props.setFilterCommentData(null)
       const val = e.target.value
       const filteredArray = props.data.filter((obj) =>
-        obj?.value?.commentator_user?.username?.toLowerCase().startsWith(val.toLowerCase())
+        obj?.value?.commentator_user?.username?.toLowerCase().startsWith(val.toLowerCase()) ||
+        obj?.value?.commentator_user?.username?.toLowerCase().includes(val.toLowerCase())
       );
       props.setDisplayData(filteredArray);
     }

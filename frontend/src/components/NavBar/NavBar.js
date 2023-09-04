@@ -101,8 +101,8 @@ const NavBar = (props) => {
                 </span>
                 <span className="ps-2">
                   <img
-                    src= {`${config.apiUrl}${props.profileData}`}
-                    // src= {props.profileData ?  `${config.apiUrl}${props.profileData}` : initialProfile}
+                    //src= {`${config.apiUrl}${props.profileData}`}
+                    src= {props.profileData ?  `${config.apiUrl}${props.profileData}` : initialProfile}
                     alt=""
                     height={45}
                     width={45}

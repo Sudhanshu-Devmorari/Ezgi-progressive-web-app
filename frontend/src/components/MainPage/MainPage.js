@@ -57,7 +57,9 @@ const MainPage = () => {
     setIsLoading(false);
   }
   useEffect(() => {
-    getProfileData();
+    if(userId){
+      getProfileData();
+    }
   }, []);
  
 
