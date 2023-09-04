@@ -659,10 +659,10 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsSubscriberSelected(!isSubscriberSelected);
-                        setStatus("only_subscriber");
+                        setSecondStatus("only_subscriber");
                       }}
                       src={
-                        status == "only_subscriber"
+                        secondStatus == "only_subscriber"
                           ? selectedRadio
                           : Radio
                       }
@@ -676,9 +676,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsWinningSelected(!isWinningSelected);
-                        setSecondStatus("winning");
+                        setStatus("winning");
                       }}
-                      src={secondStatus == "winning" ? selectedRadio : Radio}
+                      src={status == "winning" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -702,9 +702,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPublishedSelected(!isPublishedSelected);
-                        setThirdStatus("published");
+                        setStatus("published");
                       }}
-                      src={thirdStatus == "published" ? selectedRadio : Radio}
+                      src={status == "published" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -715,9 +715,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsPendingSelected(!isPendingSelected);
-                        setThirdStatus("pending");
+                        setSecondStatus("pending");
                       }}
-                      src={thirdStatus == "pending" ? selectedRadio : Radio}
+                      src={secondStatus == "pending" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -728,9 +728,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsFinishedSelected(!isFinishedSelected);
-                        setFourthStatus("finished");
+                        setStatus("finished");
                       }}
-                      src={fourthStatus == "finished" ? selectedRadio : Radio}
+                      src={status == "finished" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
@@ -741,9 +741,9 @@ const CommentsManagement = (props) => {
                     <img
                       onClick={() => {
                         setIsNotStartedSelected(!isNotStartedSelected);
-                        setFourthStatus("not_stated");
+                        setSecondStatus("not_stated");
                       }}
-                      src={fourthStatus == "not_stated" ? selectedRadio : Radio}
+                      src={secondStatus == "not_stated" ? selectedRadio : Radio}
                       alt=""
                       style={{ cursor: "pointer" }}
                     />

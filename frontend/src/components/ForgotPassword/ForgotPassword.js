@@ -37,7 +37,9 @@ const ForgotPassword = (props) => {
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone is required")
-      .matches(/^\d{10}$/, "Phone must be 10 digits"),
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
   });
   const formik = useFormik({
     initialValues: {
@@ -49,10 +51,10 @@ const ForgotPassword = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: values.phone,
       });
-      // console.log("response: FP : ", res.data);
+      console.log("response: FP : ", res.data);
       if (res.data.status === 200) {
         setShowModal(6);
-        props.setForgotPsPhone(phone);
+        props?.setForgotPsPhone(values.phone);
       } else if (res.data.status === 404) {
         setPhoneError(res.data.data);
       }

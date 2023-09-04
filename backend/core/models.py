@@ -57,7 +57,7 @@ class User(AbstractBaseUser):
     authorization_type = models.CharField(max_length=100,null=True, blank=True)
     department = models.CharField(max_length=100,null=True, blank=True)
     experience = models.CharField(max_length=20, choices=Experience, default="1-2 years")
-    success_rate = models.FloatField()
+    success_rate = models.FloatField(null=True, blank=True)
     is_transaction = models.BooleanField(default=False)
     is_view_only = models.BooleanField(default=False)
     is_process_withdrawal_request = models.BooleanField(default=False)

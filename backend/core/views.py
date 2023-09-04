@@ -43,6 +43,16 @@ from django.contrib.auth import authenticate
 
 from translate import Translator
 
+class SignupUserExistsView(APIView):
+    def post(self, request, format=None):
+        try:
+            if User.objects.filter(Q(username__iexact=request.data['username']) | Q(phone=request.data['phone']), is_admin=False).exists():
+                return Response({'data': 'User with the same username or phone number already exists', 'status': status.HTTP_400_BAD_REQUEST})
+            else:
+                return Response({'data': 'User can create', 'status': status.HTTP_200_OK})           
+        except Exception as e:
+            return Response(data=e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class SignupView(APIView):
     def post(self, request, format=None):
         # print('request.data: ', request.data)
@@ -60,20 +70,56 @@ class SignupView(APIView):
             elif User.objects.filter(username=request.data['username'], is_admin=False).exists():
                 return Response({'data': 'User with the same username already exists', 'status': status.HTTP_400_BAD_REQUEST})
             else:
-                data = serializer.save()
-                user_serializer = UserSerializer(data)
-                serialized_user = user_serializer.data
-                return Response({'data' : 'User Added', 'user' : serialized_user, 'userId' : '', 'status' : status.HTTP_200_OK})
-
+                phone = request.data['phone']
+                # data = serializer.save()
+                otp = totp.now()
+                print('otp: ', otp)
+                res = sms_send(phone, otp)  
+                # res = "Success"
+                if res == 'Success':
+                    return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+                else:
+                    return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+                # user_serializer = UserSerializer(data)
+                # serialized_user = user_serializer.data
+                # return Response({'data' : 'User Added', 'user' : serialized_user, 'userId' : '', 'status' : status.HTTP_200_OK})
+            # serializer.save()
+            # if DataCount.objects.filter(id=1).exists():
+            #     obj = DataCount.objects.get(id=1)
+            #     obj.user += 1
+            #     obj.save()
+            # else:
+            #     obj = DataCount.objects.create(user=1)
+            # if User.objects.filter(phone=request.data['phone']).exists():
+            #     return Response({'data' : 'User already Exists', 'status' : status.HTTP_400_BAD_REQUEST})
+            # else:
+            #     serializer.save()
+            # # serializer.save()
+            # if DataCount.objects.filter(id=1).exists():
+            #     obj = DataCount.objects.get(id=1)
+            #     obj.user += 1
+            #     obj.save()
+            # else:
+            #     obj = DataCount.objects.create(user=1)
+            # return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
 class OtpVerify(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             otp = request.data.get('otp')
-            # print('otp: ', otp)
+            if 'phone' and 'signup' in request.data:
+                verification_result = totp.verify(otp)
+                if verification_result:
+                    serializer = UserSerializer(data=request.data)
+                    if serializer.is_valid():
+                        data = serializer.save()
+                        return Response({'success': 'Otp successfully verified.', 'user' : serializer.data ,'status': status.HTTP_200_OK} )
+                    else:
+                        return Response({'error': 'Error', 'data' : serializer.errors ,'status': status.HTTP_200_OK} )           
+                else:
+                    return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
+                    
             verification_result = totp.verify(otp)
-            # print('verification_result: ', verification_result)
-
             if verification_result:
                 return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
             else:
@@ -87,6 +133,13 @@ class OtpReSend(APIView):
         try:
             if 'is_admin' in request.data:
                 user = User.objects.get(phone=phone,is_admin=True)
+            elif 'signup' in request.data:
+                otp = totp.now()
+                res = sms_send(phone, otp)  
+                if res == 'Success':
+                    return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+                else:
+                    return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
             else:
                 user = User.objects.get(phone=phone,is_admin=False)
             print('user: ', user)
