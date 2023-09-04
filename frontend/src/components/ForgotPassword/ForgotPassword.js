@@ -24,7 +24,7 @@ const ForgotPassword = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: phone,
       });
-      console.log("response: FP : ", res.data);
+      // console.log("response: FP : ", res.data);
       if (res.data.status === 200) {
         setShowModal(6);
         props.setForgotPsPhone(phone);
@@ -49,7 +49,7 @@ const ForgotPassword = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: values.phone,
       });
-      console.log("response: FP : ", res.data);
+      // console.log("response: FP : ", res.data);
       if (res.data.status === 200) {
         setShowModal(6);
         props.setForgotPsPhone(phone);

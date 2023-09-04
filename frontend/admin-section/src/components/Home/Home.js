@@ -187,7 +187,7 @@ const Home = (props) => {
         formData
       );
 
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
       if (response.status === 200) {
         props?.adminHomeApiData();
         Swal.fire({

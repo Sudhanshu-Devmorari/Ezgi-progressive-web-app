@@ -69,6 +69,7 @@ const CommentsPageModal = (props) => {
   const [matchDetailsDropDown, setMatchDetailsDropDown] = useState(false);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [MatchdetailsValue, setMatchdetailsValue] = useState([]);
+  const [predictionType, setPredictionType] = useState([]);
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -103,10 +104,10 @@ const CommentsPageModal = (props) => {
   };
 
   const levelOptions = [
-    "Option A",
-    "Option B",
-    "Option C",
-    // Add more options as needed
+    "Aypprentice",
+    "Journeyman",
+    "Master",
+    "Grandmaster",
   ];
 
   const [predictionTypeDropDown, setPredictionTypeDropDown] = useState(false);
@@ -123,12 +124,7 @@ const CommentsPageModal = (props) => {
     setLevelDropDown(false);
   };
 
-  const predictionTypeOptions = [
-    "Type X",
-    "Type Y",
-    "Type Z",
-    // Add more options as needed
-  ];
+  const predictionTypeOptions = predictionType;
 
   const [editorFilterModal, setEditorFlterModal] = useState(false);
 
@@ -214,6 +210,8 @@ const CommentsPageModal = (props) => {
               setCountryData={setCountryData}
               setDateData={setDateData}
               setLeagueData={setLeagueData}
+              selectedMatchDetails={selectedMatchDetails}
+              setPredictionType={setPredictionType}
             />
             <div className="my-3">
               <CustomDropdown

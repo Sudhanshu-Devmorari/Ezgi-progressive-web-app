@@ -87,7 +87,7 @@ const BecomeAEditorModal = (props) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   function handleSubmit(event) {
     event.preventDefault();
-    console.log("form submittt");
+    // console.log("form submittt");
     if (selectedKategori === "Select") {
       setCategoryError("Please select a Kategori");
     }
@@ -106,7 +106,7 @@ const BecomeAEditorModal = (props) => {
       axios
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then((res) => {
-          console.log(res, "===========>>>>res");
+          // console.log(res, "===========>>>>res");
           if (res.status === 200) {
             // setShowPaymentModal(true);
             localStorage.setItem('user-role', res.data.user_role)

@@ -27,7 +27,7 @@ const LoginModal = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      // console.log(values);
       axios
         .post(`${config.apiUrl}/login/`, {
           phone: values.phone,

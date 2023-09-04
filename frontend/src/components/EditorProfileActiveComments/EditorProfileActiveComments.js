@@ -12,7 +12,7 @@ const EditorProfileActiveComments = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log(">>>>>>>>>>>>.", props.activeCommentsshow);
+  // console.log(">>>>>>>>>>>>.", props.activeCommentsshow);
   const [profileData, setProfileData] = useState([]);
   useEffect(() => {
     async function getProfileData() {

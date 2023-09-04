@@ -143,8 +143,8 @@ const SignUpModal = (props) => {
         age: selectedAge,
       });
       const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
-      console.log("response: ", response.data);
-      console.log("response: ", response.data.user);
+      // console.log("response: ", response.data);
+      // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
         localStorage.setItem("user-role", response.data.user.user_role);
         localStorage.setItem("user-id", response.data.user.id);
@@ -276,7 +276,7 @@ const SignUpModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log("======>>>sub")
+      // console.log("======>>>sub")
       setShowModal(2);
       setName(values.name);
       setUsername(values.username);

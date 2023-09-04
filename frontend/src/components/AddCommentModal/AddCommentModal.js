@@ -32,25 +32,11 @@ const AddCommentModal = (props) => {
   //   "Match Details 3",
   // ];
   const [matchDetailsOptions, setMatchDetailsOptions] = useState([]);
-  const predictionTypeOptions = [
-    "Match Result",
-    "Handicap Match Result",
-    "First Half / Match Result",
-    "Total Goal Over/Under",
-    "Both Teams to Score",
-    "Home Team Total Goals",
-    "Away Team Total Goals",
-  ];
-  const predictionOptions = [
-    "Under 1.5 Goals",
-    "Over 1.5 Goals",
-    "Under 2.5 Goals",
-    "Over 2.5 Goals",
-    "Under 3.5 Goals",
-    "Over 3.5 Goals",
-    "Under 4.5 Goals",
-    "Over 4.5 Goals"
-  ];
+  const [predictionType, setPredictionType] = useState([]);
+  const [predictionData, setPredictionData] = useState([]);
+
+  const predictionTypeOptions =predictionType;
+  const predictionOptions = predictionData;
   const [countryOptions, setCountryOptions] = useState([]);
 
   const categoryOptions = ["Futbol", "Basketbol"];
@@ -58,7 +44,6 @@ const AddCommentModal = (props) => {
   const [dateOptions, setDateOptions] = useState([]);
   // const leagueOptions = ["League 1", "League 2", "League 3"];
   const [leagueOptions, setLeagueOptions] = useState([]);
-
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
   const [selectedPredictionType, setSelectedPredictionType] =
@@ -292,7 +277,7 @@ const AddCommentModal = (props) => {
             comment: commentText,
           }
         );
-        console.log("res", res);
+        // console.log("res", res);
         if (res.status === 200) {
           Swal.fire({
             title: "Success",
@@ -350,7 +335,93 @@ const AddCommentModal = (props) => {
       .catch((error) => {});
   }, [selectedCountry])
 
-  
+  const [matchId, setMatchId] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let type;
+      if (selectedMatchDetails !== "Select") {
+        if (selectedCategory === "Futbol") {
+          type = 1;
+        } else if (selectedCategory === "Basketbol") {
+          type = 2;
+        }
+        
+        try {
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          const matchIds = res11?.data?.data.map((item) => item.MatchID);
+          setMatchId(matchIds);
+
+          const predictionsPromises = matchIds.map(async (val) => {
+            const predictions = await axios.get(
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchType?matchID=${val}`,
+              { headers }
+            );
+            return predictions.data.data.gameType; // Assuming you want to return the data from each API call
+          });
+      
+          // Wait for all API calls to complete
+          const predictionsData = await Promise.all(predictionsPromises);
+      
+          // Flatten and remove duplicates from the predictionsData array
+          const uniquePredictions = [...new Set(predictionsData.flat())];
+      
+          // console.log("Unique Predictions:", uniquePredictions);
+          // Now you can work with the uniquePredictions array as needed
+          setPredictionType(uniquePredictions);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, headers]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let type;
+      if (selectedMatchDetails !== "Select") {
+        if (selectedCategory === "Futbol") {
+          type = 1;
+        } else if (selectedCategory === "Basketbol") {
+          type = 2;
+        }
+        
+        try {
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          const matchIds = res11?.data?.data.map((item) => item.MatchID);
+          setMatchId(matchIds);
+
+          const predictionsPromises = matchIds.map(async (val) => {
+            const predictions = await axios.get(
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/details?matchID=${val}&type=${selectedPredictionType}`,
+              { headers }
+            );
+            const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
+            return gameNames;
+          });
+      
+          // Wait for all API calls to complete
+          const predictionsData = await Promise.all(predictionsPromises);
+          // Flatten and remove duplicates from the gameNames array
+          const allGameNames = predictionsData.flat();
+          const uniqueGameNames = [...new Set(allGameNames)];
+          setPredictionData(uniqueGameNames);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, selectedPredictionType, headers]);
 
   return (
     <>

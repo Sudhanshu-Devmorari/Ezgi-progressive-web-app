@@ -25,7 +25,7 @@ const EditorManagementPage = () => {
       // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
-        console.log("%%%%%%%%%", res.data)
+        // console.log("%%%%%%%%%", res.data)
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
         // setUsers(res?.data?.users_list)
@@ -43,7 +43,7 @@ const EditorManagementPage = () => {
   function approveOrRejectrqst (id, value){
     axios.post(`${config.url}/verify-user/${id}`, {status : value})
     .then((res)=> {
-      console.log(res);
+      // console.log(res);
     })
     .catch((error) => {
       console.log(error);

@@ -771,7 +771,6 @@ class RetrieveFavEditorsAndFavComment(APIView):
         try:
             editor = []
             editor_obj = FavEditors.objects.filter(standard_user=user)
-            print('editor_obj: ', editor_obj)
             for obj in editor_obj:
                 details = {}
                 # print("********** ", obj.commentator_user.username)
@@ -2472,11 +2471,19 @@ class SupportManagement(APIView):
         try:
             """Ticket percentage"""
             status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
-            new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='progress', date_created__gte=previous_24_hours).count()
+            new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
             tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
             count = (tickets_before_24_hours - status_changed_to_resolved) + new_tickets_progress
             tickets_percentage = ((count-tickets_before_24_hours)/tickets_before_24_hours) * 100
-            all_data['new_user_percentage'] = tickets_percentage
+            all_data['new_tickets_percentage'] = tickets_percentage
+
+            """Total Ticket percentage"""
+            total_status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
+            total_new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+            total_tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            total_count = (total_tickets_before_24_hours - total_status_changed_to_resolved) + total_new_tickets_progress
+            total_tickets_percentage = ((total_count-total_tickets_before_24_hours)/total_tickets_before_24_hours) * 100
+            all_data['total_ticket_percentage'] = total_tickets_percentage
 
             current_datetime = timezone.now()
 
@@ -3231,7 +3238,7 @@ def Statistics(pk):
     incorrect_prediction = data.filter(is_prediction=False)
 
     if len(data) != 0:
-        Success_rate = (len(correct_prediction)/len(data))*100
+        Success_rate = round((len(correct_prediction)/len(data))*100, 2)
     else:
         Success_rate = 0
 
@@ -3275,7 +3282,7 @@ def Statistics(pk):
         user.commentator_level = "grandmaster"
 
     if len(data) != 0:
-        avg_odd = avg_odd/len(data)
+        avg_odd = round(avg_odd/len(data), 2)
     else:
         avg_odd = 0
 
@@ -3361,8 +3368,44 @@ class SportsStatisticsView(APIView):
         datalist = []
 
         try:
+            p_type_lst = []
             details = {}
             Comments_Journey_basketball = []
+            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
+            total_user_cmt = user_all_cmt.count()
+            
+            p_type_lst = [obj.prediction_type for obj in user_all_cmt]
+
+            prediction_type_counts = Counter(p_type_lst)
+
+            top_3_prediction_types = prediction_type_counts.most_common(3)
+
+            top_3_prediction_types = [prediction[0] for prediction in top_3_prediction_types]
+
+            prediction_types_data = []
+            for i in top_3_prediction_types:
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketball').count()
+
+                cal = (predict_type / total_user_cmt)* 100
+                data ={
+                    "prediction_type":i,
+                    "calculation":round(cal, 2)
+                }
+                prediction_types_data.append(data)
+
+            if total_user_cmt == 0:
+                prediction_types_data = []
+            else:
+                b_avg = 0
+                for i in prediction_types_data:
+                    b_avg += i['calculation']
+
+                other_data = {
+                    "prediction_type":'Other',
+                    "calculation":round(100-b_avg, 2)
+                }
+                prediction_types_data.append(other_data)
+                
             recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball').order_by('-created')[:30]
             for obj in recent_30_comments:
                 Comments_Journey_basketball.append(obj.is_prediction)
@@ -3391,13 +3434,49 @@ class SportsStatisticsView(APIView):
             # basketball_counter = Counter(basketball_Leagues)
             # basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
             details['basketball_Leagues'] = result
+            details['basketball_comment_types'] = prediction_types_data
             datalist.append(details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary
 
         try:
+            fb_p_type_lst = []
             Fb_details = {}
             Comments_Journey_football = []
+            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
+            fb_total_user_cmt = fb_user_all_cmt.count()
+            
+            fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
+
+            fb_prediction_type_counts = Counter(fb_p_type_lst)
+
+            fb_top_3_prediction_types = fb_prediction_type_counts.most_common(3)
+
+            fb_top_3_prediction_types = [prediction[0] for prediction in fb_top_3_prediction_types]
+
+            fb_prediction_types_data = []
+            for i in fb_top_3_prediction_types:
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Football').count()
+
+                cal = (predict_type / fb_total_user_cmt)* 100
+                data ={
+                    "prediction_type":i,
+                    "calculation":round(cal, 2)
+                }
+                fb_prediction_types_data.append(data)
+
+            if fb_total_user_cmt == 0:
+                fb_prediction_types_data = []
+            else:
+                fb_avg = 0
+                for i in fb_prediction_types_data:
+                    fb_avg += i['calculation']
+                fb_other_data = {
+                    "prediction_type":'Other',
+                    "calculation":round(100-fb_avg, 2)
+                }
+                fb_prediction_types_data.append(fb_other_data)
+
             fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Football').order_by('-created')[:30]
             for obj in fb_recent_30_comments:
                 Comments_Journey_football.append(obj.is_prediction)
@@ -3414,7 +3493,6 @@ class SportsStatisticsView(APIView):
                 # football_Leagues.append(obj.league)
                 translator= Translator(from_lang="turkish",to_lang="english")
                 translation_coutry = translator.translate(obj.country)
-                print (translation_coutry)
                 data = {
                     "country":translation_coutry,
                     "league":obj.league,
@@ -3427,6 +3505,7 @@ class SportsStatisticsView(APIView):
             # football_counter = Counter(football_Leagues)
             # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
             Fb_details['football_Leagues'] = fb_result
+            Fb_details['football_comment_types'] = fb_prediction_types_data
             datalist.append(Fb_details)
         except Comments.DoesNotExist:
             datalist.append({})  # Append an empty dictionary

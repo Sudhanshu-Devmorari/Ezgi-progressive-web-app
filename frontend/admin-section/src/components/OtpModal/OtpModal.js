@@ -39,7 +39,7 @@ const OtpModal = (props) => {
     axios
       .post(`${config.apiUrl}/otp-verify/`, { otp: otp })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.data.status === 200) {
           props?.setShowModal(3);
         } else if (res.data.status === 400 || res.data.status === 500) {

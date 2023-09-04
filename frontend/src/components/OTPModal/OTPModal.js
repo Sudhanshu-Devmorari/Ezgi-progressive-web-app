@@ -40,8 +40,8 @@ const OTPModal = (props) => {
     // console.log(res.data, "======>>otp res");
     if (res.data.status === 200) {
       setShowModal(7);
-      console.log("verified");
-      console.log("object");
+      // console.log("verified");
+      // console.log("object");
     }
     if (res.data.status === 400) {
       setOtpError(res.data.error);

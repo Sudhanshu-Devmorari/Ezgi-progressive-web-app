@@ -73,7 +73,7 @@ const TicketReplyModal = (props) => {
             ticket_id: tickeview?.id,
           })
           .then((res) => {
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
               Swal.fire({
                 title: "Success",
@@ -112,7 +112,7 @@ const TicketReplyModal = (props) => {
             id: tickeview?.id, // sub user id
           })
           .then((res) => {
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
               Swal.fire({
                 title: "Success",
