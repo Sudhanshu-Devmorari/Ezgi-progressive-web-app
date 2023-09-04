@@ -21,7 +21,7 @@ import { userId } from "../GetUser";
 import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
 import config from "../../config";
-import initialProfile from '../../assets/profile.png'
+import initialProfile from "../../assets/profile.png";
 
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -39,10 +39,18 @@ const ActiveComments = (props) => {
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
   const profileData = props?.profileData;
-  // console.log(props?.profileData,"===========>>>props.profileData");
-  const user = props?.profile ? props?.activeCommentsshow : userId;
-  // console.log(props?.activeCommentsshow,"=>>>props?.activeCommentsshow");
-  console.log("->>>user0", user);
+
+  let user;
+  useEffect(() => {
+    if (props?.from === "editor" && props?.activeCommentsshow) {
+      user = props.activeCommentsshow;
+    } else if (props?.from === "dashboard" && userId) {
+      user = userId;
+    } else {
+      // Handle the case where neither condition is met
+      user = localStorage.getItem('user-role'); // Set a default value if needed
+    }
+  }, []);
 
   async function handleChangeProfilePic(e) {
     try {
@@ -100,22 +108,21 @@ const ActiveComments = (props) => {
   }
 
   const [userPoints, setUserPoints] = useState({
-    success_rate : '',
-    score_point : '',
-    winning : '',
-    lose : '',
-    avg_odd : '',
-    league : '',
+    success_rate: "",
+    score_point: "",
+    winning: "",
+    lose: "",
+    avg_odd: "",
+    league: "",
   });
 
-
   useEffect(() => {
-    console.log(user,"MMMMM");
     try {
+      // console.log(user, "===api");
       axios
         .get(`${config.apiUrl}/user-statistics/${user}`)
         .then((res) => {
-          // console.log(res.data, "========>>>res");
+          // console.log(res.data, "========>>>res sucess rate api res");
           setUserPoints({
             success_rate: res.data.Success_rate,
             score_point: res.data.Score_point,
@@ -161,7 +168,9 @@ const ActiveComments = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : profileData?.profile_pic ? `${config?.apiUrl}${profileData?.profile_pic}` : initialProfile
+                    : profileData?.profile_pic
+                    ? `${config?.apiUrl}${profileData?.profile_pic}`
+                    : initialProfile
                 }
                 width={100}
                 height={100}
@@ -395,7 +404,9 @@ const ActiveComments = (props) => {
             >
               Success Rate
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#D2DB08" }}>%{userPoints.success_rate}</span>
+            <span style={{ fontSize: "1.1rem", color: "#D2DB08" }}>
+              %{userPoints.success_rate}
+            </span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -407,7 +418,9 @@ const ActiveComments = (props) => {
             >
               Score Points
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#FFA200" }}>{userPoints.score_point}</span>
+            <span style={{ fontSize: "1.1rem", color: "#FFA200" }}>
+              {userPoints.score_point}
+            </span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -419,7 +432,9 @@ const ActiveComments = (props) => {
             >
               Winning
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#37FF80" }}>{userPoints.winning}</span>
+            <span style={{ fontSize: "1.1rem", color: "#37FF80" }}>
+              {userPoints.winning}
+            </span>
           </div>
           <div className="col d-flex flex-column">
             <span
@@ -431,7 +446,9 @@ const ActiveComments = (props) => {
             >
               Lose
             </span>
-            <span style={{ fontSize: "1.1rem", color: "#FF5757" }}>{userPoints.lose}</span>
+            <span style={{ fontSize: "1.1rem", color: "#FF5757" }}>
+              {userPoints.lose}
+            </span>
           </div>
         </div>
         <div

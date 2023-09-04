@@ -52,7 +52,7 @@ const MainPage = () => {
   async function getProfileData() {
     setIsLoading(true);
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
-    console.log(res.data,"===============?>>");
+    // console.log(res.data,"===============?>>");
     setProfileData(res.data.profile_pic);
     setIsLoading(false);
   }
@@ -65,7 +65,7 @@ const MainPage = () => {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log(res.data,"Commentator Data");
+        // console.log(res.data,"Commentator Data");
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
         setHighlights(res.data.highlights);

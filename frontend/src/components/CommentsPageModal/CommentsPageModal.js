@@ -190,6 +190,15 @@ const CommentsPageModal = (props) => {
                 <RxCross2
                   onClick={() => {
                     props.onHide();
+                    setMatchDetailsDropDown(false)
+                    setLevelDropDown(false)
+                    setPredictionTypeDropDown(false)
+                    setIsNotStartedSelected(false)
+                    setIsSubscriberSelected(false)
+                    setIsLosingSelected(false)
+                    setIsPublicSelected(false)
+                    setIsFinishedSelected(false)
+                    setIsWinningSelected(false)
                   }}
                   fontSize={"1.8rem"}
                   className={`${

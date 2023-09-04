@@ -51,17 +51,36 @@ const ContentSection = ({
   const [followLabel, setFollowLabel] = useState("Follow");
 
   const followCommentator = async (commentator_id) => {
-    const res = await axios
-      .get(`${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`)
-      .then((res) => {
-        if (res.statusText === "OK") {
-          //console.log("Follow Response------", res);
-          setFollowLabel((prevLabel) => "Followed");
-        }
-      })
-      .catch((error) => {
+    try{
+      const res = await axios.get(`${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`);
+      if (res.statusText === "OK") {
+          // console.log("Follow Response------", followLabel);
+          if(followLabel !== "Follow"){
+            const confirmation = await Swal.fire({
+              title: followLabel === "Follow" ? 'Follow?' : 'Unfollow?',
+              text: followLabel==="Follow" ? 'Are you sure you want to follow this commentator?' : 'Are you sure you want to unfollow this commentator?',
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes',
+              cancelButtonText: 'Cancel',
+            });
+            console.log(confirmation.value);
+            if (confirmation.value === true) {
+              setFollowLabel(() => (followLabel === "Follow" ? "Followed" : "Follow"));
+              Swal.fire({
+                title: 'You have Unfollowed',
+                icon: 'success',
+              });
+            }
+          }else{
+            setFollowLabel(() => (followLabel === "Follow" ? "Followed" : "Follow"));
+          }
+      }
+      } catch(error) {
         console.error("Error fetching data.", error);
-      }, []);
+      }
   };
 
   const [likeCount, setLikeCount] = useState('')
@@ -207,7 +226,7 @@ const ContentSection = ({
                         fontSize: "13px",
                       }}
                     >
-                      {followLabel}
+                      {followLabel ? followLabel : "Follow"}
                     </button>
                   ) : (
                     <button
@@ -223,7 +242,7 @@ const ContentSection = ({
                         fontSize: "13px",
                       }}
                     >
-                      {followLabel}
+                      {followLabel ? followLabel : "Follow"}
                     </button>
                   )}
                 </div>

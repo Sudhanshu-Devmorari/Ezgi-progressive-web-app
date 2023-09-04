@@ -84,6 +84,7 @@ const CommentatorsCommentsPage = (props) => {
     <>
     
       <ActiveComments
+      from={'dashboard'}
         content={content}
         profile={"commentator"}
         setDashboardSUser={props.setDashboardSUser}
@@ -103,7 +104,7 @@ const CommentatorsCommentsPage = (props) => {
             SelectComment === "resolvedComments") && (
             <CommentsContentSection SelectComment={SelectComment} />
           )}
-          {SelectComment === "statistics" && <EditorProfileStatisticsSection />}
+          {SelectComment === "statistics" && <EditorProfileStatisticsSection from={'dashboard'}/>}
         </>
       )}
 
