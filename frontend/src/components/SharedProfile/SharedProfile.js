@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { BsStar, BsStarFill } from "react-icons/bs";
 
-const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
+const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(false);
@@ -172,13 +172,15 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
                 style={{ fontSize: "13px" }}
               >
                 <span className="pe-1">{data?.value.user.username}</span>
-                <img
+                {verifyid?.includes(data?.value.user.id) && 
+                  <img
                   className="responsive-blue-tick"
                   src={blueTick}
                   alt=""
                   width={17}
                   height={17}
                 />
+                }
               </div>
               <div
                 style={{

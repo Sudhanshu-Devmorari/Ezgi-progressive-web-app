@@ -57,7 +57,7 @@ const EditorProfileActiveComments = (props) => {
             SelectComment={SelectComment}
           />
           {SelectComment !== "statistics" && (
-            <CommentsContentSection SelectComment={SelectComment} />
+            <CommentsContentSection SelectComment={SelectComment} verifyid={props.verifyid}/>
           )}
           {SelectComment === "statistics" && (
             <EditorProfileStatisticsSection

@@ -75,7 +75,9 @@ const FavComments = (props) => {
                   <span className="p-1 autorname-responsive">
                     {res?.commentator_user?.username}
                   </span>
+                  {props.verifyid?.includes(res?.commentator_user?.id) && 
                   <img src={blueTick} alt="" width={16} height={16} />
+                  }
                 </div>
               </div>
               <div className="col p-0">

@@ -35,6 +35,10 @@ const MainPage = () => {
   const themeMode = localStorage.getItem("CurrentTheme");
 
   const [data, setData] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
+  const [followingid, setFollowingId] = useState([]);
+  const [verifyid, setVerifyid] = useState([]);
+  const [cmtReact, setCmtReact] = useState([]);
   const [mergedResult, setMergedResult] = useState([]);
   const [subscriptionResult, setSubscriptionResult] = useState([]);
   const [onlyPublicResult, setOnlyPublicResult] = useState([]);
@@ -66,12 +70,15 @@ const MainPage = () => {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        // console.log(res.data,"Commentator Data");
         setData(res.data);
         setPublicComments(res.data.Public_Comments);
         setHighlights(res.data.highlights);
         setsubscriptionComments(res.data.Subscription_Comments);
         setads(res.data.ads);
+        setVerifyid(res.data.verify_ids)
+        setFollowingList(res.data.following_user);
+        setFollowingId(res.data.following_user.map((item)=> item.id))
+        setCmtReact(res.data.comment_reactions)
 
         const commentatorData = res.data.Commentator.map((item) => ({
           type: "commentator",
@@ -334,6 +341,7 @@ const MainPage = () => {
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
                 getProfileData={getProfileData}
+                verifyid={verifyid}
               />
             ) : (
               <DashboardSU
@@ -341,6 +349,7 @@ const MainPage = () => {
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
                 getProfileData={getProfileData}
+                verifyid={verifyid}
               />
             )
           ) : (
@@ -391,6 +400,10 @@ const MainPage = () => {
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -415,6 +428,7 @@ const MainPage = () => {
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -457,6 +471,10 @@ const MainPage = () => {
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -472,6 +490,7 @@ const MainPage = () => {
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -514,6 +533,10 @@ const MainPage = () => {
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -529,6 +552,7 @@ const MainPage = () => {
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -543,6 +567,9 @@ const MainPage = () => {
                   ads={ads}
                   setData={setData}
                   setSelectContent={setSelectContent}
+                  followingList={followingList}
+                  followingid={followingid}
+                  verifyid={verifyid}
                 />
               )}
               {selectContent === "comments" && (
@@ -551,9 +578,14 @@ const MainPage = () => {
                   mergedResult={mergedResult}
                   onlyPublicResult={onlyPublicResult}
                   ads={ads}
+                  homeApiData={homeApiData}
                   setData={setData}
                   selectContent="comments"
                   setSelectContent={setSelectContent}
+                  followingList={followingList}
+                  followingid={followingid}
+                  verifyid={verifyid}
+                  cmtReact={cmtReact}
                 />
               )}
               {selectContent === "show-all-comments" && (
@@ -562,6 +594,7 @@ const MainPage = () => {
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
                   setDashboardSUser={setDashboardSUser}
+                  verifyid={verifyid}
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}

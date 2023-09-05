@@ -357,7 +357,7 @@ const AddCommentModal = (props) => {
 
           const predictionsPromises = matchIds.map(async (val) => {
             const predictions = await axios.get(
-              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchType?matchID=${val}`,
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
               { headers }
             );
             return predictions.data.data.gameType; // Assuming you want to return the data from each API call
@@ -401,7 +401,7 @@ const AddCommentModal = (props) => {
 
           const predictionsPromises = matchIds.map(async (val) => {
             const predictions = await axios.get(
-              `https://www.nosyapi.com/apiv2/service/bettable-matches/details?matchID=${val}&type=${selectedPredictionType}`,
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
               { headers }
             );
             const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);

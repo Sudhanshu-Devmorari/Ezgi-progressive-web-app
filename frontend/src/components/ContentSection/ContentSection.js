@@ -24,8 +24,8 @@ import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 import { userId } from "../GetUser";
-import {PiHeartStraight, PiHeartStraightFill} from "react-icons/pi"
-import {GoStar, GoStarFill} from "react-icons/go"
+import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
+import { GoStar, GoStarFill } from "react-icons/go";
 import Swal from "sweetalert2";
 
 const ContentSection = ({
@@ -34,8 +34,12 @@ const ContentSection = ({
   selectContent,
   userComments,
   SelectComment,
+  setActiveCommentsshow,
+  followingList,
+  followingid,
+  verifyid,
+  cmtReact,
   homeApiData,
-  setActiveCommentsshow
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
@@ -51,48 +55,59 @@ const ContentSection = ({
   const [followLabel, setFollowLabel] = useState("Follow");
 
   const followCommentator = async (commentator_id) => {
-    try{
-      const res = await axios.get(`${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`);
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+      );
       if (res.statusText === "OK") {
-          // console.log("Follow Response------", followLabel);
-          if(followLabel !== "Follow"){
-            const confirmation = await Swal.fire({
-              title: followLabel === "Follow" ? 'Follow?' : 'Unfollow?',
-              text: followLabel==="Follow" ? 'Are you sure you want to follow this commentator?' : 'Are you sure you want to unfollow this commentator?',
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Yes',
-              cancelButtonText: 'Cancel',
+        const user_id = localStorage.getItem("user-id");
+        homeApiData(user_id);
+        // console.log("Follow Response------", followLabel);
+        if (followLabel !== "Follow") {
+          const confirmation = await Swal.fire({
+            title: followLabel === "Follow" ? "Follow?" : "Unfollow?",
+            text:
+              followLabel === "Follow"
+                ? "Are you sure you want to follow this commentator?"
+                : "Are you sure you want to unfollow this commentator?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+          });
+          console.log(confirmation.value);
+          if (confirmation.value === true) {
+            setFollowLabel(() =>
+              followLabel === "Follow" ? "Followed" : "Follow"
+            );
+            Swal.fire({
+              title: "You have Unfollowed",
+              icon: "success",
             });
-            console.log(confirmation.value);
-            if (confirmation.value === true) {
-              setFollowLabel(() => (followLabel === "Follow" ? "Followed" : "Follow"));
-              Swal.fire({
-                title: 'You have Unfollowed',
-                icon: 'success',
-              });
-            }
-          }else{
-            setFollowLabel(() => (followLabel === "Follow" ? "Followed" : "Follow"));
           }
+        } else {
+          setFollowLabel(() =>
+            followLabel === "Follow" ? "Followed" : "Follow"
+          );
+        }
       }
-      } catch(error) {
-        console.error("Error fetching data.", error);
-      }
+    } catch (error) {
+      console.error("Error fetching data.", error);
+    }
   };
 
-  const [likeCount, setLikeCount] = useState('')
-  const [favoriteCount, setFavoriteCount] = useState('')
-  const [clapCount, setClapCount] = useState('')
+  const [likeCount, setLikeCount] = useState("");
+  const [favoriteCount, setFavoriteCount] = useState("");
+  const [clapCount, setClapCount] = useState("");
   const handleCommentReaction = async (id, reaction, count) => {
-    if(reaction === "like")
-      setLikeCount(count)
-    else if(reaction === "favorite")
-      setFavoriteCount(count)
-    else if(reaction === "clap")
-      setClapCount(count)
+    // if(reaction === "like")
+    //   setLikeCount(count)
+    // else if(reaction === "favorite")
+    //   setFavoriteCount(count)
+    // else if(reaction === "clap")
+    //   setClapCount(count)
 
   localStorage.setItem(`${id}_${reaction}`, count);
     const res = await axios.post(
@@ -101,17 +116,17 @@ const ContentSection = ({
         reaction_type: `${reaction}`,
       }
     );
-    if (res.status === 200) {
+      // const user_id = localStorage.getItem("user-id");
       homeApiData(userId);
-      
-    }
+    
   };
+
   // useEffect(() => {
   //   // Retrieve the reaction data from local storage and update state variables
   //   const likeCount = localStorage.getItem(`${data?.value.id}_like`);
   //   const favoriteCount = localStorage.getItem(`${data?.value.id}_favorite`);
   //   const clapCount = localStorage.getItem(`${data?.value.id}_clap`);
-  
+
   //   setLikeCount(likeCount || '');
   //   setFavoriteCount(favoriteCount || '');
   //   setClapCount(clapCount || '');
@@ -155,7 +170,7 @@ const ContentSection = ({
               onClick={() => {
                 if (userId) {
                   setSelectContent("show-all-comments");
-                  setActiveCommentsshow(data?.value.commentator_user?.id)
+                  setActiveCommentsshow(data?.value.commentator_user?.id);
                 } else {
                   Swal.fire({
                     // title: "Success",
@@ -163,9 +178,11 @@ const ContentSection = ({
                     // icon: "success",
                     backdrop: false,
                     customClass: `${
-                      currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+                      currentTheme === "dark"
+                        ? "dark-mode-alert"
+                        : "light-mode-alert"
                     }`,
-                  })
+                  });
                 }
               }}
             >
@@ -198,7 +215,10 @@ const ContentSection = ({
                 <span className="p-1 autorname-responsive">
                   {data?.value?.commentator_user?.username}
                 </span>
-                <img src={blueTick} alt="" width={16} height={16} />
+                {/* <img src={(verifyid).includes(data?.value.commentator_user.id) ? blueTick : } alt="" width={16} height={16} /> */}
+                {verifyid.includes(data?.value.commentator_user.id) && (
+                  <img src={blueTick} alt="" width={16} height={16} />
+                )}
               </div>
             </div>
             <div className="col p-0">
@@ -226,7 +246,11 @@ const ContentSection = ({
                         fontSize: "13px",
                       }}
                     >
-                      {followLabel ? followLabel : "Follow"}
+                      {/* {followLabel ? followLabel : "Follow"} */}
+                      {followingid.includes(data?.value.commentator_user.id)
+                        ? "Followed"
+                        : "Follow"}
+                      {/* {(followingid).includes(data?.value.commentator_user.id) ? setFollowLabel('Followed') : setFollowLabel('Follow')} */}
                     </button>
                   ) : (
                     <button
@@ -261,7 +285,9 @@ const ContentSection = ({
                 </div>
                 <div className="col">
                   <div className="rate-fonts">Score Points</div>
-                  <div style={{ fontSize: "1rem", color: "#FFA200" }}>{data?.value?.commentator_user?.score_points}</div>
+                  <div style={{ fontSize: "1rem", color: "#FFA200" }}>
+                    {data?.value?.commentator_user?.score_points}
+                  </div>
                 </div>
               </div>
             </div>
@@ -399,19 +425,25 @@ const ContentSection = ({
                 {userPhone ? (
                   <div
                     onClick={() => {
-                      handleCommentReaction(data?.value.id, "like", data?.value.total_reactions.total_likes);
+                      handleCommentReaction(
+                        data?.value.id,
+                        "like",
+                        data?.value.total_reactions.total_likes
+                      );
                     }}
                   >
                     <div>
-                    {
-                      likeCount > data?.value.total_reactions.total_likes  ? (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
-                        <PiHeartStraight size={25} color="#ff3030"/> 
+                      {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
+                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].like == 1 ? (
+                          <PiHeartStraightFill size={25} color="#ff3030" />
                         ) : (
-                        <PiHeartStraightFill size={25} color="#ff3030"/> 
-                      )
-                    }{" "}
-                    {data?.value.total_reactions.total_likes}
+                          <PiHeartStraight size={25} color="#ff3030" />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <PiHeartStraight size={25} color="#ff3030" />
+                      )}{" "}
+                      {data?.value.total_reactions.total_likes}
                     </div>
                   </div>
                 ) : (
@@ -431,7 +463,11 @@ const ContentSection = ({
                 {userPhone ? (
                   <div
                     onClick={() => {
-                      handleCommentReaction(data?.value.id, "favorite",data?.value.total_reactions.total_favorite);
+                      handleCommentReaction(
+                        data?.value.id,
+                        "favorite",
+                        data?.value.total_reactions.total_favorite
+                      );
                     }}
                   >
                     {/* <img
@@ -442,14 +478,22 @@ const ContentSection = ({
                       height={23}
                       width={23}
                     /> */}
-                     {
-                      favoriteCount > data?.value.total_reactions.total_favorite  ? (
-                        <GoStar size={25} color="#ffcc00"/> 
+                    {/* {favoriteCount >
+                    data?.value.total_reactions.total_favorite ? (
+                      <GoStar size={25} color="#ffcc00" />
+                    ) : (
+                      <GoStarFill size={25} color="#ffcc00" />
+                    )}{" "} */}
+                    {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
+                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].favorite == 1 ? (
+                          <GoStarFill size={25} color="#ffcc00" />
                         ) : (
-                        <GoStarFill size={25} color="#ffcc00"/> 
-                      )
-                    }
-                    {" "}
+                          <GoStar size={25} color="#ffcc00" />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <GoStar size={25} color="#ffcc00" />
+                      )}{" "}
                     {data?.value.total_reactions.total_favorite}
                   </div>
                 ) : (
@@ -469,7 +513,11 @@ const ContentSection = ({
                 {userPhone ? (
                   <div
                     onClick={() => {
-                      handleCommentReaction(data?.value.id, "clap",data?.value.total_reactions.total_clap);
+                      handleCommentReaction(
+                        data?.value.id,
+                        "clap",
+                        data?.value.total_reactions.total_clap
+                      );
                     }}
                   >
                     {/* <img
@@ -478,15 +526,45 @@ const ContentSection = ({
                       height={20}
                       width={20}
                     /> */}
-                    <img
-                        src={currentTheme === "dark" ? 
-                        (clapCount > data?.value.total_reactions.total_clap ? clapIcon : clapIcon1) 
-                        : (clapCount > data?.value.total_reactions.total_clap ? clapIcon : clapIcon1) }
-                        alt=""
-                        height={20}
-                        width={20}
-                      />
-                    {" "}
+                    {/* <img
+                      src={
+                        currentTheme === "dark"
+                          ? clapCount > data?.value.total_reactions.total_clap
+                            ? clapIcon
+                            : clapIcon1
+                          : clapCount > data?.value.total_reactions.total_clap
+                          ? clapIcon
+                          : clapIcon1
+                      }
+                      alt=""
+                      height={20}
+                      width={20}
+                    />{" "} */}
+                    {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
+                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].clap == 1 ? (
+                          <img
+                      src={clapIcon1}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                        ) : (
+                          <img
+                      src={clapIcon}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <img
+                      src={clapIcon}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                      )}{" "}
                     {data?.value.total_reactions.total_clap}
                   </div>
                 ) : (

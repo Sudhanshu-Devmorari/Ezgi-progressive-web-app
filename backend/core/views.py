@@ -108,6 +108,7 @@ class SignupView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
         otp = totp.now()
+        print("--------", otp)
         res = sms_send(phone, otp)  
         if res == 'Success':
             return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -189,14 +190,12 @@ class LoginView(APIView):
 
 class GoogleLoginview(APIView):
     def post(self, request, format=None):
-        # print(request.data, "=============================================request.data")
         email = request.data.get('email')
         print('email: ', email)
         try: 
             user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
             print("Email already exists")
         except User.DoesNotExist:
-            # print(request.data, "=============================================request.data")
             user = User.objects.create(
                 email=email,
                 name=request.data.get('name'),
@@ -380,7 +379,43 @@ class RetrieveCommentatorView(APIView):
             data_list['ads'] = data
         except ObjectDoesNotExist:
             data_list['ads'] = []
+        try:
+            if request.query_params.get('id') != 'null':
+                following_user = []
+                if FollowCommentator.objects.filter(standard_user__id=request.query_params.get('id')).exists():
+                    following = FollowCommentator.objects.filter(standard_user__id=request.query_params.get('id'))
+                    for obj in following:
+                        serializer = UserSerializer(obj.commentator_user).data
+                        following_user.append(serializer)
+                    data_list['following_user'] = following_user
+        except:
+            data_list['following_user'] = []
 
+        try:
+            verify_ids = []
+            bluetick = BlueTick.objects.all()
+            for obj in bluetick:
+                verify_ids.append(obj.user.id)
+            data_list['verify_ids'] = verify_ids
+        except:
+            data_list['verify_ids'] = []
+
+        try:
+            if request.query_params.get('id') != 'null':
+                cmt = []
+                if CommentReaction.objects.filter(user__id = request.query_params.get('id')).exists():
+                    cmt_reacts = CommentReaction.objects.filter(user__id = request.query_params.get('id'))
+                    for obj in cmt_reacts:
+                        details = {
+                            "comment_id":obj.comment.id,
+                            "like":obj.like,
+                            "favorite":obj.favorite,
+                            "clap":obj.clap,
+                        }
+                        cmt.append(details)
+                    data_list['comment_reactions'] = cmt
+        except:
+            data_list['comment_reactions'] = []
         return Response(data=data_list, status=status.HTTP_200_OK)
 
 
@@ -1714,8 +1749,13 @@ class FilterComments(APIView):
         data_list = []
         filters = {}
         user = User.objects.get(id=id)
-        print("----", request.data)
         try:
+            if 'level' in request.data  and request.data.get('level') != None and request.data.get('level') != "" and request.data.get('level') != "Select":
+                if request.data.get('level').lower() == 'expert':
+                    filters['commentator_user__commentator_level'] = 'master'
+                else:
+                    filters['commentator_user__commentator_level'] = request.data.get('level').lower()
+
             if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
                 if request.data.get('category') == "Futbol":
                     filters['category__contains'] = "Football"
@@ -1996,6 +2036,7 @@ class FilterComments(APIView):
                         data_list.append(comment_data)
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
+            
             if filter_type == "" and filter_type0 == "":
 
                 query_filters = Q(**filters)
@@ -2026,7 +2067,7 @@ class FilterComments(APIView):
                 # serializer = CommentsSerializer(filtered_comments, many=True)
                 # data = serializer.data
                 # data_list.append(data)
-
+            
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:

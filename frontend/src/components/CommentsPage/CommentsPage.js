@@ -13,7 +13,11 @@ const CommentsPage = ({
   selectContent,
   setSelectContent,
   selectPublicorForYou,
-  setActiveCommentsshow
+  setActiveCommentsshow,
+  followingid,
+  verifyid,
+  cmtReact,
+  homeApiData
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   // console.log('&&&&&&&&', mergedResult)
@@ -58,6 +62,10 @@ const CommentsPage = ({
                   setData={setData}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
+                  followingid={followingid}
+                  verifyid={verifyid}
+                  cmtReact={cmtReact}
+                  homeApiData={homeApiData}
                 />
               </>
             );
@@ -77,6 +85,8 @@ const CommentsPage = ({
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+
                 />
               </>
             );
@@ -102,6 +112,9 @@ const CommentsPage = ({
                   setData={setData}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+                  followingid={followingid}
+                  cmtReact={cmtReact}
                 />
               </>
             );

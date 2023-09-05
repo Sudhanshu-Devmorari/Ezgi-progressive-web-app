@@ -102,7 +102,7 @@ const CommentatorsCommentsPage = (props) => {
           />
           {(SelectComment === "activeComments" ||
             SelectComment === "resolvedComments") && (
-            <CommentsContentSection SelectComment={SelectComment} />
+            <CommentsContentSection SelectComment={SelectComment}  verifyid={props.verifyid} />
           )}
           {SelectComment === "statistics" && <EditorProfileStatisticsSection from={'dashboard'}/>}
         </>
@@ -138,12 +138,13 @@ const CommentatorsCommentsPage = (props) => {
           <FavoriteSelection
             setFavSelection={setFavSelection}
             favSelection={favSelection}
+            verifyid={props.verifyid}
           />
           {favSelection === "fav editor" && (
-            <FavEditor favEditorData={favEditorData} />
+            <FavEditor favEditorData={favEditorData} verifyid={props.verifyid} />
           )}
           {favSelection === "fav comments" && (
-            <FavComments favCommentData={favCommentData} />
+            <FavComments favCommentData={favCommentData} verifyid={props.verifyid} />
           )}
         </>
       )}
