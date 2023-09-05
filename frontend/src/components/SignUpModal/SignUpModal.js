@@ -143,29 +143,21 @@ const SignUpModal = (props) => {
         age: selectedAge,
       });
       const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
-      // console.log("response: ", response.data);
+      console.log("response8: ", response.data);
       // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
         setShowModal(6)
-        // localStorage.setItem("user-role", response.data.user.user_role);
-        // localStorage.setItem("user-id", response.data.user.id);
-        // localStorage.setItem("username", response.data.user.username);
-
-        // Swal.fire({
-        //   title: "Success",
-        //   text: "User Created Successfully!",
-        //   icon: "success",
-        //   backdrop: false,
-        //   customClass:
-        //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        // }).then((result) => {
-        //   if (result.isConfirmed) {
-        //     window.location.reload();
-        //   }
-        // });
-        //props.onHide();
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
+      } else if (response.data.status === 500){
+           Swal.fire({
+          title: "Error",
+          text: response.data.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        })
       }
     }
   };

@@ -49,7 +49,7 @@ const OTPModal = (props) => {
         gender: props?.signUpData.gender,
         age: props?.signUpData.age,
         country: "Turkey",
-        signup : 'signup',
+        signup: "signup",
       });
       if (res.data.status === 200) {
         localStorage.setItem("user-role", res.data.user.user_role);
@@ -86,24 +86,24 @@ const OTPModal = (props) => {
   };
 
   // RESEND OTP API
-  const handleResendOtp = async ()   => {
+  const handleResendOtp = async () => {
     setOtp("");
     setOtpError("");
     setTimer(30);
-    console.log(props,"==========>>>>props")
+    setIsTimerVisible(true);
     const phone = props?.signUpData.phone;
-    if (phone){
-      console.log('isphone')
+    if (phone) {
+      console.log("isphone");
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: phone,
-        signup : 'signup'
+        signup: "signup",
       });
       console.log(res.data, "======>>otp resend");
       if (res.data.status === 500) {
         setOtpError(res.data.error);
       }
     } else {
-      console.log("==else")
+      console.log("==else");
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: props.forgotPsPhone,
       });

@@ -25,6 +25,8 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
 
   const server_url = `${config.apiUrl}`;
 
+  // console.log("=>>>data", data)
+
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
     { name: "adnankeser", rate: "%67.5" },
@@ -35,7 +37,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow }) => {
     axios
       .get(`${config.apiUrl}/fav-editor/${userId}/?commentators=${e}`)
       .then((res) => {
-        console.log(res,"========>>>>>res");
+        // console.log(res,"========>>>>>res");
       })
       .catch((err) => {
         console.log(err);

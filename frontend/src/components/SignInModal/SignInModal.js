@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
@@ -12,15 +12,16 @@ import config from "../../config";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignInModal = (props) => {
+  const [showPassword, setShowPassword] = useState(false);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
   const validationSchema = Yup.object({
     phone: Yup.string()
-    .required("Phone is required")
-    .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
-    .min(10, "Phone must be 10 digits")
-    .max(10, "Phone must be 10 digits"),
+      .required("Phone is required")
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
@@ -134,19 +135,14 @@ const SignInModal = (props) => {
               </div>
               <input
                 className={`${
-                  currentTheme === "dark"
-                    ? "darkMode-input"
-                    : "lightMode-input"
+                  currentTheme === "dark" ? "darkMode-input" : "lightMode-input"
                 } form-control`}
-                type={`${formik.getFieldProps("showPassword")
-                  ? "text"
-                  : "password"
-                }`}
+                type={`${showPassword ? "text" : "password"}`}
                 name=""
                 id="password"
                 {...formik.getFieldProps("password")}
               />
-              {formik.getFieldProps("showPassword") ? (
+              {showPassword ? (
                 <AiOutlineEyeInvisible
                   fontSize={"1.5rem"}
                   style={{
@@ -154,7 +150,7 @@ const SignInModal = (props) => {
                     right: ".5rem",
                     top: "1.56rem",
                   }}
-                  onClick={() => formik.setFieldValue("showPassword", false)}
+                  onClick={() => setShowPassword(!showPassword)}
                 />
               ) : (
                 <AiOutlineEye
@@ -164,7 +160,7 @@ const SignInModal = (props) => {
                     right: ".5rem",
                     top: "1.56rem",
                   }}
-                  onClick={() => formik.setFieldValue("showPassword", true)}
+                  onClick={() => setShowPassword(!showPassword)}
                 />
               )}
               {formik.touched.password && formik.errors.password ? (
