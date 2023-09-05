@@ -21,7 +21,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(data?.is_favorite || false); // Initialize with the API data
+  const [isFavorite, setIsFavorite] = useState(false); // Initialize with the API data
 
   const server_url = `${config.apiUrl}`;
 
@@ -34,10 +34,15 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
   ];
 
   function getfav(e) {
+    // console.log(e,"=>>>e")
     axios
-      .get(`${config.apiUrl}/fav-editor/${userId}/?commentators=${e}`)
+      .get(`${config.apiUrl}/fav-editor/${userId}/?commentator=${e}`)
       .then((res) => {
-        // console.log(res,"========>>>>>res");
+        console.log(res, "========>>>>>res");
+        if (res.status === 200) {
+          const favIs = res?.data[0]?.is_fav_editor;
+          setIsFavorite(favIs);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -46,17 +51,19 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
 
   useEffect(() => {
     getfav(data?.value?.user?.id);
-  }, [])
-  
+  }, []);
 
   const favEditor = async (id) => {
     const user_id = localStorage.getItem("user-id");
     try {
-      const response = await axios.post(`${config.apiUrl}/fav-editor/${user_id}/`, {
-        id: id,
-      });
+      const response = await axios.post(
+        `${config.apiUrl}/fav-editor/${user_id}/`,
+        {
+          id: id,
+        }
+      );
       console.log("API Response:", response.data);
-      setIsFavorite(!isFavorite); // Toggle the favorite state
+      setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
@@ -84,10 +91,21 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
           </span>
           {/* <BsStar style={{ color : isFavorite ? "#0D2A53" : "" }}/> */}
           {isFavorite ? (
-            <BsStar />
-          ) : (
             <BsStarFill
+              onClick={() => {
+                if (userId) {
+                  favEditor(data?.value.user.id);
+                }
+              }}
               color={currentTheme === "dark" ? "#FFFFFF" : "#0D2A53"}
+            />
+          ) : (
+            <BsStar
+              onClick={() => {
+                if (userId) {
+                  favEditor(data?.value.user.id);
+                }
+              }}
             />
           )}
 

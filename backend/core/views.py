@@ -808,19 +808,15 @@ class FavEditorsCreateView(APIView):
         data = []
         try:
             user = get_object_or_404(User, id=id)
-            editors = request.query_params.get('commentators')
+            editor = request.query_params.get('commentator')
+            print('editor: ', editor)
 
-            for obj in editors.split(","):
-                try:
-                    commentator = get_object_or_404(User, id=obj)
-                    faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
-                    details = {
-                        "id": obj,
-                        "is_fav_editor": faveditor_obj
-                    }
-                    data.append(details)
-                except User.DoesNotExist:
-                    continue  # Skip this commentator and continue with the next one
+            commentator = get_object_or_404(User, id=editor)
+            faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
+            details = {
+                "is_fav_editor": faveditor_obj
+            }
+            data.append(details)
             return Response(data=data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -842,13 +838,20 @@ class FavEditorsCreateView(APIView):
                     data = serializer.data
                     return Response(data, status=status.HTTP_200_OK)
                 else:
-                    return Response(
-                        create_response(
-                            status.HTTP_400_BAD_REQUEST,
-                            "In your favorite editor, this editor is already present."
-                        ),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                    # editor_obj = FavEditors.objects.remove(commentator_user=comment, standard_user=user)
+                    existing_fav_editor = FavEditors.objects.filter(commentator_user=comment, standard_user=user)
+                    
+                    if existing_fav_editor.exists():
+                        existing_fav_editor.delete()
+                        return Response({'message': 'Favorite editor removed successfully'}, status=status.HTTP_200_OK)
+                    else:
+                        return Response(
+                            create_response(
+                                status.HTTP_400_BAD_REQUEST,
+                                "In your favorite editor, this editor is already present."
+                            ),
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
             else:
                 return Response({'error': 'Request Data not found'}, status=status.HTTP_404_NOT_FOUND)
         except ObjectDoesNotExist as e:
@@ -1603,18 +1606,27 @@ class UserManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            if user.user_role == "standard":
-                # user.delete()
-                user.is_delete = True
-                user.save()
-                message = {"success": "User profile Deactivate sucessfully."}
-                return Response(data=message, status=status.HTTP_200_OK)
-            else:
-                # user.deactivate_commentator = 'pending'
-                user.is_delete = True
-                user.save()
-                message = {"success": "User profile Deactivate sucessfully."}
-                return Response(data=message, status=status.HTTP_200_OK)
+            action = request.query_params.get('action')
+            if action == 'delete':
+                try:
+                    user.delete()
+                    return Response("User deleted Successfully", status= status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            elif action == 'deactive':
+                if user.user_role == "standard":
+                    # user.delete()
+                    user.is_delete = True
+                    user.save()
+                    message = {"success": "User profile Deactivate sucessfully."}
+                    return Response(data=message, status=status.HTTP_200_OK)
+                else:
+                    # user.deactivate_commentator = 'pending'
+                    user.is_delete = True
+                    user.save()
+                    message = {"success": "User profile Deactivate sucessfully."}
+                    return Response(data=message, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -3077,10 +3089,17 @@ class SubUserManagement(APIView):
     def delete(self, request, pk, format=None, *args, **kwargs):
         try:
             user = User.objects.get(pk=pk)
-            # user.delete()
-            user.is_delete = True
-            user.save()
-            return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
+            action = request.query_params.get('action')
+            if action == 'delete':
+                try:
+                    user.delete()
+                    return Response("User deleted Successfully", status= status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            elif action == 'deactive':
+                user.is_delete = True
+                user.save()
+                return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         

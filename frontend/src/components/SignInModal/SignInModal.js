@@ -16,6 +16,8 @@ const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
+    const [btnLoading, setBtnLoading] = useState(false);
+
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone is required")
@@ -34,6 +36,7 @@ const SignInModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      setBtnLoading(true);
       try {
         const res = await axios.post(`${config.apiUrl}/login/`, {
           password: values.password,
@@ -41,6 +44,7 @@ const SignInModal = (props) => {
         });
 
         if (res.data.status === 200) {
+          setBtnLoading(false);
           localStorage.setItem("user-role", res.data.userRole);
           localStorage.setItem("user-id", res.data.userId);
           localStorage.setItem("username", res.data.username);
@@ -57,6 +61,7 @@ const SignInModal = (props) => {
             }
           });
         } else if (res.data.status === 400 || res.data.status === 404) {
+          setBtnLoading(false);
           Swal.fire({
             title: "Error",
             text: res.data.data,
@@ -67,6 +72,7 @@ const SignInModal = (props) => {
           });
         }
       } catch (error) {
+        setBtnLoading(false);
         console.error("Login failed:", error);
       }
     },
@@ -177,7 +183,7 @@ const SignInModal = (props) => {
                 currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
               } px-3 py-1`}
             >
-              Continue
+             {btnLoading ? "Loading…" : "Continue"}
             </button>
             <div className="text-center my-3">
               --------------------- or ---------------------{" "}

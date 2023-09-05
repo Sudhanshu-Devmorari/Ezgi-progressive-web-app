@@ -29,26 +29,45 @@ const Home = (props) => {
     const file = e.target.files[0];
     // console.log(":::::::: ", file?.path);
   };
-  const handleDeactive = async (id) => {
+  const handleDeactive = async (id, action) => {
     try {
-      const res = await axios.delete(
-        `${config?.apiUrl}/user-management/${id}/`
-      );
-      if (res.status === 200) {
-        props?.adminHomeApiData();
-        Swal.fire({
-          title: "Success",
-          text: "User profile Delete sucessfully.",
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+      if (action === 'delete') {
+        console.log(action,"===============>>>action from delete")
+        const res = await axios.delete(
+          `${config?.apiUrl}/user-management/${id}/?action=delete`
+        );
+        if (res.status === 200) {
+          props?.adminHomeApiData();
+          Swal.fire({
+            title: "Success",
+            text: "User profile Delete sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } else if (action === 'deactive'){
+        console.log(action,"===============>>>action from deactive")
+        const res = await axios.delete(
+          `${config?.apiUrl}/user-management/${id}/?action=deactive`
+        );
+        if (res.status === 200) {
+          props?.adminHomeApiData();
+          Swal.fire({
+            title: "Success",
+            text: "User profile deactive sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
   };
+
   const [addUser, setAddUser] = useState({});
   const submitUserData = (e) => {
     let name, value;
@@ -589,7 +608,8 @@ const Home = (props) => {
                   width={25}
                 />
                 <img
-                  onClick={() => handleDeactive(res.id)}
+                  onClick={() => handleDeactive(res.id, 'delete')}
+                  // onClick={() => handleDelete(res.id)}
                   className="cursor"
                   src={trash}
                   alt=""
@@ -991,7 +1011,7 @@ const Home = (props) => {
                     <div className="col">
                       <button
                         onClick={() => {
-                          handleDeactive(userData?.id);
+                          handleDeactive(userData?.id, 'deactive');
                           setAddUser({
                             name: "",
                             username: "",
@@ -1079,10 +1099,9 @@ const Home = (props) => {
                   setPreveiwProfilePic(null);
                   setAgeDropDown(false);
                   setGenderDropDown(false);
-                  setMonthDropDown(false)
-                  setNumberDropDown(false)
-                  setLevelDropDown(false)
-                 
+                  setMonthDropDown(false);
+                  setNumberDropDown(false);
+                  setLevelDropDown(false);
                 }}
                 data-bs-dismiss="modal"
                 src={cross}
@@ -1298,9 +1317,9 @@ const Home = (props) => {
             <img
               onClick={() => {
                 setUserTypeFilterDropDown(false);
-                setCityFilterDropDown(false)
-                setGenderFilterDropDown(false)
-                setAgeFilterDropDown(false)
+                setCityFilterDropDown(false);
+                setGenderFilterDropDown(false);
+                setAgeFilterDropDown(false);
               }}
               data-bs-dismiss="modal"
               src={cross}

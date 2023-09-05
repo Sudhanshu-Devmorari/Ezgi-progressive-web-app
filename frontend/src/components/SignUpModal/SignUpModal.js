@@ -43,6 +43,7 @@ const SignUpModal = (props) => {
   const [selectedGender, setSelectedGender] = useState("Select");
   const [ageDropDown, setAgeDropDown] = useState(false);
   const [selectedAge, setSelectedAge] = useState("Select");
+  const [btnLoading, setbtnLoading] = useState(false);
 
   // SIGN UP API --------------------------------------------------
 
@@ -128,6 +129,7 @@ const SignUpModal = (props) => {
     if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
+      setbtnLoading(true);
       setCityError("");
       setGenderError("");
       setAgeError("");
@@ -137,7 +139,7 @@ const SignUpModal = (props) => {
         username: username,
         phone: phone,
         password: password,
-        country: 'Turkey',
+        country: "Turkey",
         city: selectedCity,
         gender: selectedGender,
         age: selectedAge,
@@ -146,18 +148,27 @@ const SignUpModal = (props) => {
       console.log("response8: ", response.data);
       // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
-        setShowModal(6)
+        setShowModal(6);
+        setbtnLoading(false);
+        setSelectedCity("Select")
+        setSelectedGender("Select")
+        setSelectedAge("Select")
+        setSelectCheckBox(false)
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
-      } else if (response.data.status === 500){
-           Swal.fire({
+        setbtnLoading(false);
+        setShowModal(2);
+      } else if (response.data.status === 500) {
+        setShowModal(2);
+        setbtnLoading(false);
+        Swal.fire({
           title: "Error",
           text: response.data.error,
           icon: "error",
           backdrop: false,
           customClass:
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        })
+        });
       }
     }
   };
@@ -269,28 +280,40 @@ const SignUpModal = (props) => {
       password: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      axios
-        .post(`${config.apiUrl}/signup-user-exists/`, {
+    onSubmit: async (values) => {
+      console.log("click event fire::::::::::::::::");
+      console.log("values:::::::::::::", values);
+      setbtnLoading(true);
+      try {
+        const res = await axios.post(`${config.apiUrl}/signup-user-exists/`, {
           phone: values.phone,
           username: values.username,
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.data.status === 400) {
-            setuserExists(res.data?.data);
-          } else if (res.data.status === 200) {
-            setShowModal(2);
-            setuserExists('');
-            setName(values.name);
-            setUsername(values.username);
-            setPassword(values.password);
-            setPhone(values.phone);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
         });
+        console.log("res::::::::::", res);
+        if (res.data.status === 400) {
+          setbtnLoading(false);
+          setuserExists(res.data?.data);
+        } else if (res.data.status === 200) {
+          formik.resetForm()
+          setShowModal(2);
+          setuserExists("");
+          setName(values.name);
+          setUsername(values.username);
+          setPassword(values.password);
+          setPhone(values.phone);
+          setbtnLoading(false);
+        }
+
+        // .then((res) => {
+        //   console.log(res);
+        // })
+        // .catch((error) => {
+        //   console.log(error);
+        // });
+      } catch (error) {
+        console.log("errr::::::::::::", error);
+        setbtnLoading(false);
+      }
     },
   });
 
@@ -456,7 +479,7 @@ const SignUpModal = (props) => {
                             : "lightMode-btn"
                         } px-3 py-1`}
                       >
-                        Continue
+                        {btnLoading ? "Loading…" : "Continue"}
                       </button>
                       <div className="text-center my-3">
                         --------------------- or ---------------------
@@ -492,7 +515,7 @@ const SignUpModal = (props) => {
                 currentTheme === "dark" ? "darkMode" : "lightMode"
               }`}
             >
-              <div className="m-4">
+              <div className="my-4 mx-3">
                 <div className="text-danger text-center text-capitalize">
                   {userExists}
                 </div>
@@ -605,7 +628,7 @@ const SignUpModal = (props) => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="mt-3">
+                  <div className="mt-3" style={{fontSize: "13px"}}>
                     {currentTheme === "dark" ? (
                       <img
                         alt=""
@@ -659,7 +682,7 @@ const SignUpModal = (props) => {
                           : "lightMode-btn"
                       } px-3 py-1`}
                     >
-                      Continue
+                      {btnLoading ? "Loading…" : "Continue"}
                     </button>
                     <div className="mt-4">
                       Already Account?{" "}
@@ -693,7 +716,12 @@ const SignUpModal = (props) => {
           )}
 
           {ShowModal === 6 && (
-            <OTPModal hide={props.onHide} phone={phone} signUpData={signUpData} forgotPsPhone={forgotPsPhone}/>
+            <OTPModal
+              hide={props.onHide}
+              phone={phone}
+              signUpData={signUpData}
+              forgotPsPhone={forgotPsPhone}
+            />
           )}
 
           {ShowModal === 7 && (

@@ -5,34 +5,22 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
+import Spinner from "react-bootstrap/Spinner";
 
 const ForgotPassword = (props) => {
+  console.log("props::::::::::::;", props);
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
     useContext(CurrentTheme);
 
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [btnLoading, setbtnLoading] = useState(false);
 
   const phoneReg = /^\d{10}$/;
 
   // FORGOT PASSWORD API
   const [alert, setAlert] = useState(null);
-  const handleForgotPS = async () => {
-    if (!phoneReg.test(phone)) {
-      setPhoneError("Invalid phone number");
-    } else {
-      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
-        phone: phone,
-      });
-      // console.log("response: FP : ", res.data);
-      if (res.data.status === 200) {
-        setShowModal(6);
-        props.setForgotPsPhone(phone);
-      } else if (res.data.status === 404) {
-        setPhoneError(res.data.data);
-      }
-    }
-  };
+
   // =======================
   const validationSchema = Yup.object({
     phone: Yup.string()
@@ -47,6 +35,7 @@ const ForgotPassword = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      setbtnLoading(true);
       // setPhone(values.phone);
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: values.phone,
@@ -54,12 +43,16 @@ const ForgotPassword = (props) => {
       console.log("response: FP : ", res.data);
       if (res.data.status === 200) {
         setShowModal(6);
+        setbtnLoading(false);
         props?.setForgotPsPhone(values.phone);
       } else if (res.data.status === 404) {
         setPhoneError(res.data.data);
+        setShowModal(5);
+        setbtnLoading(false);
       }
     },
   });
+
   return (
     <>
       <div>
@@ -130,8 +123,9 @@ const ForgotPassword = (props) => {
                 className={`${
                   currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                 } px-4 py-1`}
+                disabled={btnLoading}
               >
-                Send
+                {btnLoading ? "Loading…" : "Send"}
               </button>
             </div>
           </div>

@@ -1,14 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
-import OTPInput from "react-otp-input";
+// import OTPInput from "react-otp-input";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
+import OtpInput from "react18-input-otp";
 
 const OTPModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
+
+  console.log("props.otp::::::::::::::", props.otp);
 
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
@@ -18,6 +21,10 @@ const OTPModal = (props) => {
 
   useEffect(() => {
     let interval;
+
+    // if (props.otp) {
+    //   setShowModal(5);
+    // }
 
     if (isTimerVisible) {
       interval = setInterval(() => {
@@ -40,7 +47,7 @@ const OTPModal = (props) => {
     const phone = props?.signUpData.phone;
     if (phone) {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
-        otp: otp,
+        otp: props.otp,
         phone: phone,
         name: props?.signUpData.name,
         username: props?.signUpData.username,
@@ -74,7 +81,7 @@ const OTPModal = (props) => {
       }
     } else {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
-        otp: otp,
+        otp: props.otp,
       });
       if (res.data.status === 200) {
         setShowModal(7);
@@ -87,7 +94,6 @@ const OTPModal = (props) => {
 
   // RESEND OTP API
   const handleResendOtp = async () => {
-    setOtp("");
     setOtpError("");
     setTimer(30);
     setIsTimerVisible(true);
@@ -146,8 +152,21 @@ const OTPModal = (props) => {
                   ).padStart(2, "0")}`}
               </span>
             </div>
-            <div className="w-100 d-flex justify-content-center">
-              <OTPInput
+            <div className="w-100">
+              <OtpInput
+                value={otp}
+                onChange={setOtp}
+                numInputs={6}
+                separator={<span> </span>}
+                inputStyle={`${
+                  currentTheme === "dark"
+                    ? "otpinputdesign-dark-mode"
+                    : "otpinputdesign-light-mode"
+                } `}
+                containerStyle={"otpbox  my-2"}
+                isInputNum={true}
+              />
+              {/* <OTPInput
                 inputStyle={`${
                   currentTheme === "dark"
                     ? "otpinputdesign-dark-mode"
@@ -157,9 +176,11 @@ const OTPModal = (props) => {
                 onChange={setOtp}
                 numInputs={6}
                 renderSeparator={<span> </span>}
-                renderInput={(props) => <input {...props} />}
+                renderInput={(props) => (
+                  <input {...props} style={{ color: " #000" }} type="number" />
+                )}
                 containerStyle={"otpbox my-2"}
-              />
+              /> */}
             </div>
             <div className="d-flex justify-content-between">
               <small className="text-danger" style={{ fontSize: "0.71rem" }}>

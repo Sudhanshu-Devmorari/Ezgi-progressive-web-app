@@ -298,7 +298,12 @@ const CommentsManagement = (props) => {
     "Match Details 3",
   ];
   const predictionTypeOptions = predictionType;
-  const predictionOptions = ["Apprentice","Journeyman", "Expert", "Grandmaster"];
+  const predictionOptions = [
+    "Apprentice",
+    "Journeyman",
+    "Expert",
+    "Grandmaster",
+  ];
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -385,7 +390,6 @@ const CommentsManagement = (props) => {
     },
   ];
 
-  
   useEffect(() => {
     const fetchData = async () => {
       let type;
@@ -395,7 +399,7 @@ const CommentsManagement = (props) => {
         } else if (selectedCategory === "Basketbol") {
           type = 2;
         }
-        
+
         try {
           const res11 = await axios.get(
             `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
@@ -411,13 +415,13 @@ const CommentsManagement = (props) => {
             );
             return predictions.data.data.gameType; // Assuming you want to return the data from each API call
           });
-      
+
           // Wait for all API calls to complete
           const predictionsData = await Promise.all(predictionsPromises);
-      
+
           // Flatten and remove duplicates from the predictionsData array
           const uniquePredictions = [...new Set(predictionsData.flat())];
-      
+
           // console.log("Unique Predictions:", uniquePredictions);
           // Now you can work with the uniquePredictions array as needed
           setPredictionType(uniquePredictions);
@@ -428,7 +432,13 @@ const CommentsManagement = (props) => {
     };
 
     fetchData();
-  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, headers]);
+  }, [
+    selectedMatchDetails,
+    selectedCategory,
+    selectedLeague,
+    selectedDate,
+    headers,
+  ]);
 
   const server_url = `${config?.apiUrl}`;
   return (
@@ -440,12 +450,7 @@ const CommentsManagement = (props) => {
         />
         {displayUser.map((res, index) => (
           <MainDiv>
-            <div
-              onClick={() => setCurrentData(res)}
-              className="col-3 d-flex align-items-center cursor"
-              data-bs-toggle="modal"
-              data-bs-target="#filter"
-            >
+            <div className="col-3 d-flex align-items-center cursor">
               <span className="pe-1">{`# ${res?.id
                 .toString()
                 .padStart(4, "0")}`}</span>
@@ -504,7 +509,10 @@ const CommentsManagement = (props) => {
                 width={23}
               />
               <img
-                className="eye-icon"
+                onClick={() => setCurrentData(res)}
+                data-bs-toggle="modal"
+                data-bs-target="#filter"
+                className="eye-icon cursor"
                 src={eye}
                 alt=""
                 height={23}
@@ -774,10 +782,10 @@ const CommentsManagement = (props) => {
                   setMatchDetailsDropdown(false);
                   setPredictionDropdown(false);
                   setPredictionTypeDropdown(false);
-                  setStatus("")
-                  setSecondStatus("")
-                  setThirdStatus("")
-                  setFourthStatus("")
+                  setStatus("");
+                  setSecondStatus("");
+                  setThirdStatus("");
+                  setFourthStatus("");
                 }}
                 data-bs-dismiss="modal"
                 src={cross}
@@ -843,7 +851,9 @@ const CommentsManagement = (props) => {
                   )}
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">{currentData?.match_detail?.split(' - ')[0]}</span>
+                  <span className="mt-2 pt-1">
+                    {currentData?.match_detail?.split(" - ")[0]}
+                  </span>
                   <div
                     className="px-2"
                     style={{
@@ -865,7 +875,9 @@ const CommentsManagement = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">{currentData?.match_detail?.split(' - ')[1]}</span>
+                  <span className="mt-2 pt-1">
+                    {currentData?.match_detail?.split(" - ")[1]}
+                  </span>
                 </div>
                 <div className="text-end mt-3 mb-2">
                   <span

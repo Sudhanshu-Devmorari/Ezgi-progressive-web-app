@@ -68,13 +68,19 @@ const SubUserManagementFilter = (props) => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" onChange={(e)=>props.filteredData(e.target.value)} />
+            <input
+              type="text"
+              className="input-field-dark"
+              onChange={(e) => props.filteredData(e.target.value)}
+            />
           </div>
         </div>
 
         <div className="p-2">
           <button
-            onClick={() => {props?.seteditProfileModal(1);}}
+            onClick={() => {
+              props?.seteditProfileModal(1);
+            }}
             data-bs-toggle="modal"
             data-bs-target="#create-sub-user"
             className="px-3"
@@ -91,6 +97,8 @@ const SubUserManagementFilter = (props) => {
       </div>
 
       <CreateSubUser
+        getSubUsers={props.getSubUsers}
+        handleDeleteUser={props?.handleDeleteUser}
         editProfileModal={props?.editProfileModal}
         editUserId={props?.editUserId}
         seteditProfileModal={props?.seteditProfileModal}

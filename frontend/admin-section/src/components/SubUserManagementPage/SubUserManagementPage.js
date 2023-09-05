@@ -35,27 +35,24 @@ const SubUserManagementPage = () => {
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
 
-    async function getSubUsers() {
-      try {
-        const res = await axios.get(
-          `${config?.apiUrl}/subuser-management/`
-        );
-        // console.log(res.data, "==========>>>res sub users");
-        const data = res.data;
-        setNotificationCount(data.notification_count);
-        setSubuserCount(data.subuser_count);
-        setSubuserList(data.subuser_list);
-        setUserTimeline(data.user_timeline);
-      } catch (error) {
-        console.log(error);
-      }
+  async function getSubUsers() {
+    try {
+      const res = await axios.get(`${config?.apiUrl}/subuser-management/`);
+      // console.log(res.data, "==========>>>res sub users");
+      const data = res.data;
+      setNotificationCount(data.notification_count);
+      setSubuserCount(data.subuser_count);
+      setSubuserList(data.subuser_list);
+      setUserTimeline(data.user_timeline);
+    } catch (error) {
+      console.log(error);
     }
-    //getSubUsers();
+  }
+  //getSubUsers();
 
   useEffect(() => {
     getSubUsers();
-  }, [])
-  
+  }, []);
 
   const [editProfileModal, seteditProfileModal] = useState(1);
   const [editUserId, setEditUserId] = useState("");
@@ -74,21 +71,36 @@ const SubUserManagementPage = () => {
     filteredArray.length > 0 ? filteredArray : subuserList;
 
   // Delete User
-  const handleDeleteUser = async (e) => {
+  const handleDeleteUser = async (e, action) => {
     try {
-      const res = await axios.delete(
-        `${config?.apiUrl}/subuser-management/${e}`
-      );
-      // console.log(res.data);
-      if (res.data.status === 200) {
-        getSubUsers();
-        Swal.fire({
-          title: "Success",
-          text: res.data.data,
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+      if (action === "delete") {
+        const res = await axios.delete(
+          `${config?.apiUrl}/subuser-management/${e}/?action=delete`
+        );
+        if (res.data.status === 200) {
+          getSubUsers();
+          Swal.fire({
+            title: "Success",
+            text: "User profile Delete sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } else if (action === "deactive") {
+        const res = await axios.delete(
+          `${config?.apiUrl}/subuser-management/${e}/?action=deactive`
+        );
+        if (res.data.status === 200) {
+          getSubUsers();
+          Swal.fire({
+            title: "Success",
+            text: "User profile deactive sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
       }
     } catch (e) {}
   };
@@ -149,12 +161,14 @@ const SubUserManagementPage = () => {
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SubUserManagementFilter
+                    handleDeleteUser={handleDeleteUser}
                     filteredData={filteredData}
                     editProfileModal={editProfileModal}
                     seteditProfileModal={seteditProfileModal}
                     editUserId={editUserId}
                     setFilteredSubuserList={setFilteredSubuserList}
                     subuserList={subuserList}
+                    getSubUsers={getSubUsers}
                   />
                   {displaySubuserList.map((res, index) => (
                     <MainDiv key={index}>
@@ -195,12 +209,9 @@ const SubUserManagementPage = () => {
                                 (res.department === "Director Manager" &&
                                   "1px solid #FF33E4"),
                               color:
-                                (res.department === "Support" &&
-                                  "#FF9100") ||
-                                (res.department === "Financial" &&
-                                  "#58DEAA") ||
-                                (res.department === "Technical" &&
-                                  "#58DEAA") ||
+                                (res.department === "Support" && "#FF9100") ||
+                                (res.department === "Financial" && "#58DEAA") ||
+                                (res.department === "Technical" && "#58DEAA") ||
                                 (res.department === "IT Supervisor" &&
                                   "#4DD5FF") ||
                                 (res.department === "Ads Manager" &&
@@ -237,7 +248,7 @@ const SubUserManagementPage = () => {
                             alt=""
                             height={22}
                             width={22}
-                            onClick={() => handleDeleteUser(res.id)}
+                            onClick={() => handleDeleteUser(res.id, "delete")}
                           />
                         </div>
                       </>

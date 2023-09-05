@@ -72,10 +72,26 @@ const CreateSubUser = (props) => {
   const [selectedImage, setSelectedImage] = useState(false);
 
   function handleAddProfile(e) {
-    const imageFile = e.target.files[0];
-    setPreveiwProfilePic(URL.createObjectURL(imageFile));
-    setSelectedImage(imageFile);
+    try {
+      const imageFile = e.target.files[0];
+      if (imageFile) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (allowedTypes.includes(imageFile.type)) {
+          setPreveiwProfilePic(URL.createObjectURL(imageFile));
+          setSelectedImage(imageFile);
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Invalid file type. Please select a valid image file.",
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      }
+    } catch (error) {}
   }
+
   // Create Sub user API
   const [Name, setName] = useState("");
   const [NameError, setNameError] = useState("");
@@ -170,11 +186,25 @@ const CreateSubUser = (props) => {
       if (isPriceUpdateSelected) {
         formData.append("is_price_update", "true");
       }
-      const res = await axios.post(
-        `${config?.apiUrl}/subuser-management/`,
-        formData
-      );
-      // console.log(res);
+      try {
+        const res = await axios.post(
+          `${config?.apiUrl}/subuser-management/`,
+          formData
+        );
+        console.log(res);
+        if (res.status === 200) {
+          props?.getSubUsers();
+          Swal.fire({
+            title: "Success",
+            text: "Sub User Created successfully!!",
+            icon: "success",
+            backdrop: false,
+            customClass: `${"dark-mode-alert"}`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -235,6 +265,7 @@ const CreateSubUser = (props) => {
       );
       // console.log("res============>>>", res.data);
       if (res.data.status === 200) {
+        props.getSubUsers();
         Swal.fire({
           title: "Success",
           text: "Sub User Updated!",
@@ -667,7 +698,10 @@ const CreateSubUser = (props) => {
                       Remove
                     </button>
                     <button
-                      // data-bs-dismiss="modal"
+                      data-bs-dismiss="modal"
+                      onClick={() =>
+                        props?.handleDeleteUser(props?.editUserId, "deactive")
+                      }
                       className="py-1 px-2 mx-3"
                       style={{
                         backgroundColor: "transparent",
@@ -711,10 +745,9 @@ const CreateSubUser = (props) => {
             </div>
             <img
               onClick={() => {
-                resetFields()
-                setDepartmentDropDown(false)
-                }
-              }
+                resetFields();
+                setDepartmentDropDown(false);
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""
