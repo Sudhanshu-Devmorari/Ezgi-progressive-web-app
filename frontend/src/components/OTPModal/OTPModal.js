@@ -18,6 +18,7 @@ const OTPModal = (props) => {
 
   const [timer, setTimer] = useState(30);
   const [isTimerVisible, setIsTimerVisible] = useState(true);
+  const [otpLoading, setOtpLoading] = useState(true);
 
   useEffect(() => {
     let interval;
@@ -60,9 +61,9 @@ const OTPModal = (props) => {
       });
       if (res.data.status === 200) {
         setOtpLoading(false);
-        props?.setSelectedCity("Select")
-        props?.setSelectedGender("Select")
-        props?.setSelectedAge("Select")
+        props?.setSelectedCity("Select");
+        props?.setSelectedGender("Select");
+        props?.setSelectedAge("Select");
         localStorage.setItem("user-role", res.data.user.user_role);
         localStorage.setItem("user-id", res.data.user.id);
         localStorage.setItem("username", res.data.user.username);
@@ -81,6 +82,7 @@ const OTPModal = (props) => {
         // props.onHide();
       }
       if (res.data.status === 400) {
+        setOtpLoading(false)
         setOtpError(res.data.error);
       }
     } else {
@@ -90,9 +92,11 @@ const OTPModal = (props) => {
       // console.log("res:::::::::::::", res);
 
       if (res.data.status === 200) {
+        setOtpLoading(false)
         setShowModal(7);
       }
       if (res.data.status === 400) {
+        setOtpLoading(false)
         setOtpError(res.data.error);
       }
     }
@@ -217,7 +221,7 @@ const OTPModal = (props) => {
                 currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
               } px-3 py-1`}
             >
-              Continue
+              {otpLoading ? "Loading..." : "Continue"}
             </button>
           </div>
         </div>

@@ -91,17 +91,27 @@ const DashboardSU = (props) => {
           />
           {favSelection === "fav editor" && (
             <FavEditor
-              setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favEditorData={favEditorData}
-              verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}
+              setDashboardSUser={props.setDashboardSUser}
+              setFavCommentData={setFavCommentData}
+              setFavEditorData={setFavEditorData}
+              favEditorData={favEditorData}
+              verifyid={props.verifyid}
+              homeApiData={props.homeApiData}
+              cmtReact={props.cmtReact}
               setActiveCommentsshow={props?.setActiveCommentsshow}
               setSelectContent={props?.setSelectContent}
             />
           )}
-                              
+
           {favSelection === "fav comments" && (
             <FavComments
-              setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favCommentData={favCommentData}
-              verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}
+              setDashboardSUser={props.setDashboardSUser}
+              setFavCommentData={setFavCommentData}
+              setFavEditorData={setFavEditorData}
+              favCommentData={favCommentData}
+              verifyid={props.verifyid}
+              homeApiData={props.homeApiData}
+              cmtReact={props.cmtReact}
               setActiveCommentsshow={props?.setActiveCommentsshow}
               setSelectContent={props?.setSelectContent}
             />

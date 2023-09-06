@@ -259,8 +259,8 @@ const ContentSection = ({
                     <button
                       onClick={() => {
                         followCommentator(
-                          data?.value.commentator_user.id,
-                          followingid.includes(data?.value.commentator_user.id)
+                          data?.value?.commentator_user?.id,
+                          followingid?.includes(data?.value.commentator_user?.id)
                         );
                       }}
                       style={{

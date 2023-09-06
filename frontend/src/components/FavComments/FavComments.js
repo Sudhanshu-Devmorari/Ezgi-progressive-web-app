@@ -175,7 +175,7 @@ const FavComments = (props) => {
                       fontSize: "13px",
                     }}
                   >
-                    {props.followingid.includes(res?.commentator_user?.id)
+                    {props?.followingid?.includes(res?.commentator_user?.id)
                         ? "Followed"
                         : "Follow"}
                   </button>
