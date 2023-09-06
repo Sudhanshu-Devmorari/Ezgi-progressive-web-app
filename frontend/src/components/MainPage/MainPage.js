@@ -643,6 +643,7 @@ const MainPage = () => {
                   verifyid={verifyid}
                   cmtReact={cmtReact}
                   homeApiData={homeApiData}
+                  followingid={followingid}
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}

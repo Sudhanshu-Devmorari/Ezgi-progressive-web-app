@@ -137,6 +137,52 @@ const ActiveComments = (props) => {
         });
     } catch (error) {}
   }, []);
+  const [followLabel, setFollowLabel] = useState("Follow");
+
+  const followCommentator = async (commentator_id,isFollowing) => {
+    try {
+      // console.log("isFollowing",isFollowing)
+      if(isFollowing){
+        const confirmation = await Swal.fire({
+          title: "Unfollow?",
+          text: "Are you sure you want to unfollow this commentator?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes",
+          cancelButtonText: "Cancel",
+        });
+        // console.log(confirmation.value);
+        if (confirmation.value === true) {
+          const res = await axios.get(
+            `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+          );
+          // console.log("On Unfollow",res)
+          setFollowLabel(() =>
+            followLabel === "Follow" ? "Followed" : "Follow"
+          );
+
+          Swal.fire({
+            title: "You have Unfollowed",
+            icon: "success",
+          });
+          const user_id = localStorage.getItem("user-id");
+        props.homeApiData(user_id);
+        }
+      }else{
+        const res = await axios.get(
+          `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+        );
+        // console.log("On Follow",res)
+        const user_id = localStorage.getItem("user-id");
+        props.homeApiData(user_id);
+      }
+
+    } catch (error) {
+      console.error("Error fetching data.", error);
+    }
+  };
 
   return (
     <>
@@ -342,6 +388,9 @@ const ActiveComments = (props) => {
                 </button>
               ) : (
                 <button
+                onClick={() => {
+                        followCommentator(profileData?.id,props.followingid.includes(profileData?.id));
+                      }}
                   style={{
                     border:
                       currentTheme === "dark"
@@ -354,7 +403,9 @@ const ActiveComments = (props) => {
                     fontSize: "13px",
                   }}
                 >
-                  Follow
+                  {props.followingid?.includes(profileData?.id)
+                        ? "Followed"
+                        : "Follow"}
                 </button>
               )}
             </div>
