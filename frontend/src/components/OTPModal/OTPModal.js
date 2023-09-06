@@ -18,7 +18,7 @@ const OTPModal = (props) => {
 
   const [timer, setTimer] = useState(30);
   const [isTimerVisible, setIsTimerVisible] = useState(true);
-  const [otpLoading, setOtpLoading] = useState(true);
+  const [otpLoading, setOtpLoading] = useState(false);
 
   useEffect(() => {
     let interval;
@@ -67,22 +67,20 @@ const OTPModal = (props) => {
         localStorage.setItem("user-role", res.data.user.user_role);
         localStorage.setItem("user-id", res.data.user.id);
         localStorage.setItem("username", res.data.user.username);
-        Swal.fire({
+        await Swal.fire({
           title: "Success",
           text: "User Created Successfully!",
           icon: "success",
           backdrop: false,
           customClass:
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.reload();
-          }
+          timer: 2000,
         });
-        // props.onHide();
+        window.location.reload();
+        props.hide();
       }
       if (res.data.status === 400) {
-        setOtpLoading(false)
+        setOtpLoading(false);
         setOtpError(res.data.error);
       }
     } else {
@@ -92,11 +90,11 @@ const OTPModal = (props) => {
       // console.log("res:::::::::::::", res);
 
       if (res.data.status === 200) {
-        setOtpLoading(false)
+        setOtpLoading(false);
         setShowModal(7);
       }
       if (res.data.status === 400) {
-        setOtpLoading(false)
+        setOtpLoading(false);
         setOtpError(res.data.error);
       }
     }
@@ -201,7 +199,7 @@ const OTPModal = (props) => {
                 <small>Didn't get the code? </small>
                 <span
                   onClick={() => {
-                    handleResendOtp();
+                    !isTimerVisible && handleResendOtp();
                   }}
                   style={{
                     color: currentTheme === "dark" ? "#D2DB08" : "#00659D",

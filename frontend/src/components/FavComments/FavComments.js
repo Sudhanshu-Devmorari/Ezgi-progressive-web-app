@@ -44,10 +44,10 @@ const FavComments = (props) => {
 
   const [followLabel, setFollowLabel] = useState("Follow");
 
-  const followCommentator = async (commentator_id,isFollowing) => {
+  const followCommentator = async (commentator_id, isFollowing) => {
     try {
       // console.log("isFollowing",isFollowing)
-      if(isFollowing){
+      if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
           text: "Are you sure you want to unfollow this commentator?",
@@ -73,9 +73,9 @@ const FavComments = (props) => {
             icon: "success",
           });
           const user_id = localStorage.getItem("user-id");
-        props.homeApiData(user_id);
+          props.homeApiData(user_id);
         }
-      }else{
+      } else {
         const res = await axios.get(
           `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
         );
@@ -83,24 +83,22 @@ const FavComments = (props) => {
         const user_id = localStorage.getItem("user-id");
         props.homeApiData(user_id);
       }
-
     } catch (error) {
       console.error("Error fetching data.", error);
     }
   };
 
   const handleCommentReaction = async (id, reaction, count) => {
-
-  localStorage.setItem(`${id}_${reaction}`, count);
+    localStorage.setItem(`${id}_${reaction}`, count);
     const res = await axios.post(
       `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
       {
         reaction_type: `${reaction}`,
       }
     );
-      // const user_id = localStorage.getItem("user-id");
-      props.homeApiData(userId);
-      props.getFavData()
+    // const user_id = localStorage.getItem("user-id");
+    props.homeApiData(userId);
+    props.getFavData();
   };
 
   const [modalShow, setModalShow] = React.useState(false);
@@ -160,9 +158,12 @@ const FavComments = (props) => {
               <div className="col p-0">
                 <div className="d-flex justify-content-end pe-2 mt-3">
                   <button
-                      onClick={() => {
-                        followCommentator(res?.commentator_user?.id,props.followingid.includes(res?.commentator_user?.id));
-                      }}
+                    onClick={() => {
+                      followCommentator(
+                        res?.commentator_user?.id,
+                        props.followingid.includes(res?.commentator_user?.id)
+                      );
+                    }}
                     style={{
                       border:
                         currentTheme === "dark"
@@ -176,8 +177,8 @@ const FavComments = (props) => {
                     }}
                   >
                     {props?.followingid?.includes(res?.commentator_user?.id)
-                        ? "Followed"
-                        : "Follow"}
+                      ? "Followed"
+                      : "Follow"}
                   </button>
                 </div>
 
@@ -332,108 +333,146 @@ const FavComments = (props) => {
                   style={{ fontSize: "13px" }}
                 >
                   <div
-                  onClick={() => {
+                    onClick={() => {
                       handleCommentReaction(
                         res?.id,
                         "like",
                         res?.total_reactions.total_likes
                       );
                     }}
-                     className="d-flex align-items-center gap-2">
-                    {/* <img
-                      src={
-                        currentTheme === "dark"
-                          ? Dark_Unselected_Like
-                          : Light_Unselected_Like
-                      }
-                      alt=""
-                      height={20}
-                      width={20}
-                    />{" "} */}
+                    className="d-flex align-items-center gap-2"
+                  >
                     <div>
-                      {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
-                        props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].like == 1 ? (
-                          <PiHeartStraightFill size={25} color="#ff3030" />
+                      {props.cmtReact
+                        ?.map((e) => e.comment_id)
+                        ?.includes(res?.id) ? (
+                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                          .like == 1 ? (
+                          <img
+                            src={Selected_Like}
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         ) : (
-                          <PiHeartStraight size={25} color="#ff3030" />
+                          <img
+                            src={
+                              currentTheme === "dark"
+                                ? Dark_Unselected_Like
+                                : Light_Unselected_Like
+                            }
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         )
                       ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
-                        <PiHeartStraight size={25} color="#ff3030" />
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Like
+                              : Light_Unselected_Like
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
                       )}{" "}
-                    {res?.total_reactions?.total_likes}
+                      {res?.total_reactions?.total_likes}
                     </div>
                   </div>
-                  <div 
-                      onClick={() => {
+                  <div
+                    onClick={() => {
                       handleCommentReaction(
                         res?.id,
                         "favorite",
                         res?.total_reactions?.total_favorite
                       );
-                    }}>
-                    {/* <img
-                      src={`${
-                        currentTheme === "dark" ? starDarkLogin : starIcon
-                      }`}
-                      alt=""
-                      height={23}
-                      width={23}
-                    /> */}
+                    }}
+                  >
                     <div>
-                    {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
-                      props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].favorite == 1 ? (
-                          <GoStarFill size={25} color="#ffcc00" />
+                      {props.cmtReact
+                        ?.map((e) => e.comment_id)
+                        ?.includes(res?.id) ? (
+                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                          .favorite == 1 ? (
+                          <img
+                            src={Selected_Favorite}
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         ) : (
-                          <GoStar size={25} color="#ffcc00" />
+                          <img
+                            src={
+                              currentTheme === "dark"
+                                ? Dark_Unselected_Favorite
+                                : Light_Unselected_Favorite
+                            }
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         )
                       ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
-                        <GoStar size={25} color="#ffcc00" />
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Favorite
+                              : Light_Unselected_Favorite
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
                       )}{" "}
-                    {res?.total_reactions?.total_favorite}
+                      {res?.total_reactions?.total_favorite}
                     </div>
                   </div>
                   <div
-                  onClick={() => {
+                    onClick={() => {
                       handleCommentReaction(
                         res?.id,
                         "clap",
                         res?.total_reactions?.total_clap
                       );
                     }}
-                    >
-                    {/* <img
-                      src={currentTheme === "dark" ? clapIcon : clapLight}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />{" "} */}
-                    {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
-                      props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].clap == 1 ? (
-                          <img
-                      src={clapIcon1}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                        ) : (
-                          <img
-                      src={clapIcon}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                        )
-                      ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                  >
+                    {props.cmtReact
+                      ?.map((e) => e.comment_id)
+                      ?.includes(res?.id) ? (
+                      props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                        .clap == 1 ? (
                         <img
-                      src={clapIcon}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                      )}{" "}
+                          src={Selected_Clap}
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Clap
+                              : Light_Unselected_Clap
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? Dark_Unselected_Clap
+                            : Light_Unselected_Clap
+                        }
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
+                    )}{" "}
                     {res?.total_reactions?.total_clap}
                   </div>
                 </div>

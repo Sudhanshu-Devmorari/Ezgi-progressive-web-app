@@ -16,7 +16,7 @@ const SignInModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
-    const [btnLoading, setBtnLoading] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const validationSchema = Yup.object({
     phone: Yup.string()
@@ -48,18 +48,17 @@ const SignInModal = (props) => {
           localStorage.setItem("user-role", res.data.userRole);
           localStorage.setItem("user-id", res.data.userId);
           localStorage.setItem("username", res.data.username);
-          Swal.fire({
+          await Swal.fire({
             title: "Success",
             text: "You have Logged in Successfully!",
             icon: "success",
             backdrop: false,
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.reload();
-            }
+            timer: 2000,
           });
+          props?.hide();
+          window.location.reload();
         } else if (res.data.status === 400 || res.data.status === 404) {
           setBtnLoading(false);
           Swal.fire({
@@ -69,6 +68,7 @@ const SignInModal = (props) => {
             backdrop: false,
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            timer: 2000,
           });
         }
       } catch (error) {
@@ -183,7 +183,7 @@ const SignInModal = (props) => {
                 currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
               } px-3 py-1`}
             >
-             {btnLoading ? "Loading…" : "Continue"}
+              {btnLoading ? "Loading…" : "Continue"}
             </button>
             <div className="text-center my-3">
               --------------------- or ---------------------{" "}

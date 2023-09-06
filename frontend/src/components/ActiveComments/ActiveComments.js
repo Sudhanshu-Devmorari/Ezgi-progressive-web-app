@@ -391,7 +391,7 @@ const ActiveComments = (props) => {
               ) : (
                 <button
                 onClick={() => {
-                        followCommentator(profileData?.id,props.followingid.includes(profileData?.id));
+                        followCommentator(profileData?.id,props?.followingid?.includes(profileData?.id));
                       }}
                   style={{
                     border:

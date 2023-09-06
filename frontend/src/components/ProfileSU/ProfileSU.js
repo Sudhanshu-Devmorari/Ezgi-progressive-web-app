@@ -7,7 +7,7 @@ import "./ProfileSU.css";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
-import initialProfile from '../../assets/profile.png'
+import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 
 const ProfileSU = (props) => {
@@ -33,7 +33,7 @@ const ProfileSU = (props) => {
     try {
       const file = e.target.files[0];
       if (file) {
-        const allowedTypes = ["image/jpeg", "image/png"]; 
+        const allowedTypes = ["image/jpeg", "image/png"];
         if (allowedTypes.includes(file.type)) {
           setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
           setEditProfile(false);
@@ -46,7 +46,8 @@ const ProfileSU = (props) => {
           // console.log("res: ", res);
           // console.log("res: ", res.status);
           if (res.status === 200) {
-            props?.getProfileData()
+            props?.getProfileData();
+            getProfileData();
             Swal.fire({
               title: "Success",
               text: "Profile Updated!",
@@ -107,7 +108,9 @@ const ProfileSU = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : progileData?.profile_pic ? `${config.apiUrl}${progileData?.profile_pic}` : initialProfile
+                    : progileData?.profile_pic
+                    ? `${config.apiUrl}${progileData?.profile_pic}`
+                    : initialProfile
                 }
                 width={100}
                 height={100}
