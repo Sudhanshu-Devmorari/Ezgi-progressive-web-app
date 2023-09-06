@@ -131,8 +131,6 @@ const ContentSection = ({
     );
       // const user_id = localStorage.getItem("user-id");
       homeApiData(userId);
-      const randomString = generateRandomString();
-      setArrayMerge(randomString);
   };
 
   // useEffect(() => {
