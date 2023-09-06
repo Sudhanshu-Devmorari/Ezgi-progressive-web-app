@@ -49,16 +49,20 @@ const OTPModal = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
         otp: otp,
         phone: phone,
-        name: props?.signUpData.name,
-        username: props?.signUpData.username,
-        password: props?.signUpData.password,
-        city: props?.signUpData.city,
-        gender: props?.signUpData.gender,
-        age: props?.signUpData.age,
+        name: props?.signUpData?.name,
+        username: props?.signUpData?.username,
+        password: props?.signUpData?.password,
+        city: props?.signUpData?.city,
+        gender: props?.signUpData?.gender,
+        age: props?.signUpData?.age,
         country: "Turkey",
         signup: "signup",
       });
       if (res.data.status === 200) {
+        setOtpLoading(false);
+        props?.setSelectedCity("Select")
+        props?.setSelectedGender("Select")
+        props?.setSelectedAge("Select")
         localStorage.setItem("user-role", res.data.user.user_role);
         localStorage.setItem("user-id", res.data.user.id);
         localStorage.setItem("username", res.data.user.username);

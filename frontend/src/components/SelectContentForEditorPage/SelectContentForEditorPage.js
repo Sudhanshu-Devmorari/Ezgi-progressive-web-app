@@ -81,7 +81,7 @@ const SelectContentForEditorPage = (props) => {
           </button>
         </div>
         {props.comments && (
-          <div className="ms-auto d-flex align-items-center py-1 px-2">
+          <div className="ms-auto d-flex align-items-center px-2">
             <img
               src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""

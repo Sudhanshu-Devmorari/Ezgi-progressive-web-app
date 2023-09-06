@@ -129,6 +129,9 @@ const SignUpModal = (props) => {
     if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
+      console.log("selectedCity:::::::::::", selectedCity);
+      console.log("selectedGender:::::::::::", selectedGender);
+      console.log("selectedAge:::::::::::", selectedAge);
       setbtnLoading(true);
       setCityError("");
       setGenderError("");
@@ -144,16 +147,19 @@ const SignUpModal = (props) => {
         gender: selectedGender,
         age: selectedAge,
       });
-      const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
-      // console.log("response8: ", response.data);
+
+      const response = await axios.post(`${config.apiUrl}/signup/`, {
+        phone: phone,
+      });
+      console.log("response8: ", response.data);
       // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
         setShowModal(6);
         setbtnLoading(false);
-        setSelectedCity("Select")
-        setSelectedGender("Select")
-        setSelectedAge("Select")
-        setSelectCheckBox(false)
+        // setSelectedCity("Select");
+        // setSelectedGender("Select");
+        // setSelectedAge("Select");
+        setSelectCheckBox(false);
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
         setbtnLoading(false);
@@ -291,7 +297,7 @@ const SignUpModal = (props) => {
           setbtnLoading(false);
           setuserExists(res.data?.data);
         } else if (res.data.status === 200) {
-          formik.resetForm()
+          formik.resetForm();
           setShowModal(2);
           setuserExists("");
           setName(values.name);
@@ -624,7 +630,7 @@ const SignUpModal = (props) => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="mt-3" style={{fontSize: "13px"}}>
+                  <div className="mt-3" style={{ fontSize: "13px" }}>
                     {currentTheme === "dark" ? (
                       <img
                         alt=""
@@ -717,6 +723,9 @@ const SignUpModal = (props) => {
               phone={phone}
               signUpData={signUpData}
               forgotPsPhone={forgotPsPhone}
+              setSelectedCity={setSelectedCity}
+              setSelectedGender={setSelectedGender}
+              setSelectedAge={setSelectedAge}
             />
           )}
 

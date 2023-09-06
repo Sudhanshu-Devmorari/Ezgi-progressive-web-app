@@ -16,15 +16,16 @@ const ProfileSU = (props) => {
   const [editProfile, setEditProfile] = useState(false);
 
   // PROFILE API
-  const [progileData, setProgileData] = useState();
+  const [progileData, setProgileData] = useState({});
+  async function getProfileData() {
+    const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    console.log(res.data, "===============?>>");
+    setProgileData(res.data);
+  }
   useEffect(() => {
-    async function getProfileData() {
-      const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
-      // console.log(res.data,"===============?>>");
-      setProgileData(res.data);
-    }
-    getProfileData();
-  }, []);
+    userId && getProfileData();
+  }, [userId]);
+  console.log("progileData::::::::", progileData);
 
   // UPDATE PROFILE PIC
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
