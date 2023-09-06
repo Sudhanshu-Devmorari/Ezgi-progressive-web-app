@@ -170,7 +170,7 @@ const ContentSection = ({
               onClick={() => {
                 if (userId) {
                   setSelectContent("show-all-comments");
-                  setActiveCommentsshow(data?.value.commentator_user?.id);
+                  setActiveCommentsshow(data?.value?.commentator_user?.id);
                 } else {
                   Swal.fire({
                     // title: "Success",
@@ -201,9 +201,9 @@ const ContentSection = ({
               <div className="col">
                 <img
                   src={`${
-                    data?.value.commentator_user?.profile_pic
+                    data?.value?.commentator_user?.profile_pic
                       ? config.apiUrl +
-                        data?.value.commentator_user?.profile_pic
+                        data?.value?.commentator_user?.profile_pic
                       : initialProfile
                   }`}
                   className="rounded-circle"
@@ -319,7 +319,7 @@ const ContentSection = ({
                       currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                   }}
                 >
-                  {data?.value.comment}
+                  {data?.value?.comment}
                 </div>
               </>
             )}
@@ -341,15 +341,15 @@ const ContentSection = ({
                     height={26}
                     width={26}
                   />
-                  <span className="ps-1">{data?.value.league}</span>
+                  <span className="ps-1">{data?.value?.league}</span>
                 </span>
                 <span style={{ paddingRight: userPhone ? "47px" : "80px" }}>
-                  {data?.value.date}
+                  {data?.value?.date}
                 </span>
                 <span>
                   {userPhone === null ? null : (
                     <>
-                      {data?.value.public_content ? (
+                      {data?.value?.public_content ? (
                         <>
                           <img
                             src={`${
@@ -369,7 +369,7 @@ const ContentSection = ({
               </div>
               <div className="d-flex justify-content-center">
                 <span className="mt-2 pt-1">
-                  {data?.value.match_detail.split(" - ")[0]}
+                  {data?.value?.match_detail?.split(" - ")[0]}
                 </span>
                 <div
                   className="px-2"
@@ -394,7 +394,7 @@ const ContentSection = ({
                   />
                 </div>
                 <span className="mt-2 pt-1">
-                  {data?.value.match_detail.split(" - ")[1]}
+                  {data?.value?.match_detail?.split(" - ")[1]}
                 </span>
               </div>
               <div className="text-end mt-3 mb-2">
@@ -426,15 +426,15 @@ const ContentSection = ({
                   <div
                     onClick={() => {
                       handleCommentReaction(
-                        data?.value.id,
+                        data?.value?.id,
                         "like",
-                        data?.value.total_reactions.total_likes
+                        data?.value?.total_reactions?.total_likes
                       );
                     }}
                   >
                     <div>
-                      {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
-                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].like == 1 ? (
+                      {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
+                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].like == 1 ? (
                           <PiHeartStraightFill size={25} color="#ff3030" />
                         ) : (
                           <PiHeartStraight size={25} color="#ff3030" />
@@ -443,7 +443,7 @@ const ContentSection = ({
                         // <img src={likeIcondark} alt="" height={20} width={20} />
                         <PiHeartStraight size={25} color="#ff3030" />
                       )}{" "}
-                      {data?.value.total_reactions.total_likes}
+                      {data?.value?.total_reactions?.total_likes}
                     </div>
                   </div>
                 ) : (
@@ -456,7 +456,7 @@ const ContentSection = ({
                       height={20}
                       width={20}
                     />{" "}
-                    {data?.value.total_reactions.total_likes}
+                    {data?.value?.total_reactions?.total_likes}
                   </div>
                 )}
 
@@ -464,9 +464,9 @@ const ContentSection = ({
                   <div
                     onClick={() => {
                       handleCommentReaction(
-                        data?.value.id,
+                        data?.value?.id,
                         "favorite",
-                        data?.value.total_reactions.total_favorite
+                        data?.value?.total_reactions?.total_favorite
                       );
                     }}
                   >
@@ -484,8 +484,8 @@ const ContentSection = ({
                     ) : (
                       <GoStarFill size={25} color="#ffcc00" />
                     )}{" "} */}
-                    {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
-                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].favorite == 1 ? (
+                    {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
+                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].favorite == 1 ? (
                           <GoStarFill size={25} color="#ffcc00" />
                         ) : (
                           <GoStar size={25} color="#ffcc00" />
@@ -494,7 +494,7 @@ const ContentSection = ({
                         // <img src={likeIcondark} alt="" height={20} width={20} />
                         <GoStar size={25} color="#ffcc00" />
                       )}{" "}
-                    {data?.value.total_reactions.total_favorite}
+                    {data?.value?.total_reactions?.total_favorite}
                   </div>
                 ) : (
                   <div>
@@ -506,7 +506,7 @@ const ContentSection = ({
                       height={23}
                       width={23}
                     />{" "}
-                    {data?.value.total_reactions.total_favorite}
+                    {data?.value?.total_reactions?.total_favorite}
                   </div>
                 )}
 
@@ -514,9 +514,9 @@ const ContentSection = ({
                   <div
                     onClick={() => {
                       handleCommentReaction(
-                        data?.value.id,
+                        data?.value?.id,
                         "clap",
-                        data?.value.total_reactions.total_clap
+                        data?.value?.total_reactions?.total_clap
                       );
                     }}
                   >
@@ -540,8 +540,8 @@ const ContentSection = ({
                       height={20}
                       width={20}
                     />{" "} */}
-                    {cmtReact?.map((e)=>e.comment_id)?.includes(data?.value.id) ? (
-                        cmtReact.filter((e)=>e.comment_id==data.value.id)[0].clap == 1 ? (
+                    {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
+                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].clap == 1 ? (
                           <img
                       src={clapIcon1}
                       alt=""
@@ -565,7 +565,7 @@ const ContentSection = ({
                       width={20}
                     />
                       )}{" "}
-                    {data?.value.total_reactions.total_clap}
+                    {data?.value?.total_reactions?.total_clap}
                   </div>
                 ) : (
                   <div>
@@ -575,7 +575,7 @@ const ContentSection = ({
                       height={20}
                       width={20}
                     />{" "}
-                    {data?.value.total_reactions.total_clap}
+                    {data?.value?.total_reactions?.total_clap}
                   </div>
                 )}
               </div>

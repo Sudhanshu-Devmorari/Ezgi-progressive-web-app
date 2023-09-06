@@ -56,6 +56,8 @@ const TicketReplyModal = (props) => {
     }));
   };
 
+  const adminUserId = localStorage.getItem('admin-user-id')
+
   const handleTicket = async (e) => {
     if (selecteReply === "reply") {
       if (ticketRepltOrRedirect.reply === "") {
@@ -68,7 +70,7 @@ const TicketReplyModal = (props) => {
         });
       } else if (ticketRepltOrRedirect.reply !== "") {
         axios
-          .post(`${config?.apiUrl}/support-management/${38}/`, {
+          .post(`${config?.apiUrl}/support-management/${adminUserId}/`, {
             message: ticketRepltOrRedirect.reply,
             ticket_id: tickeview?.id,
           })
@@ -86,6 +88,15 @@ const TicketReplyModal = (props) => {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response.status === 500){
+              Swal.fire({
+                title: "Error",
+                text: error?.response?.data?.error,
+                icon: "error",
+                backdrop: false,
+                customClass: "dark-mode-alert",
+              });
+            }
           });
       }
     } else if (selecteReply === "redirect") {

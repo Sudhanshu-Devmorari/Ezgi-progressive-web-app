@@ -301,6 +301,35 @@ const MainPage = () => {
 
   const [activeCommentsshow, setActiveCommentsshow] = useState(null);
 
+  const [contentData, setContentData] = useState([]);
+  const [contentFilterData, setContentFilterData] = useState([]);
+  const [commentsReactionsSports, setCommentsReactionsSports] = useState([]);
+  console.log(contentFilterData, "=>>>contentFilterData");
+
+  useEffect(() => {
+    handlesportData();
+  }, [contentData]);
+
+  // console.log("=>>contentData", contentData)
+
+  const handlesportData = async () => {
+    let merged = [];
+    let remainingPublic = [...contentData];
+    console.log(remainingPublic,"=>>>remainingPublic")
+
+    if (remainingPublic.length > 0) {
+      merged = [
+        ...merged,
+        ...remainingPublic.map((comment) => ({
+          type: "content",
+          value: comment,
+        })),
+      ];
+    }
+    // console.log("merged:::::::::::::", merged);
+    setContentFilterData(merged);
+  };
+
   return (
     <>
       <div className="landing-page">
@@ -356,6 +385,7 @@ const MainPage = () => {
             <>
               {(selectContent === "home" ||
                 selectContent === "editor" ||
+                selectContent === "category-content" ||
                 selectContent === "comments") && (
                 <>
                   <Banner
@@ -363,7 +393,11 @@ const MainPage = () => {
                       ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
                     }
                   />
-                  <EditorBanner setSelectContent={setSelectContent} />
+                  <EditorBanner
+                    setSelectContent={setSelectContent}
+                    setContentData={setContentData}
+                    setCommentsReactionsSports={setCommentsReactionsSports}
+                  />
                 </>
               )}
               {selectContent === "home" &&
@@ -598,6 +632,13 @@ const MainPage = () => {
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}
+              {selectContent === "category-content" && (
+                <>
+                {contentFilterData?.map((res) => (
+                  <ContentSection data={res} />
+                ))}
+                </>
+              )}
             </>
           )}
         </div>

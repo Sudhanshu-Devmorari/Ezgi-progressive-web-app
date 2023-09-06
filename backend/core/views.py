@@ -3843,3 +3843,87 @@ class BecomeEditorView(APIView):
 #                 return Response(data={'error': 'The OTP verification failed.'}, status=status.HTTP_400_BAD_REQUEST)
 #         except Exception as e:
 #             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class FootbalAndBasketballContentView(APIView):
+#     def get(self, request, *args, **kwargs):
+#         try:
+#             category = request.query_params.get('category')
+#             print('category: ', category)
+#             if category:
+#                 queryset = Comments.objects.filter(category=[category])
+#                 print('queryset: ', queryset)
+#                 data = CommentsSerializer(queryset, many=True)
+#                 # Fetch comment reactions and calculate the total count of reactions
+
+#                 for comment in queryset:
+#                     print(comment.id,"=????d")
+#                     comment = Comments.objects.get(id=comment.id)
+#                     comment_reactions = CommentReaction.objects.filter(comment=comment)
+#                     total_reactions = comment_reactions.aggregate(
+#                         total_likes=Sum('like'),
+#                         total_favorite=Sum('favorite'),
+#                         total_clap=Sum('clap')
+#                     )
+                
+#                 reactions = {
+#                     'total_likes': total_reactions['total_likes'] or 0,
+#                     'total_favorite': total_reactions['total_favorite'] or 0,
+#                     'total_clap': total_reactions['total_clap'] or 0
+#                 }
+#                 return Response({'data' : data.data, 'total_reactions' : reactions}, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({'error' : 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+#         except Exception as e:
+#             return Response({'error' : f'Error while fetching data. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+# 
+
+class FootbalAndBasketballContentView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            category = request.query_params.get('category')
+            print('category: ', category)
+            if category:
+                queryset = Comments.objects.filter(category=[category])  # Remove square brackets around category
+                print('queryset: ', queryset)
+                data = CommentsSerializer(queryset, many=True).data  # Serialize queryset
+
+                # Create a list to store comments with their total reactions
+                comments_with_reactions = []
+
+                for comment in queryset:
+                    comment_data = CommentsSerializer(comment).data
+                    comment_reactions = CommentReaction.objects.filter(comment=comment)
+                    total_reactions = comment_reactions.aggregate(
+                        total_likes=Sum('like'),
+                        total_favorite=Sum('favorite'),
+                        total_clap=Sum('clap')
+                    )
+
+                    # total_reactions = {
+                    #     'total_likes': total_reactions['total_likes'] or 0,
+                    #     'total_favorite': total_reactions['total_favorite'] or 0,
+                    #     'total_clap': total_reactions['total_clap'] or 0
+                    # }
+                    comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+
+                    # Include comment data and total reactions in the list
+                    # comments_with_reactions.append({
+                    #     'comment_data': CommentsSerializer(comment).data,
+                    #     'reactions': reactions
+                    # })
+                    # data['reactions'] = reactions
+                
+                    comments_with_reactions.append(comment_data)
+
+                # return Response({'data': data}, status=status.HTTP_200_OK)
+                return Response({'data': comments_with_reactions}, status=status.HTTP_200_OK)
+                # return Response({'data': data}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'Error while fetching data. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+         

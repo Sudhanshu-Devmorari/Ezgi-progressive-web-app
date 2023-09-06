@@ -5,7 +5,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
-                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView)
+                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView)
 
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
@@ -51,6 +51,7 @@ urlpatterns = [
     path('user-statistics/<int:id>/', UserStatistics.as_view(), name='user-statistics'), 
     # path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
     path('sports-statistics/<int:id>/', SportsStatisticsView.as_view(), name='Sports-State'), 
+    path('football-basketball-content/', FootbalAndBasketballContentView.as_view(), name='Football-Basketball-Content'), 
 
 
     # Admin Panel's api

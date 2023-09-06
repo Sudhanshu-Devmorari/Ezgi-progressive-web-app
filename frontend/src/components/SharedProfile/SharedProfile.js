@@ -38,7 +38,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
     axios
       .get(`${config.apiUrl}/fav-editor/${userId}/?commentator=${e}`)
       .then((res) => {
-        console.log(res, "========>>>>>res");
+        // console.log(res, "========>>>>>res");
         if (res.status === 200) {
           const favIs = res?.data[0]?.is_fav_editor;
           setIsFavorite(favIs);
@@ -62,7 +62,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
           id: id,
         }
       );
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error making POST request:", error);

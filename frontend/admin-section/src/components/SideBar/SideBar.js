@@ -180,6 +180,7 @@ const SideBar = (props) => {
           <img
             onClick={() => {
               localStorage.clear();
+              navigate('/')
               window.location.reload();
             }}
             className="cursor icons-responsive-size"
