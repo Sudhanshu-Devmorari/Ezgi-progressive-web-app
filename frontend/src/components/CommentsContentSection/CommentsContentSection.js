@@ -57,6 +57,8 @@ const CommentsContentSection = (props) => {
     );
     // console.log(res);
     // console.log(id, "!!!!!!!!!!!!!!!", reaction);
+    props.homeApiData(user_id)
+    activeResolved(user_id)
   };
 
   useEffect(() => {

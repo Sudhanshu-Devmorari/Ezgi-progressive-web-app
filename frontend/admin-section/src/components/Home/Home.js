@@ -32,7 +32,7 @@ const Home = (props) => {
   const handleDeactive = async (id, action) => {
     try {
       if (action === 'delete') {
-        console.log(action,"===============>>>action from delete")
+        // console.log(action,"===============>>>action from delete")
         const res = await axios.delete(
           `${config?.apiUrl}/user-management/${id}/?action=delete`
         );
@@ -47,7 +47,7 @@ const Home = (props) => {
           });
         }
       } else if (action === 'deactive'){
-        console.log(action,"===============>>>action from deactive")
+        // console.log(action,"===============>>>action from deactive")
         const res = await axios.delete(
           `${config?.apiUrl}/user-management/${id}/?action=deactive`
         );

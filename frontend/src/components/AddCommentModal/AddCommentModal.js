@@ -217,7 +217,7 @@ const AddCommentModal = (props) => {
             `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
             { headers }
           );
-          console.log(res,"=>>res")
+          // console.log(res,"=>>res")
           const countryData = res.data.data;
           setCountryOptions(countryData.map((item) => item.country));
         } catch (error) {
@@ -293,7 +293,7 @@ const AddCommentModal = (props) => {
         console.log(error.response.status);
         console.log(error.response.data.message);
         if (error.response.status === 404) {
-          console.log("KKKK");
+          // console.log("KKKK");
           Swal.fire({
             title: "Error",
             text: error.response.data.message,

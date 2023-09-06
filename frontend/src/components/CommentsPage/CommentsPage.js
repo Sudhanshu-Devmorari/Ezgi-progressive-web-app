@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SelectContentForEditorPage from "../SelectContentForEditorPage/SelectContentForEditorPage";
 import ContentSection from "../ContentSection/ContentSection";
 import HighlightMainPage from "../HighlightMainPage/HighlightMainPage";
@@ -25,7 +25,10 @@ const CommentsPage = ({
   // console.log('&&-----&&', selectContent)
   const [filterCommentData, setFilterCommentData] = useState(null)
   const [displayData, setDisplayData] = useState(mergedResult)
-  console.log(":::::data::::::", displayData)
+  // console.log(":::::data::::::", displayData)
+  useEffect(()=>{
+    setDisplayData(mergedResult)
+  },[mergedResult])
   return (
     <>
       <SelectContentForEditorPage

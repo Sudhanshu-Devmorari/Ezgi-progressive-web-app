@@ -94,10 +94,7 @@ const MainPage = () => {
   }
 
   const mergeArrays = () => {
-    console.log("first==========", subscriptionComments)
-    console.log("subscription==========", subscriptionComments.length)
     if (subscriptionComments.length > 0) {
-      console.log("2==========")
 
       let merged = [];
       let remainingPublic = [...publicComments];
@@ -155,7 +152,6 @@ const MainPage = () => {
           })),
         ];
       }
-      console.log("merge-------", merged)
       setMergedResult(merged);
     }
 
@@ -196,7 +192,6 @@ const MainPage = () => {
           })),
         ];
       }
-      console.log("$$$$$$", merged)
       setMergedResult(merged);
     }
   };
@@ -297,7 +292,6 @@ const MainPage = () => {
 
   const user = localStorage.getItem("user-role");
   useEffect(() => {
-    console.log("first:::: ",arrayMerge)
     mergeArrays();
     subscriptionArrays();
     publicArrays();
@@ -312,7 +306,7 @@ const MainPage = () => {
   const [contentData, setContentData] = useState([]);
   const [contentFilterData, setContentFilterData] = useState([]);
   const [commentsReactionsSports, setCommentsReactionsSports] = useState([]);
-  console.log(contentFilterData, "=>>>contentFilterData");
+  // console.log(contentFilterData, "=>>>contentFilterData");
 
   useEffect(() => {
     handlesportData();
@@ -323,7 +317,7 @@ const MainPage = () => {
   const handlesportData = async () => {
     let merged = [];
     let remainingPublic = [...contentData];
-    console.log(remainingPublic,"=>>>remainingPublic")
+    // console.log(remainingPublic,"=>>>remainingPublic")
 
     if (remainingPublic.length > 0) {
       merged = [

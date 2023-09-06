@@ -11,7 +11,7 @@ const OTPModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
-  console.log("props.otp::::::::::::::", props.otp);
+  // console.log("props.otp::::::::::::::", props.otp);
 
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
@@ -83,7 +83,7 @@ const OTPModal = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
         otp: otp,
       });
-      console.log("res:::::::::::::", res);
+      // console.log("res:::::::::::::", res);
 
       if (res.data.status === 200) {
         setShowModal(7);
@@ -102,21 +102,21 @@ const OTPModal = (props) => {
     setIsTimerVisible(true);
     const phone = props?.signUpData.phone;
     if (phone) {
-      console.log("isphone");
+      // console.log("isphone");
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: phone,
         signup: "signup",
       });
-      console.log(res.data, "======>>otp resend");
+      // console.log(res.data, "======>>otp resend");
       if (res.data.status === 500) {
         setOtpError(res.data.error);
       }
     } else {
-      console.log("==else");
+      // console.log("==else");
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: props.forgotPsPhone,
       });
-      console.log(res.data, "======>>otp resend");
+      // console.log(res.data, "======>>otp resend");
       if (res.data.status === 500) {
         setOtpError(res.data.error);
       }

@@ -145,7 +145,7 @@ const SignUpModal = (props) => {
         age: selectedAge,
       });
       const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
-      console.log("response8: ", response.data);
+      // console.log("response8: ", response.data);
       // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
         setShowModal(6);
@@ -281,15 +281,12 @@ const SignUpModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("click event fire::::::::::::::::");
-      console.log("values:::::::::::::", values);
       setbtnLoading(true);
       try {
         const res = await axios.post(`${config.apiUrl}/signup-user-exists/`, {
           phone: values.phone,
           username: values.username,
         });
-        console.log("res::::::::::", res);
         if (res.data.status === 400) {
           setbtnLoading(false);
           setuserExists(res.data?.data);
@@ -311,7 +308,6 @@ const SignUpModal = (props) => {
         //   console.log(error);
         // });
       } catch (error) {
-        console.log("errr::::::::::::", error);
         setbtnLoading(false);
       }
     },

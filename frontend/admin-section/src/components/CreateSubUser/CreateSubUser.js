@@ -191,7 +191,7 @@ const CreateSubUser = (props) => {
           `${config?.apiUrl}/subuser-management/`,
           formData
         );
-        console.log(res);
+        // console.log(res);
         if (res.status === 200) {
           props?.getSubUsers();
           Swal.fire({

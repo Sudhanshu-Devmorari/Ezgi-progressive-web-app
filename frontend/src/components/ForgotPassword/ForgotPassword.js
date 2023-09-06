@@ -8,7 +8,7 @@ import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 
 const ForgotPassword = (props) => {
-  console.log("props::::::::::::;", props);
+  // console.log("props::::::::::::;", props);
   const { currentTheme, setCurrentTheme, setShowModal, ShowModal } =
     useContext(CurrentTheme);
 
@@ -40,7 +40,7 @@ const ForgotPassword = (props) => {
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
         phone: values.phone,
       });
-      console.log("response: FP : ", res.data);
+      // console.log("response: FP : ", res.data);
       if (res.data.status === 200) {
         setShowModal(6);
         setbtnLoading(false);

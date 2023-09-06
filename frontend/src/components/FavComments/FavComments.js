@@ -87,12 +87,7 @@ const FavComments = (props) => {
     );
       // const user_id = localStorage.getItem("user-id");
       props.homeApiData(userId);
-      const res2 = await axios.get(
-        `${config.apiUrl}/fav-editor-comment/${userId}`
-      );
-      // console.log("=>>>", res.data);
-      props.setFavEditorData(res2.data.favEditors);
-      props.setFavCommentData(res2.data.favComments);
+      props.getFavData()
   };
 
   return (
