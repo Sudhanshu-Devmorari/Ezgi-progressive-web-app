@@ -216,7 +216,7 @@ const ContentSection = ({
                   {data?.value?.commentator_user?.username}
                 </span>
                 {/* <img src={(verifyid).includes(data?.value.commentator_user.id) ? blueTick : } alt="" width={16} height={16} /> */}
-                {verifyid.includes(data?.value.commentator_user.id) && (
+                {verifyid?.includes(data?.value?.commentator_user?.id) && (
                   <img src={blueTick} alt="" width={16} height={16} />
                 )}
               </div>
@@ -247,7 +247,7 @@ const ContentSection = ({
                       }}
                     >
                       {/* {followLabel ? followLabel : "Follow"} */}
-                      {followingid.includes(data?.value.commentator_user.id)
+                      {followingid?.includes(data?.value?.commentator_user?.id)
                         ? "Followed"
                         : "Follow"}
                       {/* {(followingid).includes(data?.value.commentator_user.id) ? setFollowLabel('Followed') : setFollowLabel('Follow')} */}

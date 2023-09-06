@@ -47,7 +47,7 @@ const OTPModal = (props) => {
     const phone = props?.signUpData.phone;
     if (phone) {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
-        otp: props.otp,
+        otp: otp,
         phone: phone,
         name: props?.signUpData.name,
         username: props?.signUpData.username,
@@ -81,8 +81,10 @@ const OTPModal = (props) => {
       }
     } else {
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
-        otp: props.otp,
+        otp: otp,
       });
+      console.log("res:::::::::::::", res);
+
       if (res.data.status === 200) {
         setShowModal(7);
       }
@@ -95,6 +97,7 @@ const OTPModal = (props) => {
   // RESEND OTP API
   const handleResendOtp = async () => {
     setOtpError("");
+    setOtp("");
     setTimer(30);
     setIsTimerVisible(true);
     const phone = props?.signUpData.phone;

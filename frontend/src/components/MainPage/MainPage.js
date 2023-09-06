@@ -70,17 +70,17 @@ const MainPage = () => {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        setData(res.data);
-        setPublicComments(res.data.Public_Comments);
-        setHighlights(res.data.highlights);
-        setsubscriptionComments(res.data.Subscription_Comments);
-        setads(res.data.ads);
-        setVerifyid(res.data.verify_ids)
-        setFollowingList(res.data.following_user);
-        setFollowingId(res.data.following_user.map((item)=> item.id))
-        setCmtReact(res.data.comment_reactions)
+        setData(res?.data);
+        setPublicComments(res?.data?.Public_Comments);
+        setHighlights(res?.data?.highlights);
+        setsubscriptionComments(res?.data?.Subscription_Comments);
+        setads(res?.data?.ads);
+        setVerifyid(res?.data?.verify_ids);
+        setFollowingList(res?.data?.following_user);
+        setFollowingId(res?.data?.following_user?.map((item) => item?.id));
+        setCmtReact(res?.data?.comment_reactions);
 
-        const commentatorData = res.data.Commentator.map((item) => ({
+        const commentatorData = res?.data?.Commentator?.map((item) => ({
           type: "commentator",
           value: item,
         }));
