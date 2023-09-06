@@ -19,6 +19,19 @@ import world_check from "../../assets/world-check.svg";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+
+import Selected_Clap from "../../assets/Selected Clap.svg";
+import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
+import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
+
+import Selected_Like from "../../assets/Selected Like.svg";
+import Dark_Unselected_Like from "../../assets/Dark - Unselected Like.svg";
+import Light_Unselected_Like from "../../assets/Light - Unselected Like.svg";
+
+import Selected_Favorite from "../../assets/Selected Favorite.svg";
+import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
+import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Swal from "sweetalert2";
 import clapIcon1 from "../../assets/clap-svgrepo-com.png";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
@@ -90,6 +103,8 @@ const FavComments = (props) => {
       props.getFavData()
   };
 
+  const [modalShow, setModalShow] = React.useState(false);
+
   return (
     <>
       {/* <ContentSection userComments={userComments}/> */}
@@ -102,7 +117,14 @@ const FavComments = (props) => {
             }`}
           >
             <div className="row m-2">
-              <div className="position-relative col p-0">
+              <div
+                className="position-relative col p-0"
+                onClick={() => {
+                  props?.setActiveCommentsshow(res?.commentator_user?.id);
+                  props?.setDashboardSUser(false);
+                  props?.setSelectContent("show-all-comments");
+                }}
+              >
                 <img
                   src={crown}
                   alt=""
@@ -116,8 +138,8 @@ const FavComments = (props) => {
                   }}
                 />
                 <div className="col">
-                  <img 
-                  style={{objectFit: "cover", borderRadius: "50%"}}
+                  <img
+                    style={{ objectFit: "cover", borderRadius: "50%" }}
                     src={
                       res?.commentator_user?.profile_pic
                         ? `${config.apiUrl}${res?.commentator_user?.profile_pic}`
@@ -130,9 +152,9 @@ const FavComments = (props) => {
                   <span className="p-1 autorname-responsive">
                     {res?.commentator_user?.username}
                   </span>
-                  {props.verifyid?.includes(res?.commentator_user?.id) && 
-                  <img src={blueTick} alt="" width={16} height={16} />
-                  }
+                  {props.verifyid?.includes(res?.commentator_user?.id) && (
+                    <img src={blueTick} alt="" width={16} height={16} />
+                  )}
                 </div>
               </div>
               <div className="col p-0">
@@ -174,7 +196,7 @@ const FavComments = (props) => {
                   <div className="col">
                     <div className="rate-fonts">Score Points</div>
                     <div style={{ fontSize: "1rem", color: "#FFA200" }}>
-                    {res?.commentator_user?.score_points}
+                      {res?.commentator_user?.score_points}
                     </div>
                   </div>
                 </div>
@@ -317,11 +339,13 @@ const FavComments = (props) => {
                         res?.total_reactions.total_likes
                       );
                     }}
-                    >
+                     className="d-flex align-items-center gap-2">
                     {/* <img
-                      src={`${
-                        currentTheme === "dark" ? likeIcondark : likeIcon
-                      }`}
+                      src={
+                        currentTheme === "dark"
+                          ? Dark_Unselected_Like
+                          : Light_Unselected_Like
+                      }
                       alt=""
                       height={20}
                       width={20}
@@ -415,6 +439,7 @@ const FavComments = (props) => {
                 </div>
                 <div className="ms-auto" style={{ fontSize: "12px" }}>
                   <button
+                    onClick={() => setModalShow(true)}
                     className="me-2 px-2 py-1"
                     style={{
                       border:
@@ -436,6 +461,7 @@ const FavComments = (props) => {
           </div>
         ))}
       </>
+      <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 };

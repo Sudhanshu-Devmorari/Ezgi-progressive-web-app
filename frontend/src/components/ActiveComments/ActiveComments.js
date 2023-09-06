@@ -118,11 +118,11 @@ const ActiveComments = (props) => {
 
   useEffect(() => {
     try {
-      // console.log(user, "===api");
+      console.log(user, "===api");
       axios
         .get(`${config.apiUrl}/user-statistics/${user}`)
         .then((res) => {
-          // console.log(res.data, "========>>>res sucess rate api res");
+          console.log(res.data, "========>>>res sucess rate api res");
           setUserPoints({
             success_rate: res.data.Success_rate,
             score_point: res.data.Score_point,
@@ -135,8 +135,10 @@ const ActiveComments = (props) => {
         .catch((error) => {
           console.log(error);
         });
-    } catch (error) {}
-  }, []);
+    } catch (error) {
+      console.log(error,"===========>>>")
+    }
+  }, [user]);
   const [followLabel, setFollowLabel] = useState("Follow");
 
   const followCommentator = async (commentator_id,isFollowing) => {

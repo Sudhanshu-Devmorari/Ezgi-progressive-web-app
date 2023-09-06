@@ -3503,13 +3503,17 @@ class UserStatistics(APIView):
         try:
             user = get_object_or_404(User, id=id)
             serializer = UserSerializer(user).data
+            print('Statistics(id): ', Statistics(id))
             Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
             user.success_rate = Success_rate
             user.score_points = Score_point
             user.save()
+            print('only_leagues: ', only_leagues)
             element_counts = Counter(only_leagues)
+            print('element_counts: ', element_counts)
             most_common_element, max_count = element_counts.most_common(1)[0]
             result_list = [most_common_element]
+            print('result_list: ', result_list)
             data = {
                 "user": serializer,
                 "Success_rate": Success_rate,

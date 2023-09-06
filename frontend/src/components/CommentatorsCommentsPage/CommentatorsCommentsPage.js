@@ -19,7 +19,7 @@ import Support from "../Support/Support";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
-import Spinner from 'react-bootstrap/Spinner';
+import Spinner from "react-bootstrap/Spinner";
 
 const CommentatorsCommentsPage = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
@@ -74,25 +74,33 @@ const CommentatorsCommentsPage = (props) => {
 
   return (
     <>
-    {isLoading ? (
-      <>
-      <div className="d-flex justify-content-center align-items-center" style={{height:"75vh"}}>
-        <Spinner as="span" animation="border" size="md" role="status" aria-hidden="true" />
-      </div>
-      </>
-    ) : (
-    <>
-    
-      <ActiveComments
-      from={'dashboard'}
-        content={content}
-        profile={"commentator"}
-        setDashboardSUser={props.setDashboardSUser}
-        setSelectContent={props.setSelectContent}
-        profileData={profileData}
-        getProfileData= {props.getProfileData}
-      />
-      <CommentatorIcons setContent={setContent} content={content} />
+      {isLoading ? (
+        <>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "75vh" }}
+          >
+            <Spinner
+              as="span"
+              animation="border"
+              size="md"
+              role="status"
+              aria-hidden="true"
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          <ActiveComments
+            from={"dashboard"}
+            content={content}
+            profile={"commentator"}
+            setDashboardSUser={props.setDashboardSUser}
+            setSelectContent={props.setSelectContent}
+            profileData={profileData}
+            getProfileData={props.getProfileData}
+          />
+          <CommentatorIcons setContent={setContent} content={content} />
 
       {content === "home" && (
         <>
@@ -108,56 +116,67 @@ const CommentatorsCommentsPage = (props) => {
         </>
       )}
 
-      {content === "subscribers" && (
-        <>
-          <SubscribersSelection
-            setSubscribersOrSubscriptions={setSubscribersOrSubscriptions}
-            subscribersOrSubscriptions={subscribersOrSubscriptions}
-            user={"commentator"}
-          />
-          <MySubscribers
-            subscribersOrSubscriptions={subscribersOrSubscriptions}
-            user={"commentator"}
-          />
-        </>
-      )}
-      {content === "wallet" && (
-        <>
-          <WalletSelection
-            setWalletSelection={setWalletSelection}
-            walletSelection={walletSelection}
-            user={"commentator"}
-          />
-          {walletSelection === "My transactions" && <Transactions />}
-          {walletSelection === "pending balance" && <PendingBalance />}
-          {walletSelection === "account status" && <AccountStatus />}
-        </>
-      )}
-      {content === "fav" && (
-        <>
-          <FavoriteSelection
-            setFavSelection={setFavSelection}
-            favSelection={favSelection}
-            verifyid={props.verifyid}
-          />
-          {favSelection === "fav editor" && (
-            <FavEditor setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favEditorData={favEditorData} verifyid={props.verifyid} homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+          {content === "subscribers" && (
+            <>
+              <SubscribersSelection
+                setSubscribersOrSubscriptions={setSubscribersOrSubscriptions}
+                subscribersOrSubscriptions={subscribersOrSubscriptions}
+                user={"commentator"}
+              />
+              <MySubscribers
+                subscribersOrSubscriptions={subscribersOrSubscriptions}
+                user={"commentator"}
+              />
+            </>
           )}
-          {favSelection === "fav comments" && (
-            <FavComments getFavData={getFavData} setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favCommentData={favCommentData} verifyid={props.verifyid} homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+          {content === "wallet" && (
+            <>
+              <WalletSelection
+                setWalletSelection={setWalletSelection}
+                walletSelection={walletSelection}
+                user={"commentator"}
+              />
+              {walletSelection === "My transactions" && <Transactions />}
+              {walletSelection === "pending balance" && <PendingBalance />}
+              {walletSelection === "account status" && <AccountStatus />}
+            </>
+          )}
+          {content === "fav" && (
+            <>
+              <FavoriteSelection
+                setFavSelection={setFavSelection}
+                favSelection={favSelection}
+                verifyid={props.verifyid}
+              />
+              {favSelection === "fav editor" && (
+                <FavEditor setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData}
+                  setDashboardSUser={props?.setDashboardSUser}
+                  favEditorData={favEditorData}
+                  verifyid={props.verifyid}
+                  setActiveCommentsshow={props?.setActiveCommentsshow}
+                  setSelectContent={props?.setSelectContent}
+                homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+              )}
+              {favSelection === "fav comments" && (
+                <FavComments getFavData={getFavData} setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData}
+                  setDashboardSUser={props?.setDashboardSUser}
+                  favCommentData={favCommentData}
+                  verifyid={props.verifyid}
+                  setActiveCommentsshow={props?.setActiveCommentsshow}
+                  setSelectContent={props?.setSelectContent}
+                homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+              )}
+            </>
+          )}
+          {(content === "notifications" || content === "support") && (
+            <>
+              <NotificationsAndSupportSelection content={content} />
+
+              {content === "notifications" && <Notifications />}
+              {content === "support" && <Support />}
+            </>
           )}
         </>
-      )}
-      {(content === "notifications" || content === "support") && (
-        <>
-          <NotificationsAndSupportSelection content={content} />
-
-          {content === "notifications" && <Notifications />}
-          {content === "support" && <Support />}
-        </>
-      )}
-
-      </>
       )}
     </>
   );

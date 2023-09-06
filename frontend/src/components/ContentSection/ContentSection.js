@@ -27,6 +27,19 @@ import { userId } from "../GetUser";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import Swal from "sweetalert2";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+
+import Selected_Clap from "../../assets/Selected Clap.svg";
+import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
+import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
+
+import Selected_Like from "../../assets/Selected Like.svg";
+import Dark_Unselected_Like from "../../assets/Dark - Unselected Like.svg";
+import Light_Unselected_Like from "../../assets/Light - Unselected Like.svg";
+
+import Selected_Favorite from "../../assets/Selected Favorite.svg";
+import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
+import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ContentSection = ({
   data,
@@ -40,9 +53,11 @@ const ContentSection = ({
   verifyid,
   cmtReact,
   homeApiData,
-  setArrayMerge
+  setArrayMerge,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+
+  const [modalShow, setModalShow] = React.useState(false);
 
   const userPhone = localStorage.getItem("user-id");
 
@@ -55,10 +70,10 @@ const ContentSection = ({
 
   const [followLabel, setFollowLabel] = useState("Follow");
 
-  const followCommentator = async (commentator_id,isFollowing) => {
+  const followCommentator = async (commentator_id, isFollowing) => {
     try {
       // console.log("isFollowing",isFollowing)
-      if(isFollowing){
+      if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
           text: "Are you sure you want to unfollow this commentator?",
@@ -84,9 +99,9 @@ const ContentSection = ({
             icon: "success",
           });
           const user_id = localStorage.getItem("user-id");
-        homeApiData(user_id);
+          homeApiData(user_id);
         }
-      }else{
+      } else {
         const res = await axios.get(
           `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
         );
@@ -94,7 +109,6 @@ const ContentSection = ({
         const user_id = localStorage.getItem("user-id");
         homeApiData(user_id);
       }
-
     } catch (error) {
       console.error("Error fetching data.", error);
     }
@@ -104,14 +118,14 @@ const ContentSection = ({
   const [favoriteCount, setFavoriteCount] = useState("");
   const [clapCount, setClapCount] = useState("");
   const generateRandomString = () => {
-    const characters = 'abcdefghijklmnopqrstuvwxyz';
-    let randomString = '';
-  
+    const characters = "abcdefghijklmnopqrstuvwxyz";
+    let randomString = "";
+
     for (let i = 0; i < 7; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
       randomString += characters.charAt(randomIndex);
     }
-  
+
     return randomString;
   };
   const handleCommentReaction = async (id, reaction, count) => {
@@ -122,15 +136,15 @@ const ContentSection = ({
     // else if(reaction === "clap")
     //   setClapCount(count)
 
-  localStorage.setItem(`${id}_${reaction}`, count);
+    localStorage.setItem(`${id}_${reaction}`, count);
     const res = await axios.post(
       `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
       {
         reaction_type: `${reaction}`,
       }
     );
-      // const user_id = localStorage.getItem("user-id");
-      homeApiData(userId);
+    // const user_id = localStorage.getItem("user-id");
+    homeApiData(userId);
   };
 
   // useEffect(() => {
@@ -244,7 +258,10 @@ const ContentSection = ({
                   {userPhone ? (
                     <button
                       onClick={() => {
-                        followCommentator(data?.value.commentator_user.id,followingid.includes(data?.value.commentator_user.id));
+                        followCommentator(
+                          data?.value.commentator_user.id,
+                          followingid.includes(data?.value.commentator_user.id)
+                        );
                       }}
                       style={{
                         border:
@@ -445,15 +462,41 @@ const ContentSection = ({
                     }}
                   >
                     <div>
-                      {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
-                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].like == 1 ? (
-                          <PiHeartStraightFill size={25} color="#ff3030" />
+                      {cmtReact
+                        ?.map((e) => e?.comment_id)
+                        ?.includes(data?.value?.id) ? (
+                        cmtReact?.filter(
+                          (e) => e?.comment_id == data?.value?.id
+                        )[0].like == 1 ? (
+                          <img
+                            src={Selected_Like}
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         ) : (
-                          <PiHeartStraight size={25} color="#ff3030" />
+                          <img
+                            src={
+                              currentTheme === "dark"
+                                ? Dark_Unselected_Like
+                                : Light_Unselected_Like
+                            }
+                            alt=""
+                            height={20}
+                            width={20}
+                          />
                         )
                       ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
-                        <PiHeartStraight size={25} color="#ff3030" />
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Like
+                              : Light_Unselected_Like
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
                       )}{" "}
                       {data?.value?.total_reactions?.total_likes}
                     </div>
@@ -461,13 +504,15 @@ const ContentSection = ({
                 ) : (
                   <div>
                     <img
-                      src={`${
-                        currentTheme === "dark" ? likeIcondark : likeIcon
-                      }`}
+                      src={
+                        currentTheme === "dark"
+                          ? Dark_Unselected_Like
+                          : Light_Unselected_Like
+                      }
                       alt=""
                       height={20}
                       width={20}
-                    />{" "}
+                    />
                     {data?.value?.total_reactions?.total_likes}
                   </div>
                 )}
@@ -482,42 +527,56 @@ const ContentSection = ({
                       );
                     }}
                   >
-                    {/* <img
-                      src={`${
-                        currentTheme === "dark" ? starDarkLogin : starIcon
-                      }`}
-                      alt=""
-                      height={23}
-                      width={23}
-                    /> */}
-                    {/* {favoriteCount >
-                    data?.value.total_reactions.total_favorite ? (
-                      <GoStar size={25} color="#ffcc00" />
-                    ) : (
-                      <GoStarFill size={25} color="#ffcc00" />
-                    )}{" "} */}
-                    {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
-                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].favorite == 1 ? (
-                          <GoStarFill size={25} color="#ffcc00" />
-                        ) : (
-                          <GoStar size={25} color="#ffcc00" />
-                        )
+                    {cmtReact
+                      ?.map((e) => e?.comment_id)
+                      ?.includes(data?.value?.id) ? (
+                      cmtReact?.filter(
+                        (e) => e?.comment_id == data?.value?.id
+                      )[0].favorite == 1 ? (
+                        <img
+                          src={Selected_Favorite}
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
                       ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
-                        <GoStar size={25} color="#ffcc00" />
-                      )}{" "}
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Favorite
+                              : Light_Unselected_Favorite
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? Dark_Unselected_Favorite
+                            : Light_Unselected_Favorite
+                        }
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
+                    )}{" "}
                     {data?.value?.total_reactions?.total_favorite}
                   </div>
                 ) : (
                   <div>
                     <img
-                      src={`${
-                        currentTheme === "dark" ? starIcondark : starIcon
-                      }`}
+                      src={
+                        currentTheme === "dark"
+                          ? Dark_Unselected_Favorite
+                          : Light_Unselected_Favorite
+                      }
                       alt=""
-                      height={23}
-                      width={23}
-                    />{" "}
+                      height={20}
+                      width={20}
+                    />
                     {data?.value?.total_reactions?.total_favorite}
                   </div>
                 )}
@@ -532,61 +591,57 @@ const ContentSection = ({
                       );
                     }}
                   >
-                    {/* <img
-                      src={currentTheme === "dark" ? clapIcon : clapLight}
-                      alt=""
-                      height={20}
-                      width={20}
-                    /> */}
-                    {/* <img
-                      src={
-                        currentTheme === "dark"
-                          ? clapCount > data?.value.total_reactions.total_clap
-                            ? clapIcon
-                            : clapIcon1
-                          : clapCount > data?.value.total_reactions.total_clap
-                          ? clapIcon
-                          : clapIcon1
-                      }
-                      alt=""
-                      height={20}
-                      width={20}
-                    />{" "} */}
-                    {cmtReact?.map((e)=>e?.comment_id)?.includes(data?.value?.id) ? (
-                        cmtReact?.filter((e)=>e?.comment_id==data?.value?.id)[0].clap == 1 ? (
-                          <img
-                      src={clapIcon1}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                        ) : (
-                          <img
-                      src={clapIcon}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                        )
-                      ) : (
-                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                    {cmtReact
+                      ?.map((e) => e?.comment_id)
+                      ?.includes(data?.value?.id) ? (
+                      cmtReact?.filter(
+                        (e) => e?.comment_id == data?.value?.id
+                      )[0].clap == 1 ? (
                         <img
-                      src={clapIcon}
-                      alt=""
-                      height={20}
-                      width={20}
-                    />
-                      )}{" "}
+                          src={Selected_Clap}
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            currentTheme === "dark"
+                              ? Dark_Unselected_Clap
+                              : Light_Unselected_Clap
+                          }
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
+                      )
+                    ) : (
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? Dark_Unselected_Clap
+                            : Light_Unselected_Clap
+                        }
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
+                    )}{" "}
                     {data?.value?.total_reactions?.total_clap}
                   </div>
                 ) : (
                   <div>
                     <img
-                      src={currentTheme === "dark" ? clapIcon : clapLight}
+                      src={
+                        currentTheme === "dark"
+                          ? Dark_Unselected_Clap
+                          : Light_Unselected_Clap
+                      }
+                      P
                       alt=""
                       height={20}
                       width={20}
-                    />{" "}
+                    />
                     {data?.value?.total_reactions?.total_clap}
                   </div>
                 )}
@@ -598,6 +653,7 @@ const ContentSection = ({
                       <button
                         onClick={() => {
                           // setSelectContent("show-all-comments");
+                          setModalShow(true);
                         }}
                         className="me-2 px-2 py-1"
                         style={{
@@ -616,6 +672,7 @@ const ContentSection = ({
                     ) : (
                       <button
                         // onClick={() => setSelectContent("show-all-comments")}
+                        onClick={() => setModalShow(true)}
                         className="me-2 px-2 py-1"
                         style={{
                           border:
@@ -637,8 +694,7 @@ const ContentSection = ({
           </div>
         </div>
       </>
-      {/* ))
-      } */}
+      <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );
 };

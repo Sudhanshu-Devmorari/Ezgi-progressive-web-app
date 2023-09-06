@@ -368,6 +368,7 @@ const MainPage = () => {
               </>
             ) : user !== "standard" ? (
               <CommentatorsCommentsPage
+                setActiveCommentsshow={setActiveCommentsshow}
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
@@ -381,6 +382,7 @@ const MainPage = () => {
               />
             ) : (
               <DashboardSU
+                setActiveCommentsshow={setActiveCommentsshow}
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
@@ -649,9 +651,9 @@ const MainPage = () => {
               {selectContent === "become-editor" && <BecomeEditor />}
               {selectContent === "category-content" && (
                 <>
-                {contentFilterData?.map((res) => (
-                  <ContentSection data={res} />
-                ))}
+                  {contentFilterData?.map((res) => (
+                    <ContentSection data={res} />
+                  ))}
                 </>
               )}
             </>

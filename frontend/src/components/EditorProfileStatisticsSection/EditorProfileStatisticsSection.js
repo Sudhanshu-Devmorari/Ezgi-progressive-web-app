@@ -96,7 +96,7 @@ const EditorProfileStatisticsSection = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [user]);
 
   function getFlagUrl(countryCode) {
     const country = country_code.find((code) => code.code === countryCode);

@@ -89,9 +89,23 @@ const DashboardSU = (props) => {
             favSelection={favSelection}
             verifyid={props.verifyid}
           />
-          {favSelection === "fav editor" && <FavEditor setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favEditorData={favEditorData} verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}/>}
+          {favSelection === "fav editor" && (
+            <FavEditor
+              setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favEditorData={favEditorData}
+              verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}
+              setActiveCommentsshow={props?.setActiveCommentsshow}
+              setSelectContent={props?.setSelectContent}
+            />
+          )}
                               
-          {favSelection === "fav comments" && <FavComments setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favCommentData={favCommentData} verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}/>}
+          {favSelection === "fav comments" && (
+            <FavComments
+              setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favCommentData={favCommentData}
+              verifyid={props.verifyid} homeApiData={props.homeApiData} cmtReact={props.cmtReact}
+              setActiveCommentsshow={props?.setActiveCommentsshow}
+              setSelectContent={props?.setSelectContent}
+            />
+          )}
         </>
       )}
       {(content === "notifications" || content === "support") && (

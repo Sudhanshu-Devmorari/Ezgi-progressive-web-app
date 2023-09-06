@@ -4,7 +4,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import blueTick from "../../assets/blueTick.png";
 import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
-import yellowStarIcon from '../../assets/star-1 (1).svg'
+import yellowStarIcon from "../../assets/star-1 (1).svg";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import config from "../../config";
 
@@ -44,7 +44,14 @@ const FavEditor = (props) => {
             />
           </div>
           <div className="row">
-            <div className="col pe-0 d-flex position-relative">
+            <div
+              className="col pe-0 d-flex position-relative"
+              onClick={() => {
+                props?.setActiveCommentsshow(res?.data?.commentator_user?.id);
+                props?.setDashboardSUser(false);
+                props?.setSelectContent('show-all-comments');
+              }}
+            >
               <div className="position-absolute">
                 <img
                   src={crown}
@@ -85,16 +92,20 @@ const FavEditor = (props) => {
                   className="blueTick-responsive align-items-center mt-1 responsive-username"
                   style={{ fontSize: "13px" }}
                 >
-                  <span className="pe-1">{res?.data?.commentator_user.username}</span>
-                  {props.verifyid?.includes(res?.data?.commentator_user.id) && 
-                  <img
-                    className="responsive-blue-tick"
-                    src={blueTick}
-                    alt=""
-                    width={17}
-                    height={17}
-                  />
-                  }
+                  <span className="pe-1">
+                    {res?.data?.commentator_user?.username}
+                  </span>
+                  {props?.verifyid?.includes(
+                    res?.data?.commentator_user.id
+                  ) && (
+                    <img
+                      className="responsive-blue-tick"
+                      src={blueTick}
+                      alt=""
+                      width={17}
+                      height={17}
+                    />
+                  )}
                 </div>
                 <div
                   style={{
@@ -102,7 +113,7 @@ const FavEditor = (props) => {
                     color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                   }}
                 >
-                  %{res?.data?.commentator_user.success_rate}
+                  %{res?.data?.commentator_user?.success_rate}
                 </div>
               </div>
             </div>
