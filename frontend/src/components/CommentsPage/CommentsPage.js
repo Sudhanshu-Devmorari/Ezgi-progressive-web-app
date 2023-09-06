@@ -13,6 +13,11 @@ const CommentsPage = ({
   selectContent,
   setSelectContent,
   selectPublicorForYou,
+  setActiveCommentsshow,
+  followingid,
+  verifyid,
+  cmtReact,
+  homeApiData
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   // console.log('&&&&&&&&', mergedResult)
@@ -52,10 +57,15 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <ContentSection
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
+                  followingid={followingid}
+                  verifyid={verifyid}
+                  cmtReact={cmtReact}
+                  homeApiData={homeApiData}
                 />
               </>
             );
@@ -71,9 +81,12 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <SharedProfile
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+
                 />
               </>
             );
@@ -94,10 +107,14 @@ const CommentsPage = ({
                   />
                 ) : null}
                 <ContentSection
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+                  followingid={followingid}
+                  cmtReact={cmtReact}
                 />
               </>
             );
@@ -107,6 +124,7 @@ const CommentsPage = ({
               <>
                 {lastType == "comment" ? <HighlightMainPage /> : null}
                 <SharedProfile
+                setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}

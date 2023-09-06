@@ -7,6 +7,7 @@ import "./ProfileSU.css";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import initialProfile from '../../assets/profile.png'
 import config from "../../config";
 
 const ProfileSU = (props) => {
@@ -18,7 +19,8 @@ const ProfileSU = (props) => {
   const [progileData, setProgileData] = useState();
   useEffect(() => {
     async function getProfileData() {
-      const res = await axios.get(`${config?.apiUrl}/profile/${userId}`);
+      const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+      // console.log(res.data,"===============?>>");
       setProgileData(res.data);
     }
     getProfileData();
@@ -43,6 +45,7 @@ const ProfileSU = (props) => {
           // console.log("res: ", res);
           // console.log("res: ", res.status);
           if (res.status === 200) {
+            props?.getProfileData()
             Swal.fire({
               title: "Success",
               text: "Profile Updated!",
@@ -103,7 +106,7 @@ const ProfileSU = (props) => {
                 src={
                   preveiwProfilePic
                     ? preveiwProfilePic
-                    : `${config?.apiUrl}${progileData?.profile_pic}`
+                    : progileData?.profile_pic ? `${config.apiUrl}${progileData?.profile_pic}` : initialProfile
                 }
                 width={100}
                 height={100}

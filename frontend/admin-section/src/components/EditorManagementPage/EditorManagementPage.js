@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import NewUsers from "../NewUsers/NewUsers";
@@ -13,22 +13,21 @@ import LevelCount from "../LevelCount/LevelCount";
 import axios from "axios";
 import config from "../../config";
 
-
 const EditorManagementPage = () => {
-
   const [data, setData] = useState({});
   const [users, setUsers] = useState([]);
   const [verifyUser, setverifyUsererifyUser] = useState([]);
   const [deactivateUser, setDeactivateUser] = useState([]);
 
-  const editorManagementApiData =  () => {
+  function editorManagementApiData () {
     // console.log(data)
     axios
+      // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
         // console.log("%%%%%%%%%", res.data)
         setData(res.data);
-        setDeactivateUser(res.data.deactivat_user)
+        setDeactivateUser(res.data.deactivat_user);
         // setUsers(res?.data?.users_list)
         // setUserTimeLine(res?.data?.user_timeline)
       })
@@ -40,6 +39,16 @@ const EditorManagementPage = () => {
   useEffect(() => {
     editorManagementApiData();
   }, []);
+
+  function approveOrRejectrqst (id, value){
+    axios.post(`${config.url}/verify-user/${id}`, {status : value})
+    .then((res)=> {
+      // console.log(res);
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
 
   const newEditorsArray = [
     {
@@ -56,7 +65,7 @@ const EditorManagementPage = () => {
     {
       name: "Verification Requests",
       img: bluetick,
-      count: "127",
+      count: data?.verify_request_count,
     },
   ];
   const deactivationArray = [
@@ -85,14 +94,15 @@ const EditorManagementPage = () => {
                     <NewUsers array={newEditorsArray} />
                   </div>
                   <div className="col-8">
-                    <LevelCount data={data}/>
+                    <LevelCount data={data} />
                   </div>
                 </div>
                 <div className="">
                   <EditorManagemenet
-                  editorManagementApiData={editorManagementApiData}
-                  users={data.editor_list}
-                  deactivateUser={deactivateUser}
+                  approveOrRejectrqst={approveOrRejectrqst}
+                    editorManagementApiData={editorManagementApiData}
+                    users={data.editor_list}
+                    deactivateUser={deactivateUser}
                     updateProfile={updateProfile}
                     setupdateProfile={setupdateProfile}
                     verifyRqst={verifyRqst}
@@ -101,8 +111,15 @@ const EditorManagementPage = () => {
                 </div>
               </div>
               <div className="col-4">
-                <Top10 setupdateProfile={setupdateProfile} userData={data.top_ten}/>
-                <EditorAccountStatus active_editor={data.active_editor} pending_editor={data.pending_editor} deactivate_editor={data.deactivate_editor}/>
+                <Top10
+                  setupdateProfile={setupdateProfile}
+                  userData={data.top_ten}
+                />
+                <EditorAccountStatus
+                  active_editor={data.active_editor}
+                  pending_editor={data.pending_editor}
+                  deactivate_editor={data.deactivate_editor}
+                />
                 <div className="row g-0 gap-2">
                   <div className="col">
                     <Requests

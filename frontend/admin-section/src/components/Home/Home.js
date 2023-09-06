@@ -19,35 +19,55 @@ import moment from "moment";
 import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 import Swal from "sweetalert2";
-
+import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const Home = (props) => {
   const handleFile = async (e) => {
     const file = e.target.files[0];
     // console.log(":::::::: ", file?.path);
   };
-  const handleDeactive = async (id) => {
+  const handleDeactive = async (id, action) => {
     try {
-      const res = await axios.delete(
-        `${config?.apiUrl}/user-management/${id}/`
-      );
-      if (res.status === 200){
-        Swal.fire({
-          title: "Success",
-          text: "User Updated!",
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+      if (action === 'delete') {
+        console.log(action,"===============>>>action from delete")
+        const res = await axios.delete(
+          `${config?.apiUrl}/user-management/${id}/?action=delete`
+        );
+        if (res.status === 200) {
+          props?.adminHomeApiData();
+          Swal.fire({
+            title: "Success",
+            text: "User profile Delete sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } else if (action === 'deactive'){
+        console.log(action,"===============>>>action from deactive")
+        const res = await axios.delete(
+          `${config?.apiUrl}/user-management/${id}/?action=deactive`
+        );
+        if (res.status === 200) {
+          props?.adminHomeApiData();
+          Swal.fire({
+            title: "Success",
+            text: "User profile deactive sucessfully.",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
   };
+
   const [addUser, setAddUser] = useState({});
   const submitUserData = (e) => {
     let name, value;
@@ -158,6 +178,7 @@ const Home = (props) => {
         `${config?.apiUrl}/user-management/`,
         formData
       );
+      props?.userManagementApiData();
       // console.log("API Response:", response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -185,8 +206,9 @@ const Home = (props) => {
         formData
       );
 
-      console.log("API Response:", response);
-      if (response.status === 200){
+      // console.log("API Response:", response);
+      if (response.status === 200) {
+        props?.adminHomeApiData();
         Swal.fire({
           title: "Success",
           text: "User Updated!",
@@ -379,15 +401,16 @@ const Home = (props) => {
   };
 
   const filterData = (e) => {
-    const val = e.target.value;
+    const val = e.target.value.toLowerCase();
     const filteredArray = props.users.filter(
       (obj) =>
-        obj?.name?.toLowerCase().startsWith(val.toLowerCase()) ||
-        obj?.username?.toLowerCase().startsWith(val.toLowerCase())
+        obj?.name?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().includes(val) ||
+        obj?.name?.toLowerCase().includes(val)
     );
     setDisplayUser(filteredArray);
   };
-
   const monthOptions = ["1 Month", "3 Month", "6 Month"];
   const [selectedMonth, setSelectedMonth] = useState("Select");
   const [monthDropDown, setMonthDropDown] = useState(false);
@@ -483,13 +506,17 @@ const Home = (props) => {
           ?.slice()
           .reverse()
           .map((res, index) => (
-            <MainDiv>
+            <MainDiv key={index}>
               <div className="col">
                 <span className="pe-1">{`# ${res?.id
                   .toString()
                   .padStart(4, "0")}`}</span>
                 <img
-                  src={`${server_url + res?.profile_pic}`}
+                  src={`${
+                    res?.profile_pic
+                      ? server_url + res?.profile_pic
+                      : initialProfile
+                  }`}
                   className="rounded-circle"
                   alt=""
                   height={42}
@@ -516,7 +543,6 @@ const Home = (props) => {
                   //   setAddUser(res);
                   //   setPreveiwProfilePic(true);
                   // }}
-
                   >
                     {res.age}
                   </span>
@@ -528,7 +554,8 @@ const Home = (props) => {
                   className="d-flex align-items-center block-width col justify-content-center"
                   style={{ minWidth: "7.5rem" }}
                 >
-                  {res.commentator_level ? (
+                  {res.commentator_level &&
+                  res.commentator_level !== "undefined" ? (
                     <button
                       className="btn-user"
                       style={{
@@ -581,7 +608,8 @@ const Home = (props) => {
                   width={25}
                 />
                 <img
-                onClick={()=> handleDeactive(res.id)}
+                  onClick={() => handleDeactive(res.id, 'delete')}
+                  // onClick={() => handleDelete(res.id)}
                   className="cursor"
                   src={trash}
                   alt=""
@@ -822,7 +850,7 @@ const Home = (props) => {
               </div>
               <div className="row g-0 p-2 gap-3">
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdownHome
                     onChange={submitUserData}
                     name="gender"
                     value={addUser.selectedGender}
@@ -837,7 +865,7 @@ const Home = (props) => {
                   />
                 </div>
                 <div className="col d-flex flex-column">
-                  <CustomDropdown
+                  <CustomDropdownHome
                     onChange={submitUserData}
                     name="age"
                     value={addUser.selectedAge}
@@ -877,7 +905,7 @@ const Home = (props) => {
                 <div className="col-8">
                   <div className="row g-0 gap-2">
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="duration"
                         value={
@@ -892,7 +920,7 @@ const Home = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="month"
                         value={
@@ -907,7 +935,7 @@ const Home = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <CustomDropdown
+                      <CustomDropdownHome
                         onChange={submitUserData}
                         name="level"
                         value={
@@ -983,7 +1011,7 @@ const Home = (props) => {
                     <div className="col">
                       <button
                         onClick={() => {
-                          handleDeactive(userData?.id);
+                          handleDeactive(userData?.id, 'deactive');
                           setAddUser({
                             name: "",
                             username: "",
@@ -1040,6 +1068,7 @@ const Home = (props) => {
                       data-bs-dismiss="modal"
                       onClick={() => {
                         handleAddUser();
+
                         // props.onHide();
                       }}
                       className="px-3 py-1"
@@ -1068,8 +1097,12 @@ const Home = (props) => {
                   });
                   setprofile(false);
                   setPreveiwProfilePic(null);
+                  setAgeDropDown(false);
+                  setGenderDropDown(false);
+                  setMonthDropDown(false);
+                  setNumberDropDown(false);
+                  setLevelDropDown(false);
                 }}
-
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
@@ -1154,6 +1187,9 @@ const Home = (props) => {
                 ))}
               </div>
               <img
+                // onClick={()=>{
+                //   setNumberDropDown(false)
+                // }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""
@@ -1279,6 +1315,12 @@ const Home = (props) => {
               </div>
             </div>
             <img
+              onClick={() => {
+                setUserTypeFilterDropDown(false);
+                setCityFilterDropDown(false);
+                setGenderFilterDropDown(false);
+                setAgeFilterDropDown(false);
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

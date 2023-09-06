@@ -116,6 +116,10 @@ const EditorFilter = (props) => {
                   <RxCross2
                     onClick={() => {
                       props.onHide();
+                      setCountryDropDown(false);
+                      setLevelDropDown(false);
+                      setScorePointDropDown(false);
+                      setSuccessRateDropDown(false);
                     }}
                     fontSize={"1.8rem"}
                     className={`${

@@ -23,17 +23,17 @@ import config from "../../config";
 const FavComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const favCommentData = props?.favCommentData;
-  console.log(favCommentData);
+  // console.log(favCommentData);
 
   // Follow commentator
-    // const followCommentator = () =>{
-    //   try {
-      //  const res = await axios.get(`${config?.apiUrl}/follow-commentator/${userId}/?id=${}`)
-    //    console.log(res);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
+  // const followCommentator = () =>{
+  //   try {
+  //  const res = await axios.get(`http://127.0.0.1:8000/follow-commentator/${userId}/?id=${}`)
+  //    console.log(res);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   return (
     <>
@@ -61,11 +61,23 @@ const FavComments = (props) => {
                   }}
                 />
                 <div className="col">
-                  <img src={profile} width={75} height={75} alt="" />
+                  <img 
+                  style={{objectFit: "cover", borderRadius: "50%"}}
+                    src={
+                      res?.commentator_user?.profile_pic
+                        ? `${config.apiUrl}${res?.commentator_user?.profile_pic}`
+                        : profile
+                    }
+                    width={75}
+                    height={75}
+                    alt=""
+                  />
                   <span className="p-1 autorname-responsive">
-                    {res.username}
+                    {res?.commentator_user?.username}
                   </span>
+                  {props.verifyid?.includes(res?.commentator_user?.id) && 
                   <img src={blueTick} alt="" width={16} height={16} />
+                  }
                 </div>
               </div>
               <div className="col p-0">
@@ -96,13 +108,13 @@ const FavComments = (props) => {
                         color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                       }}
                     >
-                      %67.6
+                      %{res?.commentator_user?.success_rate}
                     </div>
                   </div>
                   <div className="col">
                     <div className="rate-fonts">Score Points</div>
                     <div style={{ fontSize: "1rem", color: "#FFA200" }}>
-                      256
+                    {res?.commentator_user?.score_points}
                     </div>
                   </div>
                 </div>
@@ -181,7 +193,9 @@ const FavComments = (props) => {
                   </span>
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">Antalyaspor</span>
+                  <span className="mt-2 pt-1">
+                    {res?.match_detail.split(" - ")[0]}
+                  </span>
                   <div
                     className="px-2"
                     style={{
@@ -204,7 +218,9 @@ const FavComments = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">Başakşehir</span>
+                  <span className="mt-2 pt-1">
+                    {res?.match_detail.split(" - ")[1]}
+                  </span>
                 </div>
                 <div className="text-end mt-3 mb-2">
                   <span
@@ -242,7 +258,7 @@ const FavComments = (props) => {
                       height={20}
                       width={20}
                     />{" "}
-                    258
+                    {res?.total_reactions?.total_likes}
                   </div>
                   <div>
                     <img
@@ -253,7 +269,7 @@ const FavComments = (props) => {
                       height={23}
                       width={23}
                     />
-                    258
+                    {res?.total_reactions?.total_favorite}
                   </div>
                   <div>
                     <img
@@ -262,7 +278,7 @@ const FavComments = (props) => {
                       height={20}
                       width={20}
                     />{" "}
-                    258
+                    {res?.total_reactions?.total_clap}
                   </div>
                 </div>
                 <div className="ms-auto" style={{ fontSize: "12px" }}>

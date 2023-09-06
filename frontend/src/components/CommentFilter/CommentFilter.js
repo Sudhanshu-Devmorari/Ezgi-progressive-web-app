@@ -3,7 +3,6 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 
-
 export const CommentFilter = (props) => {
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Select");
@@ -12,9 +11,8 @@ export const CommentFilter = (props) => {
   const [LeagueValue, setLeagueValue] = useState([]);
   const [DateValue, setDateValue] = useState([]);
 
-
   const handleCountrySelection = (country) => {
-    props.setCountryData(country)
+    props.setCountryData(country);
     setSelectedCountry(country);
   };
 
@@ -40,7 +38,7 @@ export const CommentFilter = (props) => {
   //   "UK",
   // ];
   const [countryOptions, setCountryOptions] = useState([]);
-
+  const [matchId, setMatchId] = useState([]);
 
   // const categoryOptions = ["Football", "Basketball"];
   const categoryOptions = ["Futbol", "Basketbol"];
@@ -63,7 +61,7 @@ export const CommentFilter = (props) => {
         try {
           const headers = {
             // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
-            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`
+            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`,
           };
           let type;
           if (selectedCategory === "Futbol") {
@@ -78,7 +76,6 @@ export const CommentFilter = (props) => {
           );
           const countryData = res.data.data;
           setCountryOptions(countryData.map((item) => item.country));
-
         } catch (error) {
           console.log(error);
         }
@@ -93,7 +90,7 @@ export const CommentFilter = (props) => {
         try {
           const headers = {
             // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
-            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`
+            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`,
           };
           // contriesAPi(categoryType, selectedCountry);
           const res = await axios.get(
@@ -115,8 +112,45 @@ export const CommentFilter = (props) => {
                 { headers }
               );
 
-              props.setMatchdetailsValue(res1?.data?.data?.map((item) => item.takimlar));
+              props.setMatchdetailsValue(
+                res1?.data?.data?.map((item) => item.takimlar)
+              );
               // props.setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
+            }
+            let type;
+            if (props.selectedMatchDetails !== "Select") {
+              if (selectedCategory === "Futbol") {
+                type = 1;
+              } else if (selectedCategory === "Basketbol") {
+                type = 2;
+              }
+              const res11 = await axios.get(
+                `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+                { headers }
+              );
+              setMatchId(res11?.data?.data.map((item) => item.MatchID));
+              
+              const predictionsPromises = await Promise.all(
+                res11?.data?.data.map((item) => item.MatchID).map(async (val) => {
+                  const predictions = await axios.get(
+                    `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
+                    { headers }
+                  );
+                  return predictions.data.data.gameType // Assuming you want to return the data from each API call
+                })
+              );
+
+              // Wait for all API calls to complete
+              // const predictionsData = await Promise.all(predictionsPromises);
+
+              // Flatten and remove duplicates from the predictionsData array
+              const uniquePredictions = [
+                ...new Set(predictionsPromises.flat()),
+              ];
+
+              // console.log("Unique Predictions:", uniquePredictions);
+              // Now you can work with the uniquePredictions array as needed
+              props.setPredictionType(uniquePredictions);
             }
           }
         } catch (error) {
@@ -125,10 +159,14 @@ export const CommentFilter = (props) => {
       }
     }
     getLeague();
-  }, [selectedCountry, selectedLeague, selectedDate]);
-
+  }, [
+    selectedCountry,
+    selectedLeague,
+    selectedDate,
+    props.selectedMatchDetails,
+  ]);
   const handleCategorySelection = (category) => {
-    props.setCategoryData(category)
+    props.setCategoryData(category);
     setSelectedCategory(category);
   };
   const toggleCategoryDropdown = () => {
@@ -145,7 +183,7 @@ export const CommentFilter = (props) => {
   };
 
   const handleDateSelection = (date) => {
-    props.setDateData(date)
+    props.setDateData(date);
     setSelectedDate(date);
   };
   const toggleDateDropdown = () => {
@@ -162,7 +200,7 @@ export const CommentFilter = (props) => {
   };
 
   const handleLeagueSelection = (league) => {
-    props.setLeagueData(league)
+    props.setLeagueData(league);
     setSelectedLeague(league);
   };
   const toggleLeagueDropdown = () => {

@@ -11,7 +11,9 @@ const LoginModal = () => {
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone is required")
-      .matches(/^\d{10}$/, "Phone must be 10 digits"),
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password must be at least 8 characters"),
@@ -27,7 +29,7 @@ const LoginModal = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      // console.log(values);
       axios
         .post(`${config?.apiUrl}/login/`, {
           phone: values.phone,
@@ -36,7 +38,7 @@ const LoginModal = () => {
         })
         .then((res) => {
           // console.log(res);
-          if ((res.data.status === 400) || res.data.status === 404) {
+          if (res.data.status === 400 || res.data.status === 404) {
             Swal.fire({
               title: "Error",
               text: res.data.data,
@@ -45,7 +47,7 @@ const LoginModal = () => {
               customClass: "dark-mode-alert",
             });
           } else if (res.data.status === 200) {
-            const userId = res.data.userId
+            const userId = res.data.userId;
             localStorage.setItem("admin-user-id", userId);
             window.location.reload();
           }

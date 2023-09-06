@@ -11,10 +11,11 @@ import lighGrp from "../../assets/Group 721.png";
 export const SelectContent = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const userPhone = localStorage.getItem("userPhone");
+  const userId = localStorage.getItem("user-id");
   const [publicSelected, setPublicSelected] = useState(false);
-
   return (
     <>
+    {userId ? (
       <div
         className={`${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -70,6 +71,7 @@ export const SelectContent = (props) => {
           </div>
         </div>
       </div>
+  ) : null}
     </>
   );
 };

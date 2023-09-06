@@ -199,6 +199,14 @@ const SalesManagementFilter = () => {
               </div>
             </div>
             <img
+            onClick={() => {
+             
+              setDateDropDown(false);
+              setTypeDropDown(false)
+              setStatusDropDown(false)
+              setDurationDropDown(false)
+             
+            }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

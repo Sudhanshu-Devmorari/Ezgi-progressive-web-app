@@ -96,6 +96,7 @@ const Export = (props) => {
               </div>
               <div className="my-4 d-flex justify-content-center">
                 <button
+                  data-bs-dismiss="modal"
                   onClick={handleExport}
                   className="px-3"
                   style={{

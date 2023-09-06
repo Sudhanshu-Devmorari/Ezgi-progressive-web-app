@@ -19,6 +19,7 @@ import Support from "../Support/Support";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
+import Spinner from 'react-bootstrap/Spinner';
 
 const CommentatorsCommentsPage = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
@@ -27,6 +28,7 @@ const CommentatorsCommentsPage = (props) => {
     useState("My subscribers");
   const [walletSelection, setWalletSelection] = useState("My transactions");
   const [favSelection, setFavSelection] = useState("fav editor");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (props.selectContent === "notifications") {
@@ -60,22 +62,35 @@ const CommentatorsCommentsPage = (props) => {
   // PROFILE API
   const [profileData, setProfileData] = useState();
   useEffect(() => {
+    setIsLoading(true);
     async function getProfileData() {
       const res = await axios.get(`${config?.apiUrl}/profile/${userId}`);
       // console.log(res.data,"========>>>");
       setProfileData(res.data);
+      setIsLoading(false);
     }
     getProfileData();
   }, []);
 
   return (
     <>
+    {isLoading ? (
+      <>
+      <div className="d-flex justify-content-center align-items-center" style={{height:"75vh"}}>
+        <Spinner as="span" animation="border" size="md" role="status" aria-hidden="true" />
+      </div>
+      </>
+    ) : (
+    <>
+    
       <ActiveComments
+      from={'dashboard'}
         content={content}
         profile={"commentator"}
         setDashboardSUser={props.setDashboardSUser}
         setSelectContent={props.setSelectContent}
         profileData={profileData}
+        getProfileData= {props.getProfileData}
       />
       <CommentatorIcons setContent={setContent} content={content} />
 
@@ -87,9 +102,9 @@ const CommentatorsCommentsPage = (props) => {
           />
           {(SelectComment === "activeComments" ||
             SelectComment === "resolvedComments") && (
-            <CommentsContentSection SelectComment={SelectComment} />
+            <CommentsContentSection SelectComment={SelectComment}  verifyid={props.verifyid} />
           )}
-          {SelectComment === "statistics" && <EditorProfileStatisticsSection />}
+          {SelectComment === "statistics" && <EditorProfileStatisticsSection from={'dashboard'}/>}
         </>
       )}
 
@@ -123,12 +138,13 @@ const CommentatorsCommentsPage = (props) => {
           <FavoriteSelection
             setFavSelection={setFavSelection}
             favSelection={favSelection}
+            verifyid={props.verifyid}
           />
           {favSelection === "fav editor" && (
-            <FavEditor favEditorData={favEditorData} />
+            <FavEditor favEditorData={favEditorData} verifyid={props.verifyid} />
           )}
           {favSelection === "fav comments" && (
-            <FavComments favCommentData={favCommentData} />
+            <FavComments favCommentData={favCommentData} verifyid={props.verifyid} />
           )}
         </>
       )}
@@ -139,6 +155,9 @@ const CommentatorsCommentsPage = (props) => {
           {content === "notifications" && <Notifications />}
           {content === "support" && <Support />}
         </>
+      )}
+
+      </>
       )}
     </>
   );

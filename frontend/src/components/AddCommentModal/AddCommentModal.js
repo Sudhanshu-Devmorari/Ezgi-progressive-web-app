@@ -32,29 +32,18 @@ const AddCommentModal = (props) => {
   //   "Match Details 3",
   // ];
   const [matchDetailsOptions, setMatchDetailsOptions] = useState([]);
-  const predictionTypeOptions = [
-    "Prediction Type 1",
-    "Prediction Type 2",
-    "Prediction Type 3",
-  ];
-  const predictionOptions = ["Prediction 1", "Prediction 2", "Prediction 3"];
+  const [predictionType, setPredictionType] = useState([]);
+  const [predictionData, setPredictionData] = useState([]);
+
+  const predictionTypeOptions =predictionType;
+  const predictionOptions = predictionData;
   const [countryOptions, setCountryOptions] = useState([]);
-  // const countryOptions = [
-  //   "India",
-  //   "Turkey",
-  //   "Paris",
-  //   "Japan",
-  //   "Germany",
-  //   "USA",
-  //   "UK",
-  // ];
 
   const categoryOptions = ["Futbol", "Basketbol"];
   // const dateOptions = ["Date 1", "Date 2", "Date 3"];
   const [dateOptions, setDateOptions] = useState([]);
   // const leagueOptions = ["League 1", "League 2", "League 3"];
   const [leagueOptions, setLeagueOptions] = useState([]);
-
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
   const [selectedPredictionType, setSelectedPredictionType] =
@@ -73,15 +62,16 @@ const AddCommentModal = (props) => {
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
+    setMatchDetailsError("")
   };
   const toggleMatchDetailsDropdown = () => {
-    MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
-      .then((res) => {
-        // console.log(res.data, "========================res");
-        const MatchList = res.data;
-        setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
-      })
-      .catch((err) => {});
+    // MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
+    //   .then((res) => {
+    //     // console.log(res.data, "========================res");
+    //     const MatchList = res.data;
+    //     setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+    //   })
+    //   .catch((err) => {});
     setPredictionTypeDropdown(false);
     setPredictionDropdown(false);
     setCountryDropDown(false);
@@ -89,9 +79,10 @@ const AddCommentModal = (props) => {
     setCategoryDropdown(false);
     setLeagueDropdown(false);
     setMatchDetailsDropdown(!matchDetailsDropdown);
-  };
+  };  
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
+    setPredictionTypeError("")
   };
   const togglePredictionTypeDropdown = () => {
     setCountryDropDown(false);
@@ -104,6 +95,7 @@ const AddCommentModal = (props) => {
 
   const handlePredictionSelection = (prediction) => {
     setSelectedPrediction(prediction);
+    setPredictionError("")
   };
   const togglePredictionDropdown = () => {
     setCountryDropDown(false);
@@ -116,6 +108,7 @@ const AddCommentModal = (props) => {
   };
   const handleCountrySelection = (country) => {
     setSelectedCountry(country);
+    setCountryError("")
   };
   const toggleCountryDropdown = () => {
     setMatchDetailsDropdown(false);
@@ -128,6 +121,7 @@ const AddCommentModal = (props) => {
   };
   const handleCategorySelection = (category) => {
     setSelectedCategory(category);
+    setCategoryError("")
   };
   const toggleCategoryDropdown = () => {
     setMatchDetailsDropdown(false);
@@ -140,15 +134,16 @@ const AddCommentModal = (props) => {
   };
   const handleDateSelection = (date) => {
     setSelectedDate(date);
+    setDateError("")
   };
   const toggleDateDropdown = () => {
-    DateAPI(categoryType, selectedLeague)
-      .then((res) => {
-        // console.log(res.data, "========================res date");
-        const DateList = res.data;
-        setDateOptions(DateList.map((item) => item.date));
-      })
-      .catch((error) => {});
+    // DateAPI(categoryType, selectedLeague)
+    //   .then((res) => {
+    //     // console.log(res.data, "========================res date");
+    //     const DateList = res.data;
+    //     setDateOptions(DateList.map((item) => item.date));
+    //   })
+    //   .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -160,17 +155,15 @@ const AddCommentModal = (props) => {
 
   const handleLeagueSelection = (league) => {
     setSelectedLeague(league);
+    setLeagueError("")
   };
   const toggleLeagueDropdown = () => {
-    LeagueAPI(categoryType, selectedCountry)
-      // console.log(res,"========================res leauge");
-      // const LeagueList = res.data;
-      .then((res) => {
-        // console.log(res, "========================res leauge");
-        const LeagueList = res.data;
-        setLeagueOptions(LeagueList.map((item) => item.league));
-      })
-      .catch((error) => {});
+    // LeagueAPI(categoryType, selectedCountry)
+    //   .then((res) => {
+    //     const LeagueList = res.data;
+    //     setLeagueOptions(LeagueList.map((item) => item.league));
+    //   })
+    //   .catch((error) => {});
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
     setPredictionTypeDropdown(false);
@@ -224,6 +217,7 @@ const AddCommentModal = (props) => {
             `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
             { headers }
           );
+          console.log(res,"=>>res")
           const countryData = res.data.data;
           setCountryOptions(countryData.map((item) => item.country));
         } catch (error) {
@@ -233,46 +227,6 @@ const AddCommentModal = (props) => {
     }
     getCountryOptions();
   }, [selectedCategory]);
-
-  // Get League / Date / Match details
-  // const [LeagueValue, setLeagueValue] = useState("");
-  // const [DateValue, setDateValue] = useState("");
-  // const [MatchdetailsValue, setMatchdetailsValue] = useState("");
-  // useEffect(() => {
-  //   async function getLeague() {
-  //     if (selectedCountry !== "Select") {
-  //       try {
-  //         contriesAPi(categoryType, selectedCountry);
-  //         const res = await axios.get(
-  //           `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
-  //           { headers }
-  //         );
-  //         console.log("res=>>>>>>", res.data);
-  //         console.log("res=>>>>>>", res?.data?.data[0]?.league);
-  //         const leagueValue = res?.data?.data[0]?.league;
-  //         console.log("League Value from API:", leagueValue);
-  //         setLeagueValue(leagueValue);
-  //         if (leagueValue !== "") {
-  //           const res = await axios.get(
-  //             `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${leagueValue}`,
-  //             { headers }
-  //           );
-  //           setDateValue(res?.data?.data[0]?.date);
-  //           const date = res?.data?.data[0]?.date;
-  //           const res1 = await axios.get(
-  //             `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${leagueValue}&t=${date}`,
-  //             { headers }
-  //           );
-  //           console.log("===??????>>>>>..", res1?.data?.data[0]?.takimlar);
-  //           setMatchdetailsValue(res1?.data?.data[0]?.takimlar);
-  //         }
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     }
-  //   }
-  //   getLeague();
-  // }, [selectedCountry]);
 
   // Add Comment pr Post comment API
   const postComment = async () => {
@@ -291,17 +245,25 @@ const AddCommentModal = (props) => {
     if (selectedMatchDetails === "Select") {
       setMatchDetailsError("Required*");
     }
-    // if (selectedPredictionType === "Select") {
-    //   setPredictionTypeError("Required*");
-    // }
-    // if (selectedPrediction === "Select") {
-    //   setPredictionError("Required*");
-    // }
+    if (selectedPredictionType === "Select") {
+      setPredictionTypeError("Required*");
+    }
+    if (selectedPrediction === "Select") {
+      setPredictionError("Required*");
+    }
     if (commentText === "") {
       setCommentError("Required*");
     }
     if (selectCheckBox) {
       try {
+        setCategoryError("")
+        setCountryError("")
+        setLeagueError("")
+        setDateError("")
+        setMatchDetailsError("")
+        setCommentError("")
+        setPredictionTypeError("")
+        setPredictionError("")
         const res = await axios.post(
           `${config?.apiUrl}/post-comment/${userId}`,
           {
@@ -316,33 +278,151 @@ const AddCommentModal = (props) => {
             comment: commentText,
           }
         );
-        console.log("res", res);
-        if (res.data.status === 200) {
+        // console.log("res", res);
+        if (res.status === 200) {
           Swal.fire({
             title: "Success",
-            text: "Level Rules setting Updated!",
+            text: "Comment post successfully!",
             icon: "success",
             backdrop: false,
-            customClass: "dark-mode-alert",
+            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
       } catch (error) {
         console.log(error);
         console.log(error.response.status);
         console.log(error.response.data.message);
-        if (error.response.status === 404){
+        if (error.response.status === 404) {
           console.log("KKKK");
           Swal.fire({
             title: "Error",
             text: error.response.data.message,
             icon: "error",
             backdrop: false,
-            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
       }
     }
   };
+
+    useEffect(() => {
+    MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
+    .then((res) => {
+      // console.log(res.data, "========================res");
+      const MatchList = res.data;
+      setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+    })
+    .catch((err) => {});
+  }, [selectedDate])
+
+    useEffect(() => {
+    DateAPI(categoryType, selectedLeague)
+      .then((res) => {
+        // console.log(res.data, "========================res date");
+        const DateList = res.data;
+        setDateOptions(DateList.map((item) => item.date));
+      })
+      .catch((error) => {});
+  }, [selectedLeague])
+
+    useEffect(() => {
+    LeagueAPI(categoryType, selectedCountry)
+      .then((res) => {
+        const LeagueList = res.data;
+        setLeagueOptions(LeagueList.map((item) => item.league));
+      })
+      .catch((error) => {});
+  }, [selectedCountry])
+
+  const [matchId, setMatchId] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let type;
+      if (selectedMatchDetails !== "Select") {
+        if (selectedCategory === "Futbol") {
+          type = 1;
+        } else if (selectedCategory === "Basketbol") {
+          type = 2;
+        }
+        
+        try {
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          const matchIds = res11?.data?.data.map((item) => item.MatchID);
+          setMatchId(matchIds);
+
+          const predictionsPromises = matchIds.map(async (val) => {
+            const predictions = await axios.get(
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
+              { headers }
+            );
+            return predictions.data.data.gameType; // Assuming you want to return the data from each API call
+          });
+      
+          // Wait for all API calls to complete
+          const predictionsData = await Promise.all(predictionsPromises);
+      
+          // Flatten and remove duplicates from the predictionsData array
+          const uniquePredictions = [...new Set(predictionsData.flat())];
+      
+          // console.log("Unique Predictions:", uniquePredictions);
+          // Now you can work with the uniquePredictions array as needed
+          setPredictionType(uniquePredictions);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, headers]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let type;
+      if (selectedMatchDetails !== "Select") {
+        if (selectedCategory === "Futbol") {
+          type = 1;
+        } else if (selectedCategory === "Basketbol") {
+          type = 2;
+        }
+        
+        try {
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          const matchIds = res11?.data?.data.map((item) => item.MatchID);
+          setMatchId(matchIds);
+
+          const predictionsPromises = matchIds.map(async (val) => {
+            const predictions = await axios.get(
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
+              { headers }
+            );
+            const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
+            return gameNames;
+          });
+      
+          // Wait for all API calls to complete
+          const predictionsData = await Promise.all(predictionsPromises);
+          // Flatten and remove duplicates from the gameNames array
+          const allGameNames = predictionsData.flat();
+          const uniqueGameNames = [...new Set(allGameNames)];
+          setPredictionData(uniqueGameNames);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, selectedPredictionType, headers]);
 
   return (
     <>
@@ -589,22 +669,6 @@ const AddCommentModal = (props) => {
                   isOpen={leagueDropdown}
                   toggleDropdown={toggleLeagueDropdown}
                 />
-                {/* <div className="d-flex flex-column">
-                  <label htmlFor="name">League</label>
-                  <input
-                    // style={{ fontSize: "12px" }}
-                    value={LeagueValue}
-                    required
-                    className={`${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    } form-control text-center`}
-                    type="text"
-                    name="name"
-                    id="name"
-                  />
-                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {leagueError}
                 </small>
@@ -618,21 +682,6 @@ const AddCommentModal = (props) => {
                   isOpen={dateDropdown}
                   toggleDropdown={toggleDateDropdown}
                 />
-                {/* <div className="d-flex flex-column">
-                  <label htmlFor="name">Date</label>
-                  <input
-                    value={DateValue}
-                    required
-                    className={`${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    } form-control text-center`}
-                    type="text"
-                    name="Date"
-                    id="Date"
-                  />
-                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {dateError}
                 </small>
@@ -650,20 +699,6 @@ const AddCommentModal = (props) => {
                 isOpen={matchDetailsDropdown}
                 toggleDropdown={toggleMatchDetailsDropdown}
               />
-              {/* <div className="d-flex flex-column">
-                <label htmlFor="name">Match Details</label>
-                <input
-                  value={MatchdetailsValue}
-                  className={`${
-                    currentTheme === "dark"
-                      ? "darkMode-input"
-                      : "lightMode-input"
-                  } form-control text-center`}
-                  type="text"
-                  name="Match Details"
-                  id="Match Details"
-                />
-              </div> */}
               <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                 {matchDetailsError}
               </small>
@@ -681,20 +716,6 @@ const AddCommentModal = (props) => {
                   isOpen={predictionTypeDropdown}
                   toggleDropdown={togglePredictionTypeDropdown}
                 />
-                {/* <div className="d-flex flex-column">
-                  <label htmlFor="name">Prediction Type</label>
-                  <input
-                    required
-                    className={`${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    } form-control text-center`}
-                    type="text"
-                    name="Match Details"
-                    id="Match Details"
-                  />
-                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {predictionTypeError}
                 </small>
@@ -708,20 +729,6 @@ const AddCommentModal = (props) => {
                   isOpen={predictionDropdown}
                   toggleDropdown={togglePredictionDropdown}
                 />
-                {/* <div className="d-flex flex-column">
-                  <label htmlFor="name">Prediction</label>
-                  <input
-                    required
-                    className={`${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    } form-control text-center`}
-                    type="text"
-                    name="Prediction"
-                    id="Prediction"
-                  />
-                </div> */}
                 <small className="text-danger" style={{ fontSize: "0.78rem" }}>
                   {predictionError}
                 </small>

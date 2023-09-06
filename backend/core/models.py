@@ -29,6 +29,13 @@ EDITOR_STATUS = (
         ('deactive','Deactive'),
     )
 
+Experience = (
+    ('1-2 years', '1-2 years'),
+    ('3-4 years', '3-4 years'),
+    ('5+ years', '5+ years'),
+    ('10+ years', '10+ years'),
+)
+
 class User(AbstractBaseUser):
     name = models.CharField(max_length=150)
     username = models.CharField(max_length=150)
@@ -49,6 +56,9 @@ class User(AbstractBaseUser):
     commentator_status = models.CharField(max_length = 20, choices = EDITOR_STATUS, null=True, blank=True)
     authorization_type = models.CharField(max_length=100,null=True, blank=True)
     department = models.CharField(max_length=100,null=True, blank=True)
+    experience = models.CharField(max_length=20, choices=Experience, default="1-2 years")
+    success_rate = models.FloatField(null=True, blank=True)
+    score_points = models.IntegerField(null=True, blank=True)
     is_transaction = models.BooleanField(default=False)
     is_view_only = models.BooleanField(default=False)
     is_process_withdrawal_request = models.BooleanField(default=False)
@@ -95,6 +105,9 @@ class Comments(models.Model):
     status = models.CharField(max_length = 20, choices = NEW_COMMENT_CHOISE, default='pending')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    is_resolve = models.BooleanField(default=False)
+    is_prediction = models.BooleanField()
+    average_odds = models.FloatField(default=0)
 
 
 SUBSCRIPTION_STATUS = (
@@ -335,3 +348,18 @@ class DataCount(models.Model):
     comment_lose = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+class BecomeEditor(models.Model):
+    question = models.CharField(null=False, blank=False)
+    answer = models.CharField(null=False, blank=False)
+
+    def __str__(self):
+        return self.question
+    
+class BecomeEditorEarnDetails(models.Model):
+    subscription_type = models.CharField(max_length=20, choices = SUBSCRIPTION_ROLE_CHOISE, null=True, blank=True, unique=True)
+    threshold_subscriber = models.IntegerField(blank=False, null=False)
+    earn_amount = models.FloatField(null=False, blank=False)
+
+    def __str__(self):
+        return self.subscription_type

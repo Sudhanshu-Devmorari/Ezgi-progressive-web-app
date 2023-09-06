@@ -18,6 +18,10 @@ import DashboardSU from "../DashboardSU/DashboardSU";
 import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
 import config from "../../config";
+import BecomeEditor from "../BecomeEditor/BecomeEditor";
+import { userId } from "../GetUser";
+import initialProfile from "../../assets/profile.png";
+import Spinner from "react-bootstrap/Spinner";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -31,6 +35,10 @@ const MainPage = () => {
   const themeMode = localStorage.getItem("CurrentTheme");
 
   const [data, setData] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
+  const [followingid, setFollowingId] = useState([]);
+  const [verifyid, setVerifyid] = useState([]);
+  const [cmtReact, setCmtReact] = useState([]);
   const [mergedResult, setMergedResult] = useState([]);
   const [subscriptionResult, setSubscriptionResult] = useState([]);
   const [onlyPublicResult, setOnlyPublicResult] = useState([]);
@@ -42,19 +50,37 @@ const MainPage = () => {
   const publicCount = 3;
   const SubscriptionCount = 3;
   const highlightCount = 5;
+  const [profileData, setProfileData] = useState(initialProfile);
+  const [isLoading, setIsLoading] = useState(false);
 
+  async function getProfileData() {
+    setIsLoading(true);
+    const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    // console.log(res.data,"===============?>>");
+    setProfileData(res.data.profile_pic);
+    setIsLoading(false);
+  }
+  useEffect(() => {
+    if (userId) {
+      getProfileData();
+    }
+  }, []);
 
-  const homeApiData = async (user_id) => {
-    const res = await axios
+  function homeApiData(user_id) {
+    axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        setData(res.data);
-        setPublicComments(res.data.Public_Comments);
-        setHighlights(res.data.highlights);
-        setsubscriptionComments(res.data.Subscription_Comments);
-        setads(res.data.ads);
+        setData(res?.data);
+        setPublicComments(res?.data?.Public_Comments);
+        setHighlights(res?.data?.highlights);
+        setsubscriptionComments(res?.data?.Subscription_Comments);
+        setads(res?.data?.ads);
+        setVerifyid(res?.data?.verify_ids);
+        setFollowingList(res?.data?.following_user);
+        setFollowingId(res?.data?.following_user?.map((item) => item?.id));
+        setCmtReact(res?.data?.comment_reactions);
 
-        const commentatorData = res.data.Commentator.map((item) => ({
+        const commentatorData = res?.data?.Commentator?.map((item) => ({
           type: "commentator",
           value: item,
         }));
@@ -63,7 +89,7 @@ const MainPage = () => {
       .catch((error) => {
         console.error("Error fetching data.", error);
       }, []);
-  };
+  }
 
   const mergeArrays = () => {
     if (subscriptionComments.length > 0) {
@@ -71,7 +97,7 @@ const MainPage = () => {
       let remainingPublic = [...publicComments];
       let remainingHighlights = [...highlights];
       let remainingSubscription = [...subscriptionComments];
-  
+
       while (
         remainingPublic.length > 0 &&
         remainingHighlights.length > 0 &&
@@ -93,7 +119,7 @@ const MainPage = () => {
             })),
         ];
       }
-  
+
       if (remainingPublic.length > 0) {
         merged = [
           ...merged,
@@ -103,7 +129,7 @@ const MainPage = () => {
           })),
         ];
       }
-  
+
       if (remainingHighlights.length > 0) {
         merged = [
           ...merged,
@@ -113,7 +139,7 @@ const MainPage = () => {
           })),
         ];
       }
-  
+
       if (remainingSubscription.length > 0) {
         merged = [
           ...merged,
@@ -128,45 +154,44 @@ const MainPage = () => {
 
     if (subscriptionComments.length === 0) {
       let merged = [];
-    let remainingPublic = [...publicComments];
-    let remainingHighlights = [...highlights];
+      let remainingPublic = [...publicComments];
+      let remainingHighlights = [...highlights];
 
-    while (remainingHighlights.length > 0 && remainingPublic.length > 0) {
-      merged = [
-        ...remainingPublic
-          .splice(0, SubscriptionCount)
-          .map((remainingPublic) => ({
+      while (remainingHighlights.length > 0 && remainingPublic.length > 0) {
+        merged = [
+          ...remainingPublic
+            .splice(0, SubscriptionCount)
+            .map((remainingPublic) => ({
+              type: "comment",
+              value: remainingPublic,
+            })),
+          ...remainingHighlights
+            .splice(0, highlightCount)
+            .map((highlight) => ({ type: "highlight", value: highlight })),
+        ];
+      }
+      if (remainingPublic.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingPublic.map((comment) => ({
             type: "comment",
-            value: remainingPublic,
+            value: comment,
           })),
-        ...remainingHighlights
-          .splice(0, highlightCount)
-          .map((highlight) => ({ type: "highlight", value: highlight })),
-      ];
-    }
-    if (remainingPublic.length > 0) {
-      merged = [
-        ...merged,
-        ...remainingPublic.map((comment) => ({
-          type: "comment",
-          value: comment,
-        })),
-      ];
-    }
+        ];
+      }
 
-    if (remainingHighlights.length > 0) {
-      merged = [
-        ...merged,
-        ...remainingHighlights.map((highlight) => ({
-          type: "highlight",
-          value: highlight,
-        })),
-      ];
-    }
+      if (remainingHighlights.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingHighlights.map((highlight) => ({
+            type: "highlight",
+            value: highlight,
+          })),
+        ];
+      }
 
-    setMergedResult(merged);
+      setMergedResult(merged);
     }
-    
   };
 
   const subscriptionArrays = () => {
@@ -208,7 +233,6 @@ const MainPage = () => {
     }
 
     setSubscriptionResult(merged);
-    
   };
 
   const publicArrays = () => {
@@ -250,7 +274,6 @@ const MainPage = () => {
     }
 
     setOnlyPublicResult(merged);
-    
   };
 
   useEffect(() => {
@@ -275,40 +298,94 @@ const MainPage = () => {
   // const user = "c-";
   // const user = localStorage.getItem("userPhone");
   // console.log("-----user_id-----", user_id)
-  
+
+  const [activeCommentsshow, setActiveCommentsshow] = useState(null);
+
+  const [contentData, setContentData] = useState([]);
+  const [contentFilterData, setContentFilterData] = useState([]);
+  const [commentsReactionsSports, setCommentsReactionsSports] = useState([]);
+  console.log(contentFilterData, "=>>>contentFilterData");
+
+  useEffect(() => {
+    handlesportData();
+  }, [contentData]);
+
+  // console.log("=>>contentData", contentData)
+
+  const handlesportData = async () => {
+    let merged = [];
+    let remainingPublic = [...contentData];
+    console.log(remainingPublic,"=>>>remainingPublic")
+
+    if (remainingPublic.length > 0) {
+      merged = [
+        ...merged,
+        ...remainingPublic.map((comment) => ({
+          type: "content",
+          value: comment,
+        })),
+      ];
+    }
+    // console.log("merged:::::::::::::", merged);
+    setContentFilterData(merged);
+  };
 
   return (
     <>
       <div className="landing-page">
         <LandingPage />
       </div>
-      <div className="container-fluid mt-3 mobile-view">
-        <div
-          style={{ marginBottom: "66px" }}
-        >
+      <div
+        className={`container-fluid mt-3 mobile-view ${
+          selectContent === "become-editor" && "p-0"
+        }`}
+      >
+        <div style={{ marginBottom: "66px" }}>
           <NavBar
             setDashboardSUser={setDashboardSUser}
             setSelectContent={setSelectContent}
+            selectContent={selectContent}
+            profileData={profileData}
           />
 
           {dashboardSUser ? (
-            user !== "standard" ? (
+            isLoading ? (
+              <>
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: "75vh" }}
+                >
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="md"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                </div>
+              </>
+            ) : user !== "standard" ? (
               <CommentatorsCommentsPage
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
+                getProfileData={getProfileData}
+                verifyid={verifyid}
               />
             ) : (
               <DashboardSU
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
                 selectContent={selectContent}
+                getProfileData={getProfileData}
+                verifyid={verifyid}
               />
             )
           ) : (
             <>
               {(selectContent === "home" ||
                 selectContent === "editor" ||
+                selectContent === "category-content" ||
                 selectContent === "comments") && (
                 <>
                   <Banner
@@ -316,7 +393,11 @@ const MainPage = () => {
                       ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
                     }
                   />
-                  <EditorBanner />
+                  <EditorBanner
+                    setSelectContent={setSelectContent}
+                    setContentData={setContentData}
+                    setCommentsReactionsSports={setCommentsReactionsSports}
+                  />
                 </>
               )}
               {selectContent === "home" &&
@@ -347,10 +428,16 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                              setActiveCommentsshow={setActiveCommentsshow}
+                              homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -371,9 +458,11 @@ const MainPage = () => {
                               />
                             ) : null}
                             <SharedProfile
+                              setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -410,10 +499,16 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                              setActiveCommentsshow={setActiveCommentsshow}
+                              homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -425,9 +520,11 @@ const MainPage = () => {
                               <HighlightMainPage />
                             ) : null}
                             <SharedProfile
+                              setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -464,10 +561,16 @@ const MainPage = () => {
                               />
                             ) : null}
                             <ContentSection
+                              setActiveCommentsshow={setActiveCommentsshow}
+                              homeApiData={homeApiData}
                               data={val}
                               setData={setData}
                               selectContent={selectPublicorForYou}
                               setSelectContent={setSelectContent}
+                              followingList={followingList}
+                              followingid={followingid}
+                              verifyid={verifyid}
+                              cmtReact={cmtReact}
                             />
                           </>
                         );
@@ -479,9 +582,11 @@ const MainPage = () => {
                               <HighlightMainPage />
                             ) : null}
                             <SharedProfile
+                              setActiveCommentsshow={setActiveCommentsshow}
                               data={val}
                               setData={setData}
                               setSelectContent={setSelectContent}
+                              verifyid={verifyid}
                             />
                           </>
                         );
@@ -491,28 +596,48 @@ const MainPage = () => {
                 )}
               {selectContent === "editor" && (
                 <EditorsPage
+                  setActiveCommentsshow={setActiveCommentsshow}
                   data={commentator}
                   ads={ads}
                   setData={setData}
                   setSelectContent={setSelectContent}
+                  followingList={followingList}
+                  followingid={followingid}
+                  verifyid={verifyid}
                 />
               )}
               {selectContent === "comments" && (
                 <CommentsPage
+                  setActiveCommentsshow={setActiveCommentsshow}
                   mergedResult={mergedResult}
                   onlyPublicResult={onlyPublicResult}
                   ads={ads}
+                  homeApiData={homeApiData}
                   setData={setData}
-                  selectContent = 'comments'
+                  selectContent="comments"
                   setSelectContent={setSelectContent}
+                  followingList={followingList}
+                  followingid={followingid}
+                  verifyid={verifyid}
+                  cmtReact={cmtReact}
                 />
               )}
               {selectContent === "show-all-comments" && (
                 <EditorProfileActiveComments
+                  activeCommentsshow={activeCommentsshow}
                   selectContent={selectContent}
                   setSelectContent={setSelectContent}
                   setDashboardSUser={setDashboardSUser}
+                  verifyid={verifyid}
                 />
+              )}
+              {selectContent === "become-editor" && <BecomeEditor />}
+              {selectContent === "category-content" && (
+                <>
+                {contentFilterData?.map((res) => (
+                  <ContentSection data={res} />
+                ))}
+                </>
               )}
             </>
           )}

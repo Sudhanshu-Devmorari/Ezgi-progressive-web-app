@@ -1,0 +1,412 @@
+import React, { useContext, useState } from "react";
+import Modal from "react-bootstrap/Modal";
+import CurrentTheme from "../../context/CurrentTheme";
+import { RxCross2 } from "react-icons/rx";
+import camera from "../../assets/camera-plus.svg";
+import initialProfile from "../../assets/profile.png";
+import config from "../../config";
+import { CustomDropdownBecomeEditor } from "../CustomDropdownBecomeEditor";
+import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
+import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
+import Swal from "sweetalert2";
+import { userId } from "../GetUser";
+import axios from "axios";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+
+const BecomeAEditorModal = (props) => {
+  const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+
+  const kategoriOptions = ["Futbol", "Basketbol", "Futbol, Basketbol"];
+
+  const deneyimOptions = ["1-2 years", "3-4 years", "5+ years", "10+ years"];
+
+  const [selectedKategori, setSelectedKategori] = useState("Select");
+  const [kategoriDropdown, setKategoriDropdown] = useState(false);
+
+  const [selectedDeneyim, setSelectedDeneyim] = useState("Select");
+  const [deneyimDropdown, setDeneyimDropdown] = useState(false);
+
+  const handleKategoriSelection = (kategori) => {
+    setSelectedKategori(kategori);
+    setCategoryError("");
+  };
+
+  const handleDeneyimSelection = (deneyim) => {
+    setSelectedDeneyim(deneyim);
+    setExperienceError("");
+  };
+
+  const toggleKategoriDropdown = () => {
+    setDeneyimDropdown(false);
+    setKategoriDropdown(!kategoriDropdown);
+  };
+
+  const toggleDeneyimDropdown = () => {
+    setKategoriDropdown(false);
+    setDeneyimDropdown(!deneyimDropdown);
+  };
+
+  const [selectCheckBox, setSelectCheckBox] = useState(false);
+
+  const [showTermsOfUse, setShowTermsOfUse] = useState(1);
+  const username = localStorage.getItem("username");
+
+  const [file, setFile] = useState(null);
+
+  const formData = new FormData();
+  function handleProfile(e) {
+    try {
+      const file = e.target.files[0];
+      if (file) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (allowedTypes.includes(file.type)) {
+          setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+          setProfileError("");
+          setFile(file);
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Invalid file type. Please select a valid image file.",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+          e.target.value = "";
+        }
+      }
+    } catch (error) {}
+  }
+  const [categoryError, setCategoryError] = useState("");
+  const [experienceError, setExperienceError] = useState("");
+  const [checkboxError, setCheckboxError] = useState("");
+  const [profileError, setProfileError] = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  function handleSubmit(event) {
+    event.preventDefault();
+    // console.log("form submittt");
+    if (selectedKategori === "Select") {
+      setCategoryError("Please select a Kategori");
+    }
+    if (!preveiwProfilePic) {
+      setProfileError("Please add a profile");
+    }
+    if (selectedDeneyim === "Select") {
+      setExperienceError("Please select a Deneyim");
+    }
+    if (!selectCheckBox) {
+      setCheckboxError("Please select a checkbox");
+    } else {
+      formData.append("category", selectedKategori);
+      formData.append("experience", selectedDeneyim);
+      formData.append("profile_pic", file);
+      axios
+        .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
+        .then((res) => {
+          // console.log(res, "===========>>>>res");
+          if (res.status === 200) {
+            // setShowPaymentModal(true);
+            localStorage.setItem('user-role', res.data.user_role)
+            props.onHide();
+            Swal.fire({
+              title: "Success",
+              text: 'User has successfully become a commentator',
+              icon: "success",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.status === 404) {
+            Swal.fire({
+              title: "Error",
+              text: error.response.data.error,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        });
+    }
+  }
+
+  return (
+    <>
+      <Modal
+        {...props}
+        size="md"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+        // backdrop="static"
+        // keyboard={false}
+      >
+        <Modal.Body
+          className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
+          style={{ fontSize: "14px" }}
+        >
+          {showTermsOfUse === 1 && (
+            <>
+              <form onSubmit={handleSubmit}>
+                <span>
+                  <RxCross2
+                    onClick={() => {
+                      props.onHide();
+                    }}
+                    fontSize={"1.5rem"}
+                    className={`${
+                      currentTheme === "dark"
+                        ? "closeBtn-dark"
+                        : "closeBtn-light"
+                    }`}
+                  />
+                </span>
+                <div className="position-relative d-flex justify-content-center align-items-center">
+                  <img
+                    src={
+                      preveiwProfilePic
+                        ? preveiwProfilePic
+                        : // : progileData?.profile_pic ? `${config.apiUrl}${progileData?.profile_pic}` : initialProfile
+                          initialProfile
+                    }
+                    width={100}
+                    height={100}
+                    alt=""
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                      opacity: currentTheme === "dark" ? "0.4" : "0.7",
+                    }}
+                  />
+                </div>
+                <div className="">
+                  <label
+                    htmlFor="camera-icon"
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <img
+                      src={camera}
+                      alt=""
+                      style={{
+                        position: "absolute",
+                        backgroundColor: "#",
+                        top: "2.8rem",
+                      }}
+                      height={40}
+                      width={40}
+                    />
+                  </label>
+                  <input
+                    type="file"
+                    name="profile_pic"
+                    id="camera-icon"
+                    className="d-none"
+                    accept=".jpg, .jpeg, .png"
+                    onChange={handleProfile}
+                  />
+                </div>
+                <div className="text-center">
+                  <span>{username}</span>
+                </div>
+                <div className="text-center">
+                  <small className="text-danger">{profileError}</small>
+                </div>
+                <div className="my-2">
+                  <CustomDropdownBecomeEditor
+                    label="Kategori"
+                    options={kategoriOptions}
+                    selectedOption={selectedKategori}
+                    onSelectOption={handleKategoriSelection}
+                    isOpen={kategoriDropdown}
+                    toggleDropdown={toggleKategoriDropdown}
+                  />
+                  <small className="text-danger">{categoryError}</small>
+                </div>
+                <div className="my-2">
+                  <CustomDropdownBecomeEditor
+                    label="Deneyim"
+                    options={deneyimOptions}
+                    selectedOption={selectedDeneyim}
+                    onSelectOption={handleDeneyimSelection}
+                    isOpen={deneyimDropdown}
+                    toggleDropdown={toggleDeneyimDropdown}
+                  />
+                  <small className="text-danger">{experienceError}</small>
+                </div>
+                <div className="my-3 mb-2 d-flex justify-content-center">
+                  {currentTheme === "dark" ? (
+                    <img
+                      alt=""
+                      src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
+                      style={{ width: "25px", cursor: "pointer" }}
+                      className="me-2"
+                      onClick={() => setSelectCheckBox(!selectCheckBox)}
+                    />
+                  ) : (
+                    <img
+                      src={
+                        !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
+                      }
+                      style={{ width: "25px", cursor: "pointer" }}
+                      className="me-2"
+                      onClick={() => setSelectCheckBox(!selectCheckBox)}
+                      alt=""
+                    />
+                  )}
+                  I have read and agree to the{" "}
+                  <span
+                    className="ps-1"
+                    style={{
+                      color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                    }}
+                    onClick={() => {
+                      setShowTermsOfUse(2);
+                    }}
+                  >
+                    Terms of use
+                  </span>
+                </div>
+                <div className="text-center">
+                  <small className="text-danger">
+                    {selectCheckBox ? "" : checkboxError}
+                  </small>
+                </div>
+                <div className="d-flex justify-content-center my-3">
+                  <button
+                    type="submit"
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
+                  >
+                    Continue
+                  </button>
+                </div>
+                <div className="d-flex flex-column text-center my-3">
+                  <span>Membership plans do not renew automatically.</span>
+                  <span>You can cancel the membership at any time.</span>
+                </div>
+              </form>
+            </>
+          )}
+          {showTermsOfUse === 2 && (
+            <>
+              <div
+                className="m-4"
+                style={{
+                  color: "#0D2A53",
+                  fontSize: "12px",
+                }}
+              >
+                <div
+                  className="d-flex justify-content-between m-2"
+                  style={{ fontWeight: "500", color: "#0D2A53" }}
+                >
+                  <span>
+                    <i
+                      onClick={() => {
+                        setShowTermsOfUse(1);
+                      }}
+                      className="fa-solid fa-arrow-left-long"
+                      style={{
+                        fontSize: "21px",
+                        position: "absolute",
+                        left: "17px",
+                        top: "10px",
+                        color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                      }}
+                    ></i>
+                  </span>
+                  <span className="">
+                    <RxCross2
+                      onClick={() => {
+                        props.onHide();
+                        setShowTermsOfUse(1);
+                      }}
+                      fontSize={"1.5rem"}
+                      className={`${
+                        currentTheme === "dark"
+                          ? "closeBtn-dark"
+                          : "closeBtn-light"
+                      }`}
+                    />
+                  </span>
+                </div>
+                <h4
+                  style={{
+                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                  }}
+                >
+                  Terms of Use
+                </h4>
+                <div
+                  style={{
+                    color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                  }}
+                >
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Nulla et est facilisis, malesuada tellus sed, tempor justo.
+                    Donec nec enim mauris. Duis auctor arcu et neque malesuada
+                    tristique. Sed ac sem nec metus ultrices tincidunt. Aenean
+                    id nisl eget odio sollicitudin viverra. Cras quis tellus vel
+                    ligula euismod dapibus. Integer eu rutrum eros. Sed
+                    efficitur nulla id justo aliquet tempus. Lorem ipsum dolor
+                    sit amet, consectetur adipiscing elit. Nulla et est
+                    facilisis, malesuada tellus sed, tempor justo. Donec nec
+                    enim mauris. Duis auctor arcu et neque malesuada tristique.
+                    Sed ac sem nec metus ultrices tincidunt. Aenean id nisl eget
+                    odio sollicitudin viverra. Cras quis tellus vel ligula
+                    euismod dapibus. Integer eu rutrum eros. Sed efficitur nulla
+                    id justo aliquet tempus. Lorem ipsum dolor sit amet,
+                    consectetur adipiscing elit. Nulla et Lorem ipsum dolor sit
+                    amet, consectetur adipiscing elit. Nulla et est facilisis,
+                    malesuada tellus sed, tempor justo. Donec nec enim mauris.
+                    Duis auctor arcu et neque malesuada tristique. Sed ac sem
+                    nec metus ultrices tincidunt. Aenean id nisl eget odio
+                    sollicitudin viverra. Cras quis tellus vel ligula euismod
+                    dapibus. Integer eu rutrum eros est facilisis, malesuada
+                    tellus sed, tempor justo. Donec nec enim mauris. Duis auctor
+                    arcu et neque malesuada tristique. Sed ac sem nec metus
+                    ultrices tincidunt. Aenean id nisl eget odio sollicitudin
+                    viverra. Cras quis tellus vel ligula euismod dapibus.
+                    Integer eu rutrum eros. Sed efficitur nulla id justo aliquet
+                    tempus.
+                  </p>
+                </div>
+                <div className="d-flex justify-content-center mb-4">
+                  <button
+                    className={`${
+                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+                    } px-3 py-1`}
+                    onClick={() => {
+                      setShowTermsOfUse(1);
+                    }}
+                  >
+                    Approve
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      <SubscribeModal
+        show={showPaymentModal}
+        onHide={() => setShowPaymentModal(false)}
+      />
+    </>
+  );
+};
+
+export default BecomeAEditorModal;

@@ -34,27 +34,28 @@ const CommentsPageModal = (props) => {
           date: dateData,
           filter_type: blueSelect,
           filter_type0: yellowSelect,
+          level:selectedLevel
         }
       );
       const editorData = response.data.map((item) => ({
         type: "comment",
         value: item,
       }));
-      props.setFilterCommentData(editorData)
+      props.setFilterCommentData(editorData);
       // Handle the response here if needed
       // console.log('API Response:', response.data);
     } catch (error) {
-      console.error('Error making POST request:', error);
+      console.error("Error making POST request:", error);
     }
   };
 
-  const [categoryData, setCategoryData] = useState('');
-  const [countryData, setCountryData] = useState('');
-  const [dateData, setDateData] = useState('');
-  const [leagueData, setLeagueData] = useState('');
+  const [categoryData, setCategoryData] = useState("");
+  const [countryData, setCountryData] = useState("");
+  const [dateData, setDateData] = useState("");
+  const [leagueData, setLeagueData] = useState("");
 
-  const [blueSelect, setBlueSelect] = useState('');
-  const [yellowSelect, setYellowSelect] = useState('');
+  const [blueSelect, setBlueSelect] = useState("");
+  const [yellowSelect, setYellowSelect] = useState("");
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
@@ -65,11 +66,11 @@ const CommentsPageModal = (props) => {
   const [isSubscriberSelected, setIsSubscriberSelected] = useState(false);
   const [isNotStartedSelected, setIsNotStartedSelected] = useState(false);
   const [isLosingSelected, setIsLosingSelected] = useState(false);
-  
+
   const [matchDetailsDropDown, setMatchDetailsDropDown] = useState(false);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [MatchdetailsValue, setMatchdetailsValue] = useState([]);
-
+  const [predictionType, setPredictionType] = useState([]);
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -77,17 +78,17 @@ const CommentsPageModal = (props) => {
 
   const toggleMatchDetailsDropdown = () => {
     setMatchDetailsDropDown(!matchDetailsDropDown);
-    setLevelDropDown(false)
-    setPredictionTypeDropDown(false)
+    setLevelDropDown(false);
+    setPredictionTypeDropDown(false);
   };
-  
+
   // const matchDetailsOptions = [
   //   "Option 1",
   //   "Option 2",
   //   "Option 3",
   //   // Add more options as needed
   // ];
-  const matchDetailsOptions = MatchdetailsValue
+  const matchDetailsOptions = MatchdetailsValue;
 
   // Similar state and functions for "Level" and "Prediction Type" dropdowns
   const [levelDropDown, setLevelDropDown] = useState(false);
@@ -99,15 +100,15 @@ const CommentsPageModal = (props) => {
 
   const toggleLevelDropdown = () => {
     setLevelDropDown(!levelDropDown);
-    setMatchDetailsDropDown(false)
-    setPredictionTypeDropDown(false)
+    setMatchDetailsDropDown(false);
+    setPredictionTypeDropDown(false);
   };
 
   const levelOptions = [
-    "Option A",
-    "Option B",
-    "Option C",
-    // Add more options as needed
+    "Apprentice",
+    "Journeyman",
+    "Master",
+    "Grandmaster",
   ];
 
   const [predictionTypeDropDown, setPredictionTypeDropDown] = useState(false);
@@ -120,33 +121,28 @@ const CommentsPageModal = (props) => {
 
   const togglePredictionTypeDropdown = () => {
     setPredictionTypeDropDown(!predictionTypeDropDown);
-    setMatchDetailsDropDown(false)
-    setLevelDropDown(false)
+    setMatchDetailsDropDown(false);
+    setLevelDropDown(false);
   };
 
-  const predictionTypeOptions = [
-    "Type X",
-    "Type Y",
-    "Type Z",
-    // Add more options as needed
-  ];
+  const predictionTypeOptions = predictionType;
 
   const [editorFilterModal, setEditorFlterModal] = useState(false);
 
   const handleRadioBlue = (e) => {
     if (e === "public") {
-      setBlueSelect("public_content")
+      setBlueSelect("public_content");
       setIsPublicSelected(!isPublicSelected);
       setIsFinishedSelected(false);
       setIsWinningSelected(false);
     } else if (e === "finished") {
-      setBlueSelect("finished")
+      setBlueSelect("finished");
       setIsPublicSelected(false);
       setIsWinningSelected(false);
       setIsFinishedSelected(!isFinishedSelected);
     }
     if (e === "winning") {
-      setBlueSelect("winning")
+      setBlueSelect("winning");
       setIsPublicSelected(false);
       setIsFinishedSelected(false);
       setIsWinningSelected(!isWinningSelected);
@@ -154,19 +150,19 @@ const CommentsPageModal = (props) => {
   };
   const handleYellowRadio = (e) => {
     if (e === "subscribe") {
-      setYellowSelect('only_subscriber')
+      setYellowSelect("only_subscriber");
       setIsSubscriberSelected(!isSubscriberSelected);
       setIsNotStartedSelected(false);
       setIsLosingSelected(false);
     }
     if (e === "not started") {
-      setYellowSelect('not_stated')
+      setYellowSelect("not_stated");
       setIsNotStartedSelected(!isNotStartedSelected);
       setIsSubscriberSelected(false);
       setIsLosingSelected(false);
     }
     if (e === "lose") {
-      setYellowSelect('lose')
+      setYellowSelect("lose");
       setIsLosingSelected(!isLosingSelected);
       setIsSubscriberSelected(false);
       setIsNotStartedSelected(false);
@@ -191,6 +187,15 @@ const CommentsPageModal = (props) => {
                 <RxCross2
                   onClick={() => {
                     props.onHide();
+                    setMatchDetailsDropDown(false)
+                    setLevelDropDown(false)
+                    setPredictionTypeDropDown(false)
+                    setIsNotStartedSelected(false)
+                    setIsSubscriberSelected(false)
+                    setIsLosingSelected(false)
+                    setIsPublicSelected(false)
+                    setIsFinishedSelected(false)
+                    setIsWinningSelected(false)
                   }}
                   fontSize={"1.8rem"}
                   className={`${
@@ -199,7 +204,16 @@ const CommentsPageModal = (props) => {
                 />
               </span>
             </div>
-            <CommentFilter setMatchdetailsValue={setMatchdetailsValue} setSelectedMatchDetails={setSelectedMatchDetails} setCategoryData={setCategoryData} setCountryData={setCountryData} setDateData={setDateData} setLeagueData={setLeagueData} />
+            <CommentFilter
+              setMatchdetailsValue={setMatchdetailsValue}
+              setSelectedMatchDetails={setSelectedMatchDetails}
+              setCategoryData={setCategoryData}
+              setCountryData={setCountryData}
+              setDateData={setDateData}
+              setLeagueData={setLeagueData}
+              selectedMatchDetails={selectedMatchDetails}
+              setPredictionType={setPredictionType}
+            />
             <div className="my-3">
               <CustomDropdown
                 label="Match Details"
@@ -365,8 +379,8 @@ const CommentsPageModal = (props) => {
                 onClick={() => {
                   handleShowButtonClick();
                   // setEditorFlterModal(true);
-                      props.onHide();
-                    }}
+                  props.onHide();
+                }}
                 className={`${
                   currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                 } px-3 py-1`}

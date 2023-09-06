@@ -6,7 +6,7 @@ import EditorFilter from "../EditorFilter/EditorFilter";
 import { useState } from "react";
 
 
-const EditorsPage = ({ data, ads, setData, setSelectContent }) => {
+const EditorsPage = ({ data, ads, setData, setSelectContent, setActiveCommentsshow, verifyid }) => {
   const [filterData, setFilterData] = useState(null)
   const [displayData, setDisplayData] = useState(data)
   return (
@@ -25,9 +25,11 @@ const EditorsPage = ({ data, ads, setData, setSelectContent }) => {
               />
             ) : null}
             <SharedProfile
+            setActiveCommentsshow={setActiveCommentsshow}
               data={val}
               setData={setData}
               setSelectContent={setSelectContent}
+              verifyid={verifyid}
             />
           </>
         );

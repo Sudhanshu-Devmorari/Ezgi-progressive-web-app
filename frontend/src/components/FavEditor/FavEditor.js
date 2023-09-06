@@ -86,6 +86,7 @@ const FavEditor = (props) => {
                   style={{ fontSize: "13px" }}
                 >
                   <span className="pe-1">{res?.data?.commentator_user.username}</span>
+                  {props.verifyid?.includes(res?.data?.commentator_user.id) && 
                   <img
                     className="responsive-blue-tick"
                     src={blueTick}
@@ -93,6 +94,7 @@ const FavEditor = (props) => {
                     width={17}
                     height={17}
                   />
+                  }
                 </div>
                 <div
                   style={{
@@ -100,7 +102,7 @@ const FavEditor = (props) => {
                     color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                   }}
                 >
-                  %67.5
+                  %{res?.data?.commentator_user.success_rate}
                 </div>
               </div>
             </div>

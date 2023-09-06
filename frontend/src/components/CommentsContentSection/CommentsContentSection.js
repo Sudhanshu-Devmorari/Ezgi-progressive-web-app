@@ -112,7 +112,10 @@ const CommentsContentSection = (props) => {
                             <span className="p-1 autorname-responsive">
                               {val?.commentator_user?.username}
                             </span>
-                            <img src={blueTick} alt="" width={14} height={14} />
+                            {props.verifyid?.includes(val?.commentator_user?.id) && 
+                              <img src={blueTick} alt="" width={14} height={14} />
+                              }
+                            
                           </div>
                         </div>
                         <div className="col p-0">
@@ -141,7 +144,7 @@ const CommentsContentSection = (props) => {
                                       : "#00659D",
                                 }}
                               >
-                                %67.6
+                                %{val?.commentator_user?.success_rate}
                               </div>
                             </div>
                             <div className="col">
@@ -149,7 +152,7 @@ const CommentsContentSection = (props) => {
                               <div
                                 style={{ fontSize: "1rem", color: "#FFA200" }}
                               >
-                                256
+                                {val?.commentator_user?.score_points}
                               </div>
                             </div>
                           </div>
@@ -374,7 +377,7 @@ const CommentsContentSection = (props) => {
                                       : "#00659D",
                                 }}
                               >
-                                %67.6
+                                %{val?.commentator_user?.success_rate}
                               </div>
                             </div>
                             <div className="col">
@@ -382,7 +385,7 @@ const CommentsContentSection = (props) => {
                               <div
                                 style={{ fontSize: "1.2rem", color: "#FFA200" }}
                               >
-                                256
+                                {val?.commentator_user?.score_points}
                               </div>
                             </div>
                           </div>
@@ -599,7 +602,10 @@ const CommentsContentSection = (props) => {
                     <span className="p-1 autorname-responsive">
                       {res?.commentator_user?.username}
                     </span>
-                    <img src={blueTick} alt="" width={14} height={14} />
+                    {props.verifyid?.includes(res?.commentator_user?.id) && 
+                      <img src={blueTick} alt="" width={14} height={14} />
+                      }
+                    
                   </div>
                 </div>
                 <div className="col p-0">
@@ -655,13 +661,13 @@ const CommentsContentSection = (props) => {
                             currentTheme === "dark" ? "#D2DB08" : "#00659D",
                         }}
                       >
-                        %67.6
+                        %{res?.commentator_user?.success_rate}
                       </div>
                     </div>
                     <div className="col">
                       <div className="rate-fonts">Score Points</div>
                       <div style={{ fontSize: "1rem", color: "#FFA200" }}>
-                        256
+                      {res?.commentator_user?.score_points}
                       </div>
                     </div>
                   </div>

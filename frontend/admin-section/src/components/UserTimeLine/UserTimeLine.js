@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import initialProfile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
 import user3 from "../../assets/user3.png";
@@ -107,7 +108,7 @@ const UserTimeLine = (props) => {
           >
             <div>
               <img src={`${
-                    server_url + res?.sender?.profile_pic
+                    res?.sender?.profile_pic ? server_url + res?.sender?.profile_pic : initialProfile
                   }`}
                   className="rounded-circle" alt="" height={45} width={45} style={{objectFit:"cover"}}/>
             </div>

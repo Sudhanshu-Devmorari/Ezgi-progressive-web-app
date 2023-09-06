@@ -18,7 +18,12 @@ import PasswordReset from "../PasswordReset/PasswordReset";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
 import GoogleLogin from "../GoogleLogin";
 import FacebookLogin from "../FacebookLogin";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import config from "../../config";
+import { cityOptions } from "./_data";
+import Swal from "sweetalert2";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignUpModal = (props) => {
   // THEME
@@ -26,17 +31,19 @@ const SignUpModal = (props) => {
     useContext(CurrentTheme);
 
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [selectCheckBox, setSelectCheckBox] = useState(false);
 
   const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Turkey");
+  // const [selectedCountry, setSelectedCountry] = useState("Turkey");
   const [cityDropDown, setCityDropDown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Select");
   const [genderDropDown, setGenderDropDown] = useState(false);
   const [selectedGender, setSelectedGender] = useState("Select");
   const [ageDropDown, setAgeDropDown] = useState(false);
   const [selectedAge, setSelectedAge] = useState("Select");
+  const [btnLoading, setbtnLoading] = useState(false);
 
   // SIGN UP API --------------------------------------------------
 
@@ -53,7 +60,16 @@ const SignUpModal = (props) => {
   const passwordReg = /^(?=.*\d)(?=.*[a-z])[\w~@#$%^&*+=`|{}:;!.?"()[\]-]{8,}$/;
   const phonReg = /^\d{10}$/;
 
-  const [signUpData, setSignUpData] = useState({});
+  const [signUpData, setSignUpData] = useState({
+    name: "",
+    username: "",
+    phone: "",
+    password: "",
+    country: "",
+    city: "",
+    gender: "",
+    age: "",
+  });
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
 
@@ -82,7 +98,7 @@ const SignUpModal = (props) => {
       username: username,
       phone: phone,
       password: password,
-      country: selectedCountry,
+      // country: selectedCountry,
       city: selectedCity,
       gender: selectedGender,
       age: selectedAge,
@@ -92,7 +108,7 @@ const SignUpModal = (props) => {
     username,
     phone,
     password,
-    selectedCountry,
+    // selectedCountry,
     selectedCity,
     selectedGender,
     selectedAge,
@@ -103,48 +119,80 @@ const SignUpModal = (props) => {
   const handleSignUp = async () => {
     if (selectedCity === "Select") {
       setCityError("Please select your city.");
-    } else if (selectedGender === "Select") {
-      setCityError("");
+    }
+    if (selectedGender === "Select") {
       setGenderError("Please select your gender.");
-    } else if (selectedAge === "Select") {
-      setGenderError("");
+    }
+    if (selectedAge === "Select") {
       setAgeError("Please select your age.");
-    } else if (!selectCheckBox) {
-      setAgeError("");
+    }
+    if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
-      const response = await axios.post(
-        `${config?.apiUrl}/signup/`,
-        signUpData
-      );
-      // console.log("response: ", response.data);
+      setbtnLoading(true);
+      setCityError("");
+      setGenderError("");
+      setAgeError("");
+      setCheckboxError("");
+      setSignUpData({
+        name: name,
+        username: username,
+        phone: phone,
+        password: password,
+        country: "Turkey",
+        city: selectedCity,
+        gender: selectedGender,
+        age: selectedAge,
+      });
+      const response = await axios.post(`${config.apiUrl}/signup/`, signUpData);
+      console.log("response8: ", response.data);
+      // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
-        props.onHide();
+        setShowModal(6);
+        setbtnLoading(false);
+        setSelectedCity("Select")
+        setSelectedGender("Select")
+        setSelectedAge("Select")
+        setSelectCheckBox(false)
       } else if (response.data.status === 400) {
         setuserExists(response.data?.data);
+        setbtnLoading(false);
+        setShowModal(2);
+      } else if (response.data.status === 500) {
+        setShowModal(2);
+        setbtnLoading(false);
+        Swal.fire({
+          title: "Error",
+          text: response.data.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
   };
 
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
-  };
+  // const handleCountrySelection = (country) => {
+  //   setSelectedCountry(country);
+  // };
 
-  const toggleCountryDropdown = () => {
-    if (cityDropDown) {
-      setCityDropDown(false);
-    }
-    if (genderDropDown) {
-      setGenderDropDown(false);
-    }
-    if (ageDropDown) {
-      setAgeDropDown(false);
-    }
-    setCountryDropDown(!countryDropDown);
-  };
+  // const toggleCountryDropdown = () => {
+  //   if (cityDropDown) {
+  //     setCityDropDown(false);
+  //   }
+  //   if (genderDropDown) {
+  //     setGenderDropDown(false);
+  //   }
+  //   if (ageDropDown) {
+  //     setAgeDropDown(false);
+  //   }
+  //   setCountryDropDown(!countryDropDown);
+  // };
 
   const handleCitySelection = (city) => {
     setSelectedCity(city);
+    setCityError("");
   };
 
   const toggleCityDropdown = () => {
@@ -162,6 +210,7 @@ const SignUpModal = (props) => {
 
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
+    setGenderError("");
   };
 
   const toggleGenderDropdown = () => {
@@ -179,6 +228,7 @@ const SignUpModal = (props) => {
 
   const handleAgeSelection = (age) => {
     setSelectedAge(age);
+    setAgeError("");
   };
 
   const toggleAgeDropdown = () => {
@@ -195,22 +245,77 @@ const SignUpModal = (props) => {
   };
 
   const countryOptions = ["Turkey"];
-  const cityOptions = [
-    "Istanbul",
-    "Ankara",
-    "İzmir",
-    "Bursa",
-    "Antalya",
-    "Konya",
-    "Adana",
-    "Gaziantep",
-    "Şanlıurfa",
-    "Mersin",
-  ];
+
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
   const [forgotPsPhone, setForgotPsPhone] = useState("");
+  // console.log(forgotPsPhone,"========")
+
+  // ===================================== UPDATE CODE ====================================================
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required("Name is required")
+      .min(5, "Name must be at least 5 characters")
+      .max(20, "Name must be at most 20 characters"),
+    username: Yup.string()
+      .required("Username is required")
+      .min(5, "Username must be at least 5 characters")
+      .max(15, "Username must be at most 15 characters"),
+    phone: Yup.string()
+      .required("Phone is required")
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      username: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      console.log("click event fire::::::::::::::::");
+      console.log("values:::::::::::::", values);
+      setbtnLoading(true);
+      try {
+        const res = await axios.post(`${config.apiUrl}/signup-user-exists/`, {
+          phone: values.phone,
+          username: values.username,
+        });
+        console.log("res::::::::::", res);
+        if (res.data.status === 400) {
+          setbtnLoading(false);
+          setuserExists(res.data?.data);
+        } else if (res.data.status === 200) {
+          formik.resetForm()
+          setShowModal(2);
+          setuserExists("");
+          setName(values.name);
+          setUsername(values.username);
+          setPassword(values.password);
+          setPhone(values.phone);
+          setbtnLoading(false);
+        }
+
+        // .then((res) => {
+        //   console.log(res);
+        // })
+        // .catch((error) => {
+        //   console.log(error);
+        // });
+      } catch (error) {
+        console.log("errr::::::::::::", error);
+        setbtnLoading(false);
+      }
+    },
+  });
 
   return (
     <>
@@ -234,13 +339,7 @@ const SignUpModal = (props) => {
                   <span>SIGN UP</span>
                   <span>
                     <RxCross2
-                      onClick={() => {
-                        setpasswordError("");
-                        setPhoneError("");
-                        setNamerror("");
-                        setUsernamerror("");
-                        props.onHide();
-                      }}
+                      onClick={props.onHide}
                       fontSize={"1.8rem"}
                       className={`${
                         currentTheme === "dark"
@@ -251,136 +350,160 @@ const SignUpModal = (props) => {
                   </span>
                 </div>
                 <div className="">
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="name">Name Surname</label>
-                    <input
-                      required
-                      onChange={(e) => setName(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name="name"
-                      id="name"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {nameError}
-                    </small>
+                  <div className="text-danger text-center text-capitalize">
+                    {userExists}
                   </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="username">Username</label>
-                    <input
-                      required
-                      onChange={(e) => setUsername(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="text"
-                      name="username"
-                      id="username"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {usernameError}
-                    </small>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="phone">Phone</label>
-                    <div className="input-group">
-                      <span
-                        className={`input-group-text ${
-                          currentTheme === "dark"
-                            ? "darkMode-input"
-                            : "lightMode-input"
-                        }`}
-                        id="basic-addon1"
-                        style={{ padding: ".375rem 0 .375rem .5rem" }}
-                      >
-                        +90
-                      </span>
+                  <form onSubmit={formik.handleSubmit}>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="name">Name Surname</label>
                       <input
-                        onChange={(e) => {
-                          setPhone(e.target.value);
-                        }}
-                        id="phone"
+                        // value={name}
+                        // onChange={(e)=>{setName(e.target.value); console.log(e.target.value,"=>>>>>");}}
+                        id="name"
                         type="text"
                         className={`${
                           currentTheme === "dark"
                             ? "darkMode-input"
                             : "lightMode-input"
                         } form-control`}
-                        aria-label="Username"
-                        aria-describedby="basic-addon1"
+                        {...formik.getFieldProps("name")}
                       />
+                      {formik.touched.name && formik.errors.name ? (
+                        <small className="text-danger">
+                          {formik.errors.name}
+                        </small>
+                      ) : null}
                     </div>
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {phonelError}
-                    </small>
-                  </div>
-                  <div className="d-flex flex-column m-2">
-                    <label htmlFor="password">Password</label>
-                    <input
-                      onChange={(e) => setPassword(e.target.value)}
-                      className={`${
-                        currentTheme === "dark"
-                          ? "darkMode-input"
-                          : "lightMode-input"
-                      } form-control`}
-                      type="password"
-                      name=""
-                      id="password"
-                    />
-                    <small
-                      className="text-danger"
-                      style={{ fontSize: "0.71rem" }}
-                    >
-                      {passwordlError}
-                    </small>
-                  </div>
-                </div>
-                <div className="d-flex flex-column align-items-center my-3">
-                  <button
-                    className={`${
-                      currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                    } px-3 py-1`}
-                    onClick={() => {
-                      hadleValidation();
-                    }}
-                  >
-                    Continue
-                  </button>
-                  <div className="text-center my-3">
-                    --------------------- or ---------------------{" "}
-                  </div>
-                  <div className="d-flex">
-                    <GoogleLogin />
-                    <FacebookLogin />
-                  </div>
-                  <div className="mt-3">
-                    Already Account?{" "}
-                    <span
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      }}
-                      onClick={() => {
-                        setShowModal(4);
-                      }}
-                    >
-                      Sign In
-                    </span>
-                  </div>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="username">Username</label>
+                      <input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        id="username"
+                        type="text"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        {...formik.getFieldProps("username")}
+                      />
+                      {formik.touched.username && formik.errors.username ? (
+                        <small className="text-danger">
+                          {formik.errors.username}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column m-2">
+                      <label htmlFor="phone">Phone</label>
+                      <div className="input-group">
+                        <span
+                          className={`input-group-text ${
+                            currentTheme === "dark"
+                              ? "darkMode-input"
+                              : "lightMode-input"
+                          }`}
+                          id="basic-addon1"
+                          style={{ padding: ".375rem 0 .375rem .5rem" }}
+                        >
+                          +90
+                        </span>
+                        <input
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          id="phone"
+                          type="text"
+                          className={`${
+                            currentTheme === "dark"
+                              ? "darkMode-input"
+                              : "lightMode-input"
+                          } form-control`}
+                          aria-label="Username"
+                          aria-describedby="basic-addon1"
+                          {...formik.getFieldProps("phone")}
+                        />
+                      </div>
+                      {formik.touched.phone && formik.errors.phone ? (
+                        <small className="text-danger">
+                          {formik.errors.phone}
+                        </small>
+                      ) : null}
+                    </div>
+                    <div className="d-flex flex-column m-2 position-relative">
+                      <label htmlFor="password">Password</label>
+                      <input
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        id="password"
+                        type={`${showPassword ? "text" : "password"}`}
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-input"
+                            : "lightMode-input"
+                        } form-control`}
+                        {...formik.getFieldProps("password")}
+                      />
+                      {formik.touched.password && formik.errors.password ? (
+                        <small className="text-danger">
+                          {formik.errors.password}
+                        </small>
+                      ) : null}
+                      {showPassword ? (
+                        <AiOutlineEyeInvisible
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: ".5rem",
+                            top: "1.7rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <AiOutlineEye
+                          fontSize={"1.5rem"}
+                          style={{
+                            position: "absolute",
+                            right: ".5rem",
+                            top: "1.7rem",
+                          }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </div>
+                    <div className="d-flex flex-column align-items-center my-3">
+                      <button
+                        type="submit"
+                        className={`${
+                          currentTheme === "dark"
+                            ? "darkMode-btn"
+                            : "lightMode-btn"
+                        } px-3 py-1`}
+                      >
+                        {btnLoading ? "Loading…" : "Continue"}
+                      </button>
+                      <div className="text-center my-3">
+                        --------------------- or ---------------------
+                      </div>
+                      <div className="d-flex">
+                        <GoogleLogin />
+                        <FacebookLogin />
+                      </div>
+                      <div className="mt-3">
+                        Already have an account?{" "}
+                        <span
+                          style={{
+                            color:
+                              currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                          }}
+                          onClick={() => {
+                            setShowModal(4);
+                          }}
+                        >
+                          Sign In
+                        </span>
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -392,7 +515,7 @@ const SignUpModal = (props) => {
                 currentTheme === "dark" ? "darkMode" : "lightMode"
               }`}
             >
-              <div className="m-4">
+              <div className="my-4 mx-3">
                 <div className="text-danger text-center text-capitalize">
                   {userExists}
                 </div>
@@ -417,12 +540,6 @@ const SignUpModal = (props) => {
                     <RxCross2
                       onClick={() => {
                         props.onHide();
-                        setpasswordError("");
-                        setPhoneError("");
-                        setGenderError("");
-                        setCityError("");
-                        setAgeError("");
-                        setCheckboxError("");
                       }}
                       fontSize={"1.8rem"}
                       className={`${
@@ -435,13 +552,28 @@ const SignUpModal = (props) => {
                 </div>
                 <div className="position-relative">
                   <div className="my-2">
-                    <CustomDropdown
+                    {/* <CustomDropdown
                       label="Country"
                       options={countryOptions}
                       selectedOption={selectedCountry}
                       onSelectOption={handleCountrySelection}
                       isOpen={countryDropDown}
                       toggleDropdown={toggleCountryDropdown}
+                    /> */}
+                    <label htmlFor="name">Country</label>
+                    <input
+                      value="Turkey"
+                      id="country"
+                      type="text"
+                      className={`${
+                        currentTheme === "dark"
+                          ? "darkMode-input"
+                          : "lightMode-input"
+                      } form-control text-center p-1 `}
+                      style={{
+                        fontSize: "14px",
+                      }}
+                      disabled
                     />
                   </div>
 
@@ -496,7 +628,7 @@ const SignUpModal = (props) => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="mt-3">
+                  <div className="mt-3" style={{fontSize: "13px"}}>
                     {currentTheme === "dark" ? (
                       <img
                         alt=""
@@ -550,7 +682,7 @@ const SignUpModal = (props) => {
                           : "lightMode-btn"
                       } px-3 py-1`}
                     >
-                      Continue
+                      {btnLoading ? "Loading…" : "Continue"}
                     </button>
                     <div className="mt-4">
                       Already Account?{" "}
@@ -560,7 +692,7 @@ const SignUpModal = (props) => {
                             currentTheme === "dark" ? "#D2DB08" : "#00659D",
                         }}
                         onClick={() => {
-                          props.setShowModal(4);
+                          setShowModal(4);
                         }}
                       >
                         Sign In
@@ -584,7 +716,12 @@ const SignUpModal = (props) => {
           )}
 
           {ShowModal === 6 && (
-            <OTPModal hide={props.onHide} forgotPsPhone={forgotPsPhone} />
+            <OTPModal
+              hide={props.onHide}
+              phone={phone}
+              signUpData={signUpData}
+              forgotPsPhone={forgotPsPhone}
+            />
           )}
 
           {ShowModal === 7 && (

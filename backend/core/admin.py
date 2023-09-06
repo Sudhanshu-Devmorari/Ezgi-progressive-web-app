@@ -2,12 +2,13 @@ from django.contrib import admin
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, 
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
                          CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
-                         BecomeCommentator, BlueTick, DataCount, TicketHistory, ResponseTicket)
+                         BecomeCommentator, BlueTick, DataCount, TicketHistory, ResponseTicket, BecomeEditor,
+                         BecomeEditorEarnDetails)
 
 # Register your models here.
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id','name','username','phone','password','country','city','age','category','profile_pic','user_role', 'is_delete','commentator_level','deactivate_commentator','commentator_status','created','updated')
+    list_display = ('id','name','username','phone','password','country','city','age','category','profile_pic','user_role', 'is_delete','commentator_level','deactivate_commentator','commentator_status', 'experience','created','updated')
 
 @admin.register(FollowCommentator)
 class FollowCommentatorAdmin(admin.ModelAdmin):
@@ -96,3 +97,11 @@ class DataCountAdmin(admin.ModelAdmin):
 @admin.register(TicketHistory)
 class TicketHistoryAdmin(admin.ModelAdmin):
     list_display = ('id','user','ticket_support','status','response_ticket','request_to', 'redirect_to', 'note', 'message','created','updated')
+
+@admin.register(BecomeEditor)
+class BecomeEditorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'question', 'answer')
+
+@admin.register(BecomeEditorEarnDetails)
+class BecomeEditorEarnDetailsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'subscription_type', 'threshold_subscriber', 'earn_amount')

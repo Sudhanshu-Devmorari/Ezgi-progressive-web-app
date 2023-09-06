@@ -23,6 +23,9 @@ import moment from "moment";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
+import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
+import { CustomDropdownEditor } from "../CustomDropdownEditor";
 
 
 const EditorManagemenet = (props) => {
@@ -235,14 +238,11 @@ const EditorManagemenet = (props) => {
   const [isGrandmasterSelected, setIsGrandmasterSelected] = useState(false);
 
   const filteredData = (e) => {
-    // props.setFilterData(null)
-    const val = e.target.value;
-    const filteredArray = props?.users.filter(
-      (obj) =>
-        obj?.editor_data?.username
-          ?.toLowerCase()
-          .startsWith(val.toLowerCase()) ||
-        obj?.editor_data?.name?.toLowerCase().startsWith(val.toLowerCase())
+    const val = e.target.value.toLowerCase();
+  
+    const filteredArray = props?.users?.filter((obj) =>
+      obj?.editor_data?.username?.toLowerCase().startsWith(val) ||
+      obj?.editor_data?.name?.toLowerCase().includes(val) 
     );
     setDisplayUser(filteredArray);
   };
@@ -695,8 +695,8 @@ const EditorManagemenet = (props) => {
             data-bs-target="#exampleModal"
             onClick={() => {
               props.setupdateProfile(2);
-              console.log("LLLL");
-              console.log(res, "NEha");
+              // console.log("LLLL");
+              // console.log(res, "NEha");
               setPartialData(res);
               setAddUser(res.editor_data);
             }}
@@ -725,7 +725,7 @@ const EditorManagemenet = (props) => {
                   <div className="position-relative">
                     <img
                       className="rounded-circle profile-icon"
-                      src={`${server_url + res?.editor_data?.profile_pic}`}
+                      src={`${res?.editor_data?.profile_pic ? server_url + res?.editor_data?.profile_pic : initialProfile}`}
                       alt=""
                       height={42}
                       width={42}
@@ -1171,7 +1171,7 @@ const EditorManagemenet = (props) => {
                       )}
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="country"
                         value={addUser.selectedCountry}
@@ -1186,7 +1186,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="city"
                         value={addUser.selectedCity}
@@ -1203,7 +1203,7 @@ const EditorManagemenet = (props) => {
                   </div>
                   <div className="row gap-3 g-0 my-2">
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="category"
                         value={addUser.selectedCategory}
@@ -1218,7 +1218,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="gender"
                         value={addUser.selectedGender}
@@ -1233,7 +1233,7 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                     <div className="col">
-                      <Dropdownmodal
+                      <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="age"
                         value={addUser.selectedAge}
@@ -1467,6 +1467,11 @@ const EditorManagemenet = (props) => {
               )}
               <img
                 onClick={() => {
+                  setCountryDropDown(false)
+                  setCityDropDown(false)
+                  setCategoryDropdown(false)
+                  setGenderDropDown(false)
+                  setAgeDropDown(false)
                   props.setupdateProfile(1);
                   setAddUser({
                     name: "",
@@ -1615,6 +1620,16 @@ const EditorManagemenet = (props) => {
               </div>
             </div>
             <img
+            onClick={() => {
+              
+              setLevelFilterDropDown(false)
+              setSuccessRateFilterDropDown(false)
+              setScorePointFilterDropDown(false)
+              setCityFilterDropDown(false)
+              setAgeFilterDropDown(false);
+              setGenderFilterDropDown(false);
+             
+            }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

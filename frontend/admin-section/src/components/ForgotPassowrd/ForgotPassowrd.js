@@ -30,7 +30,7 @@ const ForgotPassowrd = () => {
           is_admin: true,
         })
         .then((res) => {
-          console.log(res.data);
+          // console.log(res.data);
           if ((res.data.status === 500) || res.data.status === 404) {
             // Swal.fire({
             //   title: "Error",

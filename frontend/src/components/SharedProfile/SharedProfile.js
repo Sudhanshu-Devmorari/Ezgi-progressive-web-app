@@ -10,38 +10,69 @@ import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import startDarkIcon from "../../assets/star.svg";
 import axios from "axios";
+import initialProfile from "../../assets/profile.png";
 import config from "../../config";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import { BsStar, BsStarFill } from "react-icons/bs";
 
-const SharedProfile = ({ data, setSelectContent }) => {
+const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid }) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const server_url = `${config?.apiUrl}`;
+  const [showModal, setShowModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false); // Initialize with the API data
+
+  const server_url = `${config.apiUrl}`;
+
+  // console.log("=>>>data", data)
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
     { name: "adnankeser", rate: "%67.5" },
     { name: "adnankeser", rate: "%67.5" },
   ];
+
+  function getfav(e) {
+    // console.log(e,"=>>>e")
+    axios
+      .get(`${config.apiUrl}/fav-editor/${userId}/?commentator=${e}`)
+      .then((res) => {
+        // console.log(res, "========>>>>>res");
+        if (res.status === 200) {
+          const favIs = res?.data[0]?.is_fav_editor;
+          setIsFavorite(favIs);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    getfav(data?.value?.user?.id);
+  }, []);
+
   const favEditor = async (id) => {
+    const user_id = localStorage.getItem("user-id");
     try {
       const response = await axios.post(
-        `${config?.apiUrl}/fav-editor/`,
+        `${config.apiUrl}/fav-editor/${user_id}/`,
         {
-          id:id
+          id: id,
         }
       );
-      // console.log('API Response:', response.data);
+      // console.log("API Response:", response.data);
+      setIsFavorite(!isFavorite);
     } catch (error) {
-      console.error('Error making POST request:', error);
+      console.error("Error making POST request:", error);
     }
-    // console.log(".........", id);
   };
 
   return (
     <>
       {/* {props.data?.highlights?.map((res, index) => ( */}
       <div
-        
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         }`}
@@ -58,17 +89,58 @@ const SharedProfile = ({ data, setSelectContent }) => {
             </span>
             Kişi abone oldu
           </span>
-          <img
-            onClick={() => favEditor(data?.value.user.id)}
+          {/* <BsStar style={{ color : isFavorite ? "#0D2A53" : "" }}/> */}
+          {isFavorite ? (
+            <BsStarFill
+              onClick={() => {
+                if (userId) {
+                  favEditor(data?.value.user.id);
+                }
+              }}
+              color={currentTheme === "dark" ? "#FFFFFF" : "#0D2A53"}
+            />
+          ) : (
+            <BsStar
+              onClick={() => {
+                if (userId) {
+                  favEditor(data?.value.user.id);
+                }
+              }}
+            />
+          )}
+
+          {/* <img
+            // onClick={() => favEditor(data?.value.user.id)}
+            onClick={() => toggleFavorite(data?.value.user.id)}
             className=""
             src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
             alt=""
             height={22}
             width={22}
-          />
+          /> */}
         </div>
-        <div className="row" onClick={() => setSelectContent("show-all-comments")}>
-          <div className="col pe-0 d-flex position-relative">
+        <div className="row">
+          <div
+            className="col pe-0 d-flex position-relative"
+            onClick={() => {
+              if (userId) {
+                setSelectContent("show-all-comments");
+                setActiveCommentsshow(data?.value?.user?.id);
+              } else {
+                Swal.fire({
+                  // title: "Success",
+                  text: "You need to become a member to be able to view it.",
+                  // icon: "success",
+                  backdrop: false,
+                  customClass: `${
+                    currentTheme === "dark"
+                      ? "dark-mode-alert"
+                      : "light-mode-alert"
+                  }`,
+                });
+              }
+            }}
+          >
             <div className="position-absolute">
               <img
                 src={crown}
@@ -84,8 +156,12 @@ const SharedProfile = ({ data, setSelectContent }) => {
               />
             </div>
             <img
-            style={{objectFit:"cover"}}
-              src={`${server_url + data?.value.user.profile_pic}`}
+              style={{ objectFit: "cover" }}
+              src={`${
+                data?.value?.user?.profile_pic
+                  ? server_url + data?.value?.user?.profile_pic
+                  : initialProfile
+              }`}
               className="rounded-circle"
               width={75}
               height={75}
@@ -103,8 +179,10 @@ const SharedProfile = ({ data, setSelectContent }) => {
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value.user.commentator_level.charAt(0).toUpperCase() +
-                    data?.value.user.commentator_level.substring(1)}
+                  {data?.value.user.commentator_level
+                    ?.charAt(0)
+                    ?.toUpperCase() +
+                    data?.value.user.commentator_level?.substring(1)}
                 </button>
               </div>
               <div
@@ -112,13 +190,15 @@ const SharedProfile = ({ data, setSelectContent }) => {
                 style={{ fontSize: "13px" }}
               >
                 <span className="pe-1">{data?.value.user.username}</span>
-                <img
+                {verifyid?.includes(data?.value.user.id) && 
+                  <img
                   className="responsive-blue-tick"
                   src={blueTick}
                   alt=""
                   width={17}
                   height={17}
                 />
+                }
               </div>
               <div
                 style={{
@@ -126,7 +206,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
                   color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                 }}
               >
-                %67.5
+                %{data?.value.user.success_rate}
               </div>
             </div>
           </div>
@@ -153,6 +233,7 @@ const SharedProfile = ({ data, setSelectContent }) => {
             </div>
             <div className="" style={{ fontSize: "12px" }}>
               <button
+                onClick={() => setShowModal(true)}
                 className="my-2 px-2 py-1"
                 style={{
                   border:
@@ -170,7 +251,8 @@ const SharedProfile = ({ data, setSelectContent }) => {
           </div>
         </div>
       </div>
-      {/* ))} */}
+
+      <SubscribeModal show={showModal} onHide={() => setShowModal(false)} />
     </>
   );
 };

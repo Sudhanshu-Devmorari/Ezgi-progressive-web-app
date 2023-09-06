@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HiArrowSmUp } from "react-icons/hi";
+import { HiArrowSmDown, HiArrowSmUp } from "react-icons/hi";
 import SideBar from "../SideBar/SideBar";
 import NavBar from "../NavBar/NavBar";
 import support from "../../assets/lifebuoy.png";
@@ -29,27 +29,31 @@ const SupportManagementPage = () => {
   const [supportHistory, setSupportHistory] = useState([]);
   const [filteredArray, setFilteredArray] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
+  const [perNewRequest, setPerNewRequest] = useState(0);
 
   const [selectedOption, setSelectedOption] = useState("All");
 
   const [tickeview, setTickeview] = useState([]);
 
-  function getTicketsLatestData(e){
-    axios.get(`${config?.apiUrl}/show-ticket-data/${e}/`)
-    .then((res) => {
-      console.log(res.data);
-      setTickeview(res.data)
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+  function getTicketsLatestData(e) {
+    axios
+      .get(`${config.apiUrl}/show-ticket-data/${e}/`)
+      .then((res) => {
+        // console.log(res.data);
+        setTickeview(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   useEffect(() => {
     async function getSupportData() {
       try {
         const res = await axios.get(`${config?.apiUrl}/support-management`);
-        // console.log("res====>>>>", res?.data);
+        const formattedPercentage = Math.round(res?.data?.new_user_percentage)
+        // console.log("=?????", res.data.support_history);
+        setPerNewRequest(formattedPercentage);
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);
         setPendingRequest(res?.data?.pending_request);
@@ -62,19 +66,6 @@ const SupportManagementPage = () => {
     }
     getSupportData();
   }, []);
-
-  // var filteredTickets = tickets.filter((ticket) => {
-  //   if (selectedOption === "All") {
-  //     return true;
-  //   } else if (selectedOption === "Pendings") {
-  //     return ticket.status === "pending";
-  //   } else if (selectedOption === "Resolved") {
-  //     return ticket.status === "resolved";
-  //   } else if (selectedOption === "Redirected") {
-  //     return ticket.status === "redirected";
-  //   }
-  //   return false;
-  // });
 
   useEffect(() => {
     const updatedFilteredTickets = tickets.filter((ticket) => {
@@ -93,12 +84,16 @@ const SupportManagementPage = () => {
   }, [selectedOption, tickets]);
 
   const filteredData = (value) => {
-    const filteredArray = tickets.filter(
+    let sourceArray = selectedOption === "All" ? tickets : filteredTickets;
+    const filteredArray = sourceArray.filter(
       (obj) =>
         obj?.user?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
-        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase())
+        obj?.user?.name?.toLowerCase().startsWith(value.toLowerCase()) ||
+        obj?.user?.username?.toLowerCase().includes(value.toLowerCase()) ||
+        obj?.user?.name?.toLowerCase().includes(value.toLowerCase())
     );
-    setFilteredArray(filteredArray);
+    // setFilteredArray(filteredArray);
+    setFilteredTickets(filteredArray);
   };
 
   const displayTickets =
@@ -157,16 +152,29 @@ const SupportManagementPage = () => {
                       <span className="number">{NewRequest}</span>
                       <div className="w-100">
                         <span className="rate-font">
-                          <span
-                            className="rate-font"
-                            style={{ color: "#58DEAA" }}
-                          >
-                            %22
-                            <HiArrowSmUp
-                              className="arrow"
-                              style={{ marginBottom: "0.1rem" }}
-                            />
-                          </span>
+                          {perNewRequest > 0 ? (
+                            <span
+                              className="rate-font"
+                              style={{ color: "#58DEAA" }}
+                            >
+                              %{perNewRequest}
+                              <HiArrowSmUp
+                                className="arrow"
+                                style={{ marginBottom: "0.1rem" }}
+                              />
+                            </span>
+                          ) : (
+                            <span
+                              className="rate-font"
+                              style={{ color: "rgb(255, 87, 87)" }}
+                            >
+                              %{perNewRequest}
+                              <HiArrowSmDown
+                                className="arrow"
+                                style={{ marginBottom: "0.1rem" }}
+                              />
+                            </span>
+                          )}
                           last day
                         </span>
                       </div>
@@ -192,8 +200,9 @@ const SupportManagementPage = () => {
                     tickets={tickets}
                     setTickets={setTickets}
                     filteredData={filteredData}
+                    setFilteredArray={setFilteredArray}
                   />
-                  {displayTickets.map((res, index) => (
+                  {filteredTickets.map((res, index) => (
                     <MainDiv>
                       <>
                         <div
@@ -203,7 +212,9 @@ const SupportManagementPage = () => {
                           data-bs-target="#exampleModal"
                           onClick={() => getTicketsLatestData(res.id)}
                         >
-                          <span>{`#${res?.id?.toString()?.padStart(4, "0")}`}</span>
+                          <span>{`#${res?.id
+                            ?.toString()
+                            ?.padStart(4, "0")}`}</span>
                           <span className="px-2">
                             <img
                               style={{
@@ -306,11 +317,18 @@ const SupportManagementPage = () => {
                   <div className="w-100 pt-2">
                     <span className="rate-font">
                       <span className="rate-font" style={{ color: "#58DEAA" }}>
-                        %22
-                        <HiArrowSmUp
-                          className="arrow"
-                          style={{ marginBottom: "0.1rem" }}
-                        />
+                        %{perNewRequest}
+                        {perNewRequest < 0 ? (
+                          <HiArrowSmDown
+                            className="arrow"
+                            style={{ marginBottom: "0.1rem" }}
+                          />
+                        ) : (
+                          <HiArrowSmUp
+                            className="arrow"
+                            style={{ marginBottom: "0.1rem" }}
+                          />
+                        )}
                       </span>
                       last day
                     </span>
@@ -325,7 +343,7 @@ const SupportManagementPage = () => {
         </div>
       </div>
 
-      <TicketReplyModal tickeview={tickeview}/>
+      <TicketReplyModal tickeview={tickeview} />
 
       <Export exportList={displayTickets} />
     </>

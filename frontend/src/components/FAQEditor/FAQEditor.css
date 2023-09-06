@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Poppins&family=Roboto&display=swap");
+
+.accordion-button:focus {
+  box-shadow: none;
+}
+.accordion-button:not(.collapsed) {
+  color: initial;
+  background-color: initial;
+  box-shadow: initial;
+}
+.font-poppins {
+  font-family: "Poppins";
+}
+.accordian-light-mode {
+  color: #313131 !important;
+  background-color: #ffffff;
+}
+.accordian-dark-mode {
+  color: #e6e6e6 !important;
+  background-color: #0d2a53;
+}
+
+.accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+}
+
+.staticClass::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+}
+
+@media(min-width : 360px) and (max-width :418px){
+  .row-width{
+    width: 90%!important;
+  }
+}
+@media(min-width : 419px) and (max-width : 493px){
+  .row-width{
+    width: 73%!important;
+  }
+}
+.row-width{
+  width: 60%;
+}
+

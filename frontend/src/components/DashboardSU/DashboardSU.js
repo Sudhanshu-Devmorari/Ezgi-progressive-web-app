@@ -54,6 +54,7 @@ const DashboardSU = (props) => {
   return (
     <>
       <ProfileSU
+        getProfileData={props?.getProfileData}
         setSelectContent={props.setSelectContent}
         setDashboardSUser={props.setDashboardSUser}
       />
@@ -85,9 +86,10 @@ const DashboardSU = (props) => {
           <FavoriteSelection
             setFavSelection={setFavSelection}
             favSelection={favSelection}
+            verifyid={props.verifyid}
           />
-          {favSelection === "fav editor" && <FavEditor favEditorData={favEditorData} />}
-          {favSelection === "fav comments" && <FavComments favCommentData={favCommentData} />}
+          {favSelection === "fav editor" && <FavEditor favEditorData={favEditorData} verifyid={props.verifyid}/>}
+          {favSelection === "fav comments" && <FavComments favCommentData={favCommentData} verifyid={props.verifyid}/>}
         </>
       )}
       {(content === "notifications" || content === "support") && (
