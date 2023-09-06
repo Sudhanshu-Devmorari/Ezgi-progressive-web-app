@@ -17,14 +17,15 @@ const CommentsPage = ({
   followingid,
   verifyid,
   cmtReact,
-  homeApiData
+  homeApiData,
+  setArrayMerge
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   // console.log('&&&&&&&&', mergedResult)
   // console.log('&&-----&&', selectContent)
   const [filterCommentData, setFilterCommentData] = useState(null)
   const [displayData, setDisplayData] = useState(mergedResult)
-  // console.log(":::::::::::", filterCommentData)
+  console.log(":::::data::::::", displayData)
   return (
     <>
       <SelectContentForEditorPage
@@ -66,6 +67,7 @@ const CommentsPage = ({
                   verifyid={verifyid}
                   cmtReact={cmtReact}
                   homeApiData={homeApiData}
+                  setArrayMerge={setArrayMerge}
                 />
               </>
             );
@@ -115,6 +117,8 @@ const CommentsPage = ({
                   verifyid={verifyid}
                   followingid={followingid}
                   cmtReact={cmtReact}
+                  homeApiData={homeApiData}
+                  setArrayMerge={setArrayMerge}
                 />
               </>
             );

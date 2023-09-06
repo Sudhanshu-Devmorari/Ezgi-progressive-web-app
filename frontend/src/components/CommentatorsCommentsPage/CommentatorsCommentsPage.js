@@ -102,7 +102,7 @@ const CommentatorsCommentsPage = (props) => {
           />
           {(SelectComment === "activeComments" ||
             SelectComment === "resolvedComments") && (
-            <CommentsContentSection SelectComment={SelectComment}  verifyid={props.verifyid} />
+            <CommentsContentSection SelectComment={SelectComment}  verifyid={props.verifyid}  homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
           )}
           {SelectComment === "statistics" && <EditorProfileStatisticsSection from={'dashboard'}/>}
         </>
@@ -141,10 +141,10 @@ const CommentatorsCommentsPage = (props) => {
             verifyid={props.verifyid}
           />
           {favSelection === "fav editor" && (
-            <FavEditor favEditorData={favEditorData} verifyid={props.verifyid} />
+            <FavEditor setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favEditorData={favEditorData} verifyid={props.verifyid} homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
           )}
           {favSelection === "fav comments" && (
-            <FavComments favCommentData={favCommentData} verifyid={props.verifyid} />
+            <FavComments setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData} favCommentData={favCommentData} verifyid={props.verifyid} homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
           )}
         </>
       )}

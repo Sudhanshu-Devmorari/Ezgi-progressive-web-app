@@ -429,19 +429,30 @@ class FollowCommentatorView(APIView):
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
-                follow_commentator_obj, created = FollowCommentator.objects.get_or_create(
-                    commentator_user=commentator_obj, standard_user=user
-                )
-                if created:
+                # follow_commentator_obj, created = FollowCommentator.objects.get_or_create(
+                #     commentator_user=commentator_obj, standard_user=user
+                # )
+                # if created:
+                #     # send follow notification:
+                #     notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+                #     serializer = FollowCommentatorSerializer(follow_commentator_obj)
+                #     data = serializer.data
+                #     return Response(data=data, status=status.HTTP_200_OK)
+                # else:
+                #     follow_commentator_obj.delete()
+                #     return Response(data={"message":f"You unfollowed the {commentator_obj}."}, status=status.HTTP_200_OK)
+                if FollowCommentator.objects.filter(commentator_user=commentator_obj, standard_user=user).exists():
+                    follow_commentator_obj = FollowCommentator.objects.filter(commentator_user=commentator_obj, standard_user=user)
+                    for obj in follow_commentator_obj:
+                        follow_commentator_obj.delete()
+                    return Response(data={"message":f"You unfollowed the {commentator_obj}."}, status=status.HTTP_200_OK)
+                else:
+                    follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator_obj, standard_user=user)
                     # send follow notification:
                     notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
                     serializer = FollowCommentatorSerializer(follow_commentator_obj)
                     data = serializer.data
                     return Response(data=data, status=status.HTTP_200_OK)
-                else:
-                    follow_commentator_obj.delete()
-                    return Response(data={"message":f"You unfollowed the {commentator_obj}."}, status=status.HTTP_200_OK)
-
             else:
                 return Response(
                     create_response(

@@ -51,13 +51,16 @@ const EditorProfileActiveComments = (props) => {
             setDashboardSUser={props.setDashboardSUser}
             activeCommentsshow={props?.activeCommentsshow}
             profileData={profileData}
+            verifyid={props.verifyid} 
+            cmtReact={props.cmtReact} 
+            homeApiData={props.homeApiData} 
           />
           <SelectComments
             setSelectComment={setSelectComment}
             SelectComment={SelectComment}
           />
           {SelectComment !== "statistics" && (
-            <CommentsContentSection SelectComment={SelectComment} verifyid={props.verifyid}/>
+            <CommentsContentSection SelectComment={SelectComment} verifyid={props.verifyid} cmtReact={props.cmtReact} homeApiData={props.homeApiData} />
           )}
           {SelectComment === "statistics" && (
             <EditorProfileStatisticsSection

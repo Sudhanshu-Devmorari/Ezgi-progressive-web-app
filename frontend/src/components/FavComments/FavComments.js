@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
@@ -19,21 +19,81 @@ import world_check from "../../assets/world-check.svg";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
+import Swal from "sweetalert2";
+import clapIcon1 from "../../assets/clap-svgrepo-com.png";
+import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
+import { GoStar, GoStarFill } from "react-icons/go";
 
 const FavComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const favCommentData = props?.favCommentData;
   // console.log(favCommentData);
 
-  // Follow commentator
-  // const followCommentator = () =>{
-  //   try {
-  //  const res = await axios.get(`http://127.0.0.1:8000/follow-commentator/${userId}/?id=${}`)
-  //    console.log(res);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  const [followLabel, setFollowLabel] = useState("Follow");
+
+  const followCommentator = async (commentator_id,isFollowing) => {
+    try {
+      // console.log("isFollowing",isFollowing)
+      if(isFollowing){
+        const confirmation = await Swal.fire({
+          title: "Unfollow?",
+          text: "Are you sure you want to unfollow this commentator?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes",
+          cancelButtonText: "Cancel",
+        });
+        // console.log(confirmation.value);
+        if (confirmation.value === true) {
+          const res = await axios.get(
+            `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+          );
+          // console.log("On Unfollow",res)
+          setFollowLabel(() =>
+            followLabel === "Follow" ? "Followed" : "Follow"
+          );
+
+          Swal.fire({
+            title: "You have Unfollowed",
+            icon: "success",
+          });
+          const user_id = localStorage.getItem("user-id");
+        props.homeApiData(user_id);
+        }
+      }else{
+        const res = await axios.get(
+          `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+        );
+        // console.log("On Follow",res)
+        const user_id = localStorage.getItem("user-id");
+        props.homeApiData(user_id);
+      }
+
+    } catch (error) {
+      console.error("Error fetching data.", error);
+    }
+  };
+
+  const handleCommentReaction = async (id, reaction, count) => {
+
+  localStorage.setItem(`${id}_${reaction}`, count);
+    const res = await axios.post(
+      `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
+      {
+        reaction_type: `${reaction}`,
+      }
+    );
+      // const user_id = localStorage.getItem("user-id");
+      props.homeApiData(userId);
+      const res2 = await axios.get(
+        `${config.apiUrl}/fav-editor-comment/${userId}`
+      );
+      // console.log("=>>>", res.data);
+      props.setFavEditorData(res2.data.favEditors);
+      props.setFavCommentData(res2.data.favComments);
+  };
 
   return (
     <>
@@ -83,6 +143,9 @@ const FavComments = (props) => {
               <div className="col p-0">
                 <div className="d-flex justify-content-end pe-2 mt-3">
                   <button
+                      onClick={() => {
+                        followCommentator(res?.commentator_user?.id,props.followingid.includes(res?.commentator_user?.id));
+                      }}
                     style={{
                       border:
                         currentTheme === "dark"
@@ -95,7 +158,9 @@ const FavComments = (props) => {
                       fontSize: "13px",
                     }}
                   >
-                    Follow
+                    {props.followingid.includes(res?.commentator_user?.id)
+                        ? "Followed"
+                        : "Follow"}
                   </button>
                 </div>
 
@@ -249,35 +314,107 @@ const FavComments = (props) => {
                   className="gap-2 d-flex align-items-center"
                   style={{ fontSize: "13px" }}
                 >
-                  <div>
-                    <img
+                  <div
+                  onClick={() => {
+                      handleCommentReaction(
+                        res?.id,
+                        "like",
+                        res?.total_reactions.total_likes
+                      );
+                    }}
+                    >
+                    {/* <img
                       src={`${
                         currentTheme === "dark" ? likeIcondark : likeIcon
                       }`}
                       alt=""
                       height={20}
                       width={20}
-                    />{" "}
+                    />{" "} */}
+                    <div>
+                      {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
+                        props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].like == 1 ? (
+                          <PiHeartStraightFill size={25} color="#ff3030" />
+                        ) : (
+                          <PiHeartStraight size={25} color="#ff3030" />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <PiHeartStraight size={25} color="#ff3030" />
+                      )}{" "}
                     {res?.total_reactions?.total_likes}
+                    </div>
                   </div>
-                  <div>
-                    <img
+                  <div 
+                      onClick={() => {
+                      handleCommentReaction(
+                        res?.id,
+                        "favorite",
+                        res?.total_reactions?.total_favorite
+                      );
+                    }}>
+                    {/* <img
                       src={`${
                         currentTheme === "dark" ? starDarkLogin : starIcon
                       }`}
                       alt=""
                       height={23}
                       width={23}
-                    />
+                    /> */}
+                    <div>
+                    {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
+                      props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].favorite == 1 ? (
+                          <GoStarFill size={25} color="#ffcc00" />
+                        ) : (
+                          <GoStar size={25} color="#ffcc00" />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <GoStar size={25} color="#ffcc00" />
+                      )}{" "}
                     {res?.total_reactions?.total_favorite}
+                    </div>
                   </div>
-                  <div>
-                    <img
+                  <div
+                  onClick={() => {
+                      handleCommentReaction(
+                        res?.id,
+                        "clap",
+                        res?.total_reactions?.total_clap
+                      );
+                    }}
+                    >
+                    {/* <img
                       src={currentTheme === "dark" ? clapIcon : clapLight}
                       alt=""
                       height={20}
                       width={20}
-                    />{" "}
+                    />{" "} */}
+                    {props.cmtReact?.map((e)=>e.comment_id)?.includes(res?.id) ? (
+                      props.cmtReact.filter((e)=>e.comment_id==res?.id)[0].clap == 1 ? (
+                          <img
+                      src={clapIcon1}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                        ) : (
+                          <img
+                      src={clapIcon}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                        )
+                      ) : (
+                        // <img src={likeIcondark} alt="" height={20} width={20} />
+                        <img
+                      src={clapIcon}
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                      )}{" "}
                     {res?.total_reactions?.total_clap}
                   </div>
                 </div>

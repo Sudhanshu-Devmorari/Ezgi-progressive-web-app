@@ -46,6 +46,7 @@ const MainPage = () => {
   const [publicComments, setPublicComments] = useState([]);
   const [highlights, setHighlights] = useState([]);
   const [ads, setads] = useState([]);
+  const [arrayMerge, setArrayMerge] = useState("Select");
   const [commentator, setCommentator] = useState([]);
   const publicCount = 3;
   const SubscriptionCount = 3;
@@ -85,6 +86,7 @@ const MainPage = () => {
           value: item,
         }));
         setCommentator(commentatorData);
+        mergeArrays()
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -92,7 +94,11 @@ const MainPage = () => {
   }
 
   const mergeArrays = () => {
+    console.log("first==========", subscriptionComments)
+    console.log("subscription==========", subscriptionComments.length)
     if (subscriptionComments.length > 0) {
+      console.log("2==========")
+
       let merged = [];
       let remainingPublic = [...publicComments];
       let remainingHighlights = [...highlights];
@@ -149,6 +155,7 @@ const MainPage = () => {
           })),
         ];
       }
+      console.log("merge-------", merged)
       setMergedResult(merged);
     }
 
@@ -189,7 +196,7 @@ const MainPage = () => {
           })),
         ];
       }
-
+      console.log("$$$$$$", merged)
       setMergedResult(merged);
     }
   };
@@ -290,10 +297,11 @@ const MainPage = () => {
 
   const user = localStorage.getItem("user-role");
   useEffect(() => {
+    console.log("first:::: ",arrayMerge)
     mergeArrays();
     subscriptionArrays();
     publicArrays();
-  }, [publicComments, highlights, subscriptionComments]);
+  }, [publicComments, highlights, subscriptionComments, arrayMerge]);
 
   // const user = "c-";
   // const user = localStorage.getItem("userPhone");
@@ -371,6 +379,11 @@ const MainPage = () => {
                 selectContent={selectContent}
                 getProfileData={getProfileData}
                 verifyid={verifyid}
+                homeApiData={homeApiData}
+                followingList={followingList}
+                followingid={followingid}
+                cmtReact={cmtReact}
+                setArrayMerge={setArrayMerge}
               />
             ) : (
               <DashboardSU
@@ -379,6 +392,10 @@ const MainPage = () => {
                 selectContent={selectContent}
                 getProfileData={getProfileData}
                 verifyid={verifyid}
+                homeApiData={homeApiData}
+                followingList={followingList}
+                followingid={followingid}
+                cmtReact={cmtReact}
               />
             )
           ) : (
@@ -620,6 +637,7 @@ const MainPage = () => {
                   followingid={followingid}
                   verifyid={verifyid}
                   cmtReact={cmtReact}
+                  setArrayMerge={setArrayMerge}
                 />
               )}
               {selectContent === "show-all-comments" && (
@@ -629,6 +647,8 @@ const MainPage = () => {
                   setSelectContent={setSelectContent}
                   setDashboardSUser={setDashboardSUser}
                   verifyid={verifyid}
+                  cmtReact={cmtReact}
+                  homeApiData={homeApiData}
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}
