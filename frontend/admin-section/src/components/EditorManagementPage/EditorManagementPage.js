@@ -26,7 +26,7 @@ const EditorManagementPage = () => {
       // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
-        console.log("%%%%%%%%%", res.data)
+        console.log("%%%%%%%%%", res.data);
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
         setIsLoading(false);
@@ -59,7 +59,7 @@ const EditorManagementPage = () => {
       label: "New Editors",
       icon: editorIcon,
       count: `${data?.editor_count}`,
-      per: Math.round(data?.new_editor_percentage),
+      per: isLoading ? 0 : Math.round(data?.new_editor_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
       from: "editor",
@@ -69,7 +69,7 @@ const EditorManagementPage = () => {
     {
       name: "Verification Requests",
       img: bluetick,
-      count: Math.round(data?.verify_request_count),
+      count: isLoading ? 0 : Math.round(data?.verify_request_count),
     },
   ];
   const deactivationArray = [

@@ -29,12 +29,11 @@ const MainPage = () => {
         // console.log(res, "=====>>>>res.data");
         setData(res?.data);
         setUsers(res?.data?.users_list);
-        setIsLoading(false)
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
-        setIsLoading(false)
-
+        setIsLoading(false);
       }, []);
   };
   // console.log(data, "===========>>>data");
@@ -47,7 +46,7 @@ const MainPage = () => {
       label: "New Users",
       icon: newUser,
       count: `${data?.new_user}`,
-      per: Math.round(data?.new_user_percentage),
+      per: isLoading ? 0 : Math.round(data?.new_user_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -57,7 +56,7 @@ const MainPage = () => {
       label: "New Editors",
       icon: editorIcon,
       count: `${data?.new_editor}`,
-      per: Math.round(data?.new_editor_percentage),
+      per: isLoading ? 0 : Math.round(data?.new_editor_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -67,7 +66,7 @@ const MainPage = () => {
       label: "New Subscribers",
       icon: subscriberIcon,
       count: `${data?.new_subscriber}`,
-      per: Math.round(data?.new_subscriptions_percentage),
+      per: isLoading ? 0 : Math.round(data?.new_subscriptions_percentage),
       color: "#FF5757",
       rate_icon: "arrowdown",
     },
@@ -77,7 +76,7 @@ const MainPage = () => {
       label: "New Comments",
       icon: commentsIcon,
       count: `${data?.new_comment}`,
-      per: Math.round(data?.comments_percentage),
+      per: isLoading ? 0 : Math.round(data?.comments_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -96,14 +95,17 @@ const MainPage = () => {
               <div className="col-8">
                 <div className="row g-0">
                   <div className="col-4">
-                    <NewUsers array={newUsersArray}  isLoading={isLoading}/>
+                    <NewUsers array={newUsersArray} isLoading={isLoading} />
                     {/* <NewUsers total_user={data?.new_user} /> */}
                   </div>
                   <div className="col-4">
                     <NewUsers array={newEditorsArray} isLoading={isLoading} />
                   </div>
                   <div className="col-4">
-                    <NewUsers array={newSubscribersArray} isLoading={isLoading} />
+                    <NewUsers
+                      array={newSubscribersArray}
+                      isLoading={isLoading}
+                    />
                   </div>
                 </div>
               </div>
@@ -113,7 +115,11 @@ const MainPage = () => {
             </div>
             <div className="row g-0">
               <div className="col-8">
-                <Home users={users} adminHomeApiData={adminHomeApiData} isLoading={isLoading} />
+                <Home
+                  users={users}
+                  adminHomeApiData={adminHomeApiData}
+                  isLoading={isLoading}
+                />
               </div>
               <div className="col-4">
                 <DailySalesArray />

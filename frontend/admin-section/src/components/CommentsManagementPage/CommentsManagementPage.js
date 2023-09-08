@@ -21,7 +21,7 @@ const CommentsManagementPage = () => {
     await axios
       .get(`${config?.apiUrl}/comments-management/`)
       .then((res) => {
-        console.log("=-=-=-=-=-=-=> ", res.data)
+        console.log("=-=-=-=-=-=-=> ", res.data);
         setData(res.data);
         setMostLike(res?.data?.most_like);
         setCommentData(res.data.all_comment);
@@ -37,18 +37,18 @@ const CommentsManagementPage = () => {
     commentManagementApiData();
   }, []);
 
-    const newCommentsArray = [
-        {
-          label: "New Comments",
-          icon: commentsIcon,
-          count: `${data.comments_count}`,
-          per: Math.round(data?.comments_percentage),
-          color: "#58DEAA",
-          rate_icon: "arrowUp",
-          from: "comments"
-        },
-      ];
-        const winnertArray = [
+  const newCommentsArray = [
+    {
+      label: "New Comments",
+      icon: commentsIcon,
+      count: `${data.comments_count}`,
+      per: isLoading ? 0 : Math.round(data?.comments_percentage),
+      color: "#58DEAA",
+      rate_icon: "arrowUp",
+      from: "comments",
+    },
+  ];
+  const winnertArray = [
     {
       label: "Winner",
       icon: winner,
@@ -113,10 +113,13 @@ const CommentsManagementPage = () => {
             </div>
             <div className="row g-0">
               <div className="col-8">
-                <CommentsManagement commentData={commentData} isLoading={isLoading} />
+                <CommentsManagement
+                  commentData={commentData}
+                  isLoading={isLoading}
+                />
               </div>
               <div className="col-4">
-                <MostLiked mostLike={mostLike} isLoading={isLoading}/>
+                <MostLiked mostLike={mostLike} isLoading={isLoading} />
               </div>
             </div>
           </div>
