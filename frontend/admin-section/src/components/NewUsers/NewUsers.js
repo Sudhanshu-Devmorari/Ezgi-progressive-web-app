@@ -3,6 +3,7 @@ import { HiArrowSmDown, HiArrowSmUp } from "react-icons/hi";
 import "./NewUsers.css";
 
 const NewUsers = (props) => {
+  console.log("props:::::::::::::", props);
   const newArray = props.array;
   const totalArray = props?.totalArray;
 
@@ -33,7 +34,9 @@ const NewUsers = (props) => {
         >
           {item.icon && <img className="icon" src={item.icon} alt="" />}
           <span className="heading">{item.label || "New Users"}</span>
-          <span className="number">{item.count || props.total_user}</span>
+          <span className="number">
+            {props?.isLoading ? "Loading..." : item.count}
+          </span>
           {/* {item.per && ( */}
           <div className="w-100">
             {item.per >= 0 ? (
@@ -65,7 +68,9 @@ const NewUsers = (props) => {
           style={{ height: "25vh" }}
         >
           <span className="heading">{item.label}</span>
-          <span className="number">{item.count}</span>
+          <span className="number">
+            {props?.isLoading ? "Loading..." : item.count}
+          </span>
           {item.perWin && (
             <>
               <div

@@ -27,7 +27,6 @@ import initialProfile from "../../assets/profile.png";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import { CustomDropdownEditor } from "../CustomDropdownEditor";
 
-
 const EditorManagemenet = (props) => {
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);
@@ -46,7 +45,6 @@ const EditorManagemenet = (props) => {
           customClass: "dark-mode-alert",
         });
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -148,7 +146,7 @@ const EditorManagemenet = (props) => {
     formData.append("gender", addUser.gender);
     formData.append("age", addUser.age);
     formData.append("level", addUser.level);
-    const id = 1;  // temp
+    const id = 1; // temp
     try {
       const response = await axios.patch(
         `${config?.apiUrl}/editor-management/${id}/`,
@@ -216,17 +214,14 @@ const EditorManagemenet = (props) => {
 
   const handleEditorFiltor = async () => {
     try {
-      const response = await axios.post(
-        `${config?.apiUrl}/filter-editors/`,
-        {
-          lavel: selectedLevelFilter,
-          sucess_rate: selectedSuccessRateFilter,
-          score_point: selectedScorePointFilter,
-          city: selectedCityFilter,
-          age: selectedAgeFilter,
-          gender: selectedGenderFilter,
-        }
-      );
+      const response = await axios.post(`${config?.apiUrl}/filter-editors/`, {
+        lavel: selectedLevelFilter,
+        sucess_rate: selectedSuccessRateFilter,
+        score_point: selectedScorePointFilter,
+        city: selectedCityFilter,
+        age: selectedAgeFilter,
+        gender: selectedGenderFilter,
+      });
       setDisplayUser(response.data);
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -239,10 +234,11 @@ const EditorManagemenet = (props) => {
 
   const filteredData = (e) => {
     const val = e.target.value.toLowerCase();
-  
-    const filteredArray = props?.users?.filter((obj) =>
-      obj?.editor_data?.username?.toLowerCase().startsWith(val) ||
-      obj?.editor_data?.name?.toLowerCase().includes(val) 
+
+    const filteredArray = props?.users?.filter(
+      (obj) =>
+        obj?.editor_data?.username?.toLowerCase().startsWith(val) ||
+        obj?.editor_data?.name?.toLowerCase().includes(val)
     );
     setDisplayUser(filteredArray);
   };
@@ -688,117 +684,131 @@ const EditorManagemenet = (props) => {
             </button>
           </div>
         </div>
-        {displayUser?.map((res, index) => (
-          <div
-            // onClick={() => props.setupdateProfile(2)}
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
-            onClick={() => {
-              props.setupdateProfile(2);
-              // console.log("LLLL");
-              // console.log(res, "NEha");
-              setPartialData(res);
-              setAddUser(res.editor_data);
-            }}
-            className="px-2 py-1 mb-2 row-fonts cursor"
-            style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
-          >
-            <div className="row g-0 d-flex justify-content-between align-items-center">
+        {props?.isLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+            Loading...
+          </div>
+        ) : (
+          <>
+            {displayUser?.map((res, index) => (
               <div
-                className="col-3"
-
-                // data-bs-toggle="modal"
-                // onClick={() => {
-                //   props.setupdateProfile(2);
-                //   console.log("LLLL");
-                //   console.log(res,"NEha");
-                //   setPartialData(res);
-                //   setAddUser(res.editor_data);
-                // }}
-                // data-bs-target="#exampleModal"
-
+                key={index}
+                // onClick={() => props.setupdateProfile(2)}
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                onClick={() => {
+                  props.setupdateProfile(2);
+                  // console.log("LLLL");
+                  // console.log(res, "NEha");
+                  setPartialData(res);
+                  setAddUser(res.editor_data);
+                }}
+                className="px-2 py-1 mb-2 row-fonts cursor"
+                style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
               >
-                <div className="d-flex align-items-center">
-                  <span className="pe-1">{`# ${res?.editor_data?.id
-                    .toString()
-                    .padStart(4, "0")}`}</span>
-                  <div className="position-relative">
-                    <img
-                      className="rounded-circle profile-icon"
-                      src={`${res?.editor_data?.profile_pic ? server_url + res?.editor_data?.profile_pic : initialProfile}`}
-                      alt=""
-                      height={42}
-                      width={42}
-                    />
-                    <div
-                      className="position-absolute d-flex justify-content-center align-items-center crown-position"
-                      style={{
-                        height: "14px",
-                        width: "14px",
-                        border: "2px solid #FF9100",
-                        borderRadius: "50%",
-                        backgroundColor: "#0B2447",
-                        top: "0px",
-                        left: "27px",
-                      }}
-                    >
-                      <BiSolidCrown
-                        fontSize={"0.49rem"}
-                        style={{ color: "#FF9100" }}
-                      />
+                <div className="row g-0 d-flex justify-content-between align-items-center">
+                  <div
+                    className="col-3"
+
+                    // data-bs-toggle="modal"
+                    // onClick={() => {
+                    //   props.setupdateProfile(2);
+                    //   console.log("LLLL");
+                    //   console.log(res,"NEha");
+                    //   setPartialData(res);
+                    //   setAddUser(res.editor_data);
+                    // }}
+                    // data-bs-target="#exampleModal"
+                  >
+                    <div className="d-flex align-items-center">
+                      <span className="pe-1">{`# ${res?.editor_data?.id
+                        .toString()
+                        .padStart(4, "0")}`}</span>
+                      <div className="position-relative">
+                        <img
+                          className="rounded-circle profile-icon"
+                          src={`${
+                            res?.editor_data?.profile_pic
+                              ? server_url + res?.editor_data?.profile_pic
+                              : initialProfile
+                          }`}
+                          alt=""
+                          height={42}
+                          width={42}
+                        />
+                        <div
+                          className="position-absolute d-flex justify-content-center align-items-center crown-position"
+                          style={{
+                            height: "14px",
+                            width: "14px",
+                            border: "2px solid #FF9100",
+                            borderRadius: "50%",
+                            backgroundColor: "#0B2447",
+                            top: "0px",
+                            left: "27px",
+                          }}
+                        >
+                          <BiSolidCrown
+                            fontSize={"0.49rem"}
+                            style={{ color: "#FF9100" }}
+                          />
+                        </div>
+                      </div>
+                      <span className="ps-1">{res?.editor_data?.name}</span>
                     </div>
                   </div>
-                  <span className="ps-1">{res?.editor_data?.name}</span>
+                  <div className="d-flex gap-2 align-items-center col-1">
+                    <div>{res?.editor_data?.username}</div>
+                  </div>
+                  <div
+                    className="d-flex align-items-center block-width col-3 gap-1"
+                    style={{ minWidth: "7.5rem" }}
+                  >
+                    <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>
+                      %62
+                    </span>
+                    {res?.editor_data?.gender == "Male" && (
+                      <img src={gender_male} alt="" height={23} width={23} />
+                    )}
+                    {res?.editor_data?.gender == "Female" && (
+                      <img src={gender_female} alt="" height={23} width={23} />
+                    )}
+                    <span>{res?.editor_data?.age}</span>
+                    <div className="">{res?.editor_data?.country}</div>
+                  </div>
+                  <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
+                    <span>
+                      {moment(res?.editor_data?.created).format(
+                        "DD-MM.YYYY - HH:mm"
+                      )}
+                    </span>
+                    <img
+                      className="icons-edit-eye"
+                      src={circle_check}
+                      alt=""
+                      height={28}
+                      width={28}
+                    />
+                    <img
+                      className="icons-edit-eye"
+                      src={eye}
+                      alt=""
+                      height={28}
+                      width={28}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="d-flex gap-2 align-items-center col-1">
-                <div>{res?.editor_data?.username}</div>
-              </div>
-              <div
-                className="d-flex align-items-center block-width col-3 gap-1"
-                style={{ minWidth: "7.5rem" }}
-              >
-                <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>%62</span>
-                {res?.editor_data?.gender == "Male" && (
-                  <img src={gender_male} alt="" height={23} width={23} />
+                {props?.verifyRqst && <VerificationRequestsBtns />}
+                {props?.deactiveRqst && (
+                  <DeactivationRequestsBtns
+                    id={res?.editor_data?.id}
+                    editorManagementApiData={props.editorManagementApiData}
+                  />
                 )}
-                {res?.editor_data?.gender == "Female" && (
-                  <img src={gender_female} alt="" height={23} width={23} />
-                )}
-                <span>{res?.editor_data?.age}</span>
-                <div className="">{res?.editor_data?.country}</div>
               </div>
-              <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
-                <span>
-                  {moment(res?.editor_data?.created).format(
-                    "DD-MM.YYYY - HH:mm"
-                  )}
-                </span>
-                <img
-                  className="icons-edit-eye"
-                  src={circle_check}
-                  alt=""
-                  height={28}
-                  width={28}
-                />
-                <img
-                  className="icons-edit-eye"
-                  src={eye}
-                  alt=""
-                  height={28}
-                  width={28}
-                />
-              </div>
-            </div>
-            {props?.verifyRqst && <VerificationRequestsBtns />}
-            {props?.deactiveRqst && (
-              <DeactivationRequestsBtns
-                id={res?.editor_data?.id}
-                editorManagementApiData={props.editorManagementApiData}
-              />
-            )}
-          </div>
-        ))}
+            ))}
+          </>
+        )}
       </div>
 
       {/* CREATE & UPDATE EDITOR */}
@@ -1137,38 +1147,40 @@ const EditorManagemenet = (props) => {
                   <div className="row g-0 gap-3">
                     <div className="col d-flex flex-column">
                       <span>Password</span>
-                      <input
-                        onChange={submitEditorData}
-                        name="password"
-                        value={addUser.password}
-                        // style={{-webkit-text-security: square;}}
-                        // style={{ webkitTextSecurity: "circle" }}
-                        className="darkMode-input form-control"
-                        type={showPassword ? "text" : "password"}
-                        // value={password}
-                        // onChange={(e) => setPassword(e.target.value)}
-                      />
-                      {showPassword ? (
-                        <AiOutlineEyeInvisible
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            top: "16.6rem",
-                            left: "14rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
+                      <div className="darkMode-input">
+                        <input
+                          onChange={submitEditorData}
+                          name="password"
+                          value={addUser.password}
+                          // style={{-webkit-text-security: square;}}
+                          style={{ width: "13rem" }}
+                          className="darkMode-input form-control"
+                          type={showPassword ? "text" : "password"}
+                          // value={password}
+                          // onChange={(e) => setPassword(e.target.value)}
                         />
-                      ) : (
-                        <AiOutlineEye
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            top: "16.6rem",
-                            left: "14rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        />
-                      )}
+                        {showPassword ? (
+                          <AiOutlineEyeInvisible
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              top: "16.6rem",
+                              left: "14rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        ) : (
+                          <AiOutlineEye
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              top: "16.6rem",
+                              left: "14rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </div>
                     </div>
                     <div className="col">
                       <CustomDropdownEditor
@@ -1467,11 +1479,11 @@ const EditorManagemenet = (props) => {
               )}
               <img
                 onClick={() => {
-                  setCountryDropDown(false)
-                  setCityDropDown(false)
-                  setCategoryDropdown(false)
-                  setGenderDropDown(false)
-                  setAgeDropDown(false)
+                  setCountryDropDown(false);
+                  setCityDropDown(false);
+                  setCategoryDropdown(false);
+                  setGenderDropDown(false);
+                  setAgeDropDown(false);
                   props.setupdateProfile(1);
                   setAddUser({
                     name: "",
@@ -1620,16 +1632,14 @@ const EditorManagemenet = (props) => {
               </div>
             </div>
             <img
-            onClick={() => {
-              
-              setLevelFilterDropDown(false)
-              setSuccessRateFilterDropDown(false)
-              setScorePointFilterDropDown(false)
-              setCityFilterDropDown(false)
-              setAgeFilterDropDown(false);
-              setGenderFilterDropDown(false);
-             
-            }}
+              onClick={() => {
+                setLevelFilterDropDown(false);
+                setSuccessRateFilterDropDown(false);
+                setScorePointFilterDropDown(false);
+                setCityFilterDropDown(false);
+                setAgeFilterDropDown(false);
+                setGenderFilterDropDown(false);
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

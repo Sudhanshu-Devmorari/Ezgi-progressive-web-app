@@ -20,6 +20,7 @@ import config from "../../config";
 const MainPage = () => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const adminHomeApiData = async (user_id) => {
     const res = await axios
@@ -28,9 +29,12 @@ const MainPage = () => {
         // console.log(res, "=====>>>>res.data");
         setData(res?.data);
         setUsers(res?.data?.users_list);
+        setIsLoading(false)
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
+        setIsLoading(false)
+
       }, []);
   };
   // console.log(data, "===========>>>data");
@@ -92,24 +96,24 @@ const MainPage = () => {
               <div className="col-8">
                 <div className="row g-0">
                   <div className="col-4">
-                    <NewUsers array={newUsersArray} />
+                    <NewUsers array={newUsersArray}  isLoading={isLoading}/>
                     {/* <NewUsers total_user={data?.new_user} /> */}
                   </div>
                   <div className="col-4">
-                    <NewUsers array={newEditorsArray} />
+                    <NewUsers array={newEditorsArray} isLoading={isLoading} />
                   </div>
                   <div className="col-4">
-                    <NewUsers array={newSubscribersArray} />
+                    <NewUsers array={newSubscribersArray} isLoading={isLoading} />
                   </div>
                 </div>
               </div>
               <div className="col-4">
-                <NewUsers array={newCommentsArray} />
+                <NewUsers array={newCommentsArray} isLoading={isLoading} />
               </div>
             </div>
             <div className="row g-0">
               <div className="col-8">
-                <Home users={users} adminHomeApiData={adminHomeApiData} />
+                <Home users={users} adminHomeApiData={adminHomeApiData} isLoading={isLoading} />
               </div>
               <div className="col-4">
                 <DailySalesArray />

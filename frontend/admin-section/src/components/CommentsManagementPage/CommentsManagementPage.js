@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import NewUsers from "../NewUsers/NewUsers";
@@ -14,6 +14,7 @@ const CommentsManagementPage = () => {
   const [data, setData] = useState({});
   const [mostLike, setMostLike] = useState([]);
   const [commentData, setCommentData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const commentManagementApiData = async () => {
     // console.log(data)
@@ -22,11 +23,13 @@ const CommentsManagementPage = () => {
       .then((res) => {
         console.log("=-=-=-=-=-=-=> ", res.data)
         setData(res.data);
-        setMostLike(res?.data?.most_like)
-        setCommentData(res.data.all_comment)
+        setMostLike(res?.data?.most_like);
+        setCommentData(res.data.all_comment);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
+        setIsLoading(false);
       });
   };
 
@@ -86,35 +89,36 @@ const CommentsManagementPage = () => {
             <SideBar />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
-          <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers
-                        array={newCommentsArray}
-                        commentsPage={"commentsPage"}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={winnertArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={losetArray} />
-                    </div>
+            <div className="row g-0">
+              <div className="col-8">
+                <div className="row g-0">
+                  <div className="col-4">
+                    <NewUsers
+                      array={newCommentsArray}
+                      commentsPage={"commentsPage"}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                  <div className="col-4">
+                    <NewUsers array={winnertArray} isLoading={isLoading} />
+                  </div>
+                  <div className="col-4">
+                    <NewUsers array={losetArray} isLoading={isLoading} />
                   </div>
                 </div>
-                <div className="col-4">
-                  <NewUsers totalArray={totalArray} />
-                </div>
               </div>
-              <div className="row g-0">
-                <div className="col-8">
-                  <CommentsManagement commentData={commentData} />
-                </div>
-                <div className="col-4">
-                  <MostLiked mostLike={mostLike} />
-                </div>
+              <div className="col-4">
+                <NewUsers totalArray={totalArray} isLoading={isLoading} />
               </div>
+            </div>
+            <div className="row g-0">
+              <div className="col-8">
+                <CommentsManagement commentData={commentData} isLoading={isLoading} />
+              </div>
+              <div className="col-4">
+                <MostLiked mostLike={mostLike} isLoading={isLoading}/>
+              </div>
+            </div>
           </div>
         </div>
       </div>

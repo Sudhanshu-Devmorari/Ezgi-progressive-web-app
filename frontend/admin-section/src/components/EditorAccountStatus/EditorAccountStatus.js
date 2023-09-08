@@ -24,29 +24,39 @@ const EditorAccountStatus = (props) => {
   ];
   return (
     <>
-      <div className={`${"dark-mode my-2"} block-height`} style={{height:"31vh"}}>
+      <div
+        className={`${"dark-mode my-2"} block-height`}
+        style={{ height: "31vh" }}
+      >
         <div className="p-2" style={{ fontSize: "1.1rem" }}>
           Editor Account Status
         </div>
-        <div className="mt-2 d-flex justify-content-center gap-ceown">
-        {levelArray.map((res, index) => (
-            <div className="d-flex flex-column align-items-center mt-4">
-              <img
-                className="icon"
-                src={res.img}
-                alt=""
-                height={45}
-                width={45}
-              />
-              <span className="heading">
-                {res.name}
-              </span>
-              <span className="number">
-                {res.count}
-              </span>
+        {props?.isLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+            Loading...
+          </div>
+        ) : (
+          <>
+            <div className="mt-2 d-flex justify-content-center gap-ceown">
+              {levelArray?.map((res, index) => (
+                <div
+                  className="d-flex flex-column align-items-center mt-4"
+                  key={index}
+                >
+                  <img
+                    className="icon"
+                    src={res.img}
+                    alt=""
+                    height={45}
+                    width={45}
+                  />
+                  <span className="heading">{res.name}</span>
+                  <span className="number">{res.count}</span>
+                </div>
+              ))}
             </div>
-        ))}
-        </div>
+          </>
+        )}
       </div>
     </>
   );

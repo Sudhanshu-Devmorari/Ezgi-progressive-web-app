@@ -95,42 +95,60 @@ const UserTimeLine = (props) => {
     <>
       <div className="dark-mode p-2 sidebar-height" style={{ height: "90vh" }}>
         <div className="" style={{ fontSize: "1.2rem" }}>
-          {props?.transactionHistory === "history" ? (
-            "Transaction History"
-          ) : (
-            "User Timeline"
-          )}
+          {props?.transactionHistory === "history"
+            ? "Transaction History"
+            : "User Timeline"}
         </div>
-        {props?.notification.map((res, index) => (
-          <div
-            className="d-flex gap-1 my-2 pb-2"
-            style={{ borderBottom: "0.2px solid #E6E6E6" }}
-          >
-            <div>
-              <img src={`${
-                    res?.sender?.profile_pic ? server_url + res?.sender?.profile_pic : initialProfile
-                  }`}
-                  className="rounded-circle" alt="" height={45} width={45} style={{objectFit:"cover"}}/>
-            </div>
-            <div className=" flex-grow-1 d-flex flex-column">
-              <div className="d-flex justify-content-between">
-                <span className="username">{res?.sender?.name}</span>
-                <span
-                  className="support-history-fonts"
-                  style={{ fontSize: "0.8rem" }}
-                >
-                  {res?.time_since_created}
-                </span>
-              </div>
-              <span
-                className="support-history-fonts"
-                style={{ fontSize: "0.8rem" }}
-              >
-                {highlightUsername(res?.context, `@${res?.receiver?.username}`)}
-              </span>
-            </div>
+        {props.isLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-100 align-items-center justify-content-center">
+            Loading...
           </div>
-        ))}
+        ) : (
+          <>
+            {props?.notification.map((res, index) => (
+              <div
+                key={index}
+                className="d-flex gap-1 my-2 pb-2"
+                style={{ borderBottom: "0.2px solid #E6E6E6" }}
+              >
+                <div>
+                  <img
+                    src={`${
+                      res?.sender?.profile_pic
+                        ? server_url + res?.sender?.profile_pic
+                        : initialProfile
+                    }`}
+                    className="rounded-circle"
+                    alt=""
+                    height={45}
+                    width={45}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+                <div className=" flex-grow-1 d-flex flex-column">
+                  <div className="d-flex justify-content-between">
+                    <span className="username">{res?.sender?.name}</span>
+                    <span
+                      className="support-history-fonts"
+                      style={{ fontSize: "0.8rem" }}
+                    >
+                      {res?.time_since_created}
+                    </span>
+                  </div>
+                  <span
+                    className="support-history-fonts"
+                    style={{ fontSize: "0.8rem" }}
+                  >
+                    {highlightUsername(
+                      res?.context,
+                      `@${res?.receiver?.username}`
+                    )}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </>
   );

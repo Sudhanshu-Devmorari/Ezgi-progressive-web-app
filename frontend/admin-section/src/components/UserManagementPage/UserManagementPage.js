@@ -18,6 +18,7 @@ const UserManagementPage = () => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [userTimeLine, setUserTimeLine] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   async function userManagementApiData() {
     // console.log("test");
@@ -26,13 +27,15 @@ const UserManagementPage = () => {
       .then((res) => {
         console.log(res.data);
         setData(res?.data);
-        setUsers(res?.data?.users_list)
-        setUserTimeLine(res?.data?.user_timeline)
+        setUsers(res?.data?.users_list);
+        setUserTimeLine(res?.data?.user_timeline);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
+        setIsLoading(false);
       }, []);
-  };
+  }
 
   useEffect(() => {
     userManagementApiData();
@@ -125,27 +128,39 @@ const UserManagementPage = () => {
             <SideBar />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
-          <div className="row g-0">
-                <div className="col-8">
-                  <div className="row g-0">
-                    <div className="col-4">
-                      <NewUsers array={newUsersArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newEditorsArray} />
-                    </div>
-                    <div className="col-4">
-                      <NewUsers array={newSubscribersArray} />
-                    </div>
+            <div className="row g-0">
+              <div className="col-8">
+                <div className="row g-0">
+                  <div className="col-4">
+                    <NewUsers array={newUsersArray} isLoading={isLoading} />
                   </div>
-                  <div className="">
-                    <Home users={users} setUsers={setUsers} adminHomeApiData={userManagementApiData}/>
+                  <div className="col-4">
+                    <NewUsers array={newEditorsArray} isLoading={isLoading} />
+                  </div>
+                  <div className="col-4">
+                    <NewUsers
+                      array={newSubscribersArray}
+                      isLoading={isLoading}
+                    />
                   </div>
                 </div>
-                <div className="col-4 h-100">
-                  <UserTimeLine transactionHistory={"timeline"} notification={userTimeLine} />
+                <div className="">
+                  <Home
+                    users={users}
+                    setUsers={setUsers}
+                    adminHomeApiData={userManagementApiData}
+                    isLoading={isLoading}
+                  />
                 </div>
               </div>
+              <div className="col-4 h-100">
+                <UserTimeLine
+                  transactionHistory={"timeline"}
+                  notification={userTimeLine}
+                  isLoading={isLoading}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

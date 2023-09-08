@@ -33,37 +33,40 @@ const Home = (props) => {
   };
   const handleDeactive = async (id, action) => {
     try {
-      if (action === "delete") {
-        // console.log(action,"===============>>>action from delete")
-        const res = await axios.delete(
-          `${config?.apiUrl}/user-management/${id}/?action=delete`
-        );
-        if (res.status === 200) {
-          props?.adminHomeApiData();
-          Swal.fire({
-            title: "Success",
-            text: "User profile Delete sucessfully.",
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          });
-        }
-      } else if (action === "deactive") {
-        // console.log(action,"===============>>>action from deactive")
-        const res = await axios.delete(
-          `${config?.apiUrl}/user-management/${id}/?action=deactive`
-        );
-        if (res.status === 200) {
-          props?.adminHomeApiData();
-          Swal.fire({
-            title: "Success",
-            text: "User profile deactive sucessfully.",
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          });
-        }
+      // if (action === "delete") {
+      // console.log(action,"===============>>>action from delete")
+      const res = await axios.delete(
+        `${config?.apiUrl}/user-management/${id}/?action=${action}`
+      );
+      if (res.status === 200) {
+        props?.adminHomeApiData();
+        Swal.fire({
+          title: "Success",
+          text:
+            action === "delete"
+              ? "User profile Delete sucessfully."
+              : "User profile Deactive sucessfully.",
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
       }
+      // } else if (action === "deactive") {
+      //   // console.log(action,"===============>>>action from deactive")
+      //   const res = await axios.delete(
+      //     `${config?.apiUrl}/user-management/${id}/?action=deactive`
+      //   );
+      //   if (res.status === 200) {
+      //     props?.adminHomeApiData();
+      //     Swal.fire({
+      //       title: "Success",
+      //       text: "User profile deactive sucessfully.",
+      //       icon: "success",
+      //       backdrop: false,
+      //       customClass: "dark-mode-alert",
+      //     });
+      //   }
+      // }
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -507,7 +510,13 @@ const Home = (props) => {
   }
   return (
     <>
-      <div className="dark-mode p-2 m-2 mb-0 home-height pt-3">
+      <div
+        className={`dark-mode p-2 m-2 mb-0 home-height pt-3 ${
+          props?.isLoading &&
+          usersPart !== "users" &&
+          "d-flex align-items-center justify-content-center"
+        }`}
+      >
         {usersPart === "users" && (
           <div className="d-flex p-2">
             <div className="p-2 flex-grow-1">
@@ -557,123 +566,147 @@ const Home = (props) => {
             </div>
           </div>
         )}
-        {displayUser
-          ?.slice()
-          .reverse()
-          .map((res, index) => (
-            <MainDiv key={index}>
-              <div className="col">
-                <span className="pe-1">{`# ${res?.id
-                  .toString()
-                  .padStart(4, "0")}`}</span>
-                <img
-                  src={`${
-                    res?.profile_pic
-                      ? server_url + res?.profile_pic
-                      : initialProfile
-                  }`}
-                  className="rounded-circle"
-                  alt=""
-                  height={42}
-                  width={42}
-                />
-                <span className="ps-1">{res?.name}</span>
-              </div>
-              <div className="d-flex gap-2 align-items-center col ">
-                <div>{res?.username?.trim()}</div>
-                <div className="">
-                  {res.gender == "Male" && (
-                    <img src={gender_male} alt="" height={22} width={22} />
-                  )}
-                  {res.gender == "Female" && (
-                    <img src={gender_female} alt="" height={22} width={22} />
-                  )}
-                  <span
+        {props?.isLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-100 align-items-center justify-content-center">
+            Loading...
+          </div>
+        ) : (
+          <>
+            {displayUser
+              ?.slice()
+              .reverse()
+              .map((res, index) => (
+                <React.Fragment key={index}>
+                  <MainDiv>
+                    <div className="col">
+                      <span className="pe-1">{`# ${res?.id
+                        .toString()
+                        .padStart(4, "0")}`}</span>
+                      <img
+                        src={`${
+                          res?.profile_pic
+                            ? server_url + res?.profile_pic
+                            : initialProfile
+                        }`}
+                        className="rounded-circle"
+                        alt=""
+                        height={42}
+                        width={42}
+                      />
+                      <span className="ps-1">{res?.name}</span>
+                    </div>
+                    <div className="d-flex gap-2 align-items-center col ">
+                      <div>{res?.username?.trim()}</div>
+                      <div className="">
+                        {res.gender == "Male" && (
+                          <img
+                            src={gender_male}
+                            alt=""
+                            height={22}
+                            width={22}
+                          />
+                        )}
+                        {res.gender == "Female" && (
+                          <img
+                            src={gender_female}
+                            alt=""
+                            height={22}
+                            width={22}
+                          />
+                        )}
+                        <span
 
-                  // data-bs-toggle="modal"
-                  // data-bs-target="#exampleModal"
-                  // onClick={() => {
-                  //   setprofile(true);
-                  //   setUserData(res);
-                  //   setAddUser(res);
-                  //   setPreveiwProfilePic(true);
-                  // }}
-                  >
-                    {res.age}
-                  </span>
-                </div>
-                <div className="">{res.country?.trim()}</div>
-              </div>
-              {usersPart === "users" && (
-                <div
-                  className="d-flex align-items-center block-width col justify-content-center"
-                  style={{ minWidth: "7.5rem" }}
-                >
-                  {res.commentator_level &&
-                  res.commentator_level !== "undefined" ? (
-                    <button
-                      className="btn-user"
-                      style={{
-                        textAlign: "center",
-                        paddingTop: "0.1rem",
-                        width: "7.5rem",
-                        color:
-                          (res.commentator_level === "journeyman" &&
-                            "#4DD5FF") ||
-                          (res.commentator_level === "master" && "#03fc77") ||
-                          (res.commentator_level === "grandmaster" &&
-                            "#FF9100") ||
-                          (res.commentator_level === "apprentice" && "#FFEE7D"),
-                        border:
-                          (res.commentator_level === "journeyman" &&
-                            "1px solid #4DD5FF") ||
-                          (res.commentator_level === "master" &&
-                            "1px solid #03fc77") ||
-                          (res.commentator_level === "grandmaster" &&
-                            "1px solid #FF9100") ||
-                          (res.commentator_level === "apprentice" &&
-                            "1px solid #FFEE7D"),
-                        borderRadius: "2px",
-                        backgroundColor: "transparent",
-                      }}
-                    >
-                      {res.commentator_level.charAt(0).toUpperCase() +
-                        res.commentator_level.slice(1).toLowerCase()}
-                    </button>
-                  ) : (
-                    <span></span>
-                  )}
-                </div>
-              )}
-              <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
-                <span>{moment(res.created).format("DD-MM.YYYY - HH:mm")}</span>
-                <img
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  onClick={() => {
-                    setprofile(true);
-                    setUserData(res);
-                    setAddUser(res);
-                    setPreveiwProfilePic(true);
-                  }}
-                  className="cursor"
-                  src={userEdit}
-                  alt=""
-                  height={25}
-                  width={25}
-                />
-                <img
-                  onClick={() => handleDeactive(res.id, "delete")}
-                  // onClick={() => handleDelete(res.id)}
-                  className="cursor"
-                  src={trash}
-                  alt=""
-                  height={25}
-                  width={25}
-                />
-              </div>
-            </MainDiv>
-          ))}
+                        // data-bs-toggle="modal"
+                        // data-bs-target="#exampleModal"
+                        // onClick={() => {
+                        //   setprofile(true);
+                        //   setUserData(res);
+                        //   setAddUser(res);
+                        //   setPreveiwProfilePic(true);
+                        // }}
+                        >
+                          {res.age}
+                        </span>
+                      </div>
+                      <div className="">{res.country?.trim()}</div>
+                    </div>
+                    {usersPart === "users" && (
+                      <div
+                        className="d-flex align-items-center block-width col justify-content-center"
+                        style={{ minWidth: "7.5rem" }}
+                      >
+                        {res.commentator_level &&
+                        res.commentator_level !== "undefined" ? (
+                          <button
+                            className="btn-user"
+                            style={{
+                              textAlign: "center",
+                              paddingTop: "0.1rem",
+                              width: "7.5rem",
+                              color:
+                                (res.commentator_level === "journeyman" &&
+                                  "#4DD5FF") ||
+                                (res.commentator_level === "master" &&
+                                  "#03fc77") ||
+                                (res.commentator_level === "grandmaster" &&
+                                  "#FF9100") ||
+                                (res.commentator_level === "apprentice" &&
+                                  "#FFEE7D"),
+                              border:
+                                (res.commentator_level === "journeyman" &&
+                                  "1px solid #4DD5FF") ||
+                                (res.commentator_level === "master" &&
+                                  "1px solid #03fc77") ||
+                                (res.commentator_level === "grandmaster" &&
+                                  "1px solid #FF9100") ||
+                                (res.commentator_level === "apprentice" &&
+                                  "1px solid #FFEE7D"),
+                              borderRadius: "2px",
+                              backgroundColor: "transparent",
+                            }}
+                          >
+                            {res.commentator_level.charAt(0).toUpperCase() +
+                              res.commentator_level.slice(1).toLowerCase()}
+                          </button>
+                        ) : (
+                          <span></span>
+                        )}
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
+                      <span>
+                        {moment(res.created).format("DD-MM.YYYY - HH:mm")}
+                      </span>
+                      <img
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        onClick={() => {
+                          setprofile(true);
+                          setUserData(res);
+                          setAddUser(res);
+                          setPreveiwProfilePic(true);
+                        }}
+                        className="cursor"
+                        src={userEdit}
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
+                      <img
+                        onClick={() => handleDeactive(res.id, "delete")}
+                        // onClick={() => handleDelete(res.id)}
+                        className="cursor"
+                        src={trash}
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
+                    </div>
+                  </MainDiv>
+                </React.Fragment>
+              ))}
+          </>
+        )}
       </div>
 
       <div
@@ -853,74 +886,71 @@ const Home = (props) => {
                     <small className="text-danger">{formik.errors.phone}</small>
                   ) : null}
                 </div>
-                <div className="col d-flex flex-column">
+                <div className="col d-flex flex-column ">
                   <span>Password</span>
-                  <input
-                    onChange={submitUserData}
-                    name="password"
-                    value={addUser.password}
-                    // style={{-webkit-text-security: square;}}
-                    // style={{webkitTextSecurity: "star"}}
-                    className="darkMode-input form-control"
-                    type={showPassword ? "text" : "password"}
-                    // {...formik.getFieldProps("password")}
-                    // value={password}
-                    // onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {formik.touched.password && formik.errors.password ? (
-                    <small className="text-danger">
-                      {formik.errors.password}
-                    </small>
-                  ) : null}
-                  {profile ? (
-                    <>
-                      {showPassword ? (
-                        <AiOutlineEyeInvisible
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            right: "1.6rem",
-                            top: "24.1rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        />
-                      ) : (
-                        <AiOutlineEye
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            right: "1.6rem",
-                            top: "24.1rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {showPassword ? (
-                        <AiOutlineEyeInvisible
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            right: "1.6rem",
-                            top: "22.1rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        />
-                      ) : (
-                        <AiOutlineEye
-                          fontSize={"1.5rem"}
-                          style={{
-                            position: "absolute",
-                            right: "1.6rem",
-                            top: "22.1rem",
-                          }}
-                          onClick={() => setShowPassword(!showPassword)}
-                        />
-                      )}
-                    </>
-                  )}
+                  <div className="darkMode-input">
+                    <input
+                      onChange={submitUserData}
+                      name="password"
+                      value={addUser.password}
+                      // style={{-webkit-text-security: square;}}
+                      // style={{webkitTextSecurity: "star"}}
+                      className="darkMode-input form-control"
+                      type={showPassword ? "text" : "password"}
+                      // value={password}
+                      // onChange={(e) => setPassword(e.target.value)}
+                      style={{ width: "12rem" }}
+                    />
+                    {profile ? (
+                      <>
+                        {showPassword ? (
+                          <AiOutlineEyeInvisible
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              right: "1.6rem",
+                              top: "24.1rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        ) : (
+                          <AiOutlineEye
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              right: "1.6rem",
+                              top: "24.1rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {showPassword ? (
+                          <AiOutlineEyeInvisible
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              right: "1.6rem",
+                              top: "22.1rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        ) : (
+                          <AiOutlineEye
+                            fontSize={"1.5rem"}
+                            style={{
+                              position: "absolute",
+                              right: "1.6rem",
+                              top: "22.1rem",
+                            }}
+                            onClick={() => setShowPassword(!showPassword)}
+                          />
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
