@@ -23,6 +23,10 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 
+import Selected_Favorite from "../../assets/Selected Favorite.svg";
+import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
+import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+
 const ActiveComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
@@ -48,7 +52,7 @@ const ActiveComments = (props) => {
       user = userId;
     } else {
       // Handle the case where neither condition is met
-      user = localStorage.getItem('user-role'); // Set a default value if needed
+      user = localStorage.getItem("user-role"); // Set a default value if needed
     }
   }, []);
 
@@ -116,6 +120,22 @@ const ActiveComments = (props) => {
     league: "",
   });
 
+  const favEditor = async (id) => {
+    const user_id = localStorage.getItem("user-id");
+    try {
+      const response = await axios.post(
+        `${config.apiUrl}/fav-editor/${user_id}/`,
+        {
+          id: id,
+        }
+      );
+      // console.log("API Response:", response.data);
+      props?.setIsFavorite(!props?.isFavorite);
+    } catch (error) {
+      console.error("Error making POST request:", error);
+    }
+  };
+
   useEffect(() => {
     try {
       console.log(user, "===api");
@@ -136,15 +156,15 @@ const ActiveComments = (props) => {
           console.log(error);
         });
     } catch (error) {
-      console.log(error,"===========>>>")
+      console.log(error, "===========>>>");
     }
   }, [user]);
   const [followLabel, setFollowLabel] = useState("Follow");
 
-  const followCommentator = async (commentator_id,isFollowing) => {
+  const followCommentator = async (commentator_id, isFollowing) => {
     try {
       // console.log("isFollowing",isFollowing)
-      if(isFollowing){
+      if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
           text: "Are you sure you want to unfollow this commentator?",
@@ -170,9 +190,9 @@ const ActiveComments = (props) => {
             icon: "success",
           });
           const user_id = localStorage.getItem("user-id");
-        props.homeApiData(user_id);
+          props.homeApiData(user_id);
         }
-      }else{
+      } else {
         const res = await axios.get(
           `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
         );
@@ -180,7 +200,6 @@ const ActiveComments = (props) => {
         const user_id = localStorage.getItem("user-id");
         props.homeApiData(user_id);
       }
-
     } catch (error) {
       console.error("Error fetching data.", error);
     }
@@ -202,12 +221,39 @@ const ActiveComments = (props) => {
             }}
             fontSize={"1.6rem"}
           />
-          <img
-            src={`${currentTheme === "dark" ? starDark : starIcon}`}
-            alt=""
-            height={25}
-            width={25}
-          />
+          {props?.from === "editor" && (
+            <>
+              {props?.isFavorite ? (
+                <img
+                  onClick={() => {
+                    if (userId) {
+                      favEditor(profileData?.id);
+                    }
+                  }}
+                  src={Selected_Favorite}
+                  alt=""
+                  height={20}
+                  width={20}
+                />
+              ) : (
+                <img
+                  onClick={() => {
+                    if (userId) {
+                      favEditor(profileData?.id);
+                    }
+                  }}
+                  src={
+                    currentTheme === "dark"
+                      ? Dark_Unselected_Favorite
+                      : Light_Unselected_Favorite
+                  }
+                  alt=""
+                  height={20}
+                  width={20}
+                />
+              )}
+            </>
+          )}
         </div>
         <div className="row g-0">
           <div className="col pe-0 d-flex ">
@@ -390,9 +436,12 @@ const ActiveComments = (props) => {
                 </button>
               ) : (
                 <button
-                onClick={() => {
-                        followCommentator(profileData?.id,props?.followingid?.includes(profileData?.id));
-                      }}
+                  onClick={() => {
+                    followCommentator(
+                      profileData?.id,
+                      props?.followingid?.includes(profileData?.id)
+                    );
+                  }}
                   style={{
                     border:
                       currentTheme === "dark"
@@ -406,8 +455,8 @@ const ActiveComments = (props) => {
                   }}
                 >
                   {props.followingid?.includes(profileData?.id)
-                        ? "Followed"
-                        : "Follow"}
+                    ? "Followed"
+                    : "Follow"}
                 </button>
               )}
             </div>

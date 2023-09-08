@@ -745,7 +745,7 @@ const Home = (props) => {
                 {/* {console.log("********", preveiwProfilePic)} */}
                 {profile ? (
                   <img
-                    src={server_url + addUser.profile_pic}
+                    src={addUser.profile_pic ? server_url + addUser.profile_pic : initialProfile}
                     alt=""
                     height={135}
                     width={135}

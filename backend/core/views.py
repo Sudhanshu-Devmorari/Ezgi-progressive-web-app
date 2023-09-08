@@ -254,10 +254,10 @@ class RetrieveCommentatorView(APIView):
         # retrieve commentator list:
         try:
             user_detail = []
-            all_commentator = User.objects.filter(user_role='commentator').order_by('-created')
+            all_commentator = User.objects.filter(user_role='commentator').order_by('-created').only('id')
             for obj in all_commentator:
                 detail = {}
-                count = Subscription.objects.filter(commentator_user=obj).count()
+                count = Subscription.objects.filter(commentator_user_id=obj.id).count()
                 detail['user'] = UserSerializer(obj).data
                 detail['subscriber_count'] = count
                 user_detail.append(detail)
@@ -271,7 +271,7 @@ class RetrieveCommentatorView(APIView):
             return Response(data={'error': 'No commentator found.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            all_comments = Comments.objects.filter(status='approve', public_content=True).order_by('-created')
+            all_comments = Comments.objects.filter(status='approve', public_content=True).order_by('-created').only('id')
             data_list['Public_Comments'] = []
 
             for comment in all_comments:
@@ -284,7 +284,7 @@ class RetrieveCommentatorView(APIView):
                 comment_data['date'] = formatted_date 
 
                 # Fetch comment reactions and calculate the total count of reactions
-                comment_reactions = CommentReaction.objects.filter(comment=comment)
+                comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
                 total_reactions = comment_reactions.aggregate(
                     total_likes=Sum('like'),
                     total_favorite=Sum('favorite'),
@@ -312,7 +312,7 @@ class RetrieveCommentatorView(APIView):
                 # s = User.objects.get(id=6)
                 # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
                 # if Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve').exists():
-                subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='active').order_by('-created')
+                subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
 
 
                 for obj in subscription_obj:
@@ -328,7 +328,7 @@ class RetrieveCommentatorView(APIView):
 
                             comment_data['date'] = formatted_date 
 
-                            comment_reactions = CommentReaction.objects.filter(comment=comment)
+                            comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
                             total_reactions = comment_reactions.aggregate(
                                 total_likes=Sum('like'),
                                 total_favorite=Sum('favorite'),
@@ -358,17 +358,20 @@ class RetrieveCommentatorView(APIView):
         try:
             # for retrieving Highlights:
             standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
-            all_highlights = Highlight.objects.filter(status='active').order_by('-created')
+            all_highlights = Highlight.objects.filter(status='active').order_by('-created').only('id')
             data_list['highlights'] = []
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
-                user_data = highlighted_data['user']       
+                user_data = highlighted_data['user']
+        
                 count = Subscription.objects.filter(commentator_user=user_data['id']).count()
                 if standard_user_id:
                     highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
                 else:
                     highlighted_data['is_fav_editor'] = False
-                highlighted_data['subscriber_count'] = count 
+
+                highlighted_data['subscriber_count'] = count
+
                 data_list['highlights'].append(highlighted_data)
 
         except ObjectDoesNotExist:
@@ -381,11 +384,12 @@ class RetrieveCommentatorView(APIView):
             data_list['ads'] = data
         except ObjectDoesNotExist:
             data_list['ads'] = []
+
         try:
             if request.query_params.get('id') != 'null':
                 following_user = []
                 if FollowCommentator.objects.filter(standard_user__id=request.query_params.get('id')).exists():
-                    following = FollowCommentator.objects.filter(standard_user__id=request.query_params.get('id'))
+                    following = FollowCommentator.objects.filter(standard_user__id=request.query_params.get('id')).only('id', 'commentator_user')
                     for obj in following:
                         serializer = UserSerializer(obj.commentator_user).data
                         following_user.append(serializer)
@@ -394,11 +398,7 @@ class RetrieveCommentatorView(APIView):
             data_list['following_user'] = []
 
         try:
-            verify_ids = []
-            bluetick = BlueTick.objects.all()
-            for obj in bluetick:
-                verify_ids.append(obj.user.id)
-            data_list['verify_ids'] = verify_ids
+            data_list['verify_ids'] = list(BlueTick.objects.values_list('user_id', flat=True))
         except:
             data_list['verify_ids'] = []
 
@@ -406,7 +406,7 @@ class RetrieveCommentatorView(APIView):
             if request.query_params.get('id') != 'null':
                 cmt = []
                 if CommentReaction.objects.filter(user__id = request.query_params.get('id')).exists():
-                    cmt_reacts = CommentReaction.objects.filter(user__id = request.query_params.get('id'))
+                    cmt_reacts = CommentReaction.objects.filter(user__id = request.query_params.get('id')).only('comment', 'like', 'favorite', 'clap')
                     for obj in cmt_reacts:
                         details = {
                             "comment_id":obj.comment.id,
@@ -419,8 +419,7 @@ class RetrieveCommentatorView(APIView):
         except:
             data_list['comment_reactions'] = []
         return Response(data=data_list, status=status.HTTP_200_OK)
-
-
+    
 class FollowCommentatorView(APIView):
     # permission_classes = [IsAuthenticated]
 
@@ -789,8 +788,13 @@ class ProfileView(APIView):
                 data['Subscription_Count'] = subscription_obj
 
                 following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
-                data['Follow_Up_Count'] = following_obj
+                data['Follow_Up_Count'] = following_obj         
 
+            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
+            if standard_user_id:
+               data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=data['id'], standard_user_id=standard_user_id).exists()
+            else:
+                data['is_fav_editor'] = False
             return Response(data=data, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
@@ -798,8 +802,7 @@ class ProfileView(APIView):
             return Response(data={'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             # Handle other unexpected exceptions
-            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
 
     def post(self, request, id, format=None, *args, **kwargs):
         try:
@@ -2940,6 +2943,8 @@ class NotificationManagement(APIView):
             sending_type = request.data.get('sending_type')
             date = request.data.get('date')
             message = request.data.get('message')
+            sender = request.query_params.get('sender')
+            sender_instance = User.objects.get(id=sender)
 
             if not subject:
                 return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2951,14 +2956,14 @@ class NotificationManagement(APIView):
                 return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
             try:
-                user = User.objects.get(id=to)
+                user = User.objects.get(username=to)
                 # print('user: ', user)
             except User.DoesNotExist:
                 return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
             """sender and receiver baki.."""
 
-            notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message)
+            notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message, sender=sender_instance)
 
             serializer = NotificationSerializer(notification_obj)
             return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
@@ -3522,17 +3527,19 @@ class UserStatistics(APIView):
         try:
             user = get_object_or_404(User, id=id)
             serializer = UserSerializer(user).data
-            print('Statistics(id): ', Statistics(id))
+
             Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
             user.success_rate = Success_rate
             user.score_points = Score_point
             user.save()
-            # print('only_leagues: ', only_leagues)
+
             element_counts = Counter(only_leagues)
-            # print('element_counts: ', element_counts)
-            most_common_element, max_count = element_counts.most_common(1)[0]
-            result_list = [most_common_element]
-            # print('result_list: ', result_list)
+            most_common_element = None
+            if element_counts.most_common() and element_counts.most_common(1):
+                most_common_element, max_count = element_counts.most_common(1)[0]
+
+            result_list = [most_common_element] if most_common_element else []
+
             data = {
                 "user": serializer,
                 "Success_rate": Success_rate,
@@ -3547,7 +3554,6 @@ class UserStatistics(APIView):
             return Response(data={"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 # class MonthlySubScriptionChart(APIView):
 #     def get(self,request, id):
 #         user = User.objects.get(id=id)
@@ -3960,4 +3966,15 @@ class FootbalAndBasketballContentView(APIView):
                 return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'Error while fetching data. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-         
+class GetALLUsers(APIView):
+    def get(self, request):
+        try:
+            userType =  request.query_params.get('userType')
+            if userType == '':
+                return Response({'error' : 'Please specify User Type.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                queryset = User.objects.filter(user_role=userType)
+                data = UserSerializer(queryset, many=True).data
+                return Response({'data': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': f'Error while fetching users. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

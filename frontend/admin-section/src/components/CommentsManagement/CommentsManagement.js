@@ -68,7 +68,7 @@ const CommentsManagement = (props) => {
         filter_type0: secondStatus,
       })
       .then((res) => {
-        // console.log(res.data,"=====>>filter");
+        console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
       })
