@@ -33,19 +33,19 @@ const DashboardSU = (props) => {
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
   const [favCommentData, setFavCommentData] = useState([]);
-  useEffect(() => {
-    async function getFavData() {
-      try {
-        const res = await axios.get(
-          `${config?.apiUrl}/fav-editor-comment/${userId}`
-        );
-        // console.log("=>>>", res.data);
-        setFavEditorData(res.data.favEditors);
-        setFavCommentData(res.data.favComments);
-      } catch (error) {
-        console.log(error);
-      }
+  async function getFavData() {
+    try {
+      const res = await axios.get(
+        `${config?.apiUrl}/fav-editor-comment/${userId}`
+      );
+      // console.log("=>>>", res.data);
+      setFavEditorData(res.data.favEditors);
+      setFavCommentData(res.data.favComments);
+    } catch (error) {
+      console.log(error);
     }
+  }
+  useEffect(() => {
     if (content === "fav") {
       getFavData();
     }
@@ -105,15 +105,18 @@ const DashboardSU = (props) => {
 
           {favSelection === "fav comments" && (
             <FavComments
-              setDashboardSUser={props.setDashboardSUser}
+              setDashboardSUser={props?.setDashboardSUser}
               setFavCommentData={setFavCommentData}
               setFavEditorData={setFavEditorData}
               favCommentData={favCommentData}
-              verifyid={props.verifyid}
-              homeApiData={props.homeApiData}
-              cmtReact={props.cmtReact}
+              verifyid={props?.verifyid}
+              homeApiData={props?.homeApiData}
+              cmtReact={props?.cmtReact}
               setActiveCommentsshow={props?.setActiveCommentsshow}
               setSelectContent={props?.setSelectContent}
+              getFavData={getFavData}
+              followingList={props?.followingList}
+              followingid={props?.followingid}
             />
           )}
         </>

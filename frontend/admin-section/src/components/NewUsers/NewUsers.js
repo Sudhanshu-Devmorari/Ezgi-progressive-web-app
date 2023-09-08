@@ -36,10 +36,24 @@ const NewUsers = (props) => {
           <span className="number">{item.count || props.total_user}</span>
           {item.per && (
             <div className="w-100">
-              <span className="rate-font">
-                <span className="rate-font" style={{ color: item.color }}>
+              {item.per >= 0 ? (
+                <span className="rate-font" style={{ color: "#58DEAA" }}>
                   {item.per}
-                  {item.rate_icon === "arrowUp" ? (
+                  <HiArrowSmUp
+                    className="arrow"
+                    style={{ marginBottom: "0.1rem" }}
+                  />
+                </span>
+              ) : (
+                <span className="rate-font" style={{ color: "#FF5757" }}>
+                  {item.per}
+                  <HiArrowSmDown
+                    className="arrow"
+                    style={{ marginBottom: "0.1rem" }}
+                  />
+                </span>
+              )}
+              {/* {item.per > 0 ? (
                     <HiArrowSmUp
                       className="arrow"
                       style={{ marginBottom: "0.1rem" }}
@@ -49,10 +63,28 @@ const NewUsers = (props) => {
                       className="arrow"
                       style={{ marginBottom: "0.1rem" }}
                     />
-                  )}
-                </span>
-                last day
-              </span>
+                  )} */}
+              {/* {item?.per > 0 ? (
+                    <span className="rate-font" style={{ color: "#58DEAA" }}>
+                      {item.per}
+                      <HiArrowSmUp
+                        className="arrow"
+                        style={{ marginBottom: "0.1rem" }}
+                      />
+                    </span>
+                  ) : (
+                    <span
+                      className="rate-font"
+                      style={{ color: "rgb(255, 87, 87)" }}
+                    >
+                      {item.per}
+                      <HiArrowSmUp
+                        className="arrow"
+                        style={{ marginBottom: "0.1rem" }}
+                      />
+                    </span>
+                  )} */}
+              last day
             </div>
           )}
         </div>
@@ -63,8 +95,8 @@ const NewUsers = (props) => {
           key={index}
           style={{ height: "25vh" }}
         >
-            <span className="heading">{item.label}</span>
-            <span className="number">{item.count}</span>
+          <span className="heading">{item.label}</span>
+          <span className="number">{item.count}</span>
           {item.perWin && (
             <>
               <div

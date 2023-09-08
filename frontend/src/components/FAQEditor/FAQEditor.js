@@ -213,7 +213,7 @@ const FAQEditor = () => {
     <>
       <div className="accordion accordion-flush" id="accordionFlushExample">
         {FAQArray.map((res, index) => (
-          <div className="accordion-item mb-2">
+          <div className="accordion-item mb-2" key={index}>
             <h2
               className={`accordion-header ${
                 currentTheme === "dark"

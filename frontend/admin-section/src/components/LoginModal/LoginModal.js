@@ -6,8 +6,13 @@ import ForgotPassowrd from "../ForgotPassowrd/ForgotPassowrd";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const LoginModal = () => {
+  const [isLoading, setisLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const validationSchema = Yup.object({
     phone: Yup.string()
       .required("Phone is required")
@@ -30,6 +35,7 @@ const LoginModal = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       // console.log(values);
+      setisLoading(true);
       axios
         .post(`${config?.apiUrl}/login/`, {
           phone: values.phone,
@@ -51,9 +57,11 @@ const LoginModal = () => {
             localStorage.setItem("admin-user-id", userId);
             window.location.reload();
           }
+          setisLoading(false);
         })
         .catch((error) => {
           console.log(error);
+          setisLoading(false);
         });
     },
   });
@@ -88,23 +96,50 @@ const LoginModal = () => {
                 {...formik.getFieldProps("phone")}
               />
             </div>
-            {formik.touched.phone && formik.errors.phone ? (
+            {formik.touched.phone && formik.errors.phone && (
               <div className="error text-danger">{formik.errors.phone}</div>
-            ) : null}
+            )}
 
             <div className="col-auto">
               <label htmlFor="inputPassword6" className="col-form-label">
                 Password
               </label>
             </div>
-            <div className="col-auto">
+            <div
+              className="col-auto position-relative darkMode-input"
+              style={{ borderRadius: "0.4rem" }}
+            >
               <input
-                type="password"
+                type={`${showPassword ? "text" : "password"}`}
                 id="inputPassword6"
                 className="darkMode-input form-control"
                 aria-describedby="passwordHelpInline"
                 {...formik.getFieldProps("password")}
+                style={{ width: "18rem" }}
               />
+              {showPassword ? (
+                <AiOutlineEyeInvisible
+                  fontSize={"1.5rem"}
+                  style={{
+                    position: "absolute",
+                    right: ".5rem",
+                    top: "0.4rem",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              ) : (
+                <AiOutlineEye
+                  fontSize={"1.5rem"}
+                  style={{
+                    position: "absolute",
+                    right: ".5rem",
+                    top: "0.4rem",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              )}
             </div>
             {formik.touched.password && formik.errors.password ? (
               <div className="error text-danger mt-1 mb-2 justify-content-between d-flex">
@@ -130,7 +165,7 @@ const LoginModal = () => {
             <div className="d-flex justify-content-center">
               <input
                 type="submit"
-                value="Login"
+                value={isLoading ? "Loading..." : "Login"}
                 style={{
                   color: "#D2DB08",
                   border: "1px solid #D2DB08",

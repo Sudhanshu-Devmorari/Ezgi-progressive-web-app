@@ -102,19 +102,28 @@ const CommentatorsCommentsPage = (props) => {
           />
           <CommentatorIcons setContent={setContent} content={content} />
 
-      {content === "home" && (
-        <>
-          <SelectComments
-            setSelectComment={setSelectComment}
-            SelectComment={SelectComment}
-          />
-          {(SelectComment === "activeComments" ||
-            SelectComment === "resolvedComments") && (
-            <CommentsContentSection SelectComment={SelectComment}  verifyid={props.verifyid}  homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+          {content === "home" && (
+            <>
+              <SelectComments
+                setSelectComment={setSelectComment}
+                SelectComment={SelectComment}
+              />
+              {(SelectComment === "activeComments" ||
+                SelectComment === "resolvedComments") && (
+                <CommentsContentSection
+                  SelectComment={SelectComment}
+                  verifyid={props.verifyid}
+                  homeApiData={props.homeApiData}
+                  followingList={props.followingList}
+                  followingid={props.followingid}
+                  cmtReact={props.cmtReact}
+                />
+              )}
+              {SelectComment === "statistics" && (
+                <EditorProfileStatisticsSection from={"dashboard"} />
+              )}
+            </>
           )}
-          {SelectComment === "statistics" && <EditorProfileStatisticsSection from={'dashboard'}/>}
-        </>
-      )}
 
           {content === "subscribers" && (
             <>
@@ -149,22 +158,35 @@ const CommentatorsCommentsPage = (props) => {
                 verifyid={props.verifyid}
               />
               {favSelection === "fav editor" && (
-                <FavEditor setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData}
+                <FavEditor
+                  setFavCommentData={setFavCommentData}
+                  setFavEditorData={setFavEditorData}
                   setDashboardSUser={props?.setDashboardSUser}
                   favEditorData={favEditorData}
                   verifyid={props.verifyid}
                   setActiveCommentsshow={props?.setActiveCommentsshow}
                   setSelectContent={props?.setSelectContent}
-                homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+                  homeApiData={props.homeApiData}
+                  followingList={props.followingList}
+                  followingid={props.followingid}
+                  cmtReact={props.cmtReact}
+                />
               )}
               {favSelection === "fav comments" && (
-                <FavComments getFavData={getFavData} setFavCommentData={setFavCommentData} setFavEditorData={setFavEditorData}
+                <FavComments
+                  getFavData={getFavData}
+                  setFavCommentData={setFavCommentData}
+                  setFavEditorData={setFavEditorData}
                   setDashboardSUser={props?.setDashboardSUser}
                   favCommentData={favCommentData}
                   verifyid={props.verifyid}
                   setActiveCommentsshow={props?.setActiveCommentsshow}
                   setSelectContent={props?.setSelectContent}
-                homeApiData={props.homeApiData} followingList={props.followingList} followingid={props.followingid} cmtReact={props.cmtReact}/>
+                  homeApiData={props.homeApiData}
+                  followingList={props.followingList}
+                  followingid={props.followingid}
+                  cmtReact={props.cmtReact}
+                />
               )}
             </>
           )}
