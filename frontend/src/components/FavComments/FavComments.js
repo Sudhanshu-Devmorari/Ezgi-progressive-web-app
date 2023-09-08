@@ -98,7 +98,7 @@ const FavComments = (props) => {
     );
     // const user_id = localStorage.getItem("user-id");
     props.homeApiData(userId);
-    props.getFavData();
+    props?.getFavData();
   };
 
   const [modalShow, setModalShow] = React.useState(false);
@@ -161,7 +161,7 @@ const FavComments = (props) => {
                     onClick={() => {
                       followCommentator(
                         res?.commentator_user?.id,
-                        props.followingid.includes(res?.commentator_user?.id)
+                        props?.followingid?.includes(res?.commentator_user?.id)
                       );
                     }}
                     style={{
