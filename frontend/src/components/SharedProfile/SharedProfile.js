@@ -17,7 +17,16 @@ import Swal from "sweetalert2";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { BsStar, BsStarFill } from "react-icons/bs";
 
-const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid }) => {
+import Selected_Favorite from "../../assets/Selected Favorite.svg";
+import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
+import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+
+const SharedProfile = ({
+  data,
+  setSelectContent,
+  setActiveCommentsshow,
+  verifyid,
+}) => {
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(false);
@@ -25,7 +34,7 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
 
   const server_url = `${config.apiUrl}`;
 
-  // console.log("=>>>data", data)
+  // console.log("=>>>data", data);
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -49,8 +58,11 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
       });
   }
 
+  // useEffect(() => {
+  //   getfav(data?.value?.user?.id);
+  // }, []);
   useEffect(() => {
-    getfav(data?.value?.user?.id);
+    setIsFavorite(data?.value?.is_fav_editor);
   }, []);
 
   const favEditor = async (id) => {
@@ -89,35 +101,35 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
             </span>
             Kişi abone oldu
           </span>
-          {/* <BsStar style={{ color : isFavorite ? "#0D2A53" : "" }}/> */}
           {isFavorite ? (
-            <BsStarFill
+            <img
               onClick={() => {
                 if (userId) {
                   favEditor(data?.value.user.id);
                 }
               }}
-              color={currentTheme === "dark" ? "#FFFFFF" : "#0D2A53"}
+              src={Selected_Favorite}
+              alt=""
+              height={20}
+              width={20}
             />
           ) : (
-            <BsStar
+            <img
               onClick={() => {
                 if (userId) {
                   favEditor(data?.value.user.id);
                 }
               }}
+              src={
+                currentTheme === "dark"
+                  ? Dark_Unselected_Favorite
+                  : Light_Unselected_Favorite
+              }
+              alt=""
+              height={20}
+              width={20}
             />
           )}
-
-          {/* <img
-            // onClick={() => favEditor(data?.value.user.id)}
-            onClick={() => toggleFavorite(data?.value.user.id)}
-            className=""
-            src={`${currentTheme === "dark" ? startDarkIcon : starIcon}`}
-            alt=""
-            height={22}
-            width={22}
-          /> */}
         </div>
         <div className="row">
           <div
@@ -190,15 +202,15 @@ const SharedProfile = ({ data, setSelectContent, setActiveCommentsshow, verifyid
                 style={{ fontSize: "13px" }}
               >
                 <span className="pe-1">{data?.value.user.username}</span>
-                {verifyid?.includes(data?.value.user.id) && 
+                {verifyid?.includes(data?.value.user.id) && (
                   <img
-                  className="responsive-blue-tick"
-                  src={blueTick}
-                  alt=""
-                  width={17}
-                  height={17}
-                />
-                }
+                    className="responsive-blue-tick"
+                    src={blueTick}
+                    alt=""
+                    width={17}
+                    height={17}
+                  />
+                )}
               </div>
               <div
                 style={{

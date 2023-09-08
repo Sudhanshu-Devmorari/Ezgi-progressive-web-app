@@ -191,7 +191,7 @@ const NotificationModel = () => {
                 </div>
                 <div className="my-4 d-flex justify-content-center">
                   <button
-                    data-bs-dismiss="modal"
+                    // data-bs-dismiss="modal"
                     type="submit"
                     className="px-4 py-1"
                     style={{

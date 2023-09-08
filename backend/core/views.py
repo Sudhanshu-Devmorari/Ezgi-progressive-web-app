@@ -357,16 +357,18 @@ class RetrieveCommentatorView(APIView):
 
         try:
             # for retrieving Highlights:
+            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
             all_highlights = Highlight.objects.filter(status='active').order_by('-created')
             data_list['highlights'] = []
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
-                user_data = highlighted_data['user']
-        
+                user_data = highlighted_data['user']       
                 count = Subscription.objects.filter(commentator_user=user_data['id']).count()
-
-                highlighted_data['subscriber_count'] = count
-
+                if standard_user_id:
+                    highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
+                else:
+                    highlighted_data['is_fav_editor'] = False
+                highlighted_data['subscriber_count'] = count 
                 data_list['highlights'].append(highlighted_data)
 
         except ObjectDoesNotExist:

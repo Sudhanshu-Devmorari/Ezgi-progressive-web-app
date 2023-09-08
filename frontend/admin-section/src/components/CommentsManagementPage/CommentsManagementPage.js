@@ -20,7 +20,7 @@ const CommentsManagementPage = () => {
     await axios
       .get(`${config?.apiUrl}/comments-management/`)
       .then((res) => {
-        // console.log("=-=-=-=-=-=-=> ", res.data)
+        console.log("=-=-=-=-=-=-=> ", res.data)
         setData(res.data);
         setMostLike(res?.data?.most_like)
         setCommentData(res.data.all_comment)
@@ -39,7 +39,7 @@ const CommentsManagementPage = () => {
           label: "New Comments",
           icon: commentsIcon,
           count: `${data.comments_count}`,
-          per: "%22",
+          per: Math.round(data?.comments_percentage),
           color: "#58DEAA",
           rate_icon: "arrowUp",
           from: "comments"

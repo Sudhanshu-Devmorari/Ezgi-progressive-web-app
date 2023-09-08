@@ -30,6 +30,7 @@ const SupportManagementPage = () => {
   const [filteredArray, setFilteredArray] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [perNewRequest, setPerNewRequest] = useState(0);
+  const [TotalRequest, setTotalRequest] = useState(0);
 
   const [selectedOption, setSelectedOption] = useState("All");
 
@@ -51,9 +52,12 @@ const SupportManagementPage = () => {
     async function getSupportData() {
       try {
         const res = await axios.get(`${config?.apiUrl}/support-management`);
-        const formattedPercentage = Math.round(res?.data?.new_user_percentage)
-        // console.log("=?????", res.data.support_history);
+        const formattedPercentage = Math.round(
+          res?.data?.new_tickets_percentage
+        );
+        // console.log("=?????", res.data);
         setPerNewRequest(formattedPercentage);
+        setTotalRequest(Math.round(res?.data?.total_ticket_percentage));
         setTickets(res?.data?.tickets);
         setNewRequest(res?.data?.new_request);
         setPendingRequest(res?.data?.pending_request);
@@ -152,7 +156,7 @@ const SupportManagementPage = () => {
                       <span className="number">{NewRequest}</span>
                       <div className="w-100">
                         <span className="rate-font">
-                          {perNewRequest > 0 ? (
+                          {perNewRequest >= 0 ? (
                             <span
                               className="rate-font"
                               style={{ color: "#58DEAA" }}
@@ -166,7 +170,7 @@ const SupportManagementPage = () => {
                           ) : (
                             <span
                               className="rate-font"
-                              style={{ color: "rgb(255, 87, 87)" }}
+                              style={{ color: "#FF5757" }}
                             >
                               %{perNewRequest}
                               <HiArrowSmDown
@@ -316,20 +320,29 @@ const SupportManagementPage = () => {
                   <span className="number">{Total}</span>
                   <div className="w-100 pt-2">
                     <span className="rate-font">
-                      <span className="rate-font" style={{ color: "#58DEAA" }}>
-                        %{perNewRequest}
-                        {perNewRequest < 0 ? (
-                          <HiArrowSmDown
-                            className="arrow"
-                            style={{ marginBottom: "0.1rem" }}
-                          />
-                        ) : (
+                      {TotalRequest >= 0 ? (
+                        <span
+                          className="rate-font"
+                          style={{ color: "#58DEAA" }}
+                        >
+                          %{TotalRequest}
                           <HiArrowSmUp
                             className="arrow"
                             style={{ marginBottom: "0.1rem" }}
                           />
-                        )}
-                      </span>
+                        </span>
+                      ) : (
+                        <span
+                          className="rate-font"
+                          style={{ color: "#FF5757" }}
+                        >
+                          %{TotalRequest}
+                          <HiArrowSmDown
+                            className="arrow"
+                            style={{ marginBottom: "0.1rem" }}
+                          />
+                        </span>
+                      )}
                       last day
                     </span>
                   </div>

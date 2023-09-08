@@ -33,7 +33,7 @@ const MainPage = () => {
         console.error("Error fetching data.", error);
       }, []);
   };
-  console.log(data, "===========>>>data");
+  // console.log(data, "===========>>>data");
   useEffect(() => {
     adminHomeApiData();
   }, []);
@@ -43,19 +43,17 @@ const MainPage = () => {
       label: "New Users",
       icon: newUser,
       count: `${data?.new_user}`,
-      per: 12,
-      // per: `%${data?.new_user_percentage}`,
+      per: Math.round(data?.new_user_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
   ];
-  console.log(newUsersArray, "========newUsersArray");
   const newEditorsArray = [
     {
       label: "New Editors",
       icon: editorIcon,
       count: `${data?.new_editor}`,
-      per: `%${data?.new_editor_percentage}`,
+      per: Math.round(data?.new_editor_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -65,7 +63,7 @@ const MainPage = () => {
       label: "New Subscribers",
       icon: subscriberIcon,
       count: `${data?.new_subscriber}`,
-      per: `%${data?.new_subscriptions_percentage}`,
+      per: Math.round(data?.new_subscriptions_percentage),
       color: "#FF5757",
       rate_icon: "arrowdown",
     },
@@ -75,7 +73,7 @@ const MainPage = () => {
       label: "New Comments",
       icon: commentsIcon,
       count: `${data?.new_comment}`,
-      per: `%${data?.new_editor_percentage}`,
+      per: Math.round(data?.comments_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
