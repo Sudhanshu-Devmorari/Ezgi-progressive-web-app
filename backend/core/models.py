@@ -106,7 +106,7 @@ class Comments(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_resolve = models.BooleanField(default=False)
-    is_prediction = models.BooleanField()
+    is_prediction = models.BooleanField(null=True, blank=True)
     average_odds = models.FloatField(default=0)
 
 

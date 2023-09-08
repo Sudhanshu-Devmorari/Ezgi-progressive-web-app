@@ -109,7 +109,7 @@ const AddCommentModal = (props) => {
     setSelectedLeague(league);
     setLeagueError("")
 
-    DateAPI(categoryType, selectedLeague)
+    DateAPI(categoryType, league)
       .then((res) => {
         // console.log(res.data, "========================res date");
         const DateList = res.data;
@@ -315,6 +315,7 @@ const AddCommentModal = (props) => {
         );
         // console.log("res", res);
         if (res.status === 200) {
+          closeModal();
           Swal.fire({
             title: "Success",
             text: "Comment post successfully!",
@@ -384,7 +385,7 @@ const AddCommentModal = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       let type;
-      if (selectedMatchDetails !== "Select") {
+      if (selectedPredictionType !== "Select") {
         if (selectedCategory === "Futbol") {
           type = 1;
         } else if (selectedCategory === "Basketbol") {
@@ -414,7 +415,7 @@ const AddCommentModal = (props) => {
     };
 
     fetchData();
-  }, [selectedMatchDetails, selectedPredictionType]);
+  }, [selectedPredictionType]);
 
   return (
     <>

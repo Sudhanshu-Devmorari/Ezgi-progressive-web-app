@@ -529,6 +529,10 @@ class CommentView(APIView):
 
                 # print("-----------")
                 category = request.data.get('category')
+                if category == 'Futbol':
+                    category = 'Football'
+                elif category == 'Basketbol':
+                    category = 'Basketball'
                 # category = request.data['category']
                 # print('category: ', category)
                 country = request.data.get('country')
@@ -577,7 +581,6 @@ class CommentView(APIView):
                     comment=comment
                 )
 
-                print('comment_obj: ', comment_obj)
                 if comment_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1424,7 +1427,8 @@ class AdminMainPage(APIView):
             new_subscriber = Subscription.objects.all().count()
             data_list['new_subscriber'] = new_subscriber
 
-            new_comment = Comments.objects.filter(status='approve').count()
+            # new_comment = Comments.objects.filter(status='approve').count()
+            new_comment = Comments.objects.all().count()
             data_list['new_comment'] = new_comment
 
             all_user = User.objects.filter(is_delete=False, is_admin=False).order_by('-created')
@@ -1503,11 +1507,16 @@ class UserManagement(APIView):
         Create new User.
         """
         try:
+            phone = request.data['phone']
+            print("----", name)
+            if User.objects.filter(phone=phone).exists():
+                v = User.objects.filter(phone=phone)
+                print("-------", v)
+                return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
             profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
-            phone = request.data['phone']
             password = request.data['password']
             gender = request.data['gender']
             age = request.data['age']
@@ -3441,9 +3450,9 @@ def Statistics(pk):
 
     if len(correct_prediction) >=60:
         user.commentator_level = "journeyman"
-        print(user.commentator_level)
+        # print(user.commentator_level)
         user.save()
-        print("here")
+        # print("here")
     # Match_result = data.filter(prediction_type="Match Result")
     # Goal_count = data.filter(prediction_type="Goal Count")
     # Halftime = data.filter(prediction_type="Halftime")
@@ -3516,12 +3525,12 @@ class UserStatistics(APIView):
             user.success_rate = Success_rate
             user.score_points = Score_point
             user.save()
-            print('only_leagues: ', only_leagues)
+            # print('only_leagues: ', only_leagues)
             element_counts = Counter(only_leagues)
-            print('element_counts: ', element_counts)
+            # print('element_counts: ', element_counts)
             most_common_element, max_count = element_counts.most_common(1)[0]
             result_list = [most_common_element]
-            print('result_list: ', result_list)
+            # print('result_list: ', result_list)
             data = {
                 "user": serializer,
                 "Success_rate": Success_rate,

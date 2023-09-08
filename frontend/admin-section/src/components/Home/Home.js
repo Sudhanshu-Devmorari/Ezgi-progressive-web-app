@@ -20,6 +20,8 @@ import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 import Swal from "sweetalert2";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
@@ -31,7 +33,7 @@ const Home = (props) => {
   };
   const handleDeactive = async (id, action) => {
     try {
-      if (action === 'delete') {
+      if (action === "delete") {
         // console.log(action,"===============>>>action from delete")
         const res = await axios.delete(
           `${config?.apiUrl}/user-management/${id}/?action=delete`
@@ -46,7 +48,7 @@ const Home = (props) => {
             customClass: "dark-mode-alert",
           });
         }
-      } else if (action === 'deactive'){
+      } else if (action === "deactive") {
         // console.log(action,"===============>>>action from deactive")
         const res = await axios.delete(
           `${config?.apiUrl}/user-management/${id}/?action=deactive`
@@ -68,7 +70,40 @@ const Home = (props) => {
     }
   };
 
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required("Name is required")
+      .min(5, "Name must be at least 5 characters")
+      .max(20, "Name must be at most 20 characters"),
+    username: Yup.string()
+      .required("Username is required")
+      .min(5, "Username must be at least 5 characters")
+      .max(15, "Username must be at most 15 characters"),
+    phone: Yup.string()
+      .required("Phone is required")
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      username: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      //
+    },
+  });
+
   const [addUser, setAddUser] = useState({});
+  const [addUserError, setAddUserError] = useState({});
   const submitUserData = (e) => {
     let name, value;
 
@@ -148,7 +183,7 @@ const Home = (props) => {
     }
   };
 
-  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [modelClose, setModelClose] = useState(false);
   const [preveiwProfile, setPreveiwProfile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(false);
 
@@ -158,30 +193,50 @@ const Home = (props) => {
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
   }
-
+  console.log("first=========", addUser);
   const handleAddUser = async () => {
-    const formData = new FormData();
-    selectedImage != false && formData.append("file", selectedImage);
-    // formData.append("date", addUser.date);
-    formData.append("name", addUser.name);
-    formData.append("username", addUser.username);
-    formData.append("phone", addUser.phone);
-    formData.append("password", addUser.password);
-    formData.append("gender", addUser.gender);
-    formData.append("age", addUser.age);
-    formData.append("subscription", addUser.subscription);
-    formData.append("duration", addUser.duration);
-    // formData.append("month", addUser.month);
-    formData.append("level", addUser.level);
-    try {
-      const response = await axios.post(
-        `${config?.apiUrl}/user-management/`,
-        formData
-      );
-      props?.userManagementApiData();
-      // console.log("API Response:", response.data);
-    } catch (error) {
-      console.error("Error making POST request:", error);
+    if (addUser.name === "") {
+      console.log("if::::::::::::true", addUser.name)
+      setAddUserError({
+        ...addUserError,
+        name: "Please Enter the Name",
+      });
+    } else {
+      console.log("else:::::true")
+      // setModelClose(true)
+      const formData = new FormData();
+      selectedImage != false && formData.append("file", selectedImage);
+      // formData.append("date", addUser.date);
+      formData.append("name", addUser.name);
+      formData.append("username", addUser.username);
+      formData.append("phone", addUser.phone);
+      formData.append("password", addUser.password);
+      formData.append("gender", addUser.gender);
+      formData.append("age", addUser.age);
+      formData.append("subscription", addUser.subscription);
+      formData.append("duration", addUser.duration);
+      // formData.append("month", addUser.month);
+      formData.append("level", addUser.level);
+      try {
+        const response = await axios.post(
+          `${config?.apiUrl}/user-management/`,
+          formData
+        );
+        props?.userManagementApiData();
+        setModelClose(true);
+        // console.log("API Response:", response.data);
+      } catch (error) {
+        if (error.response.data.error) {
+          Swal.fire({
+            title: "Error",
+            text: `${error.response.data.error}`,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        console.error("Error making POST request:", error);
+      }
     }
   };
 
@@ -608,7 +663,7 @@ const Home = (props) => {
                   width={25}
                 />
                 <img
-                  onClick={() => handleDeactive(res.id, 'delete')}
+                  onClick={() => handleDeactive(res.id, "delete")}
                   // onClick={() => handleDelete(res.id)}
                   className="cursor"
                   src={trash}
@@ -749,7 +804,11 @@ const Home = (props) => {
                     value={addUser.name}
                     type="text"
                     className="darkMode-input form-control"
+                    // {...formik.getFieldProps("name")}
                   />
+                  {addUserError && addUserError.name ? (
+                    <small className="text-danger">{addUserError.name}</small>
+                  ) : null}
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Username</span>
@@ -759,7 +818,13 @@ const Home = (props) => {
                     value={addUser.username}
                     type="text"
                     className="darkMode-input form-control"
+                    // {...formik.getFieldProps("username")}
                   />
+                  {formik.touched.username && formik.errors.username ? (
+                    <small className="text-danger">
+                      {formik.errors.username}
+                    </small>
+                  ) : null}
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -777,12 +842,16 @@ const Home = (props) => {
                       onChange={submitUserData}
                       name="phone"
                       value={addUser.phone}
-                      type="text"
+                      type="number"
                       class="form-control darkMode-input"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
+                      // {...formik.getFieldProps("phone")}
                     />
                   </div>
+                  {formik.touched.phone && formik.errors.phone ? (
+                    <small className="text-danger">{formik.errors.phone}</small>
+                  ) : null}
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Password</span>
@@ -794,9 +863,15 @@ const Home = (props) => {
                     // style={{webkitTextSecurity: "star"}}
                     className="darkMode-input form-control"
                     type={showPassword ? "text" : "password"}
+                    // {...formik.getFieldProps("password")}
                     // value={password}
                     // onChange={(e) => setPassword(e.target.value)}
                   />
+                  {formik.touched.password && formik.errors.password ? (
+                    <small className="text-danger">
+                      {formik.errors.password}
+                    </small>
+                  ) : null}
                   {profile ? (
                     <>
                       {showPassword ? (
@@ -1011,7 +1086,7 @@ const Home = (props) => {
                     <div className="col">
                       <button
                         onClick={() => {
-                          handleDeactive(userData?.id, 'deactive');
+                          handleDeactive(userData?.id, "deactive");
                           setAddUser({
                             name: "",
                             username: "",
@@ -1065,7 +1140,7 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
-                      data-bs-dismiss="modal"
+                      data-bs-dismiss={modelClose && "modal"}
                       onClick={() => {
                         handleAddUser();
 

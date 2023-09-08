@@ -78,7 +78,7 @@ export const CommentFilter = (props) => {
     props.setLeagueData(league);
     setSelectedLeague(league);
 
-    DateAPI(categoryType, selectedLeague)
+    DateAPI(categoryType, league)
       .then((res) => {
         // console.log(res.data, "========================res date");
         const DateList = res.data;

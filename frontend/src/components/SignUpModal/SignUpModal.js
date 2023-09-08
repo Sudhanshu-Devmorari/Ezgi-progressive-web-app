@@ -129,9 +129,6 @@ const SignUpModal = (props) => {
     if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
-      console.log("selectedCity:::::::::::", selectedCity);
-      console.log("selectedGender:::::::::::", selectedGender);
-      console.log("selectedAge:::::::::::", selectedAge);
       setbtnLoading(true);
       setCityError("");
       setGenderError("");
