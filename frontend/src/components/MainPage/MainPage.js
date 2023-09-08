@@ -33,6 +33,7 @@ const MainPage = () => {
   // console.log("--------", selectContent,"=======", selectPublicorForYou)
 
   const themeMode = localStorage.getItem("CurrentTheme");
+  const [publicSelected, setPublicSelected] = useState(false);
 
   const [data, setData] = useState([]);
   const [followingList, setFollowingList] = useState([]);
@@ -71,6 +72,7 @@ const MainPage = () => {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
+        console.log("first----->>>", res?.data)
         setData(res?.data);
         setPublicComments(res?.data?.Public_Comments);
         setHighlights(res?.data?.highlights);
@@ -419,6 +421,8 @@ const MainPage = () => {
                     <SelectContent
                       selectContent={selectPublicorForYou}
                       setSelectContent={setSelectPublicorForYou}
+                      setPublicSelected={setPublicSelected}
+                      publicSelected={publicSelected}
                     />
 
                     {mergedResult.map((val, index) => {
@@ -490,6 +494,8 @@ const MainPage = () => {
                     <SelectContent
                       selectContent={selectPublicorForYou}
                       setSelectContent={setSelectPublicorForYou}
+                      setPublicSelected={setPublicSelected}
+                      publicSelected={publicSelected}
                     />
 
                     {subscriptionResult.map((val, index) => {
@@ -552,6 +558,8 @@ const MainPage = () => {
                     <SelectContent
                       selectContent={selectPublicorForYou}
                       setSelectContent={setSelectPublicorForYou}
+                      setPublicSelected={setPublicSelected}
+                      publicSelected={publicSelected}
                     />
 
                     {onlyPublicResult.map((val, index) => {

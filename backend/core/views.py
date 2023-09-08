@@ -1406,6 +1406,14 @@ class AdminMainPage(APIView):
             subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
             data_list['new_subscriptions_percentage'] = subscriptions_percentage
 
+            """Comments percentage"""
+            status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+            new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+            comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+            comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+            data_list['comments_percentage'] = comments_percentage
+
 
             new_user = User.objects.all().count()
             data_list['new_user'] = new_user

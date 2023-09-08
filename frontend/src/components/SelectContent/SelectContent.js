@@ -12,7 +12,6 @@ export const SelectContent = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const userPhone = localStorage.getItem("userPhone");
   const userId = localStorage.getItem("user-id");
-  const [publicSelected, setPublicSelected] = useState(false);
   return (
     <>
     {userId ? (
@@ -21,7 +20,7 @@ export const SelectContent = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
       >
-        {userPhone ? (
+        {userId ? (
           <>
             <div
               className="p-2"
@@ -59,9 +58,9 @@ export const SelectContent = (props) => {
               width={31}
             />
             <span className="pe-2">Only Public</span>
-            <div onClick={() => {setPublicSelected(!publicSelected); props.setSelectContent("only public")}}>
+            <div onClick={() => {props.setPublicSelected(!props.publicSelected); props.setSelectContent("only public")}}>
               <img
-                src={currentTheme === "dark" ? publicSelected ? publicSelectedIcon : darkGrp : publicSelected ? lighGrpSelected : lighGrp  }
+                src={currentTheme === "dark" ? props.publicSelected ? publicSelectedIcon : darkGrp : props.publicSelected ? lighGrpSelected : lighGrp  }
                 // src={currentTheme === "dark" ? darkGrp : lighGrp}
                 alt=""
                 height={28}

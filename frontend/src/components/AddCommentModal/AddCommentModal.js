@@ -31,34 +31,105 @@ const AddCommentModal = (props) => {
   //   "Match Details 2",
   //   "Match Details 3",
   // ];
+
   const [matchDetailsOptions, setMatchDetailsOptions] = useState([]);
   const [predictionType, setPredictionType] = useState([]);
   const [predictionData, setPredictionData] = useState([]);
 
   const predictionTypeOptions =predictionType;
   const predictionOptions = predictionData;
-  const [countryOptions, setCountryOptions] = useState([]);
 
   const categoryOptions = ["Futbol", "Basketbol"];
-  // const dateOptions = ["Date 1", "Date 2", "Date 3"];
-  const [dateOptions, setDateOptions] = useState([]);
+  const [countryOptions, setCountryOptions] = useState([]);
   // const leagueOptions = ["League 1", "League 2", "League 3"];
   const [leagueOptions, setLeagueOptions] = useState([]);
+  // const dateOptions = ["Date 1", "Date 2", "Date 3"];
+  const [dateOptions, setDateOptions] = useState([]);
+  
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
-  const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
   const [selectedPredictionType, setSelectedPredictionType] =
     useState("Select");
+    const [selectedPrediction, setSelectedPrediction] = useState("Select");
+
+  const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
+  const [matchId, setMatchId] = useState([]);
   const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
-  const [selectedPrediction, setSelectedPrediction] = useState("Select");
   const [predictionDropdown, setPredictionDropdown] = useState(false);
-  const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Select");
+  
   const [selectedCategory, setSelectedCategory] = useState("Select");
-  const [categoryDropdown, setCategoryDropdown] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("Select");
-  const [dateDropdown, setDateDropdown] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("Select");
   const [selectedLeague, setSelectedLeague] = useState("Select");
+  const [selectedDate, setSelectedDate] = useState("Select");
+  
+  const [categoryDropdown, setCategoryDropdown] = useState(false);
+  const [countryDropDown, setCountryDropDown] = useState(false);
   const [leagueDropdown, setLeagueDropdown] = useState(false);
+  const [dateDropdown, setDateDropdown] = useState(false);
+
+  const handleCategorySelection = async (category) => {
+    setSelectedCategory(category);
+    setCategoryError("")
+
+    if (category !== "Select") {
+      try {
+        let type;
+        if (category === "Futbol") {
+          type = 1;
+        } else if (category === "Basketbol") {
+          type = 2;
+        }
+        setCategoryType(type);
+        const res = await axios.get(
+          `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+          { headers }
+        );
+        // console.log(res,"=>>res")
+        const countryData = res.data.data;
+        setCountryOptions(countryData.map((item) => item.country));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+  };
+  
+  const handleCountrySelection = (country) => {
+    setSelectedCountry(country);
+    setCountryError("")
+
+    LeagueAPI(categoryType, country)
+    .then((res) => {
+      const LeagueList = res.data;
+      setLeagueOptions(LeagueList.map((item) => item.league));
+    })
+    .catch((error) => {});
+  };
+
+  const handleLeagueSelection = (league) => {
+    setSelectedLeague(league);
+    setLeagueError("")
+
+    DateAPI(categoryType, selectedLeague)
+      .then((res) => {
+        // console.log(res.data, "========================res date");
+        const DateList = res.data;
+        setDateOptions(DateList.map((item) => item.date));
+      })
+      .catch((error) => {});
+  };
+
+  const handleDateSelection = (date) => {
+    setSelectedDate(date);
+    setDateError("")
+    
+    MatchDetailsAPI(categoryType, selectedLeague, date)
+    .then((res) => {
+      const MatchList = res.data;
+      setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+          setMatchId(MatchList.map((item) => item.MatchID));
+    })
+    .catch((err) => {});
+  };
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
@@ -106,10 +177,7 @@ const AddCommentModal = (props) => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(!predictionDropdown);
   };
-  const handleCountrySelection = (country) => {
-    setSelectedCountry(country);
-    setCountryError("")
-  };
+  
   const toggleCountryDropdown = () => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
@@ -119,10 +187,7 @@ const AddCommentModal = (props) => {
     setDateDropdown(false);
     setCountryDropDown(!countryDropDown);
   };
-  const handleCategorySelection = (category) => {
-    setSelectedCategory(category);
-    setCategoryError("")
-  };
+  
   const toggleCategoryDropdown = () => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
@@ -132,10 +197,7 @@ const AddCommentModal = (props) => {
     setDateDropdown(false);
     setCategoryDropdown(!categoryDropdown);
   };
-  const handleDateSelection = (date) => {
-    setSelectedDate(date);
-    setDateError("")
-  };
+  
   const toggleDateDropdown = () => {
     // DateAPI(categoryType, selectedLeague)
     //   .then((res) => {
@@ -153,10 +215,7 @@ const AddCommentModal = (props) => {
     setDateDropdown(!dateDropdown);
   };
 
-  const handleLeagueSelection = (league) => {
-    setSelectedLeague(league);
-    setLeagueError("")
-  };
+  
   const toggleLeagueDropdown = () => {
     // LeagueAPI(categoryType, selectedCountry)
     //   .then((res) => {
@@ -202,31 +261,7 @@ const AddCommentModal = (props) => {
 
   // Get Country from Category
   const [categoryType, setCategoryType] = useState(null);
-  useEffect(() => {
-    async function getCountryOptions() {
-      if (selectedCategory !== "Select") {
-        try {
-          let type;
-          if (selectedCategory === "Futbol") {
-            type = 1;
-          } else if (selectedCategory === "Basketbol") {
-            type = 2;
-          }
-          setCategoryType(type);
-          const res = await axios.get(
-            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
-            { headers }
-          );
-          // console.log(res,"=>>res")
-          const countryData = res.data.data;
-          setCountryOptions(countryData.map((item) => item.country));
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    }
-    getCountryOptions();
-  }, [selectedCategory]);
+
 
   // Add Comment pr Post comment API
   const postComment = async () => {
@@ -307,36 +342,7 @@ const AddCommentModal = (props) => {
     }
   };
 
-    useEffect(() => {
-    MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
-    .then((res) => {
-      // console.log(res.data, "========================res");
-      const MatchList = res.data;
-      setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
-    })
-    .catch((err) => {});
-  }, [selectedDate])
 
-    useEffect(() => {
-    DateAPI(categoryType, selectedLeague)
-      .then((res) => {
-        // console.log(res.data, "========================res date");
-        const DateList = res.data;
-        setDateOptions(DateList.map((item) => item.date));
-      })
-      .catch((error) => {});
-  }, [selectedLeague])
-
-    useEffect(() => {
-    LeagueAPI(categoryType, selectedCountry)
-      .then((res) => {
-        const LeagueList = res.data;
-        setLeagueOptions(LeagueList.map((item) => item.league));
-      })
-      .catch((error) => {});
-  }, [selectedCountry])
-
-  const [matchId, setMatchId] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -349,14 +355,7 @@ const AddCommentModal = (props) => {
         }
         
         try {
-          const res11 = await axios.get(
-            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
-            { headers }
-          );
-          const matchIds = res11?.data?.data.map((item) => item.MatchID);
-          setMatchId(matchIds);
-
-          const predictionsPromises = matchIds.map(async (val) => {
+          const predictionsPromises = matchId.map(async (val) => {
             const predictions = await axios.get(
               `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
               { headers }
@@ -380,7 +379,7 @@ const AddCommentModal = (props) => {
     };
 
     fetchData();
-  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, headers]);
+  }, [selectedMatchDetails]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -393,14 +392,7 @@ const AddCommentModal = (props) => {
         }
         
         try {
-          const res11 = await axios.get(
-            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
-            { headers }
-          );
-          const matchIds = res11?.data?.data.map((item) => item.MatchID);
-          setMatchId(matchIds);
-
-          const predictionsPromises = matchIds.map(async (val) => {
+          const predictionsPromises = matchId.map(async (val) => {
             const predictions = await axios.get(
               `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
               { headers }
@@ -422,7 +414,7 @@ const AddCommentModal = (props) => {
     };
 
     fetchData();
-  }, [selectedMatchDetails, selectedCategory, selectedLeague, selectedDate, selectedPredictionType, headers]);
+  }, [selectedMatchDetails, selectedPredictionType]);
 
   return (
     <>
