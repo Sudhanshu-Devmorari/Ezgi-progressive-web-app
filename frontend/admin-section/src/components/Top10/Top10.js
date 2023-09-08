@@ -16,9 +16,7 @@ const Top10 = (props) => {
   return (
     <>
       <div className="dark-mode pb-1 ps-2 pt-2" style={{ height: "25vh" }}>
-        <div className="heading-top-10" >
-          Top 10
-        </div>
+        <div className="heading-top-10">Top 10</div>
         <div className="d-flex justify-content-center ">
           <div className="text-center d-flex gap-2 align-items-end">
             <div className="d-flex flex-column">
@@ -63,21 +61,35 @@ const Top10 = (props) => {
           </div>
         </div>
         <div className=" d-flex justify-content-center gap-2 all-users-gap">
-          {data?.slice(3).map((res, index) => (
-            <div className="d-flex flex-column text-center padding-all-users">
-              <img
-                onClick={() => props.setupdateProfile(2)}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                className="all-user-img cursor"
-                src={user1}
-                alt=""
-              />
-              <span className="all-user-text" style={{ fontSize: "0.7rem" }}>
-                {res.Subscriber_Count}
-              </span>
+          {props?.isLoading ? (
+            <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+              Loading...
             </div>
-          ))}
+          ) : (
+            <>
+              {data?.slice(3).map((res, index) => (
+                <div
+                  className="d-flex flex-column text-center padding-all-users"
+                  key={index}
+                >
+                  <img
+                    onClick={() => props.setupdateProfile(2)}
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    className="all-user-img cursor"
+                    src={user1}
+                    alt=""
+                  />
+                  <span
+                    className="all-user-text"
+                    style={{ fontSize: "0.7rem" }}
+                  >
+                    {res.Subscriber_Count}
+                  </span>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
     </>

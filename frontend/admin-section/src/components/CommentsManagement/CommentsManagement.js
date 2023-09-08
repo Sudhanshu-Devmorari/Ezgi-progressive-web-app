@@ -448,79 +448,87 @@ const CommentsManagement = (props) => {
           commentData={props?.commentData}
           setDisplayUser={setDisplayUser}
         />
-        {displayUser.map((res, index) => (
-          <MainDiv>
-            <div className="col-3 d-flex align-items-center cursor">
-              <span className="pe-1">{`# ${res?.id
-                .toString()
-                .padStart(4, "0")}`}</span>
-              <div className="position-relative">
-                <img
-                  className="rounded-circle profile-icon"
-                  src={`${
-                    res.commentator_user?.profile_pic
-                      ? server_url + res.commentator_user?.profile_pic
-                      : initialProfile
-                  }`}
-                  alt=""
-                  height={45}
-                  width={45}
-                />
-                <div
-                  className="position-absolute d-flex justify-content-center align-items-center"
-                  style={{
-                    height: "16px",
-                    width: "16px",
-                    border: "2px solid #FF9100",
-                    borderRadius: "50%",
-                    backgroundColor: "#0B2447",
-                    top: "0px",
-                    left: "25px",
-                  }}
-                >
-                  <BiSolidCrown
-                    fontSize={"0.62rem"}
-                    style={{ color: "#FF9100" }}
+        {props?.isLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+            Loading...
+          </div>
+        ) : (
+          <>
+            {displayUser?.map((res, index) => (
+              <MainDiv>
+                <div className="col-3 d-flex align-items-center cursor">
+                  <span className="pe-1">{`# ${res?.id
+                    .toString()
+                    .padStart(4, "0")}`}</span>
+                  <div className="position-relative">
+                    <img
+                      className="rounded-circle profile-icon"
+                      src={`${
+                        res.commentator_user?.profile_pic
+                          ? server_url + res.commentator_user?.profile_pic
+                          : initialProfile
+                      }`}
+                      alt=""
+                      height={45}
+                      width={45}
+                    />
+                    <div
+                      className="position-absolute d-flex justify-content-center align-items-center"
+                      style={{
+                        height: "16px",
+                        width: "16px",
+                        border: "2px solid #FF9100",
+                        borderRadius: "50%",
+                        backgroundColor: "#0B2447",
+                        top: "0px",
+                        left: "25px",
+                      }}
+                    >
+                      <BiSolidCrown
+                        fontSize={"0.62rem"}
+                        style={{ color: "#FF9100" }}
+                      />
+                    </div>
+                  </div>
+                  <span className="ps-2">{res.commentator_user?.name}</span>
+                </div>
+                <div className="col-2">
+                  <img
+                    className="flag-icon"
+                    src={flag}
+                    alt=""
+                    height={26}
+                    width={26}
+                  />
+                  <span className="ps-1">{res.league}</span>
+                </div>
+                <div className="col-4 ps-2">{res.match_detail}</div>
+                <div className="col-3 justify-content-end d-flex">
+                  <span className="pe-1">
+                    {moment(res.date).format("DD-MM.YYYY - HH:mm")}
+                  </span>
+                  <img
+                    className="eye-icon"
+                    src={circle_check}
+                    alt=""
+                    height={23}
+                    width={23}
+                  />
+                  <img
+                    onClick={() => setCurrentData(res)}
+                    data-bs-toggle="modal"
+                    data-bs-target="#filter"
+                    className="eye-icon cursor"
+                    src={eye}
+                    alt=""
+                    height={23}
+                    width={23}
                   />
                 </div>
-              </div>
-              <span className="ps-2">{res.commentator_user?.name}</span>
-            </div>
-            <div className="col-2">
-              <img
-                className="flag-icon"
-                src={flag}
-                alt=""
-                height={26}
-                width={26}
-              />
-              <span className="ps-1">{res.league}</span>
-            </div>
-            <div className="col-4 ps-2">{res.match_detail}</div>
-            <div className="col-3 justify-content-end d-flex">
-              <span className="pe-1">
-                {moment(res.date).format("DD-MM.YYYY - HH:mm")}
-              </span>
-              <img
-                className="eye-icon"
-                src={circle_check}
-                alt=""
-                height={23}
-                width={23}
-              />
-              <img
-                onClick={() => setCurrentData(res)}
-                data-bs-toggle="modal"
-                data-bs-target="#filter"
-                className="eye-icon cursor"
-                src={eye}
-                alt=""
-                height={23}
-                width={23}
-              />
-            </div>
-          </MainDiv>
-        ))}
+              </MainDiv>
+            ))}
+          </>
+        )}
       </div>
 
       <div

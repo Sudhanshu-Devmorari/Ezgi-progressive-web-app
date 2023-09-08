@@ -18,8 +18,9 @@ const EditorManagementPage = () => {
   const [users, setUsers] = useState([]);
   const [verifyUser, setverifyUsererifyUser] = useState([]);
   const [deactivateUser, setDeactivateUser] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  function editorManagementApiData () {
+  function editorManagementApiData() {
     // console.log(data)
     axios
       // .get(`${config.apiUrl}/editor-management/`)
@@ -28,26 +29,29 @@ const EditorManagementPage = () => {
         console.log("%%%%%%%%%", res.data)
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
+        setIsLoading(false);
         // setUsers(res?.data?.users_list)
         // setUserTimeLine(res?.data?.user_timeline)
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
+        setIsLoading(false);
       });
-  };
+  }
 
   useEffect(() => {
     editorManagementApiData();
   }, []);
 
-  function approveOrRejectrqst (id, value){
-    axios.post(`${config.url}/verify-user/${id}`, {status : value})
-    .then((res)=> {
-      // console.log(res);
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+  function approveOrRejectrqst(id, value) {
+    axios
+      .post(`${config.url}/verify-user/${id}`, { status: value })
+      .then((res) => {
+        // console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   const newEditorsArray = [
@@ -91,15 +95,15 @@ const EditorManagementPage = () => {
               <div className="col-8">
                 <div className="row g-0">
                   <div className="col-4">
-                    <NewUsers array={newEditorsArray} />
+                    <NewUsers array={newEditorsArray} isLoading={isLoading} />
                   </div>
                   <div className="col-8">
-                    <LevelCount data={data} />
+                    <LevelCount data={data} isLoading={isLoading} />
                   </div>
                 </div>
                 <div className="">
                   <EditorManagemenet
-                  approveOrRejectrqst={approveOrRejectrqst}
+                    approveOrRejectrqst={approveOrRejectrqst}
                     editorManagementApiData={editorManagementApiData}
                     users={data.editor_list}
                     deactivateUser={deactivateUser}
@@ -107,6 +111,7 @@ const EditorManagementPage = () => {
                     setupdateProfile={setupdateProfile}
                     verifyRqst={verifyRqst}
                     deactiveRqst={deactiveRqst}
+                    isLoading={isLoading}
                   />
                 </div>
               </div>
@@ -114,11 +119,13 @@ const EditorManagementPage = () => {
                 <Top10
                   setupdateProfile={setupdateProfile}
                   userData={data.top_ten}
+                  isLoading={isLoading}
                 />
                 <EditorAccountStatus
                   active_editor={data.active_editor}
                   pending_editor={data.pending_editor}
                   deactivate_editor={data.deactivate_editor}
+                  isLoading={isLoading}
                 />
                 <div className="row g-0 gap-2">
                   <div className="col">
@@ -128,6 +135,7 @@ const EditorManagementPage = () => {
                       verifyRqst={verifyRqst}
                       deactiveRqst={deactiveRqst}
                       setDeactiveRqst={setDeactiveRqst}
+                      isLoading={isLoading}
                     />
                   </div>
                   <div className="col">
@@ -138,6 +146,7 @@ const EditorManagementPage = () => {
                       verifyRqst={verifyRqst}
                       deactiveRqst={deactiveRqst}
                       setDeactiveRqst={setDeactiveRqst}
+                      isLoading={isLoading}
                     />
                   </div>
                 </div>
