@@ -34,59 +34,28 @@ const NewUsers = (props) => {
           {item.icon && <img className="icon" src={item.icon} alt="" />}
           <span className="heading">{item.label || "New Users"}</span>
           <span className="number">{item.count || props.total_user}</span>
-          {item.per && (
-            <div className="w-100">
-              {item.per >= 0 ? (
-                <span className="rate-font" style={{ color: "#58DEAA" }}>
-                  {item.per}
-                  <HiArrowSmUp
-                    className="arrow"
-                    style={{ marginBottom: "0.1rem" }}
-                  />
-                </span>
-              ) : (
-                <span className="rate-font" style={{ color: "#FF5757" }}>
-                  {item.per}
-                  <HiArrowSmDown
-                    className="arrow"
-                    style={{ marginBottom: "0.1rem" }}
-                  />
-                </span>
-              )}
-              {/* {item.per > 0 ? (
-                    <HiArrowSmUp
-                      className="arrow"
-                      style={{ marginBottom: "0.1rem" }}
-                    />
-                  ) : (
-                    <HiArrowSmDown
-                      className="arrow"
-                      style={{ marginBottom: "0.1rem" }}
-                    />
-                  )} */}
-              {/* {item?.per > 0 ? (
-                    <span className="rate-font" style={{ color: "#58DEAA" }}>
-                      {item.per}
-                      <HiArrowSmUp
-                        className="arrow"
-                        style={{ marginBottom: "0.1rem" }}
-                      />
-                    </span>
-                  ) : (
-                    <span
-                      className="rate-font"
-                      style={{ color: "rgb(255, 87, 87)" }}
-                    >
-                      {item.per}
-                      <HiArrowSmUp
-                        className="arrow"
-                        style={{ marginBottom: "0.1rem" }}
-                      />
-                    </span>
-                  )} */}
-              last day
-            </div>
-          )}
+          {/* {item.per && ( */}
+          <div className="w-100">
+            {item.per >= 0 ? (
+              <span className="rate-font" style={{ color: "#58DEAA" }}>
+                %{item.per}
+                <HiArrowSmUp
+                  className="arrow"
+                  style={{ marginBottom: "0.1rem" }}
+                />
+              </span>
+            ) : (
+              <span className="rate-font" style={{ color: "#FF5757" }}>
+                %{item.per}
+                <HiArrowSmDown
+                  className="arrow"
+                  style={{ marginBottom: "0.1rem" }}
+                />
+              </span>
+            )}
+            last day
+          </div>
+          {/* )} */}
         </div>
       ))}
       {totalArray?.map((item, index) => (

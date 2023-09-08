@@ -24,7 +24,7 @@ const UserManagementPage = () => {
     const res = await axios
       .get(`${config?.apiUrl}/user-management/`)
       .then((res) => {
-        // console.log(res.data);
+        console.log(res.data);
         setData(res?.data);
         setUsers(res?.data?.users_list)
         setUserTimeLine(res?.data?.user_timeline)
@@ -46,7 +46,7 @@ const UserManagementPage = () => {
       label: "New Users",
       icon: newUser,
       count: `${data?.new_user}`,
-      per: "%22",
+      per: Math.round(data?.new_user_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -56,7 +56,7 @@ const UserManagementPage = () => {
       label: "New Editors",
       icon: editorIcon,
       count: `${data?.new_editor}`,
-      per: "%22",
+      per: Math.round(data?.new_editor_percentage),
       color: "#58DEAA",
       rate_icon: "arrowUp",
     },
@@ -66,7 +66,7 @@ const UserManagementPage = () => {
       label: "New Subscribers",
       icon: subscriberIcon,
       count: `${data?.new_subscriber}`,
-      per: "%22",
+      per: Math.round(data?.new_subscriptions_percentage),
       color: "#FF5757",
       rate_icon: "arrowdown",
     },

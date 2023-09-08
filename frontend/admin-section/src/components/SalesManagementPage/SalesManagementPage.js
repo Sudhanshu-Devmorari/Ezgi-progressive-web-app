@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar/NavBar";
 import SideBar from "../SideBar/SideBar";
 import subscriptionIcon from "../../assets/Group 67.svg";
 import PlanIcon from "../../assets/Group 72.svg";
 import highlightIcon from "../../assets/rocket.svg";
-import { HiArrowSmUp } from "react-icons/hi";
+import { HiArrowSmDown, HiArrowSmUp } from "react-icons/hi";
 import SalesManagementFilter from "../SalesManagementFilter/SalesManagementFilter";
 import { MainDiv } from "../CommonBgRow";
 import user1 from "../../assets/user3.png";
@@ -19,10 +19,21 @@ import Export from "../Export/Export";
 import config from "../../config";
 
 const SalesManagementPage = () => {
+  const [salesData, setSalesData] = useState([]);
   const salesArray = [
-    { icon: PlanIcon, name: "Plan Sales" },
-    { icon: subscriptionIcon, name: "Subscription Sales" },
-    { icon: highlightIcon, name: "Highlight Sales" },
+    { icon: PlanIcon, name: "Plan Sales", count: 12.86, per: 22 },
+    {
+      icon: subscriptionIcon,
+      name: "Subscription Sales",
+      count: salesData?.subscription_count,
+      per: Math.round(salesData?.new_subscriptions_percentage),
+    },
+    {
+      icon: highlightIcon,
+      name: "Highlight Sales",
+      count: salesData?.highlight_count,
+      per: 22,
+    },
   ];
   const users = [
     {
@@ -60,7 +71,8 @@ const SalesManagementPage = () => {
     async function getSalesData() {
       try {
         const res = await axios.get(`${config?.apiUrl}/sales-management`);
-        // console.log("res====>>>>", res?.data);
+        console.log("res====>>>>", res?.data);
+        setSalesData(res?.data);
       } catch (error) {
         console.log(error);
       }
@@ -91,20 +103,33 @@ const SalesManagementPage = () => {
                         <img className="icon" src={res.icon} alt="" />
                         <span className="heading">{res.name}</span>
                         <span className="number">
-                          12.860 <small>₺</small>
+                          {res?.count} <small>₺</small>
                         </span>
                         <div className="w-100">
                           <span className="rate-font">
-                            <span
-                              className="rate-font"
-                              style={{ color: "#58DEAA" }}
-                            >
-                              %22
-                              <HiArrowSmUp
-                                className="arrow"
-                                style={{ marginBottom: "0.1rem" }}
-                              />
-                            </span>
+                            {res.per >= 0 ? (
+                              <span
+                                className="rate-font"
+                                style={{ color: "#58DEAA" }}
+                              >
+                                %{res.per}
+                                <HiArrowSmUp
+                                  className="arrow"
+                                  style={{ marginBottom: "0.1rem" }}
+                                />
+                              </span>
+                            ) : (
+                              <span
+                                className="rate-font"
+                                style={{ color: "#FF5757" }}
+                              >
+                                %{res.per}
+                                <HiArrowSmDown
+                                  className="arrow"
+                                  style={{ marginBottom: "0.1rem" }}
+                                />
+                              </span>
+                            )}
                             last day
                           </span>
                         </div>
