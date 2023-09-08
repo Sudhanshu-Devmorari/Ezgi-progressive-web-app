@@ -72,7 +72,6 @@ const MainPage = () => {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log("first----->>>", res?.data)
         setData(res?.data);
         setPublicComments(res?.data?.Public_Comments);
         setHighlights(res?.data?.highlights);

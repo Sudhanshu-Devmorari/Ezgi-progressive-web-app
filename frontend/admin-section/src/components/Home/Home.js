@@ -20,6 +20,8 @@ import axios from "axios";
 import { MainDiv } from "../CommonBgRow";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 import Swal from "sweetalert2";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
@@ -71,7 +73,40 @@ const Home = (props) => {
     }
   };
 
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required("Name is required")
+      .min(5, "Name must be at least 5 characters")
+      .max(20, "Name must be at most 20 characters"),
+    username: Yup.string()
+      .required("Username is required")
+      .min(5, "Username must be at least 5 characters")
+      .max(15, "Username must be at most 15 characters"),
+    phone: Yup.string()
+      .required("Phone is required")
+      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
+      .min(10, "Phone must be 10 digits")
+      .max(10, "Phone must be 10 digits"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      username: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      //
+    },
+  });
+
   const [addUser, setAddUser] = useState({});
+  const [addUserError, setAddUserError] = useState({});
   const submitUserData = (e) => {
     let name, value;
 
@@ -128,12 +163,35 @@ const Home = (props) => {
     fetchData();
   }, []);
 
-  const [displayUser, setDisplayUser] = useState(props?.users);
+  const [displayUser, setDisplayUser] = useState([]);
+  const [allFilterData, setAllFilterData] = useState([]);
 
-  // const [displayUser, setDisplayUser] = useState(props?.users);
+  useEffect(() => {
+    setDisplayUser(props.users);
+    setAllFilterData(props.users);
+  }, [props.users]);
+
+  useEffect(() => {
+    console.log("displayUser::::::::::::::::::", displayUser);
+  }, [displayUser]);
+
+  const filterData = (e) => {
+    const val = e.target.value.toLowerCase();
+    const filteredArray = displayUser.filter(
+      (obj) =>
+        obj?.name?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().startsWith(val) ||
+        obj?.username?.toLowerCase().includes(val) ||
+        obj?.name?.toLowerCase().includes(val)
+    );
+    setAllFilterData(filteredArray);
+  };
+
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
 
   const [userData, setUserData] = useState([]);
   const handleShow = async () => {
+    setIsFilterLoading(true);
     try {
       const response = await axios.post(
         `${config?.apiUrl}/filter-user-management/`,
@@ -144,14 +202,17 @@ const Home = (props) => {
           age: selectedAgeFilter,
         }
       );
+      console.log("API Response:::::::::::::", response.data);
       setDisplayUser(response.data);
-      // console.log('API Response:', response.data);
+      setAllFilterData(response.data);
+      response.data && setIsFilterLoading(false);
     } catch (error) {
+      setIsFilterLoading(false);
       console.error("Error making POST request:", error);
     }
   };
 
-  const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
+  const [modelClose, setModelClose] = useState(false);
   const [preveiwProfile, setPreveiwProfile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(false);
 
@@ -161,30 +222,50 @@ const Home = (props) => {
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
   }
-
+  console.log("first=========", addUser);
   const handleAddUser = async () => {
-    const formData = new FormData();
-    selectedImage != false && formData.append("file", selectedImage);
-    // formData.append("date", addUser.date);
-    formData.append("name", addUser.name);
-    formData.append("username", addUser.username);
-    formData.append("phone", addUser.phone);
-    formData.append("password", addUser.password);
-    formData.append("gender", addUser.gender);
-    formData.append("age", addUser.age);
-    formData.append("subscription", addUser.subscription);
-    formData.append("duration", addUser.duration);
-    // formData.append("month", addUser.month);
-    formData.append("level", addUser.level);
-    try {
-      const response = await axios.post(
-        `${config?.apiUrl}/user-management/`,
-        formData
-      );
-      props?.userManagementApiData();
-      // console.log("API Response:", response.data);
-    } catch (error) {
-      console.error("Error making POST request:", error);
+    if (addUser.name === "") {
+      console.log("if::::::::::::true", addUser.name)
+      setAddUserError({
+        ...addUserError,
+        name: "Please Enter the Name",
+      });
+    } else {
+      console.log("else:::::true")
+      // setModelClose(true)
+      const formData = new FormData();
+      selectedImage != false && formData.append("file", selectedImage);
+      // formData.append("date", addUser.date);
+      formData.append("name", addUser.name);
+      formData.append("username", addUser.username);
+      formData.append("phone", addUser.phone);
+      formData.append("password", addUser.password);
+      formData.append("gender", addUser.gender);
+      formData.append("age", addUser.age);
+      formData.append("subscription", addUser.subscription);
+      formData.append("duration", addUser.duration);
+      // formData.append("month", addUser.month);
+      formData.append("level", addUser.level);
+      try {
+        const response = await axios.post(
+          `${config?.apiUrl}/user-management/`,
+          formData
+        );
+        props?.userManagementApiData();
+        setModelClose(true);
+        // console.log("API Response:", response.data);
+      } catch (error) {
+        if (error.response.data.error) {
+          Swal.fire({
+            title: "Error",
+            text: `${error.response.data.error}`,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        console.error("Error making POST request:", error);
+      }
     }
   };
 
@@ -338,10 +419,6 @@ const Home = (props) => {
   // console.log("diaplay: ", displayUser)
   // console.log("users: ", props?.users)
 
-  useEffect(() => {
-    setDisplayUser(props.users);
-  }, [props.users]);
-
   const handleUserTypeFilterSelection = (gender) => {
     setSelectedUserTypeFilter(gender);
   };
@@ -403,17 +480,6 @@ const Home = (props) => {
     setAgeFilterDropDown(!ageFilterDropDown);
   };
 
-  const filterData = (e) => {
-    const val = e.target.value.toLowerCase();
-    const filteredArray = props.users.filter(
-      (obj) =>
-        obj?.name?.toLowerCase().startsWith(val) ||
-        obj?.username?.toLowerCase().startsWith(val) ||
-        obj?.username?.toLowerCase().includes(val) ||
-        obj?.name?.toLowerCase().includes(val)
-    );
-    setDisplayUser(filteredArray);
-  };
   const monthOptions = ["1 Month", "3 Month", "6 Month"];
   const [selectedMonth, setSelectedMonth] = useState("Select");
   const [monthDropDown, setMonthDropDown] = useState(false);
@@ -511,145 +577,151 @@ const Home = (props) => {
             </div>
           </div>
         )}
-        {props?.isLoading ? (
-          <div className="d-flex gap-1 my-2 pb-2 h-100 align-items-center justify-content-center">
+        {props?.isLoading || isFilterLoading ? (
+          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
             Loading...
           </div>
         ) : (
           <>
-            {displayUser
-              ?.slice()
-              .reverse()
-              .map((res, index) => (
-                <React.Fragment key={index}>
-                  <MainDiv>
-                    <div className="col">
-                      <span className="pe-1">{`# ${res?.id
-                        .toString()
-                        .padStart(4, "0")}`}</span>
-                      <img
-                        src={`${
-                          res?.profile_pic
-                            ? server_url + res?.profile_pic
-                            : initialProfile
-                        }`}
-                        className="rounded-circle"
-                        alt=""
-                        height={42}
-                        width={42}
-                      />
-                      <span className="ps-1">{res?.name}</span>
-                    </div>
-                    <div className="d-flex gap-2 align-items-center col ">
-                      <div>{res?.username?.trim()}</div>
-                      <div className="">
-                        {res.gender == "Male" && (
-                          <img
-                            src={gender_male}
-                            alt=""
-                            height={22}
-                            width={22}
-                          />
-                        )}
-                        {res.gender == "Female" && (
-                          <img
-                            src={gender_female}
-                            alt=""
-                            height={22}
-                            width={22}
-                          />
-                        )}
-                        <span
+            {allFilterData.length == 0 ? (
+              <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                No Record Found!
+              </div>
+            ) : (
+              allFilterData
+                ?.slice()
+                .reverse()
+                .map((res, index) => (
+                  <React.Fragment key={index}>
+                    <MainDiv>
+                      <div className="col">
+                        <span className="pe-1">{`# ${res?.id
+                          .toString()
+                          .padStart(4, "0")}`}</span>
+                        <img
+                          src={`${
+                            res?.profile_pic
+                              ? server_url + res?.profile_pic
+                              : initialProfile
+                          }`}
+                          className="rounded-circle"
+                          alt=""
+                          height={42}
+                          width={42}
+                        />
+                        <span className="ps-1">{res?.name}</span>
+                      </div>
+                      <div className="d-flex gap-2 align-items-center col ">
+                        <div>{res?.username?.trim()}</div>
+                        <div className="">
+                          {res.gender == "Male" && (
+                            <img
+                              src={gender_male}
+                              alt=""
+                              height={22}
+                              width={22}
+                            />
+                          )}
+                          {res.gender == "Female" && (
+                            <img
+                              src={gender_female}
+                              alt=""
+                              height={22}
+                              width={22}
+                            />
+                          )}
+                          <span
 
-                        // data-bs-toggle="modal"
-                        // data-bs-target="#exampleModal"
-                        // onClick={() => {
-                        //   setprofile(true);
-                        //   setUserData(res);
-                        //   setAddUser(res);
-                        //   setPreveiwProfilePic(true);
-                        // }}
-                        >
-                          {res.age}
-                        </span>
-                      </div>
-                      <div className="">{res.country?.trim()}</div>
-                    </div>
-                    {usersPart === "users" && (
-                      <div
-                        className="d-flex align-items-center block-width col justify-content-center"
-                        style={{ minWidth: "7.5rem" }}
-                      >
-                        {res.commentator_level &&
-                        res.commentator_level !== "undefined" ? (
-                          <button
-                            className="btn-user"
-                            style={{
-                              textAlign: "center",
-                              paddingTop: "0.1rem",
-                              width: "7.5rem",
-                              color:
-                                (res.commentator_level === "journeyman" &&
-                                  "#4DD5FF") ||
-                                (res.commentator_level === "master" &&
-                                  "#03fc77") ||
-                                (res.commentator_level === "grandmaster" &&
-                                  "#FF9100") ||
-                                (res.commentator_level === "apprentice" &&
-                                  "#FFEE7D"),
-                              border:
-                                (res.commentator_level === "journeyman" &&
-                                  "1px solid #4DD5FF") ||
-                                (res.commentator_level === "master" &&
-                                  "1px solid #03fc77") ||
-                                (res.commentator_level === "grandmaster" &&
-                                  "1px solid #FF9100") ||
-                                (res.commentator_level === "apprentice" &&
-                                  "1px solid #FFEE7D"),
-                              borderRadius: "2px",
-                              backgroundColor: "transparent",
-                            }}
+                          // data-bs-toggle="modal"
+                          // data-bs-target="#exampleModal"
+                          // onClick={() => {
+                          //   setprofile(true);
+                          //   setUserData(res);
+                          //   setAddUser(res);
+                          //   setPreveiwProfilePic(true);
+                          // }}
                           >
-                            {res.commentator_level.charAt(0).toUpperCase() +
-                              res.commentator_level.slice(1).toLowerCase()}
-                          </button>
-                        ) : (
-                          <span></span>
-                        )}
+                            {res.age}
+                          </span>
+                        </div>
+                        <div className="">{res.country?.trim()}</div>
                       </div>
-                    )}
-                    <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
-                      <span>
-                        {moment(res.created).format("DD-MM.YYYY - HH:mm")}
-                      </span>
-                      <img
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal"
-                        onClick={() => {
-                          setprofile(true);
-                          setUserData(res);
-                          setAddUser(res);
-                          setPreveiwProfilePic(true);
-                        }}
-                        className="cursor"
-                        src={userEdit}
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
-                      <img
-                        onClick={() => handleDeactive(res.id, "delete")}
-                        // onClick={() => handleDelete(res.id)}
-                        className="cursor"
-                        src={trash}
-                        alt=""
-                        height={25}
-                        width={25}
-                      />
-                    </div>
-                  </MainDiv>
-                </React.Fragment>
-              ))}
+                      {usersPart === "users" && (
+                        <div
+                          className="d-flex align-items-center block-width col justify-content-center"
+                          style={{ minWidth: "7.5rem" }}
+                        >
+                          {res.commentator_level &&
+                          res.commentator_level !== "undefined" ? (
+                            <button
+                              className="btn-user"
+                              style={{
+                                textAlign: "center",
+                                paddingTop: "0.1rem",
+                                width: "7.5rem",
+                                color:
+                                  (res.commentator_level === "journeyman" &&
+                                    "#4DD5FF") ||
+                                  (res.commentator_level === "master" &&
+                                    "#03fc77") ||
+                                  (res.commentator_level === "grandmaster" &&
+                                    "#FF9100") ||
+                                  (res.commentator_level === "apprentice" &&
+                                    "#FFEE7D"),
+                                border:
+                                  (res.commentator_level === "journeyman" &&
+                                    "1px solid #4DD5FF") ||
+                                  (res.commentator_level === "master" &&
+                                    "1px solid #03fc77") ||
+                                  (res.commentator_level === "grandmaster" &&
+                                    "1px solid #FF9100") ||
+                                  (res.commentator_level === "apprentice" &&
+                                    "1px solid #FFEE7D"),
+                                borderRadius: "2px",
+                                backgroundColor: "transparent",
+                              }}
+                            >
+                              {res.commentator_level.charAt(0).toUpperCase() +
+                                res.commentator_level.slice(1).toLowerCase()}
+                            </button>
+                          ) : (
+                            <span></span>
+                          )}
+                        </div>
+                      )}
+                      <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
+                        <span>
+                          {moment(res.created).format("DD-MM.YYYY - HH:mm")}
+                        </span>
+                        <img
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                          onClick={() => {
+                            setprofile(true);
+                            setUserData(res);
+                            setAddUser(res);
+                            setPreveiwProfilePic(true);
+                          }}
+                          className="cursor"
+                          src={userEdit}
+                          alt=""
+                          height={25}
+                          width={25}
+                        />
+                        <img
+                          onClick={() => handleDeactive(res.id, "delete")}
+                          // onClick={() => handleDelete(res.id)}
+                          className="cursor"
+                          src={trash}
+                          alt=""
+                          height={25}
+                          width={25}
+                        />
+                      </div>
+                    </MainDiv>
+                  </React.Fragment>
+                ))
+            )}
           </>
         )}
       </div>
@@ -690,7 +762,7 @@ const Home = (props) => {
                 {/* {console.log("********", preveiwProfilePic)} */}
                 {profile ? (
                   <img
-                    src={server_url + addUser.profile_pic}
+                    src={addUser.profile_pic ? server_url + addUser.profile_pic : initialProfile}
                     alt=""
                     height={135}
                     width={135}
@@ -782,7 +854,11 @@ const Home = (props) => {
                     value={addUser.name}
                     type="text"
                     className="darkMode-input form-control"
+                    // {...formik.getFieldProps("name")}
                   />
+                  {addUserError && addUserError.name ? (
+                    <small className="text-danger">{addUserError.name}</small>
+                  ) : null}
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Username</span>
@@ -792,7 +868,13 @@ const Home = (props) => {
                     value={addUser.username}
                     type="text"
                     className="darkMode-input form-control"
+                    // {...formik.getFieldProps("username")}
                   />
+                  {formik.touched.username && formik.errors.username ? (
+                    <small className="text-danger">
+                      {formik.errors.username}
+                    </small>
+                  ) : null}
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -810,12 +892,16 @@ const Home = (props) => {
                       onChange={submitUserData}
                       name="phone"
                       value={addUser.phone}
-                      type="text"
+                      type="number"
                       class="form-control darkMode-input"
                       aria-label="Username"
                       aria-describedby="basic-addon1"
+                      // {...formik.getFieldProps("phone")}
                     />
                   </div>
+                  {formik.touched.phone && formik.errors.phone ? (
+                    <small className="text-danger">{formik.errors.phone}</small>
+                  ) : null}
                 </div>
                 <div className="col d-flex flex-column ">
                   <span>Password</span>
@@ -1101,7 +1187,7 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
-                      data-bs-dismiss="modal"
+                      data-bs-dismiss={modelClose && "modal"}
                       onClick={() => {
                         handleAddUser();
 
@@ -1281,6 +1367,7 @@ const Home = (props) => {
                     <div
                       className={`${"customDropdown-dark-mode"} p-1 text-center`}
                       onClick={toggleCityFilterDropdown}
+                      style={{ cursor: "pointer" }}
                     >
                       <span>{selectedCityFilter}</span>
                     </div>
@@ -1290,6 +1377,7 @@ const Home = (props) => {
                       }`}
                       style={{
                         width: "45%",
+                        cursor: "pointer",
                       }}
                     >
                       {cityOptions.map((option, index) => (

@@ -3,8 +3,10 @@ import "./NavBar.css";
 import profile from "../../assets/profile.png";
 import bell from "../../assets/bell-ringing-1.svg";
 import NotificationModel from "../NotificationModel/NotificationModel";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
+  const navigate = useNavigate();
   return (
     <>
       <nav className="navbar navbar-expand-lg p-0">
@@ -26,7 +28,14 @@ const NavBar = () => {
             Send Notification
           </button>
           <span className="p-2">
-            <img src={bell} alt="" height={33} width={33} />
+            <img
+              className="cursor"
+              onClick={() => navigate("/notification/")}
+              src={bell}
+              alt=""
+              height={33}
+              width={33}
+            />
           </span>
           <span
             className="py-1 px-4"

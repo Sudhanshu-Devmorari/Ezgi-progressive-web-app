@@ -175,27 +175,18 @@ const OTPModal = (props) => {
                 containerStyle={"otpbox  my-2"}
                 isInputNum={true}
               />
-              {/* <OTPInput
-                inputStyle={`${
-                  currentTheme === "dark"
-                    ? "otpinputdesign-dark-mode"
-                    : "otpinputdesign-light-mode"
-                } `}
-                value={otp}
-                onChange={setOtp}
-                numInputs={6}
-                renderSeparator={<span> </span>}
-                renderInput={(props) => (
-                  <input {...props} style={{ color: " #000" }} type="number" />
-                )}
-                containerStyle={"otpbox my-2"}
-              /> */}
             </div>
-            <div className="d-flex justify-content-between">
-              <small className="text-danger" style={{ fontSize: "0.71rem" }}>
+            <div className="d-flex justify-content-between align-items-center">
+              <small
+                className="text-danger w-100"
+                style={{ fontSize: "0.71rem" }}
+              >
                 {otpError}
               </small>
-              <div className="">
+              <p
+                className="mb-0 w-100 text-end"
+                style={{ fontSize: "0.71rem" }}
+              >
                 <small>Didn't get the code? </small>
                 <span
                   onClick={() => {
@@ -207,7 +198,7 @@ const OTPModal = (props) => {
                 >
                   Send Again
                 </span>
-              </div>
+              </p>
             </div>
           </div>
           <div className="d-flex flex-column align-items-center my-4">

@@ -12,7 +12,7 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
                         HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
-                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview)
+                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers)
 
 
 urlpatterns = [
@@ -55,6 +55,7 @@ urlpatterns = [
 
 
     # Admin Panel's api
+    path('all-users/', GetALLUsers.as_view(), name='All-Users'),
     path('home/', AdminMainPage.as_view(), name='Main-Page'),
     path('filter-user-management/', FilterUserManagement.as_view(), name='Filter-User-Management'),
     path('user-management/', UserManagement.as_view(), name='UserManagement'),

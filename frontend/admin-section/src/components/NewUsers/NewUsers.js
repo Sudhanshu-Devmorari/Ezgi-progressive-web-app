@@ -3,7 +3,7 @@ import { HiArrowSmDown, HiArrowSmUp } from "react-icons/hi";
 import "./NewUsers.css";
 
 const NewUsers = (props) => {
-  console.log("props:::::::::::::", props);
+  // console.log("props:::::::::::::", props);
   const newArray = props.array;
   const totalArray = props?.totalArray;
 

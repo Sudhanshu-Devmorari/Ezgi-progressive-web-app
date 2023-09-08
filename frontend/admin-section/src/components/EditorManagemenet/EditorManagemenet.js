@@ -99,8 +99,6 @@ const EditorManagemenet = (props) => {
   // console.log("deactiveRqst----->: ", props?.deactiveRqst)
   // console.log("deactivateUser----->: ", props?.deactivateUser)
   // console.log("users----->: ", props?.users)
-  const [displayUser, setDisplayUser] = useState(props?.users);
-  // console.log("displayUser----->: ", displayUser)
 
   const [addUser, setAddUser] = useState({});
   const submitEditorData = (e, val) => {
@@ -111,14 +109,28 @@ const EditorManagemenet = (props) => {
   };
   // console.log("+++++++", addUser)
 
+  const [displayUser, setDisplayUser] = useState([]);
+  const [allFilterData, setAllFilterData] = useState([]);
+
+  // useEffect(() => {
+  //   setDisplayUser(props.users);
+  //   setAllFilterData(props.users);
+  // }, [props.users]);
+
+  useEffect(() => {
+    console.log("displayUser::::::::::::::::::", displayUser);
+  }, [displayUser]);
+
   useEffect(() => {
     if (props?.deactiveRqst) {
       setDisplayUser(props?.deactivateUser);
+      setAllFilterData(props?.deactivateUser);
     } else {
-      setDisplayUser(props?.users == undefined ? [] : props?.users);
+      setDisplayUser(props?.users);
+      setAllFilterData(props?.users);
     }
     // setDisplayUser(props?.users==undefined?[]:props?.users)
-  }, [props]);
+  }, [props.users]);
 
   const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -212,7 +224,14 @@ const EditorManagemenet = (props) => {
     }
   };
 
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+
   const handleEditorFiltor = async () => {
+    setIsFilterLoading(true);
+    console.log("city:::::::::::::", selectedCityFilter);
+    console.log("age:::::::::::::", selectedAgeFilter);
+    console.log("gender:::::::::::::", selectedGenderFilter);
+    console.log("score_point:::::::::::::", selectedScorePointFilter);
     try {
       const response = await axios.post(`${config?.apiUrl}/filter-editors/`, {
         lavel: selectedLevelFilter,
@@ -222,8 +241,12 @@ const EditorManagemenet = (props) => {
         age: selectedAgeFilter,
         gender: selectedGenderFilter,
       });
+      console.log("response.data:::::::::::::", response.data)
       setDisplayUser(response.data);
+      setAllFilterData(response.data);
+      response.data && setIsFilterLoading(false);
     } catch (error) {
+      setIsFilterLoading(false);
       console.error("Error making POST request:", error);
     }
   };
@@ -240,53 +263,9 @@ const EditorManagemenet = (props) => {
         obj?.editor_data?.username?.toLowerCase().startsWith(val) ||
         obj?.editor_data?.name?.toLowerCase().includes(val)
     );
-    setDisplayUser(filteredArray);
+    setAllFilterData(filteredArray);
   };
-  // const users = [
-  //   {
-  //     sr: "#0001",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_female,
-  //     age: "25 - 34",
-  //     country: "Ankara",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Journeyman",
-  //     profile: profile,
-  //   },
-  //   {
-  //     sr: "#0002",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_male,
-  //     age: "18 - 24",
-  //     country: "İstanbul",
-  //     date: "15-06-.2023 - 16:37",
-  //     profile: user1,
-  //   },
-  //   {
-  //     sr: "#0003",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_female,
-  //     age: "35 - 44",
-  //     country: "İzmir",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Expert",
-  //     profile: profile,
-  //   },
-  //   {
-  //     sr: "#0004",
-  //     name: "John Doe",
-  //     username: "johndoe",
-  //     gender: gender_male,
-  //     age: "25 - 34",
-  //     country: "Bursa",
-  //     date: "15-06-.2023 - 16:37",
-  //     role: "Apprentice",
-  //     profile: profile,
-  //   },
-  // ];
+
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [countryDropDown, setCountryDropDown] = useState(false);
@@ -502,6 +481,7 @@ const EditorManagemenet = (props) => {
   const [ageFilterDropDown, setAgeFilterDropDown] = useState(false);
 
   const handleCityFilterSelection = (gender) => {
+    console.log("gender::::::::::::::", gender);
     setSelectedCityFilter(gender);
   };
   const toggleCityFilterDropdown = () => {
@@ -684,129 +664,140 @@ const EditorManagemenet = (props) => {
             </button>
           </div>
         </div>
-        {props?.isLoading ? (
+        {props?.isLoading || isFilterLoading ? (
           <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
             Loading...
           </div>
         ) : (
           <>
-            {displayUser?.map((res, index) => (
-              <div
-                key={index}
-                // onClick={() => props.setupdateProfile(2)}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                onClick={() => {
-                  props.setupdateProfile(2);
-                  // console.log("LLLL");
-                  // console.log(res, "NEha");
-                  setPartialData(res);
-                  setAddUser(res.editor_data);
-                }}
-                className="px-2 py-1 mb-2 row-fonts cursor"
-                style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
-              >
-                <div className="row g-0 d-flex justify-content-between align-items-center">
-                  <div
-                    className="col-3"
+            {allFilterData?.length == 0 ? (
+              <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                No Record Found!
+              </div>
+            ) : (
+              allFilterData?.map((res, index) => (
+                <div
+                  key={index}
+                  // onClick={() => props.setupdateProfile(2)}
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  onClick={() => {
+                    props.setupdateProfile(2);
+                    // console.log("LLLL");
+                    // console.log(res, "NEha");
+                    setPartialData(res);
+                    setAddUser(res.editor_data);
+                  }}
+                  className="px-2 py-1 mb-2 row-fonts cursor"
+                  style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
+                >
+                  <div className="row g-0 d-flex justify-content-between align-items-center">
+                    <div
+                      className="col-3"
 
-                    // data-bs-toggle="modal"
-                    // onClick={() => {
-                    //   props.setupdateProfile(2);
-                    //   console.log("LLLL");
-                    //   console.log(res,"NEha");
-                    //   setPartialData(res);
-                    //   setAddUser(res.editor_data);
-                    // }}
-                    // data-bs-target="#exampleModal"
-                  >
-                    <div className="d-flex align-items-center">
-                      <span className="pe-1">{`# ${res?.editor_data?.id
-                        .toString()
-                        .padStart(4, "0")}`}</span>
-                      <div className="position-relative">
-                        <img
-                          className="rounded-circle profile-icon"
-                          src={`${
-                            res?.editor_data?.profile_pic
-                              ? server_url + res?.editor_data?.profile_pic
-                              : initialProfile
-                          }`}
-                          alt=""
-                          height={42}
-                          width={42}
-                        />
-                        <div
-                          className="position-absolute d-flex justify-content-center align-items-center crown-position"
-                          style={{
-                            height: "14px",
-                            width: "14px",
-                            border: "2px solid #FF9100",
-                            borderRadius: "50%",
-                            backgroundColor: "#0B2447",
-                            top: "0px",
-                            left: "27px",
-                          }}
-                        >
-                          <BiSolidCrown
-                            fontSize={"0.49rem"}
-                            style={{ color: "#FF9100" }}
+                      // data-bs-toggle="modal"
+                      // onClick={() => {
+                      //   props.setupdateProfile(2);
+                      //   console.log("LLLL");
+                      //   console.log(res,"NEha");
+                      //   setPartialData(res);
+                      //   setAddUser(res.editor_data);
+                      // }}
+                      // data-bs-target="#exampleModal"
+                    >
+                      <div className="d-flex align-items-center">
+                        <span className="pe-1">{`# ${res?.editor_data?.id
+                          .toString()
+                          .padStart(4, "0")}`}</span>
+                        <div className="position-relative">
+                          <img
+                            className="rounded-circle profile-icon"
+                            src={`${
+                              res?.editor_data?.profile_pic
+                                ? server_url + res?.editor_data?.profile_pic
+                                : initialProfile
+                            }`}
+                            alt=""
+                            height={42}
+                            width={42}
                           />
+                          <div
+                            className="position-absolute d-flex justify-content-center align-items-center crown-position"
+                            style={{
+                              height: "14px",
+                              width: "14px",
+                              border: "2px solid #FF9100",
+                              borderRadius: "50%",
+                              backgroundColor: "#0B2447",
+                              top: "0px",
+                              left: "27px",
+                            }}
+                          >
+                            <BiSolidCrown
+                              fontSize={"0.49rem"}
+                              style={{ color: "#FF9100" }}
+                            />
+                          </div>
                         </div>
+                        <span className="ps-1">{res?.editor_data?.name}</span>
                       </div>
-                      <span className="ps-1">{res?.editor_data?.name}</span>
+                    </div>
+                    <div className="d-flex gap-2 align-items-center col-1">
+                      <div>{res?.editor_data?.username}</div>
+                    </div>
+                    <div
+                      className="d-flex align-items-center block-width col-3 gap-1"
+                      style={{ minWidth: "7.5rem" }}
+                    >
+                      <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>
+                        %62
+                      </span>
+                      {res?.editor_data?.gender == "Male" && (
+                        <img src={gender_male} alt="" height={23} width={23} />
+                      )}
+                      {res?.editor_data?.gender == "Female" && (
+                        <img
+                          src={gender_female}
+                          alt=""
+                          height={23}
+                          width={23}
+                        />
+                      )}
+                      <span>{res?.editor_data?.age}</span>
+                      <div className="">{res?.editor_data?.country}</div>
+                    </div>
+                    <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
+                      <span>
+                        {moment(res?.editor_data?.created).format(
+                          "DD-MM.YYYY - HH:mm"
+                        )}
+                      </span>
+                      <img
+                        className="icons-edit-eye"
+                        src={circle_check}
+                        alt=""
+                        height={28}
+                        width={28}
+                      />
+                      <img
+                        className="icons-edit-eye"
+                        src={eye}
+                        alt=""
+                        height={28}
+                        width={28}
+                      />
                     </div>
                   </div>
-                  <div className="d-flex gap-2 align-items-center col-1">
-                    <div>{res?.editor_data?.username}</div>
-                  </div>
-                  <div
-                    className="d-flex align-items-center block-width col-3 gap-1"
-                    style={{ minWidth: "7.5rem" }}
-                  >
-                    <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>
-                      %62
-                    </span>
-                    {res?.editor_data?.gender == "Male" && (
-                      <img src={gender_male} alt="" height={23} width={23} />
-                    )}
-                    {res?.editor_data?.gender == "Female" && (
-                      <img src={gender_female} alt="" height={23} width={23} />
-                    )}
-                    <span>{res?.editor_data?.age}</span>
-                    <div className="">{res?.editor_data?.country}</div>
-                  </div>
-                  <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
-                    <span>
-                      {moment(res?.editor_data?.created).format(
-                        "DD-MM.YYYY - HH:mm"
-                      )}
-                    </span>
-                    <img
-                      className="icons-edit-eye"
-                      src={circle_check}
-                      alt=""
-                      height={28}
-                      width={28}
+                  {props?.verifyRqst && <VerificationRequestsBtns />}
+                  {props?.deactiveRqst && (
+                    <DeactivationRequestsBtns
+                      id={res?.editor_data?.id}
+                      editorManagementApiData={props.editorManagementApiData}
                     />
-                    <img
-                      className="icons-edit-eye"
-                      src={eye}
-                      alt=""
-                      height={28}
-                      width={28}
-                    />
-                  </div>
+                  )}
                 </div>
-                {props?.verifyRqst && <VerificationRequestsBtns />}
-                {props?.deactiveRqst && (
-                  <DeactivationRequestsBtns
-                    id={res?.editor_data?.id}
-                    editorManagementApiData={props.editorManagementApiData}
-                  />
-                )}
-              </div>
-            ))}
+              ))
+            )}
           </>
         )}
       </div>
@@ -1565,6 +1556,7 @@ const EditorManagemenet = (props) => {
                     <div
                       className={`${"customDropdown-dark-mode"} p-1 text-center`}
                       onClick={toggleCityFilterDropdown}
+                      style={{ cursor: "pointer" }}
                     >
                       <span>{selectedCityFilter}</span>
                     </div>
@@ -1574,6 +1566,7 @@ const EditorManagemenet = (props) => {
                       }`}
                       style={{
                         width: "45%",
+                        cursor: "pointer",
                       }}
                     >
                       {CityFilterOptions.map((option, index) => (

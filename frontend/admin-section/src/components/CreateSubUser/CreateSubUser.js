@@ -46,6 +46,7 @@ const CreateSubUser = (props) => {
 
   const handleDepartmentSelection = (department) => {
     setSelectedDepartment(department);
+    setDepartmentError("")
   };
 
   const toggleAuthTypeDropdown = () => {

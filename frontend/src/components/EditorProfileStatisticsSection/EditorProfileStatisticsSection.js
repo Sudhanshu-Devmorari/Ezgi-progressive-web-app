@@ -32,7 +32,9 @@ const EditorProfileStatisticsSection = (props) => {
 
   // API
   const [footballStats, setFootballStats] = useState([]);
+  const [footballCommentType, setFootballCommentType] = useState([]);
   const [basketballStats, setBasketballStats] = useState([]);
+  const [basketballCommentType, setBasketballCommentType] = useState([]);
   const [leagueFootballData, setLeagueFootballData] = useState([]);
   const [leagueBasketballData, setLeagueBasketballData] = useState([]);
 
@@ -46,7 +48,7 @@ const EditorProfileStatisticsSection = (props) => {
       user = userId;
     } else {
       // Handle the case where neither condition is met
-      user = localStorage.getItem('user-role'); // Set a default value if needed
+      user = localStorage.getItem("user-role"); // Set a default value if needed
     }
   }, []);
 
@@ -57,6 +59,39 @@ const EditorProfileStatisticsSection = (props) => {
         if (res.status === 200) {
           setBasketballStats(res.data[0]);
           setFootballStats(res.data[1]);
+
+          const FTData = res.data[1].football_comment_types.map(
+            (item, index) => {
+              let pathColor = "#37FF80"; // Default color
+              // Set different colors based on index
+              if (index === 1) {
+                pathColor = "#4DD5FF";
+              } else if (index === 2) {
+                pathColor = "#951AFF";
+              } else if (index === 3) {
+                pathColor = "#FFCC00";
+              }
+              return { ...item, pathColor };
+            }
+          );
+          setFootballCommentType(FTData);
+
+          const BTData = res.data[0].basketball_comment_types.map(
+            (item, index) => {
+              let pathColor = "#37FF80"; // Default color
+              // Set different colors based on index
+              if (index === 1) {
+                pathColor = "#4DD5FF";
+              } else if (index === 2) {
+                pathColor = "#951AFF";
+              } else if (index === 3) {
+                pathColor = "#FFCC00";
+              }
+              return { ...item, pathColor };
+            }
+          );
+          setBasketballCommentType(BTData);
+
           // setLeagueBasketballData(res.data[1].football_Leagues);
           const football = res.data[1].football_Leagues;
           const updatedFootball = football.map((item) => {
@@ -153,14 +188,17 @@ const EditorProfileStatisticsSection = (props) => {
           <>
             <div className="my-2">
               <div className="my-2">Comments Type</div>
-              <div className="row g-0 my-2 gap-3">
+              <div
+                className="row g-0 my-2 justify-content-evenly"
+                >
                 {SelectSport === "football"
-                  ? progressBarFootball.map((res, index) => (
-                      <div className="col">
+                  ? footballCommentType.map((res, index) => (
+                      <div className="col-3">
                         <CircularProgressbarWithChildren
-                          value={62}
+                          value={res.calculation}
                           strokeWidth={5}
                           styles={buildStyles({
+                            height:"100px",
                             textColor:
                               currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                             pathColor: res.pathColor,
@@ -174,21 +212,22 @@ const EditorProfileStatisticsSection = (props) => {
                                 currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                             }}
                           >
-                            {res.score}
+                            {res.calculation}
                           </span>
                           <div style={{ fontSize: 9, marginTop: -5 }}>
-                            {res.text}
+                            {res.prediction_type}
                           </div>
                         </CircularProgressbarWithChildren>
                       </div>
                     ))
                   : SelectSport === "basketball"
-                  ? progressBarBasketball.map((res, index) => (
-                      <div className="col">
+                  ? basketballCommentType.map((res, index) => (
+                      <div className="col-3">
                         <CircularProgressbarWithChildren
-                          value={62}
+                          value={res.calculation}
                           strokeWidth={5}
                           styles={buildStyles({
+                            height:"100px",
                             textColor:
                               currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                             pathColor: res.pathColor,
@@ -202,10 +241,10 @@ const EditorProfileStatisticsSection = (props) => {
                                 currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                             }}
                           >
-                            {res.score}
+                            {res.calculation}
                           </span>
                           <div style={{ fontSize: 10, marginTop: -5 }}>
-                            {res.text}
+                            {res.prediction_type}
                           </div>
                         </CircularProgressbarWithChildren>
                       </div>

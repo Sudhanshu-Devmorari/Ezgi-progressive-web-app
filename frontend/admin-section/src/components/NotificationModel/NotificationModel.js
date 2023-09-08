@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import cross from "../../assets/Group 81.svg";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import { useFormik } from "formik";
@@ -9,18 +9,66 @@ import config from "../../config";
 const NotificationModel = () => {
   const userTypeOptions = ["Standard", "Commentator", "Sub User"];
   const [userTypeDropdown, setUserTypeDropdown] = useState(false);
+  const [toDropdown, setToDropdown] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState("Select");
   const handleUserTypeSelection = (e) => {
-    formik.values.userType = e;
+    // formik.values.userType = e;
+    setSelectedUserType(e);
   };
   const toggleUserTypeDropdown = () => {
+    setToDropdown(false);
     setUserTypeDropdown(!userTypeDropdown);
   };
 
+  const handleToSelection = (option) => {
+    formik.values.to = option;
+    toggleToDropdown(); 
+  };
+
+  const toggleToDropdown = () => {
+    setUserTypeDropdown(false);
+    setToDropdown(!toDropdown);
+  };
+
+  // Get ALL Users
+  const [usernames, setUsernames] = useState([]);
+  function getUsers() {
+    try {
+      let userType = selectedUserType;
+      if (selectedUserType === "Sub User") {
+        userType = "sub_user";
+      }
+      if (selectedUserType !== "Select") {
+        axios
+          .get(`${config.apiUrl}/all-users/?userType=${userType.toLowerCase()}`)
+          .then((res) => {
+            // console.log(res.data);
+            const data = res?.data?.data;
+            if (data.length === 0) {
+              setUsernames(["User not found"]);
+            } else {
+              const extractedUsernames = data.map((user) => user.username);
+              setUsernames(extractedUsernames);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getUsers();
+  }, [selectedUserType]);
+
+  const adminUserId = localStorage.getItem('admin-user-id');
   const formik = useFormik({
     initialValues: {
       subject: "",
       user_type: "Select",
-      to: "",
+      to: "Select",
       sending_type: "",
       date: "",
       message: "",
@@ -29,10 +77,10 @@ const NotificationModel = () => {
       try {
         // console.log(values);
         const res = await axios.post(
-          `${config?.apiUrl}/notification-management/`,
+          `${config?.apiUrl}/notification-management/?sender=${adminUserId}`,
           values
         );
-        // console.log(res,"========================MMMM");
+        console.log(res,"========================MMMM");
         // console.log(res.status);
         if (res.status === 200) {
           Swal.fire({
@@ -108,7 +156,7 @@ const NotificationModel = () => {
                     <CustomDropdown
                       label="User Type"
                       options={userTypeOptions}
-                      selectedOption={formik.values.user_type}
+                      selectedOption={selectedUserType}
                       onSelectOption={handleUserTypeSelection}
                       isOpen={userTypeDropdown}
                       toggleDropdown={toggleUserTypeDropdown}
@@ -121,8 +169,8 @@ const NotificationModel = () => {
                   </div>
                 </div>
                 <div className="row my-2 g-0 gap-2">
-                  <div className="col d-flex flex-column">
-                    <span>To</span>
+                  <div className="col d-flex flex-column cursor">
+                    {/* <span>To</span>
                     <input
                       type="text"
                       className="darkMode-input form-control"
@@ -130,6 +178,19 @@ const NotificationModel = () => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={formik.values.to}
+                    />
+                    {formik.touched.to && formik.errors.to ? (
+                      <div className="error text-danger">
+                        {formik.errors.to}
+                      </div>
+                    ) : null} */}
+                    <CustomDropdown
+                      label="To"
+                      options={usernames}
+                      selectedOption={formik.values.to}
+                      onSelectOption={handleToSelection}
+                      isOpen={toDropdown}
+                      toggleDropdown={toggleToDropdown}
                     />
                     {formik.touched.to && formik.errors.to ? (
                       <div className="error text-danger">
@@ -191,7 +252,7 @@ const NotificationModel = () => {
                 </div>
                 <div className="my-4 d-flex justify-content-center">
                   <button
-                    // data-bs-dismiss="modal"
+                    data-bs-dismiss="modal"
                     type="submit"
                     className="px-4 py-1"
                     style={{
@@ -208,6 +269,10 @@ const NotificationModel = () => {
             </div>
             <img
               data-bs-dismiss="modal"
+              onClick={() => {
+                setUserTypeDropdown(false);
+                setToDropdown(false);
+              }}
               src={cross}
               alt=""
               style={{

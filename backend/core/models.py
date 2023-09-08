@@ -78,7 +78,10 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
 
-
+    class Meta:
+        indexes = [
+            models.Index(fields=['created']),
+        ]
 class FollowCommentator(models.Model):
     commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentator_user')
     standard_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='standard_user')
@@ -106,9 +109,13 @@ class Comments(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     is_resolve = models.BooleanField(default=False)
-    is_prediction = models.BooleanField()
+    is_prediction = models.BooleanField(null=True, blank=True)
     average_odds = models.FloatField(default=0)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['created']),
+        ]
 
 SUBSCRIPTION_STATUS = (
         ('active','Active'),
