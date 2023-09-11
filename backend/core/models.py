@@ -56,7 +56,7 @@ class User(AbstractBaseUser):
     commentator_status = models.CharField(max_length = 20, choices = EDITOR_STATUS, null=True, blank=True)
     authorization_type = models.CharField(max_length=100,null=True, blank=True)
     department = models.CharField(max_length=100,null=True, blank=True)
-    experience = models.CharField(max_length=20, choices=Experience, default="1-2 years")
+    experience = models.CharField(max_length=20, choices=Experience, null=True, blank=True)
     success_rate = models.FloatField(null=True, blank=True)
     score_points = models.IntegerField(null=True, blank=True)
     is_transaction = models.BooleanField(default=False)

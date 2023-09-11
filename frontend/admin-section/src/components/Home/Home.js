@@ -73,37 +73,11 @@ const Home = (props) => {
     }
   };
 
-  const validationSchema = Yup.object({
-    name: Yup.string()
-      .required("Name is required")
-      .min(5, "Name must be at least 5 characters")
-      .max(20, "Name must be at most 20 characters"),
-    username: Yup.string()
-      .required("Username is required")
-      .min(5, "Username must be at least 5 characters")
-      .max(15, "Username must be at most 15 characters"),
-    phone: Yup.string()
-      .required("Phone is required")
-      .matches(/^5\d*$/, "Phone must start with '5' and contain only digits")
-      .min(10, "Phone must be 10 digits")
-      .max(10, "Phone must be 10 digits"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      username: "",
-      phone: "",
-      password: "",
-    },
-    validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      //
-    },
-  });
+  
+  const [validName, setValidName] = useState(null);
+  const [validUsername, setValidUsername] = useState(null);
+  const [validPhone, setValidPhone] = useState(null);
+  const [validPassword, setValidPassword] = useState(null);
 
   const [addUser, setAddUser] = useState({});
   const [addUserError, setAddUserError] = useState({});
@@ -115,6 +89,46 @@ const Home = (props) => {
     value = e.target.value;
 
     setAddUser({ ...addUser, [name]: value });
+
+    if (name == "name") {
+      if (value?.length <= 5 || value?.length >= 20) {
+        console.log("asdadasdadd");
+        setValidName("Name must be 5 to 20 characters.");
+      } else {
+        setValidName(null);
+      }
+    } else if (name == "username") {
+      if (value?.length <= 5 || value?.length >= 15) {
+        setValidUsername("UserName must be 5 to 15 characters.");
+      } else {
+        setValidUsername(null);
+      }
+    } else if (name == "phone") {
+      console.log("regex", value?.match(/^5\d*$/));
+      if (value?.match(/^5\d*$/) == null || value?.length != 10) {
+        setValidPhone("Phone must start with '5' and must be 10 digits.");
+      } else {
+        setValidPhone(null);
+      }
+    } else if (name == "password") {
+      if (value?.length < 8) {
+        setValidPassword("Password must be at least 8 characters.");
+      } else {
+        setValidPassword(null);
+      }
+    } else if (name == "gender") {
+      if (value == "Select") {
+        setValidPassword("Please select gender.");
+      } else {
+        setValidPassword(null);
+      }
+    } else if (name == "age") {
+      if (value == "Select") {
+        setValidPassword("Please select age.");
+      } else {
+        setValidPassword(null);
+      }
+    }
   };
   const [cities, setCities] = useState([]);
 
@@ -172,7 +186,6 @@ const Home = (props) => {
   }, [props.users]);
 
   useEffect(() => {
-    console.log("displayUser::::::::::::::::::", displayUser);
   }, [displayUser]);
 
   const filterData = (e) => {
@@ -202,7 +215,7 @@ const Home = (props) => {
           age: selectedAgeFilter,
         }
       );
-      console.log("API Response:::::::::::::", response.data);
+      // console.log("API Response:::::::::::::", response.data);/
       setDisplayUser(response.data);
       setAllFilterData(response.data);
       response.data && setIsFilterLoading(false);
@@ -222,17 +235,10 @@ const Home = (props) => {
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
   }
-  console.log("first=========", addUser);
-  const handleAddUser = async () => {
-    if (addUser.name === "") {
-      console.log("if::::::::::::true", addUser.name)
-      setAddUserError({
-        ...addUserError,
-        name: "Please Enter the Name",
-      });
-    } else {
-      console.log("else:::::true")
-      // setModelClose(true)
+
+  const handleAddUser = async (e) => {
+    // console.log(Object.keys(addUser).length >= 6);
+    if (Object.keys(addUser).length >= 6) {
       const formData = new FormData();
       selectedImage != false && formData.append("file", selectedImage);
       // formData.append("date", addUser.date);
@@ -251,22 +257,39 @@ const Home = (props) => {
           `${config?.apiUrl}/user-management/`,
           formData
         );
+        // e.target.setAttribute("data-bs-dismiss","modal")
+        const modalElement = document.getElementById("exampleModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
         props?.userManagementApiData();
-        setModelClose(true);
-        // console.log("API Response:", response.data);
       } catch (error) {
-        if (error.response.data.error) {
+        if (error?.response?.data?.error) {
           Swal.fire({
             title: "Error",
-            text: `${error.response.data.error}`,
+            text: `${error?.response?.data?.error}`,
             icon: "error",
             backdrop: false,
             customClass: "dark-mode-alert",
           });
         }
-        console.error("Error making POST request:", error);
+        // console.error("Error making POST request:", error);
       }
+    } else {
+      Swal.fire({
+        title: "Error",
+        text: `Please fill all fields.`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
     }
+    // }
   };
 
   const handleUpdateUser = async (id) => {
@@ -762,7 +785,11 @@ const Home = (props) => {
                 {/* {console.log("********", preveiwProfilePic)} */}
                 {profile ? (
                   <img
-                    src={addUser.profile_pic ? server_url + addUser.profile_pic : initialProfile}
+                    src={
+                      addUser.profile_pic
+                        ? server_url + addUser.profile_pic
+                        : initialProfile
+                    }
                     alt=""
                     height={135}
                     width={135}
@@ -849,31 +876,44 @@ const Home = (props) => {
                 <div className="col d-flex flex-column">
                   <span>Name Surname</span>
                   <input
-                    onChange={submitUserData}
+                    onChange={(e) => {
+                      setValidName(e.target.value);
+                      submitUserData(e);
+                    }}
                     name="name"
                     value={addUser.name}
                     type="text"
                     className="darkMode-input form-control"
                     // {...formik.getFieldProps("name")}
                   />
-                  {addUserError && addUserError.name ? (
+                  {/* {addUserError && addUserError.name ? (
                     <small className="text-danger">{addUserError.name}</small>
+                  ) : null} */}
+                  {validName ? (
+                    <small className="text-danger">{validName}</small>
                   ) : null}
                 </div>
                 <div className="col d-flex flex-column">
                   <span>Username</span>
                   <input
-                    onChange={submitUserData}
+                    onChange={(e) => {
+                      setValidUsername(e.target.value);
+                      submitUserData(e);
+                    }}
                     name="username"
                     value={addUser.username}
                     type="text"
                     className="darkMode-input form-control"
+                    required
                     // {...formik.getFieldProps("username")}
                   />
-                  {formik.touched.username && formik.errors.username ? (
+                  {/* {formik.touched.username && formik.errors.username ? (
                     <small className="text-danger">
                       {formik.errors.username}
                     </small>
+                  ) : null} */}
+                  {validUsername ? (
+                    <small className="text-danger">{validUsername}</small>
                   ) : null}
                 </div>
               </div>
@@ -889,7 +929,10 @@ const Home = (props) => {
                       +90
                     </span>
                     <input
-                      onChange={submitUserData}
+                      onChange={(e) => {
+                        setValidPhone(e.target.value);
+                        submitUserData(e);
+                      }}
                       name="phone"
                       value={addUser.phone}
                       type="number"
@@ -899,15 +942,18 @@ const Home = (props) => {
                       // {...formik.getFieldProps("phone")}
                     />
                   </div>
-                  {formik.touched.phone && formik.errors.phone ? (
-                    <small className="text-danger">{formik.errors.phone}</small>
+                  {validPhone ? (
+                    <small className="text-danger">{validPhone}</small>
                   ) : null}
                 </div>
                 <div className="col d-flex flex-column ">
                   <span>Password</span>
                   <div className="darkMode-input">
                     <input
-                      onChange={submitUserData}
+                      onChange={(e) => {
+                        setValidPassword(e.target.value);
+                        submitUserData(e);
+                      }}
                       name="password"
                       value={addUser.password}
                       // style={{-webkit-text-security: square;}}
@@ -918,6 +964,9 @@ const Home = (props) => {
                       // onChange={(e) => setPassword(e.target.value)}
                       style={{ width: "12rem" }}
                     />
+                    {validPassword ? (
+                      <small className="text-danger">{validPassword}</small>
+                    ) : null}
                     {profile ? (
                       <>
                         {showPassword ? (
@@ -1187,9 +1236,10 @@ const Home = (props) => {
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
-                      data-bs-dismiss={modelClose && "modal"}
-                      onClick={() => {
-                        handleAddUser();
+                      // data-bs-target="modal"
+                      onClick={(e) => {
+                        handleAddUser(e);
+                        // setModelClose(false)
 
                         // props.onHide();
                       }}

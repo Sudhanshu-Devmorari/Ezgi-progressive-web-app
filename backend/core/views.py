@@ -1512,10 +1512,7 @@ class UserManagement(APIView):
         """
         try:
             phone = request.data['phone']
-            print("----", name)
             if User.objects.filter(phone=phone).exists():
-                v = User.objects.filter(phone=phone)
-                print("-------", v)
                 return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
             profile = request.FILES.get('file')
             date = request.data.get('date')
@@ -1526,7 +1523,7 @@ class UserManagement(APIView):
             age = request.data['age']
 
             subscription = request.data.get('subscription')
-            if subscription:
+            if subscription == 'True':
                 duration = request.data.get('duration')
                 role = 'commentator'
                 if request.data.get('level').lower() == 'expert':
@@ -1534,16 +1531,20 @@ class UserManagement(APIView):
                 else:
                     level = request.data.get('level').lower()
 
+                user_obj = User.objects.create(profile_pic=profile,
+                    name=name, username=username, phone=phone,
+                    password=password, gender=gender, age=age,
+                    user_role=role, commentator_level=level
+                    )
+                user_obj.save()
+            else:
+                user_obj = User.objects.create(profile_pic=profile,
+                    name=name, username=username, phone=phone,
+                    password=password, gender=gender, age=age
+                )
+                # user_obj.set_password(password)
+                user_obj.save()
 
-            # Any additional validations or processing can be done here
-
-            user_obj = User.objects.create(profile_pic=profile,
-                name=name, username=username, phone=phone,
-                password=password, gender=gender, age=age,
-                user_role=role, commentator_level=level
-            )
-            # user_obj.set_password(password)
-            user_obj.save()
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
                     obj = DataCount.objects.get(id=1)
@@ -1554,7 +1555,7 @@ class UserManagement(APIView):
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if subscription and user_obj != None:
+            if subscription == 'True' and user_obj != None:
                 start_date = datetime.now()
                 if duration == "1 Month":
                     end_date = start_date + timedelta(days=30)
@@ -1722,7 +1723,6 @@ class CommentsManagement(APIView):
 
         # Next, get the comment with the most likes
         comment_with_most_likes = comments_with_likes.order_by('-like_count')
-        print('comment_with_most_likes: ', comment_with_most_likes)
 
         # Finally, find the commentator who posted that comment
         for i in comment_with_most_likes:
