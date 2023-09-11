@@ -140,7 +140,7 @@ const ActiveComments = (props) => {
     try {
       // console.log(user, "===api");
       axios
-        .get(`${config.apiUrl}/user-statistics/${user}`)
+        .get(`${config.apiUrl}/user-statistics/${user}/`)
         .then((res) => {
           // console.log(res.data, "========>>>res sucess rate api res");
           setUserPoints({

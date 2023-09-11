@@ -3221,6 +3221,20 @@ class AdvertisementManagement(APIView):
             user = Advertisement.objects.get(pk=pk)
         except Advertisement.DoesNotExist:
             return Response({"error": "Advertisement not found."}, status=status.HTTP_404_NOT_FOUND)
+        print("request.data['data']============", request.data)
+        if 'count' in request.data:
+            if 'ads_view' in request.data['data']:
+                user.ad_views_count += 1
+                success_message = 'Ad view count incremented successfully.'
+
+            elif 'redirected_to_ad' in request.data['data']:
+                user.ad_clicks_and_redirected_count += 1
+                success_message = 'Ad click and redirection count incremented successfully.'
+
+            else:
+                return Response({'error': 'Invalid request data.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.save()
+            return Response({'data': success_message}, status=status.HTTP_200_OK)
         
         serializer = AdvertisementSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():

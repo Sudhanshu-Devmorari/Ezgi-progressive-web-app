@@ -249,12 +249,14 @@ ADVERTISEMENT_STATUS = (
 class Advertisement(models.Model):
     picture = models.ImageField(upload_to='advertisement_pic', null=True, blank=True)
     ads_space = models.CharField(max_length=100,null=True, blank=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     company_name = models.CharField(max_length=100,null=True, blank=True)
     link = models.CharField(max_length=100,null=True, blank=True)
     ads_budget = models.FloatField()
     status = models.CharField(max_length = 20, choices = ADVERTISEMENT_STATUS, default='pending')
+    ad_views_count = models.IntegerField(default=0)
+    ad_clicks_and_redirected_count = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

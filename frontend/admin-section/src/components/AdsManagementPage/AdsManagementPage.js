@@ -20,6 +20,7 @@ import config from "../../config";
 
 const AdsManagementPage = () => {
   const [editTrue, setEditTrue] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const adsArray = [
     {
@@ -41,17 +42,19 @@ const AdsManagementPage = () => {
   const [popUps, setPopUps] = useState(0);
 
   const AdsArray = [
-    { img: ad3, name: "Active", count: active },
-    { img: ad4, name: "Pending", count: pending },
-    { img: ad5, name: "Ended", count: end },
+    { img: ad3, name: "Active", count: isLoading ? "Loading..." : active },
+    { img: ad4, name: "Pending", count: isLoading ? "Loading..." : pending },
+    { img: ad5, name: "Ended", count: isLoading ? "Loading..." : end },
   ];
 
+  const [adsEditData, setAdsEditData] = useState([]);
   // Get Ads data API
   useEffect(() => {
     async function getAdsData() {
       try {
+        setIsLoading(true);
         const res = await axios.get(`${config?.apiUrl}/ads-management/`);
-        // console.log(res.data, "==========>>>res sub users");
+        console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setBanners(data.Banners);
         setActive(data.active);
@@ -60,12 +63,42 @@ const AdsManagementPage = () => {
         setEnd(data.end);
         setPending(data.pending);
         setPopUps(data.pop_ups);
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
     }
     getAdsData();
   }, []);
+
+  function DateTimeConverter({ datetime }) {
+    if (!datetime) return null;
+
+    const date = new Date(datetime);
+
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString();
+
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    const formattedDateTime = `${day}.${month}.${year} - ${hours}:${minutes}`;
+
+    return <span dangerouslySetInnerHTML={{ __html: formattedDateTime }} />;
+  }
+
+  function AdsPercentage({ ads, adClicksCount }) {
+    if (!ads || ads.length === 0) return null;
+
+    // Calculate the total number of ads
+    const totalAds = ads.length;
+
+    // Calculate the percentage
+    const percentage = (adClicksCount / totalAds) * 100;
+
+    return <span className="ps-1">{percentage.toFixed(1)}%</span>;
+  }
 
   return (
     <>
@@ -78,20 +111,18 @@ const AdsManagementPage = () => {
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>
               <div className="d-flex flex-column align-items-center justify-content-center col-2 dark-mode mx-2">
-                <img src={ad1} alt=""  className="icon" />
+                <img src={ad1} alt="" className="icon" />
                 <span className="heading">Advertisements</span>
-                <span className="number">{adsCount}</span>
+                <span className="number">
+                  {isLoading ? "Loading..." : adsCount}
+                </span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
                   {AdsArray.map((res, index) => (
                     <div className="d-flex flex-column align-items-center justify-content-center col">
                       <img src={res.img} alt="" className="icon" />
-                      <span
-                        className="heading"
-                      >
-                        {res.name}
-                      </span>
+                      <span className="heading">{res.name}</span>
                       <span className="number">{res.count}</span>
                     </div>
                   ))}
@@ -104,11 +135,15 @@ const AdsManagementPage = () => {
                 <div className="row g-0 pt-3">
                   <div className="col d-flex flex-column align-items-center justify-content-center">
                     <span className="heading">Banners</span>
-                    <span className="number">{banners}</span>
+                    <span className="number">
+                      {isLoading ? "Loading..." : banners}
+                    </span>
                   </div>
                   <div className="col d-flex flex-column align-items-center justify-content-center">
                     <span className="heading">Pop ups</span>
-                    <span style={{ fontSize: "1.6rem" }}>{popUps}</span>
+                    <span style={{ fontSize: "1.6rem" }}>
+                      {isLoading ? "Loading..." : popUps}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -141,177 +176,280 @@ const AdsManagementPage = () => {
                 </button>
               </div>
 
-              {adsArray.map((res, index) => (
-                <MainDiv>
-                  <>
-                    <div className="col-2 d-flex justify-content-center">
-                      <img src={res.img} alt="" height={100} width={100} />
+              {isLoading ? (
+                <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                  Loading...
+                </div>
+              ) : (
+                <>
+                  {ads.length == 0 ? (
+                    <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                      No Record Found!
                     </div>
+                  ) : (
+                    <>
+                      {ads.map((res, index) => (
+                        <MainDiv>
+                          <>
+                            <div className="col-2 d-flex justify-content-center">
+                              <img
+                                src={`${config.apiUrl}${res?.picture}`}
+                                alt="Ads.."
+                                height={100}
+                                width={100}
+                              />
+                            </div>
 
-                    <div className="col-4">
-                      {res.page === "Main" ? (
-                        <>
-                          <div className="gap-3 d-flex">
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "#4DD5FF",
-                                  borderRadius: "3px",
-                                  color: "#00D2A53",
-                                  border: "1px solid #4DD5FF",
-                                }}
-                              >
-                                Flash
-                              </button>
+                            <div className="col-4">
+                              <div className="gap-3 d-flex">
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "#FFEE7D",
+                                      borderRadius: "3px",
+                                      color: "#00D2A53",
+                                      border: "1px solid #FFEE7D",
+                                    }}
+                                  >
+                                    Banners
+                                  </button>
+                                </div>
+                                {res?.ads_space === "Main Page Top Left" && (
+                                  <div className="">
+                                    <button
+                                      style={{
+                                        backgroundColor: "transparent",
+                                        borderRadius: "3px",
+                                        color: "#4DD5FF",
+                                        border: "1px solid #4DD5FF",
+                                      }}
+                                    >
+                                      Main Page Top Right
+                                    </button>
+                                  </div>
+                                )}
+                                {res?.ads_space === "Main Page Top Right" && (
+                                  <div className="">
+                                    <button
+                                      style={{
+                                        backgroundColor: "transparent",
+                                        borderRadius: "3px",
+                                        color: "#4DD5FF",
+                                        border: "1px solid #4DD5FF",
+                                      }}
+                                    >
+                                      Main Page Top Right
+                                    </button>
+                                  </div>
+                                )}
+                                {res?.ads_space === "Timeline" && (
+                                  <div className="">
+                                    <button
+                                      style={{
+                                        backgroundColor: "transparent",
+                                        borderRadius: "3px",
+                                        color: "#DD7DFF",
+                                        border: "1px solid #DD7DFF",
+                                      }}
+                                    >
+                                      Timeline
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              {/* {res.page === "Main" ? (
+                            <>
+                              <div className="gap-3 d-flex">
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "#4DD5FF",
+                                      borderRadius: "3px",
+                                      color: "#00D2A53",
+                                      border: "1px solid #4DD5FF",
+                                    }}
+                                  >
+                                    Flash
+                                  </button>
+                                </div>
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "#FFEE7D",
+                                      borderRadius: "3px",
+                                      color: "#00D2A53",
+                                      border: "1px solid #FFEE7D",
+                                    }}
+                                  >
+                                    Banners
+                                  </button>
+                                </div>
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "#FFEE7D",
+                                      borderRadius: "3px",
+                                      color: "#00D2A53",
+                                      border: "1px solid #FFEE7D",
+                                    }}
+                                  >
+                                    Banners
+                                  </button>
+                                </div>
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "#4DD5FF",
+                                      borderRadius: "3px",
+                                      color: "#00D2A53",
+                                      border: "1px solid #4DD5FF",
+                                    }}
+                                  >
+                                    Flash
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="gap-2 my-2 d-flex">
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      borderRadius: "3px",
+                                      color: "#58DEAA",
+                                      border: "1px solid #58DEAA",
+                                    }}
+                                  >
+                                    Main Page Top Left
+                                  </button>
+                                </div>
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      borderRadius: "3px",
+                                      color: "#DD7DFF",
+                                      border: "1px solid #DD7DFF",
+                                    }}
+                                  >
+                                    Timeline
+                                  </button>
+                                </div>
+                                <div className="">
+                                  <button
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      borderRadius: "3px",
+                                      color: "#4DD5FF",
+                                      border: "1px solid #4DD5FF",
+                                    }}
+                                  >
+                                    Main Page Top Right
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="my-2">
+                                <button
+                                  style={{
+                                    backgroundColor: "#4DD5FF",
+                                    borderRadius: "3px",
+                                    color: "#00D2A53",
+                                    border: "1px solid #4DD5FF",
+                                  }}
+                                >
+                                  Flash
+                                </button>
+                              </div>
+                              <div className="">
+                                <button
+                                  style={{
+                                    backgroundColor: "transparent",
+                                    borderRadius: "3px",
+                                    color: "#FFDD00",
+                                    border: "1px solid #FFDD00",
+                                  }}
+                                >
+                                  Editor Page
+                                </button>
+                              </div>
+                            </>
+                          )} */}
                             </div>
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "#FFEE7D",
-                                  borderRadius: "3px",
-                                  color: "#00D2A53",
-                                  border: "1px solid #FFEE7D",
-                                }}
-                              >
-                                Banners
-                              </button>
+                            <div className="col-1 d-flex align-items-center">
+                              <div className="">
+                                {" "}
+                                {new URL(res?.link).hostname}
+                              </div>
                             </div>
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "#FFEE7D",
-                                  borderRadius: "3px",
-                                  color: "#00D2A53",
-                                  border: "1px solid #FFEE7D",
-                                }}
-                              >
-                                Banners
-                              </button>
+                            <div className="col-1 d-flex align-items-center">
+                              <img src={eye} alt="" height={24} width={24} />
+                              <span className="ps-1">
+                                {res?.ad_views_count}
+                              </span>
                             </div>
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "#4DD5FF",
-                                  borderRadius: "3px",
-                                  color: "#00D2A53",
-                                  border: "1px solid #4DD5FF",
-                                }}
-                              >
-                                Flash
-                              </button>
+                            <div className="col-1 d-flex align-items-center">
+                              <img
+                                src={pointer}
+                                alt=""
+                                height={24}
+                                width={24}
+                              />
+                              <span className="ps-1">
+                                {res?.ad_clicks_and_redirected_count}
+                              </span>
                             </div>
-                          </div>
-                          <div className="gap-2 my-2 d-flex">
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "transparent",
-                                  borderRadius: "3px",
-                                  color: "#58DEAA",
-                                  border: "1px solid #58DEAA",
-                                }}
-                              >
-                                Main Page Top Left
-                              </button>
+                            <div className="col-1 d-flex align-items-center">
+                              <img src={chart} alt="" height={24} width={24} />
+                              {/* <span className="ps-1">%43.8</span> */}
+                              <AdsPercentage
+                                ads={ads}
+                                adClicksCount={
+                                  res?.ad_clicks_and_redirected_count
+                                }
+                              />
                             </div>
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "transparent",
-                                  borderRadius: "3px",
-                                  color: "#DD7DFF",
-                                  border: "1px solid #DD7DFF",
-                                }}
-                              >
-                                Timeline
-                              </button>
+                            <div className="col-2 d-flex gap-2 justify-content-end pe-2 align-items-center">
+                              <div className="d-flex flex-column">
+                                {/* <span>08.06.2023 - 18:33</span> */}
+                                <DateTimeConverter datetime={res?.end_date} />
+                                <DateTimeConverter datetime={res?.start_date} />
+                              </div>
+                              <div className="">
+                                <img
+                                  onClick={() => {
+                                    setEditTrue(true);
+                                    setAdsEditData(res);
+                                  }}
+                                  className="cursor"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#CreateAds"
+                                  src={edit}
+                                  alt=""
+                                  height={25}
+                                  width={25}
+                                />
+                              </div>
                             </div>
-                            <div className="">
-                              <button
-                                style={{
-                                  backgroundColor: "transparent",
-                                  borderRadius: "3px",
-                                  color: "#4DD5FF",
-                                  border: "1px solid #4DD5FF",
-                                }}
-                              >
-                                Main Page Top Right
-                              </button>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="my-2">
-                            <button
-                              style={{
-                                backgroundColor: "#4DD5FF",
-                                borderRadius: "3px",
-                                color: "#00D2A53",
-                                border: "1px solid #4DD5FF",
-                              }}
-                            >
-                              Flash
-                            </button>
-                          </div>
-                          <div className="">
-                            <button
-                              style={{
-                                backgroundColor: "transparent",
-                                borderRadius: "3px",
-                                color: "#FFDD00",
-                                border: "1px solid #FFDD00",
-                              }}
-                            >
-                              Editor Page
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    <div className="col-1 d-flex align-items-center">
-                      <div className="">nesine.com</div>
-                    </div>
-                    <div className="col-1 d-flex align-items-center">
-                      <img src={eye} alt="" height={24} width={24} />
-                      <span className="ps-1">12.645</span>
-                    </div>
-                    <div className="col-1 d-flex align-items-center">
-                      <img src={pointer} alt="" height={24} width={24} />
-                      <span className="ps-1">4.645</span>
-                    </div>
-                    <div className="col-1 d-flex align-items-center">
-                      <img src={chart} alt="" height={24} width={24} />
-                      <span className="ps-1">%43.8</span>
-                    </div>
-                    <div className="col-2 d-flex gap-2 justify-content-end pe-2 align-items-center">
-                      <div className="d-flex flex-column">
-                        <span>08.06.2023 - 18:33</span>
-                        <span>23.06.2023 - 00:00</span>
-                      </div>
-                      <div className="">
-                        <img
-                          onClick={() => setEditTrue(true)}
-                          className="cursor"
-                          data-bs-toggle="modal"
-                          data-bs-target="#CreateAds"
-                          src={edit}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
-                      </div>
-                    </div>
-                  </>
-                </MainDiv>
-              ))}
+                          </>
+                        </MainDiv>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* <!-- Modal --> */}
-      <CreateAdsModal setEditTrue={setEditTrue} editTrue={editTrue} />
+      <CreateAdsModal
+        setEditTrue={setEditTrue}
+        editTrue={editTrue}
+        adsEditData={adsEditData}
+      />
     </>
   );
 };

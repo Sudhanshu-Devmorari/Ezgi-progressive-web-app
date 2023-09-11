@@ -7,13 +7,36 @@ import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
 
+  console.log(props.editTrue, "========props.editTrue");
+
+  const initialValues = props.editTrue
+    ? {
+        // Populate the form fields with the values from the API response
+        profile: null,
+        adsSpace: props.adsEditData.ads_space,
+        startDate: props.adsEditData.start_date,
+        endDate: props.adsEditData.end_date,
+        companyName: props.adsEditData.company_name,
+        link: props.adsEditData.link,
+        addBudget: props.adsEditData.ads_budget.toString(),
+      }
+    : {
+        profile: null,
+        startDate: "",
+        endDate: "",
+        companyName: "",
+        link: "",
+        addBudget: "",
+      };
+
   const validationSchema = Yup.object({
     profile: Yup.string().required("Required*"),
-    adsSpace: Yup.string().required("Required*"),
+    // adsSpace: Yup.string().required("Required*"),
     startDate: Yup.string().required("Required*"),
     endDate: Yup.string().required("Required*"),
     companyName: Yup.string().required("Required*"),
@@ -24,7 +47,7 @@ const CreateAdsModal = (props) => {
   const onSubmit = async (values) => {
     try {
       const formData = new FormData();
-      formData.append("ads_space", values.adsSpace);
+      formData.append("ads_space", selectedAdsSpace);
       formData.append("start_date", values.startDate);
       formData.append("end_date", values.endDate);
       formData.append("company_name", values.companyName);
@@ -38,7 +61,7 @@ const CreateAdsModal = (props) => {
       );
 
       // console.log("Response from backend:", response);
-      if (response.status === 200){
+      if (response.status === 200) {
         Swal.fire({
           title: "Success",
           text: "Ads Created!",
@@ -46,22 +69,37 @@ const CreateAdsModal = (props) => {
           backdrop: false,
           customClass: "dark-mode-alert",
         }).then((result) => {
-          if (result.isConfirmed){
+          if (result.isConfirmed) {
             window.location.reload();
           }
-        })
+        });
       }
     } catch (error) {
       console.error("Error sending data:", error);
     }
   };
 
+  const adsSpaceOptions = ["Timeline", "Main Page Top Right"];
+  const [selectedAdsSpace, setSelectedAdsSpace] =
+    useState("Main Page Top Left");
+
+  const handleAdsSpaceSelection = (adsSpace) => {
+    setSelectedAdsSpace(adsSpace);
+    // setAdsSpaceError("");
+  };
+
+  const toggleAdsSpaceDropdown = () => {
+    setAdsSpaceDropDown(!adsSpaceDropDown);
+  };
+
+  const [adsSpaceDropDown, setAdsSpaceDropDown] = useState(false);
+
   // Update Ads
   const updateAds = async () => {
-    try{
-      const res = await axios.patch(`${config?.apiUrl}/ads-management/`,)
-    } catch (error){}
-  }
+    try {
+      const res = await axios.patch(`${config?.apiUrl}/ads-management/`);
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -80,12 +118,12 @@ const CreateAdsModal = (props) => {
               <Formik
                 initialValues={{
                   profile: null,
-                  adsSpace: "",
+                  // adsSpace: "",
                   startDate: "",
                   endDate: "",
                   companyName: "",
                   link: "",
-                  addBudget: "",
+                  addBudget: "kkkkkkkkkkk",
                 }}
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
@@ -106,7 +144,7 @@ const CreateAdsModal = (props) => {
                         )}
                         <label htmlFor="profile">
                           <span
-                            className="py-1 mb-2 px-3 m-1"
+                            className="py-1 mb-2 px-3 m-1 cursor"
                             style={{
                               backgroundColor: "#0B2447",
                               borderRadius: "2px",
@@ -119,7 +157,7 @@ const CreateAdsModal = (props) => {
                               height={20}
                               width={20}
                             />
-                            <span className="ps-2 cursor">Upload</span>
+                            <span className="ps-2">Upload</span>
                           </span>
                         </label>
                         <input
@@ -144,7 +182,7 @@ const CreateAdsModal = (props) => {
                       {/* Ads Form Fields */}
                       <div className="row g-0 p-2 gap-3">
                         <div className="col d-flex flex-column">
-                          <span>Ads Space</span>
+                          {/* <span>Ads Space</span>
                           <Field
                             type="text"
                             name="adsSpace"
@@ -154,12 +192,20 @@ const CreateAdsModal = (props) => {
                             name="adsSpace"
                             component="div"
                             className="error-message text-danger px-2"
+                          /> */}
+                          <CustomDropdown
+                            label="Ads Space"
+                            options={adsSpaceOptions}
+                            selectedOption={selectedAdsSpace}
+                            onSelectOption={handleAdsSpaceSelection}
+                            isOpen={adsSpaceDropDown}
+                            toggleDropdown={toggleAdsSpaceDropdown}
                           />
                         </div>
                         <div className="col d-flex flex-column">
                           <span>Start Date</span>
                           <Field
-                            type="date"
+                            type="datetime-local"
                             name="startDate"
                             className="darkMode-input form-control text-center"
                           />
@@ -172,7 +218,7 @@ const CreateAdsModal = (props) => {
                         <div className="col d-flex flex-column">
                           <span>End Date</span>
                           <Field
-                            type="date"
+                            type="datetime-local"
                             name="endDate"
                             className="darkMode-input form-control text-center"
                           />
@@ -249,7 +295,10 @@ const CreateAdsModal = (props) => {
               </Formik>
             </div>
             <img
-              onClick={() => props?.setEditTrue(false)}
+              onClick={() => {
+                props?.setEditTrue(false);
+                setAdsSpaceDropDown(false);
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

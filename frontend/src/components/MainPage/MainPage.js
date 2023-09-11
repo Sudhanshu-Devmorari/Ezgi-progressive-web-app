@@ -68,6 +68,9 @@ const MainPage = () => {
     }
   }, []);
 
+  const [leftCornerAds, setLeftCornerAds] = useState([]);
+  const [rightCornerAds, setRightCornerAds] = useState([]);
+
   function homeApiData(user_id) {
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
@@ -77,6 +80,16 @@ const MainPage = () => {
         setHighlights(res?.data?.highlights);
         setsubscriptionComments(res?.data?.Subscription_Comments);
         setads(res?.data?.ads);
+        const ads = res?.data?.ads;
+        const leftCornerAdsFilter = ads.filter(
+          (res) => res.ads_space == "Main Page Top Left"
+        );
+        const rightCornerAdsFilter = ads.filter(
+          (res) => res.ads_space == "Main Page Right Left"
+        );
+        setLeftCornerAds(leftCornerAdsFilter);
+        setRightCornerAds(rightCornerAdsFilter);
+
         setVerifyid(res?.data?.verify_ids);
         setFollowingList(res?.data?.following_user);
         setFollowingId(res?.data?.following_user?.map((item) => item?.id));
@@ -87,7 +100,7 @@ const MainPage = () => {
           value: item,
         }));
         setCommentator(commentatorData);
-        mergeArrays()
+        mergeArrays();
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -96,7 +109,6 @@ const MainPage = () => {
 
   const mergeArrays = () => {
     if (subscriptionComments.length > 0) {
-
       let merged = [];
       let remainingPublic = [...publicComments];
       let remainingHighlights = [...highlights];
@@ -403,9 +415,11 @@ const MainPage = () => {
                 selectContent === "comments") && (
                 <>
                   <Banner
-                    data={
-                      ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
-                    }
+                    leftCornerAds={leftCornerAds}
+                    rightCornerAds={rightCornerAds}
+                    // data={
+                    //   ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
+                    // }
                   />
                   <EditorBanner
                     setSelectContent={setSelectContent}
