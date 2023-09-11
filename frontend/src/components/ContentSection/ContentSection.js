@@ -54,6 +54,9 @@ const ContentSection = ({
   cmtReact,
   homeApiData,
   setArrayMerge,
+  publicComments,
+  setPublicComments,
+  mergeArrays,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
@@ -136,15 +139,30 @@ const ContentSection = ({
     // else if(reaction === "clap")
     //   setClapCount(count)
 
-    localStorage.setItem(`${id}_${reaction}`, count);
     const res = await axios.post(
       `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
       {
         reaction_type: `${reaction}`,
       }
     );
-    // const user_id = localStorage.getItem("user-id");
-    homeApiData(userId);
+    // if (res.status == 200) {
+    //   console.log("res:::::::::::", res);
+    //   console.log("props:::::::::::", publicComments);
+    //   const filterdata = publicComments.filter((res) => res.id == id);
+    //   console.log("filterdata::::::::::::::", filterdata[0].total_reactions);
+    //   publicComments.filter(
+    //     (res) => res.id == id
+    //   )[0].total_reactions.total_clap = 501;
+
+    //   console.log("publicComments::::::::::::::::::", publicComments);
+    //   setPublicComments(publicComments);
+    //   mergeArrays();
+    // }
+    const user_id = localStorage.getItem("user-id");
+    console.log("user_id::::::::::::", user_id);
+    homeApiData(user_id);
+    mergeArrays();
+    localStorage.setItem(`${id}_${reaction}`, count);
   };
 
   // useEffect(() => {
@@ -260,7 +278,9 @@ const ContentSection = ({
                       onClick={() => {
                         followCommentator(
                           data?.value?.commentator_user?.id,
-                          followingid?.includes(data?.value.commentator_user?.id)
+                          followingid?.includes(
+                            data?.value.commentator_user?.id
+                          )
                         );
                       }}
                       style={{

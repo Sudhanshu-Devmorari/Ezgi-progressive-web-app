@@ -44,6 +44,17 @@ const ActiveComments = (props) => {
 
   const profileData = props?.profileData;
 
+  function truncateString(str, maxLength) {
+    if (str.length <= maxLength) {
+      return str;
+    } else {
+      // Subtract 3 from maxLength to make room for the ellipsis.
+      return str.substring(0, maxLength - 1) + "...";
+    }
+  }
+  const truncated = truncateString(profileData?.username, 7);
+  console.log(truncated, ":::::::::::::username:::::::::::::::::");
+
   let user;
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
@@ -131,6 +142,7 @@ const ActiveComments = (props) => {
       );
       // console.log("API Response:", response.data);
       props?.setIsFavorite(!props?.isFavorite);
+      props?.homeApiData(user_id);
     } catch (error) {
       console.error("Error making POST request:", error);
     }
@@ -138,11 +150,9 @@ const ActiveComments = (props) => {
 
   useEffect(() => {
     try {
-      // console.log(user, "===api");
       axios
         .get(`${config.apiUrl}/user-statistics/${user}/`)
         .then((res) => {
-          // console.log(res.data, "========>>>res sucess rate api res");
           setUserPoints({
             success_rate: res.data.Success_rate,
             score_point: res.data.Score_point,
@@ -190,7 +200,7 @@ const ActiveComments = (props) => {
             icon: "success",
           });
           const user_id = localStorage.getItem("user-id");
-          props.homeApiData(user_id);
+          props?.homeApiData(user_id);
         }
       } else {
         const res = await axios.get(
@@ -198,7 +208,7 @@ const ActiveComments = (props) => {
         );
         // console.log("On Follow",res)
         const user_id = localStorage.getItem("user-id");
-        props.homeApiData(user_id);
+        props?.homeApiData(user_id);
       }
     } catch (error) {
       console.error("Error fetching data.", error);
@@ -255,7 +265,7 @@ const ActiveComments = (props) => {
             </>
           )}
         </div>
-        <div className="row g-0">
+        <div className="row g-0 flex-nowrap">
           <div className="col pe-0 d-flex ">
             <div className="position-relative">
               <img
@@ -336,7 +346,8 @@ const ActiveComments = (props) => {
                 className="blueTick-responsive align-items-center mt-1 responsive-username"
                 style={{ fontSize: "14px" }}
               >
-                {profileData?.username}
+                {/* {profileData?.username} */}
+                {truncated}
                 <img
                   className="responsive-blue-tick"
                   src={blueTick}

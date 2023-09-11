@@ -58,12 +58,12 @@ const SharedProfile = ({
       });
   }
 
-  // useEffect(() => {
-  //   getfav(data?.value?.user?.id);
-  // }, []);
   useEffect(() => {
-    setIsFavorite(data?.value?.is_fav_editor);
+    getfav(data?.value?.user?.id);
   }, []);
+  // useEffect(() => {
+  //   setIsFavorite(data?.value?.is_fav_editor);
+  // }, []);
 
   const favEditor = async (id) => {
     const user_id = localStorage.getItem("user-id");

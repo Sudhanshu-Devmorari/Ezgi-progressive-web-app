@@ -107,112 +107,100 @@ const OTPModal = (props) => {
     setTimer(30);
     setIsTimerVisible(true);
     const phone = props?.signUpData.phone;
-    if (phone) {
-      // console.log("isphone");
+
+    try {
       const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
-        phone: phone,
+        phone: phone ? phone : props.forgotPsPhone,
         signup: "signup",
       });
-      // console.log(res.data, "======>>otp resend");
+      console.log(res.data, "======>>otp resend");
       if (res.data.status === 500) {
         setOtpError(res.data.error);
       }
-    } else {
-      // console.log("==else");
-      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
-        phone: props.forgotPsPhone,
-      });
-      // console.log(res.data, "======>>otp resend");
-      if (res.data.status === 500) {
-        setOtpError(res.data.error);
-      }
+    } catch (error) {
+      console.log("error:::::::::::::", error);
     }
   };
 
   return (
     <>
-      <div className="">
-        <div className="m-3 mt-4">
-          <div className="d-flex justify-content-center">
-            <span>
-              <RxCross2
-                onClick={() => {
-                  props.hide();
-                }}
-                fontSize={"1.8rem"}
-                className={`${
-                  currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
-                }`}
-              />
+      <div className="m-3 mt-4 otpMargin">
+        <div className="d-flex justify-content-center">
+          <span>
+            <RxCross2
+              onClick={() => {
+                props.hide();
+              }}
+              fontSize={"1.8rem"}
+              className={`${
+                currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
+              }`}
+            />
+          </span>
+        </div>
+        <div className="">We sent a SMS verification code to your phone.</div>
+        <div className="my-1 w-100">
+          <div className="d-flex justify-content-between">
+            <span>Enter 6 digit code</span>
+            <span
+              style={{
+                color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+              }}
+            >
+              {isTimerVisible &&
+                `${String(Math.floor(timer / 60)).padStart(2, "0")}:${String(
+                  timer % 60
+                ).padStart(2, "0")}`}
             </span>
           </div>
-          <div className="">We sent a SMS verification code to your phone.</div>
-          <div className="my-1">
-            <div className="d-flex justify-content-between">
-              <span>Enter 6 digit code</span>
+          <div className="w-100">
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              numInputs={6}
+              separator={<span> </span>}
+              inputStyle={`${
+                currentTheme === "dark"
+                  ? "otpinputdesign-dark-mode"
+                  : "otpinputdesign-light-mode"
+              } `}
+              containerStyle={"otpbox flex-wrap my-2"}
+              isInputNum={true}
+            />
+          </div>
+          <div className="d-flex justify-content-between align-items-center">
+            <small
+              className="text-danger w-100"
+              style={{ fontSize: "0.71rem" }}
+            >
+              {otpError}
+            </small>
+            <p className="mb-0 w-100 text-end" style={{ fontSize: "0.71rem" }}>
+              <small>Didn't get the code? </small>
               <span
+                onClick={() => {
+                  !isTimerVisible && handleResendOtp();
+                }}
                 style={{
                   color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                 }}
               >
-                {isTimerVisible &&
-                  `${String(Math.floor(timer / 60)).padStart(2, "0")}:${String(
-                    timer % 60
-                  ).padStart(2, "0")}`}
+                Send Again
               </span>
-            </div>
-            <div className="w-100">
-              <OtpInput
-                value={otp}
-                onChange={setOtp}
-                numInputs={6}
-                separator={<span> </span>}
-                inputStyle={`${
-                  currentTheme === "dark"
-                    ? "otpinputdesign-dark-mode"
-                    : "otpinputdesign-light-mode"
-                } `}
-                containerStyle={"otpbox  my-2"}
-                isInputNum={true}
-              />
-            </div>
-            <div className="d-flex justify-content-between align-items-center">
-              <small
-                className="text-danger w-100"
-                style={{ fontSize: "0.71rem" }}
-              >
-                {otpError}
-              </small>
-              <p
-                className="mb-0 w-100 text-end"
-                style={{ fontSize: "0.71rem" }}
-              >
-                <small>Didn't get the code? </small>
-                <span
-                  onClick={() => {
-                    !isTimerVisible && handleResendOtp();
-                  }}
-                  style={{
-                    color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                  }}
-                >
-                  Send Again
-                </span>
-              </p>
-            </div>
+            </p>
           </div>
-          <div className="d-flex flex-column align-items-center my-4">
-            <button
-              onClick={() => {
-                handleOTPVerification();
-              }}
-              className={`${
-                currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-              } px-3 py-1`}
-            >
-              {otpLoading ? "Loading..." : "Continue"}
-            </button>
-          </div>
+        </div>
+        <div className="d-flex flex-column align-items-center my-4">
+          <button
+            onClick={() => {
+              handleOTPVerification();
+            }}
+            className={`${
+              currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+            } px-3 py-1`}
+          >
+            {otpLoading ? "Loading..." : "Continue"}
+          </button>
         </div>
       </div>
     </>

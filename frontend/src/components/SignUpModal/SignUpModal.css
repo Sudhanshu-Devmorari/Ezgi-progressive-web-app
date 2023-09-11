@@ -73,12 +73,21 @@ input:focus {
 }
 .otpbox {
   gap: 0.7rem;
-  justify-content: center;
+  justify-content: space-between;
+}
+@media (max-width: 360px) {
+  .otpbox {
+    gap: 0.2rem !important;
+  }
+  .otpMargin {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
 }
 @media (min-width: 360px) and (max-width: 500px) {
   .otpbox {
-    gap: 0.7rem;
-    justify-content: center;
+    gap: 0.3rem;
+    justify-content: space-between;
   }
   .otpinputdesign-dark-mode {
     width: 2.3rem !important;
@@ -93,8 +102,8 @@ input:focus {
 }
 @media (min-width: 411px) and (max-width: 452px) {
   .otpbox {
-    gap: 1rem;
-    justify-content: center;
+    gap: 0.7rem;
+    justify-content: space-between;
   }
 }
 /* @media (min-width: 453px) and (max-width: 500px){

@@ -117,16 +117,24 @@ const SignUpModal = (props) => {
   const [userExists, setuserExists] = useState("");
 
   const handleSignUp = async () => {
-    if (selectedCity === "Select") {
+    if (
+      selectedCity === "Select" &&
+      selectedGender === "Select" &&
+      selectedAge === "Select" &&
+      !selectCheckBox
+    ) {
       setCityError("Please select your city.");
-    }
-    if (selectedGender === "Select") {
       setGenderError("Please select your gender.");
-    }
-    if (selectedAge === "Select") {
       setAgeError("Please select your age.");
-    }
-    if (!selectCheckBox) {
+      setCheckboxError("Please select the checkbox to proceed.");
+    } else if (selectedCity === "Select") {
+      console.log("if city true:::::::::::");
+      setCityError("Please select your city.");
+    } else if (selectedGender === "Select") {
+      setGenderError("Please select your gender.");
+    } else if (selectedAge === "Select") {
+      setAgeError("Please select your age.");
+    } else if (!selectCheckBox) {
       setCheckboxError("Please select the checkbox to proceed.");
     } else {
       setbtnLoading(true);
@@ -315,6 +323,14 @@ const SignUpModal = (props) => {
       }
     },
   });
+
+  const handleBackButtonArrow = () => {
+    setShowModal(1);
+    setSelectedCity("Select");
+    setSelectedGender("Select");
+    setSelectedAge("Select");
+    setSelectCheckBox(!selectCheckBox);
+  };
 
   return (
     <>
@@ -524,7 +540,10 @@ const SignUpModal = (props) => {
                 >
                   <span>
                     <i
-                      onClick={() => setShowModal(1)}
+                      onClick={() => {
+                        handleBackButtonArrow();
+                        // setShowModal(1);
+                      }}
                       className="fa-solid fa-arrow-left-long"
                       style={{
                         fontSize: "21px",
@@ -636,7 +655,10 @@ const SignUpModal = (props) => {
                         }
                         style={{ width: "25px", cursor: "pointer" }}
                         className="me-2"
-                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                        onClick={() => {
+                          setSelectCheckBox(!selectCheckBox);
+                          setCheckboxError("");
+                        }}
                       />
                     ) : (
                       <img
@@ -645,7 +667,10 @@ const SignUpModal = (props) => {
                         }
                         style={{ width: "25px", cursor: "pointer" }}
                         className="me-2"
-                        onClick={() => setSelectCheckBox(!selectCheckBox)}
+                        onClick={() => {
+                          setSelectCheckBox(!selectCheckBox);
+                          setCheckboxError("");
+                        }}
                         alt=""
                       />
                     )}
@@ -661,12 +686,14 @@ const SignUpModal = (props) => {
                       Terms of use
                     </span>
                   </div>
-                  <small
-                    className="text-danger mb-3"
-                    style={{ fontSize: "0.71rem" }}
-                  >
-                    {checkboxError}
-                  </small>
+                  {checkboxError && !selectCheckBox && (
+                    <small
+                      className="text-danger mb-3"
+                      style={{ fontSize: "0.71rem" }}
+                    >
+                      {checkboxError}
+                    </small>
+                  )}
                   <div className="d-flex flex-column align-items-center my-4">
                     <button
                       onClick={() => {

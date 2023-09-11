@@ -54,6 +54,7 @@ const MainPage = () => {
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(initialProfile);
   const [isLoading, setIsLoading] = useState(false);
+  const user_id = localStorage.getItem("user-id");
 
   async function getProfileData() {
     setIsLoading(true);
@@ -72,6 +73,7 @@ const MainPage = () => {
   const [rightCornerAds, setRightCornerAds] = useState([]);
 
   function homeApiData(user_id) {
+    console.log("userId::::::::::::", user_id);
     axios
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
@@ -299,7 +301,6 @@ const MainPage = () => {
       document.body.classList.add("body-light-mode");
       setCurrentTheme("light");
     }
-    const user_id = localStorage.getItem("user-id");
     homeApiData(user_id);
   }, [themeMode]);
 
@@ -468,6 +469,9 @@ const MainPage = () => {
                               followingid={followingid}
                               verifyid={verifyid}
                               cmtReact={cmtReact}
+                              publicComments={publicComments}
+                              setPublicComments={setPublicComments}
+                              mergeArrays={mergeArrays}
                             />
                           </>
                         );
@@ -541,6 +545,9 @@ const MainPage = () => {
                               followingid={followingid}
                               verifyid={verifyid}
                               cmtReact={cmtReact}
+                              publicComments={publicComments}
+                              setPublicComments={setPublicComments}
+                              mergeArrays={mergeArrays}
                             />
                           </>
                         );
@@ -605,6 +612,9 @@ const MainPage = () => {
                               followingid={followingid}
                               verifyid={verifyid}
                               cmtReact={cmtReact}
+                              publicComments={publicComments}
+                              setPublicComments={setPublicComments}
+                              mergeArrays={mergeArrays}
                             />
                           </>
                         );
@@ -672,8 +682,23 @@ const MainPage = () => {
               {selectContent === "become-editor" && <BecomeEditor />}
               {selectContent === "category-content" && (
                 <>
-                  {contentFilterData?.map((res) => (
-                    <ContentSection data={res} />
+                  {contentFilterData?.map((res, index) => (
+                    <ContentSection
+                      key={index}
+                      data={res}
+                      setActiveCommentsshow={setActiveCommentsshow}
+                      homeApiData={homeApiData}
+                      setData={setData}
+                      selectContent={selectPublicorForYou}
+                      setSelectContent={setSelectContent}
+                      followingList={followingList}
+                      followingid={followingid}
+                      verifyid={verifyid}
+                      cmtReact={cmtReact}
+                      mergeArrays={mergeArrays}
+                      publicComments={publicComments}
+                      setPublicComments={setPublicComments}
+                    />
                   ))}
                 </>
               )}

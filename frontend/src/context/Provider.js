@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import CurrentTheme from "./CurrentTheme";
 
 const ContextProvider = (props) => {
-  const [currentTheme, setCurrentTheme] = useState("light");
+  const currentThemeLocal = localStorage.getItem("CurrentTheme");
+  const [currentTheme, setCurrentTheme] = useState(
+    currentThemeLocal ? currentThemeLocal : "light"
+  );
   const [ShowModal, setShowModal] = useState(1);
 
   return (
