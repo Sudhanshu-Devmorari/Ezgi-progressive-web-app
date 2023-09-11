@@ -2286,11 +2286,13 @@ class EditorManagement(APIView):
         """
         # print("+++++", request.data)
         try:
+            phone = request.data['phone']
+            if User.objects.filter(phone=phone).exists():
+                return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
             profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
             username = request.data['username']
-            phone = request.data['phone']
             password = request.data['password']
             gender = request.data['gender']
             age = request.data['age']

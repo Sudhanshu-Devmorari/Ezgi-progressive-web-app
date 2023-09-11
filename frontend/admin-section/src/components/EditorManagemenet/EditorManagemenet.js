@@ -31,6 +31,20 @@ const EditorManagemenet = (props) => {
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);
 
+  const [validName, setValidName] = useState(null);
+  const [validUsername, setValidUsername] = useState(null);
+  const [validPhone, setValidPhone] = useState(null);
+  const [validPassword, setValidPassword] = useState(null);
+  const [validCountry, setValidCountry] = useState(null);
+  const [validCity, setValidCity] = useState(null);
+  const [validCategory, setValidCategory] = useState(null);
+  const [validGender, setValidGender] = useState(null);
+  const [validAge, setValidAge] = useState(null);
+  const [validAbout, setValidAbout] = useState(null);
+  const [validLevel, setValidLevel] = useState(null);
+
+  const [levelRadio, setLevelRadio] = useState("Select");
+
   const handleDeactive = async (id) => {
     try {
       const res = await axios.delete(
@@ -106,6 +120,40 @@ const EditorManagemenet = (props) => {
     name = e.target.name;
     value = val ? val : e.target.value;
     setAddUser({ ...addUser, [name]: value });
+
+    if (name == "name") {
+      if (value?.length <= 5 || value?.length >= 20) {
+        // console.log("asdadasdadd");
+        setValidName("Name must be 5 to 20 characters.");
+      } else {
+        setValidName(null);
+      }
+    } else if (name == "username") {
+      if (value?.length <= 5 || value?.length >= 15) {
+        setValidUsername("UserName must be 5 to 15 characters.");
+      } else {
+        setValidUsername(null);
+      }
+    } else if (name == "phone") {
+      // console.log("regex", value?.match(/^5\d*$/));
+      if (value?.match(/^5\d*$/) == null || value?.length != 10) {
+        setValidPhone("Phone must start with '5' and must be 10 digits.");
+      } else {
+        setValidPhone(null);
+      }
+    } else if (name == "password") {
+      if (value?.length < 8) {
+        setValidPassword("Password must be at least 8 characters.");
+      } else {
+        setValidPassword(null);
+      }
+    } else if (name == "about") {
+      if (value?.length > 250) {
+        setValidAbout("About must be less then 250 characters.");
+      } else {
+        setValidAbout(null);
+      }
+    }
   };
   // console.log("+++++++", addUser)
 
@@ -118,7 +166,7 @@ const EditorManagemenet = (props) => {
   // }, [props.users]);
 
   useEffect(() => {
-    console.log("displayUser::::::::::::::::::", displayUser);
+    // console.log("displayUser::::::::::::::::::", displayUser);
   }, [displayUser]);
 
   useEffect(() => {
@@ -144,42 +192,105 @@ const EditorManagemenet = (props) => {
   }
 
   const handleNewEditor = async () => {
-    // console.log("_____: ", addUser)
-    const formData = new FormData();
-    formData.append("file", selectedImage);
-    formData.append("name", addUser.name);
-    formData.append("username", addUser.username);
-    formData.append("phone", addUser.phone);
-    formData.append("password", addUser.password);
-    formData.append("about", addUser.about);
-    formData.append("country", addUser.country);
-    formData.append("city", addUser.city);
-    formData.append("category", `{"${addUser.category}"}`);
-    formData.append("gender", addUser.gender);
-    formData.append("age", addUser.age);
-    formData.append("level", addUser.level);
-    const id = 1; // temp
-    try {
-      const response = await axios.patch(
-        `${config?.apiUrl}/editor-management/${id}/`,
-        formData
-      );
+    if (selectedCountry == "Select") {
+      setValidCountry("Please select age.");
+    } else {
+      setValidCountry(null);
+    }
 
-      if (response.status === 200) {
-        Swal.fire({
-          title: "Success",
-          text: "Editor Created!",
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+    if (selectedCity == "Select") {
+      setValidCity("Please select age.");
+    } else {
+      setValidCity(null);
+    }
+
+    if (selectedCategory == "Select") {
+      setValidCategory("Please select age.");
+    } else {
+      setValidCategory(null);
+    }
+
+    if (selectedGender == "Select") {
+      setValidGender("Please select gender.");
+    } else {
+      setValidGender(null);
+    }
+
+    if (selectedAge == "Select") {
+      setValidAge("Please select age.");
+    } else {
+      setValidAge(null);
+    }
+
+    if (levelRadio == "Select") {
+      setValidLevel("Please select Editor's level.");
+    } else {
+      setValidLevel(null);
+    }
+
+    if (Object.keys(addUser).length >= 11) {
+      // console.log("_____: ", addUser)
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+      formData.append("name", addUser.name);
+      formData.append("username", addUser.username);
+      formData.append("phone", addUser.phone);
+      formData.append("password", addUser.password);
+      formData.append("about", addUser.about);
+      formData.append("country", addUser.country);
+      formData.append("city", addUser.city);
+      formData.append("category", `{"${addUser.category}"}`);
+      formData.append("gender", addUser.gender);
+      formData.append("age", addUser.age);
+      formData.append("level", addUser.level);
+      const id = 1; // temp
+      try {
+        const response = await axios.post(
+          `${config?.apiUrl}/editor-management/`,
+          formData
+        );
+        const modalElement = document.getElementById("exampleModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        if (response.status === 200) {
+          Swal.fire({
+            title: "Success",
+            text: "Editor Created!",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+
+        // setDisplayUser(response.data);
+
+        // console.log('API Response:', response.data);
+      } catch (error) {
+        if (error?.response?.data?.error) {
+          Swal.fire({
+            title: "Error",
+            text: `${error?.response?.data?.error}`,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        console.error("Error making POST request:", error);
       }
-
-      // setDisplayUser(response.data);
-
-      // console.log('API Response:', response.data);
-    } catch (error) {
-      console.error("Error making POST request:", error);
+    } else {
+      Swal.fire({
+        title: "Error",
+        text: `Please fill all fields.`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
     }
   };
 
@@ -228,10 +339,10 @@ const EditorManagemenet = (props) => {
 
   const handleEditorFiltor = async () => {
     setIsFilterLoading(true);
-    console.log("city:::::::::::::", selectedCityFilter);
-    console.log("age:::::::::::::", selectedAgeFilter);
-    console.log("gender:::::::::::::", selectedGenderFilter);
-    console.log("score_point:::::::::::::", selectedScorePointFilter);
+    // console.log("city:::::::::::::", selectedCityFilter);
+    // console.log("age:::::::::::::", selectedAgeFilter);
+    // console.log("gender:::::::::::::", selectedGenderFilter);
+    // console.log("score_point:::::::::::::", selectedScorePointFilter);
     try {
       const response = await axios.post(`${config?.apiUrl}/filter-editors/`, {
         lavel: selectedLevelFilter,
@@ -241,7 +352,7 @@ const EditorManagemenet = (props) => {
         age: selectedAgeFilter,
         gender: selectedGenderFilter,
       });
-      console.log("response.data:::::::::::::", response.data)
+      // console.log("response.data:::::::::::::", response.data)
       setDisplayUser(response.data);
       setAllFilterData(response.data);
       response.data && setIsFilterLoading(false);
@@ -481,7 +592,7 @@ const EditorManagemenet = (props) => {
   const [ageFilterDropDown, setAgeFilterDropDown] = useState(false);
 
   const handleCityFilterSelection = (gender) => {
-    console.log("gender::::::::::::::", gender);
+    // console.log("gender::::::::::::::", gender);
     setSelectedCityFilter(gender);
   };
   const toggleCityFilterDropdown = () => {
@@ -1096,22 +1207,33 @@ const EditorManagemenet = (props) => {
                     <div className="col d-flex flex-column">
                       <span>Name Surname</span>
                       <input
-                        onChange={submitEditorData}
+                        // onChange={submitEditorData}
+                        onChange={(e) => {
+                          submitEditorData(e);
+                        }}
                         name="name"
                         value={addUser.name}
                         type="text"
                         className="darkMode-input form-control"
                       />
+                      {validName ? (
+                        <small className="text-danger">{validName}</small>
+                      ) : null}
                     </div>
                     <div className="col d-flex flex-column">
                       <span>Username</span>
                       <input
-                        onChange={submitEditorData}
+                        onChange={(e) => {
+                          submitEditorData(e);
+                        }}
                         name="username"
                         value={addUser.username}
                         type="text"
                         className="darkMode-input form-control"
                       />
+                      {validUsername ? (
+                        <small className="text-danger">{validUsername}</small>
+                      ) : null}
                     </div>
                     <div className="col d-flex flex-column">
                       <span>Phone</span>
@@ -1124,23 +1246,30 @@ const EditorManagemenet = (props) => {
                           +90
                         </span>
                         <input
-                          onChange={submitEditorData}
+                          onChange={(e) => {
+                            submitEditorData(e);
+                          }}
                           name="phone"
                           value={addUser.phone}
-                          type="text"
+                          type="number"
                           class="form-control darkMode-input"
                           aria-label="Username"
                           aria-describedby="basic-addon1"
                         />
+                        {validPhone ? (
+                          <small className="text-danger">{validPhone}</small>
+                        ) : null}
                       </div>
                     </div>
                   </div>
                   <div className="row g-0 gap-3">
                     <div className="col d-flex flex-column">
                       <span>Password</span>
-                      <div className="darkMode-input">
+                      <div className="darkMode-input input-group align-items-center">
                         <input
-                          onChange={submitEditorData}
+                          onChange={(e) => {
+                            submitEditorData(e);
+                          }}
                           name="password"
                           value={addUser.password}
                           // style={{-webkit-text-security: square;}}
@@ -1150,28 +1279,36 @@ const EditorManagemenet = (props) => {
                           // value={password}
                           // onChange={(e) => setPassword(e.target.value)}
                         />
+
                         {showPassword ? (
-                          <AiOutlineEyeInvisible
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              top: "16.6rem",
-                              left: "14rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEyeInvisible
+                              fontSize={"1.5rem"}
+                              // style={{
+                              //   position: "absolute",
+                              //   top: "16.6rem",
+                              //   left: "14rem",
+                              // }}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         ) : (
-                          <AiOutlineEye
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              top: "16.6rem",
-                              left: "14rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEye
+                              fontSize={"1.5rem"}
+                              // style={{
+                              //   position: "absolute",
+                              //   top: "16.6rem",
+                              //   left: "14rem",
+                              // }}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         )}
                       </div>
+                      {validPassword ? (
+                        <small className="text-danger">{validPassword}</small>
+                      ) : null}
                     </div>
                     <div className="col">
                       <CustomDropdownEditor
@@ -1187,6 +1324,9 @@ const EditorManagemenet = (props) => {
                         isOpen={countryDropDown}
                         toggleDropdown={toggleCountryDropdown}
                       />
+                      {validCountry ? (
+                        <small className="text-danger">{validCountry}</small>
+                      ) : null}
                     </div>
                     <div className="col">
                       <CustomDropdownEditor
@@ -1202,6 +1342,9 @@ const EditorManagemenet = (props) => {
                         isOpen={cityDropDown}
                         toggleDropdown={toggleCityDropdown}
                       />
+                      {validCity ? (
+                        <small className="text-danger">{validCity}</small>
+                      ) : null}
                     </div>
                   </div>
                   <div className="row gap-3 g-0 my-2">
@@ -1219,6 +1362,9 @@ const EditorManagemenet = (props) => {
                         isOpen={categoryDropdown}
                         toggleDropdown={toggleCategoryDropdown}
                       />
+                      {validCategory ? (
+                        <small className="text-danger">{validCategory}</small>
+                      ) : null}
                     </div>
                     <div className="col">
                       <CustomDropdownEditor
@@ -1234,6 +1380,9 @@ const EditorManagemenet = (props) => {
                         isOpen={genderDropDown}
                         toggleDropdown={toggleGenderDropdown}
                       />
+                      {validGender ? (
+                        <small className="text-danger">{validGender}</small>
+                      ) : null}
                     </div>
                     <div className="col">
                       <CustomDropdownEditor
@@ -1247,6 +1396,9 @@ const EditorManagemenet = (props) => {
                         isOpen={ageDropDown}
                         toggleDropdown={toggleAgeDropdown}
                       />
+                      {validAge ? (
+                        <small className="text-danger">{validAge}</small>
+                      ) : null}
                     </div>
                   </div>
                   <div className="row g-0 my-2 gap-4">
@@ -1267,6 +1419,9 @@ const EditorManagemenet = (props) => {
                           Max. 250 character
                         </span>
                       </div>
+                      {validAbout ? (
+                        <small className="text-danger">{validAbout}</small>
+                      ) : null}
                     </div>
                     {props.updateProfile !== 2 && (
                       <div className="col-4 d-flex flex-column justify-content-center gap-2">
@@ -1279,6 +1434,7 @@ const EditorManagemenet = (props) => {
                             onClick={(e) => {
                               setIsJourneymanSelected(!isJourneymanSelected);
                               submitEditorData(e, "jouneyman");
+                              setLevelRadio("jouneyman");
                             }}
                             src={
                               addUser.level == "jouneyman"
@@ -1299,6 +1455,7 @@ const EditorManagemenet = (props) => {
                             onClick={(e) => {
                               setIsExpertSelected(!isExpertSelected);
                               submitEditorData(e, "master");
+                              setLevelRadio("master");
                             }}
                             src={
                               addUser.level == "master" ? selectedRadio : Radio
@@ -1317,6 +1474,7 @@ const EditorManagemenet = (props) => {
                             onClick={(e) => {
                               setIsGrandmasterSelected(!isGrandmasterSelected);
                               submitEditorData(e, "grandmaster");
+                              setLevelRadio("grandmaster");
                             }}
                             src={
                               addUser.level == "grandmaster"
@@ -1328,9 +1486,14 @@ const EditorManagemenet = (props) => {
                           />
                           <span className="px-2">Grandmaster</span>
                         </div>
+                      <div className="">
+                      {validLevel ? (
+                        <small className="text-danger">{validLevel}</small>
+                      ) : null}
+                    </div>
                       </div>
                     )}
-
+                    
                     <div
                       className={`d-flex justify-content-center my-2 ${
                         props.updateProfile === 2 && "gap-3"
@@ -1452,7 +1615,7 @@ const EditorManagemenet = (props) => {
                       ) : (
                         <button
                           onClick={handleNewEditor}
-                          data-bs-dismiss="modal"
+                          // data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
                             color: "#D2DB08",

@@ -68,7 +68,7 @@ const CommentsManagement = (props) => {
         filter_type0: secondStatus,
       })
       .then((res) => {
-        console.log(res.data,"=====>>filter");
+        // console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
       })
@@ -410,7 +410,7 @@ const CommentsManagement = (props) => {
 
           const predictionsPromises = matchIds.map(async (val) => {
             const predictions = await axios.get(
-              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
               { headers }
             );
             return predictions.data.data.gameType; // Assuming you want to return the data from each API call

@@ -31,12 +31,13 @@ const AddCommentModal = (props) => {
   //   "Match Details 2",
   //   "Match Details 3",
   // ];
+  const [allBetsData, setAllBetsData] = useState([]);
 
   const [matchDetailsOptions, setMatchDetailsOptions] = useState([]);
   const [predictionType, setPredictionType] = useState([]);
   const [predictionData, setPredictionData] = useState([]);
 
-  const predictionTypeOptions =predictionType;
+  const predictionTypeOptions = predictionType;
   const predictionOptions = predictionData;
 
   const categoryOptions = ["Futbol", "Basketbol"];
@@ -124,6 +125,8 @@ const AddCommentModal = (props) => {
     
     MatchDetailsAPI(categoryType, selectedLeague, date)
     .then((res) => {
+      console.log("======data=======", res.data)
+
       const MatchList = res.data;
       setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
           setMatchId(MatchList.map((item) => item.MatchID));
@@ -153,6 +156,7 @@ const AddCommentModal = (props) => {
   };  
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
+    setPredictionData(allBetsData.filter((x)=>x.gameName==predictionType).map((x)=>x.odds).flat().map((x)=>x.value))
     setPredictionTypeError("")
   };
   const togglePredictionTypeDropdown = () => {
@@ -326,8 +330,8 @@ const AddCommentModal = (props) => {
         }
       } catch (error) {
         console.log(error);
-        console.log(error.response.status);
-        console.log(error.response.data.message);
+        // console.log(error.response.status);
+        // console.log(error.response.data.message);
         if (error.response.status === 404) {
           // console.log("KKKK");
           Swal.fire({
@@ -343,7 +347,9 @@ const AddCommentModal = (props) => {
     }
   };
 
+  const handlePredictionTypeChange = async ()=>{
 
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -356,23 +362,27 @@ const AddCommentModal = (props) => {
         }
         
         try {
+          let holder = []
           const predictionsPromises = matchId.map(async (val) => {
             const predictions = await axios.get(
-              `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
+              `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
               { headers }
             );
+            holder = ([...holder,...predictions.data.data.Bets])
             return predictions.data.data.gameType; // Assuming you want to return the data from each API call
           });
-      
+          
           // Wait for all API calls to complete
           const predictionsData = await Promise.all(predictionsPromises);
-      
+          setAllBetsData(holder)
+          
           // Flatten and remove duplicates from the predictionsData array
           const uniquePredictions = [...new Set(predictionsData.flat())];
       
           // console.log("Unique Predictions:", uniquePredictions);
           // Now you can work with the uniquePredictions array as needed
           setPredictionType(uniquePredictions);
+          
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -382,40 +392,40 @@ const AddCommentModal = (props) => {
     fetchData();
   }, [selectedMatchDetails]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      let type;
-      if (selectedPredictionType !== "Select") {
-        if (selectedCategory === "Futbol") {
-          type = 1;
-        } else if (selectedCategory === "Basketbol") {
-          type = 2;
-        }
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     let type;
+  //     if (selectedPredictionType !== "Select") {
+  //       if (selectedCategory === "Futbol") {
+  //         type = 1;
+  //       } else if (selectedCategory === "Basketbol") {
+  //         type = 2;
+  //       }
         
-        try {
-          const predictionsPromises = matchId.map(async (val) => {
-            const predictions = await axios.get(
-              `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
-              { headers }
-            );
-            const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
-            return gameNames;
-          });
+  //       try {
+  //         const predictionsPromises = matchId.map(async (val) => {
+  //           const predictions = await axios.get(
+  //             `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
+  //             { headers }
+  //           );
+  //           const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
+  //           return gameNames;
+  //         });
       
-          // Wait for all API calls to complete
-          const predictionsData = await Promise.all(predictionsPromises);
-          // Flatten and remove duplicates from the gameNames array
-          const allGameNames = predictionsData.flat();
-          const uniqueGameNames = [...new Set(allGameNames)];
-          setPredictionData(uniqueGameNames);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
+  //         // Wait for all API calls to complete
+  //         const predictionsData = await Promise.all(predictionsPromises);
+  //         // Flatten and remove duplicates from the gameNames array
+  //         const allGameNames = predictionsData.flat();
+  //         const uniqueGameNames = [...new Set(allGameNames)];
+  //         setPredictionData(uniqueGameNames);
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }
+  //   };
 
-    fetchData();
-  }, [selectedPredictionType]);
+  //   fetchData();
+  // }, [selectedPredictionType]);
 
   return (
     <>
@@ -700,6 +710,7 @@ const AddCommentModal = (props) => {
               className="row g-0 my-3 gap-3 position-relative"
               // style={{ fontSize: "14px" }}
             >
+
               <div className="col">
                 <CustomDropdown
                   label="Prediction Type"

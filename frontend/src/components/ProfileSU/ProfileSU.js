@@ -19,13 +19,13 @@ const ProfileSU = (props) => {
   const [progileData, setProgileData] = useState({});
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
-    console.log(res.data, "===============?>>");
+    // console.log(res.data, "===============?>>");
     setProgileData(res.data);
   }
   useEffect(() => {
     userId && getProfileData();
   }, [userId]);
-  console.log("progileData::::::::", progileData);
+  // console.log("progileData::::::::", progileData);
 
   // UPDATE PROFILE PIC
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);

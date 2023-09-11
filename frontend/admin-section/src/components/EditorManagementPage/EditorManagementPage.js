@@ -26,7 +26,7 @@ const EditorManagementPage = () => {
       // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
-        console.log("%%%%%%%%%", res.data);
+        // console.log("%%%%%%%%%", res.data);
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
         setIsLoading(false);

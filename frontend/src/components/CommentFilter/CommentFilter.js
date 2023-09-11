@@ -171,7 +171,7 @@ export const CommentFilter = (props) => {
               const predictionsPromises = await Promise.all(
                 res11?.data?.data.map((item) => item.MatchID).map(async (val) => {
                   const predictions = await axios.get(
-                    `https://www.nosyapi.com/apiv2/service/bettable-matches/matchTypeCustom?matchID=${val}`,
+                    `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
                     { headers }
                   );
                   return predictions.data.data.gameType // Assuming you want to return the data from each API call

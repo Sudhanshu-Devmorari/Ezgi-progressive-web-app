@@ -148,7 +148,7 @@ const SignUpModal = (props) => {
       const response = await axios.post(`${config.apiUrl}/signup/`, {
         phone: phone,
       });
-      console.log("response8: ", response.data);
+      // console.log("response8: ", response.data);
       // console.log("response: ", response.data.user);
       if (response.data.status === 200) {
         setShowModal(6);

@@ -25,7 +25,7 @@ const UserManagementPage = () => {
     const res = await axios
       .get(`${config?.apiUrl}/user-management/`)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setData(res?.data);
         setUsers(res?.data?.users_list);
         setUserTimeLine(res?.data?.user_timeline);

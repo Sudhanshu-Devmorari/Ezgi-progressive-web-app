@@ -80,7 +80,7 @@ const NotificationModel = () => {
           `${config?.apiUrl}/notification-management/?sender=${adminUserId}`,
           values
         );
-        console.log(res,"========================MMMM");
+        // console.log(res,"========================MMMM");
         // console.log(res.status);
         if (res.status === 200) {
           Swal.fire({

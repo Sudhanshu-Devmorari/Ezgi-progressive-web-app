@@ -22,7 +22,7 @@ const EditorProfileActiveComments = (props) => {
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
         `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
       );
-      console.log(res.data,"========fffffffffff>>>");
+      // console.log(res.data,"========fffffffffff>>>");
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor)
       setIsLoading(false);

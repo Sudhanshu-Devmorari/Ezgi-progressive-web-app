@@ -73,11 +73,12 @@ const Home = (props) => {
     }
   };
 
-  
   const [validName, setValidName] = useState(null);
   const [validUsername, setValidUsername] = useState(null);
   const [validPhone, setValidPhone] = useState(null);
   const [validPassword, setValidPassword] = useState(null);
+  const [validGender, setValidGender] = useState(null);
+  const [validAge, setValidAge] = useState(null);
 
   const [addUser, setAddUser] = useState({});
   const [addUserError, setAddUserError] = useState({});
@@ -92,7 +93,7 @@ const Home = (props) => {
 
     if (name == "name") {
       if (value?.length <= 5 || value?.length >= 20) {
-        console.log("asdadasdadd");
+        // console.log("asdadasdadd");
         setValidName("Name must be 5 to 20 characters.");
       } else {
         setValidName(null);
@@ -104,7 +105,7 @@ const Home = (props) => {
         setValidUsername(null);
       }
     } else if (name == "phone") {
-      console.log("regex", value?.match(/^5\d*$/));
+      // console.log("regex", value?.match(/^5\d*$/));
       if (value?.match(/^5\d*$/) == null || value?.length != 10) {
         setValidPhone("Phone must start with '5' and must be 10 digits.");
       } else {
@@ -113,18 +114,6 @@ const Home = (props) => {
     } else if (name == "password") {
       if (value?.length < 8) {
         setValidPassword("Password must be at least 8 characters.");
-      } else {
-        setValidPassword(null);
-      }
-    } else if (name == "gender") {
-      if (value == "Select") {
-        setValidPassword("Please select gender.");
-      } else {
-        setValidPassword(null);
-      }
-    } else if (name == "age") {
-      if (value == "Select") {
-        setValidPassword("Please select age.");
       } else {
         setValidPassword(null);
       }
@@ -185,8 +174,7 @@ const Home = (props) => {
     setAllFilterData(props.users);
   }, [props.users]);
 
-  useEffect(() => {
-  }, [displayUser]);
+  useEffect(() => {}, [displayUser]);
 
   const filterData = (e) => {
     const val = e.target.value.toLowerCase();
@@ -238,6 +226,18 @@ const Home = (props) => {
 
   const handleAddUser = async (e) => {
     // console.log(Object.keys(addUser).length >= 6);
+    if (selectedGender == "Select") {
+      setValidGender("Please select gender.");
+    } else {
+      setValidGender(null);
+    }
+    
+    if (selectedAge == "Select") {
+      setValidAge("Please select age.");
+    } else {
+      setValidAge(null);
+    }
+
     if (Object.keys(addUser).length >= 6) {
       const formData = new FormData();
       selectedImage != false && formData.append("file", selectedImage);
@@ -877,7 +877,6 @@ const Home = (props) => {
                   <span>Name Surname</span>
                   <input
                     onChange={(e) => {
-                      setValidName(e.target.value);
                       submitUserData(e);
                     }}
                     name="name"
@@ -897,7 +896,6 @@ const Home = (props) => {
                   <span>Username</span>
                   <input
                     onChange={(e) => {
-                      setValidUsername(e.target.value);
                       submitUserData(e);
                     }}
                     name="username"
@@ -930,7 +928,6 @@ const Home = (props) => {
                     </span>
                     <input
                       onChange={(e) => {
-                        setValidPhone(e.target.value);
                         submitUserData(e);
                       }}
                       name="phone"
@@ -951,7 +948,6 @@ const Home = (props) => {
                   <div className="darkMode-input">
                     <input
                       onChange={(e) => {
-                        setValidPassword(e.target.value);
                         submitUserData(e);
                       }}
                       name="password"
@@ -964,9 +960,6 @@ const Home = (props) => {
                       // onChange={(e) => setPassword(e.target.value)}
                       style={{ width: "12rem" }}
                     />
-                    {validPassword ? (
-                      <small className="text-danger">{validPassword}</small>
-                    ) : null}
                     {profile ? (
                       <>
                         {showPassword ? (
@@ -1017,6 +1010,9 @@ const Home = (props) => {
                       </>
                     )}
                   </div>
+                  {validPassword ? (
+                      <small className="text-danger">{validPassword}</small>
+                    ) : null}
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -1034,6 +1030,9 @@ const Home = (props) => {
                     isOpen={genderDropDown}
                     toggleDropdown={toggleGenderDropdown}
                   />
+                  {validGender ? (
+                    <small className="text-danger">{validGender}</small>
+                  ) : null}
                 </div>
                 <div className="col d-flex flex-column">
                   <CustomDropdownHome
@@ -1047,6 +1046,9 @@ const Home = (props) => {
                     isOpen={ageDropDown}
                     toggleDropdown={toggleAgeDropdown}
                   />
+                  {validAge ? (
+                    <small className="text-danger">{validAge}</small>
+                  ) : null}
                 </div>
               </div>
               <div className="d-flex" style={{ gap: "4rem" }}>
