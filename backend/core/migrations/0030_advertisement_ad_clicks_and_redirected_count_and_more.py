@@ -28,4 +28,9 @@ class Migration(migrations.Migration):
             model_name='user',
             index=models.Index(fields=['created'], name='core_user_created_bf51fc_idx'),
         ),
+        migrations.AlterField(
+            model_name='user',
+            name='experience',
+            field=models.CharField(blank=True, choices=[('1-2 years', '1-2 years'), ('3-4 years', '3-4 years'), ('5+ years', '5+ years'), ('10+ years', '10+ years')], max_length=20, null=True),
+        ),
     ]
