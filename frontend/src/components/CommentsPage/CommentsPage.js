@@ -24,6 +24,7 @@ const CommentsPage = ({
   const [onlyPublic, setOnlyPublic] = useState("");
   const [filterCommentData, setFilterCommentData] = useState(null);
   const [displayData, setDisplayData] = useState(mergedResult);
+  const [publicSelected, setPublicSelected] = useState(false);
 
   useEffect(() => {
     setDisplayData(mergedResult);
@@ -148,6 +149,8 @@ const CommentsPage = ({
         setOnlyPublic={setOnlyPublic}
         setFilterCommentData={setFilterCommentData}
         setDisplayData={setDisplayData}
+        setPublicSelected={setPublicSelected}
+        publicSelected={publicSelected}
       />
       <div className="" id="banner1">
         <AdvertisementBanner data={adsId} />

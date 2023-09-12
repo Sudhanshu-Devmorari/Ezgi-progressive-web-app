@@ -2344,6 +2344,9 @@ class EditorManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
+        if User.objects.filter(phone=request.data['phone']).exists():
+            return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             try:

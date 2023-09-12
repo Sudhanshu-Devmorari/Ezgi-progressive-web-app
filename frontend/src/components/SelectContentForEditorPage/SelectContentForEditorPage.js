@@ -8,6 +8,8 @@ import darkGrp from "../../assets/Group 712.png";
 import lighGrp from "../../assets/Group 721.png";
 import EditorFilter from "../EditorFilter/EditorFilter";
 import CommentsPageModal from "../CommentsPageModal/CommentsPageModal";
+import publicSelectedIcon from "../../assets/Public Content Radio Button Selected.svg";
+import lighGrpSelected from "../../assets/Group 312.png";
 
 const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -90,9 +92,11 @@ const SelectContentForEditorPage = (props) => {
               width={32}
             />
             <span className="pe-2">Only Public</span>
-            <div onClick={()=>props.setOnlyPublic('Only public')}>
+            {/* {console.log(props.publicSelected)} */}
+            <div onClick={()=>{props.setPublicSelected(!props.publicSelected); props.publicSelected == true ? props.setOnlyPublic("") : props.setOnlyPublic("Only public")}} >
               <img
-                src={currentTheme === "dark" ? darkGrp : lighGrp}
+                // src={currentTheme === "dark" ? darkGrp : lighGrp}
+                src={currentTheme === "dark" ? props.publicSelected ? publicSelectedIcon : darkGrp : props.publicSelected ? lighGrpSelected : lighGrp  }
                 alt=""
                 height={28}
                 width={28}

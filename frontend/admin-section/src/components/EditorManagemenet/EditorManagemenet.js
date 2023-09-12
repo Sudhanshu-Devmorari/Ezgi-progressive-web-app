@@ -44,7 +44,27 @@ const EditorManagemenet = (props) => {
   const [validLevel, setValidLevel] = useState(null);
 
   const [levelRadio, setLevelRadio] = useState("Select");
+  const clearError = () => {
+    setValidName(null);
+    setValidUsername(null);
+    setValidPhone(null);
+    setValidPassword(null);
+    setValidCountry(null);
+    setValidCity(null);
+    setValidCategory(null);
+    setValidGender(null);
+    setValidAge(null);
+    setValidAbout(null);
+    setValidLevel(null);
+  };
 
+  const clearEditorData = () => {
+    setSelectedAge("Select");
+    setSelectedCategory("Select")
+    setSelectedCity("Select")
+    setSelectedCountry("Select")
+    setSelectedGender("Select")
+  }
   const handleDeactive = async (id) => {
     try {
       const res = await axios.delete(
@@ -122,14 +142,14 @@ const EditorManagemenet = (props) => {
     setAddUser({ ...addUser, [name]: value });
 
     if (name == "name") {
-      if (value?.length <= 5 || value?.length >= 20) {
+      if (value?.length <= 4 || value?.length >= 20) {
         // console.log("asdadasdadd");
         setValidName("Name must be 5 to 20 characters.");
       } else {
         setValidName(null);
       }
     } else if (name == "username") {
-      if (value?.length <= 5 || value?.length >= 15) {
+      if (value?.length <= 4 || value?.length >= 15) {
         setValidUsername("UserName must be 5 to 15 characters.");
       } else {
         setValidUsername(null);
@@ -192,8 +212,21 @@ const EditorManagemenet = (props) => {
   }
 
   const handleNewEditor = async () => {
+    if (addUser.name == "" || addUser.name == undefined) {
+      setValidName("Name must be 5 to 20 characters.");
+    }
+    if (addUser.username == "" || addUser.username == undefined) {
+      setValidUsername("UserName must be 5 to 15 characters.");
+    }
+    if (addUser.phone == "" || addUser.phone == undefined) {
+      setValidPhone("Phone must start with '5' and must be 10 digits.");
+    }
+    if (addUser.password == "" || addUser.password == undefined) {
+      setValidPassword("Password must be at least 8 characters.");
+    }
+
     if (selectedCountry == "Select") {
-      setValidCountry("Please select age.");
+      setValidCountry("Please select Country.");
     } else {
       setValidCountry(null);
     }
@@ -228,7 +261,19 @@ const EditorManagemenet = (props) => {
       setValidLevel(null);
     }
 
-    if (Object.keys(addUser).length >= 11) {
+    if (
+      Object.keys(addUser).length >= 10 &&
+      validName == null &&
+      validUsername == null &&
+      validPhone == null &&
+      validPassword == null &&
+      validCountry == null &&
+      validCity == null &&
+      validCategory == null &&
+      validAge == null &&
+      validGender == null &&
+      validLevel == null
+    ) {
       // console.log("_____: ", addUser)
       const formData = new FormData();
       formData.append("file", selectedImage);
@@ -259,12 +304,26 @@ const EditorManagemenet = (props) => {
           }
         }
         if (response.status === 200) {
+          clearEditorData()
+          clearError();
           Swal.fire({
             title: "Success",
             text: "Editor Created!",
             icon: "success",
             backdrop: false,
             customClass: "dark-mode-alert",
+          });
+          setAddUser({
+            name: "",
+            username: "",
+            phone: "",
+            password: "",
+            country: "",
+            city: "",
+            category: "",
+            gender: "",
+            age: "",
+            about: "",
           });
         }
 
@@ -302,36 +361,124 @@ const EditorManagemenet = (props) => {
     setUpdateEditor({ ...updateEditor, [name]: value });
   };
   const handleUpdateEditor = async (id) => {
-    const formData = new FormData();
-    selectedImage != false && formData.append("profile_pic", selectedImage);
-    formData.append("name", addUser.name);
-    formData.append("username", addUser.username);
-    formData.append("phone", addUser.phone);
-    formData.append("password", addUser.password);
-    formData.append("about", addUser.about);
-    formData.append("country", addUser.country);
-    formData.append("city", addUser.city);
-    formData.append("category", addUser.category);
-    formData.append("gender", addUser.gender);
-    formData.append("age", addUser.age);
-    try {
-      const response = await axios.patch(
-        `${config?.apiUrl}/editor-management/${id}/`,
-        formData
-      );
-      if (response.status === 200) {
-        Swal.fire({
-          title: "Success",
-          text: "Editor Updated!",
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+    if (addUser.country == "" || addUser.country == "Select") {
+      setValidCountry("Please select Country.");
+    } else {
+      setValidCountry(null);
+    }
+
+    if (addUser.city == "" || addUser.city == "Select") {
+      setValidCity("Please select City.");
+    } else {
+      setValidCity(null);
+    }
+
+    if (
+      addUser.category.length <= 0 ||
+      addUser.category[0] == "Select" ||
+      addUser.category[0] == ""
+    ) {
+      setValidCategory("Please select Category.");
+    } else {
+      setValidCategory(null);
+    }
+
+    if (addUser.gender == "" || addUser.gender == "Select") {
+      setValidGender("Please select gender.");
+    } else {
+      setValidGender(null);
+    }
+
+    if (addUser.age == "" || addUser.age == "Select") {
+      setValidAge("Please select age.");
+    } else {
+      setValidAge(null);
+    }
+
+    if (
+      Object.keys(addUser).length >= 9 &&
+      validName == null &&
+      validUsername == null &&
+      validPhone == null &&
+      validPassword == null &&
+      validCountry == null &&
+      validCity == null &&
+      validCategory == null &&
+      validAge == null &&
+      validGender == null
+    ) {
+      const formData = new FormData();
+      selectedImage != false && formData.append("profile_pic", selectedImage);
+      formData.append("name", addUser.name);
+      formData.append("username", addUser.username);
+      formData.append("phone", addUser.phone);
+      formData.append("password", addUser.password);
+      formData.append("about", addUser.about);
+      formData.append("country", addUser.country);
+      formData.append("city", addUser.city);
+      formData.append("category", addUser.category);
+      formData.append("gender", addUser.gender);
+      formData.append("age", addUser.age);
+      try {
+        const response = await axios.patch(
+          `${config?.apiUrl}/editor-management/${id}/`,
+          formData
+        );
+        if (response.status === 200) {
+          clearError();
+          props.setupdateProfile(1);
+          setAddUser({
+            name: "",
+            username: "",
+            phone: "",
+            password: "",
+            country: "",
+            city: "",
+            category: "",
+            gender: "",
+            age: "",
+            about: "",
+          });
+          Swal.fire({
+            title: "Success",
+            text: "Editor Updated!",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        const modalElement = document.getElementById("exampleModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        // setDisplayUser(response.data);
+        // console.log('API Response:', response.data);
+      } catch (error) {
+        console.log(error)
+        if (error?.response?.data?.error) {
+          Swal.fire({
+            title: "Error",
+            text: `${error?.response?.data?.error}`,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        console.error("Error making POST request:", error);
       }
-      // setDisplayUser(response.data);
-      // console.log('API Response:', response.data);
-    } catch (error) {
-      console.error("Error making POST request:", error);
+    } else {
+      Swal.fire({
+        title: "Error",
+        text: `Please fill all fields.`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
     }
   };
 
@@ -1410,7 +1557,7 @@ const EditorManagemenet = (props) => {
                           <textarea
                             onChange={submitEditorData}
                             name="about"
-                            value={addUser.about}
+                            value={addUser.about == "null" ? "" : addUser.about}
                             style={{ height: "100px" }}
                             className="darkMode-input form-control"
                           ></textarea>
@@ -1486,14 +1633,14 @@ const EditorManagemenet = (props) => {
                           />
                           <span className="px-2">Grandmaster</span>
                         </div>
-                      <div className="">
-                      {validLevel ? (
-                        <small className="text-danger">{validLevel}</small>
-                      ) : null}
-                    </div>
+                        <div className="">
+                          {validLevel ? (
+                            <small className="text-danger">{validLevel}</small>
+                          ) : null}
+                        </div>
                       </div>
                     )}
-                    
+
                     <div
                       className={`d-flex justify-content-center my-2 ${
                         props.updateProfile === 2 && "gap-3"
@@ -1517,6 +1664,7 @@ const EditorManagemenet = (props) => {
                                 age: "",
                                 about: "",
                               });
+                              clearError();
                             }}
                             className="px-3 py-1"
                             style={{
@@ -1559,21 +1707,8 @@ const EditorManagemenet = (props) => {
                           <button
                             onClick={() => {
                               handleUpdateEditor(partialData.editor_data?.id);
-                              props.setupdateProfile(1);
-                              setAddUser({
-                                name: "",
-                                username: "",
-                                phone: "",
-                                password: "",
-                                country: "",
-                                city: "",
-                                category: "",
-                                gender: "",
-                                age: "",
-                                about: "",
-                              });
                             }}
-                            data-bs-dismiss="modal"
+                            // data-bs-dismiss="modal"
                             className="px-3 py-1"
                             style={{
                               color: "#D2DB08",
@@ -1639,6 +1774,8 @@ const EditorManagemenet = (props) => {
                   setGenderDropDown(false);
                   setAgeDropDown(false);
                   props.setupdateProfile(1);
+                  clearError();
+                  clearEditorData();
                   setAddUser({
                     name: "",
                     username: "",
