@@ -1802,9 +1802,9 @@ class FilterComments(APIView):
 
             if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
                 if request.data.get('category') == "Futbol":
-                    filters['category__contains'] = "Football"
+                     filters['category__icontains'] = "Football"
                 if request.data.get('category') == "Basketbol":
-                    filters['category__contains'] = "Basketball"
+                     filters['category__icontains'] = "Basketball"
 
             if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')

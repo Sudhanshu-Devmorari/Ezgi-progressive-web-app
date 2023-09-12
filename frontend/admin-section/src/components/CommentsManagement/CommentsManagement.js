@@ -54,7 +54,16 @@ const CommentsManagement = (props) => {
   }, [props?.commentData]);
 
   const updateCommentApiData = async () => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = localStorage.getItem("admin-user-id");
+    console.log("selectedCategory: ",selectedCategory)
+    console.log("selectedCountry: ",selectedCountry)
+    console.log("selectedLeague: ",selectedLeague)
+    console.log("selectedDate: ",selectedDate)
+    console.log("selectedMatchDetails: ",selectedMatchDetails)
+    console.log("selectedPrediction: ",selectedPrediction)
+    console.log("selectedPredictionType: ",selectedPredictionType)
+    console.log("status: ",status)
+    console.log("secondStatus: ",secondStatus)
     await axios
       .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
