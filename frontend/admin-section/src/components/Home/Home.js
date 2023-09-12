@@ -92,14 +92,14 @@ const Home = (props) => {
     setAddUser({ ...addUser, [name]: value });
 
     if (name == "name") {
-      if (value?.length <= 5 || value?.length >= 20) {
+      if (value?.length <= 4 || value?.length >= 20) {
         // console.log("asdadasdadd");
         setValidName("Name must be 5 to 20 characters.");
       } else {
         setValidName(null);
       }
     } else if (name == "username") {
-      if (value?.length <= 5 || value?.length >= 15) {
+      if (value?.length <= 4 || value?.length >= 15) {
         setValidUsername("UserName must be 5 to 15 characters.");
       } else {
         setValidUsername(null);
@@ -223,22 +223,57 @@ const Home = (props) => {
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
   }
-
+  const clearError = () => {
+    setValidName(null);
+    setValidUsername(null);
+    setValidPhone(null);
+    setValidPassword(null);
+    setValidGender(null);
+    setValidAge(null);
+  };
   const handleAddUser = async (e) => {
     // console.log(Object.keys(addUser).length >= 6);
+    if (addUser.name == "" || addUser.name == undefined) {
+      setValidName("Please select name.");
+    } else {
+      setValidName(null);
+    }
+    if (addUser.username == "" || addUser.username == undefined) {
+      setValidUsername("Please select username.");
+    } else {
+      setValidUsername(null);
+    }
+    if (addUser.phone == "" || addUser.phone == undefined) {
+      setValidPhone("Please select phone.");
+    } else {
+      setValidPhone(null);
+    }
+    if (addUser.password == "" || addUser.password == undefined) {
+      setValidPassword("Please select password.");
+    } else {
+      setValidPassword(null);
+    }
     if (selectedGender == "Select") {
       setValidGender("Please select gender.");
     } else {
       setValidGender(null);
     }
-    
+
     if (selectedAge == "Select") {
       setValidAge("Please select age.");
     } else {
       setValidAge(null);
     }
 
-    if (Object.keys(addUser).length >= 6) {
+    if (
+      Object.keys(addUser).length >= 6 &&
+      validName == null &&
+      validUsername == null &&
+      validPhone == null &&
+      validPassword == null &&
+      validGender == null &&
+      validAge == null
+    ) {
       const formData = new FormData();
       selectedImage != false && formData.append("file", selectedImage);
       // formData.append("date", addUser.date);
@@ -267,6 +302,7 @@ const Home = (props) => {
             closeButton.click();
           }
         }
+        clearError();
         props?.userManagementApiData();
       } catch (error) {
         if (error?.response?.data?.error) {
@@ -945,7 +981,7 @@ const Home = (props) => {
                 </div>
                 <div className="col d-flex flex-column ">
                   <span>Password</span>
-                  <div className="darkMode-input">
+                  <div className="darkMode-input input-group align-items-center">
                     <input
                       onChange={(e) => {
                         submitUserData(e);
@@ -963,56 +999,44 @@ const Home = (props) => {
                     {profile ? (
                       <>
                         {showPassword ? (
-                          <AiOutlineEyeInvisible
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              right: "1.6rem",
-                              top: "24.1rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEyeInvisible
+                              fontSize={"1.5rem"}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         ) : (
-                          <AiOutlineEye
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              right: "1.6rem",
-                              top: "24.1rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEye
+                              fontSize={"1.5rem"}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         )}
                       </>
                     ) : (
                       <>
                         {showPassword ? (
-                          <AiOutlineEyeInvisible
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              right: "1.6rem",
-                              top: "22.1rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEyeInvisible
+                              fontSize={"1.5rem"}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         ) : (
-                          <AiOutlineEye
-                            fontSize={"1.5rem"}
-                            style={{
-                              position: "absolute",
-                              right: "1.6rem",
-                              top: "22.1rem",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          />
+                          <div className="input-group-append">
+                            <AiOutlineEye
+                              fontSize={"1.5rem"}
+                              onClick={() => setShowPassword(!showPassword)}
+                            />
+                          </div>
                         )}
                       </>
                     )}
                   </div>
                   {validPassword ? (
-                      <small className="text-danger">{validPassword}</small>
-                    ) : null}
+                    <small className="text-danger">{validPassword}</small>
+                  ) : null}
                 </div>
               </div>
               <div className="row g-0 p-2 gap-3">
@@ -1276,6 +1300,7 @@ const Home = (props) => {
                   setMonthDropDown(false);
                   setNumberDropDown(false);
                   setLevelDropDown(false);
+                  clearError();
                 }}
                 data-bs-dismiss="modal"
                 src={cross}

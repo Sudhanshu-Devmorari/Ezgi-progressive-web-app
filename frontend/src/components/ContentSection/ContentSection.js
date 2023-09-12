@@ -57,17 +57,13 @@ const ContentSection = ({
   publicComments,
   setPublicComments,
   mergeArrays,
+  setCmtReact,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [modalShow, setModalShow] = React.useState(false);
 
   const userPhone = localStorage.getItem("user-id");
-
-  // console.log(data,"=================>>>data");
-  // console.log("FavData", props?.FavData);
-
-  // const userPhone = localStorage.getItem("userPhone");
 
   const server_url = `${config.apiUrl}`;
 
@@ -132,6 +128,7 @@ const ContentSection = ({
     return randomString;
   };
   const handleCommentReaction = async (id, reaction, count) => {
+    console.log("id::::::::::::::::data", id);
     // if(reaction === "like")
     //   setLikeCount(count)
     // else if(reaction === "favorite")
@@ -145,60 +142,64 @@ const ContentSection = ({
         reaction_type: `${reaction}`,
       }
     );
-    // if (res.status == 200) {
-    //   console.log("res:::::::::::", res);
-    //   console.log("props:::::::::::", publicComments);
-    //   const filterdata = publicComments.filter((res) => res.id == id);
-    //   console.log("filterdata::::::::::::::", filterdata[0].total_reactions);
-    //   publicComments.filter(
-    //     (res) => res.id == id
-    //   )[0].total_reactions.total_clap = 501;
+    if (res.status == 200) {
+      let data = res?.data?.data;
+      if (data) {
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_clap = data?.total_clap;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_favorite = data?.total_favorite;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_likes = data?.total_likes;
 
-    //   console.log("publicComments::::::::::::::::::", publicComments);
-    //   setPublicComments(publicComments);
-    //   mergeArrays();
-    // }
-    const user_id = localStorage.getItem("user-id");
-    console.log("user_id::::::::::::", user_id);
-    homeApiData(user_id);
-    mergeArrays();
+        const commentIds = cmtReact.map((data) => {
+          return data.comment_id;
+        });
+
+        if (commentIds.includes(data?.comment_id)) {
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].clap = data?.clap;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].favorite = data?.favorite;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].like = data?.like;
+        } else {
+          const newObj = {
+            clap: data?.clap,
+            comment_id: data?.comment_id,
+            favorite: data?.favorite,
+            like: data?.like,
+          };
+          cmtReact.push(newObj);
+        }
+
+        setPublicComments(publicComments);
+        setCmtReact(cmtReact);
+        mergeArrays();
+      }
+    }
     localStorage.setItem(`${id}_${reaction}`, count);
   };
 
-  // useEffect(() => {
-  //   // Retrieve the reaction data from local storage and update state variables
-  //   const likeCount = localStorage.getItem(`${data?.value.id}_like`);
-  //   const favoriteCount = localStorage.getItem(`${data?.value.id}_favorite`);
-  //   const clapCount = localStorage.getItem(`${data?.value.id}_clap`);
+ 
 
-  //   setLikeCount(likeCount || '');
-  //   setFavoriteCount(favoriteCount || '');
-  //   setClapCount(clapCount || '');
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.post(
-  //         `${config?.apiUrl}/comment-reaction/${data?.value.id}/${userId}`,
-  //         {
-  //           reaction_type:"like",
-  //         }
-  //       );
-  //       // const response = await axios.get(`${config?.apiUrl}/comment-reaction/${data?.value.id}/${userId}`);
+  function truncateString(str, maxLength) {
+    if (str && str?.length <= maxLength) {
+      return str;
+    } else {
+      // Subtract 3 from maxLength to make room for the ellipsis.
+      return str?.substring(0, maxLength - 1) + "...";
+    }
+  }
+  // const truncated = truncateString("Hello D", 6);
+  const truncated = truncateString(data?.value?.league, 6);
 
-  //       if (response.status === 200) {
-  //         console.log("Response from fetch",response.data)
-  //         // const { total_likes, total_favorites, total_claps } = response.data;
-  //         // setLikeCount(total_likes);
-  //         // setFavoriteCount(total_favorites);
-  //         // setClapCount(total_claps);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
-
-  //   fetchData(); // Fetch data when the component mounts
-
-  // }, [data?.value.id, userId]);
   return (
     <>
       {/* {data?.Public_Comments?.map((comment) => ( */}
@@ -390,7 +391,8 @@ const ContentSection = ({
                     height={26}
                     width={26}
                   />
-                  <span className="ps-1">{data?.value?.league}</span>
+                  <span className="ps-1">{truncated}</span>
+                  {/* <span className="ps-1">{data?.value?.league}</span> */}
                 </span>
                 <span style={{ paddingRight: userPhone ? "47px" : "80px" }}>
                   {data?.value?.date}

@@ -69,6 +69,7 @@ class User(AbstractBaseUser):
     is_all_permission = models.BooleanField(default=False)
     is_delete = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    description = models.CharField(max_length=255, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

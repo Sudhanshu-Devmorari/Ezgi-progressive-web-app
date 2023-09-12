@@ -75,9 +75,10 @@ const MainPage = () => {
   function homeApiData(user_id) {
     console.log("userId::::::::::::", user_id);
     axios
+      // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        setData(res?.data);
+        console.log("res:::::::::::::", res.data);
         setPublicComments(res?.data?.Public_Comments);
         setHighlights(res?.data?.highlights);
         setsubscriptionComments(res?.data?.Subscription_Comments);
@@ -393,6 +394,10 @@ const MainPage = () => {
                 followingid={followingid}
                 cmtReact={cmtReact}
                 setArrayMerge={setArrayMerge}
+                setCmtReact={setCmtReact}
+                publicComments={publicComments}
+                setPublicComments={setPublicComments}
+                mergeArrays={mergeArrays}
               />
             ) : (
               <DashboardSU
@@ -406,6 +411,11 @@ const MainPage = () => {
                 followingList={followingList}
                 followingid={followingid}
                 cmtReact={cmtReact}
+                setCmtReact={setCmtReact}
+                setArrayMerge={setArrayMerge}
+                publicComments={publicComments}
+                setPublicComments={setPublicComments}
+                mergeArrays={mergeArrays}
               />
             )
           ) : (
@@ -472,6 +482,7 @@ const MainPage = () => {
                               publicComments={publicComments}
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
+                              setCmtReact={setCmtReact}
                             />
                           </>
                         );
@@ -548,6 +559,7 @@ const MainPage = () => {
                               publicComments={publicComments}
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
+                              setCmtReact={setCmtReact}
                             />
                           </>
                         );
@@ -615,6 +627,7 @@ const MainPage = () => {
                               publicComments={publicComments}
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
+                              setCmtReact={setCmtReact}
                             />
                           </>
                         );
@@ -665,6 +678,10 @@ const MainPage = () => {
                   verifyid={verifyid}
                   cmtReact={cmtReact}
                   setArrayMerge={setArrayMerge}
+                  setCmtReact={setCmtReact}
+                  publicComments={publicComments}
+                  setPublicComments={setPublicComments}
+                  mergeArrays={mergeArrays}
                 />
               )}
               {selectContent === "show-all-comments" && (
@@ -677,6 +694,17 @@ const MainPage = () => {
                   cmtReact={cmtReact}
                   homeApiData={homeApiData}
                   followingid={followingid}
+                  setCmtReact={setCmtReact}
+                  setActiveCommentsshow={setActiveCommentsshow}
+                  mergedResult={mergedResult}
+                  onlyPublicResult={onlyPublicResult}
+                  ads={ads}
+                  setData={setData}
+                  followingList={followingList}
+                  setArrayMerge={setArrayMerge}
+                  publicComments={publicComments}
+                  setPublicComments={setPublicComments}
+                  mergeArrays={mergeArrays}
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}
@@ -698,6 +726,7 @@ const MainPage = () => {
                       mergeArrays={mergeArrays}
                       publicComments={publicComments}
                       setPublicComments={setPublicComments}
+                      setCmtReact={setCmtReact}
                     />
                   ))}
                 </>

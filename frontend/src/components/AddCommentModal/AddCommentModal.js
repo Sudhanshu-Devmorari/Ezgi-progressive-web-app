@@ -46,22 +46,22 @@ const AddCommentModal = (props) => {
   const [leagueOptions, setLeagueOptions] = useState([]);
   // const dateOptions = ["Date 1", "Date 2", "Date 3"];
   const [dateOptions, setDateOptions] = useState([]);
-  
+
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [selectedPredictionType, setSelectedPredictionType] =
     useState("Select");
-    const [selectedPrediction, setSelectedPrediction] = useState("Select");
+  const [selectedPrediction, setSelectedPrediction] = useState("Select");
 
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
   const [matchId, setMatchId] = useState([]);
   const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
   const [predictionDropdown, setPredictionDropdown] = useState(false);
-  
+
   const [selectedCategory, setSelectedCategory] = useState("Select");
   const [selectedCountry, setSelectedCountry] = useState("Select");
   const [selectedLeague, setSelectedLeague] = useState("Select");
   const [selectedDate, setSelectedDate] = useState("Select");
-  
+
   const [categoryDropdown, setCategoryDropdown] = useState(false);
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [leagueDropdown, setLeagueDropdown] = useState(false);
@@ -69,7 +69,7 @@ const AddCommentModal = (props) => {
 
   const handleCategorySelection = async (category) => {
     setSelectedCategory(category);
-    setCategoryError("")
+    setCategoryError("");
 
     if (category !== "Select") {
       try {
@@ -91,24 +91,23 @@ const AddCommentModal = (props) => {
         console.log(error);
       }
     }
-
   };
-  
+
   const handleCountrySelection = (country) => {
     setSelectedCountry(country);
-    setCountryError("")
+    setCountryError("");
 
     LeagueAPI(categoryType, country)
-    .then((res) => {
-      const LeagueList = res.data;
-      setLeagueOptions(LeagueList.map((item) => item.league));
-    })
-    .catch((error) => {});
+      .then((res) => {
+        const LeagueList = res.data;
+        setLeagueOptions(LeagueList.map((item) => item.league));
+      })
+      .catch((error) => {});
   };
 
   const handleLeagueSelection = (league) => {
     setSelectedLeague(league);
-    setLeagueError("")
+    setLeagueError("");
 
     DateAPI(categoryType, league)
       .then((res) => {
@@ -121,22 +120,22 @@ const AddCommentModal = (props) => {
 
   const handleDateSelection = (date) => {
     setSelectedDate(date);
-    setDateError("")
-    
-    MatchDetailsAPI(categoryType, selectedLeague, date)
-    .then((res) => {
-      console.log("======data=======", res.data)
+    setDateError("");
 
-      const MatchList = res.data;
-      setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
-          setMatchId(MatchList.map((item) => item.MatchID));
-    })
-    .catch((err) => {});
+    MatchDetailsAPI(categoryType, selectedLeague, date)
+      .then((res) => {
+        // console.log("======data=======", res.data);
+
+        const MatchList = res.data;
+        setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+        setMatchId(MatchList.map((item) => item.MatchID));
+      })
+      .catch((err) => {});
   };
 
   const handleMatchDetailsSelection = (matchDetails) => {
     setSelectedMatchDetails(matchDetails);
-    setMatchDetailsError("")
+    setMatchDetailsError("");
   };
   const toggleMatchDetailsDropdown = () => {
     // MatchDetailsAPI(categoryType, selectedLeague, selectedDate)
@@ -153,11 +152,17 @@ const AddCommentModal = (props) => {
     setCategoryDropdown(false);
     setLeagueDropdown(false);
     setMatchDetailsDropdown(!matchDetailsDropdown);
-  };  
+  };
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
-    setPredictionData(allBetsData.filter((x)=>x.gameName==predictionType).map((x)=>x.odds).flat().map((x)=>x.value))
-    setPredictionTypeError("")
+    setPredictionData(
+      allBetsData
+        .filter((x) => x.gameName == predictionType)
+        .map((x) => x.odds)
+        .flat()
+        .map((x) => x.value)
+    );
+    setPredictionTypeError("");
   };
   const togglePredictionTypeDropdown = () => {
     setCountryDropDown(false);
@@ -170,7 +175,7 @@ const AddCommentModal = (props) => {
 
   const handlePredictionSelection = (prediction) => {
     setSelectedPrediction(prediction);
-    setPredictionError("")
+    setPredictionError("");
   };
   const togglePredictionDropdown = () => {
     setCountryDropDown(false);
@@ -181,7 +186,7 @@ const AddCommentModal = (props) => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(!predictionDropdown);
   };
-  
+
   const toggleCountryDropdown = () => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
@@ -191,7 +196,7 @@ const AddCommentModal = (props) => {
     setDateDropdown(false);
     setCountryDropDown(!countryDropDown);
   };
-  
+
   const toggleCategoryDropdown = () => {
     setMatchDetailsDropdown(false);
     setPredictionDropdown(false);
@@ -201,7 +206,7 @@ const AddCommentModal = (props) => {
     setDateDropdown(false);
     setCategoryDropdown(!categoryDropdown);
   };
-  
+
   const toggleDateDropdown = () => {
     // DateAPI(categoryType, selectedLeague)
     //   .then((res) => {
@@ -219,7 +224,6 @@ const AddCommentModal = (props) => {
     setDateDropdown(!dateDropdown);
   };
 
-  
   const toggleLeagueDropdown = () => {
     // LeagueAPI(categoryType, selectedCountry)
     //   .then((res) => {
@@ -266,6 +270,17 @@ const AddCommentModal = (props) => {
   // Get Country from Category
   const [categoryType, setCategoryType] = useState(null);
 
+  const clearData = () => {
+    setSelectedCategory("Select");
+    setSelectedCountry("Select");
+    setSelectedLeague("Select");
+    setSelectedDate("Select");
+    setSelectedMatchDetails("Select");
+    setSelectedPredictionType("Select");
+    setSelectedPrediction("Select");
+    setToggleInput(false);
+    setcommentText("");
+  };
 
   // Add Comment pr Post comment API
   const postComment = async () => {
@@ -295,14 +310,14 @@ const AddCommentModal = (props) => {
     }
     if (selectCheckBox) {
       try {
-        setCategoryError("")
-        setCountryError("")
-        setLeagueError("")
-        setDateError("")
-        setMatchDetailsError("")
-        setCommentError("")
-        setPredictionTypeError("")
-        setPredictionError("")
+        setCategoryError("");
+        setCountryError("");
+        setLeagueError("");
+        setDateError("");
+        setMatchDetailsError("");
+        setCommentError("");
+        setPredictionTypeError("");
+        setPredictionError("");
         const res = await axios.post(
           `${config?.apiUrl}/post-comment/${userId}`,
           {
@@ -320,12 +335,14 @@ const AddCommentModal = (props) => {
         // console.log("res", res);
         if (res.status === 200) {
           closeModal();
+          clearData();
           Swal.fire({
             title: "Success",
             text: "Comment post successfully!",
             icon: "success",
             backdrop: false,
-            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
       } catch (error) {
@@ -347,9 +364,7 @@ const AddCommentModal = (props) => {
     }
   };
 
-  const handlePredictionTypeChange = async ()=>{
-
-  }
+  const handlePredictionTypeChange = async () => {};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -360,29 +375,28 @@ const AddCommentModal = (props) => {
         } else if (selectedCategory === "Basketbol") {
           type = 2;
         }
-        
+
         try {
-          let holder = []
+          let holder = [];
           const predictionsPromises = matchId.map(async (val) => {
             const predictions = await axios.get(
               `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
               { headers }
             );
-            holder = ([...holder,...predictions.data.data.Bets])
+            holder = [...holder, ...predictions.data.data.Bets];
             return predictions.data.data.gameType; // Assuming you want to return the data from each API call
           });
-          
+
           // Wait for all API calls to complete
           const predictionsData = await Promise.all(predictionsPromises);
-          setAllBetsData(holder)
-          
+          setAllBetsData(holder);
+
           // Flatten and remove duplicates from the predictionsData array
           const uniquePredictions = [...new Set(predictionsData.flat())];
-      
+
           // console.log("Unique Predictions:", uniquePredictions);
           // Now you can work with the uniquePredictions array as needed
           setPredictionType(uniquePredictions);
-          
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -401,7 +415,7 @@ const AddCommentModal = (props) => {
   //       } else if (selectedCategory === "Basketbol") {
   //         type = 2;
   //       }
-        
+
   //       try {
   //         const predictionsPromises = matchId.map(async (val) => {
   //           const predictions = await axios.get(
@@ -411,7 +425,7 @@ const AddCommentModal = (props) => {
   //           const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
   //           return gameNames;
   //         });
-      
+
   //         // Wait for all API calls to complete
   //         const predictionsData = await Promise.all(predictionsPromises);
   //         // Flatten and remove duplicates from the gameNames array
@@ -546,6 +560,7 @@ const AddCommentModal = (props) => {
                 <RxCross2
                   onClick={() => {
                     closeModal();
+                    clearData();
                   }}
                   fontSize={"1.8rem"}
                   className={`${
@@ -710,7 +725,6 @@ const AddCommentModal = (props) => {
               className="row g-0 my-3 gap-3 position-relative"
               // style={{ fontSize: "14px" }}
             >
-
               <div className="col">
                 <CustomDropdown
                   label="Prediction Type"

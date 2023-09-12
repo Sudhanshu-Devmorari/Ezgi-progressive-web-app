@@ -38,6 +38,24 @@ import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 
 const FavComments = (props) => {
+  const {
+    data,
+    setSelectContent,
+    selectContent,
+    userComments,
+    SelectComment,
+    setActiveCommentsshow,
+    followingList,
+    followingid,
+    verifyid,
+    cmtReact,
+    homeApiData,
+    setArrayMerge,
+    publicComments,
+    setPublicComments,
+    mergeArrays,
+    setCmtReact,
+  } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const favCommentData = props?.favCommentData;
   // console.log(favCommentData);
@@ -46,7 +64,6 @@ const FavComments = (props) => {
 
   const followCommentator = async (commentator_id, isFollowing) => {
     try {
-      // console.log("isFollowing",isFollowing)
       if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
@@ -58,12 +75,10 @@ const FavComments = (props) => {
           confirmButtonText: "Yes",
           cancelButtonText: "Cancel",
         });
-        // console.log(confirmation.value);
         if (confirmation.value === true) {
           const res = await axios.get(
             `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
           );
-          // console.log("On Unfollow",res)
           setFollowLabel(() =>
             followLabel === "Follow" ? "Followed" : "Follow"
           );
@@ -79,7 +94,6 @@ const FavComments = (props) => {
         const res = await axios.get(
           `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
         );
-        // console.log("On Follow",res)
         const user_id = localStorage.getItem("user-id");
         props.homeApiData(user_id);
       }
@@ -96,8 +110,49 @@ const FavComments = (props) => {
         reaction_type: `${reaction}`,
       }
     );
-    // const user_id = localStorage.getItem("user-id");
-    props.homeApiData(userId);
+
+    if (res.status == 200) {
+      let data = res?.data?.data;
+      if (data) {
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_clap = data?.total_clap;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_favorite = data?.total_favorite;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_likes = data?.total_likes;
+
+        const commentIds = cmtReact.map((data) => {
+          return data.comment_id;
+        });
+
+        if (commentIds.includes(data?.comment_id)) {
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].clap = data?.clap;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].favorite = data?.favorite;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].like = data?.like;
+        } else {
+          const newObj = {
+            clap: data?.clap,
+            comment_id: data?.comment_id,
+            favorite: data?.favorite,
+            like: data?.like,
+          };
+          cmtReact.push(newObj);
+        }
+
+        setPublicComments(publicComments);
+        setCmtReact(cmtReact);
+        mergeArrays();
+      }
+    }
     props?.getFavData();
   };
 

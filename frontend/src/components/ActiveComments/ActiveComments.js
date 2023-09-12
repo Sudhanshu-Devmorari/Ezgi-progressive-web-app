@@ -28,24 +28,22 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ActiveComments = (props) => {
+  const profileData = props?.profileData;
+  console.log(profileData, "===>>>>profileData");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);
   const [withdrawalModal, setWithdrawalModal] = useState(false);
+  const [descriptionShow, setDescriptionShow] = useState(false);
   const [AddCommentModalModalShow, setAddCommentModalModalShow] =
     useState(false);
 
-  const [textareaValue, setTextareaValue] = useState(
-    "2012 yılından beri profesyonel olarak..."
-  );
+  const [textareaValue, setTextareaValue] = useState(profileData?.description);
 
   const [editProfile, setEditProfile] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
-  const profileData = props?.profileData;
-
   function truncateString(str, maxLength) {
-    console.log("str:::::::::::::::::", str);
     if (str && str?.length <= maxLength) {
       return str;
     } else {
@@ -54,7 +52,6 @@ const ActiveComments = (props) => {
     }
   }
   const truncated = truncateString(profileData?.username, 7);
-  console.log(truncated, ":::::::::::::username:::::::::::::::::");
 
   let user;
   useEffect(() => {
@@ -78,6 +75,7 @@ const ActiveComments = (props) => {
           setEditProfile(false);
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
+          formData.append("update", "profile");
           const res = await axios.post(
             `${config.apiUrl}/profile/${user}`,
             formData
@@ -213,6 +211,30 @@ const ActiveComments = (props) => {
       }
     } catch (error) {
       console.error("Error fetching data.", error);
+    }
+  };
+
+  const handleSavedata = async () => {
+    try {
+      const res = await axios.post(`${config.apiUrl}/profile/${userId}`, {
+        description: textareaValue,
+        update: "comment",
+      });
+      setTextareaValue(res.data.data.description);
+      setDescriptionShow(false);
+      setEditProfile(false);
+      if (res.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: "Description Updated!",
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.log("error".error);
     }
   };
 
@@ -422,7 +444,10 @@ const ActiveComments = (props) => {
             <div className="mt-2 d-flex justify-content-end">
               {props.profile === "commentator" ? (
                 <button
-                  onClick={() => setEditProfile(!editProfile)}
+                  onClick={() => {
+                    setEditProfile(!editProfile);
+                    setDescriptionShow(editProfile);
+                  }}
                   style={{
                     border: editProfile
                       ? currentTheme === "dark"
@@ -478,7 +503,7 @@ const ActiveComments = (props) => {
           className="my-2 p-1 content-font position-relative"
           style={{
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            opacity: editProfile ? "0.3" : "",
+            opacity: editProfile ? (!descriptionShow ? "0.3" : "") : "",
           }}
         >
           <Form.Control
@@ -491,22 +516,59 @@ const ActiveComments = (props) => {
             }`}
             value={textareaValue}
             onChange={(e) => setTextareaValue(e.target.value)}
-            disabled={!editProfile}
+            disabled={editProfile ? (descriptionShow ? false : true) : true}
           />
         </div>
         <img
-          // onClick={() => setEditProfile(!editProfile)}
+          onClick={() => setDescriptionShow(!descriptionShow)}
           src={currentTheme === "dark" ? edit : editLight}
           alt=""
           height={35}
           width={35}
           style={{
-            display: editProfile ? "block" : "none",
+            display: editProfile
+              ? !descriptionShow
+                ? "block"
+                : "none"
+              : "none",
             position: "absolute",
             right: "10rem",
             top: "10rem",
           }}
         />
+        <button
+          style={{
+            display: editProfile
+              ? descriptionShow
+                ? "block"
+                : "none"
+              : "none",
+            position: "absolute",
+            right: "1rem",
+            top: "13.5rem",
+            border: editProfile
+              ? currentTheme === "dark"
+                ? "1px solid #4DD5FF"
+                : "1px solid #007BF6"
+              : currentTheme === "dark"
+              ? "1px solid #E6E6E6"
+              : "1px solid #0D2A53",
+            color: editProfile
+              ? currentTheme === "dark"
+                ? "#4DD5FF"
+                : "#007BF6"
+              : currentTheme === "dark"
+              ? "#E6E6E6"
+              : "#0D2A53",
+            backgroundColor: "transparent",
+            borderRadius: "18px",
+            padding: "0.1rem 1.2rem",
+            fontSize: "13px",
+          }}
+          onClick={() => handleSavedata()}
+        >
+          Save
+        </button>
         <div className="row g-0 text-center my-2 gap-1">
           <div className="col d-flex flex-column">
             <span

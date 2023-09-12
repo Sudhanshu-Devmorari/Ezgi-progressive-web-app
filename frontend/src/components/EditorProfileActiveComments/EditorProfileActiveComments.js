@@ -10,6 +10,7 @@ import Spinner from "react-bootstrap/esm/Spinner";
 import { userId } from "../GetUser";
 
 const EditorProfileActiveComments = (props) => {
+  console.log("props::::::::::::::", props);
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -24,7 +25,7 @@ const EditorProfileActiveComments = (props) => {
       );
       // console.log(res.data,"========fffffffffff>>>");
       setProfileData(res.data);
-      setIsFavorite(res?.data?.is_fav_editor)
+      setIsFavorite(res?.data?.is_fav_editor);
       setIsLoading(false);
     }
     getProfileData();
@@ -72,6 +73,17 @@ const EditorProfileActiveComments = (props) => {
               verifyid={props.verifyid}
               cmtReact={props.cmtReact}
               homeApiData={props.homeApiData}
+              followingList={props.followingList}
+              followingid={props.followingid}
+              setActiveCommentsshow={props.setActiveCommentsshow}
+              setData={props.setData}
+              selectContent={props.selectContent}
+              setSelectContent={props.setSelectContent}
+              setArrayMerge={props.setArrayMerge}
+              publicComments={props.publicComments}
+              setPublicComments={props.setPublicComments}
+              mergeArrays={props.mergeArrays}
+              setCmtReact={props.setCmtReact}
             />
           )}
           {SelectComment === "statistics" && (

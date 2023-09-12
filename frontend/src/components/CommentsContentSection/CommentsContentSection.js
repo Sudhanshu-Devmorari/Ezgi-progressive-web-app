@@ -30,7 +30,37 @@ import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import config from "../../config";
 
+import Selected_Clap from "../../assets/Selected Clap.svg";
+import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
+import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
+
+import Selected_Like from "../../assets/Selected Like.svg";
+import Dark_Unselected_Like from "../../assets/Dark - Unselected Like.svg";
+import Light_Unselected_Like from "../../assets/Light - Unselected Like.svg";
+
+import Selected_Favorite from "../../assets/Selected Favorite.svg";
+import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
+import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+
 const CommentsContentSection = (props) => {
+  const {
+    data,
+    setSelectContent,
+    selectContent,
+    userComments,
+    SelectComment,
+    setActiveCommentsshow,
+    followingList,
+    followingid,
+    verifyid,
+    cmtReact,
+    homeApiData,
+    setArrayMerge,
+    publicComments,
+    setPublicComments,
+    mergeArrays,
+    setCmtReact,
+  } = props;
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
   const server_url = `${config?.apiUrl}`;
@@ -57,8 +87,50 @@ const CommentsContentSection = (props) => {
     );
     // console.log(res);
     // console.log(id, "!!!!!!!!!!!!!!!", reaction);
-    props.homeApiData(user_id)
-    activeResolved(user_id)
+    // props.homeApiData(user_id);
+    if (res.status == 200) {
+      let data = res?.data?.data;
+      if (data) {
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_clap = data?.total_clap;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_favorite = data?.total_favorite;
+        publicComments.filter(
+          (response) => response.id == data?.comment_id
+        )[0].total_reactions.total_likes = data?.total_likes;
+
+        const commentIds = cmtReact.map((data) => {
+          return data.comment_id;
+        });
+
+        if (commentIds.includes(data?.comment_id)) {
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].clap = data?.clap;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].favorite = data?.favorite;
+          cmtReact.filter(
+            (response) => response.comment_id == data?.comment_id
+          )[0].like = data?.like;
+        } else {
+          const newObj = {
+            clap: data?.clap,
+            comment_id: data?.comment_id,
+            favorite: data?.favorite,
+            like: data?.like,
+          };
+          cmtReact.push(newObj);
+        }
+
+        setPublicComments(publicComments);
+        setCmtReact(cmtReact);
+        mergeArrays();
+      }
+    }
+    activeResolved(user_id);
   };
 
   useEffect(() => {
@@ -267,32 +339,41 @@ const CommentsContentSection = (props) => {
                                 handleCommentReaction(val?.id, "like");
                               }}
                             >
-                              {/* <img
-                                src={`${
-                                  currentTheme === "dark"
-                                    ? likeIcondark
-                                    : likeIcon
-                                }`}
-                                alt=""
-                                height={20}
-                                width={20}
-                              />{" "} */}
                               {props.cmtReact
                                 ?.map((e) => e.comment_id)
                                 ?.includes(val?.id) ? (
                                 props.cmtReact.filter(
                                   (e) => e.comment_id == val?.id
                                 )[0].like == 1 ? (
-                                  <PiHeartStraightFill
-                                    size={25}
-                                    color="#ff3030"
+                                  <img
+                                    src={Selected_Like}
+                                    alt=""
+                                    height={20}
+                                    width={20}
                                   />
                                 ) : (
-                                  <PiHeartStraight size={25} color="#ff3030" />
+                                  <img
+                                    src={
+                                      currentTheme === "dark"
+                                        ? Dark_Unselected_Like
+                                        : Light_Unselected_Like
+                                    }
+                                    alt=""
+                                    height={20}
+                                    width={20}
+                                  />
                                 )
                               ) : (
-                                // <img src={likeIcondark} alt="" height={20} width={20} />
-                                <PiHeartStraight size={25} color="#ff3030" />
+                                <img
+                                  src={
+                                    currentTheme === "dark"
+                                      ? Dark_Unselected_Like
+                                      : Light_Unselected_Like
+                                  }
+                                  alt=""
+                                  height={20}
+                                  width={20}
+                                />
                               )}{" "}
                               {val?.total_reactions?.total_likes}
                             </div>
@@ -301,29 +382,41 @@ const CommentsContentSection = (props) => {
                                 handleCommentReaction(val?.id, "favorite");
                               }}
                             >
-                              {/* <img
-                                src={`${
-                                  currentTheme === "dark"
-                                    ? starDarkLogin
-                                    : starIcon
-                                }`}
-                                alt=""
-                                height={23}
-                                width={23}
-                              />{" "} */}
                               {props.cmtReact
                                 ?.map((e) => e.comment_id)
                                 ?.includes(val?.id) ? (
                                 props.cmtReact.filter(
                                   (e) => e.comment_id == val?.id
                                 )[0].favorite == 1 ? (
-                                  <GoStarFill size={25} color="#ffcc00" />
+                                  <img
+                                    src={Selected_Favorite}
+                                    alt=""
+                                    height={20}
+                                    width={20}
+                                  />
                                 ) : (
-                                  <GoStar size={25} color="#ffcc00" />
+                                  <img
+                                    src={
+                                      currentTheme === "dark"
+                                        ? Dark_Unselected_Favorite
+                                        : Light_Unselected_Favorite
+                                    }
+                                    alt=""
+                                    height={20}
+                                    width={20}
+                                  />
                                 )
                               ) : (
-                                // <img src={likeIcondark} alt="" height={20} width={20} />
-                                <GoStar size={25} color="#ffcc00" />
+                                <img
+                                  src={
+                                    currentTheme === "dark"
+                                      ? Dark_Unselected_Favorite
+                                      : Light_Unselected_Favorite
+                                  }
+                                  alt=""
+                                  height={20}
+                                  width={20}
+                                />
                               )}{" "}
                               {val?.total_reactions?.total_favorite}
                             </div>
@@ -332,14 +425,6 @@ const CommentsContentSection = (props) => {
                                 handleCommentReaction(val?.id, "clap");
                               }}
                             >
-                              {/* <img
-                                src={
-                                  currentTheme === "dark" ? clapIcon : clapLight
-                                }
-                                alt=""
-                                height={20}
-                                width={20}
-                              />{" "} */}
                               {props.cmtReact
                                 ?.map((e) => e.comment_id)
                                 ?.includes(val?.id) ? (
@@ -347,14 +432,18 @@ const CommentsContentSection = (props) => {
                                   (e) => e.comment_id == val?.id
                                 )[0].clap == 1 ? (
                                   <img
-                                    src={clapIcon1}
+                                    src={Selected_Clap}
                                     alt=""
                                     height={20}
                                     width={20}
                                   />
                                 ) : (
                                   <img
-                                    src={clapIcon}
+                                    src={
+                                      currentTheme === "dark"
+                                        ? Dark_Unselected_Clap
+                                        : Light_Unselected_Clap
+                                    }
                                     alt=""
                                     height={20}
                                     width={20}
@@ -363,7 +452,11 @@ const CommentsContentSection = (props) => {
                               ) : (
                                 // <img src={likeIcondark} alt="" height={20} width={20} />
                                 <img
-                                  src={clapIcon}
+                                  src={
+                                    currentTheme === "dark"
+                                      ? Dark_Unselected_Clap
+                                      : Light_Unselected_Clap
+                                  }
                                   alt=""
                                   height={20}
                                   width={20}

@@ -7,6 +7,7 @@ import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
 
 const MySubscribers = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -260,10 +261,15 @@ const MySubscribers = (props) => {
           </>
         )}
       </div>
-      <SubscribeRenewModal
+      <SubscribeModal
         show={RenewModalShow}
         onHide={() => setRenewModalShow(false)}
+        text='renew'
       />
+      {/* <SubscribeRenewModal
+        show={RenewModalShow}
+        onHide={() => setRenewModalShow(false)}
+      /> */}
     </>
   );
 };

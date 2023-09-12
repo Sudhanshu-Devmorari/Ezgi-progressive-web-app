@@ -358,7 +358,7 @@ const SupportManagementPage = () => {
 
       <TicketReplyModal tickeview={tickeview} />
 
-      <Export exportList={displayTickets} />
+      <Export exportList={displayTickets} exportData={"Support"} />
     </>
   );
 };

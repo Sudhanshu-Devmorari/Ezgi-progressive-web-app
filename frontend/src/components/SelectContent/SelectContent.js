@@ -58,7 +58,10 @@ export const SelectContent = (props) => {
               width={31}
             />
             <span className="pe-2">Only Public</span>
-            <div onClick={() => {props.setPublicSelected(!props.publicSelected); props.setSelectContent("only public")}}>
+            {/* {console.log(props.publicSelected)} */}
+            <div onClick={() => {props.setPublicSelected(!props.publicSelected); props.publicSelected == true ? props.setSelectContent("for you") : props.setSelectContent("only public")}} 
+            
+            >
               <img
                 src={currentTheme === "dark" ? props.publicSelected ? publicSelectedIcon : darkGrp : props.publicSelected ? lighGrpSelected : lighGrp  }
                 // src={currentTheme === "dark" ? darkGrp : lighGrp}

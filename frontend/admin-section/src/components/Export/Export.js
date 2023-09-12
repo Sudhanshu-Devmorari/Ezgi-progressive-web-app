@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import cross from "../../assets/Group 81.svg";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import config from "../../config";
 
 const Export = (props) => {
   const [dateSelected, setDateSelected] = useState({
@@ -39,23 +40,37 @@ const Export = (props) => {
   const handleExport = () => {
     const doc = new jsPDF();
 
-    const tableData = exportData.map((entry, index) => [
-      index + 1,
-      entry.user.name,
-      entry.department,
-      entry.subject,
-      entry.message,
-      entry.status.charAt(0).toUpperCase() + entry.status.slice(1),
-    ]);
+    if (props?.exportData === "Ads") {
+      const tableData = exportData.map((entry, index) => [
+        index + 1,
+        entry.ads_space,
+        entry.link,
+        entry.company_name,
+      ]);
 
-    const headers = [
-      ["SR", "Name", "Department", "Subject", "Message", "Status"],
-    ];
+      const headers = [["SR", "Ads Space", "Link", "Company"]];
+      doc.autoTable({
+        head: headers,
+        body: tableData,
+      });
+    } else if (props?.exportData === "Support") {
+      const tableData = exportData.map((entry, index) => [
+        index + 1,
+        entry.user.name,
+        entry.department,
+        entry.subject,
+        entry.message,
+        entry.status.charAt(0).toUpperCase() + entry.status.slice(1),
+      ]);
 
-    doc.autoTable({
-      head: headers,
-      body: tableData,
-    });
+      const headers = [
+        ["SR", "Name", "Department", "Subject", "Message", "Status"],
+      ];
+      doc.autoTable({
+        head: headers,
+        body: tableData,
+      });
+    }
 
     doc.save("exported_data.pdf");
   };

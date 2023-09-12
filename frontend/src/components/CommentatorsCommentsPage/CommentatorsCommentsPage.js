@@ -22,6 +22,8 @@ import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 
 const CommentatorsCommentsPage = (props) => {
+  console.log("props.publicComments:::::::::::::::", props);
+
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [content, setContent] = useState("home");
   const [subscribersOrSubscriptions, setSubscribersOrSubscriptions] =
@@ -117,6 +119,15 @@ const CommentatorsCommentsPage = (props) => {
                   followingList={props.followingList}
                   followingid={props.followingid}
                   cmtReact={props.cmtReact}
+                  setActiveCommentsshow={props.setActiveCommentsshow}
+                  setData={props.setData}
+                  selectContent={props.selectContent}
+                  setSelectContent={props.setSelectContent}
+                  setArrayMerge={props.setArrayMerge}
+                  publicComments={props.publicComments}
+                  setPublicComments={props.setPublicComments}
+                  mergeArrays={props.mergeArrays}
+                  setCmtReact={props.setCmtReact}
                 />
               )}
               {SelectComment === "statistics" && (
@@ -186,6 +197,14 @@ const CommentatorsCommentsPage = (props) => {
                   followingList={props.followingList}
                   followingid={props.followingid}
                   cmtReact={props.cmtReact}
+                  SelectComment={SelectComment}
+                  setData={props.setData}
+                  selectContent={props.selectContent}
+                  setArrayMerge={props.setArrayMerge}
+                  publicComments={props.publicComments}
+                  setPublicComments={props.setPublicComments}
+                  mergeArrays={props.mergeArrays}
+                  setCmtReact={props.setCmtReact}
                 />
               )}
             </>

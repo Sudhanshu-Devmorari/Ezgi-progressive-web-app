@@ -6,22 +6,6 @@ import config from "../../config";
 const EditorHighlightSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Journeyman");
 
-  // Highlights Settings API
-  const [highlightssettingData, setHighlightssettingData] = useState([]);
-  useEffect(() => {
-    async function getData() {
-      try {
-        const res = await axios.get(
-          `${config?.apiUrl}/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
-        );
-        // console.log("res==>>", res.data[0]);
-        setHighlightssettingData(res.data[0]);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getData();
-  }, [selectLevel]);
   return (
     <>
       <div className="my-2 mt-3">
@@ -47,11 +31,7 @@ const EditorHighlightSettings = () => {
           Grandmaster
         </span>
       </div>
-      <SalesHighlightSettings
-        highlightssettingData={highlightssettingData}
-        setHighlightssettingData={setHighlightssettingData}
-        selectLevel={selectLevel}
-      />
+      <SalesHighlightSettings selectLevel={selectLevel} />
     </>
   );
 };

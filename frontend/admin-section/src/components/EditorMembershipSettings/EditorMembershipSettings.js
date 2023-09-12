@@ -6,20 +6,6 @@ import config from "../../config";
 const EditorMembershipSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Apprentice");
 
-  const [getMembershipData, setGetMembershipData] = useState([]);
-  useEffect(() => {
-    async function getData() {
-      try {
-        const res = await axios.get(
-          `${config?.apiUrl}/membership-setting/?commentator_level=${selectLevel.toLowerCase()}`
-        );
-        setGetMembershipData(res.data[0]);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getData();
-  }, [selectLevel]);
   return (
     <>
       <div className="my-2 mt-3">
@@ -52,11 +38,7 @@ const EditorMembershipSettings = () => {
           Grandmaster
         </span>
       </div>
-      <SalesMembershipSettings
-        getMembershipData={getMembershipData}
-        setGetMembershipData={setGetMembershipData}
-        selectLevel={selectLevel}
-      />
+      <SalesMembershipSettings selectLevel={selectLevel} />
     </>
   );
 };

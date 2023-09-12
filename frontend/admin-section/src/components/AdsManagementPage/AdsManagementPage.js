@@ -17,6 +17,7 @@ import upload from "../../assets/upload.svg";
 import axios from "axios";
 import CreateAdsModal from "../CreateAdsModal/CreateAdsModal";
 import config from "../../config";
+import Export from "../Export/Export";
 
 const AdsManagementPage = () => {
   const [editTrue, setEditTrue] = useState(false);
@@ -151,6 +152,7 @@ const AdsManagementPage = () => {
             <div className="dark-mode p-2 m-2 mb-0 home-height">
               <div className="my-2 d-flex justify-content-end">
                 <button
+                  onClick={() => setEditTrue(false)}
                   data-bs-toggle="modal"
                   data-bs-target="#CreateAds"
                   className="px-2"
@@ -164,6 +166,8 @@ const AdsManagementPage = () => {
                   Create Ads
                 </button>
                 <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#exportModal"
                   className="px-2 mx-2"
                   style={{
                     border: "1px solid #58DEAA",
@@ -202,7 +206,7 @@ const AdsManagementPage = () => {
                                 />
                               </div>
 
-                              <div className="col-4">
+                              <div className="col-3">
                                 <div className="gap-3 d-flex">
                                   <div className="">
                                     <button
@@ -222,11 +226,11 @@ const AdsManagementPage = () => {
                                         style={{
                                           backgroundColor: "transparent",
                                           borderRadius: "3px",
-                                          color: "#4DD5FF",
-                                          border: "1px solid #4DD5FF",
+                                          color: "#58DEAA",
+                                          border: "1px solid #58DEAA",
                                         }}
                                       >
-                                        Main Page Top Right
+                                        Main Page Top Left
                                       </button>
                                     </div>
                                   )}
@@ -380,7 +384,7 @@ const AdsManagementPage = () => {
                           )} */}
                               </div>
                               <div
-                                className="col-1 d-flex align-items-center"
+                                className="col-2 d-flex align-items-center"
                                 style={{ overflowWrap: "anywhere" }}
                               >
                                 {/* <div className=""> */}{" "}
@@ -464,6 +468,7 @@ const AdsManagementPage = () => {
         editTrue={editTrue}
         adsEditData={adsEditData}
       />
+      <Export exportList={ads} exportData={'Ads'}/>
     </>
   );
 };

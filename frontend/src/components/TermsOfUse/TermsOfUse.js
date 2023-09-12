@@ -32,7 +32,7 @@ const TermsOfUse = (props) => {
               }}
             ></i>
           </span>
-          <span className="">
+          {/* <span className="">
             <RxCross2
               onClick={() => {
                 props.hide();
@@ -42,7 +42,7 @@ const TermsOfUse = (props) => {
                 currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
               }`}
             />
-          </span>
+          </span> */}
         </div>
         <h4
           style={{

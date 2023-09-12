@@ -16,6 +16,7 @@ import requests
 from datetime import datetime
 import json
 from django.db import IntegrityError
+from django.http import HttpResponseServerError
 
 # From rest_framework 
 from rest_framework.views import APIView
@@ -719,53 +720,107 @@ class NotificationView(APIView):
 
 
 class CommentReactionView(APIView):
+
     def post(self, request, comment_id, id, format=None, *args, **kwargs):
-        # print("------- ",comment_id,"====", id)
         
-        try:
-            comment = Comments.objects.get(id=comment_id)
-        except Comments.DoesNotExist:
+        # Comment object validation
+        comment = Comments.objects.filter(id=comment_id).exists()
+        if not comment:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # user = request.user
-        user = User.objects.get(id=id)
+        # User object validation
+        is_user_exist = User.objects.filter(id=id).exists()
+        if not is_user_exist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Reaction type validation
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
         if reaction_type not in ('like', 'favorite', 'clap'):
             return Response({'error': 'Invalid reaction type'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            comment_reaction = CommentReaction.objects.get(comment=comment, user=user)
-            if getattr(comment_reaction, reaction_type):
-                # User clicked the same button again, remove the reaction
-                setattr(comment_reaction, reaction_type, None)
-                if comment_reaction.like is None and comment_reaction.favorite is None and comment_reaction.clap is None:
-                    comment_reaction.delete()
-                    total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
-                    return Response({'message': 'Reaction removed successfully', 'new_total_clap': total_clap})
-            else:
-                # User clicked a different button, update the reaction
-                setattr(comment_reaction, reaction_type, 1)
-                comment_reaction.save()
-                total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
-
-                return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'new_total_clap': total_clap})
-
-            comment_reaction.save()
-        except CommentReaction.DoesNotExist:
-            # If the user has not reacted before, create a new reaction
-            reaction_data = {'comment': comment_id, 'user': user.id}
+        comment_reaction = CommentReaction.objects.filter(comment_id=comment_id, user_id=id).first()
+        
+        # If the user has not reacted before, create a new reaction
+        if not comment_reaction:
+            reaction_data = {'comment': comment_id, 'user': id}
             reaction_data[reaction_type] = 1
+
             serializer = CommentReactionSerializer(data=reaction_data)
             if serializer.is_valid():
                 serializer.save()
-                total_clap = CommentReaction.objects.filter(comment=comment).aggregate(Sum('clap'))['clap__sum'] or 0
+                comment_reactions = CommentReaction.objects.filter(comment_id=comment_id).values('like', 'favorite', 'clap')
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
 
-                return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'new_total_clap': total_clap})
+                data = {'comment_id': comment_id,
+                        'total_likes': total_reactions['total_likes'] or 0,
+                        'total_favorite': total_reactions['total_favorite'] or 0,
+                        'total_clap': total_reactions['total_clap'] or 0,
+                        'like': reaction_data.get('like', 0),
+                        'favorite': reaction_data.get('favorite', 0),
+                        'clap': reaction_data.get('clap', 0),
+                        }
+                return Response({'message': f'Reaction "{reaction_type}" saved successfully',
+                                 'new_total_clap': total_reactions['total_clap'] or 0,
+                                 'status': status.HTTP_200_OK, 'data': data})
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': f'Reaction "{reaction_type}" saved successfully', 'hgf' : 'gdh'})
+        if getattr(comment_reaction, reaction_type):
+            # User clicked the same button again, remove the reaction
+            setattr(comment_reaction, reaction_type, None)
+            comment_reaction.save(update_fields=[reaction_type,'updated'])
+
+            if comment_reaction.like is None and comment_reaction.favorite is None and comment_reaction.clap is None:
+                comment_reaction.delete()
+                comment_reaction = None
+
+            comment_reactions = CommentReaction.objects.filter(comment_id=comment_id).values('like', 'favorite', 'clap')
+            total_reactions = comment_reactions.aggregate(
+                total_likes=Sum('like'),
+                total_favorite=Sum('favorite'),
+                total_clap=Sum('clap')
+            )
+
+            data = {'comment_id': comment_id,
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0,
+                    'like': 1 if comment_reaction and comment_reaction.like else 0,
+                    'favorite': 1 if comment_reaction and comment_reaction.favorite else 0,
+                    'clap': 1 if comment_reaction and comment_reaction.clap else 0,
+                    }
+            return Response({'message': 'Reaction removed successfully',
+                             'new_total_clap': total_reactions['total_clap'] or 0,
+                             'status': status.HTTP_200_OK, 'data': data})
+        else:
+            # User clicked a different button, update the reaction
+            setattr(comment_reaction, reaction_type, 1)
+            comment_reaction.save(update_fields=[reaction_type,'updated'])
+
+            comment_reactions = CommentReaction.objects.filter(comment_id=comment_id).values('like', 'favorite', 'clap')
+            total_reactions = comment_reactions.aggregate(
+                total_likes=Sum('like'),
+                total_favorite=Sum('favorite'),
+                total_clap=Sum('clap')
+            )
+
+            data = {'comment_id': comment_id,
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0,
+                    'like': 1 if comment_reaction.like else 0,
+                    'favorite': 1 if comment_reaction.favorite else 0,
+                    'clap': 1 if comment_reaction.clap else 0,
+                    }
+            return Response({'message': f'Reaction "{reaction_type}" saved successfully',
+                             'new_total_clap': total_reactions['total_clap'] or 0,
+                             'status': status.HTTP_200_OK, 'data': data})
    
+
 class ProfileView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -811,10 +866,15 @@ class ProfileView(APIView):
 
         if 'file' not in request.data:
             return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
+        elif 'file' in request.data:
+            profile_pic = request.data['file']
+            user.profile_pic = profile_pic
 
-        profile_pic = request.data['file']
-
-        user.profile_pic = profile_pic
+        if 'description' in request.data:
+            description = request.data['description']
+            user.description = description
+        if 'description' not in request.data:
+            return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
         user.save()
 
         serializer = UserSerializer(user)
@@ -881,50 +941,39 @@ class FavEditorsCreateView(APIView):
 class RetrieveFavEditorsAndFavComment(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         data_list = {}
-        fav_editor_list = []
-        fav_comment_list = []
 
-        # user = request.user
-        user = User.objects.get(id=id)
-
+        is_user_exist = User.objects.filter(id=id).exists()
+        if not is_user_exist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
         try:
             editor = []
-            editor_obj = FavEditors.objects.filter(standard_user=user)
+            editor_obj = FavEditors.objects.filter(standard_user_id=id)
             for obj in editor_obj:
                 details = {}
-                # print("********** ", obj.commentator_user.username)
 
-                count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
-                # print("********** ", count)
-
+                # FavEditor data
                 serializer = FavEditorsSerializer(obj)
                 data = serializer.data
                 details['data'] = data
+                
+                # Subscribe count
+                count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
                 details['subscriber_count'] = count
 
                 editor.append(details)
 
-
-            # serializer = UserSerializer(fav_editor_list, many=True)
             data_list['favEditors'] = editor
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # print("========== ", data_list)
-
         try:
-            comment_obj = CommentReaction.objects.filter(user=user, favorite=1)
+            comment_obj = CommentReaction.objects.filter(user_id=id, favorite=1)
             details = []
             for obj in comment_obj:
                 comment_data = CommentsSerializer(obj.comment).data
-
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
 
-                # Format the datetime object as desired (DD.MM.YYYY)
-                formatted_date = date_obj.strftime("%d.%m.%Y")
-
-                comment_data['date'] = formatted_date 
-                # fav_comment_list.append(obj.comment)
                 comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
                 total_reactions = comment_reactions.aggregate(
                     total_likes=Sum('like'),
@@ -932,6 +981,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
                     total_clap=Sum('clap')
                 )
                 
+                comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
                 comment_data['total_reactions'] = {
                     'total_likes': total_reactions['total_likes'] or 0,
                     'total_favorite': total_reactions['total_favorite'] or 0,
@@ -940,13 +990,12 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
                 details.append(comment_data)
 
-
-            # serializer1 = CommentsSerializer(fav_comment_list, many=True)
             data_list['favComments'] = details
         except Exception as e:
             return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=data_list, status=status.HTTP_200_OK)       
+        return Response(data=data_list, status=status.HTTP_200_OK)
+        
 
 class SupportView(APIView):
     # for retrieve login user all tickets:
@@ -1130,24 +1179,20 @@ class ResolvedTicket(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 class ActiveResolvedCommentRetrieveView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
-        # print("--===--", id)
-        user = User.objects.get(id=id)
+        is_user_exist = User.objects.filter(id=id).exists()
+        if not is_user_exist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         data_list = {}
 
         try:
             details =[]
-            all_active_comment = Comments.objects.filter(commentator_user=user, is_resolve=False)
+            all_active_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=False).only('id')
             for obj in all_active_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
-
-                # Format the datetime object as desired (DD.MM.YYYY)
-                formatted_date = date_obj.strftime("%d.%m.%Y")
-
-                comment_data['date'] = formatted_date 
-
                 comment_reactions = CommentReaction.objects.filter(comment=obj)
                 total_reactions = comment_reactions.aggregate(
                     total_likes=Sum('like'),
@@ -1155,28 +1200,23 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     total_clap=Sum('clap')
                 )
                 
+                comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
                 comment_data['total_reactions'] = {
                     'total_likes': total_reactions['total_likes'] or 0,
                     'total_favorite': total_reactions['total_favorite'] or 0,
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 details.append(comment_data)
-            # serializer = CommentsSerializer(all_active_comment, many=True)
             data_list['active_comments'] = details
         except Comments.DoesNotExist:
             data_list['active_comments'] = []
 
         try:
             details =[]
-            all_resolved_comment = Comments.objects.filter(commentator_user=user, is_resolve=True)
+            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=True).only('id')
             for obj in all_resolved_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
-
-                # Format the datetime object as desired (DD.MM.YYYY)
-                formatted_date = date_obj.strftime("%d.%m.%Y")
-
-                comment_data['date'] = formatted_date 
 
                 comment_reactions = CommentReaction.objects.filter(comment=obj)
                 total_reactions = comment_reactions.aggregate(
@@ -1185,13 +1225,13 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     total_clap=Sum('clap')
                 )
                 
+                comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
                 comment_data['total_reactions'] = {
                     'total_likes': total_reactions['total_likes'] or 0,
                     'total_favorite': total_reactions['total_favorite'] or 0,
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 details.append(comment_data)
-            # serializer1 = CommentsSerializer(all_resolved_comment, many=True)
             data_list['resolved_comments'] = details
         except Comments.DoesNotExist:
             data_list['resolved_comments'] = []
@@ -1802,9 +1842,9 @@ class FilterComments(APIView):
 
             if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
                 if request.data.get('category') == "Futbol":
-                    filters['category__contains'] = "Football"
+                     filters['category__icontains'] = "Football"
                 if request.data.get('category') == "Basketbol":
-                    filters['category__contains'] = "Basketball"
+                     filters['category__icontains'] = "Basketball"
 
             if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')
@@ -2344,6 +2384,9 @@ class EditorManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
+        if User.objects.filter(phone=request.data['phone']).exists():
+            return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             try:
@@ -3301,7 +3344,7 @@ class MembershipSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = MembershipSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -3336,7 +3379,7 @@ class SubscriptionSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -3371,7 +3414,7 @@ class HighlightSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = HighlightSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -3453,65 +3496,65 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def Statistics(pk):
-    user = User.objects.get(id=pk)
-    
-    data = Comments.objects.filter(commentator_user=pk)
-    correct_prediction = data.filter(is_prediction=True)
-    incorrect_prediction = data.filter(is_prediction=False)
+def Statistics(user_obj=None, user_id=None):
+    try:
+        user = User.objects.get(id=user_id) if not user_obj else user_obj
+        
+        data = Comments.objects.filter(commentator_user=user)
+        win_count = data.filter(is_prediction=True).count()
+        lose_count = data.filter(is_prediction=False).count()
 
-    if len(data) != 0:
-        Success_rate = round((len(correct_prediction)/len(data))*100, 2)
-    else:
-        Success_rate = 0
-
-    Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
-
-    win_count = correct_prediction.count()
-    lose_count = incorrect_prediction.count()
-
-    if len(correct_prediction) >=60:
-        user.commentator_level = "journeyman"
-        # print(user.commentator_level)
-        user.save()
-        # print("here")
-    # Match_result = data.filter(prediction_type="Match Result")
-    # Goal_count = data.filter(prediction_type="Goal Count")
-    # Halftime = data.filter(prediction_type="Halftime")
-    # print(len(Match_result), len(Goal_count), len(Halftime))
-    # Match_result_rate = round((len(Match_result)/len(data))*100,2)
-    # Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
-    # Halftime_rate = round((len(Halftime)/len(data))*100,2)
-    country_leagues = {}
-    only_leagues = []
-    avg_odd = 0
-    for i in data:
-        avg_odd += i.average_odds
-        only_leagues.append(i.league)
-        country = i.country
-        league = i.league
-        if country in country_leagues:
-            country_leagues[country].append(league)
+        if len(data) != 0:
+            Success_rate = round((win_count/len(data))*100, 2)
         else:
-            country_leagues[country] = [league]
+            Success_rate = 0
+        
+        Score_point = ((10*win_count)- (10*lose_count))
 
-    if 0 < Success_rate < 60:
-        user.commentator_level = "apprentice"
-    if 60 < Success_rate< 65:
-        user.commentator_level = "journeyman"
-    if 65 < Success_rate < 70:
-        user.commentator_level = "master"
-    if 70 < Success_rate < 100:
-        user.commentator_level = "grandmaster"
+        if win_count >= 60:
+            user.commentator_level = "journeyman"
+            user.save(update_fields=['commentator_level','updated'])
 
-    if len(data) != 0:
-        avg_odd = round(avg_odd/len(data), 2)
-    else:
+        # Match_result = data.filter(prediction_type="Match Result")
+        # Goal_count = data.filter(prediction_type="Goal Count")
+        # Halftime = data.filter(prediction_type="Halftime")
+        # print(len(Match_result), len(Goal_count), len(Halftime))
+        # Match_result_rate = round((len(Match_result)/len(data))*100,2)
+        # Goal_count_rate = round((len(Goal_count)/len(data))*100, 2)
+        # Halftime_rate = round((len(Halftime)/len(data))*100,2)
+
+        country_leagues = {}
+        only_leagues = []
         avg_odd = 0
+        for i in data:
+            avg_odd += i.average_odds
+            only_leagues.append(i.league)
+            country = i.country
+            league = i.league
+            if country in country_leagues:
+                country_leagues[country].append(league)
+            else:
+                country_leagues[country] = [league]
 
-    user.save()
-    # return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
-    return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
+        if 0 < Success_rate < 60:
+            user.commentator_level = "apprentice"
+        if 60 < Success_rate< 65:
+            user.commentator_level = "journeyman"
+        if 65 < Success_rate < 70:
+            user.commentator_level = "master"
+        if 70 < Success_rate < 100:
+            user.commentator_level = "grandmaster"
+
+        if len(data) != 0:
+            avg_odd = round(avg_odd/len(data), 2)
+        else:
+            avg_odd = 0
+
+        user.save(update_fields=['commentator_level','updated'])
+        # return Success_rate, Score_point, Match_result_rate, Goal_count_rate, Halftime_rate,country_leagues, avg_odd, win_count, lose_count
+        return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
+    except:
+        raise HttpResponseServerError("Statistics Exception")
 
 # class UserStatistics(APIView):
 #     def get(self, request, id=id):
@@ -3537,16 +3580,18 @@ def Statistics(pk):
 #                             'resolve_comment': resolve_comment.values(),
 #                             'Active_comment': Active_comment.values(),
 #                             }, status=status.HTTP_200_OK)
+
 class UserStatistics(APIView):
+   
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = get_object_or_404(User, id=id)
             serializer = UserSerializer(user).data
 
-            Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(id)
+            Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues = Statistics(user_obj=user)
             user.success_rate = Success_rate
             user.score_points = Score_point
-            user.save()
+            user.save(update_fields=['success_rate', 'score_points', 'updated'])
 
             element_counts = Counter(only_leagues)
             most_common_element = None
@@ -3993,3 +4038,252 @@ class GetALLUsers(APIView):
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': f'Error while fetching users. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RetrievePageData():
+
+    unique_comment_ids = set()
+    
+    def get_public_comments(self):
+        """ Return public comments data """
+        public_comments = []
+
+        try:
+            all_comments = Comments.objects.filter(status='approve', public_content=True).order_by('-created').only('id')
+
+            for comment in all_comments:
+                comment_data = CommentsSerializer(comment).data
+                date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+        
+                # Fetch comment reactions and calculate the total count of reactions
+                comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
+                total_reactions = comment_reactions.aggregate(
+                    total_likes=Sum('like'),
+                    total_favorite=Sum('favorite'),
+                    total_clap=Sum('clap')
+                )
+                
+                # Update comment_data
+                comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
+                comment_data['total_reactions'] = {
+                    'total_likes': total_reactions['total_likes'] or 0,
+                    'total_favorite': total_reactions['total_favorite'] or 0,
+                    'total_clap': total_reactions['total_clap'] or 0
+                }
+                
+                if comment.id not in self.unique_comment_ids:
+                    self.unique_comment_ids.add(comment.id)
+                    public_comments.append(comment_data)
+
+        except:
+            public_comments = []
+
+        return public_comments
+    
+    def get_subscription_comments(self, id):
+        """ Return subscription comments data """
+        subscription_comments = []
+
+        try:
+            # Id validation
+            if id == 'null':
+                return subscription_comments
+
+            # Is user exist validation
+            is_user_exist = User.objects.filter(id=id).exists()
+            if not is_user_exist:
+                return subscription_comments
+            
+            subscription_obj = Subscription.objects.filter(standard_user_id=id, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
+            for obj in subscription_obj:
+                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
+                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').order_by('-created')
+
+                    for comment in subscription_comment:
+                        comment_data = CommentsSerializer(comment).data
+                        date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+                        comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
+                        total_reactions = comment_reactions.aggregate(
+                            total_likes=Sum('like'),
+                            total_favorite=Sum('favorite'),
+                            total_clap=Sum('clap')
+                        )
+                        
+                        # Update comment data
+                        comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
+                        comment_data['total_reactions'] = {
+                            'total_likes': total_reactions['total_likes'] or 0,
+                            'total_favorite': total_reactions['total_favorite'] or 0,
+                            'total_clap': total_reactions['total_clap'] or 0
+                        }
+
+                        if comment.id not in self.unique_comment_ids:
+                            self.unique_comment_ids.add(comment.id)
+                            subscription_comments.append(comment_data)
+
+        except:
+            subscription_comments = []
+        
+        return subscription_comments
+    
+    def get_highlights(self, id):
+        """ Return highlights data """
+        highlights = []
+        standard_user_id = id if id != 'null' else None
+
+        try:
+            # Validation
+            standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
+
+            # Get data
+            all_highlights = Highlight.objects.filter(status='active').order_by('-created').only('id')
+            for obj in all_highlights:
+                highlighted_data = HighlightSerializer(obj).data
+                user_data = highlighted_data['user'] 
+
+                count = Subscription.objects.filter(commentator_user=user_data['id']).count()
+                highlighted_data['subscriber_count'] = count
+
+                if standard_user_id:
+                    highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
+                else:
+                    highlighted_data['is_fav_editor'] = False
+
+                highlights.append(highlighted_data)
+        except:
+            highlights = []
+        
+        return highlights
+    
+
+    def get_ads(self):
+        """ Return advertisment data """
+        try:
+            ads = Advertisement.objects.all()
+            serializer = AdvertisementSerializer(ads, many=True)
+            data = serializer.data
+            return data
+        except:
+            return []
+    
+
+    def get_following_user(self, id):
+        """ Return following user data """
+        following_user = []
+        try:
+            if id != 'null':
+                if FollowCommentator.objects.filter(standard_user__id=id).exists():
+                    following = FollowCommentator.objects.filter(standard_user__id=id).only('id', 'commentator_user')
+                    for obj in following:
+                        serializer = UserSerializer(obj.commentator_user).data
+                        following_user.append(serializer)
+        except:
+            following_user = []
+        
+        return following_user
+    
+
+    def get_verify_ids(self):
+        """ Return verify ids data """
+        return list(BlueTick.objects.values_list('user_id', flat=True))
+
+    def get_comment_reactions(self, id):
+        """ Return comment reactions data """
+        comment_reactions_data = []
+        try:
+            if id != 'null':
+                if CommentReaction.objects.filter(user__id=id).exists():
+                    cmt_reacts = CommentReaction.objects.filter(user__id=id).only('comment', 'like', 'favorite', 'clap')
+                    for obj in cmt_reacts:
+                        details = {
+                            "comment_id":obj.comment.id,
+                            "like":obj.like,
+                            "favorite":obj.favorite,
+                            "clap":obj.clap,
+                        }
+                        comment_reactions_data.append(details)
+        except:
+            comment_reactions_data = []
+        
+        return comment_reactions_data
+
+    def get_commentator(self, id):
+        """ Return commentator data """
+        user_detail = []
+        user_id = id if id != 'null' else None
+        try:
+            # Validation
+            user_id = user_id if User.objects.filter(id=user_id).exists() else None
+
+            # Get data
+            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator').order_by('-created').only('id')
+            for obj in all_commentator:
+                detail = {}
+                count = Subscription.objects.filter(commentator_user_id=obj.id).count()
+
+                detail['user'] = UserSerializer(obj).data
+                detail['subscriber_count'] = count
+                user_detail.append(detail)
+        except:
+            user_detail = []
+
+        return user_detail
+
+class RetrieveHomeView(APIView):
+    """
+    for Home page:
+    """
+    def get(self, request, format=None, *args, **kwargs):
+        data_list = {
+            "Public_Comments": [],
+            "Subscription_Comments": [],
+            "highlights": [],
+            "ads": [],
+            "following_user": [],
+            "verify_ids": [],
+            "comment_reactions": [],
+        } # data_list to return in response
+        
+        # Instantiate RetrievePageData object
+        retrieve_data = RetrievePageData()
+
+        # Get public comments data
+        data_list['Public_Comments'] = retrieve_data.get_public_comments()
+
+        # Get subscription comments data
+        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id'))
+      
+        # Get highlights data
+        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id'))
+        
+        # Get advertisment data
+        data_list['ads'] = retrieve_data.get_ads()
+
+        # Get following user data
+        data_list['following_user'] = retrieve_data.get_following_user(request.query_params.get('id'))
+        
+        # Get verify ids data
+        data_list['verify_ids'] = retrieve_data.get_verify_ids()
+
+        # Get comment reactions data
+        data_list['comment_reactions'] = retrieve_data.get_comment_reactions(request.query_params.get('id'))
+        
+        return Response(data=data_list, status=status.HTTP_200_OK)
+    
+
+class RetrieveEditorView(APIView):
+    """
+    Editor list view
+    """
+    def get(self, request, format=None, *args, **kwargs):
+        data_list = {
+            "Commentator": [],
+        } # data_list to return in response
+
+        # Instantiate RetrievePageData object
+        retrieve_data = RetrievePageData()
+
+        # Get commentator data
+        data_list['Commentator'] = retrieve_data.get_commentator(request.query_params.get('id'))
+        
+        return Response(data=data_list, status=status.HTTP_200_OK)

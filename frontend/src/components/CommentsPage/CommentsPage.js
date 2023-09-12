@@ -20,10 +20,15 @@ const CommentsPage = ({
   cmtReact,
   homeApiData,
   setArrayMerge,
+  publicComments,
+  setPublicComments,
+  setCmtReact,
+  mergeArrays,
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   const [filterCommentData, setFilterCommentData] = useState(null);
   const [displayData, setDisplayData] = useState(mergedResult);
+  const [publicSelected, setPublicSelected] = useState(false);
 
   useEffect(() => {
     setDisplayData(mergedResult);
@@ -50,8 +55,15 @@ const CommentsPage = ({
 
   // Simulated API call function
   const fetchBannerData = async () => {
-    const res = await countsAdsAPI("ads_view", adsId?.id);
-    // console.log("res=>>>>", res);
+    if (adsId?.id) {
+      try {
+        const res = await countsAdsAPI("ads_view", adsId?.id);
+
+        // console.log("res=>>>>", res);
+      } catch (error) {
+        console.log("error:::::::::::::::", error);
+      }
+    }
   };
 
   const checkBannerVisibility = () => {
@@ -148,6 +160,8 @@ const CommentsPage = ({
         setOnlyPublic={setOnlyPublic}
         setFilterCommentData={setFilterCommentData}
         setDisplayData={setDisplayData}
+        setPublicSelected={setPublicSelected}
+        publicSelected={publicSelected}
       />
       <div className="" id="banner1">
         <AdvertisementBanner data={adsId} />
@@ -176,6 +190,10 @@ const CommentsPage = ({
                     cmtReact={cmtReact}
                     homeApiData={homeApiData}
                     setArrayMerge={setArrayMerge}
+                    publicComments={publicComments}
+                    setPublicComments={setPublicComments}
+                    mergeArrays={mergeArrays}
+                    setCmtReact={setCmtReact}
                   />
                 </>
               );

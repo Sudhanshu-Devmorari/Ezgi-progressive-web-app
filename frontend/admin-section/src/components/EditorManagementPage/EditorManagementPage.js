@@ -26,7 +26,7 @@ const EditorManagementPage = () => {
       // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
-        // console.log("%%%%%%%%%", res.data);
+        // console.log("%%%%%%%%%", res.data.top_ten);
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
         setIsLoading(false);
@@ -118,7 +118,7 @@ const EditorManagementPage = () => {
               <div className="col-4">
                 <Top10
                   setupdateProfile={setupdateProfile}
-                  userData={data.top_ten}
+                  userData={data?.top_ten}
                   isLoading={isLoading}
                 />
                 <EditorAccountStatus

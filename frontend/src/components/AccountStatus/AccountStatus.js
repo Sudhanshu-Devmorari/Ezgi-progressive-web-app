@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import {
   CircularProgressbar,
@@ -15,11 +15,16 @@ import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import VerificationModal from "../VerificationModal/VerificationModal";
 import config from "../../config";
+import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import { Range, getTrackBackground } from "react-range";
 
 const AccountStatus = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [verifyShow, setVerifyShow] = React.useState(false);
+  const [subLoading, setSubLoading] = React.useState(false);
+  const [commentatorSubscriptionData, setCommentatorSubscriptionData] =
+    React.useState({});
 
   const handleVerification = () => {
     axios
@@ -40,10 +45,86 @@ const AccountStatus = () => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         } else if (err.response.status === 200) {
-          setVerifyShow(true)
+          setVerifyShow(true);
         }
       });
   };
+
+  // Editor earning API
+  const [earnings, setEarnings] = useState(0);
+  const [selectSub, setSelectSub] = useState("journeyman");
+  const [selectSubRangeData, setSelectSubRangeData] = useState("journeyman");
+  const [values, setValues] = useState([0]);
+
+  const STEP = 1;
+  const MIN = 0;
+  const MAX = 1000;
+  function getEarnings() {
+    const type =
+      selectSub === "journeyman" ||
+      selectSub === "expert" ||
+      selectSub === "grandmaster";
+    if (type) {
+      axios
+        .get(
+          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${type}`
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            setEarnings(res.data.total_earning);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          // if (error.response.status === 404 || error.response.status === 500) {
+          //   Swal.fire({
+          //     title: "Error",
+          //     text: error.response.data.error,
+          //     icon: "error",
+          //     backdrop: false,
+          //     customClass:
+          //       currentTheme === "dark"
+          //         ? "dark-mode-alert"
+          //         : "light-mode-alert",
+          //   });
+          // }
+        });
+    }
+  }
+
+  const fetchSubscriptionData = async () => {
+    setSubLoading(true);
+    try {
+      const res = await axios.get(
+        `${
+          config?.apiUrl
+        }/subscription-setting/?commentator_level=${selectSub?.toLowerCase()}`
+      );
+      const commisionData = await axios.get(
+        `${
+          config?.apiUrl
+        }/membership-setting/?commentator_level=${selectSub?.toLowerCase()}`
+      );
+      setTimeout(() => {
+        setCommentatorSubscriptionData({
+          ...res?.data[0],
+          commission_rate: commisionData?.data[0]?.commission_rate,
+        });
+        setSubLoading(false);
+      }, 1500);
+    } catch (error) {
+      console.log(error, "fetchy error:::::::::");
+      setSubLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubscriptionData();
+  }, [selectSub]);
+
+  useEffect(() => {
+    getEarnings();
+  }, [selectSubRangeData]);
 
   return (
     <>
@@ -104,59 +185,118 @@ const AccountStatus = () => {
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                height: "100%",
               }}
             >
-              <div className="my-2" style={{ fontSize: "13px" }}>
+              <div className="d-flex justify-content-center  gap-2 fw-medium my-2">
                 <span
+                  className="cursor text-center"
+                  onClick={() => setSelectSub("journeyman")}
                   style={{
-                    color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                    color:
+                      currentTheme !== "dark"
+                        ? selectSub === "journeyman"
+                          ? "#007bf6"
+                          : "#000"
+                        : selectSub === "journeyman"
+                        ? "#4dd5ff"
+                        : "#fff",
                   }}
                 >
                   Journeyman
                 </span>
-                <span className="ps-1">Estimated Earnings</span>
+                <span
+                  className="cursor text-center"
+                  onClick={() => setSelectSub("expert")}
+                  style={{
+                    color:
+                      currentTheme !== "dark"
+                        ? selectSub === "expert"
+                          ? "#007bf6"
+                          : "#000"
+                        : selectSub === "expert"
+                        ? "#4dd5ff"
+                        : "#fff",
+                  }}
+                >
+                  Expert
+                </span>
+                <span
+                  className="cursor text-center"
+                  onClick={() => setSelectSub("grandmaster")}
+                  style={{
+                    color:
+                      currentTheme !== "dark"
+                        ? selectSub === "grandmaster"
+                          ? "#007bf6"
+                          : "#000"
+                        : selectSub === "grandmaster"
+                        ? "#4dd5ff"
+                        : "#fff",
+                  }}
+                >
+                  Grandmaster
+                </span>
               </div>
-              <div className="row g-0">
-                <div className="col text-center">
-                  <div className="mb-1 d-flex flex-column">
-                    <span className="font-res">1 Month Subscription</span>
-                    <span className="number-font">49.90₺</span>
-                  </div>
-                  <div className="d-flex flex-column">
-                    <span className="font-res">3 Month Subscription</span>
-                    <span className="number-font">129.90₺</span>
-                  </div>
-                </div>
-                <div className="col text-center">
-                  <div className="mb-1 d-flex flex-column">
-                    <span className="font-res">6 Month Subscription</span>
-                    <span className="number-font">229.90₺</span>
-                  </div>
-                  <div className="d-flex flex-column">
-                    <span className="font-res">12 Month Subscription</span>
-                    <span className="number-font">409.90₺</span>
-                  </div>
-                </div>
-
-                <div className="d-flex justify-content-between">
-                  <span className="font-res">
-                    Commmision Rate{" "}
-                    <span
-                      className="fw-bold"
-                      style={{
-                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                      }}
-                    >
-                      %25
-                    </span>
-                  </span>
-                  <span className="font-res">
-                    Next Level{" "}
-                    <span className="fw-bold" style={{ color: "#FFA200" }}>
-                      USTA
-                    </span>
-                  </span>
-                </div>
+              <div
+                className={`row g-0 justify-content-center ${
+                  subLoading ? "pt-4" : "pt-0"
+                }`}
+              >
+                {subLoading ? (
+                  "Loading...."
+                ) : (
+                  <>
+                    <div className="col text-center">
+                      <div className="mb-1 d-flex flex-column">
+                        <span className="font-res">1 Month Subscription</span>
+                        <span className="number-font">
+                          {commentatorSubscriptionData?.month_1}₺
+                        </span>
+                      </div>
+                      <div className="d-flex flex-column">
+                        <span className="font-res">3 Month Subscription</span>
+                        <span className="number-font">
+                          {commentatorSubscriptionData?.month_3}₺
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col text-center">
+                      <div className="mb-1 d-flex flex-column">
+                        <span className="font-res">6 Month Subscription</span>
+                        <span className="number-font">
+                          {commentatorSubscriptionData?.month_6}₺
+                        </span>
+                      </div>
+                      <div className="d-flex flex-column">
+                        <span className="font-res">12 Month Subscription</span>
+                        <span className="number-font">
+                          {commentatorSubscriptionData?.year_1}₺
+                        </span>
+                      </div>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <span className="font-res">
+                        Commmision Rate{" "}
+                        <span
+                          className="fw-bold"
+                          style={{
+                            color:
+                              currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                          }}
+                        >
+                          {commentatorSubscriptionData?.commission_rate}
+                        </span>
+                      </span>
+                      <span className="font-res">
+                        Next Level{" "}
+                        <span className="fw-bold" style={{ color: "#FFA200" }}>
+                          USTA
+                        </span>
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -217,27 +357,118 @@ const AccountStatus = () => {
             }}
           >
             <div className="d-flex gap-2 my-2">
-              <div className="">Estimated Maonthly Earnings</div>
-              <div
-                className=""
+              <div className="">Estimated Monthly Earnings</div>
+              <span
+                className="cursor text-center"
+                onClick={() => setSelectSubRangeData("journeyman")}
                 style={{
-                  color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                  color:
+                    currentTheme !== "dark"
+                      ? selectSubRangeData === "journeyman"
+                        ? "#007bf6"
+                        : "#000"
+                      : selectSubRangeData === "journeyman"
+                      ? "#4dd5ff"
+                      : "#fff",
                 }}
               >
                 JOURNEYMAN
-              </div>
-              <div className="">EXPERT</div>
-              <div className="">GRANDMASTER</div>
+              </span>
+              <span
+                className="cursor text-center"
+                onClick={() => setSelectSubRangeData("expert")}
+                style={{
+                  color:
+                    currentTheme !== "dark"
+                      ? selectSubRangeData === "expert"
+                        ? "#007bf6"
+                        : "#000"
+                      : selectSubRangeData === "expert"
+                      ? "#4dd5ff"
+                      : "#fff",
+                }}
+              >
+                EXPERT
+              </span>
+              <span
+                className="cursor text-center"
+                onClick={() => setSelectSubRangeData("grandmaster")}
+                style={{
+                  color:
+                    currentTheme !== "dark"
+                      ? selectSubRangeData === "grandmaster"
+                        ? "#007bf6"
+                        : "#000"
+                      : selectSubRangeData === "grandmaster"
+                      ? "#4dd5ff"
+                      : "#fff",
+                }}
+              >
+                GRANDMASTER
+              </span>
             </div>
-            <input
-              className="w-100"
-              type="range"
-              name=""
-              id=""
-              style={{
-                height: "2px",
-                background: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+
+            <Range
+              values={values}
+              step={STEP}
+              min={MIN}
+              max={MAX}
+              // onChange={(newValues) => getEarnings()}
+              onChange={(newValues) => {
+                setValues(newValues);
+                getEarnings();
               }}
+              renderTrack={({ props, children }) => {
+                return (
+                  <div
+                    onMouseDown={props.onMouseDown}
+                    onTouchStart={props.onTouchStart}
+                    style={{
+                      ...props.style,
+                      height: "36px",
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <div
+                      ref={props.ref}
+                      style={{
+                        height: "4px",
+                        width: "100%",
+                        borderRadius: "4px",
+                        background: getTrackBackground({
+                          values: values,
+                          colors: [
+                            currentTheme === "dark" ? "#4DD5FF" : "#007bf6",
+                            currentTheme === "dark" ? "#fff" : "#313131",
+                          ],
+                          min: MIN,
+                          max: MAX,
+                        }),
+                        alignSelf: "center",
+                      }}
+                    >
+                      {children}
+                    </div>
+                  </div>
+                );
+              }}
+              renderThumb={({ props, isDragged }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: "20px",
+                    width: "20px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      currentTheme === "dark" ? "#4DD5FF" : "#007bf6",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                />
+              )}
             />
             <div className="d-flex gap-3 my-2" style={{ fontSize: "12px" }}>
               <div className="">
@@ -248,7 +479,7 @@ const AccountStatus = () => {
                   }}
                 >
                   {" "}
-                  1.356
+                  {values}
                 </span>
               </div>
               <div className="">
@@ -259,7 +490,7 @@ const AccountStatus = () => {
                   }}
                 >
                   {" "}
-                  21.610₺
+                  {earnings}₺
                 </span>
               </div>
             </div>
@@ -334,9 +565,10 @@ const AccountStatus = () => {
           </div>
         </div>
       </div>
-      <SubscribeRenewModal
+      <SubscribeModal
         show={modalShow}
         onHide={() => setModalShow(false)}
+        text="renew"
       />
       <VerificationModal
         show={verifyShow}
