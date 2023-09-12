@@ -75,7 +75,7 @@ const LevelRules = (props) => {
       try {
         const formData = new FormData();
         if (previewIcon) {
-          formData.append("level_icon", previewIcon);
+          formData.append("level_icon", values.level_icon);
         }
         for (const key in values) {
           if (key !== "level_icon") {
