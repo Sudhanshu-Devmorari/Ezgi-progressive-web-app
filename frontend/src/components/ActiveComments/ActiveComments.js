@@ -45,11 +45,12 @@ const ActiveComments = (props) => {
   const profileData = props?.profileData;
 
   function truncateString(str, maxLength) {
-    if (str.length <= maxLength) {
+    console.log("str:::::::::::::::::", str);
+    if (str && str?.length <= maxLength) {
       return str;
     } else {
       // Subtract 3 from maxLength to make room for the ellipsis.
-      return str.substring(0, maxLength - 1) + "...";
+      return str?.substring(0, maxLength - 1) + "...";
     }
   }
   const truncated = truncateString(profileData?.username, 7);

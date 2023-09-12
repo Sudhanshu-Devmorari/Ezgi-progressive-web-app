@@ -182,82 +182,84 @@ const AdsManagementPage = () => {
                 </div>
               ) : (
                 <>
-                  {ads.length == 0 ? (
+                  {ads?.length == 0 ? (
                     <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                       No Record Found!
                     </div>
                   ) : (
                     <>
-                      {ads.map((res, index) => (
-                        <MainDiv>
-                          <>
-                            <div className="col-2 d-flex justify-content-center">
-                              <img
-                                src={`${config.apiUrl}${res?.picture}`}
-                                alt="Ads.."
-                                height={100}
-                                width={100}
-                              />
-                            </div>
-
-                            <div className="col-4">
-                              <div className="gap-3 d-flex">
-                                <div className="">
-                                  <button
-                                    style={{
-                                      backgroundColor: "#FFEE7D",
-                                      borderRadius: "3px",
-                                      color: "#00D2A53",
-                                      border: "1px solid #FFEE7D",
-                                    }}
-                                  >
-                                    Banners
-                                  </button>
-                                </div>
-                                {res?.ads_space === "Main Page Top Left" && (
-                                  <div className="">
-                                    <button
-                                      style={{
-                                        backgroundColor: "transparent",
-                                        borderRadius: "3px",
-                                        color: "#4DD5FF",
-                                        border: "1px solid #4DD5FF",
-                                      }}
-                                    >
-                                      Main Page Top Right
-                                    </button>
-                                  </div>
-                                )}
-                                {res?.ads_space === "Main Page Top Right" && (
-                                  <div className="">
-                                    <button
-                                      style={{
-                                        backgroundColor: "transparent",
-                                        borderRadius: "3px",
-                                        color: "#4DD5FF",
-                                        border: "1px solid #4DD5FF",
-                                      }}
-                                    >
-                                      Main Page Top Right
-                                    </button>
-                                  </div>
-                                )}
-                                {res?.ads_space === "Timeline" && (
-                                  <div className="">
-                                    <button
-                                      style={{
-                                        backgroundColor: "transparent",
-                                        borderRadius: "3px",
-                                        color: "#DD7DFF",
-                                        border: "1px solid #DD7DFF",
-                                      }}
-                                    >
-                                      Timeline
-                                    </button>
-                                  </div>
-                                )}
+                      {ads &&
+                        ads.map((res, index) => (
+                          <MainDiv>
+                            <>
+                              <div className="col-2 d-flex justify-content-center">
+                                <img
+                                  src={`${config.apiUrl}${res?.picture}`}
+                                  alt="Ads.."
+                                  height={100}
+                                  width={100}
+                                  style={{ objectFit: "cover" }}
+                                />
                               </div>
-                              {/* {res.page === "Main" ? (
+
+                              <div className="col-4">
+                                <div className="gap-3 d-flex">
+                                  <div className="">
+                                    <button
+                                      style={{
+                                        backgroundColor: "#FFEE7D",
+                                        borderRadius: "3px",
+                                        color: "#00D2A53",
+                                        border: "1px solid #FFEE7D",
+                                      }}
+                                    >
+                                      Banners
+                                    </button>
+                                  </div>
+                                  {res?.ads_space === "Main Page Top Left" && (
+                                    <div className="">
+                                      <button
+                                        style={{
+                                          backgroundColor: "transparent",
+                                          borderRadius: "3px",
+                                          color: "#4DD5FF",
+                                          border: "1px solid #4DD5FF",
+                                        }}
+                                      >
+                                        Main Page Top Right
+                                      </button>
+                                    </div>
+                                  )}
+                                  {res?.ads_space === "Main Page Top Right" && (
+                                    <div className="">
+                                      <button
+                                        style={{
+                                          backgroundColor: "transparent",
+                                          borderRadius: "3px",
+                                          color: "#4DD5FF",
+                                          border: "1px solid #4DD5FF",
+                                        }}
+                                      >
+                                        Main Page Top Right
+                                      </button>
+                                    </div>
+                                  )}
+                                  {res?.ads_space === "Timeline" && (
+                                    <div className="">
+                                      <button
+                                        style={{
+                                          backgroundColor: "transparent",
+                                          borderRadius: "3px",
+                                          color: "#DD7DFF",
+                                          border: "1px solid #DD7DFF",
+                                        }}
+                                      >
+                                        Timeline
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                {/* {res.page === "Main" ? (
                             <>
                               <div className="gap-3 d-flex">
                                 <div className="">
@@ -376,65 +378,77 @@ const AdsManagementPage = () => {
                               </div>
                             </>
                           )} */}
-                            </div>
-                            <div className="col-1 d-flex align-items-center">
-                              <div className="">
-                                {" "}
-                                {new URL(res?.link).hostname}
                               </div>
-                            </div>
-                            <div className="col-1 d-flex align-items-center">
-                              <img src={eye} alt="" height={24} width={24} />
-                              <span className="ps-1">
-                                {res?.ad_views_count}
-                              </span>
-                            </div>
-                            <div className="col-1 d-flex align-items-center">
-                              <img
-                                src={pointer}
-                                alt=""
-                                height={24}
-                                width={24}
-                              />
-                              <span className="ps-1">
-                                {res?.ad_clicks_and_redirected_count}
-                              </span>
-                            </div>
-                            <div className="col-1 d-flex align-items-center">
-                              <img src={chart} alt="" height={24} width={24} />
-                              {/* <span className="ps-1">%43.8</span> */}
-                              <AdsPercentage
-                                ads={ads}
-                                adClicksCount={
-                                  res?.ad_clicks_and_redirected_count
-                                }
-                              />
-                            </div>
-                            <div className="col-2 d-flex gap-2 justify-content-end pe-2 align-items-center">
-                              <div className="d-flex flex-column">
-                                {/* <span>08.06.2023 - 18:33</span> */}
-                                <DateTimeConverter datetime={res?.end_date} />
-                                <DateTimeConverter datetime={res?.start_date} />
+                              <div
+                                className="col-1 d-flex align-items-center"
+                                style={{ overflowWrap: "anywhere" }}
+                              >
+                                {/* <div className=""> */}{" "}
+                                {/* {res &&
+                                    res.link &&
+                                    new URL(res?.link).hostname} */}
+                                {res?.link}
+                                {/* </div> */}
                               </div>
-                              <div className="">
+                              <div className="col-1 d-flex align-items-center">
+                                <img src={eye} alt="" height={24} width={24} />
+                                <span className="ps-1">
+                                  {res?.ad_views_count}
+                                </span>
+                              </div>
+                              <div className="col-1 d-flex align-items-center">
                                 <img
-                                  onClick={() => {
-                                    setEditTrue(true);
-                                    setAdsEditData(res);
-                                  }}
-                                  className="cursor"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#CreateAds"
-                                  src={edit}
+                                  src={pointer}
                                   alt=""
-                                  height={25}
-                                  width={25}
+                                  height={24}
+                                  width={24}
+                                />
+                                <span className="ps-1">
+                                  {res?.ad_clicks_and_redirected_count}
+                                </span>
+                              </div>
+                              <div className="col-1 d-flex align-items-center">
+                                <img
+                                  src={chart}
+                                  alt=""
+                                  height={24}
+                                  width={24}
+                                />
+                                {/* <span className="ps-1">%43.8</span> */}
+                                <AdsPercentage
+                                  ads={ads}
+                                  adClicksCount={
+                                    res?.ad_clicks_and_redirected_count
+                                  }
                                 />
                               </div>
-                            </div>
-                          </>
-                        </MainDiv>
-                      ))}
+                              <div className="col-2 d-flex gap-2 justify-content-end pe-2 align-items-center">
+                                <div className="d-flex flex-column">
+                                  {/* <span>08.06.2023 - 18:33</span> */}
+                                  <DateTimeConverter datetime={res?.end_date} />
+                                  <DateTimeConverter
+                                    datetime={res?.start_date}
+                                  />
+                                </div>
+                                <div className="">
+                                  <img
+                                    onClick={() => {
+                                      setEditTrue(true);
+                                      setAdsEditData(res);
+                                    }}
+                                    className="cursor"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#CreateAds"
+                                    src={edit}
+                                    alt=""
+                                    height={25}
+                                    width={25}
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          </MainDiv>
+                        ))}
                     </>
                   )}
                 </>
