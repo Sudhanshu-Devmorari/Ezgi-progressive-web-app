@@ -5,7 +5,9 @@ import user3 from "../../assets/user2.png";
 import user4 from "../../assets/user4.png";
 import user5 from "../../assets/user5.png";
 import user6 from "../../assets/user6.png";
+import initialProfile from "../../assets/profile.png";
 import "./Top10.css";
+import config from "../../config";
 
 const Top10 = (props) => {
   const [data, setData] = useState([]);
@@ -21,41 +23,41 @@ const Top10 = (props) => {
           <div className="text-center d-flex gap-2 align-items-end">
             <div className="d-flex flex-column">
               <img
-                onClick={() => props.setupdateProfile(2)}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
+                // onClick={() => props.setupdateProfile(2)}
+                // data-bs-toggle="modal"
+                // data-bs-target="#exampleModal"
                 className="top-2-img cursor"
-                src={user2}
+                src={data[0]?.editor_data?.profile_pic ? `${config.apiUrl}${data[0]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""
               />
               <span className="text-top10" style={{ fontSize: "0.7rem" }}>
-                {data.length > 0 ? data[1].Subscriber_Count : null}
-              </span>
-            </div>
-            <div className="d-flex flex-column">
-              <img
-                onClick={() => props.setupdateProfile(2)}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                className="top-1-img cursor"
-                src={user1}
-                alt=""
-              />
-              <span className="text-top10" style={{ fontSize: "0.8rem" }}>
                 {data.length > 0 ? data[0].Subscriber_Count : null}
               </span>
             </div>
             <div className="d-flex flex-column">
               <img
-                onClick={() => props.setupdateProfile(2)}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
+                // onClick={() => props.setupdateProfile(2)}
+                // data-bs-toggle="modal"
+                // data-bs-target="#exampleModal"
+                className="top-1-img cursor"
+                src={data[2]?.editor_data?.profile_pic ? `${config.apiUrl}${data[2]?.editor_data?.profile_pic}` : initialProfile}
+                alt=""
+              />
+              <span className="text-top10" style={{ fontSize: "0.8rem" }}>
+                {data.length > 0 ? data[2].Subscriber_Count : null}
+              </span>
+            </div>
+            <div className="d-flex flex-column">
+              <img
+                // onClick={() => props.setupdateProfile(2)}
+                // data-bs-toggle="modal"
+                // data-bs-target="#exampleModal"
                 className="top-2-img cursor"
-                src={user3}
+                src={data[1]?.editor_data?.profile_pic ? `${config.apiUrl}${data[1]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""
               />
               <span className="text-top10" style={{ fontSize: "0.7rem" }}>
-                {data.length > 0 ? data[2].Subscriber_Count : null}
+                {data.length > 0 ? data[1].Subscriber_Count : null}
               </span>
             </div>
           </div>
@@ -73,11 +75,11 @@ const Top10 = (props) => {
                   key={index}
                 >
                   <img
-                    onClick={() => props.setupdateProfile(2)}
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
+                    // onClick={() => props.setupdateProfile(2)}
+                    // data-bs-toggle="modal"
+                    // data-bs-target="#exampleModal"
                     className="all-user-img cursor"
-                    src={user1}
+                    src={res?.editor_data?.profile_pic ? `${config.apiUrl}${res?.editor_data?.profile_pic}` : initialProfile}
                     alt=""
                   />
                   <span

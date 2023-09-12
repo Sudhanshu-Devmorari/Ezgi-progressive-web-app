@@ -11,14 +11,12 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
-
-  // console.log("adsEditData======>>>", props?.adsEditData)
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (props.adsEditData) {
-      console.log("==>>>data")
+    if (props?.editTrue && props?.adsEditData) {
       formik.setValues({
-        profile: null,
+        profile: props.adsEditData.picture,
         adsSpace: props.adsEditData.ads_space,
         startDate: props.adsEditData.start_date,
         endDate: props.adsEditData.end_date,
@@ -26,10 +24,9 @@ const CreateAdsModal = (props) => {
         link: props.adsEditData.link,
         addBudget: props.adsEditData.ads_budget,
       });
-
-      setProfilePreview(props.adsEditData.picture);
+      setProfilePreview(`${config.apiUrl}${props.adsEditData.picture}`);
     }
-  }, [props?.adsEditData]);
+  }, [props?.editTrue, props?.adsEditData]);
 
   const validationSchema = Yup.object({
     profile: Yup.mixed().required("Ads picture is required"),
@@ -55,43 +52,82 @@ const CreateAdsModal = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      try {
-        const formData = new FormData();
-        formData.append("ads_space", selectedAdsSpace);
-        formData.append("start_date", values.startDate);
-        formData.append("end_date", values.endDate);
-        formData.append("company_name", values.companyName);
-        formData.append("link", values.link);
-        formData.append("ads_budget", values.addBudget);
-        formData.append("file", values.profile);
-
-        const response = await axios.post(
-          `${config?.apiUrl}/ads-management/`,
-          formData
-        );
-
-        if (response.status === 200) {
-          Swal.fire({
-            title: "Success",
-            text: "Ads Created!",
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.reload();
-            }
-          });
+      const formData = new FormData();
+      formData.append("ads_space", selectedAdsSpace);
+      formData.append("start_date", values.startDate);
+      formData.append("end_date", values.endDate);
+      formData.append("company_name", values.companyName);
+      formData.append("link", values.link);
+      formData.append("ads_budget", values.addBudget);
+      formData.append("file", values.profile);
+      if (props?.editTrue && props?.adsEditData) {
+        try {
+          setIsLoading(true);
+          const response = await axios.patch(
+            `${config?.apiUrl}/ads-management/${props?.adsEditData?.id}/`,
+            formData
+          );
+          setIsLoading(false);
+          if (response.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Ads Updated successfully!",
+              icon: "success",
+              backdrop: false,
+              customClass: "dark-mode-alert",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.reload();
+              }
+            });
+          }
+        } catch (error) {
+          console.log("Error while updating data: ", error);
         }
-      } catch (error) {
-        console.error("Error sending data:", error);
+      } else {
+        try {
+          setIsLoading(true);
+          const response = await axios.post(
+            `${config?.apiUrl}/ads-management/`,
+            formData
+          );
+          setIsLoading(false);
+          if (response.status === 200) {
+            Swal.fire({
+              title: "Success",
+              text: "Ads Created!",
+              icon: "success",
+              backdrop: false,
+              customClass: "dark-mode-alert",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.reload();
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error sending data:", error);
+        }
       }
     },
   });
 
   const handleProfileChange = (e) => {
-    formik.setFieldValue("profile", e.target.files[0]);
-    setProfilePreview(URL.createObjectURL(e.target.files[0]));
+    const allowedTypes = ["image/jpeg", "image/png"];
+    const file = e.target.files[0];
+    if (allowedTypes.includes(file.type)) {
+      formik.setFieldValue("profile", file);
+      setProfilePreview(URL.createObjectURL(file));
+    } else {
+      Swal.fire({
+        title: "Error",
+        text: "Invalid file type. Please select a valid image file.",
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
+      e.target.value = "";
+    }
   };
 
   const adsSpaceOptions = ["Timeline", "Main Page Top Right"];
@@ -107,13 +143,6 @@ const CreateAdsModal = (props) => {
   };
 
   const [adsSpaceDropDown, setAdsSpaceDropDown] = useState(false);
-
-  // Update Ads
-  const updateAds = async () => {
-    try {
-      const res = await axios.patch(`${config?.apiUrl}/ads-management/`);
-    } catch (error) {}
-  };
 
   return (
     <>
@@ -161,6 +190,7 @@ const CreateAdsModal = (props) => {
                     </label>
                     <input
                       className="d-none"
+                      accept=".jpg, .jpeg, .png"
                       type="file"
                       name=""
                       id="profile"
@@ -283,7 +313,11 @@ const CreateAdsModal = (props) => {
                         borderRadius: "4px",
                       }}
                     >
-                      {props?.editTrue ? "Update" : "Create"}
+                      {isLoading
+                        ? "Loading..."
+                        : props?.editTrue
+                        ? "Update"
+                        : "Create"}
                     </button>
                   </div>
                 </div>
@@ -293,6 +327,8 @@ const CreateAdsModal = (props) => {
               onClick={() => {
                 props?.setEditTrue(false);
                 setAdsSpaceDropDown(false);
+                setProfilePreview(null);
+                formik.resetForm();
               }}
               data-bs-dismiss="modal"
               src={cross}

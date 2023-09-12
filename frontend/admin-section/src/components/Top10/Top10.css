@@ -15,12 +15,18 @@
 .top-1-img{
     height: 60px;
     width: 60px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 .top-2-img{
     height: 41px;
     width: 41px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 .all-user-img{
     height: 36px;
     width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
 }

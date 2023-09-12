@@ -7,22 +7,6 @@ import config from "../../config";
 const EditorsSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Apprentice");
 
-  // Level - Rule API
-  const [getRuleForLevel, setGetRuleForLevel] = useState([]);
-  useEffect(() => {
-    async function getData() {
-      try {
-        const res = await axios.get(
-          `${config?.apiUrl}/level-rule/?commentator_level=${selectLevel.toLowerCase()}`
-        );
-        setGetRuleForLevel(res.data[0]);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getData();
-  }, [selectLevel]);
-
   return (
     <>
       <div className="p-2 m-2 fonts-block">
@@ -60,11 +44,7 @@ const EditorsSettings = () => {
               Grandmaster
             </span>
           </div>
-          <LevelRules
-            getRuleForLevel={getRuleForLevel}
-            selectLevel={selectLevel}
-            setGetRuleForLevel={setGetRuleForLevel}
-          />
+          <LevelRules selectLevel={selectLevel} />
         </div>
       </div>
     </>

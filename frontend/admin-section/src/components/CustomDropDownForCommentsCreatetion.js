@@ -20,7 +20,7 @@ export const CustomDropDownForCommentsCreatetion = ({
           isOpen ? "d-block" : "d-none"
         }`}
         style={{
-          width: "19%",
+          width: (label === 'Prediction' && '29.1%') || "19%",
         }}
       >
         {options.map((option, index) => (

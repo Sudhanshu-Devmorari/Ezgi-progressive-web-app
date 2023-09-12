@@ -811,10 +811,15 @@ class ProfileView(APIView):
 
         if 'file' not in request.data:
             return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
+        elif 'file' in request.data:
+            profile_pic = request.data['file']
+            user.profile_pic = profile_pic
 
-        profile_pic = request.data['file']
-
-        user.profile_pic = profile_pic
+        if 'description' in request.data:
+            description = request.data['description']
+            user.description = description
+        if 'description' not in request.data:
+            return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
         user.save()
 
         serializer = UserSerializer(user)
@@ -3304,7 +3309,7 @@ class MembershipSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = MembershipSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -3339,7 +3344,7 @@ class SubscriptionSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
@@ -3374,7 +3379,7 @@ class HighlightSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
-        commentator_level = request.data.get('commentator_level')
+        commentator_level = request.query_params.get('commentator_level')
         existing_record = HighlightSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
