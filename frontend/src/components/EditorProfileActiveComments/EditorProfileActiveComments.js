@@ -10,12 +10,10 @@ import Spinner from "react-bootstrap/esm/Spinner";
 import { userId } from "../GetUser";
 
 const EditorProfileActiveComments = (props) => {
-  console.log("props::::::::::::::", props);
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // console.log(">>>>>>>>>>>>.", props.activeCommentsshow);
   const [profileData, setProfileData] = useState([]);
   useEffect(() => {
     async function getProfileData() {
@@ -23,7 +21,6 @@ const EditorProfileActiveComments = (props) => {
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
         `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
       );
-      // console.log(res.data,"========fffffffffff>>>");
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);
       setIsLoading(false);

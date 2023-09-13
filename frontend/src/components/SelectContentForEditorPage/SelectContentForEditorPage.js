@@ -58,7 +58,6 @@ const SelectContentForEditorPage = (props) => {
           </span>
           <input
             onChange={filterData}
-            // onClick={props.setFilterData(null)}
             type="text"
             className={` ${
               currentTheme === "dark" ? "input-field-dark" : "input-field-light"

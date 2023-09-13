@@ -73,12 +73,11 @@ const MainPage = () => {
   const [rightCornerAds, setRightCornerAds] = useState([]);
 
   function homeApiData(user_id) {
-    console.log("userId::::::::::::", user_id);
     axios
-      // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
-      .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
+      .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
+      // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log("res:::::::::::::", res.data);
+        console.log("res:::::::::::::::", res.data);
         setPublicComments(res?.data?.Public_Comments);
         setHighlights(res?.data?.highlights);
         setsubscriptionComments(res?.data?.Subscription_Comments);
@@ -98,11 +97,11 @@ const MainPage = () => {
         setFollowingId(res?.data?.following_user?.map((item) => item?.id));
         setCmtReact(res?.data?.comment_reactions);
 
-        const commentatorData = res?.data?.Commentator?.map((item) => ({
-          type: "commentator",
-          value: item,
-        }));
-        setCommentator(commentatorData);
+        // const commentatorData = res?.data?.Commentator?.map((item) => ({
+        //   type: "commentator",
+        //   value: item,
+        // }));
+        // setCommentator(commentatorData);
         mergeArrays();
       })
       .catch((error) => {
@@ -305,11 +304,42 @@ const MainPage = () => {
     homeApiData(user_id);
   }, [themeMode]);
 
+  const [mergedEditorResult, setMergedEditorResult] = useState([]);
+
+  const mergeEditorArrays = () => {
+    if (highlights.length > 0) {
+      let merged = [];
+      let remainingPublic = [];
+      let remainingHighlights = [...highlights];
+
+      if (remainingPublic.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingPublic.map((comment) => ({
+            value: comment,
+          })),
+        ];
+      }
+
+      if (remainingHighlights.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingHighlights.map((highlight) => ({
+            value: highlight,
+          })),
+        ];
+      }
+
+      setMergedEditorResult(merged);
+    }
+  };
+
   const user = localStorage.getItem("user-role");
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();
     publicArrays();
+    mergeEditorArrays()
   }, [publicComments, highlights, subscriptionComments, arrayMerge]);
 
   // const user = "c-";
@@ -332,7 +362,6 @@ const MainPage = () => {
   const handlesportData = async () => {
     let merged = [];
     let remainingPublic = [...contentData];
-    // console.log(remainingPublic,"=>>>remainingPublic")
 
     if (remainingPublic.length > 0) {
       merged = [
@@ -343,7 +372,6 @@ const MainPage = () => {
         })),
       ];
     }
-    // console.log("merged:::::::::::::", merged);
     setContentFilterData(merged);
   };
 
@@ -508,6 +536,11 @@ const MainPage = () => {
                               setData={setData}
                               setSelectContent={setSelectContent}
                               verifyid={verifyid}
+                              setHighlights={setHighlights}
+                              highlights={highlights}
+                              mergeArrays={mergeArrays}
+                              // setMergedEditorResult={setMergedEditorResult}
+                              // mergedEditorResult={mergedEditorResult}
                             />
                           </>
                         );
@@ -661,6 +694,7 @@ const MainPage = () => {
                   followingList={followingList}
                   followingid={followingid}
                   verifyid={verifyid}
+                  highlights={highlights}
                 />
               )}
               {selectContent === "comments" && (
@@ -718,6 +752,7 @@ const MainPage = () => {
                       homeApiData={homeApiData}
                       setData={setData}
                       selectContent={selectPublicorForYou}
+                      selectPublicorForYou={selectContent}
                       setSelectContent={setSelectContent}
                       followingList={followingList}
                       followingid={followingid}
@@ -727,6 +762,9 @@ const MainPage = () => {
                       publicComments={publicComments}
                       setPublicComments={setPublicComments}
                       setCmtReact={setCmtReact}
+                      handlesportData={handlesportData}
+                      setContentData={setContentData}
+                      contentData={contentData}
                     />
                   ))}
                 </>

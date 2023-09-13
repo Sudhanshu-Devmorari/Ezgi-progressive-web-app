@@ -18,7 +18,6 @@ import { userId } from "../GetUser";
 import config from "../../config";
 
 const DashboardSU = (props) => {
-  console.log("props:::::::::::", props)
   const [content, setContent] = useState("subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");

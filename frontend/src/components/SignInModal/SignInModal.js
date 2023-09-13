@@ -48,6 +48,7 @@ const SignInModal = (props) => {
           localStorage.setItem("user-role", res.data.userRole);
           localStorage.setItem("user-id", res.data.userId);
           localStorage.setItem("username", res.data.username);
+          props?.hide();
           await Swal.fire({
             title: "Success",
             text: "You have Logged in Successfully!",
@@ -57,7 +58,6 @@ const SignInModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
             timer: 2000,
           });
-          props?.hide();
           window.location.reload();
         } else if (res.data.status === 400 || res.data.status === 404) {
           setBtnLoading(false);

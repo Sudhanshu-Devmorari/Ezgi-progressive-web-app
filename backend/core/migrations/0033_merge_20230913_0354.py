@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0032_merge_20230912_0508'),
-        ('core', '0032_user_description_and_more'),
+        # ('core', '0032_user_description_and_more'),
     ]
 
     operations = [
