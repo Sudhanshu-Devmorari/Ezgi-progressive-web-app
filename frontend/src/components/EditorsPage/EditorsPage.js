@@ -6,6 +6,9 @@ import EditorFilter from "../EditorFilter/EditorFilter";
 import { useState } from "react";
 import { countsAdsAPI } from "../CountsAdViewAPI";
 import { useEffect } from "react";
+import axios from "axios";
+import config from "../../config";
+import { userId } from "../GetUser";
 
 const EditorsPage = ({
   data,
@@ -14,12 +17,17 @@ const EditorsPage = ({
   setSelectContent,
   setActiveCommentsshow,
   verifyid,
+  highlights,
 }) => {
   const [filterData, setFilterData] = useState(null);
-  const [displayData, setDisplayData] = useState(data);
+  const [isLoading, setIsLoading] = useState(true);
+  const [displayData, setDisplayData] = useState([]);
+  const [mergedEditorResult, setMergedEditorResult] = useState([]);
+
   // ADS viewsssssssss-----------------
   const [adsId, setAdsId] = useState(null);
   useEffect(() => {
+    console.log("this page called");
     const timelineFilter = ads.filter((res) => res.ads_space == "Timeline");
 
     const adsBannerId = (
@@ -32,7 +40,63 @@ const EditorsPage = ({
     } else {
       setAdsId(ads[adsBannerId]);
     }
+    HandleCommentator();
   }, []);
+
+  const HandleCommentator = async () => {
+    try {
+      const response = await axios.get(
+        `${config?.apiUrl}/retrieve-commentator-list/?id=${userId}`
+      );
+      // const commentatorData = response?.data?.Commentator?.map((item) => ({
+      //   type: "commentator",
+      //   value: item,
+      // }));
+      // console.log("commentatorData::::::::::::::::", commentatorData);
+      console.log("highlights::::::::::::::::", highlights);
+      setDisplayData(response?.data?.Commentator);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log("err:::", error);
+    }
+  };
+
+  const mergeEditorArrays = () => {
+    if (displayData.length > 0) {
+      let merged = [];
+      let remainingPublic = [...displayData];
+      let remainingHighlights = [...highlights];
+
+      if (remainingPublic.length > 0) {
+        merged = [
+          ...merged,
+          ...remainingPublic.map((comment) => ({
+            value: comment,
+          })),
+        ];
+      }
+
+      // if (remainingHighlights.length > 0) {
+      //   merged = [
+      //     ...merged,
+      //     ...remainingHighlights.map((highlight) => ({
+      //       value: highlight,
+      //     })),
+      //   ];
+      // }
+
+      setMergedEditorResult(merged);
+    }
+  };
+
+  useEffect(() => {
+    mergeEditorArrays();
+  }, [displayData, highlights]);
+
+  useEffect(() => {
+    console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
+  }, [mergedEditorResult]);
 
   const [showBanner, setShowBanner] = useState(false);
 
@@ -74,7 +138,7 @@ const EditorsPage = ({
     <>
       <SelectContentForEditorPage
         editor={true}
-        data={data}
+        data={mergedEditorResult}
         setDisplayData={setDisplayData}
         setFilterData={setFilterData}
       />
@@ -82,27 +146,37 @@ const EditorsPage = ({
         data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
       /> */}
       {/* <SharedProfile /> */}
-      {(filterData == null ? displayData : filterData)?.map((val, index) => {
-        return (
-          <>
-            {index % 10 == 0 ? (
-              // <AdvertisementBanner
-              //   data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
-              // />
-              <div className="" id={`banner-${index}`}>
-                <AdvertisementBanner data={adsId} />
-              </div>
-            ) : null}
-            <SharedProfile
-              setActiveCommentsshow={setActiveCommentsshow}
-              data={val}
-              setData={setData}
-              setSelectContent={setSelectContent}
-              verifyid={verifyid}
-            />
-          </>
-        );
-      })}
+      {isLoading ? (
+        <div className="d-flex justify-content-center align-items-center">
+          Loading…
+        </div>
+      ) : (
+        (filterData == null ? mergedEditorResult : filterData)?.map(
+          (val, index) => {
+            return (
+              <>
+                {index % 10 == 0 ? (
+                  // <AdvertisementBanner
+                  //   data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
+                  // />
+                  <div className="" id={`banner-${index}`}>
+                    <AdvertisementBanner data={adsId} />
+                  </div>
+                ) : null}
+                <SharedProfile
+                  setActiveCommentsshow={setActiveCommentsshow}
+                  data={val}
+                  setData={setData}
+                  setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+                  mergedEditorResult={mergedEditorResult}
+                  setMergedEditorResult={setMergedEditorResult}
+                />
+              </>
+            );
+          }
+        )
+      )}
     </>
   );
 };

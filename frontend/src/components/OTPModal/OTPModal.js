@@ -67,6 +67,7 @@ const OTPModal = (props) => {
         localStorage.setItem("user-role", res.data.user.user_role);
         localStorage.setItem("user-id", res.data.user.id);
         localStorage.setItem("username", res.data.user.username);
+        props.hide();
         await Swal.fire({
           title: "Success",
           text: "User Created Successfully!",
@@ -77,7 +78,6 @@ const OTPModal = (props) => {
           timer: 2000,
         });
         window.location.reload();
-        props.hide();
       }
       if (res.data.status === 400) {
         setOtpLoading(false);

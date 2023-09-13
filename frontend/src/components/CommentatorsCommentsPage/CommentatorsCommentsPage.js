@@ -22,7 +22,6 @@ import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 
 const CommentatorsCommentsPage = (props) => {
-  // console.log("props.publicComments:::::::::::::::", props);
 
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [content, setContent] = useState("home");

@@ -244,7 +244,7 @@ class PasswordResetView(APIView):
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
 
-class RetrieveCommentatorView(APIView):
+class RetrieveCommentatorView(APIView): 
     """
     for Home page:
     """
@@ -906,22 +906,26 @@ class FavEditorsCreateView(APIView):
                 user = User.objects.get(id=id)
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                # print("******* ", request.data.get("id"))
-                comment = User.objects.get(id=request.data.get("id"))
-                # user = request.user
 
+                commentator_id = request.data.get("id")
+                comment = User.objects.get(id=commentator_id)
+
+                response_data = {'user_id': commentator_id}
                 if not FavEditors.objects.filter(commentator_user=comment, standard_user=user).exists():
                     editor_obj = FavEditors.objects.create(commentator_user=comment, standard_user=user)
-                    serializer = FavEditorsSerializer(editor_obj)
-                    data = serializer.data
-                    return Response(data, status=status.HTTP_200_OK)
+                    # serializer = FavEditorsSerializer(editor_obj)
+                    # data = serializer.data
+                    response_data['is_fav_editor'] = True
+                    response_data['message'] = 'Favorite editor add successfully'
+                    return Response(response_data, status=status.HTTP_200_OK)
                 else:
-                    # editor_obj = FavEditors.objects.remove(commentator_user=comment, standard_user=user)
                     existing_fav_editor = FavEditors.objects.filter(commentator_user=comment, standard_user=user)
                     
                     if existing_fav_editor.exists():
                         existing_fav_editor.delete()
-                        return Response({'message': 'Favorite editor removed successfully'}, status=status.HTTP_200_OK)
+                        response_data['is_fav_editor'] = False
+                        response_data['message'] = 'Favorite editor removed successfully'
+                        return Response(response_data, status=status.HTTP_200_OK)
                     else:
                         return Response(
                             create_response(
@@ -3388,7 +3392,7 @@ class SubscriptionSettingView(APIView):
             
             serializer = SubscriptionSettingSerializer(level_obj, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        
+    
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -3396,8 +3400,10 @@ class SubscriptionSettingView(APIView):
         commentator_level = request.query_params.get('commentator_level')
         existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
 
+        data = request.data
+        data.update({'commentator_level': commentator_level})
         if existing_record:
-            serializer = SubscriptionSettingSerializer(existing_record, data=request.data, partial=True)
+            serializer = SubscriptionSettingSerializer(existing_record, data=data, partial=True)
         else:
             request.data['commentator_level'] = commentator_level
             serializer = SubscriptionSettingSerializer(data=request.data)
@@ -4083,9 +4089,7 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
-    unique_comment_ids = set()
-    
-    def get_public_comments(self):
+    def get_public_comments(self, unique_comment_ids):
         """ Return public comments data """
         public_comments = []
 
@@ -4112,16 +4116,16 @@ class RetrievePageData():
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 
-                if comment.id not in self.unique_comment_ids:
-                    self.unique_comment_ids.add(comment.id)
+                if comment.id not in unique_comment_ids:
+                    unique_comment_ids.add(comment.id)
                     public_comments.append(comment_data)
 
         except:
             public_comments = []
 
-        return public_comments
+        return public_comments, unique_comment_ids
     
-    def get_subscription_comments(self, id):
+    def get_subscription_comments(self, id, unique_comment_ids):
         """ Return subscription comments data """
         subscription_comments = []
 
@@ -4158,14 +4162,14 @@ class RetrievePageData():
                             'total_clap': total_reactions['total_clap'] or 0
                         }
 
-                        if comment.id not in self.unique_comment_ids:
-                            self.unique_comment_ids.add(comment.id)
+                        if comment.id not in unique_comment_ids:
+                            unique_comment_ids.add(comment.id)
                             subscription_comments.append(comment_data)
 
         except:
             subscription_comments = []
         
-        return subscription_comments
+        return subscription_comments, unique_comment_ids
     
     def get_highlights(self, id):
         """ Return highlights data """
@@ -4261,8 +4265,14 @@ class RetrievePageData():
             for obj in all_commentator:
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id).count()
+                user_data = UserSerializer(obj).data
 
-                detail['user'] = UserSerializer(obj).data
+                if user_id:
+                    detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id).exists()
+                else:
+                    detail['is_fav_editor'] = False
+                
+                detail['user'] = user_data
                 detail['subscriber_count'] = count
                 user_detail.append(detail)
         except:
@@ -4287,12 +4297,13 @@ class RetrieveHomeView(APIView):
         
         # Instantiate RetrievePageData object
         retrieve_data = RetrievePageData()
+        self.unique_comment_ids = set()
 
         # Get public comments data
-        data_list['Public_Comments'] = retrieve_data.get_public_comments()
+        data_list['Public_Comments'], self.unique_comment_ids  = retrieve_data.get_public_comments(self.unique_comment_ids)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id'))
+        data_list['Subscription_Comments'], self.unique_comment_ids  = retrieve_data.get_subscription_comments(request.query_params.get('id'), self.unique_comment_ids)
       
         # Get highlights data
         data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id'))
