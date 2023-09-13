@@ -29,7 +29,7 @@ import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.
 
 const ActiveComments = (props) => {
   const profileData = props?.profileData;
-  console.log(profileData, "===>>>>profileData");
+  // console.log(profileData, "===>>>>profileData");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);

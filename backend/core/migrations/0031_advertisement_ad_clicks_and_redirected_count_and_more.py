@@ -10,24 +10,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='advertisement',
-            name='ad_clicks_and_redirected_count',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AddField(
-            model_name='advertisement',
-            name='ad_views_count',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AlterField(
-            model_name='advertisement',
-            name='end_date',
-            field=models.DateTimeField(),
-        ),
-        migrations.AlterField(
-            model_name='advertisement',
-            name='start_date',
-            field=models.DateTimeField(),
-        ),
+        # migrations.AddField(
+        #     model_name='advertisement',
+        #     name='ad_clicks_and_redirected_count',
+        #     field=models.IntegerField(default=0),
+        # ),
+        # migrations.AddField(
+        #     model_name='advertisement',
+        #     name='ad_views_count',
+        #     field=models.IntegerField(default=0),
+        # ),
+        # migrations.AlterField(
+        #     model_name='advertisement',
+        #     name='end_date',
+        #     field=models.DateTimeField(),
+        # ),
+        # migrations.AlterField(
+        #     model_name='advertisement',
+        #     name='start_date',
+        #     field=models.DateTimeField(),
+        # ),
     ]

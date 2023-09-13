@@ -47,6 +47,9 @@ const AddCommentModal = (props) => {
   // const dateOptions = ["Date 1", "Date 2", "Date 3"];
   const [dateOptions, setDateOptions] = useState([]);
 
+  const [matchList, setMatchList] = useState([]);
+
+
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [selectedPredictionType, setSelectedPredictionType] =
     useState("Select");
@@ -127,13 +130,15 @@ const AddCommentModal = (props) => {
         // console.log("======data=======", res.data);
 
         const MatchList = res.data;
+        setMatchList(MatchList)
         setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
-        setMatchId(MatchList.map((item) => item.MatchID));
+        // setMatchId(MatchList.map((item) => item.MatchID));
       })
       .catch((err) => {});
   };
 
   const handleMatchDetailsSelection = (matchDetails) => {
+    setMatchId(matchList.filter((data) => matchDetails==data.takimlar).map((data)=>data.MatchID))
     setSelectedMatchDetails(matchDetails);
     setMatchDetailsError("");
   };
@@ -156,11 +161,11 @@ const AddCommentModal = (props) => {
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
     setPredictionData(
-      allBetsData
+      [...new Set(allBetsData
         .filter((x) => x.gameName == predictionType)
         .map((x) => x.odds)
         .flat()
-        .map((x) => x.value)
+        .map((x) => x.value))]
     );
     setPredictionTypeError("");
   };
