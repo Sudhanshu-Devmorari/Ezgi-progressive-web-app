@@ -530,10 +530,10 @@ class CommentView(APIView):
 
                 # print("-----------")
                 category = request.data.get('category')
-                if category == 'Futbol':
-                    category = 'Football'
-                elif category == 'Basketbol':
-                    category = 'Basketball'
+                # if category == 'Futbol':
+                #     category = 'Football'
+                # elif category == 'Basketbol':
+                #     category = 'Basketball'
                 # category = request.data['category']
                 # print('category: ', category)
                 country = request.data.get('country')
@@ -3323,12 +3323,12 @@ class LevelRule(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
-        # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
             serializer = CommentatorLevelRuleSerializer(existing_record, data=request.data,  partial=True)
         else:
+            request.data['commentator_level'] = commentator_level
             serializer = CommentatorLevelRuleSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -3363,6 +3363,7 @@ class MembershipSettingView(APIView):
         if existing_record:
             serializer = MembershipSettingSerializer(existing_record, data=request.data, partial=True)
         else:
+            request.data['commentator_level'] = commentator_level
             serializer = MembershipSettingSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -3398,6 +3399,7 @@ class SubscriptionSettingView(APIView):
         if existing_record:
             serializer = SubscriptionSettingSerializer(existing_record, data=request.data, partial=True)
         else:
+            request.data['commentator_level'] = commentator_level
             serializer = SubscriptionSettingSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -3405,7 +3407,7 @@ class SubscriptionSettingView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class HighlightSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
@@ -3450,12 +3452,38 @@ class HighlightSettingView(APIView):
 class CommentSetting(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data = request.data.copy() 
-        # print('data: ', data)
-        data['status'] = 'approve'  # Set the status to 'approve'
 
         comment_serializer = CommentsSerializer(data=data)
         if comment_serializer.is_valid():
-            comment = comment_serializer.save()
+
+            editor = request.data['editor']
+
+            user = User.objects.get(username=editor)
+
+            category = request.data.get('category')
+            country = request.data.get('country')
+            league = request.data.get('league')
+            match_detail = request.data.get('match_detail')
+            prediction_type = request.data.get('prediction_type')
+            prediction = request.data.get('prediction')
+            if user.commentator_level == 'apprentice':
+                public_content = True
+            else:
+                public_content = request.data.get('public_content')
+            comment_1 = request.data.get('comment')
+
+            comment = Comments.objects.create(
+                    commentator_user=user,
+                    category=[category],
+                    country=country,
+                    league=league,
+                    match_detail=match_detail,
+                    prediction_type=prediction_type,
+                    prediction=prediction,
+                    public_content=public_content,
+                    comment=comment_1
+                )
+
             if DataCount.objects.filter(id=1).exists():
                 obj = DataCount.objects.get(id=1)
                 obj.comment += 1

@@ -105,133 +105,139 @@ const SalesHighlightSettings = (props) => {
 
   return (
     <>
-      <form onSubmit={formik.handleSubmit}>
-        <div className="my-2 mt-3 d-flex gap-3">
-          <div className="col-2">
-            <div className="col d-flex flex-column">
-              <span className="p-1 ps-0">1 Week</span>
-              <input
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                type="text"
-                className="darkMode-input form-control text-center"
-                value={formik.values.week_1}
-                name="week_1"
-              />
-              {formik.touched.week_1 && formik.errors.week_1 && (
-                <div className="text-danger">{formik.errors.week_1}</div>
-              )}
-            </div>
-          </div>
-          <div className="col-2">
-            <div className="col d-flex flex-column">
-              <span className="p-1 ps-0">2 Week</span>
-              <input
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                type="text"
-                className="darkMode-input form-control text-center"
-                value={formik.values.week_2}
-                name="week_2"
-              />
-              {formik.touched.week_2 && formik.errors.week_2 && (
-                <div className="text-danger">{formik.errors.week_2}</div>
-              )}
-            </div>
-          </div>
-          <div className="col-2">
-            <div className="col d-flex flex-column">
-              <span className="p-1 ps-0">1 Month</span>
-              <input
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                type="text"
-                className="darkMode-input form-control text-center"
-                value={formik.values.month_1}
-                name="month_1"
-              />
-              {formik.touched.month_1 && formik.errors.month_1 && (
-                <div className="text-danger">{formik.errors.month_1}</div>
-              )}
-            </div>
-          </div>
+      {isLoading ? (
+        <div className="d-flex gap-1 h-100 my-2 pb-2 align-items-center justify-content-center">
+          Loading...
         </div>
-        <div className="my-2 mt-3 d-flex gap-3">
-          <div className="col-2">
-            <div className="col d-flex flex-column">
-              <span className="p-1 ps-0">Highlight Icon & Color</span>
-              <label
-                className="p-1 text-center cursor"
-                htmlFor="level-icon"
-                style={{ backgroundColor: "#0B2447", borderRadius: "4px" }}
-              >
-                {(previewIcon || formik.values.highlight_icon) && (
-                  <span className="pe-2">
-                    {" "}
-                    <img
-                      src={
-                        previewIcon
-                          ? previewIcon
-                          : `${config?.apiUrl}${formik.values.highlight_icon}`
-                      }
-                      alt=""
-                      height={22}
-                      width={22}
-                    />
-                  </span>
-                )}
-                <img src={upload} alt="" height={22} width={22} />
+      ) : (
+        <form onSubmit={formik.handleSubmit}>
+          <div className="my-2 mt-3 d-flex gap-3">
+            <div className="col-2">
+              <div className="col d-flex flex-column">
+                <span className="p-1 ps-0">1 Week</span>
                 <input
-                  accept=".jpg, .jpeg, .png"
-                  type="file"
-                  id="level-icon"
-                  className="d-none"
-                  onChange={(e) => {
-                    const allowedTypes = ["image/jpeg", "image/png"];
-                    const selectedFile = e.target.files[0];
-                    if (allowedTypes.includes(selectedFile.type)) {
-                      setPreviewIcon(URL.createObjectURL(selectedFile));
-                      formik.setFieldValue("highlight_icon", selectedFile);
-                    } else {
-                      Swal.fire({
-                        title: "Error",
-                        text: "Invalid file type. Please select a valid image file.",
-                        icon: "error",
-                        backdrop: false,
-                        customClass: "dark-mode-alert",
-                      });
-                      e.target.value = "";
-                    }
-                  }}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  type="text"
+                  className="darkMode-input form-control text-center"
+                  value={formik.values.week_1}
+                  name="week_1"
                 />
-              </label>
-              {formik.touched.highlight_icon &&
-                formik.errors.highlight_icon && (
-                  <div className="text-danger">
-                    {formik.errors.highlight_icon}
-                  </div>
+                {formik.touched.week_1 && formik.errors.week_1 && (
+                  <div className="text-danger">{formik.errors.week_1}</div>
                 )}
+              </div>
+            </div>
+            <div className="col-2">
+              <div className="col d-flex flex-column">
+                <span className="p-1 ps-0">2 Week</span>
+                <input
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  type="text"
+                  className="darkMode-input form-control text-center"
+                  value={formik.values.week_2}
+                  name="week_2"
+                />
+                {formik.touched.week_2 && formik.errors.week_2 && (
+                  <div className="text-danger">{formik.errors.week_2}</div>
+                )}
+              </div>
+            </div>
+            <div className="col-2">
+              <div className="col d-flex flex-column">
+                <span className="p-1 ps-0">1 Month</span>
+                <input
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  type="text"
+                  className="darkMode-input form-control text-center"
+                  value={formik.values.month_1}
+                  name="month_1"
+                />
+                {formik.touched.month_1 && formik.errors.month_1 && (
+                  <div className="text-danger">{formik.errors.month_1}</div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          class="fixed-bottom  d-flex justify-content-center"
-          style={{ marginBottom: "200px" }}
-        >
-          <button
-            type="submit"
-            className="py-1 px-3"
-            style={{
-              color: "#D2DB08",
-              border: "1px solid #D2DB08",
-              borderRadius: "3px",
-              backgroundColor: "transparent",
-            }}
+          <div className="my-2 mt-3 d-flex gap-3">
+            <div className="col-2">
+              <div className="col d-flex flex-column">
+                <span className="p-1 ps-0">Highlight Icon & Color</span>
+                <label
+                  className="p-1 text-center cursor"
+                  htmlFor="level-icon"
+                  style={{ backgroundColor: "#0B2447", borderRadius: "4px" }}
+                >
+                  {(previewIcon || formik.values.highlight_icon) && (
+                    <span className="pe-2">
+                      {" "}
+                      <img
+                        src={
+                          previewIcon
+                            ? previewIcon
+                            : `${config?.apiUrl}${formik.values.highlight_icon}`
+                        }
+                        alt=""
+                        height={22}
+                        width={22}
+                      />
+                    </span>
+                  )}
+                  <img src={upload} alt="" height={22} width={22} />
+                  <input
+                    accept=".jpg, .jpeg, .png"
+                    type="file"
+                    id="level-icon"
+                    className="d-none"
+                    onChange={(e) => {
+                      const allowedTypes = ["image/jpeg", "image/png"];
+                      const selectedFile = e.target.files[0];
+                      if (allowedTypes.includes(selectedFile.type)) {
+                        setPreviewIcon(URL.createObjectURL(selectedFile));
+                        formik.setFieldValue("highlight_icon", selectedFile);
+                      } else {
+                        Swal.fire({
+                          title: "Error",
+                          text: "Invalid file type. Please select a valid image file.",
+                          icon: "error",
+                          backdrop: false,
+                          customClass: "dark-mode-alert",
+                        });
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                </label>
+                {formik.touched.highlight_icon &&
+                  formik.errors.highlight_icon && (
+                    <div className="text-danger">
+                      {formik.errors.highlight_icon}
+                    </div>
+                  )}
+              </div>
+            </div>
+          </div>
+          <div
+            class="fixed-bottom  d-flex justify-content-center"
+            style={{ marginBottom: "200px" }}
           >
-            {isLoading ? "Loading" : "Save"}
-          </button>
-        </div>
-      </form>
+            <button
+              type="submit"
+              className="py-1 px-3"
+              style={{
+                color: "#D2DB08",
+                border: "1px solid #D2DB08",
+                borderRadius: "3px",
+                backgroundColor: "transparent",
+              }}
+            >
+              {isLoading ? "Loading" : "Save"}
+            </button>
+          </div>
+        </form>
+      )}
     </>
   );
 };

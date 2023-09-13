@@ -20,9 +20,9 @@ const EditorsubscriptionSettings = () => {
         </span>
         <span
           className="p-2 cursor"
-          style={{ color: selectLevel === "Expert" && "#4DD5FF" }}
+          style={{ color: selectLevel === "master" && "#4DD5FF" }}
           onClick={() => {
-            setSelectLevel("Expert");
+            setSelectLevel("master");
           }}
         >
           Expert
