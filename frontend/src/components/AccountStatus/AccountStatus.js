@@ -62,7 +62,7 @@ const AccountStatus = () => {
   function getEarnings() {
     const type =
       selectSub === "journeyman" ||
-      selectSub === "expert" ||
+      selectSub === "master" ||
       selectSub === "grandmaster";
     if (type) {
       axios
@@ -207,14 +207,14 @@ const AccountStatus = () => {
                 </span>
                 <span
                   className="cursor text-center"
-                  onClick={() => setSelectSub("expert")}
+                  onClick={() => setSelectSub("master")}
                   style={{
                     color:
                       currentTheme !== "dark"
-                        ? selectSub === "expert"
+                        ? selectSub === "master"
                           ? "#007bf6"
                           : "#000"
-                        : selectSub === "expert"
+                        : selectSub === "master"
                         ? "#4dd5ff"
                         : "#fff",
                   }}
@@ -376,14 +376,14 @@ const AccountStatus = () => {
               </span>
               <span
                 className="cursor text-center"
-                onClick={() => setSelectSubRangeData("expert")}
+                onClick={() => setSelectSubRangeData("master")}
                 style={{
                   color:
                     currentTheme !== "dark"
-                      ? selectSubRangeData === "expert"
+                      ? selectSubRangeData === "master"
                         ? "#007bf6"
                         : "#000"
-                      : selectSubRangeData === "expert"
+                      : selectSubRangeData === "master"
                       ? "#4dd5ff"
                       : "#fff",
                 }}
