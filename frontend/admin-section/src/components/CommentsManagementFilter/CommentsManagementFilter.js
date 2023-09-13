@@ -5,7 +5,7 @@ const CommentsManagementFilter = (props) => {
   // console.log("***:::::***", props?.commentData)
   const [selectedOption, setSelectedOption] = useState("All");
 
-  const options = ["All", "Pending", "Resolved", "Redirected"];
+  const options = ["All", "Published", "Pending", "Stopped"];
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -24,8 +24,7 @@ const CommentsManagementFilter = (props) => {
   };
 
   const filterData = (e) => {
-    // console.log("^^^^^^^", e)
-    const val = e;
+    const val = e == "Published"?"Approve":e=="Stopped"?"Reject":e;
     const filteredArray = props?.commentData.filter(
       (obj) =>
         obj?.status?.toLowerCase() == val?.toLowerCase()

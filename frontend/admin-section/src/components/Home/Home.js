@@ -39,6 +39,7 @@ const Home = (props) => {
         `${config?.apiUrl}/user-management/${id}/?action=${action}`
       );
       if (res.status === 200) {
+        clearError();
         props?.adminHomeApiData();
         Swal.fire({
           title: "Success",
@@ -155,16 +156,16 @@ const Home = (props) => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data1 = await cityApiData1();
-      const data2 = await cityApiData2();
-      const combinedCities = [...data1, ...data2];
-      setCities(combinedCities);
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const data1 = await cityApiData1();
+  //     const data2 = await cityApiData2();
+  //     const combinedCities = [...data1, ...data2];
+  //     setCities(combinedCities);
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const [displayUser, setDisplayUser] = useState([]);
   const [allFilterData, setAllFilterData] = useState([]);
@@ -234,22 +235,22 @@ const Home = (props) => {
   const handleAddUser = async (e) => {
     // console.log(Object.keys(addUser).length >= 6);
     if (addUser.name == "" || addUser.name == undefined) {
-      setValidName("Please select name.");
+      setValidName("Please enter name.");
     } else {
       setValidName(null);
     }
     if (addUser.username == "" || addUser.username == undefined) {
-      setValidUsername("Please select username.");
+      setValidUsername("Please enter username.");
     } else {
       setValidUsername(null);
     }
-    if (addUser.phone == "" || addUser.phone == undefined) {
-      setValidPhone("Please select phone.");
+    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone == "" || addUser.phone == undefined) {
+      setValidPhone("Please enter valid phone.");
     } else {
       setValidPhone(null);
     }
     if (addUser.password == "" || addUser.password == undefined) {
-      setValidPassword("Please select password.");
+      setValidPassword("Please enter password.");
     } else {
       setValidPassword(null);
     }
@@ -328,40 +329,119 @@ const Home = (props) => {
     // }
   };
 
-  const handleUpdateUser = async (id) => {
-    // console.log("::::::::", addUser);
-    const formData = new FormData();
-    selectedImage != false && formData.append("profile_pic", selectedImage);
-    // formData.append("date", addUser.date);
-    formData.append("name", addUser.name);
-    formData.append("username", addUser.username);
-    formData.append("phone", addUser.phone);
-    formData.append("password", addUser.password);
-    formData.append("gender", addUser.gender);
-    formData.append("age", addUser.age);
-    formData.append("subscription", addUser.subscription);
-    formData.append("duration", addUser.duration);
-    // formData.append("month", addUser.month);
-    formData.append("level", addUser.level);
-    try {
-      const response = await axios.patch(
-        `${config?.apiUrl}/user-management/${id}/`,
-        formData
-      );
+  const handleUpdateUser = async (id, user_id) => {
+    if (addUser.name == "" || addUser.name == undefined) {
+      setValidName("Please enter name.");
+    } else {
+      setValidName(null);
+    }
+    if (addUser.username == "" || addUser.username == undefined) {
+      setValidUsername("Please enter username.");
+    } else {
+      setValidUsername(null);
+    }
+    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone == "" || addUser.phone == undefined) {
+      setValidPhone("Please enter valid phone.");
+    } else {
+      setValidPhone(null);
+    }
+    if (addUser.password == "" || addUser.password == undefined) {
+      setValidPassword("Please enter password.");
+    } else {
+      setValidPassword(null);
+    }
+    if (addUser.gender == "" || addUser.gender == "Select") {
+      setValidGender("Please select gender.");
+    } else {
+      setValidGender(null);
+    }
 
-      // console.log("API Response:", response);
-      if (response.status === 200) {
-        props?.adminHomeApiData();
-        Swal.fire({
-          title: "Success",
-          text: "User Updated!",
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+    if (addUser.age == "" || addUser.age == "Select") {
+      setValidAge("Please select age.");
+    } else {
+      setValidAge(null);
+    }
+
+    if (
+      Object.keys(addUser).length >= 6 &&
+      validName == null &&
+      validUsername == null &&
+      validPhone == null &&
+      validPassword == null &&
+      validGender == null &&
+      validAge == null
+    ) {
+      // console.log("::::::::", addUser);
+      const formData = new FormData();
+      selectedImage != false && formData.append("profile_pic", selectedImage);
+      // formData.append("date", addUser.date);
+      formData.append("name", addUser.name);
+      formData.append("username", addUser.username);
+      formData.append("phone", addUser.phone);
+      formData.append("password", addUser.password);
+      formData.append("gender", addUser.gender);
+      formData.append("age", addUser.age);
+      formData.append("subscription", addUser.subscription);
+      formData.append("duration", addUser.duration);
+      // formData.append("month", addUser.month);
+      formData.append("level", addUser.level);
+      formData.append("user_id", user_id);
+      try {
+        const response = await axios.patch(
+          `${config?.apiUrl}/user-management/${id}/`,
+          formData
+        );
+        // console.log("API Response:", response);
+        if (response.status === 200) {
+          const modalElement = document.getElementById("exampleModal");
+          if (modalElement) {
+            const closeButton = modalElement.querySelector(
+              "[data-bs-dismiss='modal']"
+            );
+            if (closeButton) {
+              closeButton.click();
+            }
+          }
+          clearError();
+          setAddUser({
+            name: "",
+            username: "",
+            phone: "",
+            password: "",
+            gender: "",
+            age: "",
+          });
+          setprofile(false);
+          setPreveiwProfilePic(null);
+          props?.adminHomeApiData();
+          Swal.fire({
+            title: "Success",
+            text: "User Updated!",
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } catch (error) {
+        if (error?.response?.data?.error) {
+          Swal.fire({
+            title: "Error",
+            text: `${error?.response?.data?.error}`,
+            icon: "error",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+        console.error("Error making POST request:", error);
       }
-    } catch (error) {
-      console.error("Error making POST request:", error);
+    }else {
+      Swal.fire({
+        title: "Error",
+        text: `Please fill all fields.`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
     }
   };
 
@@ -1165,6 +1245,7 @@ const Home = (props) => {
                           });
                           setprofile(false);
                           setPreveiwProfilePic(null);
+                          clearError();
                         }}
                         data-bs-dismiss="modal"
                         className="px-3 py-1"
@@ -1181,19 +1262,9 @@ const Home = (props) => {
                     <div className="col">
                       <button
                         onClick={() => {
-                          handleUpdateUser(userData?.id);
-                          setAddUser({
-                            name: "",
-                            username: "",
-                            phone: "",
-                            password: "",
-                            gender: "",
-                            age: "",
-                          });
-                          setprofile(false);
-                          setPreveiwProfilePic(null);
+                          handleUpdateUser(userData?.id, addUser.id);
                         }}
-                        data-bs-dismiss="modal"
+                        // data-bs-dismiss="modal"
                         className="px-3 py-1"
                         style={{
                           color: "#FF9100",

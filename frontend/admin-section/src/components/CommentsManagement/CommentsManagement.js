@@ -53,17 +53,20 @@ const CommentsManagement = (props) => {
     setDisplayUser(props?.commentData);
   }, [props?.commentData]);
 
+  const handleFilterState = () => {
+    setSelectedCategory('Select')
+    setSelectedCountry('Select')
+    setSelectedDate('Select')
+    setSelectedLeague('Select')
+    setSelectedMatchDetails('Select')
+    setSelectedPrediction('Select')
+    setSelectedPredictionType('Select')
+    setStatus("")
+    setSecondStatus("")
+  }
+
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("admin-user-id");
-    console.log("selectedCategory: ",selectedCategory)
-    console.log("selectedCountry: ",selectedCountry)
-    console.log("selectedLeague: ",selectedLeague)
-    console.log("selectedDate: ",selectedDate)
-    console.log("selectedMatchDetails: ",selectedMatchDetails)
-    console.log("selectedPrediction: ",selectedPrediction)
-    console.log("selectedPredictionType: ",selectedPredictionType)
-    console.log("status: ",status)
-    console.log("secondStatus: ",secondStatus)
     await axios
       .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
@@ -80,6 +83,7 @@ const CommentsManagement = (props) => {
         // console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
+        handleFilterState()
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -803,6 +807,7 @@ const CommentsManagement = (props) => {
                   setSecondStatus("");
                   setThirdStatus("");
                   setFourthStatus("");
+                  handleFilterState()
                 }}
                 data-bs-dismiss="modal"
                 src={cross}

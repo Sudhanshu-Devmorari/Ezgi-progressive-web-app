@@ -130,10 +130,6 @@ const EditorManagemenet = (props) => {
     fetchData();
   }, []);
 
-  // console.log("deactiveRqst----->: ", props?.deactiveRqst)
-  // console.log("deactivateUser----->: ", props?.deactivateUser)
-  // console.log("users----->: ", props?.users)
-
   const [addUser, setAddUser] = useState({});
   const submitEditorData = (e, val) => {
     let name, value;
@@ -143,7 +139,6 @@ const EditorManagemenet = (props) => {
 
     if (name == "name") {
       if (value?.length <= 4 || value?.length >= 20) {
-        // console.log("asdadasdadd");
         setValidName("Name must be 5 to 20 characters.");
       } else {
         setValidName(null);
@@ -155,7 +150,6 @@ const EditorManagemenet = (props) => {
         setValidUsername(null);
       }
     } else if (name == "phone") {
-      // console.log("regex", value?.match(/^5\d*$/));
       if (value?.match(/^5\d*$/) == null || value?.length != 10) {
         setValidPhone("Phone must start with '5' and must be 10 digits.");
       } else {
@@ -175,7 +169,6 @@ const EditorManagemenet = (props) => {
       }
     }
   };
-  // console.log("+++++++", addUser)
 
   const [displayUser, setDisplayUser] = useState([]);
   const [allFilterData, setAllFilterData] = useState([]);
@@ -185,9 +178,9 @@ const EditorManagemenet = (props) => {
   //   setAllFilterData(props.users);
   // }, [props.users]);
 
-  useEffect(() => {
+  // useEffect(() => {
     // console.log("displayUser::::::::::::::::::", displayUser);
-  }, [displayUser]);
+  // }, [displayUser]);
 
   useEffect(() => {
     if (props?.deactiveRqst) {
@@ -206,7 +199,6 @@ const EditorManagemenet = (props) => {
 
   function handleAddProfile(e) {
     const imageFile = e.target.files[0];
-    // console.log("SDDD",e.target.files[0])
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
     setSelectedImage(imageFile);
   }
@@ -274,7 +266,6 @@ const EditorManagemenet = (props) => {
       validGender == null &&
       validLevel == null
     ) {
-      // console.log("_____: ", addUser)
       const formData = new FormData();
       formData.append("file", selectedImage);
       formData.append("name", addUser.name);
@@ -326,10 +317,7 @@ const EditorManagemenet = (props) => {
             about: "",
           });
         }
-
         // setDisplayUser(response.data);
-
-        // console.log('API Response:', response.data);
       } catch (error) {
         if (error?.response?.data?.error) {
           Swal.fire({
@@ -360,7 +348,7 @@ const EditorManagemenet = (props) => {
     value = val ? val : e.target.value;
     setUpdateEditor({ ...updateEditor, [name]: value });
   };
-  const handleUpdateEditor = async (id) => {
+  const handleUpdateEditor = async (id, editor_id) => {
     if (addUser.country == "" || addUser.country == "Select") {
       setValidCountry("Please select Country.");
     } else {
@@ -419,6 +407,7 @@ const EditorManagemenet = (props) => {
       formData.append("category", addUser.category);
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
+      formData.append("editor_id", editor_id);
       try {
         const response = await axios.patch(
           `${config?.apiUrl}/editor-management/${id}/`,
@@ -486,20 +475,15 @@ const EditorManagemenet = (props) => {
 
   const handleEditorFiltor = async () => {
     setIsFilterLoading(true);
-    // console.log("city:::::::::::::", selectedCityFilter);
-    // console.log("age:::::::::::::", selectedAgeFilter);
-    // console.log("gender:::::::::::::", selectedGenderFilter);
-    // console.log("score_point:::::::::::::", selectedScorePointFilter);
     try {
       const response = await axios.post(`${config?.apiUrl}/filter-editors/`, {
         lavel: selectedLevelFilter,
-        sucess_rate: selectedSuccessRateFilter,
+        success_rate: selectedSuccessRateFilter,
         score_point: selectedScorePointFilter,
         city: selectedCityFilter,
         age: selectedAgeFilter,
         gender: selectedGenderFilter,
       });
-      // console.log("response.data:::::::::::::", response.data)
       setDisplayUser(response.data);
       setAllFilterData(response.data);
       response.data && setIsFilterLoading(false);
@@ -541,7 +525,6 @@ const EditorManagemenet = (props) => {
 
   const handleCountrySelection = (name, value) => {
     setSelectedCountry(value);
-    // console.log("---", name,"----",value)
     setAddUser({ ...addUser, [name]: value });
   };
 
@@ -713,8 +696,8 @@ const EditorManagemenet = (props) => {
     "Denizli",
   ];
   const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const SuccessRateFilterOptions = ["option 3SR", "option 41"];
-  const ScorePointFilterOptions = ["option 5SP", "option 61"];
+  const SuccessRateFilterOptions = ["0 - 40", "40 - 60", , "60 - 80", "80 - 100"];
+  const ScorePointFilterOptions = ["0 - 400", "400 - 600", "600 - 800", "800+"];
 
   const [selectedSuccessRateFilter, setSelectedSuccessRateFilter] =
     useState("Select");
@@ -739,7 +722,6 @@ const EditorManagemenet = (props) => {
   const [ageFilterDropDown, setAgeFilterDropDown] = useState(false);
 
   const handleCityFilterSelection = (gender) => {
-    // console.log("gender::::::::::::::", gender);
     setSelectedCityFilter(gender);
   };
   const toggleCityFilterDropdown = () => {
@@ -941,8 +923,6 @@ const EditorManagemenet = (props) => {
                   data-bs-target="#exampleModal"
                   onClick={() => {
                     props.setupdateProfile(2);
-                    // console.log("LLLL");
-                    // console.log(res, "NEha");
                     setPartialData(res);
                     setAddUser(res.editor_data);
                   }}
@@ -1706,7 +1686,7 @@ const EditorManagemenet = (props) => {
                           </button>
                           <button
                             onClick={() => {
-                              handleUpdateEditor(partialData.editor_data?.id);
+                              handleUpdateEditor(partialData.editor_data?.id, addUser.id);
                             }}
                             // data-bs-dismiss="modal"
                             className="px-3 py-1"

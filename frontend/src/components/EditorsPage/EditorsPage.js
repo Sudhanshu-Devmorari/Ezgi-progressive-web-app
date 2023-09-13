@@ -17,7 +17,6 @@ const EditorsPage = ({
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [displayData, setDisplayData] = useState(data);
-
   // ADS viewsssssssss-----------------
   const [adsId, setAdsId] = useState(null);
   useEffect(() => {
@@ -40,7 +39,7 @@ const EditorsPage = ({
   // Simulated API call function
   const fetchBannerData = async () => {
     const res = await countsAdsAPI("ads_view", adsId?.id);
-    console.log("res=>>>>", res);
+    // console.log("res=>>>>", res);
   };
 
   const checkBannerVisibility = () => {

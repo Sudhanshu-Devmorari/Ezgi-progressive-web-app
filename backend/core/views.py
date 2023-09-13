@@ -1639,6 +1639,12 @@ class UserManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
+        if User.objects.filter(id=request.data['user_id']).exists():
+            user_obj = User.objects.get(id=request.data['user_id'])
+            if user_obj.phone != request.data['phone']:
+                if User.objects.filter(phone=request.data['phone']).exists():
+                    return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
+                
         if request.data.get('subscription') == 'undefined':
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
@@ -1840,7 +1846,7 @@ class FilterComments(APIView):
                 else:
                     filters['commentator_user__commentator_level'] = request.data.get('level').lower()
 
-            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select":
+            if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select" and request.data.get('category')[0] != '':
                 if request.data.get('category') == "Futbol":
                      filters['category__icontains'] = "Football"
                 if request.data.get('category') == "Basketbol":
@@ -1866,10 +1872,10 @@ class FilterComments(APIView):
 
             if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "" and request.data.get('date') != "Select":
                 filters['date'] = request.data.get('date')
-            
+
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
             if filter_type in ('public_content', 'finished', 'winning', 'published'):
-
+                
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
                     all_comments = Comments.objects.filter(status='approve', public_content=True,**filters)
@@ -2383,10 +2389,13 @@ class EditorManagement(APIView):
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-        
-        if User.objects.filter(phone=request.data['phone']).exists():
-            return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if User.objects.filter(id=request.data['editor_id']).exists():
+            user_obj = User.objects.get(id=request.data['editor_id'])
+            if user_obj.phone != request.data['phone']:
+                if User.objects.filter(phone=request.data['phone']).exists():
+                    return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
+            
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             try:
@@ -2476,15 +2485,20 @@ class FilterEditors(APIView):
                 if 'lavel' in request.data and request.data.get('lavel') != None and request.data.get('lavel') != "Select":
                     filters['commentator_level'] = request.data.get('lavel').lower()
 
-                if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "Select":
+                if 'category' in request.data and request.data.get('category')[0] != None and request.data.get('category') != "Select":
                     filters['category__contains'] = request.data.get('category')
 
-                if 'sucess_rate' in request.data and request.data.get('sucess_rate') != None and request.data.get('sucess_rate') != "Select":
-                    filters['sucess_rate'] = request.data.get('sucess_rate')
+                if 'success_rate' in request.data and request.data.get('success_rate') != None and request.data.get('success_rate') != "Select":
+                    success_rate__range = request.data.get('success_rate').split(" - ")
+                    filters['success_rate__range'] = (float(success_rate__range[0]), float(success_rate__range[1]))
 
                 if 'score_point' in request.data and request.data.get('score_point') != None and request.data.get('score_point') != "Select":
-                    filters['score_point'] = request.data.get('score_point')
-
+                    if request.data['score_point'] == '800+':
+                        filters['score_points__gt'] = 800
+                    else:
+                        score_point__range = request.data.get('score_point').split(" - ")
+                        filters['score_points__range'] = (int(score_point__range[0]), int(score_point__range[1]))
+                    
                 if 'city' in request.data and request.data.get('city') != None and request.data.get('city') != "Select":
                     filters['city'] = request.data.get('city')
 
@@ -2495,7 +2509,6 @@ class FilterEditors(APIView):
                     filters['gender'] = request.data.get('gender')
 
                 filters['user_role'] = 'commentator'
-
                 query_filters = Q(**filters)
                 filtered_comments = User.objects.filter(query_filters)
                 data = []

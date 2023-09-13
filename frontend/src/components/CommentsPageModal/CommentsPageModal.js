@@ -18,13 +18,24 @@ import axios from "axios";
 import config from "../../config";
 
 const CommentsPageModal = (props) => {
+  const handleClearData = () => {
+    setCategoryData("")
+    setCountryData("")
+    setLeagueData("")
+    setDateData("")
+    setSelectedMatchDetails("Select")
+    setSelectedLevel("Select")
+    setSelectedPredictionType("Select")
+    setBlueSelect("")
+    setYellowSelect("")
+  }
   const handleShowButtonClick = async () => {
     const user_id = localStorage.getItem("user-id");
     try {
       const response = await axios.post(
         `${config?.apiUrl}/filter-comments/${user_id}/`,
         {
-          category: [categoryData],
+          category: categoryData,
           country: countryData,
           league: leagueData,
           match_detail: selectedMatchDetails,
@@ -42,6 +53,7 @@ const CommentsPageModal = (props) => {
         value: item,
       }));
       props.setFilterCommentData(editorData);
+      handleClearData()
       // Handle the response here if needed
       // console.log('API Response:', response.data);
     } catch (error) {
@@ -186,6 +198,7 @@ const CommentsPageModal = (props) => {
               <span className="mb-2">
                 <RxCross2
                   onClick={() => {
+                    handleClearData()
                     props.onHide();
                     setMatchDetailsDropDown(false)
                     setLevelDropDown(false)

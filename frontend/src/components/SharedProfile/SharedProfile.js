@@ -191,18 +191,16 @@ const SharedProfile = ({
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value.user.commentator_level
-                    ?.charAt(0)
-                    ?.toUpperCase() +
-                    data?.value.user.commentator_level?.substring(1)}
+                  {data?.value?.user?.commentator_level?.charAt(0)?.toUpperCase() +
+                    data?.value?.user?.commentator_level?.substring(1)}
                 </button>
               </div>
               <div
                 className="blueTick-responsive align-items-center mt-1 responsive-username"
                 style={{ fontSize: "13px" }}
               >
-                <span className="pe-1">{data?.value.user.username}</span>
-                {verifyid?.includes(data?.value.user.id) && (
+                <span className="pe-1">{data?.value?.user?.username}</span>
+                {verifyid?.includes(data?.value?.user?.id) && (
                   <img
                     className="responsive-blue-tick"
                     src={blueTick}
@@ -218,13 +216,13 @@ const SharedProfile = ({
                   color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                 }}
               >
-                %{data?.value.user.success_rate}
+                %{data?.value?.user?.success_rate}
               </div>
             </div>
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
             <div className="mt-1">
-              {data?.value.user.category.includes("Football") && (
+              {data?.value?.user?.category.includes("Football") && (
                 <img
                   src={football}
                   alt=""
@@ -233,7 +231,7 @@ const SharedProfile = ({
                   style={{ color: "#00C936" }}
                 />
               )}
-              {data?.value.user.category.includes("Basketball") && (
+              {data?.value?.user?.category.includes("Basketball") && (
                 <img
                   src={basketball}
                   alt=""

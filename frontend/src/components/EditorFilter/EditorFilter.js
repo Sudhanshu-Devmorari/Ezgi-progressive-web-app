@@ -7,6 +7,12 @@ import axios from "axios";
 import config from "../../config";
 
 const EditorFilter = (props) => {
+  const clearFilterData = () => {
+    setSelectedCountry(null)
+    setSelectedLevel(null)
+    setSelectedScorePoint(null)
+    setSelectedSuccessRate(null)
+  }
   const handleShowButtonClick = async () => {
     try {
       const response = await axios.post(
@@ -15,16 +21,23 @@ const EditorFilter = (props) => {
           category: [selectedCountry],
           lavel: selectedLevel,
           score_point: selectedScorePoint,
-          sucess_rate: selectedSuccessRate,
+          success_rate: selectedSuccessRate,
         }
       );
-      
-
-      const editorData = response.data.map((item) => ({
+      // const editorData = response.data.map((item) => ({
+      //   type: "editor",
+      //   value: item,
+      // }));
+      const transformedData = response.data.map((item) => ({
         type: "editor",
-        value: item,
+        value: {
+          user: item.editor_data,
+          subscriber_count: item.subscriber_count,
+        },
       }));
-      props.setFilterData(editorData)
+
+      props.setFilterData(transformedData)
+      clearFilterData()
       // Handle the response here if needed
       // console.log('API Response:', response.data);
     } catch (error) {
@@ -38,8 +51,8 @@ const EditorFilter = (props) => {
     "Basketball",
   ];
   const levelOptions = ["Apprentice", "Journeyman", "Master","Grandmaster"];
-  const scorePointOptions = [0, 10];
-  const successRateOptions = [0, 25, 50, 75, 100];
+  const scorePointOptions = ["0 - 400", "400 - 600", "600 - 800", "800+"];
+  const successRateOptions = ["0 - 40", "40 - 60", , "60 - 80", "80 - 100"];
 
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [levelDropDown, setLevelDropDown] = useState(false);
@@ -115,6 +128,7 @@ const EditorFilter = (props) => {
                 <span>
                   <RxCross2
                     onClick={() => {
+                      clearFilterData()
                       props.onHide();
                       setCountryDropDown(false);
                       setLevelDropDown(false);
