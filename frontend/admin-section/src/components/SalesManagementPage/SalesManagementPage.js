@@ -71,7 +71,7 @@ const SalesManagementPage = () => {
     async function getSalesData() {
       try {
         const res = await axios.get(`${config?.apiUrl}/sales-management`);
-        // console.log("res====>>>>", res?.data);
+        console.log("res====>>>>", res?.data);
         setSalesData(res?.data);
       } catch (error) {
         console.log(error);

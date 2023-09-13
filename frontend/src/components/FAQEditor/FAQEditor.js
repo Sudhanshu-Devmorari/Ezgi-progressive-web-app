@@ -174,7 +174,7 @@ const FAQEditor = () => {
   function getEarnings() {
     const type =
       (selectSub === "KALFA" && "journeyman") ||
-      (selectSub === "USTA" && "expert") ||
+      (selectSub === "USTA" && "master") ||
       (selectSub === "büyük usta" && "grandmaster");
     if (type) {
       axios

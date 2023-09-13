@@ -35,15 +35,19 @@ const SubUserManagementPage = () => {
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   async function getSubUsers() {
     try {
+      setIsLoading(true);
       const res = await axios.get(`${config?.apiUrl}/subuser-management/`);
-      // console.log(res.data, "==========>>>res sub users");
-      const data = res.data;
-      setNotificationCount(data.notification_count);
-      setSubuserCount(data.subuser_count);
-      setSubuserList(data.subuser_list);
-      setUserTimeline(data.user_timeline);
+      console.log(res.data, "==========>>>res sub users");
+      const data = res?.data;
+      setNotificationCount(data?.notification_count);
+      setSubuserCount(data?.subuser_count);
+      setSubuserList(data?.subuser_list);
+      setUserTimeline(data?.user_timeline);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -123,7 +127,9 @@ const SubUserManagementPage = () => {
                   >
                     <img src={SubUsers} alt="" className="icon" />
                     <span className="heading">Sub Users</span>
-                    <span className="number">{subuserCount}</span>
+                    <span className="number">
+                      {isLoading ? "Loading..." : subuserCount}
+                    </span>
                   </div>
                   <div className="col p-0">
                     <div
@@ -156,7 +162,9 @@ const SubUserManagementPage = () => {
                   >
                     <img src={bell} alt="" className="icon" />
                     <span className="heading">Notifications</span>
-                    <span className="number">{notificationCount}</span>
+                    <span className="number">
+                      {isLoading ? "Loading..." : notificationCount}
+                    </span>
                   </div>
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
@@ -170,90 +178,115 @@ const SubUserManagementPage = () => {
                     subuserList={subuserList}
                     getSubUsers={getSubUsers}
                   />
-                  {displaySubuserList.map((res, index) => (
-                    <MainDiv key={index}>
-                      <>
-                        <div className="col d-flex align-items-center">
-                          <span>#0001</span>
-                          <span className="px-2">
-                            <img
-                              style={{
-                                objectFit: "cover",
-                                borderRadius: "50%",
-                              }}
-                              src={`${config?.apiUrl}${res.profile_pic}`}
-                              alt=""
-                              height={45}
-                              width={45}
-                            />
-                          </span>
-                          <span>{res.name}</span>
+                  {isLoading ? (
+                    <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                      Loading...
+                    </div>
+                  ) : (
+                    <>
+                      {displaySubuserList?.length === 0 ? (
+                        <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                          No Record Found!
                         </div>
-                        <div className="col d-flex align-items-center justify-content-start">
-                          <button
-                            className="px-2"
-                            style={{
-                              backgroundColor: "transparent",
-                              borderRadius: "4px",
-                              border:
-                                (res.department === "Support" &&
-                                  "1px solid #FF9100") ||
-                                (res.department === "Financial" &&
-                                  "1px solid #58DEAA") ||
-                                (res.department === "Technical" &&
-                                  "1px solid #58DEAA") ||
-                                (res.department === "IT Supervisor" &&
-                                  "1px solid #4DD5FF") ||
-                                (res.department === "Ads Manager" &&
-                                  "1px solid #FFEE7D") ||
-                                (res.department === "Director Manager" &&
-                                  "1px solid #FF33E4"),
-                              color:
-                                (res.department === "Support" && "#FF9100") ||
-                                (res.department === "Financial" && "#58DEAA") ||
-                                (res.department === "Technical" && "#58DEAA") ||
-                                (res.department === "IT Supervisor" &&
-                                  "#4DD5FF") ||
-                                (res.department === "Ads Manager" &&
-                                  "#FFEE7D") ||
-                                (res.department === "Director Manager" &&
-                                  "#FF33E4"),
-                            }}
-                          >
-                            {res.department}
-                          </button>
-                        </div>
-                        <div className="col d-flex align-items-center justify-content-end">
-                          <div className="">
-                            {moment(res.created).format("DD.MM.YYYY - HH:mm")}
-                          </div>
-                        </div>
-                        <div className="col-1 d-flex align-items-center justify-content-end gap-1">
-                          <img
-                            onClick={() => {
-                              seteditProfileModal(2);
-                              setEditUserId(res.id);
-                            }}
-                            className="cursor"
-                            data-bs-toggle="modal"
-                            data-bs-target="#create-sub-user"
-                            src={edit}
-                            alt=""
-                            height={25}
-                            width={25}
-                          />
-                          <img
-                            className="cursor"
-                            src={trash}
-                            alt=""
-                            height={22}
-                            width={22}
-                            onClick={() => handleDeleteUser(res.id, "delete")}
-                          />
-                        </div>
-                      </>
-                    </MainDiv>
-                  ))}
+                      ) : (
+                        <>
+                          {displaySubuserList.map((res, index) => (
+                            <MainDiv key={index}>
+                              <>
+                                <div className="col d-flex align-items-center">
+                                  <span>#0001</span>
+                                  <span className="px-2">
+                                    <img
+                                      style={{
+                                        objectFit: "cover",
+                                        borderRadius: "50%",
+                                      }}
+                                      src={`${config?.apiUrl}${res.profile_pic}`}
+                                      alt=""
+                                      height={45}
+                                      width={45}
+                                    />
+                                  </span>
+                                  <span>{res.name}</span>
+                                </div>
+                                <div className="col d-flex align-items-center justify-content-start">
+                                  <button
+                                    className="px-2"
+                                    style={{
+                                      backgroundColor: "transparent",
+                                      borderRadius: "4px",
+                                      border:
+                                        (res.department === "Support" &&
+                                          "1px solid #FF9100") ||
+                                        (res.department === "Financial" &&
+                                          "1px solid #58DEAA") ||
+                                        (res.department === "Technical" &&
+                                          "1px solid #58DEAA") ||
+                                        (res.department === "IT Supervisor" &&
+                                          "1px solid #4DD5FF") ||
+                                        (res.department === "Ads Manager" &&
+                                          "1px solid #FFEE7D") ||
+                                        (res.department ===
+                                          "Director Manager" &&
+                                          "1px solid #FF33E4"),
+                                      color:
+                                        (res.department === "Support" &&
+                                          "#FF9100") ||
+                                        (res.department === "Financial" &&
+                                          "#58DEAA") ||
+                                        (res.department === "Technical" &&
+                                          "#58DEAA") ||
+                                        (res.department === "IT Supervisor" &&
+                                          "#4DD5FF") ||
+                                        (res.department === "Ads Manager" &&
+                                          "#FFEE7D") ||
+                                        (res.department ===
+                                          "Director Manager" &&
+                                          "#FF33E4"),
+                                    }}
+                                  >
+                                    {res.department}
+                                  </button>
+                                </div>
+                                <div className="col d-flex align-items-center justify-content-end">
+                                  <div className="">
+                                    {moment(res.created).format(
+                                      "DD.MM.YYYY - HH:mm"
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="col-1 d-flex align-items-center justify-content-end gap-1">
+                                  <img
+                                    onClick={() => {
+                                      seteditProfileModal(2);
+                                      setEditUserId(res.id);
+                                    }}
+                                    className="cursor"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#create-sub-user"
+                                    src={edit}
+                                    alt=""
+                                    height={25}
+                                    width={25}
+                                  />
+                                  <img
+                                    className="cursor"
+                                    src={trash}
+                                    alt=""
+                                    height={22}
+                                    width={22}
+                                    onClick={() =>
+                                      handleDeleteUser(res.id, "delete")
+                                    }
+                                  />
+                                </div>
+                              </>
+                            </MainDiv>
+                          ))}
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
               <div className="col-4">
