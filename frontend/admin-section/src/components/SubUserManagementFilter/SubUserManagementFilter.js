@@ -100,7 +100,7 @@ const SubUserManagementFilter = (props) => {
         getSubUsers={props.getSubUsers}
         handleDeleteUser={props?.handleDeleteUser}
         editProfileModal={props?.editProfileModal}
-        editUserId={props?.editUserId}
+        editUser={props?.editUser}
         seteditProfileModal={props?.seteditProfileModal}
       />
       {/* Transaction History modal */}

@@ -216,9 +216,9 @@ const SupportManagementPage = () => {
                           data-bs-target="#exampleModal"
                           onClick={() => getTicketsLatestData(res.id)}
                         >
-                          <span>{`#${res?.id
-                            ?.toString()
-                            ?.padStart(4, "0")}`}</span>
+                          <span className="pe-1">{`# ${(index + 1)
+                          .toString()
+                          .padStart(4, "0")}`}</span>
                           <span className="px-2">
                             <img
                               style={{

@@ -244,7 +244,11 @@ const Home = (props) => {
     } else {
       setValidUsername(null);
     }
-    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone == "" || addUser.phone == undefined) {
+    if (
+      addUser.phone.match(/^5\d*$/) == null ||
+      addUser.phone == "" ||
+      addUser.phone == undefined
+    ) {
       setValidPhone("Please enter valid phone.");
     } else {
       setValidPhone(null);
@@ -340,7 +344,11 @@ const Home = (props) => {
     } else {
       setValidUsername(null);
     }
-    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone == "" || addUser.phone == undefined) {
+    if (
+      addUser.phone.match(/^5\d*$/) == null ||
+      addUser.phone == "" ||
+      addUser.phone == undefined
+    ) {
       setValidPhone("Please enter valid phone.");
     } else {
       setValidPhone(null);
@@ -434,7 +442,7 @@ const Home = (props) => {
         }
         console.error("Error making POST request:", error);
       }
-    }else {
+    } else {
       Swal.fire({
         title: "Error",
         text: `Please fill all fields.`,
@@ -734,7 +742,10 @@ const Home = (props) => {
                   <React.Fragment key={index}>
                     <MainDiv>
                       <div className="col">
-                        <span className="pe-1">{`# ${res?.id
+                        {/* <span className="pe-1">{`# ${res?.id
+                          .toString()
+                          .padStart(4, "0")}`}</span> */}
+                        <span className="pe-1">{`# ${(index + 1)
                           .toString()
                           .padStart(4, "0")}`}</span>
                         <img

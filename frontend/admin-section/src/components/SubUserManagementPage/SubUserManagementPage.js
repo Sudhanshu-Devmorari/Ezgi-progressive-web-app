@@ -41,7 +41,7 @@ const SubUserManagementPage = () => {
     try {
       setIsLoading(true);
       const res = await axios.get(`${config?.apiUrl}/subuser-management/`);
-      console.log(res.data, "==========>>>res sub users");
+      // console.log(res.data, "==========>>>res sub users");
       const data = res?.data;
       setNotificationCount(data?.notification_count);
       setSubuserCount(data?.subuser_count);
@@ -59,14 +59,14 @@ const SubUserManagementPage = () => {
   }, []);
 
   const [editProfileModal, seteditProfileModal] = useState(1);
-  const [editUserId, setEditUserId] = useState("");
+  const [editUser, setEditUser] = useState("");
   const [filteredArray, setFilteredArray] = useState([]);
 
   const filteredData = (value) => {
     const filteredArray = subuserList.filter(
       (obj) =>
-        obj?.username?.toLowerCase().startsWith(value.toLowerCase()) ||
-        obj?.name?.toLowerCase().startsWith(value.toLowerCase())
+        obj?.name?.toLowerCase().startsWith(value.toLowerCase()) ||
+        obj?.name?.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredArray(filteredArray);
   };
@@ -81,7 +81,8 @@ const SubUserManagementPage = () => {
         const res = await axios.delete(
           `${config?.apiUrl}/subuser-management/${e}/?action=delete`
         );
-        if (res.data.status === 200) {
+        console.log(res, "===============>>res");
+        if (res.status === 200) {
           getSubUsers();
           Swal.fire({
             title: "Success",
@@ -173,7 +174,7 @@ const SubUserManagementPage = () => {
                     filteredData={filteredData}
                     editProfileModal={editProfileModal}
                     seteditProfileModal={seteditProfileModal}
-                    editUserId={editUserId}
+                    editUser={editUser}
                     setFilteredSubuserList={setFilteredSubuserList}
                     subuserList={subuserList}
                     getSubUsers={getSubUsers}
@@ -194,7 +195,10 @@ const SubUserManagementPage = () => {
                             <MainDiv key={index}>
                               <>
                                 <div className="col d-flex align-items-center">
-                                  <span>#0001</span>
+                                  {/* <span>#0001</span> */}
+                                  <span className="pe-1">{`# ${(index + 1)
+                                    .toString()
+                                    .padStart(4, "0")}`}</span>
                                   <span className="px-2">
                                     <img
                                       style={{
@@ -259,7 +263,7 @@ const SubUserManagementPage = () => {
                                   <img
                                     onClick={() => {
                                       seteditProfileModal(2);
-                                      setEditUserId(res.id);
+                                      setEditUser(res);
                                     }}
                                     className="cursor"
                                     data-bs-toggle="modal"
@@ -290,7 +294,7 @@ const SubUserManagementPage = () => {
                 </div>
               </div>
               <div className="col-4">
-                <SubUsesTimeLine />
+                <SubUsesTimeLine userTimeline={userTimeline} />
               </div>
             </div>
           </div>

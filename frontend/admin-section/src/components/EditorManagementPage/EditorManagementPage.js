@@ -20,18 +20,18 @@ const EditorManagementPage = () => {
   const [deactivateUser, setDeactivateUser] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [verificationRequests, setVerificationRequests] = useState([]);
+  const [deactivationonRequests, setDeactivationonRequests] = useState([]);
   function editorManagementApiData() {
-    // console.log(data)
     axios
-      // .get(`${config.apiUrl}/editor-management/`)
       .get(`${config?.apiUrl}/editor-management/`)
       .then((res) => {
-        // console.log("%%%%%%%%%", res.data.top_ten);
+        console.log("%%%%%%%%%", res.data);
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
+        setVerificationRequests(res?.data?.verify_user);
+        setDeactivationonRequests(res?.data?.deactivat_user);
         setIsLoading(false);
-        // setUsers(res?.data?.users_list)
-        // setUserTimeLine(res?.data?.user_timeline)
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -42,17 +42,6 @@ const EditorManagementPage = () => {
   useEffect(() => {
     editorManagementApiData();
   }, []);
-
-  function approveOrRejectrqst(id, value) {
-    axios
-      .post(`${config.url}/verify-user/${id}`, { status: value })
-      .then((res) => {
-        // console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
 
   const newEditorsArray = [
     {
@@ -103,7 +92,8 @@ const EditorManagementPage = () => {
                 </div>
                 <div className="">
                   <EditorManagemenet
-                    approveOrRejectrqst={approveOrRejectrqst}
+                    deactivationonRequests={deactivationonRequests}
+                    verificationRequests={verificationRequests}
                     editorManagementApiData={editorManagementApiData}
                     users={data.editor_list}
                     deactivateUser={deactivateUser}
