@@ -551,19 +551,19 @@ class CommentView(APIView):
                 comment = request.data.get('comment')
                 # print('comment: ', comment)
 
-                if not category:
+                if not category and category=='Select':
                     raise NotFound("Category not found.")
-                if not country:
+                if not country and country=='Select':
                     raise NotFound("Country not found.")
-                if not league:
+                if not league and league=='Select':
                     raise NotFound("League not found.")
-                if not date:
+                if not date and date=='Select':
                     raise NotFound("Date not found.")
-                if not match_detail:
+                if not match_detail and match_detail=='Select':
                     raise NotFound("Match detail not found.")
-                if not prediction_type:
+                if not prediction_type and prediction_type=='Select':
                     raise NotFound("Prediction Type not found.")
-                if not prediction:
+                if not prediction and prediction=='Select':
                     raise NotFound("Prediction not found.")
                 # if not public_content:
                 #     raise NotFound("Public Content not found.")
@@ -3310,12 +3310,20 @@ class LevelRule(APIView):
             if not level:
                 return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
             
+            if level.lower() == 'expert':
+                level = 'master'
+            
             level_obj = CommentatorLevelRule.objects.filter(commentator_level=level)
             
             if not level_obj.exists():
                 return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
             
             serializer = CommentatorLevelRuleSerializer(level_obj, many=True)
+            if level.lower() == 'expert':
+                for data in serializer.data:
+                    if data['commentator_level'].lower() == 'master':
+                        data['commentator_level'] = 'expert'
+            
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         
         except Exception as e:
@@ -3323,13 +3331,21 @@ class LevelRule(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
+        
+        data = request.data.copy()
+        if commentator_level.lower() == 'expert':
+            data["commentator_level"] = 'master'
+            commentator_level = 'master' 
+        else:
+            data["commentator_level"] = commentator_level
+
         # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
-
+        
         if existing_record:
-            serializer = CommentatorLevelRuleSerializer(existing_record, data=request.data,  partial=True)
+            serializer = CommentatorLevelRuleSerializer(existing_record, data=data,  partial=True)
         else:
-            serializer = CommentatorLevelRuleSerializer(data=request.data)
+            serializer = CommentatorLevelRuleSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()

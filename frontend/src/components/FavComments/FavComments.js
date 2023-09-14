@@ -376,7 +376,7 @@ const FavComments = (props) => {
                     }}
                   >
                     {res.public_content
-                      ? "FT - Home & 2.5 Over 2.40"
+                      ? `${res?.prediction_type} & ${res?.prediction}`
                       : "Subscribers Only"}
                   </span>
                 </div>

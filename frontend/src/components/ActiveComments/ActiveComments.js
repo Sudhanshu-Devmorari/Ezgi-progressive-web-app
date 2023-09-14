@@ -655,8 +655,8 @@ const ActiveComments = (props) => {
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
           }}
         >
-          <div className="py-1">Average Odds</div>
-          <div className="py-1">{userPoints?.avg_odd || 0}</div>
+          <div className="py-1">Experience</div>
+          <div className="py-1">{userPoints?.experience || 0}</div>
         </div>
         <div
           className="d-flex justify-content-between p-2"

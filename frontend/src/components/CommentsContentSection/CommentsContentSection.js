@@ -324,7 +324,7 @@ const CommentsContentSection = (props) => {
                                 fontSize: "12px",
                               }}
                             >
-                              FT - Home & 2.5 Over 2.40
+                              {`${val?.prediction_type} & ${val?.prediction}`}
                             </span>
                           </div>
                         </div>
@@ -994,14 +994,28 @@ const CommentsContentSection = (props) => {
                     </div>
                     <span>{res?.match_detail.split(" - ")[1]}</span>
                   </div>
-                  <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
+                  {console.log("--------", res)}
+                  <div className="text-end mt-3 mb-2">
                     <span
-                      className="ps-1"
-                      style={{ color: "#FF3030", fontSize: "12px" }}
+                      // className="ps-1"
+                      className="p-1 px-2"
+                      // style={{ color: "#FF3030", fontSize: "12px" }}
+                      style={{
+                                backgroundColor:
+                                  props.SelectComment === "resolvedComments"
+                                    ? "#00DE51"
+                                    : "#00659D",
+                                color:
+                                  props.SelectComment === "resolvedComments"
+                                    ? "#0D2A53"
+                                    : "#FFFFFF",
+                                fontSize: "12px",
+                              }}
                     >
-                      {res.text}
+                      {/* {res.text} */}
+                      {`${res?.prediction_type} & ${res?.prediction}`}
                     </span>
-                    <span
+                    {/* <span
                       className="p-1"
                       style={{
                         backgroundColor:
@@ -1028,7 +1042,7 @@ const CommentsContentSection = (props) => {
                       }}
                     >
                       FT - Home & 2.5 Over 2.40
-                    </span>
+                    </span> */}
                   </div>
                 </div>
                 <div className="d-flex mt-2 align-items-center">
