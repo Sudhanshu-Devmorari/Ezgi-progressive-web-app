@@ -287,7 +287,7 @@ const ContentSection = ({
                   className="d-flex justify-content-end pe-2 mt-3"
                   style={{ height: "24.69px" }}
                 >
-                  {userPhone ? (
+                  {userPhone != data?.value?.commentator_user?.id ? (
                     <button
                       onClick={() => {
                         followCommentator(
@@ -488,7 +488,7 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {userPhone ? "FT - Home & 2.5 Over 2.40" : "Subscribers Only"}
+                  {userPhone ? `${data?.value?.prediction_type} & ${data?.value?.prediction}` : "Subscribers Only"}
                 </span>
               </div>
             </div>
@@ -567,11 +567,13 @@ const ContentSection = ({
                 {userPhone ? (
                   <div
                     onClick={() => {
+                      if(userPhone != data?.value?.commentator_user?.id) {
                       handleCommentReaction(
                         data?.value?.id,
                         "favorite",
                         data?.value?.total_reactions?.total_favorite
                       );
+                      }
                     }}
                   >
                     {cmtReact
@@ -623,7 +625,7 @@ const ContentSection = ({
                       alt=""
                       height={20}
                       width={20}
-                    />
+                    />{" "}
                     {data?.value?.total_reactions?.total_favorite}
                   </div>
                 )}

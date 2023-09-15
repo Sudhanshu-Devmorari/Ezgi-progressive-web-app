@@ -60,11 +60,11 @@ const EditorManagemenet = (props) => {
 
   const clearEditorData = () => {
     setSelectedAge("Select");
-    setSelectedCategory("Select")
-    setSelectedCity("Select")
-    setSelectedCountry("Select")
-    setSelectedGender("Select")
-  }
+    setSelectedCategory("Select");
+    setSelectedCity("Select");
+    setSelectedCountry("Select");
+    setSelectedGender("Select");
+  };
   const handleDeactive = async (id) => {
     try {
       const res = await axios.delete(
@@ -179,7 +179,7 @@ const EditorManagemenet = (props) => {
   // }, [props.users]);
 
   // useEffect(() => {
-    // console.log("displayUser::::::::::::::::::", displayUser);
+  // console.log("displayUser::::::::::::::::::", displayUser);
   // }, [displayUser]);
 
   useEffect(() => {
@@ -295,7 +295,7 @@ const EditorManagemenet = (props) => {
           }
         }
         if (response.status === 200) {
-          clearEditorData()
+          clearEditorData();
           clearError();
           Swal.fire({
             title: "Success",
@@ -448,7 +448,7 @@ const EditorManagemenet = (props) => {
         // setDisplayUser(response.data);
         // console.log('API Response:', response.data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
         if (error?.response?.data?.error) {
           Swal.fire({
             title: "Error",
@@ -696,7 +696,7 @@ const EditorManagemenet = (props) => {
     "Denizli",
   ];
   const ageFilterOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const SuccessRateFilterOptions = ["0 - 40", "40 - 60", , "60 - 80", "80 - 100"];
+  const SuccessRateFilterOptions = ["0 - 40", "40 - 60", "60 - 80", "80 - 100"];
   const ScorePointFilterOptions = ["0 - 400", "400 - 600", "600 - 800", "800+"];
 
   const [selectedSuccessRateFilter, setSelectedSuccessRateFilter] =
@@ -852,6 +852,12 @@ const EditorManagemenet = (props) => {
   };
   const server_url = `${config?.apiUrl}`;
 
+  const editorsArray = props?.verifyRqst
+    ? props?.verificationRequests
+    : props?.deactiveRqst
+    ? props?.deactivationonRequests
+    : allFilterData;
+
   return (
     <>
       <div className="dark-mode p-2 m-2 mb-0 home-height">
@@ -910,17 +916,14 @@ const EditorManagemenet = (props) => {
           </div>
         ) : (
           <>
-            {allFilterData?.length == 0 ? (
+            {editorsArray?.length == 0 ? (
               <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                 No Record Found!
               </div>
             ) : (
-              allFilterData?.map((res, index) => (
+              editorsArray?.map((res, index) => (
                 <div
                   key={index}
-                  // onClick={() => props.setupdateProfile(2)}
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
                   onClick={() => {
                     props.setupdateProfile(2);
                     setPartialData(res);
@@ -930,21 +933,9 @@ const EditorManagemenet = (props) => {
                   style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
                 >
                   <div className="row g-0 d-flex justify-content-between align-items-center">
-                    <div
-                      className="col-3"
-
-                      // data-bs-toggle="modal"
-                      // onClick={() => {
-                      //   props.setupdateProfile(2);
-                      //   console.log("LLLL");
-                      //   console.log(res,"NEha");
-                      //   setPartialData(res);
-                      //   setAddUser(res.editor_data);
-                      // }}
-                      // data-bs-target="#exampleModal"
-                    >
+                    <div className="col-3">
                       <div className="d-flex align-items-center">
-                        <span className="pe-1">{`# ${res?.editor_data?.id
+                        <span className="pe-1">{`# ${(index + 1)
                           .toString()
                           .padStart(4, "0")}`}</span>
                         <div className="position-relative">
@@ -977,17 +968,33 @@ const EditorManagemenet = (props) => {
                             />
                           </div>
                         </div>
-                        <span className="ps-1">{res?.editor_data?.name}</span>
+                        <span
+                          className="ps-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exampleModal"
+                        >
+                          {res?.editor_data?.name}
+                        </span>
                       </div>
                     </div>
-                    <div className="d-flex gap-2 align-items-center col-1">
+                    <div
+                      className="d-flex gap-2 align-items-center col-1"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                    >
                       <div>{res?.editor_data?.username}</div>
                     </div>
                     <div
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
                       className="d-flex align-items-center block-width col-3 gap-1"
                       style={{ minWidth: "7.5rem" }}
                     >
-                      <span style={{ color: "#D2DB0B", fontSize: "1rem" }}>
+                      <span
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        style={{ color: "#D2DB0B", fontSize: "1rem" }}
+                      >
                         %62
                       </span>
                       {res?.editor_data?.gender == "Male" && (
@@ -1004,7 +1011,11 @@ const EditorManagemenet = (props) => {
                       <span>{res?.editor_data?.age}</span>
                       <div className="">{res?.editor_data?.country}</div>
                     </div>
-                    <div className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap">
+                    <div
+                      className="d-flex align-items-center gap-1 col-3 justify-content-end eye-gap"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                    >
                       <span>
                         {moment(res?.editor_data?.created).format(
                           "DD-MM.YYYY - HH:mm"
@@ -1026,7 +1037,12 @@ const EditorManagemenet = (props) => {
                       />
                     </div>
                   </div>
-                  {props?.verifyRqst && <VerificationRequestsBtns />}
+                  {props?.verifyRqst && (
+                    <VerificationRequestsBtns
+                      id={res?.editor_data?.id}
+                      editorManagementApiData={props?.editorManagementApiData}
+                    />
+                  )}
                   {props?.deactiveRqst && (
                     <DeactivationRequestsBtns
                       id={res?.editor_data?.id}
@@ -1686,7 +1702,10 @@ const EditorManagemenet = (props) => {
                           </button>
                           <button
                             onClick={() => {
-                              handleUpdateEditor(partialData.editor_data?.id, addUser.id);
+                              handleUpdateEditor(
+                                partialData.editor_data?.id,
+                                addUser.id
+                              );
                             }}
                             // data-bs-dismiss="modal"
                             className="px-3 py-1"

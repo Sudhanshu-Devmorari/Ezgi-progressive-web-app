@@ -49,7 +49,6 @@ const AddCommentModal = (props) => {
 
   const [matchList, setMatchList] = useState([]);
 
-
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [selectedPredictionType, setSelectedPredictionType] =
     useState("Select");
@@ -130,7 +129,7 @@ const AddCommentModal = (props) => {
         // console.log("======data=======", res.data);
 
         const MatchList = res.data;
-        setMatchList(MatchList)
+        setMatchList(MatchList);
         setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
         // setMatchId(MatchList.map((item) => item.MatchID));
       })
@@ -138,7 +137,11 @@ const AddCommentModal = (props) => {
   };
 
   const handleMatchDetailsSelection = (matchDetails) => {
-    setMatchId(matchList.filter((data) => matchDetails==data.takimlar).map((data)=>data.MatchID))
+    setMatchId(
+      matchList
+        .filter((data) => matchDetails == data.takimlar)
+        .map((data) => data.MatchID)
+    );
     setSelectedMatchDetails(matchDetails);
     setMatchDetailsError("");
   };
@@ -160,13 +163,15 @@ const AddCommentModal = (props) => {
   };
   const handlePredictionTypeSelection = (predictionType) => {
     setSelectedPredictionType(predictionType);
-    setPredictionData(
-      [...new Set(allBetsData
-        .filter((x) => x.gameName == predictionType)
-        .map((x) => x.odds)
-        .flat()
-        .map((x) => x.value))]
-    );
+    setPredictionData([
+      ...new Set(
+        allBetsData
+          .filter((x) => x.gameName == predictionType)
+          .map((x) => x.odds)
+          .flat()
+          .map((x) => x.value)
+      ),
+    ]);
     setPredictionTypeError("");
   };
   const togglePredictionTypeDropdown = () => {
@@ -269,7 +274,9 @@ const AddCommentModal = (props) => {
     setPredictionTypeError("");
     setPredictionError("");
     setCommentError("");
+    setSelectCheckBox(false);
     props.onHide();
+    setcommentText("");
   }
 
   // Get Country from Category
@@ -285,14 +292,16 @@ const AddCommentModal = (props) => {
     setSelectedPrediction("Select");
     setToggleInput(false);
     setcommentText("");
+    setSelectCheckBox(false);
   };
 
   // Add Comment pr Post comment API
   const postComment = async () => {
+
     if (selectedCategory === "Select") {
       setCategoryError("Required*");
     }
-    if (countryOptions === "Select") {
+    if (selectedCountry === "Select") {
       setCountryError("Required*");
     }
     if (selectedLeague === "Select") {
@@ -313,7 +322,23 @@ const AddCommentModal = (props) => {
     if (commentText === "") {
       setCommentError("Required*");
     }
-    if (selectCheckBox) {
+    if (commentText.length < 100) {
+      setCommentError("Minimum 100 charaters required.");
+    }
+    if ((commentText.length > 100) & (commentText.length < 250)) {
+      setCommentError('');
+    }
+    if (
+      selectCheckBox &&
+      selectedCategory !== "Select" &&
+      selectedCountry !== "Select" &&
+      selectedLeague !== "Select"&&
+      selectedDate !== "Select" &&
+      selectedMatchDetails !== "Select" &&
+      selectedPredictionType !== "Select" &&
+      selectedPrediction !== "Select" &&
+      commentText !== ""
+    ) {
       try {
         setCategoryError("");
         setCountryError("");
@@ -358,11 +383,10 @@ const AddCommentModal = (props) => {
           // console.log("KKKK");
           Swal.fire({
             title: "Error",
-            text: error.response.data.message,
+            text: `${error.response.data.error}`,
             icon: "error",
             backdrop: false,
-            customClass:
-              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
       }
@@ -491,6 +515,8 @@ const AddCommentModal = (props) => {
                   <RxCross2
                     onClick={() => {
                       closeModal();
+                      // setTermsOfUseShow(!termsOfUseShow);
+                      setTermsOfUseShow(false);
                     }}
                     fontSize={"1.8rem"}
                     className={`${
@@ -793,6 +819,7 @@ const AddCommentModal = (props) => {
                   setcommentText(e.target.value);
                 }}
                 as="textarea"
+                value={commentText}
                 maxLength={250}
                 className={`${
                   currentTheme === "dark"

@@ -28,8 +28,8 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ActiveComments = (props) => {
+  const [showBankUpdate, setShowBankUpdate] = useState(false);
   const profileData = props?.profileData;
-  // console.log(profileData, "===>>>>profileData");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);
@@ -235,6 +235,42 @@ const ActiveComments = (props) => {
       }
     } catch (error) {
       console.log("error".error);
+    }
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const handleDeactivation = async () => {
+    try {
+      setIsLoading(true);
+      const res = await axios.patch(
+        `${config.apiUrl}/deactivate-commentator/${userId}/`
+      );
+      if (res.status === 200) {
+        setIsLoading(false);
+        setEditProfile(false);
+        Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 400) {
+        setIsLoading(false);
+        setEditProfile(false);
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
@@ -655,8 +691,8 @@ const ActiveComments = (props) => {
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
           }}
         >
-          <div className="py-1">Average Odds</div>
-          <div className="py-1">{userPoints?.avg_odd || 0}</div>
+          <div className="py-1">Experience</div>
+          <div className="py-1">{userPoints?.experience || 0}</div>
         </div>
         <div
           className="d-flex justify-content-between p-2"
@@ -716,7 +752,10 @@ const ActiveComments = (props) => {
             )}
             {props.content === "wallet" && (
               <button
-                onClick={() => setWithdrawalModal(true)}
+                onClick={() => {
+                  setShowBankUpdate(false);
+                  setWithdrawalModal(true);
+                }}
                 className="p-1 px-2"
                 style={{
                   color: currentTheme === "dark" ? "#C66EF8" : "#00659D",
@@ -752,6 +791,25 @@ const ActiveComments = (props) => {
                 Promote Me
               </button>
             )}
+            {editProfile && (
+              <button
+                onClick={() => {
+                  if (userId) {
+                    handleDeactivation();
+                  }
+                }}
+                className="p-1 px-2"
+                style={{
+                  color: "#FF5757",
+                  border: "1px solid #FF5757",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                }}
+              >
+                {isLoading ? "Loading..." : "Deactive"}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -769,6 +827,8 @@ const ActiveComments = (props) => {
         onHide={() => setAddCommentModalModalShow(false)}
       />
       <WithdrawalModal
+        setShowBankUpdate={setShowBankUpdate}
+        showBankUpdate={showBankUpdate}
         show={withdrawalModal}
         onHide={() => setWithdrawalModal(false)}
       />

@@ -1,39 +1,55 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../../config";
-
+import Swal from "sweetalert2";
 
 const DeactivationRequestsBtns = (props) => {
+  const [time, setTime] = useState(false);
 
-  const [time , setTime] = useState(false);
-  const handleDeactivation = async (status) => {
-    // console.log("::::::::::::;>>>>>>",props.id, "^^^^", status)
+  const id = props?.id;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingAccept, setIsLoadingAccept] = useState(false);
+
+  const handleDeactivation = async (action) => {
     try {
-      const res = await axios.patch(
-        `${config?.apiUrl}/user-management/${props.id}/`,
-        {
-          deactivate_commentator:status
+      if (action === "accept") {
+        setIsLoadingAccept(true);
+      } else {
+        setIsLoading(true);
+      }
+      const res = await axios.post(
+        `${config?.apiUrl}/deactivate-commentator/${id}/`,
+        { status: action }
+      );
+      if (res.status === 200) {
+        if (action === "accept") {
+          setIsLoadingAccept(false);
+        } else {
+          setIsLoading(false);
         }
-      )
-      props.editorManagementApiData();
-
-      
+        props?.editorManagementApiData();
+        Swal.fire({
+          title: "Success",
+          text:
+            (action === "accept" &&
+              "Deactivation request successfully approved.") ||
+            (action === "reject" &&
+              "Deactivation request successfully rejected."),
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
-      return [];
     }
-  }
-  // useEffect(() => {
-  //   if(time){
-      
-  //   }
-  // }, [time])
-  
-  
+  };
+
   return (
     <>
       <div className="my-2">
-        <button onClick={() => {handleDeactivation('pending')}}
+        <button
           className="px-2"
           style={{
             border: "1px solid #4DD5FF",
@@ -45,7 +61,12 @@ const DeactivationRequestsBtns = (props) => {
         >
           In Progress
         </button>
-        <button onClick={() => {handleDeactivation('accept')}}
+        <button
+          onClick={() => {
+            if (id) {
+              handleDeactivation("accept");
+            }
+          }}
           className="px-2 mx-3"
           style={{
             border: "1px solid #FFDD00",
@@ -55,9 +76,14 @@ const DeactivationRequestsBtns = (props) => {
             fontSize: "0.9rem",
           }}
         >
-          Deactive
+          {isLoadingAccept ? "Loading..." : "Deactive"}
         </button>
-        <button onClick={() => {handleDeactivation('reject')}}
+        <button
+          onClick={() => {
+            if (id) {
+              handleDeactivation("reject");
+            }
+          }}
           className="px-2"
           style={{
             border: "1px solid #FF5757",
@@ -67,7 +93,7 @@ const DeactivationRequestsBtns = (props) => {
             fontSize: "0.9rem",
           }}
         >
-          Reject
+          {isLoading ? "Loading..." : "Reject"}
         </button>
       </div>
     </>
