@@ -58,15 +58,15 @@ const ContentSection = ({
   setPublicComments,
   mergeArrays,
   setCmtReact,
+  handlesportData,
+  selectPublicorForYou,
+  setContentData,
+  contentData,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
   const [modalShow, setModalShow] = React.useState(false);
-
   const userPhone = localStorage.getItem("user-id");
-
   const server_url = `${config.apiUrl}`;
-
   const [followLabel, setFollowLabel] = useState("Follow");
 
   const followCommentator = async (commentator_id, isFollowing) => {
@@ -178,16 +178,78 @@ const ContentSection = ({
           };
           cmtReact.push(newObj);
         }
+      );
+      if (res.status == 200) {
+        let data = res?.data?.data;
+        if (data) {
+          if (selectPublicorForYou == "category-content") {
+            contentData.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_clap = data?.total_clap;
+            contentData.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_favorite = data?.total_favorite;
+            contentData.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_likes = data?.total_likes;
 
-        setPublicComments(publicComments);
-        setCmtReact(cmtReact);
-        mergeArrays();
+            setContentData(contentData);
+          } else {
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_clap = data?.total_clap;
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_favorite = data?.total_favorite;
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_likes = data?.total_likes;
+
+            setPublicComments(publicComments);
+          }
+
+          const commentIds = cmtReact.map((data) => {
+            return data.comment_id;
+          });
+
+          if (commentIds.includes(data?.comment_id)) {
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].clap = data?.clap;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].favorite = data?.favorite;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].like = data?.like;
+          } else {
+            const newObj = {
+              clap: data?.clap,
+              comment_id: data?.comment_id,
+              favorite: data?.favorite,
+              like: data?.like,
+            };
+            cmtReact.push(newObj);
+          }
+
+          setCmtReact(cmtReact);
+          mergeArrays();
+        }
+      }
+      localStorage.setItem(`${id}_${reaction}`, count);
+    } catch (error) {
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
-    localStorage.setItem(`${id}_${reaction}`, count);
   };
-
- 
 
   function truncateString(str, maxLength) {
     if (str && str?.length <= maxLength) {
@@ -393,10 +455,18 @@ const ContentSection = ({
                   <span className="ps-1">{truncated}</span>
                   {/* <span className="ps-1">{data?.value?.league}</span> */}
                 </span>
-                <span style={{ paddingRight: userPhone ? "47px" : "80px" }}>
+                <span
+                  style={{
+                    paddingRight: userPhone
+                      ? data?.value?.public_content
+                        ? "47px"
+                        : "80px"
+                      : "80px",
+                  }}
+                >
                   {data?.value?.date}
                 </span>
-                <span>
+                <div>
                   {userPhone === null ? null : (
                     <>
                       {data?.value?.public_content ? (
@@ -415,11 +485,13 @@ const ContentSection = ({
                       ) : null}
                     </>
                   )}
-                </span>
+                </div>
               </div>
               <div className="d-flex justify-content-center">
-                <span className="mt-2 pt-1">
-                  {data?.value?.match_detail?.split(" - ")[0]}
+                <span className="mt-2 pt-1 text-end" style={{ width: "140px" }}>
+                  <span className="w-100">
+                    {data?.value?.match_detail?.split(" - ")[0]}
+                  </span>
                 </span>
                 <div
                   className="px-2"
@@ -443,8 +515,10 @@ const ContentSection = ({
                     })}
                   />
                 </div>
-                <span className="mt-2 pt-1">
-                  {data?.value?.match_detail?.split(" - ")[1]}
+                <span className="mt-2 pt-1" style={{ width: "156px" }}>
+                  <span className="w-100">
+                    {data?.value?.match_detail?.split(" - ")[1]}
+                  </span>
                 </span>
               </div>
               <div className="text-end mt-3 mb-2">
@@ -462,7 +536,9 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {userPhone ? `${data?.value?.prediction_type} & ${data?.value?.prediction}` : "Subscribers Only"}
+                  {userPhone
+                    ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
+                    : "Subscribers Only"}
                 </span>
               </div>
             </div>
@@ -541,12 +617,12 @@ const ContentSection = ({
                 {userPhone && (data?.value?.public_content || selectContent == 'subscription') ? (
                   <div
                     onClick={() => {
-                      if(userPhone != data?.value?.commentator_user?.id) {
-                      handleCommentReaction(
-                        data?.value?.id,
-                        "favorite",
-                        data?.value?.total_reactions?.total_favorite
-                      );
+                      if (userPhone != data?.value?.commentator_user?.id) {
+                        handleCommentReaction(
+                          data?.value?.id,
+                          "favorite",
+                          data?.value?.total_reactions?.total_favorite
+                        );
                       }
                     }}
                   >

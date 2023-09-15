@@ -18,6 +18,7 @@ COMMENTATOR_ROLE_CHOISE = (
         ('grandmaster','Grandmaster'),
     )
 DEACTIVATE_STATUS = (
+        ('', 'Select'),  # Blank option
         ('accept','Accept'),
         ('reject','Reject'),
         ('pending','Pending'),
@@ -70,6 +71,7 @@ class User(AbstractBaseUser):
     is_delete = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     description = models.CharField(max_length=255, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -360,8 +362,11 @@ class DataCount(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 class BecomeEditor(models.Model):
-    question = models.CharField(null=False, blank=False)
-    answer = models.CharField(null=False, blank=False)
+    index = models.IntegerField(blank=True, null=True)
+    question = models.TextField(null=False, blank=False)
+    answer = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.question

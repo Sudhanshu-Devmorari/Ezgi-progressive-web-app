@@ -470,9 +470,9 @@ const CommentsManagement = (props) => {
             {displayUser?.map((res, index) => (
               <MainDiv>
                 <div className="col-3 d-flex align-items-center cursor">
-                  <span className="pe-1">{`# ${res?.id
-                    .toString()
-                    .padStart(4, "0")}`}</span>
+                <span className="pe-1">{`# ${(index + 1)
+                          .toString()
+                          .padStart(4, "0")}`}</span>
                   <div className="position-relative">
                     <img
                       className="rounded-circle profile-icon"

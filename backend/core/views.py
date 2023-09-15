@@ -43,6 +43,8 @@ import pyotp
 from django.contrib.auth import authenticate
 
 from translate import Translator
+from core.models import BLUETICK_CHOISE
+from core.models import DEACTIVATE_STATUS
 
 class SignupUserExistsView(APIView):
     def post(self, request, format=None):
@@ -170,14 +172,15 @@ class OtpReSend(APIView):
             })
 
 class LoginView(APIView):
+
     def post(self, request, format=None):
         phone = request.data['phone']
         password = request.data['password']
         try:
             if 'is_admin' in request.data:
-                user_phone = User.objects.get(phone=phone,is_admin=True)
+                user_phone = User.objects.filter(phone=phone,is_admin=True).only('id', 'password', 'user_role', 'username').first()
             else:
-                user_phone = User.objects.get(phone=phone)
+                user_phone = User.objects.filter(phone=phone).only('id', 'password', 'user_role', 'username').first()
                 
             if user_phone.password == password:
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
@@ -244,7 +247,7 @@ class PasswordResetView(APIView):
         return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
 
 
-class RetrieveCommentatorView(APIView):
+class RetrieveCommentatorView(APIView): 
     """
     for Home page:
     """
@@ -487,9 +490,11 @@ class CommentView(APIView):
 
     def post(self, request, id, format=None, *args, **kwargs):
         try:
-            # user = request.user
             user = User.objects.get(id=id)
-            # print('user: ', user)
+            
+            if not user.is_active:
+                return Response({'data' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -530,10 +535,10 @@ class CommentView(APIView):
 
                 # print("-----------")
                 category = request.data.get('category')
-                if category == 'Futbol':
-                    category = 'Football'
-                elif category == 'Basketbol':
-                    category = 'Basketball'
+                # if category == 'Futbol':
+                #     category = 'Football'
+                # elif category == 'Basketbol':
+                #     category = 'Basketball'
                 # category = request.data['category']
                 # print('category: ', category)
                 country = request.data.get('country')
@@ -732,6 +737,10 @@ class CommentReactionView(APIView):
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        user = User.objects.get(id=id)
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Reaction type validation
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
@@ -864,18 +873,25 @@ class ProfileView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
-        if 'file' not in request.data:
-            return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
-        elif 'file' in request.data:
-            profile_pic = request.data['file']
-            user.profile_pic = profile_pic
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if 'profile' in request.data['update']:
 
-        if 'description' in request.data:
-            description = request.data['description']
-            user.description = description
-        if 'description' not in request.data:
-            return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
-        user.save()
+            if 'file' not in request.data:
+                return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
+            elif 'file' in request.data:
+                profile_pic = request.data['file']
+                user.profile_pic = profile_pic
+                
+        elif 'comment' in request.data['update']:
+
+            if 'description' in request.data:
+                description = request.data['description']
+                user.description = description
+            if 'description' not in request.data:
+                return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
+        user.save(update_fields=['profile_pic', 'description', 'updated'])
 
         serializer = UserSerializer(user)
         return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
@@ -904,24 +920,32 @@ class FavEditorsCreateView(APIView):
         try:
             if request.data:
                 user = User.objects.get(id=id)
+
+                if not user.is_active:
+                    return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
-                # print("******* ", request.data.get("id"))
-                comment = User.objects.get(id=request.data.get("id"))
-                # user = request.user
 
+                commentator_id = request.data.get("id")
+                comment = User.objects.get(id=commentator_id)
+
+                response_data = {'user_id': commentator_id}
                 if not FavEditors.objects.filter(commentator_user=comment, standard_user=user).exists():
                     editor_obj = FavEditors.objects.create(commentator_user=comment, standard_user=user)
-                    serializer = FavEditorsSerializer(editor_obj)
-                    data = serializer.data
-                    return Response(data, status=status.HTTP_200_OK)
+                    # serializer = FavEditorsSerializer(editor_obj)
+                    # data = serializer.data
+                    response_data['is_fav_editor'] = True
+                    response_data['message'] = 'Favorite editor add successfully'
+                    return Response(response_data, status=status.HTTP_200_OK)
                 else:
-                    # editor_obj = FavEditors.objects.remove(commentator_user=comment, standard_user=user)
                     existing_fav_editor = FavEditors.objects.filter(commentator_user=comment, standard_user=user)
                     
                     if existing_fav_editor.exists():
                         existing_fav_editor.delete()
-                        return Response({'message': 'Favorite editor removed successfully'}, status=status.HTTP_200_OK)
+                        response_data['is_fav_editor'] = False
+                        response_data['message'] = 'Favorite editor removed successfully'
+                        return Response(response_data, status=status.HTTP_200_OK)
                     else:
                         return Response(
                             create_response(
@@ -1475,7 +1499,7 @@ class AdminMainPage(APIView):
             new_comment = Comments.objects.all().count()
             data_list['new_comment'] = new_comment
 
-            all_user = User.objects.filter(is_delete=False, is_admin=False).order_by('-created')
+            all_user = User.objects.filter(is_delete=False,is_admin=False).order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -1693,19 +1717,23 @@ class UserManagement(APIView):
                 except Exception as e:
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-            elif action == 'deactive':
+            elif action == 'remove':
                 if user.user_role == "standard":
-                    # user.delete()
                     user.is_delete = True
-                    user.save()
-                    message = {"success": "User profile Deactivate sucessfully."}
-                    return Response(data=message, status=status.HTTP_200_OK)
+                    user.save(update_fields=['is_delete', 'updated'])
+                    return Response({'data': "User profile removed sucessfully."}, status=status.HTTP_200_OK)
                 else:
-                    # user.deactivate_commentator = 'pending'
                     user.is_delete = True
-                    user.save()
-                    message = {"success": "User profile Deactivate sucessfully."}
-                    return Response(data=message, status=status.HTTP_200_OK)
+                    user.save(update_fields=['is_delete', 'updated'])
+                    return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1726,8 +1754,15 @@ class FilterUserManagement(APIView):
 
                 if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
-
-                # print("****", filters)
+                
+                if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
+                    users = request.data.get('users')
+                    print('users: ', users)
+                    if users == 'Deactivated Users':
+                        filters.update({'is_active': False})
+                    if users == 'Deleted Users':
+                        filters.update({'is_delete': True})
+                
                 query_filters = Q(**filters)
                 filtered_user = User.objects.filter(query_filters)
                 serializer = UserSerializer(filtered_user, many=True)
@@ -1746,6 +1781,7 @@ class FilterUserManagement(APIView):
 
 
 class CommentsManagement(APIView):
+    
     def get(self, request, format=None, *args, **kwargs):
         management = {}
         commentator = []
@@ -1775,22 +1811,19 @@ class CommentsManagement(APIView):
             if i:
                 if i.commentator_user:
                     commentator_of_most_liked_comment = i.commentator_user
-
-                    # Get the total likes for the comment object
-                    total_likes = CommentReaction.objects.filter(comment=i).aggregate(total_likes=Sum('like'))['total_likes']
-
-                    # Get the total favorites for the comment object
-                    total_favorites = CommentReaction.objects.filter(comment=i).aggregate(total_favorites=Sum('favorite'))['total_favorites']
-
-                    # Get the total claps for the comment object
-                    total_claps = CommentReaction.objects.filter(comment=i).aggregate(total_claps=Sum('clap'))['total_claps']
-
+                   
+                    comment_reactions = CommentReaction.objects.filter(comment=i).values('like', 'favorite', 'clap')
+                    total_reactions = comment_reactions.aggregate(
+                        total_likes=Sum('like'),
+                        total_favorite=Sum('favorite'),
+                        total_clap=Sum('clap')
+                    )
+                    
                     # If the comment has no reactions, the total counts will be None, so you can set them to 0 if desired.
-                    total_likes = total_likes or 0
-                    total_favorites = total_favorites or 0
-                    total_claps = total_claps or 0
+                    total_likes = total_reactions['total_likes'] or 0
+                    total_favorites = total_reactions['total_favorite'] or 0
+                    total_claps = total_reactions['total_clap'] or 0
 
-                    # print("Posted by commentator:", commentator_of_most_liked_comment.username)
                     user_obj = User.objects.get(username=commentator_of_most_liked_comment.username)
                     serializer = UserSerializer(user_obj)
                     data = serializer.data
@@ -1833,6 +1866,7 @@ class CommentsManagement(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class FilterComments(APIView):
     def post(self, request,id, format=None, *args, **kwargs):
@@ -2294,28 +2328,23 @@ class EditorManagement(APIView):
             data_list['deactivat_user'] = deactivation_request_user
             data_list['deactivation_request'] = deactivation_request.count()
 
-            verify_obj = BlueTick.objects.filter(status='pending')
+
+            user_id_list = BlueTick.objects.filter(status='pending').values_list('user', flat=True)
+            user_objs = User.objects.filter(id__in=user_id_list).order_by('created')
             verify_obj_user = []
-            # for obj in verify_obj:
-            #     detail = {}
-            #     follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
-            #     detail['Follower_Count'] = follow_obj
+            for obj in user_objs:
+                detail = {}
+                detail['Follower_Count'] = FollowCommentator.objects.filter(commentator_user=obj).count()
+                detail['Following_Count'] = FollowCommentator.objects.filter(standard_user=obj).count()
+                detail['Subscriber_Count'] = Subscription.objects.filter(commentator_user=obj).count()
+                detail['Subscription_Count'] = Subscription.objects.filter(standard_user=obj).count()
 
-            #     follow_obj = FollowCommentator.objects.filter(standard_user=obj).count()
-            #     detail['Following_Count'] = follow_obj
+                serializer = UserSerializer(obj)
+                detail['editor_data'] = serializer.data
+                verify_obj_user.append(detail)
 
-            #     subscriber_obj = Subscription.objects.filter(commentator_user=obj).count()
-            #     detail['Subscriber_Count'] = subscriber_obj
-
-            #     subscriber_obj = Subscription.objects.filter(standard_user=obj).count()
-            #     detail['Subscription_Count'] = subscriber_obj
-
-            #     serializer = UserSerializer(obj)
-            #     detail['editor_data'] = serializer.data
-
-            #     verify_obj_user.append(detail)
-            # data_list['verify_user'] = verify_obj_user
-            data_list['verify_request_count'] = verify_obj.count()
+            data_list['verify_user'] = verify_obj_user
+            data_list['verify_request_count'] = user_objs.count()
 
             return Response(data=data_list, status=status.HTTP_200_OK)
         
@@ -2412,38 +2441,73 @@ class EditorManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            # user.deactivate_commentator = 'pending'
-            user.is_delete = True
-            user.save()
-            return Response({"success": "The deactivation request for a user has been processed successfully."}, status=status.HTTP_404_NOT_FOUND)
+            action = request.query_params.get('action')
+            if not action:
+                return Response({'error' : 'Something went wrong. Try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if action == 'delete':
+                try:
+                    user.delete()
+                    return Response("User deleted Successfully", status= status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            elif action == 'remove':
+                user.is_delete = True
+                user.save(update_fields=['is_delete', 'updated'])
+                return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
+            
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
 
 class UpdateStatusForVerifyRequest(APIView):
     def get(self, request, format=None):
+        data_list = {'verification_requests': []}
+
         try:
-            verification_request_count = BlueTick.objects.filter(status='pending').count()
-            return Response(data={'verification_request_count': verification_request_count}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+            verification_requests = BlueTick.objects.filter(status='pending')
+            serializer = BlueTickSerializer(verification_requests, many=True)
+            data_list['verification_requests'] = serializer.data
+            return Response(data=data_list, status=status.HTTP_200_OK)
+
+        except:
+            return Response(data=data_list, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, id, format=None, *args, **kwargs):
         try:
-            if 'status' not in request.data:
-                    return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
-            obj_status = request.data.get('status')
-            obj = BlueTick.objects.get(id=id)
-            obj.status = obj_status
-            obj.save()
-            serializer = BlueTickSerializer(obj).data
-            return Response(data=serializer, status=status.HTTP_200_OK)
+            # Validations
+            verify_status = request.data.get('status')
+            if verify_status is None:
+                return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if verify_status not in dict(BLUETICK_CHOISE).keys():
+                return Response({'error': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Update status
+            user = User.objects.get(id=id)
+            obj = BlueTick.objects.get(user=user)
+            obj.status = verify_status
+            obj.save(update_fields=['status','updated'])
+
+            # Get data
+            # serializer = BlueTickSerializer(obj).data
+            return Response({'data' : 'Request Updated.'}, status=status.HTTP_200_OK)
+       
         except BlueTick.DoesNotExist:
             return Response(data={'error': 'BlueTick object not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+             
 class EditorSubscriptionDetails(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = []
@@ -2542,24 +2606,47 @@ class DeactivateCommentator(APIView):
         serializer = UserSerializer(user, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
         
-
-    def patch(self, request, pk, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(pk=pk)
+            # Validations
+            deactivation_status = request.data.get('status')
+            if deactivation_status is None:
+                return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if deactivation_status not in dict(DEACTIVATE_STATUS).keys():
+                return Response({'error': 'Invalid status.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Update status
+            obj = User.objects.get(id=id)
+            if deactivation_status == 'accept':
+                obj.deactivate_commentator = deactivation_status
+                obj.is_delete =True
+                obj.save(update_fields=['deactivate_commentator' 'is_delete','updated'])
+            elif deactivation_status == 'reject':
+                print('deactivation_status: ', deactivation_status)
+                obj.deactivate_commentator == ''
+                obj.save(update_fields=['deactivate_commentator','updated'])
+
+            # Get data
+            serializer = UserSerializer(obj).data
+            return Response(data=serializer, status=status.HTTP_200_OK)
+       
+        except User.DoesNotExist:
+            return Response(data={'error': 'User data not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(pk=id)
+            if user.deactivate_commentator == 'pending':
+                return Response({'data' : 'You have already sent the request.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.deactivate_commentator = 'pending'
+            user.save()
+            return Response({'data' : 'Deactivation request sent successfully.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class SalesManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -3038,6 +3125,7 @@ class NotificationManagement(APIView):
 
 
 class SubUserManagement(APIView):
+
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
 
@@ -3057,70 +3145,58 @@ class SubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            notification_count = Notification.objects.all().count()
-            data_list['notification_count'] = notification_count
+            ticket_history = TicketHistory.objects.filter(status__in=["redirect", "comment_by_user"]).order_by('-created')
+            ticket_serializer = TicketHistorySerializer(ticket_history, many=True)
+            data_list['user_timeline'] = ticket_serializer.data
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            all_notification = Notification.objects.filter(Q(subject__icontains='subscription') | Q(subject__icontains='highlights')).order_by('-created')
-            # all_notification = Notification.objects.all().order_by('-created')
-            serializer1 = NotificationSerializer(all_notification, many=True)
-            data_list['user_timeline'] = serializer1.data
+            notification_count = ticket_history.count()
+            data_list['notification_count'] = notification_count
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
         return Response(data=data_list, status=status.HTTP_200_OK)
 
     def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
-                # print('request.data: ', request.data)
                 role = 'sub_user'
-                
-                # required_fields = ['file', 'name', 'phone', 'password', 'authorization_type', 'department', 'permission']
-                # for field in required_fields:
-                #     if field not in request.data:
-                #         return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+                phone = request.data['phone']
+
+                if User.objects.filter(phone=phone).exists():
+                    return Response({'data' : 'User already exists!'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 password = request.data.get('password')
-                # print('password: ', password)
-
                 permission_type = request.data.get('permission')
-                # print('permission_type: ', permission_type)
+
                 if permission_type == 'transaction':
                     transaction = True
                     all_permission = request.data.get('all_permission')
-                    # print('all_permission: ', all_permission)
                     
                     if all_permission and all_permission.lower() == 'true':
+                        all_permission = True
                         process_withdrawal = True
                         rule_update = True
                         price_update = True
                         withdrawal_export = True
                         sales_export = True
                     else:
-                        process_withdrawal = request.data.get('process_withdrawal')
-                        # print('process_withdrawal: ', process_withdrawal)
-                        rule_update = request.data.get('rule_update')
-                        price_update = request.data.get('price_update')
-                        withdrawal_export = request.data.get('withdrawal_export')
-                        sales_export = request.data.get('sales_export')
+                        process_withdrawal = True if request.data.get('process_withdrawal') == 'true' else False
+                        rule_update = True if request.data.get('rule_update') == 'true' else False
+                        price_update = True if request.data.get('price_update') == 'true' else False
+                        withdrawal_export = True if request.data.get('withdrawal_export') == 'true' else False
+                        sales_export = True if request.data.get('sales_export') == 'true' else False
                         all_permission = False
 
-                    # print("================================")
-                    # print("================================", request.data.get('file'))
-                    # print("================================request.data.get('name')", request.data.get('name'))
-                    # print("================================request.data.get('phone')", request.data.get('phone'))
-                    # print("================================request.data.get('authorization_type')", request.data.get('authorization_type'))
-                    # print("================================request.data.get('department')", request.data.get('department'))
-
                     sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
-                                                       password=password, authorization_type=request.data.get('authorization_type'),
-                                                       department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
-                                                       is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
-                                                       is_sales_export=sales_export, is_all_permission=all_permission)
-                    # print(sub_user_obj,"===================sub_user_obj")
+                                                        password=password, authorization_type=request.data.get('authorization_type'),
+                                                        department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
+                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
+                                                        is_sales_export=sales_export, is_all_permission=all_permission)
                 elif permission_type == 'only_view':
                     view_only = True
                     process_withdrawal = False
@@ -3130,21 +3206,13 @@ class SubUserManagement(APIView):
                     sales_export = False
                     all_permission = False
                     sub_user_obj = User.objects.create(profile_pic=request.data.get('file'),user_role=role, name=request.data.get('name'), phone=request.data.get('phone'),
-                                                       password=password, authorization_type=request.data.get('authorization_type'),
-                                                       department=request.data.get('department'), is_view_only=view_only, is_process_withdrawal_request=process_withdrawal,
-                                                       is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
-                                                       is_sales_export=sales_export, is_all_permission=all_permission)
+                                                        password=password, authorization_type=request.data.get('authorization_type'),
+                                                        department=request.data.get('department'), is_view_only=view_only, is_process_withdrawal_request=process_withdrawal,
+                                                        is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
+                                                        is_sales_export=sales_export, is_all_permission=all_permission)
 
-                # print("***************************")
-                # sub_user_obj.set_password(password)
                 sub_user_obj.save()
-                # if sub_user_obj != None:
-                #     if DataCount.objects.filter(id=1).exists():
-                #         obj = DataCount.objects.get(id=1)
-                #         obj.user += 1
-                #         obj.save()
-                #     else:
-                #         obj = DataCount.objects.create(user=1)
+
                 serializer = UserSerializer(sub_user_obj)
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
 
@@ -3157,6 +3225,11 @@ class SubUserManagement(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
+        phone = request.data['phone']
+
+        if User.objects.filter(~Q(id=pk), phone=phone).exists():
+            return Response({'data' : 'User already exists!'}, status=status.HTTP_400_BAD_REQUEST)
+
         data = request.data.copy()
         if data.get('is_view_only'):
             data['is_process_withdrawal_request'] = False
@@ -3190,20 +3263,60 @@ class SubUserManagement(APIView):
         try:
             user = User.objects.get(pk=pk)
             action = request.query_params.get('action')
+            if not action:
+                return Response({'error' : 'Something went wrong. Try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             if action == 'delete':
                 try:
                     user.delete()
                     return Response("User deleted Successfully", status= status.HTTP_200_OK)
                 except Exception as e:
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            elif action == 'deactive':
+                
+            elif action == 'remove':
                 user.is_delete = True
-                user.save()
-                return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
+                user.save(update_fields=['is_delete', 'updated'])
+                return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
+            
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        
+class FilterSubUserManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = {}
+        try:
+            filters = {}
+            if request.data:
+                
+                if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
+                    users = request.data.get('users')
+                    print('users: ', users)
+                    if users == 'Deactivated Users':
+                        filters.update({'is_active': False})
+                    if users == 'Deleted Users':
+                        filters.update({'is_delete': True})
+                
+                query_filters = Q(**filters)
+                filtered_user = User.objects.filter(query_filters, user_role='sub_user')
+                serializer = UserSerializer(filtered_user, many=True)
+                data = serializer.data
+
+                return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                return Response(data={'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+      
 class AdvertisementManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -3339,21 +3452,13 @@ class LevelRule(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
-        
-        data = request.data.copy()
-        if commentator_level.lower() == 'expert':
-            data["commentator_level"] = 'master'
-            commentator_level = 'master' 
-        else:
-            data["commentator_level"] = commentator_level
-
-        # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
         
         if existing_record:
             serializer = CommentatorLevelRuleSerializer(existing_record, data=data,  partial=True)
         else:
-            serializer = CommentatorLevelRuleSerializer(data=data)
+            request.data['commentator_level'] = commentator_level
+            serializer = CommentatorLevelRuleSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -3387,6 +3492,7 @@ class MembershipSettingView(APIView):
         if existing_record:
             serializer = MembershipSettingSerializer(existing_record, data=request.data, partial=True)
         else:
+            request.data['commentator_level'] = commentator_level
             serializer = MembershipSettingSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -3411,7 +3517,7 @@ class SubscriptionSettingView(APIView):
             
             serializer = SubscriptionSettingSerializer(level_obj, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        
+    
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -3419,9 +3525,12 @@ class SubscriptionSettingView(APIView):
         commentator_level = request.query_params.get('commentator_level')
         existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
 
+        data = request.data
+        data.update({'commentator_level': commentator_level})
         if existing_record:
-            serializer = SubscriptionSettingSerializer(existing_record, data=request.data, partial=True)
+            serializer = SubscriptionSettingSerializer(existing_record, data=data, partial=True)
         else:
+            request.data['commentator_level'] = commentator_level
             serializer = SubscriptionSettingSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -3429,7 +3538,7 @@ class SubscriptionSettingView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class HighlightSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
@@ -3474,12 +3583,38 @@ class HighlightSettingView(APIView):
 class CommentSetting(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data = request.data.copy() 
-        # print('data: ', data)
-        data['status'] = 'approve'  # Set the status to 'approve'
 
         comment_serializer = CommentsSerializer(data=data)
         if comment_serializer.is_valid():
-            comment = comment_serializer.save()
+
+            editor = request.data['editor']
+
+            user = User.objects.get(username=editor)
+
+            category = request.data.get('category')
+            country = request.data.get('country')
+            league = request.data.get('league')
+            match_detail = request.data.get('match_detail')
+            prediction_type = request.data.get('prediction_type')
+            prediction = request.data.get('prediction')
+            if user.commentator_level == 'apprentice':
+                public_content = True
+            else:
+                public_content = request.data.get('public_content')
+            comment_1 = request.data.get('comment')
+
+            comment = Comments.objects.create(
+                    commentator_user=user,
+                    category=[category],
+                    country=country,
+                    league=league,
+                    match_detail=match_detail,
+                    prediction_type=prediction_type,
+                    prediction=prediction,
+                    public_content=public_content,
+                    comment=comment_1
+                )
+
             if DataCount.objects.filter(id=1).exists():
                 obj = DataCount.objects.get(id=1)
                 obj.comment += 1
@@ -3950,7 +4085,10 @@ class BecomeEditorView(APIView):
         After sucessfully payment below code execute.
         """
         user = User.objects.get(id=id)
-        print(request.data)
+        
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
         if user.user_role == "standard":
             if user.profile_pic == "":
                 if 'profile_pic' not in request.data:
@@ -4079,9 +4217,7 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
-    unique_comment_ids = set()
-    
-    def get_public_comments(self):
+    def get_public_comments(self, unique_comment_ids):
         """ Return public comments data """
         public_comments = []
 
@@ -4108,16 +4244,16 @@ class RetrievePageData():
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 
-                if comment.id not in self.unique_comment_ids:
-                    self.unique_comment_ids.add(comment.id)
+                if comment.id not in unique_comment_ids:
+                    unique_comment_ids.add(comment.id)
                     public_comments.append(comment_data)
 
         except:
             public_comments = []
 
-        return public_comments
+        return public_comments, unique_comment_ids
     
-    def get_subscription_comments(self, id):
+    def get_subscription_comments(self, id, unique_comment_ids):
         """ Return subscription comments data """
         subscription_comments = []
 
@@ -4154,14 +4290,14 @@ class RetrievePageData():
                             'total_clap': total_reactions['total_clap'] or 0
                         }
 
-                        if comment.id not in self.unique_comment_ids:
-                            self.unique_comment_ids.add(comment.id)
+                        if comment.id not in unique_comment_ids:
+                            unique_comment_ids.add(comment.id)
                             subscription_comments.append(comment_data)
 
         except:
             subscription_comments = []
         
-        return subscription_comments
+        return subscription_comments, unique_comment_ids
     
     def get_highlights(self, id):
         """ Return highlights data """
@@ -4257,8 +4393,14 @@ class RetrievePageData():
             for obj in all_commentator:
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id).count()
+                user_data = UserSerializer(obj).data
 
-                detail['user'] = UserSerializer(obj).data
+                if user_id:
+                    detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id).exists()
+                else:
+                    detail['is_fav_editor'] = False
+                
+                detail['user'] = user_data
                 detail['subscriber_count'] = count
                 user_detail.append(detail)
         except:
@@ -4283,12 +4425,13 @@ class RetrieveHomeView(APIView):
         
         # Instantiate RetrievePageData object
         retrieve_data = RetrievePageData()
+        self.unique_comment_ids = set()
 
         # Get public comments data
-        data_list['Public_Comments'] = retrieve_data.get_public_comments()
+        data_list['Public_Comments'], self.unique_comment_ids  = retrieve_data.get_public_comments(self.unique_comment_ids)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id'))
+        data_list['Subscription_Comments'], self.unique_comment_ids  = retrieve_data.get_subscription_comments(request.query_params.get('id'), self.unique_comment_ids)
       
         # Get highlights data
         data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id'))
@@ -4324,3 +4467,55 @@ class RetrieveEditorView(APIView):
         data_list['Commentator'] = retrieve_data.get_commentator(request.query_params.get('id'))
         
         return Response(data=data_list, status=status.HTTP_200_OK)
+    
+class BecomeEditorFAQView(APIView):
+
+    def get(self, request, id=None):
+        if id != None:
+            try:
+                data = BecomeEditor.objects.get(id=id)
+                serializer = BecomeEditorSerializer(data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            except BecomeEditor.DoesNotExist:
+                return Response({"msg": "DoesNotExist"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            data = BecomeEditor.objects.all() 
+            serializer = BecomeEditorSerializer(data, many=True)
+            return Response(serializer.data)
+
+
+    def post(self, request):
+        try:
+            data_list = []
+            faq_data = request.data['faq_data'] if request.data['faq_data'] else []
+            for index, data in enumerate(faq_data):
+                # Update
+                if data.get('id', None):
+                    editor_obj = BecomeEditor.objects.filter(id=data['id']).first()
+                
+                # Add
+                else:
+                    editor_obj = BecomeEditor()
+                
+                if editor_obj:
+                    editor_obj.index = index
+                    editor_obj.question = data['question'] if data['question'] else None
+                    editor_obj.answer = data['answer'] if data['answer'] else None
+                    editor_obj.save()
+                    data_list.append(editor_obj)
+            
+            serializer = BecomeEditorSerializer(data_list, many=True)
+            return Response({'msg': 'Data saved successfully.', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+    def delete(self, request, id):
+        try:
+            data_delete = BecomeEditor.objects.get(id=id)
+            data_delete.delete()
+            return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
+        except BecomeEditor.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)

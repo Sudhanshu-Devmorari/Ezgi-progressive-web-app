@@ -166,23 +166,16 @@ class TicketHistorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class BecomeEditorSerializer(serializers.Serializer):
-    question = serializers.CharField(required=True)
-    answer = serializers.CharField(required=True)
+class BecomeEditorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BecomeEditor
         fields = '__all__'
-        REQUIRED_FIELDS = '__all__'
-
-    def create(self, validated_data):
-        return BecomeEditor.objects.create(**validated_data)
     
-    def update(self, instance, validated_data):
-        instance.question = validated_data.get('question', instance.question)
-        instance.answer = validated_data.get('answer', instance.answer)
-        instance.save()
-        return instance
+    def validate_question(self, value):
+        if not value:
+            raise serializers.ValidationError("Question is required.")
+        return value
     
 
 class BecomeEditorEarnDetailsSerializer(serializers.Serializer):

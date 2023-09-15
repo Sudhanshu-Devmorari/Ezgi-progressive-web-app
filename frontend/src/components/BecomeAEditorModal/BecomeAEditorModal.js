@@ -109,11 +109,11 @@ const BecomeAEditorModal = (props) => {
           // console.log(res, "===========>>>>res");
           if (res.status === 200) {
             // setShowPaymentModal(true);
-            localStorage.setItem('user-role', res.data.user_role)
+            localStorage.setItem("user-role", res.data.user_role);
             props.onHide();
             Swal.fire({
               title: "Success",
-              text: 'User has successfully become a commentator',
+              text: "User has successfully become a commentator",
               icon: "success",
               backdrop: false,
               customClass:
@@ -129,6 +129,17 @@ const BecomeAEditorModal = (props) => {
             Swal.fire({
               title: "Error",
               text: error.response.data.error,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          } else if (error.response.status === 400) {
+            Swal.fire({
+              title: "Error",
+              text: error?.response?.data?.error,
               icon: "error",
               backdrop: false,
               customClass:

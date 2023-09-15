@@ -19,10 +19,6 @@ const SubscribeModal = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
-  useEffect(() => {
-    setShowModal(9);
-  }, []);
-
   return (
     <>
       <Modal
@@ -42,7 +38,7 @@ const SubscribeModal = (props) => {
               <RxCross2
                 onClick={() => {
                   props.onHide();
-                  setShowModal(9);
+                  setShowModal(1);
                 }}
                 fontSize={"1.8rem"}
                 className={`${
@@ -50,7 +46,7 @@ const SubscribeModal = (props) => {
                 }`}
               />
             </span>
-            {(ShowModal === 9 || ShowModal === 2) && (
+            {ShowModal !== 3 && (
               <>
                 <div className="row">
                   <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">

@@ -28,8 +28,8 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ActiveComments = (props) => {
+  const [showBankUpdate, setShowBankUpdate] = useState(false);
   const profileData = props?.profileData;
-  // console.log(profileData, "===>>>>profileData");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);
@@ -53,15 +53,16 @@ const ActiveComments = (props) => {
   }
   const truncated = truncateString(profileData?.username, 7);
 
-  let user;
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
-      user = props.activeCommentsshow;
+      setUser(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
-      user = userId;
+      setUser(userId);
     } else {
-      // Handle the case where neither condition is met
-      user = localStorage.getItem("user-role"); // Set a default value if needed
+      const user = localStorage.getItem("user-id");
+      setUser(user);
     }
   }, []);
 
@@ -71,18 +72,18 @@ const ActiveComments = (props) => {
       if (file) {
         const allowedTypes = ["image/jpeg", "image/png"];
         if (allowedTypes.includes(file.type)) {
-          setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-          setEditProfile(false);
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
           formData.append("update", "profile");
+
           const res = await axios.post(
             `${config.apiUrl}/profile/${user}`,
             formData
           );
-          // console.log("res: ", res);
-          // console.log("res: ", res.status);
+          console.log(res, "===>>>res");
           if (res.status === 200) {
+            setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+            setEditProfile(false);
             props.getProfileData();
             Swal.fire({
               title: "Success",
@@ -118,7 +119,19 @@ const ActiveComments = (props) => {
           e.target.value = "";
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
   }
 
   const [userPoints, setUserPoints] = useState({
@@ -139,11 +152,21 @@ const ActiveComments = (props) => {
           id: id,
         }
       );
-      // console.log("API Response:", response.data);
+      console.log("API Response:", response);
       props?.setIsFavorite(!props?.isFavorite);
       props?.homeApiData(user_id);
     } catch (error) {
       console.error("Error making POST request:", error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
@@ -234,7 +257,53 @@ const ActiveComments = (props) => {
         });
       }
     } catch (error) {
-      console.log("error".error);
+      console.log("error", error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const handleDeactivation = async () => {
+    try {
+      setIsLoading(true);
+      const res = await axios.patch(
+        `${config.apiUrl}/deactivate-commentator/${userId}/`
+      );
+      if (res.status === 200) {
+        setIsLoading(false);
+        setEditProfile(false);
+        Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.response.status === 400) {
+        setIsLoading(false);
+        setEditProfile(false);
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
@@ -499,26 +568,29 @@ const ActiveComments = (props) => {
             </div>
           </div>
         </div>
-        <div
-          className="my-2 p-1 content-font position-relative"
-          style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            opacity: editProfile ? (!descriptionShow ? "0.3" : "") : "",
-          }}
-        >
-          <Form.Control
-            as="textarea"
-            maxLength={250}
-            className={`${
-              currentTheme === "dark"
-                ? "textArea-dark-mode content-font"
-                : "textArea-light-mode content-font"
-            }`}
-            value={textareaValue}
-            onChange={(e) => setTextareaValue(e.target.value)}
-            disabled={editProfile ? (descriptionShow ? false : true) : true}
-          />
-        </div>
+        {(props?.from === "dashboard" || textareaValue) && (
+          <div
+            className="my-2 p-1 content-font position-relative"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              opacity: editProfile ? (!descriptionShow ? "0.3" : "") : "",
+            }}
+          >
+            <Form.Control
+              as="textarea"
+              maxLength={250}
+              className={`${
+                currentTheme === "dark"
+                  ? "textArea-dark-mode content-font"
+                  : "textArea-light-mode content-font"
+              }`}
+              placeholder="No Data Found"
+              value={textareaValue}
+              onChange={(e) => setTextareaValue(e.target.value)}
+              disabled={editProfile ? (descriptionShow ? false : true) : true}
+            />
+          </div>
+        )}
         <img
           onClick={() => setDescriptionShow(!descriptionShow)}
           src={currentTheme === "dark" ? edit : editLight}
@@ -665,7 +737,9 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="py-1">Leagues</div>
-          <div className="py-1">{userPoints.league}</div>
+          <div className="py-1">
+            {userPoints.league ? userPoints.league : "No League"}
+          </div>
         </div>
         {props.profile !== "commentator" && (
           <div
@@ -716,7 +790,10 @@ const ActiveComments = (props) => {
             )}
             {props.content === "wallet" && (
               <button
-                onClick={() => setWithdrawalModal(true)}
+                onClick={() => {
+                  setShowBankUpdate(false);
+                  setWithdrawalModal(true);
+                }}
                 className="p-1 px-2"
                 style={{
                   color: currentTheme === "dark" ? "#C66EF8" : "#00659D",
@@ -752,6 +829,25 @@ const ActiveComments = (props) => {
                 Promote Me
               </button>
             )}
+            {editProfile && (
+              <button
+                onClick={() => {
+                  if (userId) {
+                    handleDeactivation();
+                  }
+                }}
+                className="p-1 px-2"
+                style={{
+                  color: "#FF5757",
+                  border: "1px solid #FF5757",
+                  backgroundColor: "transparent",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                }}
+              >
+                {isLoading ? "Loading..." : "Deactive"}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -769,6 +865,8 @@ const ActiveComments = (props) => {
         onHide={() => setAddCommentModalModalShow(false)}
       />
       <WithdrawalModal
+        setShowBankUpdate={setShowBankUpdate}
+        showBankUpdate={showBankUpdate}
         show={withdrawalModal}
         onHide={() => setWithdrawalModal(false)}
       />

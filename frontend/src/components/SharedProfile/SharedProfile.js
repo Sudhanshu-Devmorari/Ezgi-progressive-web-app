@@ -21,12 +21,18 @@ import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
-const SharedProfile = ({
-  data,
-  setSelectContent,
-  setActiveCommentsshow,
-  verifyid,
-}) => {
+const SharedProfile = (props) => {
+  const {
+    data,
+    setSelectContent,
+    setActiveCommentsshow,
+    verifyid,
+    mergedEditorResult,
+    setMergedEditorResult,
+    setHighlights,
+    highlights,
+    mergeArrays,
+  } = props;
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(false);
@@ -53,12 +59,23 @@ const SharedProfile = ({
           setIsFavorite(favIs);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
+        if (error.response.status === 400) {
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.error,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       });
   }
 
   useEffect(() => {
+    // console.log("data::::::::::::", data)
     // getfav(data?.value?.user?.id);
   }, []);
   useEffect(() => {
@@ -74,16 +91,58 @@ const SharedProfile = ({
           id: id,
         }
       );
-      // console.log("API Response:", response.data);
+      console.log("API Response:", response.data);
+
+      if (mergedEditorResult) {
+        console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
+
+        const filterArray = mergedEditorResult.filter(
+          (res) => res?.value?.user?.id == response.data.user_id
+        );
+        console.log("filterArray::::::::::::::", filterArray);
+
+        mergedEditorResult.filter(
+          (res) => res?.value?.user?.id == response.data.user_id
+        )[0].value.is_fav_editor = response.data.is_fav_editor;
+        setMergedEditorResult(mergedEditorResult);
+      }
+
+      // if (highlights) {
+      //   // console.log("mergedResult::::::::::::::", highlights);
+      //   const filterArray = highlights.filter(
+      //     (res) => res?.user?.id == response.data.user_id
+      //   );
+
+      //   highlights.filter(
+      //     (res) => res?.user?.id == response.data.user_id
+      //   )[0].is_fav_editor = response.data.is_fav_editor;
+
+      //   console.log("highlights::::::::::::::", highlights);
+
+      //   setHighlights(highlights);
+      //   mergeArrays();
+
+      // }
+
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error making POST request:", error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
   return (
     <>
-      {/* {props.data?.highlights?.map((res, index) => ( */}
+      {/* {props.data?.value?.highlights?.map((res, index) => ( */}
       <div
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -97,15 +156,16 @@ const SharedProfile = ({
                 color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
               }}
             >
-              {data?.value.subscriber_count}
+              {data?.value?.subscriber_count}
             </span>
             Kişi abone oldu
           </span>
-          {isFavorite ? (
+          {data?.value?.is_fav_editor ? (
             <img
               onClick={() => {
+                console.log("star click:::::::::::::", data);
                 if (userId) {
-                  favEditor(data?.value.user.id);
+                  favEditor(data?.value?.user?.id);
                 }
               }}
               src={Selected_Favorite}
@@ -116,8 +176,9 @@ const SharedProfile = ({
           ) : (
             <img
               onClick={() => {
+                console.log("star click:::::::::::::", data);
                 if (userId) {
-                  favEditor(data?.value.user.id);
+                  favEditor(data?.value?.user?.id);
                 }
               }}
               src={
@@ -191,7 +252,9 @@ const SharedProfile = ({
                     fontSize: "13px",
                   }}
                 >
-                  {data?.value?.user?.commentator_level?.charAt(0)?.toUpperCase() +
+                  {data?.value?.user?.commentator_level
+                    ?.charAt(0)
+                    ?.toUpperCase() +
                     data?.value?.user?.commentator_level?.substring(1)}
                 </button>
               </div>

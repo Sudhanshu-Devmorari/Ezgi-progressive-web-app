@@ -16,6 +16,8 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Dropdownmodal } from "../Dropdownmodal";
 import axios from "axios";
 import CreateSubUser from "../CreateSubUser/CreateSubUser";
+import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import config from "../../config";
 
 const SubUserManagementFilter = (props) => {
   const transactions = [
@@ -60,6 +62,40 @@ const SubUserManagementFilter = (props) => {
     },
   ];
 
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const userOptions = ["Deactivated Users", "Deleted Users"];
+
+  const [selectedUserFilter, setSelectedUserFilter] = useState("Select");
+  const [userFilterDropDown, setUserFilterDropDown] = useState(false);
+
+  const handleUserFilterSelection = (userOption) => {
+    setSelectedUserFilter(userOption);
+  };
+
+  const toggleUserFilterDropdown = () => {
+    setUserFilterDropDown(!userFilterDropDown);
+  };
+
+  const handleShow = async () => {
+    // setIsFilterLoading(true);
+    try {
+      const response = await axios.post(
+        `${config?.apiUrl}/filter-sub-user-management/`,
+        {
+          users: selectedUserFilter,
+        }
+      );
+      console.log("API Response:::::::::::::", response.data);
+      // setDisplayUser(response.data);
+      // setAllFilterData(response.data);
+      response.data && props?.setSubuserList(response.data);
+    } catch (error) {
+      // setIsFilterLoading(false);
+      console.error("Error making POST request:", error);
+    }
+  };
+
   return (
     <>
       <div className="d-flex p-2">
@@ -78,9 +114,22 @@ const SubUserManagementFilter = (props) => {
 
         <div className="p-2">
           <button
-            onClick={() => {
-              props?.seteditProfileModal(1);
+            data-bs-toggle="modal"
+            data-bs-target="#filter-sub-user"
+            className="px-2"
+            style={{
+              backgroundColor: "transparent",
+              borderRadius: "3px",
+              border: "1px solid #E6E6E6",
+              color: "#E6E6E6",
             }}
+          >
+            Filter
+          </button>
+        </div>
+
+        <div className="p-2">
+          <button
             data-bs-toggle="modal"
             data-bs-target="#create-sub-user"
             className="px-3"
@@ -100,7 +149,7 @@ const SubUserManagementFilter = (props) => {
         getSubUsers={props.getSubUsers}
         handleDeleteUser={props?.handleDeleteUser}
         editProfileModal={props?.editProfileModal}
-        editUserId={props?.editUserId}
+        editUser={props?.editUser}
         seteditProfileModal={props?.seteditProfileModal}
       />
       {/* Transaction History modal */}
@@ -236,6 +285,74 @@ const SubUserManagementFilter = (props) => {
               </div>
             </div>
             <img
+              data-bs-dismiss="modal"
+              src={cross}
+              alt=""
+              style={{
+                position: "absolute",
+                top: "-1rem",
+                right: "-1.1rem",
+                cursor: "pointer",
+              }}
+              height={45}
+              width={45}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* filter */}
+      <div
+        className="modal fade"
+        id="filter-sub-user"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="filter-sub-userLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-md">
+          <div class="modal-content">
+            <div
+              className="modal-body dark-mode p-3"
+              style={{ fontSize: ".9rem" }}
+            >
+              <div className="row g-0 p-2 gap-3">
+                <div className="">
+                  <CustomDropdown
+                    label="Sub-Users"
+                    options={userOptions}
+                    selectedOption={selectedUserFilter}
+                    onSelectOption={handleUserFilterSelection}
+                    isOpen={userFilterDropDown}
+                    toggleDropdown={toggleUserFilterDropdown}
+                  />
+                </div>
+                <div className="d-flex justify-content-center my-4">
+                  <button
+                    data-bs-dismiss="modal"
+                    onClick={() => {
+                      handleShow();
+                      // props.onHide();
+                    }}
+                    className="px-3 py-1"
+                    style={{
+                      color: "#D2DB08",
+                      backgroundColor: "transparent",
+                      border: "1px solid #D2DB08",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Show
+                  </button>
+                </div>
+              </div>
+            </div>
+            <img
+              onClick={() => {
+                handleShow();
+                setUserFilterDropDown(false);
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

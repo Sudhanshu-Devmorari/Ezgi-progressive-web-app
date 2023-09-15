@@ -1,6 +1,46 @@
-import React from "react";
+import axios from "axios";
+import React, { useState } from "react";
+import config from "../../config";
+import Swal from "sweetalert2";
 
-const VerificationRequestsBtns = () => {
+const VerificationRequestsBtns = (props) => {
+  const id = props?.id;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingApprove, setIsLoadingApprove] = useState(false);
+
+  const handleApproveOrReject = async (action) => {
+    try {
+      if (action === "approve") {
+        setIsLoadingApprove(true);
+      } else {
+        setIsLoading(true);
+      }
+      const res = await axios.post(`${config.apiUrl}/verify-user/${id}/`, {
+        status: action,
+      });
+      if (res.status === 200) {
+        if (action === "approve") {
+          setIsLoadingApprove(false);
+        } else {
+          setIsLoading(false);
+        }
+        props?.editorManagementApiData();
+        Swal.fire({
+          title: "Success",
+          text:
+            (action === "approve" && "Request successfully approved.") ||
+            (action === "reject" && "Request successfully rejected."),
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div className="my-2">
@@ -17,6 +57,11 @@ const VerificationRequestsBtns = () => {
           In Progress
         </button>
         <button
+          onClick={() => {
+            if (id) {
+              handleApproveOrReject("approve");
+            }
+          }}
           className="px-2 mx-3"
           style={{
             border: "1px solid #58DEAA",
@@ -26,9 +71,14 @@ const VerificationRequestsBtns = () => {
             fontSize: "0.9rem",
           }}
         >
-          Approve
+          {isLoadingApprove ? "Loading..." : "Approve"}
         </button>
         <button
+          onClick={() => {
+            if (id) {
+              handleApproveOrReject("reject");
+            }
+          }}
           className="px-2"
           style={{
             border: "1px solid #FF5757",
@@ -38,7 +88,7 @@ const VerificationRequestsBtns = () => {
             fontSize: "0.9rem",
           }}
         >
-          Reject
+          {isLoading ? "Loading" : "Reject"}
         </button>
       </div>
     </>
