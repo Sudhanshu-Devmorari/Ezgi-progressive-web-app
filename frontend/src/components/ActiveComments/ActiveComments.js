@@ -535,26 +535,29 @@ const ActiveComments = (props) => {
             </div>
           </div>
         </div>
-        <div
-          className="my-2 p-1 content-font position-relative"
-          style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            opacity: editProfile ? (!descriptionShow ? "0.3" : "") : "",
-          }}
-        >
-          <Form.Control
-            as="textarea"
-            maxLength={250}
-            className={`${
-              currentTheme === "dark"
-                ? "textArea-dark-mode content-font"
-                : "textArea-light-mode content-font"
-            }`}
-            value={textareaValue}
-            onChange={(e) => setTextareaValue(e.target.value)}
-            disabled={editProfile ? (descriptionShow ? false : true) : true}
-          />
-        </div>
+        {(props?.from === "dashboard" || textareaValue) && (
+          <div
+            className="my-2 p-1 content-font position-relative"
+            style={{
+              backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+              opacity: editProfile ? (!descriptionShow ? "0.3" : "") : "",
+            }}
+          >
+            <Form.Control
+              as="textarea"
+              maxLength={250}
+              className={`${
+                currentTheme === "dark"
+                  ? "textArea-dark-mode content-font"
+                  : "textArea-light-mode content-font"
+              }`}
+              placeholder="No Data Found"
+              value={textareaValue}
+              onChange={(e) => setTextareaValue(e.target.value)}
+              disabled={editProfile ? (descriptionShow ? false : true) : true}
+            />
+          </div>
+        )}
         <img
           onClick={() => setDescriptionShow(!descriptionShow)}
           src={currentTheme === "dark" ? edit : editLight}
@@ -701,7 +704,9 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="py-1">Leagues</div>
-          <div className="py-1">{userPoints.league}</div>
+          <div className="py-1">
+            {userPoints.league ? userPoints.league : "No League"}
+          </div>
         </div>
         {props.profile !== "commentator" && (
           <div

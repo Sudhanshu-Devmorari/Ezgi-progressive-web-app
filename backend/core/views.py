@@ -4366,3 +4366,55 @@ class RetrieveEditorView(APIView):
         data_list['Commentator'] = retrieve_data.get_commentator(request.query_params.get('id'))
         
         return Response(data=data_list, status=status.HTTP_200_OK)
+    
+class BecomeEditorFAQView(APIView):
+
+    def get(self, request, id=None):
+        if id != None:
+            try:
+                data = BecomeEditor.objects.get(id=id)
+                serializer = BecomeEditorSerializer(data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            except BecomeEditor.DoesNotExist:
+                return Response({"msg": "DoesNotExist"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            data = BecomeEditor.objects.all() 
+            serializer = BecomeEditorSerializer(data, many=True)
+            return Response(serializer.data)
+
+
+    def post(self, request):
+        try:
+            data_list = []
+            faq_data = request.data['faq_data'] if request.data['faq_data'] else []
+            for index, data in enumerate(faq_data):
+                # Update
+                if data.get('id', None):
+                    editor_obj = BecomeEditor.objects.filter(id=data['id']).first()
+                
+                # Add
+                else:
+                    editor_obj = BecomeEditor()
+                
+                if editor_obj:
+                    editor_obj.index = index
+                    editor_obj.question = data['question'] if data['question'] else None
+                    editor_obj.answer = data['answer'] if data['answer'] else None
+                    editor_obj.save()
+                    data_list.append(editor_obj)
+            
+            serializer = BecomeEditorSerializer(data_list, many=True)
+            return Response({'msg': 'Data saved successfully.', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        
+    def delete(self, request, id):
+        try:
+            data_delete = BecomeEditor.objects.get(id=id)
+            data_delete.delete()
+            return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
+        except BecomeEditor.DoesNotExist:
+            return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)

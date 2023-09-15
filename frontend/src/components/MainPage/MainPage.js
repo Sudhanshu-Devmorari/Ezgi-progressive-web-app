@@ -339,7 +339,7 @@ const MainPage = () => {
     mergeArrays();
     subscriptionArrays();
     publicArrays();
-    mergeEditorArrays()
+    mergeEditorArrays();
   }, [publicComments, highlights, subscriptionComments, arrayMerge]);
 
   // const user = "c-";
@@ -744,29 +744,35 @@ const MainPage = () => {
               {selectContent === "become-editor" && <BecomeEditor />}
               {selectContent === "category-content" && (
                 <>
-                  {contentFilterData?.map((res, index) => (
-                    <ContentSection
-                      key={index}
-                      data={res}
-                      setActiveCommentsshow={setActiveCommentsshow}
-                      homeApiData={homeApiData}
-                      setData={setData}
-                      selectContent={selectPublicorForYou}
-                      selectPublicorForYou={selectContent}
-                      setSelectContent={setSelectContent}
-                      followingList={followingList}
-                      followingid={followingid}
-                      verifyid={verifyid}
-                      cmtReact={cmtReact}
-                      mergeArrays={mergeArrays}
-                      publicComments={publicComments}
-                      setPublicComments={setPublicComments}
-                      setCmtReact={setCmtReact}
-                      handlesportData={handlesportData}
-                      setContentData={setContentData}
-                      contentData={contentData}
-                    />
-                  ))}
+                  {contentFilterData.length == 0 ? (
+                    <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                      No Record Found!
+                    </div>
+                  ) : (
+                    contentFilterData?.map((res, index) => (
+                      <ContentSection
+                        key={index}
+                        data={res}
+                        setActiveCommentsshow={setActiveCommentsshow}
+                        homeApiData={homeApiData}
+                        setData={setData}
+                        selectContent={selectPublicorForYou}
+                        selectPublicorForYou={selectContent}
+                        setSelectContent={setSelectContent}
+                        followingList={followingList}
+                        followingid={followingid}
+                        verifyid={verifyid}
+                        cmtReact={cmtReact}
+                        mergeArrays={mergeArrays}
+                        publicComments={publicComments}
+                        setPublicComments={setPublicComments}
+                        setCmtReact={setCmtReact}
+                        handlesportData={handlesportData}
+                        setContentData={setContentData}
+                        contentData={contentData}
+                      />
+                    ))
+                  )}
                 </>
               )}
             </>

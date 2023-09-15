@@ -360,8 +360,11 @@ class DataCount(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 class BecomeEditor(models.Model):
-    question = models.CharField(null=False, blank=False)
-    answer = models.CharField(null=False, blank=False)
+    index = models.IntegerField(blank=True, null=True)
+    question = models.TextField(null=False, blank=False)
+    answer = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.question

@@ -12,7 +12,7 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
                         HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
-                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView)
+                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView, BecomeEditorFAQView)
 
 
 urlpatterns = [
@@ -96,4 +96,6 @@ urlpatterns = [
 
     path('retrieve-dashboard/', RetrieveHomeView.as_view(), name='Retrieve-Home'),
     path('retrieve-commentator-list/', RetrieveEditorView.as_view(), name='Retrieve-Editor'),
+    path('become-editor-faq/', BecomeEditorFAQView.as_view(), name='become-editor'),
+    path('become-editor-faq/<int:id>', BecomeEditorFAQView.as_view(), name='become-editor'),
 ]
