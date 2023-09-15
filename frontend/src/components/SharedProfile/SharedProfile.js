@@ -59,8 +59,18 @@ const SharedProfile = (props) => {
           setIsFavorite(favIs);
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
+        if (error.response.status === 400) {
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.error,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       });
   }
 
@@ -84,13 +94,12 @@ const SharedProfile = (props) => {
       console.log("API Response:", response.data);
 
       if (mergedEditorResult) {
-        console.log("mergedEditorResult:::::::::::::", mergedEditorResult)
+        console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
 
         const filterArray = mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
         );
         console.log("filterArray::::::::::::::", filterArray);
-
 
         mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
@@ -118,6 +127,16 @@ const SharedProfile = (props) => {
       setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error making POST request:", error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 

@@ -12,7 +12,7 @@ from core.views import (AdminMainPage, UserManagement, FilterUserManagement, Com
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
                         HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
-                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView, BecomeEditorFAQView)
+                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView, BecomeEditorFAQView, FilterSubUserManagement)
 
 
 urlpatterns = [
@@ -76,6 +76,7 @@ urlpatterns = [
     path('notification-management/', NotificationManagement.as_view(), name='Notification-Management'),
     path('subuser-management/', SubUserManagement.as_view(), name='SubUser-Management'),
     path('subuser-management/<int:pk>/', SubUserManagement.as_view(), name='SubUser-Management'),
+    path('filter-sub-user-management/', FilterSubUserManagement.as_view(), name='Filter-Sub-User-Management'),
     path('ads-management/', AdvertisementManagement.as_view(), name='Advertisement-Management'),
     path('ads-management/<int:pk>/', AdvertisementManagement.as_view(), name='Advertisement-Management'),
     path('level-rule/', LevelRule.as_view(), name='Level-Rule'),

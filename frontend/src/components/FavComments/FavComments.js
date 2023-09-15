@@ -104,56 +104,69 @@ const FavComments = (props) => {
 
   const handleCommentReaction = async (id, reaction, count) => {
     localStorage.setItem(`${id}_${reaction}`, count);
-    const res = await axios.post(
-      `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
-      {
-        reaction_type: `${reaction}`,
-      }
-    );
-
-    if (res.status == 200) {
-      let data = res?.data?.data;
-      if (data) {
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_clap = data?.total_clap;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_favorite = data?.total_favorite;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_likes = data?.total_likes;
-
-        const commentIds = cmtReact.map((data) => {
-          return data.comment_id;
-        });
-
-        if (commentIds.includes(data?.comment_id)) {
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].clap = data?.clap;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].favorite = data?.favorite;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].like = data?.like;
-        } else {
-          const newObj = {
-            clap: data?.clap,
-            comment_id: data?.comment_id,
-            favorite: data?.favorite,
-            like: data?.like,
-          };
-          cmtReact.push(newObj);
+    try {
+      const res = await axios.post(
+        `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
+        {
+          reaction_type: `${reaction}`,
         }
+      );
 
-        setPublicComments(publicComments);
-        setCmtReact(cmtReact);
-        mergeArrays();
+      if (res.status == 200) {
+        let data = res?.data?.data;
+        if (data) {
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_clap = data?.total_clap;
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_favorite = data?.total_favorite;
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_likes = data?.total_likes;
+
+          const commentIds = cmtReact.map((data) => {
+            return data.comment_id;
+          });
+
+          if (commentIds.includes(data?.comment_id)) {
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].clap = data?.clap;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].favorite = data?.favorite;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].like = data?.like;
+          } else {
+            const newObj = {
+              clap: data?.clap,
+              comment_id: data?.comment_id,
+              favorite: data?.favorite,
+              like: data?.like,
+            };
+            cmtReact.push(newObj);
+          }
+
+          setPublicComments(publicComments);
+          setCmtReact(cmtReact);
+          mergeArrays();
+        }
+      }
+      props?.getFavData();
+    } catch (error) {
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
-    props?.getFavData();
   };
 
   const [modalShow, setModalShow] = React.useState(false);

@@ -41,6 +41,7 @@ import Light_Unselected_Like from "../../assets/Light - Unselected Like.svg";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+import Swal from "sweetalert2";
 
 const CommentsContentSection = (props) => {
   const {
@@ -79,58 +80,69 @@ const CommentsContentSection = (props) => {
   };
   const handleCommentReaction = async (id, reaction) => {
     const user_id = localStorage.getItem("user-id");
-    const res = await axios.post(
-      `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
-      {
-        reaction_type: `${reaction}`,
-      }
-    );
-    // console.log(res);
-    // console.log(id, "!!!!!!!!!!!!!!!", reaction);
-    // props.homeApiData(user_id);
-    if (res.status == 200) {
-      let data = res?.data?.data;
-      if (data) {
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_clap = data?.total_clap;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_favorite = data?.total_favorite;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_likes = data?.total_likes;
-
-        const commentIds = cmtReact.map((data) => {
-          return data.comment_id;
-        });
-
-        if (commentIds.includes(data?.comment_id)) {
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].clap = data?.clap;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].favorite = data?.favorite;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].like = data?.like;
-        } else {
-          const newObj = {
-            clap: data?.clap,
-            comment_id: data?.comment_id,
-            favorite: data?.favorite,
-            like: data?.like,
-          };
-          cmtReact.push(newObj);
+    try {
+      const res = await axios.post(
+        `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
+        {
+          reaction_type: `${reaction}`,
         }
+      );
+      if (res.status == 200) {
+        let data = res?.data?.data;
+        if (data) {
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_clap = data?.total_clap;
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_favorite = data?.total_favorite;
+          publicComments.filter(
+            (response) => response.id == data?.comment_id
+          )[0].total_reactions.total_likes = data?.total_likes;
 
-        setPublicComments(publicComments);
-        setCmtReact(cmtReact);
-        mergeArrays();
+          const commentIds = cmtReact.map((data) => {
+            return data.comment_id;
+          });
+
+          if (commentIds.includes(data?.comment_id)) {
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].clap = data?.clap;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].favorite = data?.favorite;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].like = data?.like;
+          } else {
+            const newObj = {
+              clap: data?.clap,
+              comment_id: data?.comment_id,
+              favorite: data?.favorite,
+              like: data?.like,
+            };
+            cmtReact.push(newObj);
+          }
+
+          setPublicComments(publicComments);
+          setCmtReact(cmtReact);
+          mergeArrays();
+        }
+      }
+      activeResolved(user_id);
+    } catch (error) {
+      console.log(error)
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
       }
     }
-    activeResolved(user_id);
   };
 
   useEffect(() => {
@@ -1001,16 +1013,16 @@ const CommentsContentSection = (props) => {
                       className="p-1 px-2"
                       // style={{ color: "#FF3030", fontSize: "12px" }}
                       style={{
-                                backgroundColor:
-                                  props.SelectComment === "resolvedComments"
-                                    ? "#00DE51"
-                                    : "#00659D",
-                                color:
-                                  props.SelectComment === "resolvedComments"
-                                    ? "#0D2A53"
-                                    : "#FFFFFF",
-                                fontSize: "12px",
-                              }}
+                        backgroundColor:
+                          props.SelectComment === "resolvedComments"
+                            ? "#00DE51"
+                            : "#00659D",
+                        color:
+                          props.SelectComment === "resolvedComments"
+                            ? "#0D2A53"
+                            : "#FFFFFF",
+                        fontSize: "12px",
+                      }}
                     >
                       {/* {res.text} */}
                       {`${res?.prediction_type} & ${res?.prediction}`}

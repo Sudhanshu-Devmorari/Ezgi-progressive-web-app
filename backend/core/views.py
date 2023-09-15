@@ -490,9 +490,11 @@ class CommentView(APIView):
 
     def post(self, request, id, format=None, *args, **kwargs):
         try:
-            # user = request.user
             user = User.objects.get(id=id)
-            # print('user: ', user)
+            
+            if not user.is_active:
+                return Response({'data' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -735,6 +737,10 @@ class CommentReactionView(APIView):
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        user = User.objects.get(id=id)
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Reaction type validation
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
@@ -866,6 +872,9 @@ class ProfileView(APIView):
             user = User.objects.get(id=id)
         except User.DoesNotExist:
             return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
+
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
         
         if 'profile' in request.data['update']:
 
@@ -911,6 +920,10 @@ class FavEditorsCreateView(APIView):
         try:
             if request.data:
                 user = User.objects.get(id=id)
+
+                if not user.is_active:
+                    return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1486,7 +1499,7 @@ class AdminMainPage(APIView):
             new_comment = Comments.objects.all().count()
             data_list['new_comment'] = new_comment
 
-            all_user = User.objects.filter(is_delete=False, is_admin=False).order_by('-created')
+            all_user = User.objects.filter(is_delete=False,is_admin=False).order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -1704,18 +1717,23 @@ class UserManagement(APIView):
                 except Exception as e:
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
-            elif action == 'deactive':
+            elif action == 'remove':
                 if user.user_role == "standard":
-                    # user.delete()
                     user.is_delete = True
-                    user.save()
-                    message = {"success": "User profile Deactivate sucessfully."}
-                    return Response(data=message, status=status.HTTP_200_OK)
+                    user.save(update_fields=['is_delete', 'updated'])
+                    return Response({'data': "User profile removed sucessfully."}, status=status.HTTP_200_OK)
                 else:
                     user.is_delete = True
-                    user.save()
-                    message = {"success": "User profile Deactivate sucessfully."}
-                    return Response(data=message, status=status.HTTP_200_OK)
+                    user.save(update_fields=['is_delete', 'updated'])
+                    return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1736,8 +1754,15 @@ class FilterUserManagement(APIView):
 
                 if 'age' in request.data and request.data.get('age') != None and request.data.get('age') != "Select":
                     filters['age'] = request.data.get('age')
-
-                # print("****", filters)
+                
+                if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
+                    users = request.data.get('users')
+                    print('users: ', users)
+                    if users == 'Deactivated Users':
+                        filters.update({'is_active': False})
+                    if users == 'Deleted Users':
+                        filters.update({'is_delete': True})
+                
                 query_filters = Q(**filters)
                 filtered_user = User.objects.filter(query_filters)
                 serializer = UserSerializer(filtered_user, many=True)
@@ -2416,10 +2441,31 @@ class EditorManagement(APIView):
         """
         try:
             user = User.objects.get(pk=pk)
-            # user.deactivate_commentator = 'pending'
-            user.is_delete = True
-            user.save()
-            return Response({"success": "The deactivation request for a user has been processed successfully."}, status=status.HTTP_404_NOT_FOUND)
+            action = request.query_params.get('action')
+            if not action:
+                return Response({'error' : 'Something went wrong. Try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if action == 'delete':
+                try:
+                    user.delete()
+                    return Response("User deleted Successfully", status= status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            elif action == 'remove':
+                user.is_delete = True
+                user.save(update_fields=['is_delete', 'updated'])
+                return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
+            
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
@@ -2574,8 +2620,12 @@ class DeactivateCommentator(APIView):
             obj = User.objects.get(id=id)
             if deactivation_status == 'accept':
                 obj.deactivate_commentator = deactivation_status
-            
-            obj.save(update_fields=['deactivate_commentator','updated'])
+                obj.is_delete =True
+                obj.save(update_fields=['deactivate_commentator' 'is_delete','updated'])
+            elif deactivation_status == 'reject':
+                print('deactivation_status: ', deactivation_status)
+                obj.deactivate_commentator == ''
+                obj.save(update_fields=['deactivate_commentator','updated'])
 
             # Get data
             serializer = UserSerializer(obj).data
@@ -3205,20 +3255,60 @@ class SubUserManagement(APIView):
         try:
             user = User.objects.get(pk=pk)
             action = request.query_params.get('action')
+            if not action:
+                return Response({'error' : 'Something went wrong. Try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             if action == 'delete':
                 try:
                     user.delete()
                     return Response("User deleted Successfully", status= status.HTTP_200_OK)
                 except Exception as e:
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            elif action == 'deactive':
+                
+            elif action == 'remove':
                 user.is_delete = True
-                user.save()
-                return Response({'data' : "User Deleted", 'status' : status.HTTP_200_OK})
+                user.save(update_fields=['is_delete', 'updated'])
+                return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+            
+            elif action == 'deactive':
+                user.is_active = False
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
+            
+            elif action == 'active':
+                user.is_active = True
+                user.save(update_fields=['is_active', 'updated'])
+                return Response({'data' : 'User profile activated sucessfully.'}, status=status.HTTP_200_OK)
+            
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        
+class FilterSubUserManagement(APIView):
+    def post(self, request, format=None, *args, **kwargs):
+        data_list = {}
+        try:
+            filters = {}
+            if request.data:
+                
+                if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
+                    users = request.data.get('users')
+                    print('users: ', users)
+                    if users == 'Deactivated Users':
+                        filters.update({'is_active': False})
+                    if users == 'Deleted Users':
+                        filters.update({'is_delete': True})
+                
+                query_filters = Q(**filters)
+                filtered_user = User.objects.filter(query_filters, user_role='sub_user')
+                serializer = UserSerializer(filtered_user, many=True)
+                data = serializer.data
+
+                return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                return Response(data={'error': 'Request data not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+      
 class AdvertisementManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -3987,7 +4077,10 @@ class BecomeEditorView(APIView):
         After sucessfully payment below code execute.
         """
         user = User.objects.get(id=id)
-        print(request.data)
+        
+        if not user.is_active:
+            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+
         if user.user_role == "standard":
             if user.profile_pic == "":
                 if 'profile_pic' not in request.data:

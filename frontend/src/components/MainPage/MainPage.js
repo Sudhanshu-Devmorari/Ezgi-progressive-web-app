@@ -539,8 +539,8 @@ const MainPage = () => {
                               setHighlights={setHighlights}
                               highlights={highlights}
                               mergeArrays={mergeArrays}
-                              // setMergedEditorResult={setMergedEditorResult}
-                              // mergedEditorResult={mergedEditorResult}
+                              setMergedEditorResult={setMergedEditorResult}
+                              mergedEditorResult={mergedEditorResult}
                             />
                           </>
                         );
@@ -716,6 +716,8 @@ const MainPage = () => {
                   publicComments={publicComments}
                   setPublicComments={setPublicComments}
                   mergeArrays={mergeArrays}
+                  mergedEditorResult={mergedEditorResult}
+                  setMergedEditorResult={setMergedEditorResult}
                 />
               )}
               {selectContent === "show-all-comments" && (

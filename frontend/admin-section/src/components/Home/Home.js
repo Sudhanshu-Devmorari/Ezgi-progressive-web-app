@@ -27,47 +27,25 @@ import Swal from "sweetalert2";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const Home = (props) => {
-  const handleFile = async (e) => {
-    const file = e.target.files[0];
-    // console.log(":::::::: ", file?.path);
-  };
+  const [isLoadingActions, setIsLoadingActions] = useState(false);
   const handleDeactive = async (id, action) => {
     try {
-      // if (action === "delete") {
-      // console.log(action,"===============>>>action from delete")
+      setIsLoadingActions(true);
       const res = await axios.delete(
         `${config?.apiUrl}/user-management/${id}/?action=${action}`
       );
       if (res.status === 200) {
+        setIsLoadingActions(false);
         clearError();
         props?.adminHomeApiData();
         Swal.fire({
           title: "Success",
-          text:
-            action === "delete"
-              ? "User profile Delete sucessfully."
-              : "User profile Deactive sucessfully.",
+          text: res?.data?.data,
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
         });
       }
-      // } else if (action === "deactive") {
-      //   // console.log(action,"===============>>>action from deactive")
-      //   const res = await axios.delete(
-      //     `${config?.apiUrl}/user-management/${id}/?action=deactive`
-      //   );
-      //   if (res.status === 200) {
-      //     props?.adminHomeApiData();
-      //     Swal.fire({
-      //       title: "Success",
-      //       text: "User profile deactive sucessfully.",
-      //       icon: "success",
-      //       backdrop: false,
-      //       customClass: "dark-mode-alert",
-      //     });
-      //   }
-      // }
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -202,9 +180,10 @@ const Home = (props) => {
           city: selectedCityFilter,
           gender: selectedGenderFilter,
           age: selectedAgeFilter,
+          users: selectedUserFilter,
         }
       );
-      // console.log("API Response:::::::::::::", response.data);/
+      // console.log("API Response:::::::::::::", response.data);
       setDisplayUser(response.data);
       setAllFilterData(response.data);
       response.data && setIsFilterLoading(false);
@@ -579,6 +558,7 @@ const Home = (props) => {
     if (cityFilterDropDown) {
       setGenderFilterDropDown(false);
     }
+    setUserFilterDropDown(false);
     setUserTypeFilterDropDown(!userTypeFilterDropDown);
   };
   const handleCityFilterSelection = (gender) => {
@@ -594,6 +574,7 @@ const Home = (props) => {
     if (userTypeFilterDropDown) {
       setUserTypeFilterDropDown(false);
     }
+    setUserFilterDropDown(false);
     setCityFilterDropDown(!cityFilterDropDown);
   };
   const handleGenderFilterSelection = (gender) => {
@@ -609,6 +590,7 @@ const Home = (props) => {
     if (userTypeFilterDropDown) {
       setUserTypeFilterDropDown(false);
     }
+    setUserFilterDropDown(false);
     setGenderFilterDropDown(!genderFilterDropDown);
   };
   const handleAgeFilterSelection = (gender) => {
@@ -624,6 +606,7 @@ const Home = (props) => {
     if (userTypeFilterDropDown) {
       setUserTypeFilterDropDown(false);
     }
+    setUserFilterDropDown(false);
     setAgeFilterDropDown(!ageFilterDropDown);
   };
 
@@ -666,6 +649,23 @@ const Home = (props) => {
     const imageFile = e.target.files[0];
     setPreveiwProfilePic(URL.createObjectURL(imageFile));
   }
+
+  const userOptions = ["Deactivated Users", "Deleted Users"];
+
+  const [selectedUserFilter, setSelectedUserFilter] = useState("Select");
+  const [userFilterDropDown, setUserFilterDropDown] = useState(false);
+
+  const handleUserFilterSelection = (userOption) => {
+    setSelectedUserFilter(userOption);
+  };
+
+  const toggleUserFilterDropdown = () => {
+    setGenderFilterDropDown(false);
+    setCityFilterDropDown(false);
+    setUserTypeFilterDropDown(false);
+    setAgeFilterDropDown(false);
+    setUserFilterDropDown(!userFilterDropDown);
+  };
   return (
     <>
       <div
@@ -780,19 +780,7 @@ const Home = (props) => {
                               width={22}
                             />
                           )}
-                          <span
-
-                          // data-bs-toggle="modal"
-                          // data-bs-target="#exampleModal"
-                          // onClick={() => {
-                          //   setprofile(true);
-                          //   setUserData(res);
-                          //   setAddUser(res);
-                          //   setPreveiwProfilePic(true);
-                          // }}
-                          >
-                            {res.age}
-                          </span>
+                          <span>{res.age}</span>
                         </div>
                         <div className="">{res.country?.trim()}</div>
                       </div>
@@ -859,8 +847,11 @@ const Home = (props) => {
                           width={25}
                         />
                         <img
-                          onClick={() => handleDeactive(res.id, "delete")}
-                          // onClick={() => handleDelete(res.id)}
+                          onClick={() => {
+                            if (userData?.is_delete) {
+                              handleDeactive(res.id, "delete");
+                            }
+                          }}
                           className="cursor"
                           src={trash}
                           alt=""
@@ -1242,105 +1233,89 @@ const Home = (props) => {
                   </div>
                 </div>
                 {profile ? (
-                  <div className="my-2 d-flex row g-0 mb-3 gap-4 px-3">
-                    <div className="col">
-                      <button
-                        onClick={() => {
-                          setAddUser({
-                            name: "",
-                            username: "",
-                            phone: "",
-                            password: "",
-                            gender: "",
-                            age: "",
-                          });
-                          setprofile(false);
-                          setPreveiwProfilePic(null);
-                          clearError();
-                        }}
-                        data-bs-dismiss="modal"
-                        className="px-3 py-1"
-                        style={{
-                          color: "#FF5757",
-                          backgroundColor: "transparent",
-                          border: "1px solid #FF5757",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Remove
-                      </button>
+                  <>
+                    <div className="my-2 d-flex justify-content-center gap-3 mb-3 px-3">
+                      <div className="">
+                        <button
+                          onClick={() => {
+                            handleDeactive(userData?.id, "remove");
+                            setAddUser({
+                              name: "",
+                              username: "",
+                              phone: "",
+                              password: "",
+                              gender: "",
+                              age: "",
+                            });
+                            setprofile(false);
+                            setPreveiwProfilePic(null);
+                            clearError();
+                          }}
+                          data-bs-dismiss="modal"
+                          className="px-3 py-1"
+                          style={{
+                            color: "#FF5757",
+                            backgroundColor: "transparent",
+                            border: "1px solid #FF5757",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {isLoadingActions ? "Loading..." : "Remove"}
+                        </button>
+                      </div>
+                      <div className="">
+                        <button
+                          onClick={() => {
+                            handleUpdateUser(userData?.id, addUser.id);
+                          }}
+                          // data-bs-dismiss="modal"
+                          className="px-3 py-1"
+                          style={{
+                            color: "#FF9100",
+                            backgroundColor: "transparent",
+                            border: "1px solid #FF9100",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          Update
+                        </button>
+                      </div>
+                      <div className="">
+                        <button
+                          onClick={() => {
+                            handleDeactive(
+                              userData?.id,
+                              userData?.is_active ? "deactive" : "active"
+                            );
+                            setAddUser({
+                              name: "",
+                              username: "",
+                              phone: "",
+                              password: "",
+                              gender: "",
+                              age: "",
+                            });
+                            setprofile(false);
+                            setPreveiwProfilePic(null);
+                          }}
+                          data-bs-dismiss="modal"
+                          className="px-3 py-1"
+                          style={{
+                            color: "#D2DB08",
+                            backgroundColor: "transparent",
+                            border: "1px solid #D2DB08",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {isLoadingActions
+                            ? "Loading..."
+                            : userData?.is_active
+                            ? "Deactive"
+                            : "Active"}
+                        </button>
+                      </div>
                     </div>
-                    <div className="col">
-                      <button
-                        onClick={() => {
-                          handleUpdateUser(userData?.id, addUser.id);
-                        }}
-                        // data-bs-dismiss="modal"
-                        className="px-3 py-1"
-                        style={{
-                          color: "#FF9100",
-                          backgroundColor: "transparent",
-                          border: "1px solid #FF9100",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Update
-                      </button>
-                    </div>
-                    <div className="col">
-                      <button
-                        onClick={() => {
-                          handleDeactive(userData?.id, "deactive");
-                          setAddUser({
-                            name: "",
-                            username: "",
-                            phone: "",
-                            password: "",
-                            gender: "",
-                            age: "",
-                          });
-                          setprofile(false);
-                          setPreveiwProfilePic(null);
-                        }}
-                        data-bs-dismiss="modal"
-                        className="px-3 py-1"
-                        style={{
-                          color: "#D2DB08",
-                          backgroundColor: "transparent",
-                          border: "1px solid #D2DB08",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Deactive
-                      </button>
-                    </div>
-                    <div className="col">
-                      <button
-                        onClick={() => {
-                          setAddUser({
-                            name: "",
-                            username: "",
-                            phone: "",
-                            password: "",
-                            gender: "",
-                            age: "",
-                          });
-                          setprofile(false);
-                          setPreveiwProfilePic(null);
-                        }}
-                        data-bs-dismiss="modal"
-                        className="px-3 py-1"
-                        style={{
-                          color: "#E6E6E6",
-                          backgroundColor: "transparent",
-                          border: "1px solid #E6E6E6",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        Login
-                      </button>
-                    </div>
-                  </div>
+                  </>
                 ) : (
                   <div className="my-2 d-flex justify-content-center">
                     <button
@@ -1578,7 +1553,17 @@ const Home = (props) => {
                   />
                 </div>
               </div>
-              <div className="d-flex justify-content-center my-2">
+              <div className="mb-5">
+                <CustomDropdown
+                  label="Users"
+                  options={userOptions}
+                  selectedOption={selectedUserFilter}
+                  onSelectOption={handleUserFilterSelection}
+                  isOpen={userFilterDropDown}
+                  toggleDropdown={toggleUserFilterDropdown}
+                />
+              </div>
+              <div className="d-flex justify-content-center my-4">
                 <button
                   data-bs-dismiss="modal"
                   onClick={() => {
@@ -1603,6 +1588,7 @@ const Home = (props) => {
                 setCityFilterDropDown(false);
                 setGenderFilterDropDown(false);
                 setAgeFilterDropDown(false);
+                setUserFilterDropDown(false);
               }}
               data-bs-dismiss="modal"
               src={cross}

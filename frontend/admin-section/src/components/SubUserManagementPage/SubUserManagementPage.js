@@ -75,39 +75,35 @@ const SubUserManagementPage = () => {
     filteredArray.length > 0 ? filteredArray : subuserList;
 
   // Delete User
-  const handleDeleteUser = async (e, action) => {
+  const handleDeleteUser = async (e, action, event) => {
+    event.preventDefault();
     try {
-      if (action === "delete") {
-        const res = await axios.delete(
-          `${config?.apiUrl}/subuser-management/${e}/?action=delete`
-        );
-        console.log(res, "===============>>res");
-        if (res.status === 200) {
-          getSubUsers();
-          Swal.fire({
-            title: "Success",
-            text: "User profile Delete sucessfully.",
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          });
-        }
-      } else if (action === "deactive") {
-        const res = await axios.delete(
-          `${config?.apiUrl}/subuser-management/${e}/?action=deactive`
-        );
-        if (res.data.status === 200) {
-          getSubUsers();
-          Swal.fire({
-            title: "Success",
-            text: "User profile deactive sucessfully.",
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          });
-        }
+      const res = await axios.delete(
+        `${config?.apiUrl}/subuser-management/${e}/?action=${action}`
+      );
+      if (res.status === 200) {
+        getSubUsers();
+        Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
       }
-    } catch (e) {}
+    } catch (error) {
+      console.log(error);
+      if (error?.response?.status === 500) {
+        getSubUsers();
+        Swal.fire({
+          title: "Success",
+          text: error?.response?.data?.error,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
+    }
   };
 
   return (
@@ -170,6 +166,7 @@ const SubUserManagementPage = () => {
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
                   <SubUserManagementFilter
+                    setSubuserList={setSubuserList}
                     handleDeleteUser={handleDeleteUser}
                     filteredData={filteredData}
                     editProfileModal={editProfileModal}

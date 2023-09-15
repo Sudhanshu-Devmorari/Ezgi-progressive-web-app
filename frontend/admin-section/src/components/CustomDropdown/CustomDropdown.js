@@ -27,6 +27,8 @@ export const CustomDropdown = ({
             (["Ads Space"].includes(label) && "29.6%") ||
             (["Type", "Status", "Duration"].includes(label) && "43.5%") ||
             (["Country", "City", "Match Details"].includes(label) && "100%") ||
+            (["Users"].includes(label) && "93.5%") ||
+            (["Sub-Users"].includes(label) && "90.3%") ||
             "45%",
           cursor: "pointer",
         }}

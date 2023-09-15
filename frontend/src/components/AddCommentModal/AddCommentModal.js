@@ -297,7 +297,6 @@ const AddCommentModal = (props) => {
 
   // Add Comment pr Post comment API
   const postComment = async () => {
-
     if (selectedCategory === "Select") {
       setCategoryError("Required*");
     }
@@ -326,13 +325,13 @@ const AddCommentModal = (props) => {
       setCommentError("Minimum 100 charaters required.");
     }
     if ((commentText.length > 100) & (commentText.length < 250)) {
-      setCommentError('');
+      setCommentError("");
     }
     if (
       selectCheckBox &&
       selectedCategory !== "Select" &&
       selectedCountry !== "Select" &&
-      selectedLeague !== "Select"&&
+      selectedLeague !== "Select" &&
       selectedDate !== "Select" &&
       selectedMatchDetails !== "Select" &&
       selectedPredictionType !== "Select" &&
@@ -377,16 +376,23 @@ const AddCommentModal = (props) => {
         }
       } catch (error) {
         console.log(error);
-        // console.log(error.response.status);
-        // console.log(error.response.data.message);
         if (error.response.status === 404) {
-          // console.log("KKKK");
           Swal.fire({
             title: "Error",
             text: `${error.response.data.error}`,
             icon: "error",
             backdrop: false,
-            customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        } else if (error.response.status === 400) {
+          Swal.fire({
+            title: "Error",
+            text: `${error.response.data.data}`,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
       }

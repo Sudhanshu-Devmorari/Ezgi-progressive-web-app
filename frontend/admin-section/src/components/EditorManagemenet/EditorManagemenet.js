@@ -65,15 +65,20 @@ const EditorManagemenet = (props) => {
     setSelectedCountry("Select");
     setSelectedGender("Select");
   };
-  const handleDeactive = async (id) => {
+
+  // const [isLoadingDeactive, setIsLoadingDeactive] = useState(false);
+
+  const handleDeactive = async (id, action) => {
     try {
+      // setIsLoadingDeactive(true);
       const res = await axios.delete(
-        `${config?.apiUrl}/editor-management/${id}/`
+        `${config?.apiUrl}/editor-management/${id}/?action=${action}`
       );
-      if (res.status === 404) {
+      if (res.status === 200) {
+        props?.editorManagementApiData();
         Swal.fire({
           title: "Success",
-          text: "Editor account Deactived!",
+          text: res?.data?.data,
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
@@ -81,7 +86,15 @@ const EditorManagemenet = (props) => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      return [];
+      if (error?.response?.status === 500) {
+        Swal.fire({
+          title: "Success",
+          text: error?.response?.data?.error,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+      }
     }
   };
 
@@ -1647,6 +1660,10 @@ const EditorManagemenet = (props) => {
                           <button
                             data-bs-dismiss="modal"
                             onClick={() => {
+                              handleDeactive(
+                                partialData.editor_data?.id,
+                                "remove"
+                              );
                               props.setupdateProfile(1);
                               setAddUser({
                                 name: "",
@@ -1674,7 +1691,12 @@ const EditorManagemenet = (props) => {
                           </button>
                           <button
                             onClick={() => {
-                              handleDeactive(partialData.editor_data?.id);
+                              handleDeactive(
+                                partialData.editor_data?.id,
+                                partialData.editor_data?.is_active
+                                  ? "deactive"
+                                  : "active"
+                              );
                               props.setupdateProfile(1);
                               setAddUser({
                                 name: "",
@@ -1698,7 +1720,9 @@ const EditorManagemenet = (props) => {
                               borderRadius: "4px",
                             }}
                           >
-                            Deactive
+                            {partialData.editor_data?.is_active
+                              ? "Deactive"
+                              : "Active"}
                           </button>
                           <button
                             onClick={() => {
@@ -1717,33 +1741,6 @@ const EditorManagemenet = (props) => {
                             }}
                           >
                             Update
-                          </button>
-                          <button
-                            onClick={() => {
-                              setAddUser({
-                                name: "",
-                                username: "",
-                                phone: "",
-                                password: "",
-                                country: "",
-                                city: "",
-                                category: "",
-                                gender: "",
-                                age: "",
-                                about: "",
-                              });
-                              props.setupdateProfile(1);
-                            }}
-                            className="px-3 py-1"
-                            data-bs-dismiss="modal"
-                            style={{
-                              color: "#E6E6E6",
-                              backgroundColor: "transparent",
-                              border: "1px solid #E6E6E6",
-                              borderRadius: "4px",
-                            }}
-                          >
-                            Login
                           </button>
                         </>
                       ) : (

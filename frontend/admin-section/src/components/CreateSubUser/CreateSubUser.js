@@ -97,13 +97,12 @@ const CreateSubUser = (props) => {
     } catch (error) {}
   }
 
-  console.log(props?.editUser,"=>>>edit")
 
   // // Edit Sub User Profile
   const [userProfile, setuserProfile] = useState(null);
 
   const resetFields = () => {
-    setSelectedDepartment("Support")
+    setSelectedDepartment("Support");
     setIsTransactionSelected(true);
     setIsOnlyViewSelected(false);
     setIsWithdrawalRequestsSelected(false);
@@ -135,7 +134,7 @@ const CreateSubUser = (props) => {
           setIsRulesUpdateSelected(props?.editUser?.is_rule_update);
           setIsSalesExportSelected(props?.editUser?.is_sales_export);
           setIsPriceUpdateSelected(props?.editUser?.is_price_update);
-          setSelectedDepartment(props?.editUser?.department)
+          setSelectedDepartment(props?.editUser?.department);
         }
       } else if (props?.editUser?.is_view_only) {
         setIsOnlyViewSelected(true);
@@ -283,7 +282,7 @@ const CreateSubUser = (props) => {
   return (
     <>
       <div
-        class="modal fade"
+        className="modal fade"
         id="create-sub-user"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
@@ -706,48 +705,64 @@ const CreateSubUser = (props) => {
                   <div className="my-3 justify-content-center align-items-center d-flex py-2">
                     {props?.editProfileModal === 2 && (
                       <>
-                        <button
-                          data-bs-dismiss="modal"
-                          className="py-1 px-2"
-                          style={{
-                            backgroundColor: "transparent",
-                            borderRadius: "4px",
-                            border: "1px solid #FF5757",
-                            color: "#FF5757",
-                          }}
-                        >
-                          Remove
-                        </button>
-                        <button
-                          data-bs-dismiss="modal"
-                          onClick={() =>
-                            props?.handleDeleteUser(
-                              props?.editUser?.id,
-                              "deactive"
-                            )
-                          }
-                          className="py-1 px-2 mx-3"
-                          style={{
-                            backgroundColor: "transparent",
-                            borderRadius: "4px",
-                            border: "1px solid #FF9100",
-                            color: "#FF9100",
-                          }}
-                        >
-                          Deactive
-                        </button>
-                        <button
-                          onClick={formik.handleSubmit}
-                          className="py-1 px-2"
-                          style={{
-                            backgroundColor: "transparent",
-                            borderRadius: "4px",
-                            border: "1px solid #D2DB08",
-                            color: "#D2DB08",
-                          }}
-                        >
-                          {isLoading ? "Loading..." : "Update"}
-                        </button>
+                        {!props?.editUser?.is_delete && (
+                          <>
+                            <button
+                              onClick={(event) =>
+                                props?.handleDeleteUser(
+                                  props?.editUser?.id,
+                                  "remove",
+                                  event
+                                )
+                              }
+                              data-bs-dismiss="modal"
+                              className="py-1 px-2"
+                              style={{
+                                backgroundColor: "transparent",
+                                borderRadius: "4px",
+                                border: "1px solid #FF5757",
+                                color: "#FF5757",
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <button
+                              data-bs-dismiss="modal"
+                              onClick={(event) =>
+                                props?.handleDeleteUser(
+                                  props?.editUser?.id,
+                                  props?.editUser?.is_active
+                                    ? "deactive"
+                                    : "active",
+                                  event
+                                )
+                              }
+                              className="py-1 px-2 mx-3"
+                              style={{
+                                backgroundColor: "transparent",
+                                borderRadius: "4px",
+                                border: "1px solid #FF9100",
+                                color: "#FF9100",
+                              }}
+                            >
+                              {props?.editUser?.is_active
+                                ? "Deactive"
+                                : "Active"}
+                            </button>
+                            <button
+                              onClick={formik.handleSubmit}
+                              className="py-1 px-2"
+                              style={{
+                                backgroundColor: "transparent",
+                                borderRadius: "4px",
+                                border: "1px solid #D2DB08",
+                                color: "#D2DB08",
+                              }}
+                            >
+                              {isLoading ? "Loading..." : "Update"}
+                            </button>
+                          </>
+                        )}
                       </>
                     )}
                     {props?.editProfileModal === 1 && (
