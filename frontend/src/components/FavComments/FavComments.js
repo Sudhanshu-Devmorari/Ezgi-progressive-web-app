@@ -55,10 +55,11 @@ const FavComments = (props) => {
     setPublicComments,
     mergeArrays,
     setCmtReact,
+    favSelection,
   } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const favCommentData = props?.favCommentData;
-  // console.log(favCommentData);
+  // console.log("----",favSelection);
 
   const [followLabel, setFollowLabel] = useState("Follow");
 
@@ -389,11 +390,13 @@ const FavComments = (props) => {
                 >
                   <div
                     onClick={() => {
+                      if(res.public_content === true){
                       handleCommentReaction(
                         res?.id,
                         "like",
                         res?.total_reactions.total_likes
                       );
+                      }
                     }}
                     className="d-flex align-items-center gap-2"
                   >
@@ -438,11 +441,13 @@ const FavComments = (props) => {
                   </div>
                   <div
                     onClick={() => {
+                      if(res.public_content === true){
                       handleCommentReaction(
                         res?.id,
                         "favorite",
                         res?.total_reactions?.total_favorite
                       );
+                      }
                     }}
                   >
                     <div>
@@ -486,11 +491,13 @@ const FavComments = (props) => {
                   </div>
                   <div
                     onClick={() => {
+                      if(res.public_content === true){
                       handleCommentReaction(
                         res?.id,
                         "clap",
                         res?.total_reactions?.total_clap
                       );
+                      }
                     }}
                   >
                     {props.cmtReact

@@ -114,6 +114,7 @@ const CommentatorsCommentsPage = (props) => {
                 SelectComment === "resolvedComments") && (
                 <CommentsContentSection
                   SelectComment={SelectComment}
+                  dashboardSUser={props.dashboardSUser}
                   verifyid={props.verifyid}
                   homeApiData={props.homeApiData}
                   followingList={props.followingList}
@@ -205,6 +206,8 @@ const CommentatorsCommentsPage = (props) => {
                   setPublicComments={props.setPublicComments}
                   mergeArrays={props.mergeArrays}
                   setCmtReact={props.setCmtReact}
+                  favSelection={favSelection}
+
                 />
               )}
             </>

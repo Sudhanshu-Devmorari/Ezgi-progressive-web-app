@@ -128,7 +128,7 @@ const ContentSection = ({
     return randomString;
   };
   const handleCommentReaction = async (id, reaction, count) => {
-    console.log("id::::::::::::::::data", id);
+    // console.log("id::::::::::::::::data", id);
     // if(reaction === "like")
     //   setLikeCount(count)
     // else if(reaction === "favorite")
@@ -341,8 +341,7 @@ const ContentSection = ({
                 </div>
               </div>
             </div>
-
-            {userPhone === null ? (
+            {(userPhone === null || !data?.value?.public_content) && selectContent !== 'subscription' ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -473,7 +472,7 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-                {userPhone ? (
+                {userPhone && (data?.value?.public_content || selectContent == 'subscription')  ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -534,12 +533,12 @@ const ContentSection = ({
                       alt=""
                       height={20}
                       width={20}
-                    />
+                    />{" "}
                     {data?.value?.total_reactions?.total_likes}
                   </div>
                 )}
 
-                {userPhone ? (
+                {userPhone && (data?.value?.public_content || selectContent == 'subscription') ? (
                   <div
                     onClick={() => {
                       if(userPhone != data?.value?.commentator_user?.id) {
@@ -605,7 +604,7 @@ const ContentSection = ({
                   </div>
                 )}
 
-                {userPhone ? (
+                {userPhone && (data?.value?.public_content || selectContent == 'subscription') ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -665,7 +664,7 @@ const ContentSection = ({
                       alt=""
                       height={20}
                       width={20}
-                    />
+                    />{" "}
                     {data?.value?.total_reactions?.total_clap}
                   </div>
                 )}

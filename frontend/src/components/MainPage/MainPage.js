@@ -30,7 +30,7 @@ const MainPage = () => {
   const [selectContent, setSelectContent] = useState("home");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const [dashboardSUser, setDashboardSUser] = useState(false);
-  // console.log("--------", selectContent,"=======", selectPublicorForYou)
+  // console.log("--------", dashboardSUser)
 
   const themeMode = localStorage.getItem("CurrentTheme");
   const [publicSelected, setPublicSelected] = useState(false);
@@ -73,12 +73,12 @@ const MainPage = () => {
   const [rightCornerAds, setRightCornerAds] = useState([]);
 
   function homeApiData(user_id) {
-    console.log("userId::::::::::::", user_id);
+    // console.log("userId::::::::::::", user_id);
     axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log("res:::::::::::::", res.data);
+        // console.log("res:::::::::::::", res.data);
         setPublicComments(res?.data?.Public_Comments);
         setHighlights(res?.data?.highlights);
         setsubscriptionComments(res?.data?.Subscription_Comments);
@@ -386,6 +386,7 @@ const MainPage = () => {
                 setActiveCommentsshow={setActiveCommentsshow}
                 setSelectContent={setSelectContent}
                 setDashboardSUser={setDashboardSUser}
+                dashboardSUser={dashboardSUser}
                 selectContent={selectContent}
                 getProfileData={getProfileData}
                 verifyid={verifyid}

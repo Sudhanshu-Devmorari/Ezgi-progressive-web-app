@@ -18,10 +18,10 @@ import { userId } from "../GetUser";
 import config from "../../config";
 
 const DashboardSU = (props) => {
-  console.log("props:::::::::::", props)
   const [content, setContent] = useState("subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");
+  // console.log("favSelection:::::::::::", favSelection)
 
   useEffect(() => {
     if (props.selectContent === "notifications") {
@@ -118,6 +118,7 @@ const DashboardSU = (props) => {
               getFavData={getFavData}
               followingList={props?.followingList}
               followingid={props?.followingid}
+              favSelection={favSelection}
             />
           )}
         </>

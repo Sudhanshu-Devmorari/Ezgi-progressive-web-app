@@ -9,7 +9,13 @@ const Export = (props) => {
     fromDate: "",
     toDate: "",
   });
-
+  const clearDateSelected = () => {
+    setDateSelected({
+      fromDate: "",
+      toDate: "",
+    });
+  };
+  // console.log("exportList===", props?.exportList);
   const exportList = props?.exportList || [];
 
   const handleChange = (e) => {
@@ -70,9 +76,30 @@ const Export = (props) => {
         head: headers,
         body: tableData,
       });
+    } else if (props?.exportData === "Sales") {
+      const tableData = exportData.map((entry, index) => [
+        index + 1,
+        entry.user?.name ? entry.user?.name : entry.commentator_user?.name,
+        entry.highlight ? "highlight" : "subscription",
+        entry.standard_user?.name ? entry.standard_user?.name : "-",
+        entry.duration,
+        entry.money,
+      ]);
+
+      const headers = [
+        ["SR", "Name", "Sales Type", "Name", "Duration", "Price"],
+      ];
+      doc.autoTable({
+        head: headers,
+        body: tableData,
+      });
     }
 
     doc.save("exported_data.pdf");
+    setDateSelected({
+      fromDate: "",
+      toDate: "",
+    });
   };
 
   return (
@@ -126,6 +153,7 @@ const Export = (props) => {
               </div>
             </div>
             <img
+              onClick={() => clearDateSelected}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

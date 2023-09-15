@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
 
-const SalesManagementFilter = () => {
+const SalesManagementFilter = (props) => {
   const DateOptions = ["option 1", "option 2"];
   const TypeOptions = ["Subscription", "Highlight"];
   const StatusOptions = ["Active", "Pending", "Deactive"];
@@ -64,6 +64,12 @@ const SalesManagementFilter = () => {
     setStatusDropDown(false);
     setDateDropDown(false);
   };
+  const clearFilterData = () => {
+    setSelectedType("Select")
+    setSelectedStatus("Select")
+    setSelectedDuration("Select")
+    setDate("")
+  }
 
   // Filter API
   const [date, setDate] = useState("");
@@ -80,8 +86,31 @@ const SalesManagementFilter = () => {
         `${config?.apiUrl}/sales-management/`,
         payload
       );
-      // console.log(res.data, "====>>>>>res");
-    } catch (error) {}
+      // console.log("@@@@@@@@@@@@: ", res.data);
+      props.updateRecordsDisplay(res.data[0])
+      const modalElement = document.getElementById("filterModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        clearFilterData()
+      
+    } catch (error) {
+      const modalElement = document.getElementById("filterModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        clearFilterData()
+    }
   };
 
   const [modalShow, setModalShow] = React.useState(false);
@@ -93,7 +122,11 @@ const SalesManagementFilter = () => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" />
+            <input
+              onChange={props.filteredData}
+              type="text"
+              className="input-field-dark"
+            />
           </div>
         </div>
         <div className="p-2">
@@ -113,7 +146,8 @@ const SalesManagementFilter = () => {
         </div>
         <div className="p-2">
           <button
-            data-bs-toggle="modal" data-bs-target="#exportModal"
+            data-bs-toggle="modal"
+            data-bs-target="#exportModal"
             className="px-3"
             style={{
               backgroundColor: "transparent",
@@ -144,7 +178,9 @@ const SalesManagementFilter = () => {
                 <div className="col d-flex flex-column cursor">
                   <span className="p-1 ps-0">Date</span>
                   <input
-                    onClick={(e) => setDate(e.target.value)}
+                    onChange={(e) => {
+                      setDate(e.target.value);
+                    }}
                     name="date"
                     type="date"
                     className="darkMode-input form-control text-center"
@@ -199,14 +235,13 @@ const SalesManagementFilter = () => {
               </div>
             </div>
             <img
-            onClick={() => {
-             
-              setDateDropDown(false);
-              setTypeDropDown(false)
-              setStatusDropDown(false)
-              setDurationDropDown(false)
-             
-            }}
+              onClick={() => {
+                setDateDropDown(false);
+                setTypeDropDown(false);
+                setStatusDropDown(false);
+                setDurationDropDown(false);
+                clearFilterData()
+              }}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

@@ -2583,7 +2583,7 @@ class SalesManagement(APIView):
             highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
             highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
             highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
-            data_list['new_subscriptions_percentage'] = highlights_percentage
+            data_list['new_highlights_percentage'] = highlights_percentage
 
             # Subscription objects handling
             subscription_obj = Subscription.objects.filter(subscription=True)
@@ -2621,7 +2621,9 @@ class SalesManagement(APIView):
         data_list = []
         filters = {}
         try:
+            print("---------", request.data)
             if request.data:
+                details = {}
                 # if 'type' not in request.data:
                     # type = request.data.get('type')
                     # return Response({'error': 'Type not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2629,7 +2631,7 @@ class SalesManagement(APIView):
                 if 'date' in request.data:
                     filters['start_date__contains'] = request.data.get('date')
                 if 'status' in request.data:
-                    filters['status'] = request.data.get('status')
+                    filters['status'] = request.data.get('status').lower()
                 if 'duration' in request.data:
                     filters['duration'] = request.data.get('duration')
 
@@ -2641,17 +2643,23 @@ class SalesManagement(APIView):
 
                 query_filters = Q(**filters)
 
-                if type == 'subscription':
+                if type.lower() == 'subscription':
                     subscription_obj = Subscription.objects.filter(query_filters)
                     serializer = SubscriptionSerializer(subscription_obj, many=True)
-                    data_list.append(serializer.data)
+                    # data_list.append(serializer.data)
+                    details['subscription'] = serializer.data
+                    details['highlight'] = []
+                    data_list.append(details)
 
-                elif type == 'highlight':
+                elif type.lower() == 'highlight':
                     highlight_obj = Highlight.objects.filter(query_filters)
                     serializer1 = HighlightSerializer(highlight_obj, many=True)
-                    data_list.append(serializer1.data)
+                    # data_list.append(serializer1.data)
+                    details['subscription'] = []
+                    details['highlight'] = serializer1.data
+                    data_list.append(details)
                 else:
-                    details = {}
+                    
                     subscription_obj = Subscription.objects.filter(query_filters)
                     serializer = SubscriptionSerializer(subscription_obj, many=True)
                     details['subscription'] = serializer.data

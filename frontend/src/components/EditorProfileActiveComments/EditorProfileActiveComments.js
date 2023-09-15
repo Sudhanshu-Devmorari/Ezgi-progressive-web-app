@@ -10,7 +10,7 @@ import Spinner from "react-bootstrap/esm/Spinner";
 import { userId } from "../GetUser";
 
 const EditorProfileActiveComments = (props) => {
-  console.log("props::::::::::::::", props);
+  // console.log("props::::::::::::::", props);
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -69,6 +69,7 @@ const EditorProfileActiveComments = (props) => {
           />
           {SelectComment !== "statistics" && (
             <CommentsContentSection
+            userProfileId={profileData?.id}
               SelectComment={SelectComment}
               verifyid={props.verifyid}
               cmtReact={props.cmtReact}

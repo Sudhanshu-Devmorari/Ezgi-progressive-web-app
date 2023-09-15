@@ -17,9 +17,12 @@ import "./SalesManagementPage.css";
 import axios from "axios";
 import Export from "../Export/Export";
 import config from "../../config";
+import moment from "moment";
 
 const SalesManagementPage = () => {
-  const [salesData, setSalesData] = useState([]);
+  const [salesData, setSalesData] = useState({});
+  const [records, setRecords] = useState([]);
+  const [recordsDisplay, setRecordsDisplay] = useState(records);
   const salesArray = [
     { icon: PlanIcon, name: "Plan Sales", count: 12.86, per: 22 },
     {
@@ -32,7 +35,8 @@ const SalesManagementPage = () => {
       icon: highlightIcon,
       name: "Highlight Sales",
       count: salesData?.highlight_count,
-      per: 22,
+      // per: 22,
+      per: Math.round(salesData?.new_highlights_percentage),
     },
   ];
   const users = [
@@ -66,12 +70,225 @@ const SalesManagementPage = () => {
     { icon: perIcon, name: "Ads Revenues" },
   ];
 
+  const filteredData = (e) => {
+    const val = e.target.value;
+    // console.log("val", val);
+    // console.log("records", records);
+    const filteredArray = records.filter(
+      (obj) =>
+        obj?.user?.name?.toLowerCase().match(val?.toLowerCase()) ||
+        obj?.commentator_user?.name?.toLowerCase().match(val?.toLowerCase()) ||
+        obj?.standard_user?.name?.toLowerCase().match(val?.toLowerCase())
+    );
+    // console.log(filteredArray,"filteredArray")
+    setRecordsDisplay(filteredArray);
+  };
+  const updateRecordsDisplay = (allData) => {
+    const subscriptionJSX = allData?.subscription.map((data) => {
+      return {
+        ...data,
+        Comp: (props) => (
+          <MainDiv>
+            <>
+              <div className="col-3 d-flex align-items-center">
+                <span>{`# ${props.i.toString().padStart(4, "0")}`}</span>
+                <span className="px-2">
+                  <img
+                    className="user-profile"
+                    src={config.apiUrl + data.standard_user.profile_pic}
+                    alt=""
+                    height={45}
+                    width={45}
+                  />
+                </span>
+                <span>{data.standard_user.name}</span>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <div className="">
+                  <button
+                    className="px-2"
+                    style={{
+                      backgroundColor: "transparent",
+                      borderRadius: "4px",
+                      border: "1px solid #58DEAA",
+                      // (res.planD === "Expert" &&
+                      //   "1px solid #FF9100") ||
+                      // (res.planD === "Apprentice" &&
+                      //   "1px solid #4DD5FF") ||
+                      // (res.planD === "Highlight" &&
+                      //   "1px solid #D2DB08"),
+                      color: "#58DEAA",
+                      // (res.planD === "Expert" && "#FF9100") ||
+                      // (res.planD === "Apprentice" && "#4DD5FF") ||
+                      // (res.planD === "Highlight" && "#D2DB08"),
+                    }}
+                  >
+                    Subscription
+                  </button>
+                </div>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                {data.commentator_user ? (
+                  <>
+                    <img
+                      className="user-profile"
+                      src={config.apiUrl + data.commentator_user.profile_pic}
+                      alt=""
+                      srcset=""
+                      height={32}
+                      width={32}
+                    />
+                    <span className="ps-2">{data.commentator_user.name}</span>
+                  </>
+                ) : (
+                  <>
+                    {data.commentator_user && (
+                      <button
+                        className="px-2 text-center"
+                        style={{
+                          // backgroundColor:
+                          //   (res.plan === "Renew" && "#FF9100") ||
+                          //   (res.plan === "New" && "#4DD5FF"),
+                          // borderRadius: "4px",
+                          // border:
+                          //   (res.plan === "Renew" &&
+                          //     "1px solid #FF9100") ||
+                          //   (res.plan === "New" && "#4DD5FF"),
+                          color: "#0D2A53",
+                          width: "4.5rem",
+                        }}
+                      >
+                        ABC
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <div className="">{data.duration}</div>
+              </div>
+              <div className="col-1 d-flex align-items-center justify-content-center">
+                <div className="">{data.money}</div>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-end">
+                <div className="">
+                  {moment(data.created).format("DD-MM.YYYY - HH:mm")}
+                </div>
+              </div>
+            </>
+          </MainDiv>
+        ),
+      };
+    });
+
+    const highlightJSX = allData?.highlight.map((data) => {
+      return {
+        ...data,
+        Comp: (props) => (
+          <MainDiv>
+            <>
+              <div className="col-3 d-flex align-items-center">
+                <span>{`# ${props.i.toString().padStart(4, "0")}`}</span>
+                <span className="px-2">
+                  <img
+                    className="user-profile"
+                    src={config.apiUrl + data.user.profile_pic}
+                    alt=""
+                    height={45}
+                    width={45}
+                  />
+                </span>
+                <span>{data.user.name}</span>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <div className="">
+                  <button
+                    className="px-2"
+                    style={{
+                      backgroundColor: "transparent",
+                      borderRadius: "4px",
+                      border: "1px solid #D2DB08",
+                      // (res.planD === "Expert" &&
+                      //   "1px solid #FF9100") ||
+                      // (res.planD === "Apprentice" &&
+                      //   "1px solid #4DD5FF") ||
+                      // (res.planD === "Highlight" &&
+                      //   "1px solid #D2DB08"),
+                      color: "#D2DB08",
+                      // (res.planD === "Expert" && "#FF9100") ||
+                      // (res.planD === "Apprentice" && "#4DD5FF") ||
+                      // (res.planD === "Highlight" && "#D2DB08"),
+                    }}
+                  >
+                    Highlight
+                  </button>
+                </div>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                {/* {data.user ? (
+            <>
+              <img
+                className="user-profile"
+                src={config.apiUrl + data.commentator_user.profile_pic}
+                alt=""
+                srcset=""
+                height={32}
+                width={32}
+              />
+              <span className="ps-2">{data.commentator_user.name}</span>
+            </>
+          ) : (
+            <>
+              {data.commentator_user && (
+                <button
+                  className="px-2 text-center"
+                  style={{
+                    // backgroundColor:
+                    //   (res.plan === "Renew" && "#FF9100") ||
+                    //   (res.plan === "New" && "#4DD5FF"),
+                    // borderRadius: "4px",
+                    // border:
+                    //   (res.plan === "Renew" &&
+                    //     "1px solid #FF9100") ||
+                    //   (res.plan === "New" && "#4DD5FF"),
+                    color: "#0D2A53",
+                    width: "4.5rem",
+                  }}
+                >
+                  ABC
+                </button>
+              )}
+            </>
+          )} */}
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-center">
+                <div className="">{data.duration}</div>
+              </div>
+              <div className="col-1 d-flex align-items-center justify-content-center">
+                <div className="">{data.money}</div>
+              </div>
+              <div className="col-2 d-flex align-items-center justify-content-end">
+                <div className="">
+                  {moment(data.created).format("DD-MM.YYYY - HH:mm")}
+                </div>
+              </div>
+            </>
+          </MainDiv>
+        ),
+      };
+    });
+    const data = [...subscriptionJSX, ...highlightJSX];
+    data.sort((a, b) => moment(b.created).unix() - moment(a.created).unix());
+    setRecords(data);
+    setRecordsDisplay(data);
+  };
+  const displayTickets = recordsDisplay
   // Sales management API
   useEffect(() => {
     async function getSalesData() {
       try {
         const res = await axios.get(`${config?.apiUrl}/sales-management`);
-        // console.log("res====>>>>", res?.data);
+        updateRecordsDisplay(res?.data);
         setSalesData(res?.data);
       } catch (error) {
         console.log(error);
@@ -138,8 +355,17 @@ const SalesManagementPage = () => {
                   ))}
                 </div>
                 <div className="dark-mode p-2 m-2 mb-0 home-height">
-                  <SalesManagementFilter />
-                  {users.map((res, index) => (
+                  <SalesManagementFilter
+                    setRecordsDisplay={setRecordsDisplay}
+                    filteredData={filteredData}
+                    updateRecordsDisplay={updateRecordsDisplay}
+                  />
+
+                  {recordsDisplay.map((x, i) => (
+                    <x.Comp i={i + 1} />
+                  ))}
+
+                  {/* {records.map((res, index) => (
                     <MainDiv>
                       <>
                         <div className="col-3 d-flex align-items-center">
@@ -230,7 +456,7 @@ const SalesManagementPage = () => {
                         </div>
                       </>
                     </MainDiv>
-                  ))}
+                  ))} */}
                 </div>
               </div>
               <div className="col-4">
@@ -304,7 +530,8 @@ const SalesManagementPage = () => {
           </div>
         </div>
       </div>
-      <Export />
+      {/* {console.log("*******",displayTickets )} */}
+      <Export exportList={displayTickets} exportData={"Sales"} />
     </>
   );
 };
