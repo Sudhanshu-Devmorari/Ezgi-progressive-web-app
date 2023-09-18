@@ -133,6 +133,7 @@ const ActiveComments = (props) => {
       }
     }
   }
+  const userPhone = localStorage.getItem("user-id");
 
   const [userPoints, setUserPoints] = useState({
     success_rate: "",
@@ -340,7 +341,7 @@ const ActiveComments = (props) => {
               ) : (
                 <img
                   onClick={() => {
-                    if (userId) {
+                    if (userId && userPhone != profileData?.id) {
                       favEditor(profileData?.id);
                     }
                   }}
@@ -543,10 +544,12 @@ const ActiveComments = (props) => {
               ) : (
                 <button
                   onClick={() => {
+                    if(userPhone != profileData?.id){
                     followCommentator(
                       profileData?.id,
                       props?.followingid?.includes(profileData?.id)
                     );
+                    }
                   }}
                   style={{
                     border:

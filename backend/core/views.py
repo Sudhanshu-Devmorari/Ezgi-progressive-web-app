@@ -2708,7 +2708,7 @@ class SalesManagement(APIView):
         data_list = []
         filters = {}
         try:
-            print("---------", request.data)
+            # print("---------", request.data)
             if request.data:
                 details = {}
                 # if 'type' not in request.data:
@@ -3452,13 +3452,22 @@ class LevelRule(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
+
+        data = request.data.copy()
+        if commentator_level.lower() == 'expert':
+            data["commentator_level"] = 'master'
+            commentator_level = 'master' 
+        else:
+            data["commentator_level"] = commentator_level
+
+        # commentator_level = request.data.get('commentator_level')
         existing_record = CommentatorLevelRule.objects.filter(commentator_level=commentator_level).first()
         
         if existing_record:
             serializer = CommentatorLevelRuleSerializer(existing_record, data=data,  partial=True)
         else:
             request.data['commentator_level'] = commentator_level
-            serializer = CommentatorLevelRuleSerializer(data=request.data)
+            serializer = CommentatorLevelRuleSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()

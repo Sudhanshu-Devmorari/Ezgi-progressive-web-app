@@ -94,12 +94,12 @@ const SharedProfile = (props) => {
       console.log("API Response:", response.data);
 
       if (mergedEditorResult) {
-        console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
+        // console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
 
         const filterArray = mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
         );
-        console.log("filterArray::::::::::::::", filterArray);
+        // console.log("filterArray::::::::::::::", filterArray);
 
         mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
@@ -163,8 +163,8 @@ const SharedProfile = (props) => {
           {data?.value?.is_fav_editor ? (
             <img
               onClick={() => {
-                console.log("star click:::::::::::::", data);
-                if (userId) {
+                // console.log("star click:::::::::::::", data);
+                if (userId && userId!=data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
               }}
@@ -176,8 +176,8 @@ const SharedProfile = (props) => {
           ) : (
             <img
               onClick={() => {
-                console.log("star click:::::::::::::", data);
-                if (userId) {
+                // console.log("star click:::::::::::::", data);
+                if (userId && userId!=data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
               }}

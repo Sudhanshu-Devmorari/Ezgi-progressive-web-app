@@ -10,7 +10,7 @@ import darkmode from "../../assets/brightness-up.png";
 import moon from "../../assets/Header Dark Mode.svg";
 import { userId } from "../GetUser";
 import config from "../../config";
-import initialProfile from "../../assets/profile.png"
+import initialProfile from "../../assets/profile.png";
 
 const NavBar = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -80,7 +80,7 @@ const NavBar = (props) => {
                     props.setDashboardSUser(true);
                     props.setSelectContent("notifications");
                   }
-                  setShowModal(4)
+                  setShowModal(4);
                 }}
               />
             </span>
@@ -102,8 +102,12 @@ const NavBar = (props) => {
                 <span className="ps-2">
                   <img
                     //src= {`${config.apiUrl}${props.profileData}`}
-                    src= {props.profileData ?  `${config.apiUrl}${props.profileData}` : initialProfile}
-                    alt=""
+                    src={
+                      props.profileData
+                        ? `${config.apiUrl}${props.profileData}`
+                        : initialProfile
+                    }
+                    alt="profile"
                     height={45}
                     width={45}
                     style={{ borderRadius: "50%" }}

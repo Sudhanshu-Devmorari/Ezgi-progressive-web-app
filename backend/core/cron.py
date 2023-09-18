@@ -49,10 +49,14 @@ def subscriptionstatus():
             deobj.save()
 
 def Userst():
-    all_user = User.objects.all()
+    all_user = User.objects.filter(user_role='commentator')
+
     for individual in all_user:
         user = User.objects.get(id=individual.id)
-        data = Comments.objects.filter(commentator_user= user.id)
+
+        if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
+            continue
+        data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
 
         correct_prediction = data.filter(is_prediction=True)
         incorrect_prediction = data.filter(is_prediction=False)
@@ -72,12 +76,10 @@ def Userst():
         user.save()
 
         for i in data:
-            # print("i", i.commentator_user)
-            # print(i.date, i.country, i.match_detail, i.category, i.league, i.status, i.prediction_type, i.prediction)
             if (i.category[0].lower()) == 'football':
-                url = f"https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=1&league={i.league}&t={i.date}"
+                url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={i.league}&date={i.date}"
             else:
-                url = f"https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=2&league={i.league}&t={i.date}"
+                url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={i.league}&date={i.date}"
 
             headers = {
                 "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
@@ -85,58 +87,47 @@ def Userst():
             response = requests.get(url, headers=headers)
             json_data = response.json()
             match_data_list = json_data["data"]
-
+            
+            if len(match_data_list) <= 0:
+                continue
+            
             for match in match_data_list:
+                if match['LiveStatus'] != 0:
+                    teams = match.get("Teams")
 
-                takimlar = match.get("takimlar")
-                # print("Teams:", takimlar)
-                if takimlar == i.match_detail:
+                    if teams == i.match_detail:
 
-                    # print("i am here")
-                    matchID = match.get("MatchID")
-                    # print(matchID, "-------------here")
+                        matchID = match.get("MatchID")
+                        matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
 
-                    matchid_url = f"https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}"
+                        data = requests.get(matchid_url, headers=headers)
+                        matchID_data = data.json()
+                        matchID_data_list = matchID_data["data"]
 
-                    data = requests.get(matchid_url, headers=headers)
+                        for match in matchID_data_list:
 
-                    matchID_data = data.json()
-                    matchID_data_list = matchID_data["data"]
+                            bettableResult = match.get("bettableResult")
 
-                    for match in matchID_data_list:
+                            for obj in bettableResult:
 
-                        data = match.get("LiveStatus")
+                                if obj['gameName'] == i.prediction_type:
+                                    if obj['game_result'][0]['value'] == i.prediction:
+                                        i.is_prediction = True
+                                        i.save()
+                                    else:
+                                        i.is_prediction = False
+                                        i.save()
 
-                        data_2 = match.get("matchResult")
-                        for j in data_2:
-                            if j['metaName'] == 'msHomeScore':
-                                result = j['value']
-                                print(result, "result")
-                                if result == 1:
-                                    i.is_prediction = True
-                                    i.save()
-                                else:
-                                    i.is_prediction = False
-                                    i.save()
+                            HomeWin = float(match['HomeWin'])
+                            Draw = float(match['Draw'])
+                            AwayWin = float(match['AwayWin'])
+                            GoalUnder = float(match['Under25'])
+                            GoalOver = float(match['Over25'])
+                            avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                            
+                            i.average_odds =round(avg, 2)
+                            i.save()
 
-                        HomeWin = float(match['HomeWin'])
-                        Draw = float(match['Draw'])
-                        AwayWin = float(match['AwayWin'])
-                        GoalUnder = float(match['Under25'])
-                        GoalOver = float(match['Over25'])
-                        avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
-                        
-                        i.average_odds =round(avg, 2)
-                        i.save()
-
-                        if data == 0:
-                            if i.date < datetime.now().date():
+                            if match['LiveStatus'] != 0:
                                 i.is_resolve = True
                                 i.save()
-                        if data == 1:
-                            i.is_resolve = True
-                            i.save()
-                        # print(data, "live")
-
-                # print(i.date, i.country, i.match_detail, i.category, i.league, i.status)
-                # print(i.match_detail)

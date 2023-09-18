@@ -134,7 +134,7 @@ const CommentsContentSection = (props) => {
       }
       activeResolved(user_id);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error.response.status === 400) {
         Swal.fire({
           title: "Error",
@@ -691,14 +691,20 @@ const CommentsContentSection = (props) => {
                                 fontSize: "12px",
                               }}
                             >
-                              Subscribers Only{" "}
-                              <img
-                                className="mb-1"
-                                src={lock}
-                                alt=""
-                                height={15}
-                                width={15}
-                              />
+                              {user_id == val?.commentator_user?.id ? (
+                                <>{`${val?.prediction_type} & ${val?.prediction}`}</>
+                              ) : (
+                                <>
+                                  Subscribers Only{" "}
+                                  <img
+                                    className="mb-1"
+                                    src={lock}
+                                    alt=""
+                                    height={15}
+                                    width={15}
+                                  />
+                                </>
+                              )}
                             </span>
                           </div>
                         </div>
@@ -947,22 +953,23 @@ const CommentsContentSection = (props) => {
                   </div>
                 </div>
                 <div className="col p-0">
-                {/* {console.log("^^^^^^^", res)} */}
+                  {/* {console.log("^^^^^^^", res)} */}
                   {props.SelectComment === "resolvedComments" && (
                     <div className="d-flex justify-content-end pe-2">
                       {/* {res.status === "green" && ( */}
                       <>
-                      {res?.public_content == true && (
-                        <img
-                          src={`${
-                            currentTheme === "dark"
-                              ? world_check
-                              : world_check_light
-                          }`}
-                          alt=""
-                          height={31}
-                          width={31}
-                        />)}
+                        {res?.public_content == true && (
+                          <img
+                            src={`${
+                              currentTheme === "dark"
+                                ? world_check
+                                : world_check_light
+                            }`}
+                            alt=""
+                            height={31}
+                            width={31}
+                          />
+                        )}
                         {res?.is_prediction == true && (
                           <img
                             src={circle_check}
@@ -1129,7 +1136,20 @@ const CommentsContentSection = (props) => {
                       }}
                     >
                       {/* {res.text} */}
-                      {`${res?.prediction_type} & ${res?.prediction}`}
+                      {user_id == res?.commentator_user?.id ? (
+                        <>{`${res?.prediction_type} & ${res?.prediction}`}</>
+                      ) : (
+                        <>
+                          Subscribers Only{" "}
+                          <img
+                            className="mb-1"
+                            src={lock}
+                            alt=""
+                            height={15}
+                            width={15}
+                          />
+                        </>
+                      )}
                     </span>
                     {/* <span
                       className="p-1"

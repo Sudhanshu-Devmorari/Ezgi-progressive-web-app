@@ -493,7 +493,7 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {userPhone
+                  {(userPhone && data?.value?.public_content)
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>
