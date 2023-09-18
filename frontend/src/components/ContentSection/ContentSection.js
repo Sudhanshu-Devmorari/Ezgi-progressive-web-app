@@ -128,55 +128,11 @@ const ContentSection = ({
     return randomString;
   };
   const handleCommentReaction = async (id, reaction, count) => {
-    // console.log("id::::::::::::::::data", id);
-    // if(reaction === "like")
-    //   setLikeCount(count)
-    // else if(reaction === "favorite")
-    //   setFavoriteCount(count)
-    // else if(reaction === "clap")
-    //   setClapCount(count)
-
-    const res = await axios.post(
-      `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
-      {
-        reaction_type: `${reaction}`,
-      }
-    );
-    if (res.status == 200) {
-      let data = res?.data?.data;
-      if (data) {
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_clap = data?.total_clap;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_favorite = data?.total_favorite;
-        publicComments.filter(
-          (response) => response.id == data?.comment_id
-        )[0].total_reactions.total_likes = data?.total_likes;
-
-        const commentIds = cmtReact.map((data) => {
-          return data.comment_id;
-        });
-
-        if (commentIds.includes(data?.comment_id)) {
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].clap = data?.clap;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].favorite = data?.favorite;
-          cmtReact.filter(
-            (response) => response.comment_id == data?.comment_id
-          )[0].like = data?.like;
-        } else {
-          const newObj = {
-            clap: data?.clap,
-            comment_id: data?.comment_id,
-            favorite: data?.favorite,
-            like: data?.like,
-          };
-          cmtReact.push(newObj);
+    try {
+      const res = await axios.post(
+        `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
+        {
+          reaction_type: `${reaction}`,
         }
       );
       if (res.status == 200) {
@@ -403,7 +359,8 @@ const ContentSection = ({
                 </div>
               </div>
             </div>
-            {(userPhone === null || !data?.value?.public_content) && selectContent !== 'subscription' ? (
+            {(userPhone === null || !data?.value?.public_content) &&
+            selectContent !== "subscription" ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -548,7 +505,9 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-                {userPhone && (data?.value?.public_content || selectContent == 'subscription')  ? (
+                {userPhone &&
+                (data?.value?.public_content ||
+                  selectContent == "subscription") ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -614,7 +573,9 @@ const ContentSection = ({
                   </div>
                 )}
 
-                {userPhone && (data?.value?.public_content || selectContent == 'subscription') ? (
+                {userPhone &&
+                (data?.value?.public_content ||
+                  selectContent == "subscription") ? (
                   <div
                     onClick={() => {
                       if (userPhone != data?.value?.commentator_user?.id) {
@@ -680,7 +641,9 @@ const ContentSection = ({
                   </div>
                 )}
 
-                {userPhone && (data?.value?.public_content || selectContent == 'subscription') ? (
+                {userPhone &&
+                (data?.value?.public_content ||
+                  selectContent == "subscription") ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
