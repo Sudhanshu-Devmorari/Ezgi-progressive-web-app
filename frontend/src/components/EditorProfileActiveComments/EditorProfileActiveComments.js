@@ -22,6 +22,8 @@ const EditorProfileActiveComments = (props) => {
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
         `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
       );
+      console.log("res::::::::::::", res.data.id, ":::::::::::condition::::::::::", res.data.id == userId)
+      console.log("userId::::::::::::::::", userId)
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);
       setIsLoading(false);

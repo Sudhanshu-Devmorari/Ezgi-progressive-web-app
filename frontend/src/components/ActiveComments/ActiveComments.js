@@ -330,7 +330,8 @@ const ActiveComments = (props) => {
                 <img
                   onClick={() => {
                     if (userId) {
-                      favEditor(profileData?.id);
+                      props?.profileData?.id != userId &&
+                        favEditor(profileData?.id);
                     }
                   }}
                   src={Selected_Favorite}

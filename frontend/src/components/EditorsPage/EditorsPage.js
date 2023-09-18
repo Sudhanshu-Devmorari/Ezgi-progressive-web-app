@@ -23,6 +23,7 @@ const EditorsPage = ({
   const [isLoading, setIsLoading] = useState(true);
   const [displayData, setDisplayData] = useState([]);
   const [mergedEditorResult, setMergedEditorResult] = useState([]);
+  const [adsdata, setAdsdata] = useState([]);
 
   // ADS viewsssssssss-----------------
   const [adsId, setAdsId] = useState(null);
@@ -30,16 +31,6 @@ const EditorsPage = ({
     console.log("this page called");
     const timelineFilter = ads.filter((res) => res.ads_space == "Timeline");
 
-    const adsBannerId = (
-      Math.random() * (timelineFilter.length - 1) +
-      1
-    ).toFixed(0);
-
-    if (adsBannerId >= timelineFilter.length) {
-      setAdsId(ads[adsBannerId - 1]);
-    } else {
-      setAdsId(ads[adsBannerId]);
-    }
     HandleCommentator();
   }, []);
 
@@ -53,7 +44,6 @@ const EditorsPage = ({
       //   value: item,
       // }));
       // console.log("commentatorData::::::::::::::::", commentatorData);
-      console.log("highlights::::::::::::::::", highlights);
       setDisplayData(response?.data?.Commentator);
       setIsLoading(false);
     } catch (error) {
@@ -94,16 +84,19 @@ const EditorsPage = ({
     mergeEditorArrays();
   }, [displayData, highlights]);
 
-  useEffect(() => {
-    console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
-  }, [mergedEditorResult]);
-
   const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    adsId && fetchBannerData();
+  }, [adsId]);
 
   // Simulated API call function
   const fetchBannerData = async () => {
-    const res = await countsAdsAPI("ads_view", adsId?.id);
-    // console.log("res=>>>>", res);
+    try {
+      const res = await countsAdsAPI("ads_view", adsId);
+    } catch (error) {
+      console.log("error=>>>>", error);
+    }
   };
 
   const checkBannerVisibility = () => {
@@ -115,6 +108,8 @@ const EditorsPage = ({
 
       if (bannerRect.top < windowHeight && bannerRect.bottom >= 0) {
         setShowBanner(true);
+      } else {
+        setShowBanner(false);
       }
     }
   };
@@ -129,6 +124,14 @@ const EditorsPage = ({
   }, []);
 
   useEffect(() => {
+    const adsIdFilter = ads.map((res) => res.id);
+
+    function get_random(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    setAdsId(get_random(adsIdFilter));
+    setAdsdata(ads[get_random(adsIdFilter)]);
     if (showBanner) {
       fetchBannerData();
     }
@@ -155,12 +158,12 @@ const EditorsPage = ({
           (val, index) => {
             return (
               <>
-                {index % 10 == 0 ? (
+                {index % 5 == 0 ? (
                   // <AdvertisementBanner
                   //   data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
                   // />
-                  <div className="" id={`banner-${index}`}>
-                    <AdvertisementBanner data={adsId} />
+                  <div className="" id={`banner`}>
+                    <AdvertisementBanner data={adsdata} />
                   </div>
                 ) : null}
                 <SharedProfile

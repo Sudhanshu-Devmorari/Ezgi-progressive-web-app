@@ -101,6 +101,8 @@ const DashboardSU = (props) => {
               cmtReact={props.cmtReact}
               setActiveCommentsshow={props?.setActiveCommentsshow}
               setSelectContent={props?.setSelectContent}
+              setMergedEditorResult={props.setMergedEditorResult}
+              mergedEditorResult={props.mergedEditorResult}
             />
           )}
 

@@ -29,6 +29,7 @@ const CommentsPage = ({
   const [filterCommentData, setFilterCommentData] = useState(null);
   const [displayData, setDisplayData] = useState(mergedResult);
   const [publicSelected, setPublicSelected] = useState(false);
+  const [adsdata, setAdsdata] = useState([]);
 
   useEffect(() => {
     setDisplayData(mergedResult);
@@ -53,16 +54,16 @@ const CommentsPage = ({
 
   const [showBanner, setShowBanner] = useState(false);
 
+  useEffect(() => {
+    adsId && fetchBannerData();
+  }, [adsId]);
+
   // Simulated API call function
   const fetchBannerData = async () => {
-    if (adsId?.id) {
-      try {
-        const res = await countsAdsAPI("ads_view", adsId?.id);
-
-        // console.log("res=>>>>", res);
-      } catch (error) {
-        console.log("error:::::::::::::::", error);
-      }
+    try {
+      const res = await countsAdsAPI("ads_view", adsId);
+    } catch (error) {
+      console.log("error=>>>>", error);
     }
   };
 
@@ -75,6 +76,8 @@ const CommentsPage = ({
 
       if (bannerRect.top < windowHeight && bannerRect.bottom >= 0) {
         setShowBanner(true);
+      } else {
+        setShowBanner(false);
       }
     }
   };
@@ -89,6 +92,14 @@ const CommentsPage = ({
   }, []);
 
   useEffect(() => {
+    const adsIdFilter = ads.map((res) => res.id);
+
+    function get_random(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    setAdsId(get_random(adsIdFilter));
+    setAdsdata(ads[get_random(adsIdFilter)]);
     if (showBanner) {
       fetchBannerData();
     }
@@ -164,7 +175,7 @@ const CommentsPage = ({
         publicSelected={publicSelected}
       />
       <div className="" id="banner1">
-        <AdvertisementBanner data={adsId} />
+        <AdvertisementBanner data={adsdata} />
       </div>
       {onlyPublic == "" &&
         (filterCommentData == null ? displayData : filterCommentData)?.map(
@@ -176,7 +187,7 @@ const CommentsPage = ({
                 <>
                   {lastType == "highlight" ? (
                     <div className="" id="banner2">
-                      <AdvertisementBanner data={adsId} />
+                      <AdvertisementBanner data={adsdata} />
                     </div>
                   ) : null}
                   <ContentSection
@@ -234,7 +245,7 @@ const CommentsPage = ({
                   //   }
                   // />
                   <div className="" id="banner3">
-                    <AdvertisementBanner data={adsId} />
+                    <AdvertisementBanner data={adsdata} />
                   </div>
                 ) : null}
                 <ContentSection

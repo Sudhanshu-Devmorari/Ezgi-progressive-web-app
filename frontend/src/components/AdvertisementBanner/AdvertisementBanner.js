@@ -8,6 +8,13 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const server_url = `${config?.apiUrl}`;
 
+  useEffect(() => {
+    console.log("data:::::::::::", data)
+  
+   
+  }, [data])
+  
+
   // Redirected & click count
   const handleLinkClick = (ads_id) => {
     try {

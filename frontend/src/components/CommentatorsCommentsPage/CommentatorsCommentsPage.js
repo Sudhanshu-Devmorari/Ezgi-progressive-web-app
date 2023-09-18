@@ -181,6 +181,8 @@ const CommentatorsCommentsPage = (props) => {
                   followingList={props.followingList}
                   followingid={props.followingid}
                   cmtReact={props.cmtReact}
+                  setMergedEditorResult={props.setMergedEditorResult}
+                  mergedEditorResult={props.mergedEditorResult}
                 />
               )}
               {favSelection === "fav comments" && (

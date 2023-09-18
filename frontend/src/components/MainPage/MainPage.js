@@ -88,7 +88,7 @@ const MainPage = () => {
           (res) => res.ads_space == "Main Page Top Left"
         );
         const rightCornerAdsFilter = ads.filter(
-          (res) => res.ads_space == "Main Page Right Left"
+          (res) => res.ads_space == "Main Page Top Right"
         );
         setLeftCornerAds(leftCornerAdsFilter);
         setRightCornerAds(rightCornerAdsFilter);
@@ -428,6 +428,8 @@ const MainPage = () => {
                 publicComments={publicComments}
                 setPublicComments={setPublicComments}
                 mergeArrays={mergeArrays}
+                setMergedEditorResult={setMergedEditorResult}
+                mergedEditorResult={mergedEditorResult}
               />
             ) : (
               <DashboardSU
@@ -446,6 +448,8 @@ const MainPage = () => {
                 publicComments={publicComments}
                 setPublicComments={setPublicComments}
                 mergeArrays={mergeArrays}
+                setMergedEditorResult={setMergedEditorResult}
+                mergedEditorResult={mergedEditorResult}
               />
             )
           ) : (
@@ -456,6 +460,7 @@ const MainPage = () => {
                 selectContent === "comments") && (
                 <>
                   <Banner
+                    ads={ads}
                     leftCornerAds={leftCornerAds}
                     rightCornerAds={rightCornerAds}
                     // data={
@@ -743,6 +748,8 @@ const MainPage = () => {
                   publicComments={publicComments}
                   setPublicComments={setPublicComments}
                   mergeArrays={mergeArrays}
+                  mergedEditorResult={mergedEditorResult}
+                  setMergedEditorResult={setMergedEditorResult}
                 />
               )}
               {selectContent === "become-editor" && <BecomeEditor />}

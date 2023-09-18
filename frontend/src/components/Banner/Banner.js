@@ -10,33 +10,53 @@ import { useState } from "react";
 import { countsAdsAPI } from "../CountsAdViewAPI";
 import { useEffect } from "react";
 
-const Banner = ({ leftCornerAds, rightCornerAds }) => {
+const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const server_url = `${config.apiUrl}`;
 
   const [showBanner, setShowBanner] = useState(false);
+  const [adsLeftdata, setAdsLeftdata] = useState([]);
+  const [adsRightdata, setAdsRightdata] = useState([]);
 
-  const banner1 =
-    leftCornerAds[(Math.random() * (leftCornerAds?.length - 1) + 1).toFixed(0)];
-  const banner2 =
-    rightCornerAds[
-      (Math.random() * (rightCornerAds?.length - 1) + 1).toFixed(0)
-    ];
+  // const banner1 =
+  //   leftCornerAds[(Math.random() * (leftCornerAds?.length - 1) + 1).toFixed(0)];
+  // const banner2 =
+  //   rightCornerAds[
+  //     (Math.random() * (rightCornerAds?.length - 1) + 1).toFixed(0)
+  //   ];
 
   useEffect(() => {
+    const adsLeftIdFilter = leftCornerAds.map((res) => res.id);
+    const adsRightIdFilter = rightCornerAds.map((res) => res.id);
+
+    function get_random(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    // setAdsId(get_random(adsIdFilter));
+    const leftAdsdata =
+      ads && ads.filter((res) => res.id == get_random(adsLeftIdFilter));
+    const rightAdsdata =
+      ads && ads.filter((res) => res.id == get_random(adsRightIdFilter));
+    setAdsLeftdata(leftAdsdata);
+    setAdsRightdata(rightAdsdata);
     async function addViewCount() {
       try {
-        const res1 = await countsAdsAPI("ads_view", banner1?.id);
-        console.log(res1);
-        const res2 = await countsAdsAPI("ads_view", banner2?.id);
-        console.log(res2);
+        const res1 = await countsAdsAPI(
+          "ads_view",
+          get_random(adsLeftIdFilter)
+        );
+        const res2 = await countsAdsAPI(
+          "ads_view",
+          get_random(adsRightIdFilter)
+        );
       } catch (error) {
         // console.log(error)
       }
     }
-    addViewCount();
-  }, [banner1, banner2]);
+    adsLeftIdFilter && adsRightIdFilter && addViewCount();
+  }, [leftCornerAds, rightCornerAds]);
 
   // Redirected & click count
   const handleLinkClick = (ads_id) => {
@@ -66,10 +86,16 @@ const Banner = ({ leftCornerAds, rightCornerAds }) => {
           }`}
           style={{ height: "135px" }}
         >
-          <Link to={banner1?.link} onClick={() => handleLinkClick(banner2?.id)} target="_blank">
+          <Link
+            to={adsLeftdata[0]?.link}
+            onClick={() => handleLinkClick(adsLeftdata[0]?.id)}
+            target="_blank"
+          >
             <img
               src={`${
-                banner1?.picture ? server_url + banner1?.picture : bannerimg
+                adsLeftdata[0]?.picture
+                  ? server_url + adsLeftdata[0]?.picture
+                  : bannerimg
               }`}
               alt="Main Page Left Corner"
               style={{ height: "100%", width: "100%", objectFit: "cover" }}
@@ -83,10 +109,18 @@ const Banner = ({ leftCornerAds, rightCornerAds }) => {
           }`}
           style={{ height: "135px" }}
         >
-          <Link to={banner2?.link} onClick={() => handleLinkClick(banner2?.id)} target="_blank">
+          <Link
+            to={adsRightdata[0]?.link}
+            onClick={() => handleLinkClick(adsRightdata[0]?.id)}
+            target="_blank"
+          >
             <img
               style={{ height: "100%", width: "100%", objectFit: "cover" }}
-              src={`${banner2?.picture ? server_url + banner2?.picture : bannerimg}`}
+              src={`${
+                adsRightdata[0]?.picture
+                  ? server_url + adsRightdata[0]?.picture
+                  : bannerimg
+              }`}
               alt="Main Page Right Corner"
             />
           </Link>
