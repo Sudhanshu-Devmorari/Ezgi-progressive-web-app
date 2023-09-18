@@ -4,49 +4,88 @@ import pytz
 import requests
 from core.utils import sms_send
 from core.models import User, Comments
+# from django_cron import CronJobBase, Schedule
 
-def subscriptionstatus():
-    today_date = datetime.now(timezone.utc)
-    # utc = pytz.timezone('UTC')
+def subscription_reminder_cron():
+    print("\n\n =======>>>>>> Entering subscription")
+    try:
+        notification_list = []
+        today_date = timezone.now().date() 
+        cutoff_date = timezone.now() + timedelta(days=3)
 
-    add_threeday = today_date + timedelta(days=3)
-    # add_threeday_utc = add_threeday.astimezone(utc)
-    # utc_offset_formatted = add_threeday_utc.strftime('%z')
-    # utc_offset_formatted = f"{utc_offset_formatted[:-2]}:{utc_offset_formatted[-2:]}"
-    # formatted_add_threeday = add_threeday_utc.strftime("%Y-%m-%d %H:%M:%S") + utc_offset_formatted
-    if Subscription.objects.filter(end_date=add_threeday).exists():
-        notify_user = Subscription.objects.filter(end_date=add_threeday)
-        if notify_user.exists():
-            """
-            Notification : for Renew Subscription.
-            """
+        # Send notification and sms before 3 days of subscription expiration
+        reminder_notification_sub_data = Subscription.objects.filter(end_date__date=cutoff_date.date(), status='active')
+        for sub in reminder_notification_sub_data:
+            is_exist = Notification.objects.filter(receiver=sub.standard_user, subject='Subscription Plan Expires', date=today_date).exists()
             
-            for obj in notify_user:
-                notification_obj = Notification.objects.get(user=obj.standard_user, status=False, context=f'Your {obj.commentator_user.username} commentator subscription expires in three days.')
+            if not is_exist:
+                notification_obj = Notification(
+                    receiver=sub.standard_user, 
+                    subject='Subscription Plan Expires',
+                    date=today_date, 
+                    status=True,
+                    context=f'Hi {sub.standard_user.username}, 3 days left until the subscription plan expires. You can renew your plan.'
+                )
 
-                user = obj.standard_user
-                message = "Hello, {}! This is a test SMS from your Django app.".format(user.username)
-                to_number = user.phone
-                sms_send(to_number, message)
+                notification_list.append(notification_obj)
 
-    # today_date1 = datetime.now(timezone.utc)
-    # formatted_date = today_date1.strftime('%Y-%m-%d %H:%M:%S') + '+00:00'
-    if Subscription.objects.filter(end_date__lt=today_date).exists():
-        pending_status = Subscription.objects.filter(end_date=today_date)
-        for obj in pending_status:
-            obj.status = 'pending'
-            obj.save()
+        Notification.objects.bulk_create(notification_list)
+        send_notification_sms(notification_list) 
 
-    sub_threeday = today_date - timedelta(days=3)
-    # sub_threeday_utc = sub_threeday.astimezone(utc)
-    # utc_offset_formatted1 = sub_threeday_utc.strftime('%z')
-    # utc_offset_formatted2 = f"{utc_offset_formatted1[:-2]}:{utc_offset_formatted1[-2:]}"
-    # formatted_sub_threeday = sub_threeday_utc.strftime("%Y-%m-%d %H:%M:%S") + utc_offset_formatted2
-    if Subscription.objects.filter(end_date = sub_threeday).exists():
-        deactivate_status = Subscription.objects.filter(end_date = sub_threeday)
-        for deobj in deactivate_status:
-            deobj.status = 'deactive'
-            deobj.save()
+        # Update subscription status to pending if subscription is not actived after subscription expiration
+        pending_status = Subscription.objects.filter(end_date__gt=(today_date+ timedelta(days=3)), end_date__lt=(today_date+ timedelta(days=5)), status='active').update(status='pending')
+        
+        # Deactivate subscription after 3 days of expiration if subscription not activated
+        pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
+        return True
+    
+    except:
+        return False
+
+def send_notification_sms(notification_data):
+    try:
+        for notification_obj in notification_data:
+            message = f'Hi {notification_obj.receiver.username}, 3 days left until the subscription plan expires. You can renew your plan.'
+            to_number = notification_obj.receiver.phone
+            sms_send(to_number, message)
+            return True
+        return False
+    
+    except:
+        return False
+
+# def subscriptionstatus():
+#     today_date = datetime.now(timezone.utc)
+
+#     add_threeday = today_date + timedelta(days=3)
+
+#     if Subscription.objects.filter(end_date=add_threeday).exists():
+#         notify_user = Subscription.objects.filter(end_date=add_threeday)
+#         if notify_user.exists():
+#             """
+#             Notification : for Renew Subscription.
+#             """
+            
+#             for obj in notify_user:
+#                 notification_obj = Notification.objects.get(user=obj.standard_user, status=False, context=f'Your {obj.commentator_user.username} commentator subscription expires in three days.')
+
+#                 user = obj.standard_user
+#                 message = "Hello, {}! This is a test SMS from your Django app.".format(user.username)
+#                 to_number = user.phone
+#                 sms_send(to_number, message)
+
+#     if Subscription.objects.filter(end_date__lt=today_date).exists():
+#         pending_status = Subscription.objects.filter(end_date=today_date)
+#         for obj in pending_status:
+#             obj.status = 'pending'
+#             obj.save()
+
+#     sub_threeday = today_date - timedelta(days=3)
+#     if Subscription.objects.filter(end_date = sub_threeday).exists():
+#         deactivate_status = Subscription.objects.filter(end_date = sub_threeday)
+#         for deobj in deactivate_status:
+#             deobj.status = 'deactive'
+#             deobj.save()
 
 def Userst():
     all_user = User.objects.filter(user_role='commentator')

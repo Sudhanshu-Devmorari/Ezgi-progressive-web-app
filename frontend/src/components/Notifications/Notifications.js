@@ -4,10 +4,11 @@ import profile from "../../assets/profile.png";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
-import initialProfile from '../../assets/profile.png'
+import initialProfile from "../../assets/profile.png";
 
 const Notifications = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const [unreadNotificationsIds, setUnreadNotificationsIds] = useState([]);
   const notification = [
     {
       profile: profile,
@@ -41,8 +42,11 @@ const Notifications = () => {
       axios
         .get(`${config.apiUrl}/notification/${userId}`)
         .then((res) => {
-          // console.log(res.data);
-          setNotificationData(res.data)
+          const data = res?.data;
+          const isRead = data.filter((res) => res?.status === false);
+          const idsOfUnreadItems = isRead.map((item) => item.id);
+          setUnreadNotificationsIds(idsOfUnreadItems);
+          setNotificationData(res.data);
         })
         .catch((err) => {
           console.log(err);
@@ -50,6 +54,28 @@ const Notifications = () => {
     }
     getNotifications();
   }, []);
+
+  useEffect(() => {
+    if (unreadNotificationsIds) {
+      try {
+        axios
+          .post(
+            `${config.apiUrl}/notification/${userId}`,
+            {
+              'update-status': unreadNotificationsIds
+            }
+          )
+          .then((res) => {
+            // console.log(res, "===========>>>post");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, [unreadNotificationsIds]);
 
   return (
     <>
@@ -61,7 +87,16 @@ const Notifications = () => {
           style={{ fontSize: "13px" }}
         >
           <div className="d-flex">
-            <img src={res?.sender?.profile_pic ? `${config.apiUrl}${res?.sender?.profile_pic}` : initialProfile} alt="" height={42} width={42} />
+            <img
+              src={
+                res?.sender?.profile_pic
+                  ? `${config.apiUrl}${res?.sender?.profile_pic}`
+                  : initialProfile
+              }
+              alt=""
+              height={42}
+              width={42}
+            />
             <div
               className="d-flex flex-column mt-2 ps-1"
               style={{ width: "66%" }}

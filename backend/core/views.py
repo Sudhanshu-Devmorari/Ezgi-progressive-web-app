@@ -693,7 +693,7 @@ class NotificationView(APIView):
         user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(receiver=user, status=False)
+            notification_obj = Notification.objects.filter(receiver=user)
             # notification_obj = Notification.objects.filter(receiver=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
@@ -707,15 +707,20 @@ class NotificationView(APIView):
             )
         
     def post(self, request, format=None, *args, **kwargs):
-        user = request.user
+        # user = request.user
         try:
             if request.data:
-                notification_obj = Notification.objects.get(receiver=user, id=request.data.get("id"))
-                notification_obj.status = True
-                notification_obj.save()
-                serializer = NotificationSerializer(notification_obj)
-                data = serializer.data
-                return Response(data=data, status=status.HTTP_200_OK)
+                if request.data['update-status']:
+                    ids = request.data['update-status'] if request.data['update-status'] else []
+                    notifications = Notification.objects.filter(id__in=ids).update(status=True)
+                    return Response({'data' : 'Notifications updated successfully'}, status=status.HTTP_200_OK)
+
+                # notification_obj = Notification.objects.get(receiver=user, id=request.data.get("id"))
+                # notification_obj.status = True
+                # notification_obj.save()
+                # serializer = NotificationSerializer(notification_obj)
+                # data = serializer.data
+                # return Response(data=data, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Request data is missing"}, status=status.HTTP_400_BAD_REQUEST)
         except Notification.DoesNotExist:
@@ -3061,15 +3066,35 @@ class NotificationManagement(APIView):
             data = {}
 
             # Count the number of notifications with status=False
-            viewed = Notification.objects.filter(status=False).count()
+            # viewed = Notification.objects.filter(status=False).count()
+            viewed = Notification.objects.filter(
+                    Q(subject='Subscription Purchase') | 
+                    Q(subject='Subscription Plan Expires') | 
+                    Q(subject='Promotion'), 
+                    status=True
+                ).count()
             data['viewed'] = viewed
 
             # Count the number of notifications with status=True
-            pending = Notification.objects.filter(status=True).count()
+            # pending = Notification.objects.filter(status=True).count()
+            pending = Notification.objects.filter(
+                    Q(subject='Subscription Purchase') | 
+                    Q(subject='Subscription Plan Expires') | 
+                    Q(subject='Promotion'), 
+                    status=False
+                ).count()
             data['pending'] = pending
 
             # Retrieve all notification objects
-            notification_obj = Notification.objects.all()
+            # notification_obj = Notification.objects.all()
+            admin_user = User.objects.get(is_admin=True)
+            
+            notification_obj = Notification.objects.filter(
+                Q(subject='Subscription Purchase') |
+                Q(subject='Subscription Plan Expires') |
+                Q(subject='Promotion') |
+                Q(sender=admin_user)
+            )
 
             # Serialize the notification objects
             serializer = NotificationSerializer(notification_obj, many=True)
@@ -3506,6 +3531,20 @@ class MembershipSettingView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            promotion_rate = request.data['promotion_rate']
+            notification_list = {}
+            standard_users = User.objects.filter(user_role='standard')
+            for user in standard_users:
+                notification_obj = Notification(
+                    receiver=user, 
+                    subject='Promotion',
+                    date=datetime.today().date(), 
+                    status=False,
+                    context=f'Hi {user.username}, We have defined a special promotion for you. You can now make {promotion_rate}% off plan to upgrate your role'
+                )
+                notification_list.append(notification_obj)
+            Notification.objects.bulk_create(notification_list)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
@@ -4528,3 +4567,26 @@ class BecomeEditorFAQView(APIView):
             return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
         except BecomeEditor.DoesNotExist:
             return Response({'msg':"DoesNotExist"},status=status.HTTP_404_NOT_FOUND)
+        
+
+def create_reminder_notification():
+    try:
+        notification_list = []
+        cutoff_date = timezone.now() + timedelta(days=3)
+
+        expires_sub = Subscription.objects.filter(end_date__date=cutoff_date.date())
+        for sub in expires_sub:
+            notification_obj = Notification(
+                receiver=sub.commentator_user, 
+                subject='Subscription Plan Expires',
+                date=datetime.today().date(), 
+                status=False,
+                context=f'Hi {sub.commentator_user.username}, 3 days left until the subscription plan expires. You can renew your plan.'
+            )
+            
+            notification_list.append(notification_obj)
+
+        Notification.objects.bulk_create(notification_list)
+        return True
+    except:
+        False

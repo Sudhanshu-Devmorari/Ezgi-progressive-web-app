@@ -30,7 +30,6 @@ const CreateAdsModal = (props) => {
 
   const validationSchema = Yup.object({
     profile: Yup.mixed().required("Ads picture is required"),
-    adsSpace: Yup.string().required("Ads Space is required"),
     startDate: Yup.date().required("Start Date is required"),
     endDate: Yup.date().required("End Date is required"),
     companyName: Yup.string().required("Company Name is required"),
@@ -43,7 +42,6 @@ const CreateAdsModal = (props) => {
   const formik = useFormik({
     initialValues: {
       profile: null,
-      adsSpace: "",
       startDate: "",
       endDate: "",
       companyName: "",

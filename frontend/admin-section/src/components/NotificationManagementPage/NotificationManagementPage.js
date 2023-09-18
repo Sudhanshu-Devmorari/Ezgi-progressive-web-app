@@ -14,16 +14,21 @@ import yellow_tick from "../../assets/checks.svg";
 import "./NotificationManagementPage.css";
 import axios from "axios";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
+import moment from "moment";
 
 const NotificationManagementPage = () => {
   const [notifications, setNotifications] = useState([]);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [viewedCount, setViewedCount] = useState(0);
+  const [notificationsCount, setNotificationsCount] = useState({
+    notificatios: 0,
+    pending: 0,
+    viewed: 0,
+    total: 0,
+  });
 
   const requestArray = [
-    { img: bell2, name: "Viewed", count: viewedCount },
-    { img: bell3, name: "Pending", count: pendingCount },
+    { img: bell2, name: "Viewed", count: notificationsCount.viewed },
+    { img: bell3, name: "Pending", count: notificationsCount.pending },
   ];
   const users = [
     {
@@ -73,12 +78,16 @@ const NotificationManagementPage = () => {
         const res = await axios.get(
           `${config?.apiUrl}/notification-management/`
         );
-        // console.log(res.data, "==========>>>res sub users");
+        console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotifications(data.notification);
-        setNotificationCount(data.notification_count);
-        setPendingCount(data.pending);
-        setViewedCount(data.viewed);
+        setNotificationsCount({
+          ...notificationsCount,
+          notificatios: data?.notification_count,
+          pending: data?.pending,
+          viewed: data?.viewed,
+          total: data?.notification_count,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -115,7 +124,9 @@ const NotificationManagementPage = () => {
               <div className="d-flex flex-column align-items-center justify-content-center col-3 dark-mode mx-2">
                 <img src={bell1} alt="" className="icon" />
                 <span className="heading">Notifications</span>
-                <span className="number">{notificationCount}</span>
+                <span className="number">
+                  {notificationsCount.notificatios}
+                </span>
               </div>
               <div className="col col p-0 dark-mode">
                 <div className="row g-0 h-100">
@@ -130,19 +141,33 @@ const NotificationManagementPage = () => {
               </div>
               <div className="d-flex flex-column align-items-center justify-content-center col-3 dark-mode mx-2">
                 <span className="heading">Total</span>
-                <span className="number">658</span>
+                <span className="number">
+                  {notificationsCount.notificatios}
+                </span>
               </div>
             </div>
             <div className="dark-mode p-2 m-2 mb-0 home-height">
-              {users.map((res, index) => (
+              {notifications.map((res, index) => (
                 <MainDiv>
                   <>
                     <div className="col-2 d-flex align-items-center">
-                      <span>#0001</span>
+                      <span className="pe-1">{`# ${(index + 1)
+                        .toString()
+                        .padStart(4, "0")}`}</span>
                       <span className="px-2">
-                        <img src={res.profile} alt="" height={45} width={45} />
+                        <img
+                        style={{objectFit: 'cover', borderRadius: '50%'}}
+                          src={
+                            res?.receiver?.profile_pic
+                              ? `${config.apiUrl}${res?.receiver?.profile_pic}`
+                              : initialProfile
+                          }
+                          alt=""
+                          height={45}
+                          width={45}
+                        />
                       </span>
-                      <span>johndoe</span>
+                      <span>{res?.receiver?.username}</span>
                     </div>
                     <div className="col-1 d-flex align-items-center justify-content-center">
                       <button
@@ -151,39 +176,56 @@ const NotificationManagementPage = () => {
                           backgroundColor: "transparent",
                           borderRadius: "4px",
                           border:
-                            (res.role === "Subscriber" &&
+                            (res?.receiver?.user_role === "Subscriber" &&
                               "1px solid #58DEAA") ||
-                            (res.role === "Editor" && "1px solid #FF9100") ||
-                            (res.role === "Standard User" &&
+                            (res?.receiver?.user_role === "commentator" &&
+                              "1px solid #FF9100") ||
+                            (res?.receiver?.user_role === "standard" &&
                               "1px solid #3370FF"),
                           color:
-                            (res.role === "Subscriber" && "#58DEAA") ||
-                            (res.role === "Editor" && "#FF9100") ||
-                            (res.role === "Standard User" && "#3370FF"),
+                            (res?.receiver?.user_role === "Subscriber" &&
+                              "#58DEAA") ||
+                            (res?.receiver?.user_role === "commentator" &&
+                              "#FF9100") ||
+                            (res?.receiver?.user_role === "standard" &&
+                              "#3370FF"),
                         }}
                       >
-                        {res.role}
+                        {res?.receiver?.user_role === "commentator" && "Editor"}
+                        {res?.receiver?.user_role === "standard" &&
+                          "Standard User"}
                       </button>
                     </div>
                     <div className="col-2 d-flex align-items-center justify-content-center">
-                      <button
-                        className="px-2"
-                        style={{
-                          backgroundColor: "transparent",
-                          borderRadius: "4px",
-                          border:
-                            (res.plan === "Subscription" &&
-                              "1px solid #58DEAA") ||
-                            (res.plan === "Reminder" && "1px solid #FFDD00") ||
-                            (res.plan === "Private" && "1px solid #DD7DFF"),
-                          color:
-                            (res.plan === "Subscription" && "#58DEAA") ||
-                            (res.plan === "Reminder" && "#FFDD00") ||
-                            (res.plan === "Private" && "#DD7DFF"),
-                        }}
-                      >
-                        {res.plan}
-                      </button>
+                      {(res?.subject === "Subscription Purchase" ||
+                        res?.subject === "Subscription Plan Expires" ||
+                        res?.subject === "Promotion") && (
+                        <button
+                          className="px-2"
+                          style={{
+                            backgroundColor: "transparent",
+                            borderRadius: "4px",
+                            border:
+                              (res.subject === "Subscription Purchase" &&
+                                "1px solid #58DEAA") ||
+                              (res.subject === "Subscription Plan Expires" &&
+                                "1px solid #FFDD00") ||
+                              (res.subject === "Private" &&
+                                "1px solid #DD7DFF"),
+                            color:
+                              (res.subject === "Subscription" && "#58DEAA") ||
+                              (res.subject === "Subscription Plan Expires" &&
+                                "#FFDD00") ||
+                              (res.subject === "Private" && "#DD7DFF"),
+                          }}
+                        >
+                          {res.subject === "Subscription Plan Expires" &&
+                            "Reminder"}
+                          {res.subject === "Subscription Purchase" &&
+                            "Subscription"}
+                          {res.subject === "Promotion" && "Private"}
+                        </button>
+                      )}
                     </div>
                     <div className="col-5 d-flex align-items-center">
                       <div
@@ -195,12 +237,17 @@ const NotificationManagementPage = () => {
                           width: "700px",
                         }}
                       >
-                        {formatContent(res.content)}
+                        {formatContent(res?.context)}
                       </div>
                     </div>
                     <div className="col-2 d-flex align-items-center justify-content-end gap-2">
-                      <div className="">15-06-2023 - 16:37</div>
-                      <img src={res.tick} alt="" height={22} width={22} />
+                      <div className="">{moment(res.created).format("DD-MM.YYYY - HH:mm")}</div>
+                      <img
+                        src={res?.status ? green_tick : yellow_tick}
+                        alt=""
+                        height={22}
+                        width={22}
+                      />
                     </div>
                   </>
                 </MainDiv>
