@@ -11,6 +11,7 @@ import moon from "../../assets/Header Dark Mode.svg";
 import { userId } from "../GetUser";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
+import Spinner from "react-bootstrap/esm/Spinner";
 
 const NavBar = (props) => {
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -19,7 +20,7 @@ const NavBar = (props) => {
   const [signUpModalShow, setSignUpModalShow] = useState(false);
   const [addCommentShow, setAddCommentShow] = useState(false);
   // console.log(props.profileData,"Profile Datata")
- 
+
   const handleTheme = (e) => {
     if (e === "dark") {
       localStorage.setItem("CurrentTheme", "dark");
@@ -42,69 +43,73 @@ const NavBar = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } ${props?.selectContent === "become-editor" && "mx-2"}`}
       >
-        <div className="container-fluid justify-content-end">
-          <div className="">
-            {currentTheme === "light" ? (
-              <span className="p-2">
-                <img
-                  src={moon}
-                  alt=""
-                  height={35}
-                  width={35}
-                  onClick={() => handleTheme("dark")}
-                />
-              </span>
-            ) : (
-              <span className="p-2">
-                <img
-                  src={darkmode}
-                  alt=""
-                  height={35}
-                  width={35}
-                  onClick={() => {
-                    handleTheme("light");
-                  }}
-                />
-              </span>
-            )}
-            <span className="pe-2 ps-0 py-2">
+        <div className="container-fluid justify-content-end align-items-center">
+          {currentTheme === "light" ? (
+            <span className="px-2">
               <img
-                src={currentTheme === "dark" ? bell : bellLight}
+                src={moon}
+                alt=""
+                height={35}
+                width={35}
+                onClick={() => handleTheme("dark")}
+              />
+            </span>
+          ) : (
+            <span className="px-2">
+              <img
+                src={darkmode}
                 alt=""
                 height={35}
                 width={35}
                 onClick={() => {
-                  if (!userId) {
-                    setSignUpModalShow(true);
-                  } else {
-                    props.setDashboardSUser(true);
-                    props.setSelectContent("notifications");
-                  }
-                  setShowModal(4);
+                  handleTheme("light");
                 }}
               />
             </span>
-            {userPhone ? (
-              <>
-                <span
-                  onClick={() => {
-                    props.setDashboardSUser(true);
-                    props.setSelectContent("show-all-comments");
-                  }}
-                  className="py-2 px-3"
-                  style={{
-                    backgroundColor:
-                      currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                  }}
-                >
-                  Dashboard
-                </span>
-                <span className="ps-2">
+          )}
+          <span className="pe-2 ps-0">
+            <img
+              src={currentTheme === "dark" ? bell : bellLight}
+              alt=""
+              height={35}
+              width={35}
+              onClick={() => {
+                if (!userId) {
+                  setSignUpModalShow(true);
+                } else {
+                  props.setDashboardSUser(true);
+                  props.setSelectContent("notifications");
+                }
+                setShowModal(4);
+              }}
+            />
+          </span>
+          {userPhone ? (
+            <>
+              <span
+                onClick={() => {
+                  props.setDashboardSUser(true);
+                  props.setSelectContent("show-all-comments");
+                }}
+                className="py-2 px-3"
+                style={{
+                  backgroundColor:
+                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                }}
+              >
+                Dashboard
+              </span>
+              <span className="ps-2">
+                {props?.isLoading ? (
+                  <Spinner
+                    size={2}
+                    color={currentTheme == "dark" ? "#fff" : "#F6F6F6"}
+                  />
+                ) : (
                   <img
-                    //src= {`${config.apiUrl}${props.profileData}`}
                     src={
-                      props.profileData
-                        ? `${config.apiUrl}${props.profileData}`
+                      props?.profileData
+                        ? `${config.apiUrl}${props?.profileData}`
                         : initialProfile
                     }
                     alt="profile"
@@ -112,31 +117,31 @@ const NavBar = (props) => {
                     width={45}
                     style={{ borderRadius: "50%" }}
                   />
-                </span>
-              </>
-            ) : (
-              <>
-                <span
-                  className="p-2 cursor"
-                  onClick={() => {
-                    setSignUpModalShow(true);
-                    setShowModal(1);
-                  }}
-                >
-                  Sign Up
-                </span>
-                <span
-                  className="px-0 py-2 cursor"
-                  onClick={() => {
-                    setSignUpModalShow(true);
-                    setShowModal(4);
-                  }}
-                >
-                  Sign In
-                </span>
-              </>
-            )}
-          </div>
+                )}
+              </span>
+            </>
+          ) : (
+            <>
+              <span
+                className="p-2 cursor"
+                onClick={() => {
+                  setSignUpModalShow(true);
+                  setShowModal(1);
+                }}
+              >
+                Sign Up
+              </span>
+              <span
+                className="px-0 py-2 cursor"
+                onClick={() => {
+                  setSignUpModalShow(true);
+                  setShowModal(4);
+                }}
+              >
+                Sign In
+              </span>
+            </>
+          )}
         </div>
       </nav>
       <SignUpModal

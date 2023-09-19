@@ -261,12 +261,12 @@ const SignUpModal = (props) => {
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
 
   const [forgotPsPhone, setForgotPsPhone] = useState("");
-  // console.log(forgotPsPhone,"========")
 
   // ===================================== UPDATE CODE ====================================================
   const validationSchema = Yup.object({
     name: Yup.string()
       .required("Name is required")
+      .matches(/^[a-zA-Z\s]*$/, "Name must contain only letters and spaces")
       .min(5, "Name must be at least 5 characters")
       .max(20, "Name must be at most 20 characters"),
     username: Yup.string()
@@ -311,13 +311,6 @@ const SignUpModal = (props) => {
           setPhone(values.phone);
           setbtnLoading(false);
         }
-
-        // .then((res) => {
-        //   console.log(res);
-        // })
-        // .catch((error) => {
-        //   console.log(error);
-        // });
       } catch (error) {
         setbtnLoading(false);
       }
@@ -354,7 +347,10 @@ const SignUpModal = (props) => {
                   <span>SIGN UP</span>
                   <span>
                     <RxCross2
-                      onClick={props.onHide}
+                      onClick={() => {
+                        props.onHide();
+                        formik.resetForm();
+                      }}
                       fontSize={"1.8rem"}
                       className={`${
                         currentTheme === "dark"
@@ -372,8 +368,6 @@ const SignUpModal = (props) => {
                     <div className="d-flex flex-column m-2">
                       <label htmlFor="name">Name Surname</label>
                       <input
-                        // value={name}
-                        // onChange={(e)=>{setName(e.target.value); console.log(e.target.value,"=>>>>>");}}
                         id="name"
                         type="text"
                         className={`${

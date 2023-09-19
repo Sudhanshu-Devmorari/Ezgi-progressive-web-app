@@ -22,14 +22,40 @@ const EditorProfileActiveComments = (props) => {
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
         `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
       );
-      console.log("res::::::::::::", res.data.id, ":::::::::::condition::::::::::", res.data.id == userId)
-      console.log("userId::::::::::::::::", userId)
+      console.log(
+        "res::::::::::::",
+        res.data.id,
+        ":::::::::::condition::::::::::",
+        res.data.id == userId
+      );
+      console.log("userId::::::::::::::::", userId);
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);
       setIsLoading(false);
     }
     getProfileData();
   }, []);
+
+  const [active, setActive] = useState([]);
+  const [resolve, setResolve] = useState([]);
+
+  const activeResolved = async (user_id) => {
+    console.log("userID::::::::::::", user_id);
+    try {
+      const res = await axios
+        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
+        .then((res) => {
+          console.log("activeResolved::::::::::: ", res.data);
+          setActive(res.data?.active_comments);
+          setResolve(res.data?.resolved_comments);
+        })
+        .catch((error) => {
+          console.error("Error fetching data.", error);
+        });
+    } catch (error) {
+      console.error("Error fetching data.", error);
+    }
+  };
 
   return (
     <>
@@ -62,6 +88,7 @@ const EditorProfileActiveComments = (props) => {
             followingid={props.followingid}
             isFavorite={isFavorite}
             setIsFavorite={setIsFavorite}
+            activeResolved={activeResolved}
           />
           <SelectComments
             setSelectComment={setSelectComment}
@@ -69,7 +96,7 @@ const EditorProfileActiveComments = (props) => {
           />
           {SelectComment !== "statistics" && (
             <CommentsContentSection
-            userProfileId={profileData?.id}
+              userProfileId={profileData?.id}
               SelectComment={SelectComment}
               verifyid={props.verifyid}
               cmtReact={props.cmtReact}
@@ -85,6 +112,11 @@ const EditorProfileActiveComments = (props) => {
               setPublicComments={props.setPublicComments}
               mergeArrays={props.mergeArrays}
               setCmtReact={props.setCmtReact}
+              activeResolved={activeResolved}
+              setActive={setActive}
+              active={active}
+              setResolve={setResolve}
+              resolve={resolve}
             />
           )}
           {SelectComment === "statistics" && (

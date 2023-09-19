@@ -231,7 +231,7 @@ const CommentsPage = ({
             }
           }
         )}
-      {onlyPublic == "Only public" &&
+      {onlyPublic == "only public" &&
         onlyPublicResult?.map((val, index) => {
           let lastType = onlyPublicResult[index == 0 ? 0 : index - 1]?.type;
 

@@ -17,7 +17,7 @@ import "react-circular-progressbar/dist/styles.css";
 import world_check_light from "../../assets/world-check.png";
 import world_check from "../../assets/world-check.svg";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { truncateString, userId } from "../GetUser";
 import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 
@@ -174,9 +174,9 @@ const FavComments = (props) => {
 
   return (
     <>
-      {/* <ContentSection userComments={userComments}/> */}
-      <>
-        {favCommentData?.map((res, index) => (
+      {favCommentData?.map((res, index) => {
+        const truncated = truncateString(res?.country, 6);
+        return (
           <div
             key={index}
             className={`card border-0 rounded-0 mb-2 ${
@@ -217,7 +217,7 @@ const FavComments = (props) => {
                     alt=""
                   />
                   <span className="p-1 autorname-responsive">
-                    {res?.commentator_user?.username}
+                    {truncateString(res?.commentator_user?.username, 11)}
                   </span>
                   {props.verifyid?.includes(res?.commentator_user?.id) && (
                     <img src={blueTick} alt="" width={16} height={16} />
@@ -325,8 +325,7 @@ const FavComments = (props) => {
                       height={26}
                       width={26}
                     />
-                    <span className="ps-1">{res?.country}</span>
-                    {/* <span className="ps-1">Süper Lig</span> */}
+                    <span className="ps-1">{truncated}</span>
                   </span>
                   <span style={{ paddingRight: "53px" }}>{res.date}</span>
                   <span>
@@ -345,8 +344,13 @@ const FavComments = (props) => {
                   </span>
                 </div>
                 <div className="d-flex justify-content-center">
-                  <span className="mt-2 pt-1">
-                    {res?.match_detail.split(" - ")[0]}
+                  <span
+                    className="mt-2 pt-1 text-end"
+                    style={{ width: "140px" }}
+                  >
+                    <span className="w-100">
+                      {res?.match_detail.split(" - ")[0]}
+                    </span>
                   </span>
                   <div
                     className="px-2"
@@ -370,8 +374,10 @@ const FavComments = (props) => {
                       })}
                     />
                   </div>
-                  <span className="mt-2 pt-1">
-                    {res?.match_detail.split(" - ")[1]}
+                  <span className="mt-2 pt-1" style={{ width: "156px" }}>
+                    <span className="w-100">
+                      {res?.match_detail.split(" - ")[1]}
+                    </span>
                   </span>
                 </div>
                 <div className="text-end mt-3 mb-2">
@@ -403,12 +409,12 @@ const FavComments = (props) => {
                 >
                   <div
                     onClick={() => {
-                      if(res.public_content === true){
-                      handleCommentReaction(
-                        res?.id,
-                        "like",
-                        res?.total_reactions.total_likes
-                      );
+                      if (res.public_content === true) {
+                        handleCommentReaction(
+                          res?.id,
+                          "like",
+                          res?.total_reactions.total_likes
+                        );
                       }
                     }}
                     className="d-flex align-items-center gap-2"
@@ -454,12 +460,12 @@ const FavComments = (props) => {
                   </div>
                   <div
                     onClick={() => {
-                      if(res.public_content === true){
-                      handleCommentReaction(
-                        res?.id,
-                        "favorite",
-                        res?.total_reactions?.total_favorite
-                      );
+                      if (res.public_content === true) {
+                        handleCommentReaction(
+                          res?.id,
+                          "favorite",
+                          res?.total_reactions?.total_favorite
+                        );
                       }
                     }}
                   >
@@ -504,12 +510,12 @@ const FavComments = (props) => {
                   </div>
                   <div
                     onClick={() => {
-                      if(res.public_content === true){
-                      handleCommentReaction(
-                        res?.id,
-                        "clap",
-                        res?.total_reactions?.total_clap
-                      );
+                      if (res.public_content === true) {
+                        handleCommentReaction(
+                          res?.id,
+                          "clap",
+                          res?.total_reactions?.total_clap
+                        );
                       }
                     }}
                   >
@@ -573,8 +579,8 @@ const FavComments = (props) => {
               </div>
             </div>
           </div>
-        ))}
-      </>
+        );
+      })}
       <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
     </>
   );

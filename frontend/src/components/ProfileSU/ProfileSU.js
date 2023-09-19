@@ -39,6 +39,7 @@ const ProfileSU = (props) => {
           setEditProfile(false);
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
+          formData.append("update", "profile");
           const res = await axios.post(
             `${config?.apiUrl}/profile/${userId}`,
             formData

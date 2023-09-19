@@ -15,22 +15,29 @@ const SelectContentForEditorPage = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const filterData = (e) => {
-    if(props.editor == true){
-      props.setFilterData(null)
-      const val = e.target.value
-      const filteredArray = props.data.filter((obj) =>
-        obj?.value?.user?.username?.toLowerCase().startsWith(val.toLowerCase()) ||
-        obj?.value?.user?.username?.toLowerCase().includes(val.toLowerCase()) 
+    if (props.editor == true) {
+      props.setFilterData(null);
+      const val = e.target.value;
+      const filteredArray = props.data.filter(
+        (obj) =>
+          obj?.value?.user?.username
+            ?.toLowerCase()
+            .startsWith(val.toLowerCase()) ||
+          obj?.value?.user?.username?.toLowerCase().includes(val.toLowerCase())
       );
       props.setDisplayData(filteredArray);
-    }
-    else{
+    } else {
       // console.log("*=======>>>>>>", props.comments)
-      props.setFilterCommentData(null)
-      const val = e.target.value
-      const filteredArray = props.data.filter((obj) =>
-        obj?.value?.commentator_user?.username?.toLowerCase().startsWith(val.toLowerCase()) ||
-        obj?.value?.commentator_user?.username?.toLowerCase().includes(val.toLowerCase())
+      props.setFilterCommentData(null);
+      const val = e.target.value;
+      const filteredArray = props.data.filter(
+        (obj) =>
+          obj?.value?.commentator_user?.username
+            ?.toLowerCase()
+            .startsWith(val.toLowerCase()) ||
+          obj?.value?.commentator_user?.username
+            ?.toLowerCase()
+            .includes(val.toLowerCase())
       );
       props.setDisplayData(filteredArray);
     }
@@ -90,27 +97,50 @@ const SelectContentForEditorPage = (props) => {
               height={32}
               width={32}
             />
-            <span className="pe-2">Only Public</span>
-            {/* {console.log(props.publicSelected)} */}
-            <div onClick={()=>{props.setPublicSelected(!props.publicSelected); props.publicSelected == true ? props.setOnlyPublic("") : props.setOnlyPublic("Only public")}} >
+            <span className="pe-2" style={{ width: "max-content" }}>
+              Only Public
+            </span>
+            <div
+              onClick={() => {
+                props.setPublicSelected(!props.publicSelected);
+                props.publicSelected == true
+                  ? props.setOnlyPublic("")
+                  : props.setOnlyPublic("only public");
+              }}
+            >
               <img
                 // src={currentTheme === "dark" ? darkGrp : lighGrp}
-                src={currentTheme === "dark" ? props.publicSelected ? publicSelectedIcon : darkGrp : props.publicSelected ? lighGrpSelected : lighGrp  }
+                src={
+                  currentTheme === "dark"
+                    ? props.publicSelected
+                      ? publicSelectedIcon
+                      : darkGrp
+                    : props.publicSelected
+                    ? lighGrpSelected
+                    : lighGrp
+                }
                 alt=""
                 height={28}
                 width={28}
               />
             </div>
-            
           </div>
         )}
       </div>
 
       {props?.editor && (
-        <EditorFilter show={modalShow} onHide={() => setModalShow(false)} setFilterData={props.setFilterData}/>
-      ) }
+        <EditorFilter
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          setFilterData={props.setFilterData}
+        />
+      )}
       {props?.comments && (
-        <CommentsPageModal show={modalShow} onHide={() => setModalShow(false)} setFilterCommentData={props.setFilterCommentData}/>
+        <CommentsPageModal
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          setFilterCommentData={props.setFilterCommentData}
+        />
       )}
     </>
   );

@@ -25,11 +25,9 @@ const EditorsPage = ({
   const [mergedEditorResult, setMergedEditorResult] = useState([]);
   const [adsdata, setAdsdata] = useState([]);
 
-  // ADS viewsssssssss-----------------
   const [adsId, setAdsId] = useState(null);
   useEffect(() => {
     console.log("this page called");
-    const timelineFilter = ads.filter((res) => res.ads_space == "Timeline");
 
     HandleCommentator();
   }, []);
@@ -39,11 +37,7 @@ const EditorsPage = ({
       const response = await axios.get(
         `${config?.apiUrl}/retrieve-commentator-list/?id=${userId}`
       );
-      // const commentatorData = response?.data?.Commentator?.map((item) => ({
-      //   type: "commentator",
-      //   value: item,
-      // }));
-      // console.log("commentatorData::::::::::::::::", commentatorData);
+
       setDisplayData(response?.data?.Commentator);
       setIsLoading(false);
     } catch (error) {
@@ -56,7 +50,6 @@ const EditorsPage = ({
     if (displayData.length > 0) {
       let merged = [];
       let remainingPublic = [...displayData];
-      let remainingHighlights = [...highlights];
 
       if (remainingPublic.length > 0) {
         merged = [
@@ -66,15 +59,6 @@ const EditorsPage = ({
           })),
         ];
       }
-
-      // if (remainingHighlights.length > 0) {
-      //   merged = [
-      //     ...merged,
-      //     ...remainingHighlights.map((highlight) => ({
-      //       value: highlight,
-      //     })),
-      //   ];
-      // }
 
       setMergedEditorResult(merged);
     }
@@ -145,10 +129,7 @@ const EditorsPage = ({
         setDisplayData={setDisplayData}
         setFilterData={setFilterData}
       />
-      {/* <AdvertisementBanner
-        data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
-      /> */}
-      {/* <SharedProfile /> */}
+
       {isLoading ? (
         <div className="d-flex justify-content-center align-items-center">
           Loading…
@@ -158,10 +139,7 @@ const EditorsPage = ({
           (val, index) => {
             return (
               <>
-                {index % 5 == 0 ? (
-                  // <AdvertisementBanner
-                  //   data={ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]}
-                  // />
+                {index % 10 == 0 ? (
                   <div className="" id={`banner`}>
                     <AdvertisementBanner data={adsdata} />
                   </div>

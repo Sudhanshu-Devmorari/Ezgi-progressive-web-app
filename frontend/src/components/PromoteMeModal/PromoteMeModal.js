@@ -55,7 +55,7 @@ const PromoteMeModal = (props) => {
                 }`}
               />
             </span>
-            {(ShowModal === 7 || ShowModal === 2) && (
+            {ShowModal !== 3 && (
               <>
                 <div className="">
                   <div className="text-center">

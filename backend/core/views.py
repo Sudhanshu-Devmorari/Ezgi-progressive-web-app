@@ -49,7 +49,7 @@ from core.models import DEACTIVATE_STATUS
 class SignupUserExistsView(APIView):
     def post(self, request, format=None):
         try:
-            if User.objects.filter(Q(username__iexact=request.data['username']) | Q(phone=request.data['phone']), is_admin=False).exists():
+            if User.objects.filter(Q(username__iexact=request.data['username']) | Q(phone=request.data['phone']), is_admin=False, is_delete=False).exists():
                 return Response({'data': 'User with the same username or phone number already exists', 'status': status.HTTP_400_BAD_REQUEST})
             else:
                 return Response({'data': 'User can create', 'status': status.HTTP_200_OK})           
@@ -148,7 +148,7 @@ class OtpReSend(APIView):
         phone = request.data['phone']
         try:
             if 'is_admin' in request.data:
-                user = User.objects.get(phone=phone,is_admin=True)
+                user = User.objects.filter(phone=phone, is_admin=True, is_delete=False).first()
             elif 'signup' in request.data:
                 otp = totp.now()
                 res = sms_send(phone, otp)  
@@ -157,17 +157,23 @@ class OtpReSend(APIView):
                 else:
                     return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
             else:
-                user = User.objects.get(phone=phone,is_admin=False)
+                user = User.objects.filter(phone=phone, is_admin=False, is_delete=False).first()
+
+            if not user:
+                return Response({
+                    'data':"User Doesn't exists.",
+                    'status' : status.HTTP_404_NOT_FOUND
+                })
+
             otp = totp.now()
-            print('otp: ', otp)
             res = sms_send(phone, otp)  
             if res == 'Success':
                 return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
             else:
                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
-        except User.DoesNotExist:
+        except:
             return Response({
-                'data':"User Doesn't exists.",
+                'data':"Something went wrong!",
                 'status' : status.HTTP_404_NOT_FOUND
             })
 
@@ -178,18 +184,24 @@ class LoginView(APIView):
         password = request.data['password']
         try:
             if 'is_admin' in request.data:
-                user_phone = User.objects.filter(phone=phone,is_admin=True).only('id', 'password', 'user_role', 'username').first()
+                user_phone = User.objects.filter(phone=phone, is_admin=True, is_delete=False).only('id', 'password', 'user_role', 'username').first()
             else:
-                user_phone = User.objects.filter(phone=phone).only('id', 'password', 'user_role', 'username').first()
-                
+                user_phone = User.objects.filter(phone=phone, is_delete=False).only('id', 'password', 'user_role', 'username').first()
+            
+            if not user_phone:
+                return Response({
+                    'data':"User Doesn't exists!",
+                    'status' : status.HTTP_404_NOT_FOUND
+                })
+
             if user_phone.password == password:
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
-        except User.DoesNotExist:
+        except:
             return Response({
-                'data':"User Doesn't exists!",
-                'status' : status.HTTP_404_NOT_FOUND
+                'data':"Something went wrong!",
+                'status' : status.HTTP_500_INTERNAL_SERVER_ERROR
             })
 
 class GoogleLoginview(APIView):
@@ -1218,7 +1230,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_active_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=False).only('id')
+            all_active_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=False).only('id').order_by('-created')
             for obj in all_active_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1242,7 +1254,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=True).only('id')
+            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=True).only('id').order_by('-created')
             for obj in all_resolved_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1917,7 +1929,7 @@ class FilterComments(APIView):
                 
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
-                    all_comments = Comments.objects.filter(status='approve', public_content=True,**filters)
+                    all_comments = Comments.objects.filter(status='approve', public_content=True,**filters).order_by('-created')
                     # data_list['Public_Comments'] = []
 
                     for comment in all_comments:
@@ -1950,7 +1962,7 @@ class FilterComments(APIView):
                 
                 if filter_type == "finished":
                     # all_resolved_comment = Comments.objects.filter(commentator_user=request.user, date__lt=datetime.now().date(),**filters)
-                    all_resolved_comment = Comments.objects.filter(date__lt=datetime.now().date(),**filters)
+                    all_resolved_comment = Comments.objects.filter(date__lt=datetime.now().date(),**filters).order_by('-created')
                     for comment in all_resolved_comment:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1981,7 +1993,7 @@ class FilterComments(APIView):
                     # return Response(data=data0, status=status.HTTP_200_OK)
 
                 if filter_type == "published":
-                    all_comments = Comments.objects.filter(status='approve',**filters)
+                    all_comments = Comments.objects.filter(status='approve',**filters).order_by('-created')
                     for comment in all_comments:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -2010,7 +2022,7 @@ class FilterComments(APIView):
                     """
                     winning logic here.
                     """
-                    all_comments = Comments.objects.filter(is_prediction=True,**filters)
+                    all_comments = Comments.objects.filter(is_prediction=True,**filters).order_by('-created')
                     for comment in all_comments:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -2042,7 +2054,7 @@ class FilterComments(APIView):
                     subscribe_comment = []
                     # s = User.objects.get(id=6)
                     # subscription_obj = Subscription.objects.filter(standard_user=s, end_date__gte=datetime.now(), status='approve')
-                    subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve')
+                    subscription_obj = Subscription.objects.filter(standard_user=user, end_date__gte=datetime.now(), status='approve').order_by('-created')
 
                     for obj in subscription_obj:
                         if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
@@ -2080,7 +2092,7 @@ class FilterComments(APIView):
 
                 if filter_type0 == "not_stated":
                     # all_active_comment = Comments.objects.filter(commentator_user=request.user, date__gt=datetime.now().date(),**filters)
-                    all_active_comment = Comments.objects.filter(date__gt=datetime.now().date(),**filters)
+                    all_active_comment = Comments.objects.filter(date__gt=datetime.now().date(),**filters).order_by('-created')
                     for comment in all_active_comment:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -2110,7 +2122,7 @@ class FilterComments(APIView):
                     # return Response(data=data1, status=status.HTTP_200_OK)
 
                 if filter_type0 == "pending":
-                    all_comments = Comments.objects.filter(status='pending',**filters)
+                    all_comments = Comments.objects.filter(status='pending',**filters).order_by('-created')
                     for comment in all_comments:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -2139,7 +2151,7 @@ class FilterComments(APIView):
                     """
                     lose logic here.
                     """
-                    all_comments = Comments.objects.filter(is_prediction=False,**filters)
+                    all_comments = Comments.objects.filter(is_prediction=False,**filters).order_by('-created')
                     for comment in all_comments:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -2169,7 +2181,7 @@ class FilterComments(APIView):
             if filter_type == "" and filter_type0 == "":
 
                 query_filters = Q(**filters)
-                filtered_comments = Comments.objects.filter(query_filters)
+                filtered_comments = Comments.objects.filter(query_filters).order_by('-created')
                 for comment in filtered_comments:
                     comment_data = CommentsSerializer(comment).data
                     date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -4204,10 +4216,8 @@ class FootbalAndBasketballContentView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             category = request.query_params.get('category')
-            print('category: ', category)
             if category:
-                queryset = Comments.objects.filter(category=[category])  # Remove square brackets around category
-                print('queryset: ', queryset)
+                queryset = Comments.objects.filter(category=[category]).order_by('-created')  # Remove square brackets around category
                 data = CommentsSerializer(queryset, many=True).data  # Serialize queryset
 
                 # Create a list to store comments with their total reactions

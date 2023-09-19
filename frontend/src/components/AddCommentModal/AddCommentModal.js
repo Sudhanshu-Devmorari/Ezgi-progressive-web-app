@@ -24,6 +24,7 @@ import Swal from "sweetalert2";
 import config from "../../config";
 
 const AddCommentModal = (props) => {
+  const { activeResolved } = props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // const matchDetailsOptions = [
@@ -373,6 +374,7 @@ const AddCommentModal = (props) => {
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
+          await activeResolved(userId);
         }
       } catch (error) {
         console.log(error);
@@ -398,8 +400,6 @@ const AddCommentModal = (props) => {
       }
     }
   };
-
-  const handlePredictionTypeChange = async () => {};
 
   useEffect(() => {
     const fetchData = async () => {

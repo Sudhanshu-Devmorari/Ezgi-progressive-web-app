@@ -17,7 +17,7 @@ import edit from "../../assets/edit.png";
 import editLight from "../../assets/edit.svg";
 import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { truncateString, userId } from "../GetUser";
 import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
 import config from "../../config";
@@ -28,6 +28,7 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ActiveComments = (props) => {
+  const { activeResolved } = props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
   const profileData = props?.profileData;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -43,14 +44,6 @@ const ActiveComments = (props) => {
   const [editProfile, setEditProfile] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
-  function truncateString(str, maxLength) {
-    if (str && str?.length <= maxLength) {
-      return str;
-    } else {
-      // Subtract 3 from maxLength to make room for the ellipsis.
-      return str?.substring(0, maxLength - 1) + "...";
-    }
-  }
   const truncated = truncateString(profileData?.username, 7);
 
   const [user, setUser] = useState(null);
@@ -545,11 +538,11 @@ const ActiveComments = (props) => {
               ) : (
                 <button
                   onClick={() => {
-                    if(userPhone != profileData?.id){
-                    followCommentator(
-                      profileData?.id,
-                      props?.followingid?.includes(profileData?.id)
-                    );
+                    if (userPhone != profileData?.id) {
+                      followCommentator(
+                        profileData?.id,
+                        props?.followingid?.includes(profileData?.id)
+                      );
                     }
                   }}
                   style={{
@@ -867,6 +860,7 @@ const ActiveComments = (props) => {
       <AddCommentModal
         show={AddCommentModalModalShow}
         onHide={() => setAddCommentModalModalShow(false)}
+        activeResolved={activeResolved}
       />
       <WithdrawalModal
         setShowBankUpdate={setShowBankUpdate}

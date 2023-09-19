@@ -22,7 +22,6 @@ import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 
 const CommentatorsCommentsPage = (props) => {
-
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [content, setContent] = useState("home");
   const [subscribersOrSubscriptions, setSubscribersOrSubscriptions] =
@@ -73,6 +72,27 @@ const CommentatorsCommentsPage = (props) => {
     getProfileData();
   }, []);
 
+  const [active, setActive] = useState([]);
+  const [resolve, setResolve] = useState([]);
+
+  const activeResolved = async (user_id) => {
+    console.log("userID::::::::::::", user_id);
+    try {
+      const res = await axios
+        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
+        .then((res) => {
+          console.log("activeResolved::::::::::: ", res.data);
+          setActive(res.data?.active_comments);
+          setResolve(res.data?.resolved_comments);
+        })
+        .catch((error) => {
+          console.error("Error fetching data.", error);
+        });
+    } catch (error) {
+      console.error("Error fetching data.", error);
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -100,6 +120,7 @@ const CommentatorsCommentsPage = (props) => {
             setSelectContent={props.setSelectContent}
             profileData={profileData}
             getProfileData={props.getProfileData}
+            activeResolved={activeResolved}
           />
           <CommentatorIcons setContent={setContent} content={content} />
 
@@ -130,6 +151,11 @@ const CommentatorsCommentsPage = (props) => {
                   setsubscriptionComments={props.setsubscriptionComments}
                   mergeArrays={props.mergeArrays}
                   setCmtReact={props.setCmtReact}
+                  activeResolved={activeResolved}
+                  setActive={setActive}
+                  active={active}
+                  setResolve={setResolve}
+                  resolve={resolve}
                 />
               )}
               {SelectComment === "statistics" && (
@@ -210,7 +236,6 @@ const CommentatorsCommentsPage = (props) => {
                   mergeArrays={props.mergeArrays}
                   setCmtReact={props.setCmtReact}
                   favSelection={favSelection}
-
                 />
               )}
             </>

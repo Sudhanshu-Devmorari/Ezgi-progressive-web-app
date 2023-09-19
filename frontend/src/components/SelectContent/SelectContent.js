@@ -14,66 +14,82 @@ export const SelectContent = (props) => {
   const userId = localStorage.getItem("user-id");
   return (
     <>
-    {userId ? (
-      <div
-        className={`${
-          currentTheme === "dark" ? "dark-mode" : "light-mode"
-        } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
-      >
-        {userId ? (
-          <>
-            <div
-              className="p-2"
-              style={{
-                color: props.selectContent === "for you" ? "#D2DB08" : "",
-              }}
-              onClick={() => props.setSelectContent("for you")}
-            >
-              For You
-            </div>
-            <div
-              className="p-2"
-              style={{
-                color: props.selectContent === "subscription" ? "#D2DB08" : "",
-              }}
-              onClick={() => props.setSelectContent("subscription")}
-            >
-              My Subscriptions
-            </div>
-          </>
-        ) : null}
+      {userId ? (
         <div
           className={`${
-            userPhone ? "text-end ms-auto py-1 px-2" : "ms-auto py-1 px-2"
-          }`}
+            currentTheme === "dark" ? "dark-mode" : "light-mode"
+          } d-flex g-0 my-2 align-items-center p-1 responsive-font`}
         >
-          <div className="d-flex align-items-center">
-            <img
-              src={`${
-                currentTheme === "dark" ? world_check : world_check_light
-              }`}
-              alt=""
-              style={{ color: "#007BF6" }}
-              height={31}
-              width={31}
-            />
-            <span className="pe-2">Only Public</span>
-            {/* {console.log(props.publicSelected)} */}
-            <div onClick={() => {props.setPublicSelected(!props.publicSelected); props.publicSelected == true ? props.setSelectContent("for you") : props.setSelectContent("only public")}} 
-            
-            >
+          {userId ? (
+            <>
+              <div
+                className="p-2"
+                style={{
+                  color: props.selectContent === "for you" ? "#D2DB08" : "",
+                }}
+                onClick={() => props.setSelectContent("for you")}
+              >
+                For You
+              </div>
+              <div
+                className="p-2"
+                style={{
+                  color:
+                    props.selectContent === "subscription" ? "#D2DB08" : "",
+                }}
+                onClick={() => props.setSelectContent("subscription")}
+              >
+                My Subscriptions
+              </div>
+            </>
+          ) : null}
+          <div
+            className={`${
+              userPhone ? "text-end ms-auto py-1 px-2" : "ms-auto py-1 px-2"
+            }`}
+          >
+            <div className="d-flex align-items-center">
               <img
-                src={currentTheme === "dark" ? props.publicSelected ? publicSelectedIcon : darkGrp : props.publicSelected ? lighGrpSelected : lighGrp  }
-                // src={currentTheme === "dark" ? darkGrp : lighGrp}
+                src={`${
+                  currentTheme === "dark" ? world_check : world_check_light
+                }`}
                 alt=""
-                height={28}
-                width={28}
+                style={{ color: "#007BF6" }}
+                height={31}
+                width={31}
               />
+              <span className="pe-2" style={{ width: "max-content" }}>
+                Only Public
+              </span>
+              {/* {console.log(props.publicSelected)} */}
+              <div
+                onClick={() => {
+                  props.setPublicSelected(!props.publicSelected);
+                  props.publicSelected == true
+                    ? props.setSelectContent("for you")
+                    : props.setSelectContent("only public");
+                }}
+              >
+                <img
+                  src={
+                    currentTheme === "dark"
+                      ? props.publicSelected
+                        ? publicSelectedIcon
+                        : darkGrp
+                      : props.publicSelected
+                      ? lighGrpSelected
+                      : lighGrp
+                  }
+                  // src={currentTheme === "dark" ? darkGrp : lighGrp}
+                  alt=""
+                  height={28}
+                  width={28}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-  ) : null}
+      ) : null}
     </>
   );
 };

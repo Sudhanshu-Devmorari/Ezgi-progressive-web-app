@@ -53,11 +53,10 @@ const MainPage = () => {
   const SubscriptionCount = 3;
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(initialProfile);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const user_id = localStorage.getItem("user-id");
 
   async function getProfileData() {
-    setIsLoading(true);
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data.profile_pic);
@@ -392,6 +391,7 @@ const MainPage = () => {
             setSelectContent={setSelectContent}
             selectContent={selectContent}
             profileData={profileData}
+            isLoading={isLoading}
           />
 
           {dashboardSUser ? (

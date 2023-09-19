@@ -23,7 +23,7 @@ import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { truncateString, userId } from "../GetUser";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import Swal from "sweetalert2";
@@ -207,14 +207,6 @@ const ContentSection = ({
     }
   };
 
-  function truncateString(str, maxLength) {
-    if (str && str?.length <= maxLength) {
-      return str;
-    } else {
-      // Subtract 3 from maxLength to make room for the ellipsis.
-      return str?.substring(0, maxLength - 1) + "...";
-    }
-  }
   // const truncated = truncateString("Hello D", 6);
   const truncated = truncateString(data?.value?.league, 6);
 
@@ -276,9 +268,8 @@ const ContentSection = ({
                   style={{ objectFit: "cover" }}
                 />
                 <span className="p-1 autorname-responsive">
-                  {data?.value?.commentator_user?.username}
+                  {truncateString(data?.value?.commentator_user?.username, 11)}
                 </span>
-                {/* <img src={(verifyid).includes(data?.value.commentator_user.id) ? blueTick : } alt="" width={16} height={16} /> */}
                 {verifyid?.includes(data?.value?.commentator_user?.id) && (
                   <img src={blueTick} alt="" width={16} height={16} />
                 )}
@@ -286,6 +277,7 @@ const ContentSection = ({
             </div>
             <div className="col p-0">
               {(selectContent === "for you" ||
+                selectContent === "only public" ||
                 userComments ||
                 selectContent === "comments") && (
                 <div
@@ -493,7 +485,7 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {(userPhone && data?.value?.public_content)
+                  {userPhone && data?.value?.public_content
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>

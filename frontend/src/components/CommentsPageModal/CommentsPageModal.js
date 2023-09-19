@@ -279,7 +279,7 @@ const CommentsPageModal = (props) => {
                     height={31}
                     width={31}
                   />
-                  <span className="ps-1">Only Public</span>
+                  <span className="ps-1" style={{ width: "max-content" }}>Only Public</span>
                 </div>
                 <div className="col d-flex align-items-center justify-content-end">
                   <span className="pe-1">Only Subscriber</span>

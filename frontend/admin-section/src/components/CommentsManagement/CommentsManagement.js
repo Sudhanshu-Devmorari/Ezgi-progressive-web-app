@@ -681,7 +681,7 @@ const CommentsManagement = (props) => {
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
-                    <span className="px-2">Only Public</span>
+                    <span className="px-2" style={{ width: "max-content" }}>Only Public</span>
                   </div>
                   <div className="">
                     <span className="px-2">Only Subscribers</span>
