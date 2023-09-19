@@ -139,10 +139,27 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
 
 CRONJOBS = [
-    ('0 0 * * *', 'core.cron.subscriptionstatus'),
-    ('0 */2 * * *', 'core.cron.Userst')
-    # ('* * * * *', 'core.cron.subscription_reminder_cron'),
+    ('*/5 * * * *', 'core.cron.Userst'),
+    ('0 0 * * *', 'core.cron.subscriptionstatus')
 ]
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django_cron.log', 
+        },
+    },
+    'loggers': {
+        'django_cron': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+} 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

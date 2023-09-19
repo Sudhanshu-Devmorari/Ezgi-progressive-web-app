@@ -126,6 +126,8 @@ const CommentatorsCommentsPage = (props) => {
                   setArrayMerge={props.setArrayMerge}
                   publicComments={props.publicComments}
                   setPublicComments={props.setPublicComments}
+                  subscriptionComments={props.subscriptionComments}
+                  setsubscriptionComments={props.setsubscriptionComments}
                   mergeArrays={props.mergeArrays}
                   setCmtReact={props.setCmtReact}
                 />

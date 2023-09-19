@@ -60,6 +60,8 @@ const CommentsContentSection = (props) => {
     setArrayMerge,
     publicComments,
     setPublicComments,
+    subscriptionComments,
+    setsubscriptionComments,
     mergeArrays,
     setCmtReact,
   } = props;
@@ -81,7 +83,7 @@ const CommentsContentSection = (props) => {
         console.error("Error fetching data.", error);
       }, []);
   };
-  const handleCommentReaction = async (id, reaction) => {
+  const handleCommentReaction = async (id, reaction, is_public) => {
     const user_id = localStorage.getItem("user-id");
     try {
       const res = await axios.post(
@@ -92,7 +94,7 @@ const CommentsContentSection = (props) => {
       );
       if (res.status == 200) {
         let data = res?.data?.data;
-        if (data) {
+        if (data && is_public) {
           publicComments.filter(
             (response) => response.id == data?.comment_id
           )[0].total_reactions.total_clap = data?.total_clap;
@@ -131,11 +133,38 @@ const CommentsContentSection = (props) => {
           setCmtReact(cmtReact);
           mergeArrays();
         }
+        if(!is_public && data){
+          activeResolved(user_id)
+          const commentIds = cmtReact.map((data) => {
+            return data.comment_id;
+          });
+
+          if (commentIds.includes(data?.comment_id)) {
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].clap = data?.clap;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].favorite = data?.favorite;
+            cmtReact.filter(
+              (response) => response.comment_id == data?.comment_id
+            )[0].like = data?.like;
+          } else {
+            const newObj = {
+              clap: data?.clap,
+              comment_id: data?.comment_id,
+              favorite: data?.favorite,
+              like: data?.like,
+            };
+            cmtReact.push(newObj);
+          }
+          setCmtReact(cmtReact);
+        }
       }
       activeResolved(user_id);
     } catch (error) {
       console.log(error);
-      if (error.response.status === 400) {
+      if (error.response?.status === 400) {
         Swal.fire({
           title: "Error",
           text: error?.response?.data?.error,
@@ -362,7 +391,7 @@ const CommentsContentSection = (props) => {
                             <div
                               onClick={() => {
                                 if (val.public_content === true) {
-                                  handleCommentReaction(val?.id, "like");
+                                  handleCommentReaction(val?.id, "like", val.public_content);
                                 }
                               }}
                             >
@@ -407,7 +436,7 @@ const CommentsContentSection = (props) => {
                             <div
                               onClick={() => {
                                 if (userPhone != val?.commentator_user?.id) {
-                                  handleCommentReaction(val?.id, "favorite");
+                                  handleCommentReaction(val?.id, "favorite", val.public_content);
                                 }
                               }}
                             >
@@ -452,7 +481,7 @@ const CommentsContentSection = (props) => {
                             <div
                               onClick={() => {
                                 if (val.public_content === true) {
-                                  handleCommentReaction(val?.id, "clap");
+                                  handleCommentReaction(val?.id, "clap", val.public_content);
                                 }
                               }}
                             >
@@ -716,7 +745,7 @@ const CommentsContentSection = (props) => {
                           >
                             <div
                               onClick={() => {
-                                handleCommentReaction(val?.id, "like");
+                                handleCommentReaction(val?.id, "like", val.public_content);
                               }}
                             >
                               {/* <img
@@ -771,7 +800,7 @@ const CommentsContentSection = (props) => {
                             <div
                               onClick={() => {
                                 if (user_id != val?.commentator_user?.id) {
-                                  handleCommentReaction(val?.id, "favorite");
+                                  handleCommentReaction(val?.id, "favorite", val.public_content);
                                 }
                               }}
                             >
@@ -826,7 +855,7 @@ const CommentsContentSection = (props) => {
                             </div>
                             <div
                               onClick={() => {
-                                handleCommentReaction(val?.id, "clap");
+                                handleCommentReaction(val?.id, "clap", val.public_content);
                               }}
                             >
                               {/* <img
@@ -980,10 +1009,10 @@ const CommentsContentSection = (props) => {
                         )}
                       </>
                       {/* )} */}
-                      {(res.status === "red" || res.status === "yellow") && (
+                      {(res.is_prediction != true || res.status === "yellow") && (
                         <img
                           src={
-                            (res.status === "red" && circle_x) ||
+                            (res.is_prediction != true && circle_x) ||
                             (res.status === "yellow" && clock_pause)
                           }
                           alt=""
@@ -1099,19 +1128,19 @@ const CommentsContentSection = (props) => {
                           textSize: "26px",
                           pathColor:
                             currentTheme === "dark"
-                              ? res.status === "green"
+                              ? res.is_prediction == true
                                 ? "#37FF80"
                                 : res.status === "yellow"
                                 ? "#FFCC00"
-                                : res.status === "red"
+                                : res.is_prediction != true
                                 ? "#FF5757"
                                 : ""
-                              : res.status === "green"
-                              ? res.color
+                              : res.is_prediction == true
+                              ? '#37FF80'
                               : res.status === "yellow"
                               ? res.color
-                              : res.status === "red"
-                              ? res.color
+                              : res.is_prediction != true
+                              ? "#FF5757"
                               : "",
                         })}
                       />
@@ -1119,7 +1148,7 @@ const CommentsContentSection = (props) => {
                     <span>{res?.match_detail.split(" - ")[1]}</span>
                   </div>
                   <div className="text-end mt-3 mb-2">
-                    <span
+                    {/* <span
                       // className="ps-1"
                       className="p-1 px-2"
                       // style={{ color: "#FF3030", fontSize: "12px" }}
@@ -1134,9 +1163,50 @@ const CommentsContentSection = (props) => {
                             : "#FFFFFF",
                         fontSize: "12px",
                       }}
-                    >
+                    > */}
                       {/* {res.text} */}
-                      {user_id == res?.commentator_user?.id ? (
+                      {/* {user_id == res?.commentator_user?.id ? (
+                        <>{`${res?.prediction_type} & ${res?.prediction}`}</>
+                      ) : (
+                        <>
+                          Subscribers Only{" "}
+                          <img
+                            className="mb-1"
+                            src={lock}
+                            alt=""
+                            height={15}
+                            width={15}
+                          />
+                        </>
+                      )}
+                    </span> */}
+                    <span
+                      className="p-1"
+                      style={{
+                        backgroundColor:
+                          currentTheme === "dark"
+                            ? res.is_prediction == true
+                              ? "#37FF80"
+                              : res.status === "yellow"
+                              ? "#FFCC00"
+                              : res.is_prediction != true
+                              ? "#FF5757"
+                              : ""
+                            : res.is_prediction == true
+                            ? "#37FF80"
+                            : res.status === "yellow"
+                            ? res.color
+                            : res.is_prediction != true
+                            ? "#FF5757"
+                            : "",
+                        color:
+                          props.SelectComment === "resolvedComments"
+                            ? "#0D2A53"
+                            : "#FFFFFF",
+                        fontSize: "12px",
+                      }}
+                    >
+                      {(user_id == res?.commentator_user?.id || res.public_content) ? (
                         <>{`${res?.prediction_type} & ${res?.prediction}`}</>
                       ) : (
                         <>
@@ -1151,34 +1221,6 @@ const CommentsContentSection = (props) => {
                         </>
                       )}
                     </span>
-                    {/* <span
-                      className="p-1"
-                      style={{
-                        backgroundColor:
-                          currentTheme === "dark"
-                            ? res.status === "green"
-                              ? "#37FF80"
-                              : res.status === "yellow"
-                              ? "#FFCC00"
-                              : res.status === "red"
-                              ? "#FF5757"
-                              : ""
-                            : res.status === "green"
-                            ? res.color
-                            : res.status === "yellow"
-                            ? res.color
-                            : res.status === "red"
-                            ? res.color
-                            : "",
-                        color:
-                          props.SelectComment === "resolvedComments"
-                            ? "#0D2A53"
-                            : "#FFFFFF",
-                        fontSize: "12px",
-                      }}
-                    >
-                      FT - Home & 2.5 Over 2.40
-                    </span> */}
                   </div>
                 </div>
                 <div className="d-flex mt-2 align-items-center">
@@ -1188,7 +1230,7 @@ const CommentsContentSection = (props) => {
                   >
                     <div
                       onClick={() => {
-                        handleCommentReaction(res?.id, "like");
+                        handleCommentReaction(res?.id, "like", res.public_content);
                       }}
                     >
                       {/* <img
@@ -1240,7 +1282,7 @@ const CommentsContentSection = (props) => {
                     <div
                       onClick={() => {
                         if (user_id != res?.commentator_user?.id) {
-                          handleCommentReaction(res?.id, "favorite");
+                          handleCommentReaction(res?.id, "favorite", res.public_content);
                         }
                       }}
                     >
@@ -1292,7 +1334,7 @@ const CommentsContentSection = (props) => {
                     </div>
                     <div
                       onClick={() => {
-                        handleCommentReaction(res?.id, "clap");
+                        handleCommentReaction(res?.id, "clap", res.public_content);
                       }}
                     >
                       {/* <img

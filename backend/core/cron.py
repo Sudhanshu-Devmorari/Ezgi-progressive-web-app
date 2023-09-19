@@ -4,7 +4,10 @@ import pytz
 import requests
 from core.utils import sms_send
 from core.models import User, Comments
+import logging
 # from django_cron import CronJobBase, Schedule
+
+logger = logging.getLogger('django_cron')
 
 def subscription_reminder_cron():
     print("\n\n =======>>>>>> Entering subscription")
@@ -88,85 +91,97 @@ def send_notification_sms(notification_data):
 #             deobj.save()
 
 def Userst():
-    all_user = User.objects.filter(user_role='commentator')
+    try:
+        all_user = User.objects.filter(user_role='commentator')
+        for individual in all_user:
+            user = User.objects.get(id=individual.id)
+            logger.info("Processing user: %s", user.username)
 
-    for individual in all_user:
-        user = User.objects.get(id=individual.id)
-
-        if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
-            continue
-        data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
-
-        correct_prediction = data.filter(is_prediction=True)
-        incorrect_prediction = data.filter(is_prediction=False)
-        Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
-
-        Success_rate = round((len(correct_prediction)/len(data))*100, 2)
-        user.success_rate = Success_rate
-        user.score_points = Score_point
-        if 0 < Success_rate < 60:
-            user.commentator_level = "apprentice"
-        if 60 < Success_rate< 65:
-            user.commentator_level = "journeyman"
-        if 65 < Success_rate < 70:
-            user.commentator_level = "master"
-        if 70 < Success_rate < 100:
-            user.commentator_level = "grandmaster"
-        user.save()
-
-        for i in data:
-            if (i.category[0].lower()) == 'football':
-                url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={i.league}&date={i.date}"
-            else:
-                url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={i.league}&date={i.date}"
-
-            headers = {
-                "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
-            }
-            response = requests.get(url, headers=headers)
-            json_data = response.json()
-            match_data_list = json_data["data"]
-            
-            if len(match_data_list) <= 0:
+            if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
                 continue
-            
-            for match in match_data_list:
-                if match['LiveStatus'] != 0:
-                    teams = match.get("Teams")
+            data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
+            logger.info("Processing Comment data: %s", data)
 
-                    if teams == i.match_detail:
+            correct_prediction = data.filter(is_prediction=True)
+            incorrect_prediction = data.filter(is_prediction=False)
+            Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
 
-                        matchID = match.get("MatchID")
-                        matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
+            Success_rate = round((len(correct_prediction)/len(data))*100, 2)
+            user.success_rate = Success_rate
+            user.score_points = Score_point
+            if 0 < Success_rate < 60:
+                user.commentator_level = "apprentice"
+            if 60 < Success_rate< 65:
+                user.commentator_level = "journeyman"
+            if 65 < Success_rate < 70:
+                user.commentator_level = "master"
+            if 70 < Success_rate < 100:
+                user.commentator_level = "grandmaster"
+            user.save()
 
-                        data = requests.get(matchid_url, headers=headers)
-                        matchID_data = data.json()
-                        matchID_data_list = matchID_data["data"]
+            for i in data:
+                logger.info("i.category[0] : %s", i.category[0])
+                if (i.category[0].lower()) == 'futbol':
+                    url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={i.league}&date={i.date}"
+                    logger.info("url : %s", url)
+                else:
+                    url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={i.league}&date={i.date}"
+                    logger.info("url : %s", url)
 
-                        for match in matchID_data_list:
+                headers = {
+                    "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+                }
+                response = requests.get(url, headers=headers)
+                json_data = response.json()
+                match_data_list = json_data["data"]
+                logger.info("match_data_list : %s", match_data_list)
+                
+                if len(match_data_list) <= 0:
+                    continue
+                
+                for match in match_data_list:
+                    logger.info("LiveStatus : %s", match['LiveStatus'])
+                    if match['LiveStatus'] != 0:
+                        teams = match.get("Teams")
 
-                            bettableResult = match.get("bettableResult")
+                        if teams == i.match_detail:
 
-                            for obj in bettableResult:
-
-                                if obj['gameName'] == i.prediction_type:
-                                    if obj['game_result'][0]['value'] == i.prediction:
-                                        i.is_prediction = True
-                                        i.save()
-                                    else:
-                                        i.is_prediction = False
-                                        i.save()
-
-                            HomeWin = float(match['HomeWin'])
-                            Draw = float(match['Draw'])
-                            AwayWin = float(match['AwayWin'])
-                            GoalUnder = float(match['Under25'])
-                            GoalOver = float(match['Over25'])
-                            avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                            matchID = match.get("MatchID")
+                            logger.info("matchID : %s", matchID)
                             
-                            i.average_odds =round(avg, 2)
-                            i.save()
+                            matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
 
-                            if match['LiveStatus'] != 0:
-                                i.is_resolve = True
+                            data = requests.get(matchid_url, headers=headers)
+                            matchID_data = data.json()
+                            matchID_data_list = matchID_data["data"]
+                            logger.info("matchID_data_list : %s", matchID_data_list)
+
+                            for match in matchID_data_list:
+
+                                bettableResult = match.get("bettableResult")
+
+                                for obj in bettableResult:
+
+                                    if obj['gameName'] == i.prediction_type:
+                                        if obj['game_result'][0]['value'] == i.prediction:
+                                            i.is_prediction = True
+                                            i.save()
+                                        else:
+                                            i.is_prediction = False
+                                            i.save()
+
+                                HomeWin = float(match['HomeWin'])
+                                Draw = float(match['Draw'])
+                                AwayWin = float(match['AwayWin'])
+                                GoalUnder = float(match['Under25'])
+                                GoalOver = float(match['Over25'])
+                                avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                                
+                                i.average_odds =round(avg, 2)
                                 i.save()
+
+                                if match['LiveStatus'] != 0:
+                                    i.is_resolve = True
+                                    i.save()
+    except Exception as e:
+        logger.error('\n Error occurred in comment prediction check cron: %s', str(e))

@@ -427,6 +427,8 @@ const MainPage = () => {
                 setCmtReact={setCmtReact}
                 publicComments={publicComments}
                 setPublicComments={setPublicComments}
+                subscriptionComments={subscriptionComments}
+                setsubscriptionComments={setsubscriptionComments}
                 mergeArrays={mergeArrays}
                 setMergedEditorResult={setMergedEditorResult}
                 mergedEditorResult={mergedEditorResult}

@@ -1218,7 +1218,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_active_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=False).only('id')
+            all_active_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=False).only('id')
             for obj in all_active_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1242,7 +1242,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=True).only('id')
+            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=True).only('id')
             for obj in all_resolved_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
