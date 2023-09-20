@@ -140,7 +140,7 @@ MEDIA_ROOT = BASE_DIR/'media'
 
 CRONJOBS = [
     ('*/5 * * * *', 'core.cron.Userst'),
-    ('0 0 * * *', 'core.cron.subscriptionstatus')
+    ('* * * * *', 'core.cron.subscription_reminder_cron')
 ]
 LOGGING = {
     'version': 1,

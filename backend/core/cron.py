@@ -10,8 +10,11 @@ import logging
 logger = logging.getLogger('django_cron')
 
 def subscription_reminder_cron():
-    print("\n\n =======>>>>>> Entering subscription")
     try:
+        u = User.objects.get(id=68)
+        u.name = 'mansiiiiiiiii00000-------------------'
+        u.save()
+        print("\n\n =======>>>>>> Entering subscription")
         notification_list = []
         today_date = timezone.now().date() 
         cutoff_date = timezone.now() + timedelta(days=3)

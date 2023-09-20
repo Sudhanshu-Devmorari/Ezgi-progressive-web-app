@@ -661,13 +661,16 @@ class SubscriptionView(APIView):
     """
     Standard user purchase the NEW Subscription to view commentator post:
     """
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request, id, format=None, *args, **kwargs):
         """
         Subscription purchase logic here, if purchase is successful, below code runs.
         """
-        user = request.user
-        if user.user_role == 'standard':
+        try:
+            user = User.objects.get(id=id)
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
+            
+            if Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists():
+                return Response({'data':'Your subscription plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
@@ -681,8 +684,13 @@ class SubscriptionView(APIView):
                     end_date = start_date + timedelta(days=365)
 
                 money = request.data.get('money')
-            Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=request.user, duration=duration, 
-                                                           start_date=start_date, end_date=end_date, status='active', money=money)
+            if user.user_role == 'commentator':
+                Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=user, duration=duration, subscription=True,
+                                                            start_date=start_date, end_date=end_date, status='active', money=money)
+            elif user.user_role == 'standard':
+                Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=user, duration=duration, subscription=True,
+                                                            start_date=start_date, end_date=end_date, status='active', money=money)
+                
             # send Subscription notification:
             notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{request.user.username} Subscribe you.')
             if Subscription_obj != None:
@@ -696,6 +704,8 @@ class SubscriptionView(APIView):
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'data': 'User Doen not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class NotificationView(APIView):
@@ -4331,12 +4341,12 @@ class RetrievePageData():
         try:
             # Id validation
             if id == 'null':
-                return subscription_comments
+                return subscription_comments, unique_comment_ids
 
             # Is user exist validation
             is_user_exist = User.objects.filter(id=id).exists()
             if not is_user_exist:
-                return subscription_comments
+                return subscription_comments, unique_comment_ids
             
             subscription_obj = Subscription.objects.filter(standard_user_id=id, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
             for obj in subscription_obj:
@@ -4502,22 +4512,22 @@ class RetrieveHomeView(APIView):
         data_list['Public_Comments'], self.unique_comment_ids  = retrieve_data.get_public_comments(self.unique_comment_ids)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'], self.unique_comment_ids  = retrieve_data.get_subscription_comments(request.query_params.get('id'), self.unique_comment_ids)
+        data_list['Subscription_Comments'], self.unique_comment_ids  = retrieve_data.get_subscription_comments(request.query_params.get('id', None), self.unique_comment_ids)
       
         # Get highlights data
-        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id'))
+        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None))
         
         # Get advertisment data
         data_list['ads'] = retrieve_data.get_ads()
 
         # Get following user data
-        data_list['following_user'] = retrieve_data.get_following_user(request.query_params.get('id'))
+        data_list['following_user'] = retrieve_data.get_following_user(request.query_params.get('id', None))
         
         # Get verify ids data
         data_list['verify_ids'] = retrieve_data.get_verify_ids()
 
         # Get comment reactions data
-        data_list['comment_reactions'] = retrieve_data.get_comment_reactions(request.query_params.get('id'))
+        data_list['comment_reactions'] = retrieve_data.get_comment_reactions(request.query_params.get('id', None))
         
         return Response(data=data_list, status=status.HTTP_200_OK)
     

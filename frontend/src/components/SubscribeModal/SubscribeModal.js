@@ -4,8 +4,8 @@ import Modal from "react-bootstrap/Modal";
 import profile from "../../assets/profile.png";
 import crown from "../../assets/crown.png";
 import "./SubscribeModal.css";
-import CheckBoxDark from "../../assets/Checkbox Selected.svg";
-import CheckBoxSelectDark from "../../assets/Checkbox Unselected.svg";
+import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
+import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import football from "../../assets/Profile Card Football.svg";
 import CurrentTheme from "../../context/CurrentTheme";
@@ -13,11 +13,112 @@ import CheckBoxLight from "../../assets/CheckBoxBlankLight.svg";
 import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import PlanSelection from "../PlanSelection/PlanSelection";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
+import axios from "axios";
+import config from "../../config";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const SubscribeModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
+
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [validationError, setValidationError] = useState("");
+
+  const { commentatorUser } = props;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubscription = async () => {
+    if (props?.text !== "renew") {
+      if (selectCheckBox && selectedPlan) {
+        setValidationError("");
+        const money =
+          (selectedPlan === "1 Year" && subscriptionPlan?.year_1) ||
+          (selectedPlan === "1 Month" && subscriptionPlan?.month_1) ||
+          (selectedPlan === "3 Month" && subscriptionPlan?.month_3) ||
+          (selectedPlan === "6 Month" && subscriptionPlan?.month_6);
+        try {
+          setIsLoading(true);
+          const res = await axios.post(
+            `${config.apiUrl}/subscription/${userId}/`,
+            {
+              duration: selectedPlan,
+              money: money,
+              commentator_id: commentatorUser?.id,
+            }
+          );
+          if (res?.status === 200) {
+            setIsLoading(false);
+            props.onHide();
+            Swal.fire({
+              title: "Success",
+              text: `You've subscribe to ${commentatorUser?.username}`,
+              icon: "sucess",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          if (error?.response?.status === 500) {
+            setIsLoading(false);
+            props.onHide();
+            Swal.fire({
+              title: "Error",
+              text: "something went wrong",
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+          if (error?.response?.status === 400) {
+            setIsLoading(false);
+            props.onHide();
+            Swal.fire({
+              title: "Error",
+              text: error?.response?.data?.data,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        }
+      } else {
+        setValidationError("Please select a Plan or Checkbox");
+      }
+    }
+  };
+
+  const [subscriptionPlan, setSubscriptionPlan] = useState([]);
+  useEffect(() => {
+    async function getData() {
+      try {
+        const res = await axios.get(
+          `${
+            config?.apiUrl
+          }/subscription-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
+        );
+        if (res.status === 200) {
+          const data = res?.data[0];
+          setSubscriptionPlan(data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    commentatorUser?.commentator_level && getData();
+  }, [commentatorUser]);
 
   return (
     <>
@@ -37,6 +138,9 @@ const SubscribeModal = (props) => {
             <span className="mb-2">
               <RxCross2
                 onClick={() => {
+                  setSelectCheckBox(false);
+                  setSelectedPlan(null);
+                  setValidationError("");
                   props.onHide();
                   setShowModal(1);
                 }}
@@ -67,7 +171,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      %67.6
+                      %{commentatorUser?.success_rate}
                     </div>
                     <div className="">
                       <span
@@ -120,12 +224,20 @@ const SubscribeModal = (props) => {
                       className="d-flex flex-column"
                       style={{ fontSize: "15px" }}
                     >
-                      <span className="">johndoe</span>
-                      <span className="">Ankara/Turkey</span>
+                      <span className="">{commentatorUser?.username}</span>
+                      <span className="">{commentatorUser?.city}/Turkey</span>
                       <span className="">22.04.2022</span>
                       <div className="">
-                        <img src={basketball} alt="" height={40} width={40} />
-                        <img src={football} alt="" height={40} width={40} />
+                        {commentatorUser?.category?.some((categoryItem) =>
+                          categoryItem.includes("Basketball")
+                        ) && (
+                          <img src={basketball} alt="" height={40} width={40} />
+                        )}
+                        {commentatorUser?.category?.some((categoryItem) =>
+                          categoryItem.includes("Football")
+                        ) && (
+                          <img src={football} alt="" height={40} width={40} />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -147,7 +259,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      256
+                      {commentatorUser?.score_points}
                     </div>
                     <div className="">
                       <span
@@ -173,12 +285,28 @@ const SubscribeModal = (props) => {
                   </div>
                 </div>
 
-                <PlanSelection />
+                <PlanSelection
+                  subscriptionPlan={subscriptionPlan}
+                  setSelectedPlan={setSelectedPlan}
+                  selectedPlan={selectedPlan}
+                />
                 <div className="">
-                  <div className="text-center my-2">
-                    <div>Total Amount</div>
-                    <div style={{ fontSize: "19px" }}>329.90₺</div>
-                  </div>
+                  {selectedPlan && (
+                    <div className="text-center my-2">
+                      <div>Total Amount</div>
+                      <div style={{ fontSize: "19px" }}>
+                        {(selectedPlan === "1 Year" &&
+                          subscriptionPlan?.year_1) ||
+                          (selectedPlan === "1 Month" &&
+                            subscriptionPlan?.month_1) ||
+                          (selectedPlan === "3 Month" &&
+                            subscriptionPlan?.month_3) ||
+                          (selectedPlan === "6 Month" &&
+                            subscriptionPlan?.month_6)}
+                        ₺
+                      </div>
+                    </div>
+                  )}
                   <div className="text-center">
                     <div className="my-3" style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
@@ -217,8 +345,10 @@ const SubscribeModal = (props) => {
                         Terms of use
                       </span>
                     </div>
+                    <small className="text-danger">{validationError}</small>
                     <div className="d-flex justify-content-center my-3">
                       <button
+                        onClick={handleSubscription}
                         style={{ fontSize: "14px" }}
                         className={`${
                           currentTheme === "dark"
@@ -226,7 +356,11 @@ const SubscribeModal = (props) => {
                             : "lightMode-btn"
                         } px-3 py-1`}
                       >
-                        {props.text == "renew" ? "Renew " : "Checkout"}
+                        {props.text == "renew"
+                          ? "Renew "
+                          : isLoading
+                          ? "Loading"
+                          : "Checkout"}
                       </button>
                     </div>
                     <div className="text-center" style={{ fontSize: "12px" }}>

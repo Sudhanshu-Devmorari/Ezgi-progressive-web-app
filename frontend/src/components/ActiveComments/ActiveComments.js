@@ -28,9 +28,9 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 
 const ActiveComments = (props) => {
-  const { activeResolved } = props;
+  const { activeResolved, profileData } = props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
-  const profileData = props?.profileData;
+  // const profileData = props?.profileData;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SubscribeModalShow, setSubscribeModalShow] = useState(false);
   const [PromoteModalShow, setPromoteModalShow] = useState(false);
@@ -47,6 +47,11 @@ const ActiveComments = (props) => {
   const truncated = truncateString(profileData?.username, 7);
 
   const [user, setUser] = useState(null);
+
+  const [commentatorUser, setCommentatorUser] = useState([]);
+  const [winningOrLoseData, setWinningOrLoseData] = useState({
+    win: '', lose: '',
+  });
 
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
@@ -745,7 +750,7 @@ const ActiveComments = (props) => {
             {userPoints.league ? userPoints.league : "No League"}
           </div>
         </div>
-        {props.profile !== "commentator" && (
+        {props.profile !== "commentator" && profileData?.commentator_level !== 'apprentice' && (
           <div
             className={`d-flex justify-content-center align-items-center my-3 ${
               props.content === ("home" || "wallet") && "mb-5"
@@ -753,7 +758,15 @@ const ActiveComments = (props) => {
           >
             Month/29.90₺
             <button
-              onClick={() => setSubscribeModalShow(true)}
+              onClick={() => {
+                setWinningOrLoseData({
+                  ...winningOrLoseData, 
+                  win: userPoints?.winning,
+                  lose: userPoints?.lose,
+                })
+                setCommentatorUser(profileData);
+                setSubscribeModalShow(true);
+              }}
               className="ms-1 px-3 py-1"
               style={{
                 border:
@@ -857,6 +870,7 @@ const ActiveComments = (props) => {
       </div>
 
       <SubscribeModal
+        commentatorUser={commentatorUser}
         show={SubscribeModalShow}
         onHide={() => setSubscribeModalShow(false)}
       />

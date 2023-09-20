@@ -602,6 +602,12 @@ const MainPage = () => {
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
                               setCmtReact={setCmtReact}
+                              key={index}
+                              handlesportData={handlesportData}
+                              setContentData={setContentData}
+                              contentData={contentData}
+                              subscriptionResult={subscriptionResult}
+                              setSubscriptionResult={setSubscriptionResult}
                             />
                           </>
                         );

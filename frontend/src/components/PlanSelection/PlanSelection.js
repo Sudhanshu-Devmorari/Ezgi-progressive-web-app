@@ -5,16 +5,19 @@ import darkradioSelected from "../../assets/Ellipse 217 (1).svg";
 import darkradio from "../../assets/Ellipse 216.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 
-function PlanSelection() {
-  const [selectedPlan, setSelectedPlan] = useState(null);
+function PlanSelection(props) {
+  
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
+  const { subscriptionPlan } = props;
+  // console.log(subscriptionPlan,"===>>>subscriptionPlan")
+
   const handlePlanClick = (plan) => {
-    setSelectedPlan(plan);
+    props?.setSelectedPlan(plan);
   };
 
   const isPlanSelected = (plan) => {
-    return selectedPlan === plan;
+    return props?.selectedPlan === plan;
   };
 
   const renderPlan = (plan, price, discountText, backgroundColor) => (
@@ -56,10 +59,30 @@ function PlanSelection() {
   return (
     <div className="my-2" style={{ fontSize: "14px" }}>
       <div className="my-2">Subscription Plans</div>
-      {renderPlan("1 Month", "69.90₺", null, currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
-      {renderPlan("3 Month", "179.90₺", "%20 Save!", currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
-      {renderPlan("6 Month", "329.90₺", "%30 Save!", currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
-      {renderPlan("1 Year", "609.90₺", "%40 Save!", currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
+      {renderPlan(
+        "1 Month",
+        `${subscriptionPlan?.month_1}₺`,
+        null,
+        currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+      )}
+      {renderPlan(
+        "3 Month",
+        `${subscriptionPlan?.month_3}₺`,
+        "%20 Save!",
+        currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+      )}
+      {renderPlan(
+        "6 Month",
+        `${subscriptionPlan?.month_6}₺`,
+        "%30 Save!",
+        currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+      )}
+      {renderPlan(
+        "1 Year",
+        `${subscriptionPlan?.year_1}₺`,
+        "%40 Save!",
+        currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+      )}
     </div>
   );
 }

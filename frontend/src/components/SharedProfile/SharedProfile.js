@@ -39,8 +39,9 @@ const SharedProfile = (props) => {
   const [isFavorite, setIsFavorite] = useState(false); // Initialize with the API data
 
   const server_url = `${config.apiUrl}`;
+  const [commentatorUser, setCommentatorUser] = useState([]);
 
-  // console.log("=>>>data", data);
+  // console.log("=>>>data", data?.value?.user);
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -75,7 +76,7 @@ const SharedProfile = (props) => {
   }
 
   useEffect(() => {
-    // console.log("data::::::::::::", data)
+    console.log("data::::::::::::", data)
     // getfav(data?.value?.user?.id);
   }, []);
   useEffect(() => {
@@ -164,7 +165,7 @@ const SharedProfile = (props) => {
             <img
               onClick={() => {
                 // console.log("star click:::::::::::::", data);
-                if (userId && userId!=data?.value?.user?.id) {
+                if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
               }}
@@ -177,7 +178,7 @@ const SharedProfile = (props) => {
             <img
               onClick={() => {
                 // console.log("star click:::::::::::::", data);
-                if (userId && userId!=data?.value?.user?.id) {
+                if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
               }}
@@ -279,13 +280,13 @@ const SharedProfile = (props) => {
                   color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
                 }}
               >
-                %{data?.value?.user?.success_rate}
+                %{data?.value?.user?.success_rate || 0}
               </div>
             </div>
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
             <div className="mt-1">
-              {data?.value?.user?.category.includes("Football") && (
+              {data?.value?.user?.category.includes("Football") || data?.value?.user?.category.includes("Futbol") && (
                 <img
                   src={football}
                   alt=""
@@ -294,7 +295,7 @@ const SharedProfile = (props) => {
                   style={{ color: "#00C936" }}
                 />
               )}
-              {data?.value?.user?.category.includes("Basketball") && (
+              {data?.value?.user?.category.includes("Basketball") || data?.value?.user?.category.includes("Basketbol") && (
                 <img
                   src={basketball}
                   alt=""
@@ -304,28 +305,37 @@ const SharedProfile = (props) => {
                 />
               )}
             </div>
-            <div className="" style={{ fontSize: "12px" }}>
-              <button
-                onClick={() => setShowModal(true)}
-                className="my-2 px-2 py-1"
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #37FF80"
-                      : "1px solid #00659D",
-                  color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                  backgroundColor: "transparent",
-                  borderRadius: "3px",
-                }}
-              >
-                Subscribe
-              </button>
-            </div>
+            {data?.value?.user?.commentator_level !== "apprentice" && (
+              <div className="" style={{ fontSize: "12px" }}>
+                <button
+                  onClick={() => {
+                    setCommentatorUser(data?.value?.user);
+                    setShowModal(true);
+                  }}
+                  className="my-2 px-2 py-1"
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #37FF80"
+                        : "1px solid #00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    backgroundColor: "transparent",
+                    borderRadius: "3px",
+                  }}
+                >
+                  Subscribe
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <SubscribeModal show={showModal} onHide={() => setShowModal(false)} />
+      <SubscribeModal
+        commentatorUser={commentatorUser}
+        show={showModal}
+        onHide={() => setShowModal(false)}
+      />
     </>
   );
 };

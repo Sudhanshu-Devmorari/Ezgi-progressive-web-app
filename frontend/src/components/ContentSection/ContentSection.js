@@ -62,6 +62,8 @@ const ContentSection = ({
   selectPublicorForYou,
   setContentData,
   contentData,
+  subscriptionResult,
+  setSubscriptionResult,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
@@ -142,6 +144,7 @@ const ContentSection = ({
           reaction_type: `${reaction}`,
         }
       );
+      console.log(res);
       if (res.status == 200) {
         let data = res?.data?.data;
         if (data) {
@@ -157,17 +160,43 @@ const ContentSection = ({
             )[0].total_reactions.total_likes = data?.total_likes;
 
             setContentData(contentData);
-          } else {
-            publicComments.filter(
-              (response) => response.id == data?.comment_id
-            )[0].total_reactions.total_clap = data?.total_clap;
-            publicComments.filter(
-              (response) => response.id == data?.comment_id
-            )[0].total_reactions.total_favorite = data?.total_favorite;
-            publicComments.filter(
-              (response) => response.id == data?.comment_id
-            )[0].total_reactions.total_likes = data?.total_likes;
+          } else if (subscriptionResult) {
+            const subscriptionfiltered = subscriptionResult.filter(
+              (res) => res.type == "comment"
+            );
 
+            const filterData = subscriptionfiltered.map((data) => {
+              return data.value.id;
+            });
+
+            if (filterData.includes(data?.comment_id)) {
+              subscriptionfiltered.filter(
+                (response) => response.value.id == data?.comment_id
+              )[0].value.total_reactions.total_clap = data?.total_clap;
+              subscriptionfiltered.filter(
+                (response) => response.value.id == data?.comment_id
+              )[0].value.total_reactions.total_favorite = data?.total_favorite;
+              subscriptionfiltered.filter(
+                (response) => response.value.id == data?.comment_id
+              )[0].value.total_reactions.total_likes = data?.total_likes;
+            }
+            setSubscriptionResult(subscriptionResult);
+          } else {
+            const filterData = publicComments.map((data) => {
+              return data.id;
+            });
+
+            if (filterData.includes(data?.comment_id)) {
+              publicComments.filter(
+                (response) => response.id == data?.comment_id
+              )[0].total_reactions.total_clap = data?.total_clap;
+              publicComments.filter(
+                (response) => response.id == data?.comment_id
+              )[0].total_reactions.total_favorite = data?.total_favorite;
+              publicComments.filter(
+                (response) => response.id == data?.comment_id
+              )[0].total_reactions.total_likes = data?.total_likes;
+            }
             setPublicComments(publicComments);
           }
 
@@ -201,7 +230,8 @@ const ContentSection = ({
       }
       localStorage.setItem(`${id}_${reaction}`, count);
     } catch (error) {
-      if (error.response.status === 400) {
+      console.log(error);
+      if (error?.response?.status === 400) {
         Swal.fire({
           title: "Error",
           text: error?.response?.data?.error,
@@ -513,6 +543,10 @@ const ContentSection = ({
                         data?.value?.id,
                         "like",
                         data?.value?.total_reactions?.total_likes
+                      );
+                      console.log(
+                        data?.value?.total_reactions?.total_likes,
+                        "====data?.value?.total_reactions?.total_likes"
                       );
                     }}
                   >
