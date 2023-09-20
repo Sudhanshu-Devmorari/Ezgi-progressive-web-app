@@ -227,6 +227,13 @@ const ActiveComments = (props) => {
         props?.homeApiData(user_id);
       }
     } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: `${error.response.data}`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
       console.error("Error fetching data.", error);
     }
   };

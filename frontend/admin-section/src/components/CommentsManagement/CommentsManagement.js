@@ -125,6 +125,7 @@ const CommentsManagement = (props) => {
         `${config?.apiUrl}/comments-management/${id}/`,
         { status: `${status}` }
       );
+      window.location.reload()
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];

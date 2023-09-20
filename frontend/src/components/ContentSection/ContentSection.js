@@ -110,6 +110,13 @@ const ContentSection = ({
       }
     } catch (error) {
       console.error("Error fetching data.", error);
+      Swal.fire({
+        title: "Error",
+        text: `${error.response.data}`,
+        icon: "error",
+        backdrop: false,
+        customClass: "dark-mode-alert",
+      });
     }
   };
   // console.log("first: ", data)

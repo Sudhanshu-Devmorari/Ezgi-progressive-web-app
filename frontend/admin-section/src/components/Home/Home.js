@@ -35,16 +35,28 @@ const Home = (props) => {
         `${config?.apiUrl}/user-management/${id}/?action=${action}`
       );
       if (res.status === 200) {
-        setIsLoadingActions(false);
-        clearError();
-        props?.adminHomeApiData();
-        Swal.fire({
-          title: "Success",
-          text: res?.data?.data,
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
-        });
+        const modalElement = document.getElementById("exampleModal");
+          if (modalElement) {
+            const closeButton = modalElement.querySelector(
+              "[data-bs-dismiss='modal']"
+            );
+            if (closeButton) {
+              closeButton.click();
+            }
+          }
+          setIsLoadingActions(false);
+          clearError();
+          props?.adminHomeApiData();
+          const confirmation = await Swal.fire({
+            title: "Success",
+            text: res?.data?.data,
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+          if (confirmation.value === true) {
+          window.location.reload()
+          }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -286,6 +298,7 @@ const Home = (props) => {
             closeButton.click();
           }
         }
+        window.location.reload()
         clearError();
         props?.userManagementApiData();
       } catch (error) {
@@ -401,13 +414,16 @@ const Home = (props) => {
           setprofile(false);
           setPreveiwProfilePic(null);
           props?.adminHomeApiData();
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text: "User Updated!",
             icon: "success",
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          if (confirm.value === true){
+            window.location.reload()
+          }
         }
       } catch (error) {
         if (error?.response?.data?.error) {
@@ -848,10 +864,11 @@ const Home = (props) => {
                         />
                         <img
                           onClick={() => {
-                            if (userData?.is_delete) {
+                            // if (userData?.is_delete) {
                               handleDeactive(res.id, "delete");
                             }
-                          }}
+                          // }
+                          }
                           className="cursor"
                           src={trash}
                           alt=""
@@ -1237,6 +1254,7 @@ const Home = (props) => {
                     <div className="my-2 d-flex justify-content-center gap-3 mb-3 px-3">
                       <div className="">
                         <button
+                        // disabled={true}
                           onClick={() => {
                             handleDeactive(userData?.id, "remove");
                             setAddUser({
@@ -1251,7 +1269,7 @@ const Home = (props) => {
                             setPreveiwProfilePic(null);
                             clearError();
                           }}
-                          data-bs-dismiss="modal"
+                          // data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
                             color: "#FF5757",
@@ -1282,6 +1300,7 @@ const Home = (props) => {
                       </div>
                       <div className="">
                         <button
+                        // disabled={true}
                           onClick={() => {
                             handleDeactive(
                               userData?.id,
@@ -1298,7 +1317,7 @@ const Home = (props) => {
                             setprofile(false);
                             setPreveiwProfilePic(null);
                           }}
-                          data-bs-dismiss="modal"
+                          // data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
                             color: "#D2DB08",

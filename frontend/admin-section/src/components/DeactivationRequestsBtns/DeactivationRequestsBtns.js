@@ -10,7 +10,7 @@ const DeactivationRequestsBtns = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingAccept, setIsLoadingAccept] = useState(false);
-
+  
   const handleDeactivation = async (action) => {
     try {
       if (action === "accept") {
@@ -22,6 +22,7 @@ const DeactivationRequestsBtns = (props) => {
         `${config?.apiUrl}/deactivate-commentator/${id}/`,
         { status: action }
       );
+      props?.editorManagementApiData()
       if (res.status === 200) {
         if (action === "accept") {
           setIsLoadingAccept(false);

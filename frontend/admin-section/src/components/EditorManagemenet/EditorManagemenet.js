@@ -204,7 +204,7 @@ const EditorManagemenet = (props) => {
       setAllFilterData(props?.users);
     }
     // setDisplayUser(props?.users==undefined?[]:props?.users)
-  }, [props.users]);
+  }, [props.users,props?.deactiveRqst]);
 
   const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -1158,13 +1158,8 @@ const EditorManagemenet = (props) => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {partialData.editor_data.commentator_level
-                            .charAt(0)
-                            .toUpperCase() +
-                            partialData.editor_data.commentator_level
-
-                              .slice(1)
-                              .toLowerCase()}
+                          {partialData?.editor_data?.commentator_level?.charAt(0).toUpperCase() +
+                            partialData?.editor_data?.commentator_level?.slice(1).toLowerCase()}
                         </button>
                       </div>
                     )}

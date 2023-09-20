@@ -440,8 +440,11 @@ class FollowCommentatorView(APIView):
 
     def get(self, request, id, format=None, *args, **kwargs):
         user = User.objects.get(id=id)
+
         # user = request.user
         try:
+            if user.is_active == False:
+                return Response("Your account has been deactivated. Contact support for assistance.", status=status.HTTP_400_BAD_REQUEST)
             commentator_id = request.query_params.get('id')
             if commentator_id:
                 commentator_obj = User.objects.get(id=commentator_id)
@@ -503,9 +506,11 @@ class CommentView(APIView):
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
+            if user.is_active == False:
+                return Response({'data' : "Your account has been deactivated. Contact support for assistance."}, status=status.HTTP_400_BAD_REQUEST)
             
-            if not user.is_active:
-                return Response({'data' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+            # if not user.is_active:
+            #     return Response({'data' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
 
             if user.user_role == 'commentator':
 
@@ -757,7 +762,7 @@ class CommentReactionView(APIView):
         
         user = User.objects.get(id=id)
         if not user.is_active:
-            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Reaction type validation
         reaction_type = request.data.get('reaction_type')  # This will contain 'like', 'favorite', or 'clap'
@@ -891,7 +896,7 @@ class ProfileView(APIView):
             return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
         if not user.is_active:
-            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
         
         if 'profile' in request.data['update']:
 
@@ -939,7 +944,7 @@ class FavEditorsCreateView(APIView):
                 user = User.objects.get(id=id)
 
                 if not user.is_active:
-                    return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'error' : 'Your account has been deactivated. Contact support for assistance..'}, status=status.HTTP_400_BAD_REQUEST)
 
                 if 'id' not in request.data:
                     return Response({'error': 'Commentator Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1516,7 +1521,7 @@ class AdminMainPage(APIView):
             new_comment = Comments.objects.all().count()
             data_list['new_comment'] = new_comment
 
-            all_user = User.objects.filter(is_delete=False,is_admin=False).order_by('-created')
+            all_user = User.objects.filter(is_delete=False,is_admin=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -1572,7 +1577,8 @@ class UserManagement(APIView):
             new_subscriber = Subscription.objects.all().count()
             data_list['new_subscriber'] = new_subscriber
 
-            all_user = User.objects.filter(is_delete=False).order_by('-created')
+            # all_user = User.objects.filter(is_delete=False).order_by('-created')
+            all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
@@ -1592,13 +1598,15 @@ class UserManagement(APIView):
         Create new User.
         """
         try:
+            username = request.data['username']
+            if User.objects.filter(username=username).exists():
+                return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
             phone = request.data['phone']
             if User.objects.filter(phone=phone).exists():
                 return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
             profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
-            username = request.data['username']
             password = request.data['password']
             gender = request.data['gender']
             age = request.data['age']
@@ -1774,7 +1782,7 @@ class FilterUserManagement(APIView):
                 
                 if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
                     users = request.data.get('users')
-                    print('users: ', users)
+                    # print('users: ', users)
                     if users == 'Deactivated Users':
                         filters.update({'is_active': False})
                     if users == 'Deleted Users':
@@ -2230,7 +2238,8 @@ class EditorManagement(APIView):
 
 
             editor_list = []
-            commentator = User.objects.filter(user_role='commentator').order_by('created')
+            # all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
+            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True).order_by('created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2378,13 +2387,16 @@ class EditorManagement(APIView):
         """
         # print("+++++", request.data)
         try:
+            username = request.data['username']
+            if User.objects.filter(username=username).exists():
+                return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
             phone = request.data['phone']
             if User.objects.filter(phone=phone).exists():
                 return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
             profile = request.FILES.get('file')
             date = request.data.get('date')
             name = request.data['name']
-            username = request.data['username']
+            # username = request.data['username']
             password = request.data['password']
             gender = request.data['gender']
             age = request.data['age']
@@ -2627,6 +2639,7 @@ class DeactivateCommentator(APIView):
         try:
             # Validations
             deactivation_status = request.data.get('status')
+            print("----- ", deactivation_status)
             if deactivation_status is None:
                 return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2638,10 +2651,10 @@ class DeactivateCommentator(APIView):
             if deactivation_status == 'accept':
                 obj.deactivate_commentator = deactivation_status
                 obj.is_delete =True
-                obj.save(update_fields=['deactivate_commentator' 'is_delete','updated'])
+                obj.save(update_fields=['deactivate_commentator', 'is_delete', 'updated'])
             elif deactivation_status == 'reject':
                 print('deactivation_status: ', deactivation_status)
-                obj.deactivate_commentator == ''
+                obj.deactivate_commentator = ''
                 obj.save(update_fields=['deactivate_commentator','updated'])
 
             # Get data
@@ -4147,7 +4160,7 @@ class BecomeEditorView(APIView):
         user = User.objects.get(id=id)
         
         if not user.is_active:
-            return Response({'error' : 'Account is disabled. Please contact to the support team.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if user.user_role == "standard":
             if user.profile_pic == "":
