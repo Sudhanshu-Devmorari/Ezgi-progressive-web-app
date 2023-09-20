@@ -24,6 +24,7 @@ const CommentsPage = ({
   setPublicComments,
   setCmtReact,
   mergeArrays,
+  handleOnlyPublicData,
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   const [filterCommentData, setFilterCommentData] = useState(null);
@@ -173,6 +174,7 @@ const CommentsPage = ({
         setDisplayData={setDisplayData}
         setPublicSelected={setPublicSelected}
         publicSelected={publicSelected}
+        handleOnlyPublicData={handleOnlyPublicData}
       />
       <div className="" id="banner1">
         <AdvertisementBanner data={adsdata} />
@@ -185,11 +187,11 @@ const CommentsPage = ({
             if (val.type == "comment") {
               return (
                 <>
-                  {lastType == "highlight" ? (
+                  {lastType == "highlight" && (
                     <div className="" id="banner2">
                       <AdvertisementBanner data={adsdata} />
                     </div>
-                  ) : null}
+                  )}
                   <ContentSection
                     setActiveCommentsshow={setActiveCommentsshow}
                     data={val}
@@ -212,13 +214,7 @@ const CommentsPage = ({
             if (val.type == "highlight") {
               return (
                 <>
-                  {lastType == "comment" ? (
-                    <HighlightMainPage
-                      data={
-                        ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
-                      }
-                    />
-                  ) : null}
+                  {lastType == "comment" && <HighlightMainPage />}
                   <SharedProfile
                     setActiveCommentsshow={setActiveCommentsshow}
                     data={val}
@@ -238,16 +234,11 @@ const CommentsPage = ({
           if (val.type == "comment") {
             return (
               <>
-                {lastType == "highlight" ? (
-                  // <AdvertisementBanner
-                  //   data={
-                  //     ads[(Math.random() * (ads.length - 1) + 1).toFixed(0)]
-                  //   }
-                  // />
+                {lastType == "highlight" && (
                   <div className="" id="banner3">
                     <AdvertisementBanner data={adsdata} />
                   </div>
-                ) : null}
+                )}
                 <ContentSection
                   setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
@@ -259,6 +250,10 @@ const CommentsPage = ({
                   cmtReact={cmtReact}
                   homeApiData={homeApiData}
                   setArrayMerge={setArrayMerge}
+                  publicComments={publicComments}
+                  setPublicComments={setPublicComments}
+                  mergeArrays={mergeArrays}
+                  setCmtReact={setCmtReact}
                 />
               </>
             );
@@ -266,7 +261,7 @@ const CommentsPage = ({
           if (val.type == "highlight") {
             return (
               <>
-                {lastType == "comment" ? <HighlightMainPage /> : null}
+                {lastType == "comment" && <HighlightMainPage />}
                 <SharedProfile
                   setActiveCommentsshow={setActiveCommentsshow}
                   data={val}

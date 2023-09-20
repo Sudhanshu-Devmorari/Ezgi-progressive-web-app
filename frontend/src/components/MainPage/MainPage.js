@@ -293,6 +293,46 @@ const MainPage = () => {
     setOnlyPublicResult(merged);
   };
 
+  const handleOnlyPublicData = async (isPublic) => {
+    console.log("isPublic::::::::::", isPublic);
+    let merged = [];
+    let remainingPublic = [...publicComments];
+    let remainingHighlights = [...highlights];
+
+    if (!isPublic) {
+      const filterData = publicComments.filter(
+        (res) => res.public_content === !isPublic
+      );
+      if (filterData.length > 0) {
+        const remainingLength =
+          (filterData.length / 2).toFixed(0) - filterData.length;
+        merged = [
+          ...filterData
+            .slice(0, (filterData.length / 2).toFixed(0))
+            .map((comment) => ({
+              type: "comment",
+              value: comment,
+            })),
+          ...highlights.map((highlight) => ({
+            type: "highlight",
+            value: highlight,
+          })),
+          ...filterData.slice(remainingLength).map((comment) => ({
+            type: "comment",
+            value: comment,
+          })),
+        ];
+      }
+      setOnlyPublicResult(merged);
+    } else {
+      mergeArrays();
+    }
+  };
+
+  useEffect(() => {
+    selectPublicorForYou == "only public" && handleOnlyPublicData();
+  }, [selectPublicorForYou]);
+
   useEffect(() => {
     if (themeMode === "dark") {
       document.body.classList.add("body-dark-mode");
@@ -432,6 +472,7 @@ const MainPage = () => {
                 mergeArrays={mergeArrays}
                 setMergedEditorResult={setMergedEditorResult}
                 mergedEditorResult={mergedEditorResult}
+                handleOnlyPublicData={handleOnlyPublicData}
               />
             ) : (
               <DashboardSU
@@ -452,6 +493,7 @@ const MainPage = () => {
                 mergeArrays={mergeArrays}
                 setMergedEditorResult={setMergedEditorResult}
                 mergedEditorResult={mergedEditorResult}
+                handleOnlyPublicData={handleOnlyPublicData}
               />
             )
           ) : (
@@ -484,6 +526,7 @@ const MainPage = () => {
                       setSelectContent={setSelectPublicorForYou}
                       setPublicSelected={setPublicSelected}
                       publicSelected={publicSelected}
+                      handleOnlyPublicData={handleOnlyPublicData}
                     />
 
                     {mergedResult.map((val, index) => {
@@ -566,6 +609,7 @@ const MainPage = () => {
                       setSelectContent={setSelectPublicorForYou}
                       setPublicSelected={setPublicSelected}
                       publicSelected={publicSelected}
+                      handleOnlyPublicData={handleOnlyPublicData}
                     />
 
                     {subscriptionResult.map((val, index) => {
@@ -640,11 +684,29 @@ const MainPage = () => {
                       setSelectContent={setSelectPublicorForYou}
                       setPublicSelected={setPublicSelected}
                       publicSelected={publicSelected}
+                      handleOnlyPublicData={handleOnlyPublicData}
                     />
 
                     {onlyPublicResult.map((val, index) => {
                       let lastType =
                         onlyPublicResult[index == 0 ? 0 : index - 1]?.type;
+
+                      if (val.type == "highlight") {
+                        return (
+                          <>
+                            {lastType == "comment" ? (
+                              <HighlightMainPage />
+                            ) : null}
+                            <SharedProfile
+                              setActiveCommentsshow={setActiveCommentsshow}
+                              data={val}
+                              setData={setData}
+                              setSelectContent={setSelectContent}
+                              verifyid={verifyid}
+                            />
+                          </>
+                        );
+                      }
 
                       if (val.type == "comment") {
                         return (
@@ -680,22 +742,6 @@ const MainPage = () => {
                           </>
                         );
                       }
-                      if (val.type == "highlight") {
-                        return (
-                          <>
-                            {lastType == "comment" ? (
-                              <HighlightMainPage />
-                            ) : null}
-                            <SharedProfile
-                              setActiveCommentsshow={setActiveCommentsshow}
-                              data={val}
-                              setData={setData}
-                              setSelectContent={setSelectContent}
-                              verifyid={verifyid}
-                            />
-                          </>
-                        );
-                      }
                     })}
                   </>
                 )}
@@ -710,6 +756,7 @@ const MainPage = () => {
                   followingid={followingid}
                   verifyid={verifyid}
                   highlights={highlights}
+                  handleOnlyPublicData={handleOnlyPublicData}
                 />
               )}
               {selectContent === "comments" && (
@@ -733,6 +780,7 @@ const MainPage = () => {
                   mergeArrays={mergeArrays}
                   mergedEditorResult={mergedEditorResult}
                   setMergedEditorResult={setMergedEditorResult}
+                  handleOnlyPublicData={handleOnlyPublicData}
                 />
               )}
               {selectContent === "show-all-comments" && (

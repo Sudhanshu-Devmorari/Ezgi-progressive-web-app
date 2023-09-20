@@ -121,6 +121,15 @@ const DashboardSU = (props) => {
               followingList={props?.followingList}
               followingid={props?.followingid}
               favSelection={favSelection}
+              publicComments={props?.publicComments}
+              setPublicComments={props?.setPublicComments}
+              mergeArrays={props?.mergeArrays}
+              setMergedEditorResult={props?.setMergedEditorResult}
+              mergedEditorResult={props?.mergedEditorResult}
+              setData={props?.setData}
+              selectContent={props?.selectContent}
+              setArrayMerge={props?.setArrayMerge}
+              setCmtReact={props?.setCmtReact}
             />
           )}
         </>

@@ -100,55 +100,57 @@ const BecomeAEditorModal = (props) => {
     if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
-      formData.append("category", selectedKategori);
-      formData.append("experience", selectedDeneyim);
-      formData.append("profile_pic", file);
-      axios
-        .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
-        .then((res) => {
-          // console.log(res, "===========>>>>res");
-          if (res.status === 200) {
-            // setShowPaymentModal(true);
-            localStorage.setItem("user-role", res.data.user_role);
-            props.onHide();
-            Swal.fire({
-              title: "Success",
-              text: "User has successfully become a commentator",
-              icon: "success",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.response.status === 404) {
-            Swal.fire({
-              title: "Error",
-              text: error.response.data.error,
-              icon: "error",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          } else if (error.response.status === 400) {
-            Swal.fire({
-              title: "Error",
-              text: error?.response?.data?.error,
-              icon: "error",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          }
-        });
+      if (preveiwProfilePic) {
+        formData.append("category", selectedKategori);
+        formData.append("experience", selectedDeneyim);
+        formData.append("profile_pic", file);
+        axios
+          .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
+          .then((res) => {
+            // console.log(res, "===========>>>>res");
+            if (res.status === 200) {
+              // setShowPaymentModal(true);
+              localStorage.setItem("user-role", res.data.user_role);
+              props.onHide();
+              Swal.fire({
+                title: "Success",
+                text: "User has successfully become a commentator",
+                icon: "success",
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response.status === 404) {
+              Swal.fire({
+                title: "Error",
+                text: error.response.data.error,
+                icon: "error",
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            } else if (error.response.status === 400) {
+              Swal.fire({
+                title: "Error",
+                text: error?.response?.data?.error,
+                icon: "error",
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            }
+          });
+      }
     }
   }
 
@@ -159,8 +161,9 @@ const BecomeAEditorModal = (props) => {
         size="md"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        // backdrop="static"
-        // keyboard={false}
+        scrollable
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Body
           className={`${currentTheme === "dark" ? "darkMode" : "lightMode"}`}
@@ -168,20 +171,19 @@ const BecomeAEditorModal = (props) => {
         >
           {showTermsOfUse === 1 && (
             <>
+              <RxCross2
+                onClick={() => {
+                  props.onHide();
+                }}
+                fontSize={"1.5rem"}
+                className={`position-absolute ${
+                  currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
+                }`}
+                style={{ zIndex: 1 }}
+              />
               <form onSubmit={handleSubmit}>
-                <span>
-                  <RxCross2
-                    onClick={() => {
-                      props.onHide();
-                    }}
-                    fontSize={"1.5rem"}
-                    className={`${
-                      currentTheme === "dark"
-                        ? "closeBtn-dark"
-                        : "closeBtn-light"
-                    }`}
-                  />
-                </span>
+                {/* <span> */}
+                {/* </span> */}
                 <div className="position-relative d-flex justify-content-center align-items-center">
                   <img
                     src={

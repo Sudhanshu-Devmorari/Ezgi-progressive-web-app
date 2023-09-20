@@ -5,8 +5,10 @@ import CurrentTheme from "../../context/CurrentTheme";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import Form from "react-bootstrap/Form";
 import config from "../../config";
+import Swal from "sweetalert2";
 
 const CreateNewTicket = (props) => {
+  const { setShowModal, ticketsData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
@@ -36,13 +38,41 @@ const CreateNewTicket = (props) => {
     } else if (message === "") {
       setMessageError("Message is required.");
     } else {
-      const res = await axios.post(`${config?.apiUrl}/support/${userId}`, {
-        department: selectedMatchDetails,
-        subject: subject,
-        message: message,
-      });
-      if (res.status === 200) {
-        props.setShowModal(1);
+      const mapDepartmentData = ticketsData?.map((res) => res.department);
+      const mapStatusData = ticketsData?.map((res) => res.status);
+
+      if (
+        mapDepartmentData?.includes(selectedMatchDetails) &&
+        mapStatusData?.includes("pending")
+      ) {
+        await Swal.fire({
+          title: "Error",
+          text: "You must wait until the previous ticket for the same department is resolved before creating another one.",
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+        setShowModal(1);
+      } else {
+        const res = await axios.post(`${config?.apiUrl}/support/${userId}`, {
+          department: selectedMatchDetails,
+          subject: subject,
+          message: message,
+        });
+        if (res.status === 200) {
+          await Swal.fire({
+            title: "Success",
+            text: "Support request successfully submitted. We will respond as soon as possible.",
+            icon: "success",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            timer: 2000,
+          });
+          
+          setShowModal(1);
+        }
       }
     }
   };

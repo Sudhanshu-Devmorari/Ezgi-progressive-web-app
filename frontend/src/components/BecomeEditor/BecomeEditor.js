@@ -8,6 +8,7 @@ import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
 const BecomeEditor = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
+  const user_role = localStorage.getItem("user-role");
   return (
     <>
       <div
@@ -39,24 +40,26 @@ const BecomeEditor = () => {
       <div className="my-2 px-4">
         <img src={landingPage} alt="" className="img-fluid" />
       </div>
-      <div
-        className="d-flex justify-content-center my-4"
-        style={{ fontSize: "15px" }}
-      >
-        <button
-          onClick={() => setModalShow(true)}
-          style={{
-            border: "1px solid #00DE51",
-            color: "#00DE51",
-            borderRadius: "3px",
-            backgroundColor: "transparent",
-            padding: ".1rem .7rem",
-            fontFamily: "Poppins",
-          }}
+      {user_role !== "commentator" && (
+        <div
+          className="d-flex justify-content-center my-4"
+          style={{ fontSize: "15px" }}
         >
-          Editör Profilini Oluştur
-        </button>
-      </div>
+          <button
+            onClick={() => setModalShow(true)}
+            style={{
+              border: "1px solid #00DE51",
+              color: "#00DE51",
+              borderRadius: "3px",
+              backgroundColor: "transparent",
+              padding: ".1rem .7rem",
+              fontFamily: "Poppins",
+            }}
+          >
+            Editör Profilini Oluştur
+          </button>
+        </div>
+      )}
       <FAQEditor />
       <BecomeAEditorModal show={modalShow} onHide={() => setModalShow(false)} />
     </>

@@ -4303,7 +4303,7 @@ class RetrievePageData():
         public_comments = []
 
         try:
-            all_comments = Comments.objects.filter(status='approve', public_content=True).order_by('-created').only('id')
+            all_comments = Comments.objects.filter(status='approve').order_by('-created').only('id')
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data

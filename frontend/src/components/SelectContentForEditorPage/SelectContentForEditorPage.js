@@ -12,6 +12,7 @@ import publicSelectedIcon from "../../assets/Public Content Radio Button Selecte
 import lighGrpSelected from "../../assets/Group 312.png";
 
 const SelectContentForEditorPage = (props) => {
+  const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const filterData = (e) => {
@@ -102,6 +103,7 @@ const SelectContentForEditorPage = (props) => {
             </span>
             <div
               onClick={() => {
+                handleOnlyPublicData(props.publicSelected)
                 props.setPublicSelected(!props.publicSelected);
                 props.publicSelected == true
                   ? props.setOnlyPublic("")

@@ -18,6 +18,7 @@ const EditorsPage = ({
   setActiveCommentsshow,
   verifyid,
   highlights,
+  handleOnlyPublicData
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -128,6 +129,7 @@ const EditorsPage = ({
         data={mergedEditorResult}
         setDisplayData={setDisplayData}
         setFilterData={setFilterData}
+        handleOnlyPublicData={handleOnlyPublicData}
       />
 
       {isLoading ? (

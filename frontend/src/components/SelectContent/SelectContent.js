@@ -9,6 +9,7 @@ import lighGrpSelected from "../../assets/Group 312.png";
 import lighGrp from "../../assets/Group 721.png";
 
 export const SelectContent = (props) => {
+  const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const userPhone = localStorage.getItem("userPhone");
   const userId = localStorage.getItem("user-id");
@@ -64,6 +65,7 @@ export const SelectContent = (props) => {
               {/* {console.log(props.publicSelected)} */}
               <div
                 onClick={() => {
+                  handleOnlyPublicData(props.publicSelected);
                   props.setPublicSelected(!props.publicSelected);
                   props.publicSelected == true
                     ? props.setSelectContent("for you")

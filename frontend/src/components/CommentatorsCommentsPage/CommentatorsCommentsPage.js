@@ -236,6 +236,8 @@ const CommentatorsCommentsPage = (props) => {
                   mergeArrays={props.mergeArrays}
                   setCmtReact={props.setCmtReact}
                   favSelection={favSelection}
+                  setMergedEditorResult={props?.setMergedEditorResult}
+                  mergedEditorResult={props?.mergedEditorResult}
                 />
               )}
             </>

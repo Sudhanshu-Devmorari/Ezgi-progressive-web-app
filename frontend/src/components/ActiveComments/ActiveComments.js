@@ -548,31 +548,35 @@ const ActiveComments = (props) => {
                   Edit Profile
                 </button>
               ) : (
-                <button
-                  onClick={() => {
-                    if (userPhone != profileData?.id) {
-                      followCommentator(
-                        profileData?.id,
-                        props?.followingid?.includes(profileData?.id)
-                      );
-                    }
-                  }}
-                  style={{
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #4DD5FF"
-                        : "1px solid #007BF6",
-                    color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                    backgroundColor: "transparent",
-                    borderRadius: "18px",
-                    padding: "0.1rem 2.2rem",
-                    fontSize: "13px",
-                  }}
-                >
-                  {props.followingid?.includes(profileData?.id)
-                    ? "Followed"
-                    : "Follow"}
-                </button>
+                <>
+                  {userId != profileData?.id && (
+                    <button
+                      onClick={() => {
+                        if (userPhone != profileData?.id) {
+                          followCommentator(
+                            profileData?.id,
+                            props?.followingid?.includes(profileData?.id)
+                          );
+                        }
+                      }}
+                      style={{
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid #4DD5FF"
+                            : "1px solid #007BF6",
+                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                        backgroundColor: "transparent",
+                        borderRadius: "18px",
+                        padding: "0.1rem 2.2rem",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {props.followingid?.includes(profileData?.id)
+                        ? "Followed"
+                        : "Follow"}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -757,8 +761,9 @@ const ActiveComments = (props) => {
             }`}
           >
             Month/29.90₺
-            <button
-              onClick={() => {
+            {userId != profileData?.id && (
+              <button
+                onClick={() => {
                 setWinningOrLoseData({
                   ...winningOrLoseData, 
                   win: userPoints?.winning,
@@ -767,19 +772,20 @@ const ActiveComments = (props) => {
                 setCommentatorUser(profileData);
                 setSubscribeModalShow(true);
               }}
-              className="ms-1 px-3 py-1"
-              style={{
-                border:
-                  currentTheme === "dark"
-                    ? "1px solid #37FF80"
-                    : "1px solid #00659D",
-                color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                backgroundColor: "transparent",
-                borderRadius: "3px",
-              }}
-            >
-              Subscribe
-            </button>
+                className="ms-1 px-3 py-1"
+                style={{
+                  border:
+                    currentTheme === "dark"
+                      ? "1px solid #37FF80"
+                      : "1px solid #00659D",
+                  color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                  backgroundColor: "transparent",
+                  borderRadius: "3px",
+                }}
+              >
+                Subscribe
+              </button>
+            )}
           </div>
         )}
         {props.profile === "commentator" && (

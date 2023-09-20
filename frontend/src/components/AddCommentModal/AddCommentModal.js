@@ -265,6 +265,7 @@ const AddCommentModal = (props) => {
   const [predictionTypeError, setPredictionTypeError] = useState("");
   const [predictionError, setPredictionError] = useState("");
   const [commentError, setCommentError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function closeModal() {
     setCategoryError("");
@@ -298,6 +299,7 @@ const AddCommentModal = (props) => {
 
   // Add Comment pr Post comment API
   const postComment = async () => {
+    setIsLoading(true);
     if (selectedCategory === "Select") {
       setCategoryError("Required*");
     }
@@ -375,9 +377,11 @@ const AddCommentModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
           await activeResolved(userId);
+          setIsLoading(false);
         }
       } catch (error) {
         console.log(error);
+        setIsLoading(false);
         if (error.response.status === 404) {
           Swal.fire({
             title: "Error",
@@ -881,7 +885,7 @@ const AddCommentModal = (props) => {
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
                 >
-                  Publish
+                  {isLoading ? "Loading..." : "Publish"}
                 </button>
               </div>
               <div className="my-3" style={{ fontSize: "12px" }}>

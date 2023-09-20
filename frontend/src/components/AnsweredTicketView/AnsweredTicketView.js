@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
-  const ticketData = props?.ticketData || [];
+  const ticketData = props?.ticketData || {};
 
   const handleResolvedTicket = () => {
     axios
@@ -123,23 +123,25 @@ const AnsweredTicketView = (props) => {
           >
             Reply
           </button>
-          <button
-            onClick={() => {
-              handleResolvedTicket();
-            }}
-            className="px-3"
-            style={{
-              color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
-              backgroundColor: "transparent",
-              border:
-                currentTheme === "dark"
-                  ? "1px solid #D2DB0B"
-                  : "1px solid #00659D",
-              borderRadius: "3px",
-            }}
-          >
-            Resolved
-          </button>
+          {ticketData?.admin_response && (
+            <button
+              onClick={() => {
+                handleResolvedTicket();
+              }}
+              className="px-3"
+              style={{
+                color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                backgroundColor: "transparent",
+                border:
+                  currentTheme === "dark"
+                    ? "1px solid #D2DB0B"
+                    : "1px solid #00659D",
+                borderRadius: "3px",
+              }}
+            >
+              Resolved
+            </button>
+          )}
         </div>
       </div>
     </>

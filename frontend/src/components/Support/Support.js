@@ -147,7 +147,7 @@ const Support = () => {
 
         {showModal === 2 && (
           <>
-            <CreateNewTicket setShowModal={setShowModal} />
+            <CreateNewTicket setShowModal={setShowModal} ticketsData={ticketsData}/>
           </>
         )}
 

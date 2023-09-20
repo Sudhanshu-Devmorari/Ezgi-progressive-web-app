@@ -306,11 +306,6 @@ const CommentsManagement = (props) => {
     setDateDropdown(false);
     setLeagueDropdown(!leagueDropdown);
   };
-  const matchDetailsOptions = [
-    "Match Details 1",
-    "Match Details 2",
-    "Match Details 3",
-  ];
   const predictionTypeOptions = predictionType;
   const predictionOptions = [
     "Apprentice",
@@ -356,53 +351,6 @@ const CommentsManagement = (props) => {
     setDateDropdown(false);
     setPredictionDropdown(!predictionDropdown);
   };
-
-  const users = [
-    {
-      sr: "#0001",
-      name: "john Doe",
-      username: "johndoe",
-      flag: flag,
-      league: "Süper Lig",
-      date: "15-06-.2023 - 16:37",
-      role: "Antalyaspor - Başakşehir",
-      profile: user1,
-      status: circle_check,
-    },
-    {
-      sr: "#0002",
-      name: "john Doe",
-      username: "johndoe",
-      flag: UKflag,
-      league: "Championship",
-      date: "15-06-.2023 - 16:37",
-      role: "Sheffield United - West Bromwich",
-      profile: user2,
-      status: clock_exclamation,
-    },
-    {
-      sr: "#0003",
-      name: "john Doe",
-      username: "johndoe",
-      flag: flag,
-      league: "Süper Lig",
-      date: "15-06-.2023 - 16:37",
-      role: "Antalyaspor - Başakşehir",
-      profile: user3,
-      status: circle_x,
-    },
-    {
-      sr: "#0004",
-      name: "john Doe",
-      username: "johndoe",
-      flag: UKflag,
-      league: "Championship",
-      date: "15-06-.2023 - 16:37",
-      role: "Sheffield United - West Bromwich",
-      profile: user4,
-      status: circle_check,
-    },
-  ];
 
   useEffect(() => {
     const fetchData = async () => {

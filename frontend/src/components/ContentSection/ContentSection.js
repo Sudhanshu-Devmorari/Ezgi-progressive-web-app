@@ -317,56 +317,64 @@ const ContentSection = ({
                 selectContent === "only public" ||
                 userComments ||
                 selectContent === "comments") && (
-                <div
-                  className="d-flex justify-content-end pe-2 mt-3"
-                  style={{ height: "24.69px" }}
-                >
-                  {userPhone != data?.value?.commentator_user?.id ? (
-                    <button
-                      onClick={() => {
-                        followCommentator(
-                          data?.value?.commentator_user?.id,
-                          followingid?.includes(
-                            data?.value.commentator_user?.id
+                <>
+                  {userId != data?.value?.commentator_user?.id && (
+                    <div
+                      className="d-flex justify-content-end pe-2 mt-3"
+                      style={{ height: "24.69px" }}
+                    >
+                      {userId != data?.value?.commentator_user?.id ? (
+                        <button
+                          onClick={() => {
+                            followCommentator(
+                              data?.value?.commentator_user?.id,
+                              followingid?.includes(
+                                data?.value.commentator_user?.id
+                              )
+                            );
+                          }}
+                          style={{
+                            border:
+                              currentTheme === "dark"
+                                ? "1px solid #4DD5FF"
+                                : "1px solid #007BF6",
+                            color:
+                              currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                            backgroundColor: "transparent",
+                            borderRadius: "18px",
+                            padding: "0.1rem 2.1rem",
+                            fontSize: "13px",
+                          }}
+                        >
+                          {/* {followLabel ? followLabel : "Follow"} */}
+                          {followingid?.includes(
+                            data?.value?.commentator_user?.id
                           )
-                        );
-                      }}
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #4DD5FF"
-                            : "1px solid #007BF6",
-                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                        backgroundColor: "transparent",
-                        borderRadius: "18px",
-                        padding: "0.1rem 2.1rem",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {/* {followLabel ? followLabel : "Follow"} */}
-                      {followingid?.includes(data?.value?.commentator_user?.id)
-                        ? "Followed"
-                        : "Follow"}
-                      {/* {(followingid).includes(data?.value.commentator_user.id) ? setFollowLabel('Followed') : setFollowLabel('Follow')} */}
-                    </button>
-                  ) : (
-                    <button
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #4DD5FF"
-                            : "1px solid #007BF6",
-                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                        backgroundColor: "transparent",
-                        borderRadius: "18px",
-                        padding: "0.1rem 2.1rem",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {followLabel ? followLabel : "Follow"}
-                    </button>
+                            ? "Followed"
+                            : "Follow"}
+                          {/* {(followingid).includes(data?.value.commentator_user.id) ? setFollowLabel('Followed') : setFollowLabel('Follow')} */}
+                        </button>
+                      ) : (
+                        <button
+                          style={{
+                            border:
+                              currentTheme === "dark"
+                                ? "1px solid #4DD5FF"
+                                : "1px solid #007BF6",
+                            color:
+                              currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                            backgroundColor: "transparent",
+                            borderRadius: "18px",
+                            padding: "0.1rem 2.1rem",
+                            fontSize: "13px",
+                          }}
+                        >
+                          {followLabel ? followLabel : "Follow"}
+                        </button>
+                      )}
+                    </div>
                   )}
-                </div>
+                </>
               )}
               <div className={`${"mt-3"} row gap-1 g-0 text-center`}>
                 <div className="col">
