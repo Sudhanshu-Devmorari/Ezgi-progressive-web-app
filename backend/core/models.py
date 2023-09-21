@@ -378,3 +378,18 @@ class BecomeEditorEarnDetails(models.Model):
 
     def __str__(self):
         return self.subscription_type
+
+BANK_UPDATE_CHOISE = (
+        ('pending','Pending'),
+        ('approve','Approve'),
+        ('reject','Reject'),
+    )
+class BankDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bank_iban = models.CharField(unique=True)
+    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE, default='pending')
+    total_balance = models.FloatField(null=True, blank=True)
+    pending_balance = models.FloatField(null=True, blank=True)
+    withdrawable_balance = models.FloatField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

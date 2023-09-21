@@ -3,7 +3,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
                           SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -231,3 +231,9 @@ class UpdateUserRoleSerializer(serializers.Serializer):
         instance.experience = validated_data.get('experience', instance.experience)
         instance.save()
         return instance
+    
+class BankDetailsSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = BankDetails
+        fields = '__all__'

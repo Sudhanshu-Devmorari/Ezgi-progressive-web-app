@@ -43,6 +43,7 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Swal from "sweetalert2";
 import { truncateString } from "../GetUser";
+import { formatTimeDifference } from "../FormatTime";
 
 const CommentsContentSection = (props) => {
   const {
@@ -557,7 +558,8 @@ const CommentsContentSection = (props) => {
                                   Subscribe
                                 </button>
                               )}
-                              10 dk önce
+                              {/* 10 dk önce */}
+                              {formatTimeDifference(val?.created)}
                             </div>
                           </div>
                         </div>
@@ -945,6 +947,7 @@ const CommentsContentSection = (props) => {
                                   Subscribe
                                 </button>
                               )}
+                              {formatTimeDifference(val?.created)}
                               10 dk önce
                             </div>
                           </div>
@@ -1396,7 +1399,8 @@ const CommentsContentSection = (props) => {
                     </div>
                   </div>
                   <div className="ms-auto" style={{ fontSize: "12px" }}>
-                    10 dk önce
+                    {/* 10 dk önce */}
+                    {formatTimeDifference(res?.created)}
                   </div>
                 </div>
               </div>

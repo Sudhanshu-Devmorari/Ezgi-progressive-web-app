@@ -26,6 +26,7 @@ import initialProfile from "../../assets/profile.png";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 
 const ActiveComments = (props) => {
   const { activeResolved, profileData } = props;
@@ -50,7 +51,8 @@ const ActiveComments = (props) => {
 
   const [commentatorUser, setCommentatorUser] = useState([]);
   const [winningOrLoseData, setWinningOrLoseData] = useState({
-    win: '', lose: '',
+    win: "",
+    lose: "",
   });
 
   useEffect(() => {
@@ -308,6 +310,66 @@ const ActiveComments = (props) => {
         Swal.fire({
           title: "Error",
           text: error?.response?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
+
+  // Bank update
+  const [bankDetails, setBankDetails] = useState([]);
+  const handleBankUpdate = async () => {
+    try {
+      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      if (res?.status === 200) {
+        setBankDetails(res?.data?.data);
+        setWithdrawalModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.status === 404) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+      if (
+        error?.response?.status === 500 &&
+        error?.response?.data?.error ===
+          "No BankDetails matches the given query."
+      ) {
+        setShowBankUpdate(true);
+      }
+    }
+  };
+
+  // check activation
+  const checkDeactivation = async (value) => {
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/check-deactivated-account/${userId}`
+      );
+      if (res.status === 200) {
+        if (value === "add comment") {
+          setAddCommentModalModalShow(true);
+        } else if (value === "promote me") {
+          setPromoteModalShow(true);
+        } else if (value === "bank update") {
+          handleBankUpdate();
+        }
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
           icon: "error",
           backdrop: false,
           customClass:
@@ -758,40 +820,41 @@ const ActiveComments = (props) => {
             {userPoints.league ? userPoints.league : "No League"}
           </div>
         </div>
-        {props.profile !== "commentator" && profileData?.commentator_level !== 'apprentice' && (
-          <div
-            className={`d-flex justify-content-center align-items-center my-3 ${
-              props.content === ("home" || "wallet") && "mb-5"
-            }`}
-          >
-            Month/29.90₺
-            {userId != profileData?.id && (
-              <button
-                onClick={() => {
-                setWinningOrLoseData({
-                  ...winningOrLoseData, 
-                  win: userPoints?.winning,
-                  lose: userPoints?.lose,
-                })
-                setCommentatorUser(profileData);
-                setSubscribeModalShow(true);
-              }}
-                className="ms-1 px-3 py-1"
-                style={{
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #37FF80"
-                      : "1px solid #00659D",
-                  color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                  backgroundColor: "transparent",
-                  borderRadius: "3px",
-                }}
-              >
-                Subscribe
-              </button>
-            )}
-          </div>
-        )}
+        {props.profile !== "commentator" &&
+          profileData?.commentator_level !== "apprentice" && (
+            <div
+              className={`d-flex justify-content-center align-items-center my-3 ${
+                props.content === ("home" || "wallet") && "mb-5"
+              }`}
+            >
+              Month/29.90₺
+              {userId != profileData?.id && (
+                <button
+                  onClick={() => {
+                    setWinningOrLoseData({
+                      ...winningOrLoseData,
+                      win: userPoints?.winning,
+                      lose: userPoints?.lose,
+                    });
+                    setCommentatorUser(profileData);
+                    setSubscribeModalShow(true);
+                  }}
+                  className="ms-1 px-3 py-1"
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #37FF80"
+                        : "1px solid #00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    backgroundColor: "transparent",
+                    borderRadius: "3px",
+                  }}
+                >
+                  Subscribe
+                </button>
+              )}
+            </div>
+          )}
         {props.profile === "commentator" && (
           <div
             className="d-flex justify-content-center my-3 gap-2"
@@ -799,7 +862,9 @@ const ActiveComments = (props) => {
           >
             {props.content === "home" && (
               <button
-                onClick={() => setAddCommentModalModalShow(true)}
+                onClick={() => {
+                  checkDeactivation("add comment");
+                }}
                 className="p-1 px-2"
                 style={{
                   color: currentTheme === "dark" ? "#4DD5FF" : "#00659D",
@@ -818,8 +883,7 @@ const ActiveComments = (props) => {
             {props.content === "wallet" && (
               <button
                 onClick={() => {
-                  setShowBankUpdate(false);
-                  setWithdrawalModal(true);
+                  checkDeactivation("bank update");
                 }}
                 className="p-1 px-2"
                 style={{
@@ -840,7 +904,9 @@ const ActiveComments = (props) => {
               props.content === "wallet" ||
               props.content === "subscribers") && (
               <button
-                onClick={() => setPromoteModalShow(true)}
+                onClick={() => {
+                  checkDeactivation("promote me");
+                }}
                 className="p-1 px-2"
                 style={{
                   color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
@@ -894,10 +960,13 @@ const ActiveComments = (props) => {
         activeResolved={activeResolved}
       />
       <WithdrawalModal
-        setShowBankUpdate={setShowBankUpdate}
-        showBankUpdate={showBankUpdate}
+        bankDetails={bankDetails}
         show={withdrawalModal}
         onHide={() => setWithdrawalModal(false)}
+      />
+      <BankUpdateModal
+        show={showBankUpdate}
+        onHide={() => setShowBankUpdate(false)}
       />
     </>
   );

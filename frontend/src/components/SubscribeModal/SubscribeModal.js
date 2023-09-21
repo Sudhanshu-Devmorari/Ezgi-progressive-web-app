@@ -30,73 +30,67 @@ const SubscribeModal = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscription = async () => {
-    if (props?.text !== "renew") {
-      if (selectCheckBox && selectedPlan) {
-        setValidationError("");
-        const money =
-          (selectedPlan === "1 Year" && subscriptionPlan?.year_1) ||
-          (selectedPlan === "1 Month" && subscriptionPlan?.month_1) ||
-          (selectedPlan === "3 Month" && subscriptionPlan?.month_3) ||
-          (selectedPlan === "6 Month" && subscriptionPlan?.month_6);
-        try {
-          setIsLoading(true);
-          const res = await axios.post(
-            `${config.apiUrl}/subscription/${userId}/`,
-            {
-              duration: selectedPlan,
-              money: money,
-              commentator_id: commentatorUser?.id,
-            }
-          );
-          if (res?.status === 200) {
-            setIsLoading(false);
-            props.onHide();
-            Swal.fire({
-              title: "Success",
-              text: `You've subscribe to ${commentatorUser?.username}`,
-              icon: "sucess",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
+    // if (props?.text !== "renew") {
+    if (selectCheckBox && selectedPlan) {
+      setValidationError("");
+      const money =
+        (selectedPlan === "1 Year" && subscriptionPlan?.year_1) ||
+        (selectedPlan === "1 Month" && subscriptionPlan?.month_1) ||
+        (selectedPlan === "3 Month" && subscriptionPlan?.month_3) ||
+        (selectedPlan === "6 Month" && subscriptionPlan?.month_6);
+      try {
+        setIsLoading(true);
+        const res = await axios.post(
+          `${config.apiUrl}/subscription/${userId}/`,
+          {
+            duration: selectedPlan,
+            money: money,
+            commentator_id: commentatorUser?.id,
           }
-        } catch (error) {
-          console.log(error);
-          if (error?.response?.status === 500) {
-            setIsLoading(false);
-            props.onHide();
-            Swal.fire({
-              title: "Error",
-              text: "something went wrong",
-              icon: "error",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          }
-          if (error?.response?.status === 400) {
-            setIsLoading(false);
-            props.onHide();
-            Swal.fire({
-              title: "Error",
-              text: error?.response?.data?.data,
-              icon: "error",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          }
+        );
+        if (res?.status === 200) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Success",
+            text: `You've subscribe to ${commentatorUser?.username}`,
+            icon: "sucess",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
         }
-      } else {
-        setValidationError("Please select a Plan or Checkbox");
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 500) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: "something went wrong",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+        if (error?.response?.status === 400) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.data,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
+    } else {
+      setValidationError("Please select a Plan or Checkbox");
     }
+    // }
   };
 
   const [subscriptionPlan, setSubscriptionPlan] = useState([]);
@@ -286,6 +280,7 @@ const SubscribeModal = (props) => {
                 </div>
 
                 <PlanSelection
+                  text={props?.text}
                   subscriptionPlan={subscriptionPlan}
                   setSelectedPlan={setSelectedPlan}
                   selectedPlan={selectedPlan}

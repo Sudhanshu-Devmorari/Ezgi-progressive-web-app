@@ -1,9 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import "./Transactions.css";
 import TransactionArray from "../TransactionArray/TransactionArray";
 import bankLogo from "../../assets/Akbank-Logo-PNG.png";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
+import axios from "axios";
+import config from "../../config";
+import { userId } from "../GetUser";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -16,6 +19,22 @@ const Transactions = () => {
     { name: "Las", color: "#0CC6FF", height: "4rem", darkcolor: "#0CC6FF" },
     { name: "Ara", color: "#FFFFFF", height: "4rem", darkcolor: "#0D2A53" },
   ];
+
+  const [bankDetails, setBankDetails] = useState([]);
+  async function getBankIban() {
+    try {
+      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      if (res?.status === 200) {
+        setBankDetails(res?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getBankIban();
+  }, []);
+
   return (
     <>
       <div
@@ -105,7 +124,12 @@ const Transactions = () => {
           <span>
             <img src={bankLogo} alt="" height={15} width={50} />
           </span>
-          <span>TR00 2151 2532 0000 3315 1200 58</span>
+          <span>
+            {bankDetails.bank_iban
+              ? `TR ${bankDetails.bank_iban}`
+              : "Add Bank Iban..."}
+          </span>
+          {/* <span>TR00 2151 2532 0000 3315 1200 58</span> */}
           <button
             onClick={() => setModalShow(true)}
             className="px-2"
@@ -126,7 +150,12 @@ const Transactions = () => {
         <TransactionArray />
       </div>
 
-      <BankUpdateModal show={modalShow} onHide={() => setModalShow(false)} />
+      <BankUpdateModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        getBankIban={getBankIban}
+        bank_iban={bankDetails?.bank_iban}
+      />
     </>
   );
 };

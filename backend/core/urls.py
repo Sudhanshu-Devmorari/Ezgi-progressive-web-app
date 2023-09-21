@@ -5,14 +5,14 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
-                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView)
+                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata)
 
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
                         FilterEditors, DeactivateCommentator, SalesManagement, SupportManagement, NotificationManagement,
                         SubUserManagement, AdvertisementManagement, LevelRule, MembershipSettingView, SubscriptionSettingView,
                         HighlightSettingView, CommentSetting, FilterSalesManagement, UpdateStatusForVerifyRequest, SubUserShowTicketData, 
-                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView, BecomeEditorFAQView, FilterSubUserManagement)
+                        UserStatistics, BecomeEditorView, BecomeEditorEarnDetailsview, GetALLUsers, RetrieveHomeView, RetrieveEditorView, BecomeEditorFAQView, FilterSubUserManagement, BankDetailsView)
 
 
 urlpatterns = [
@@ -99,4 +99,7 @@ urlpatterns = [
     path('retrieve-commentator-list/', RetrieveEditorView.as_view(), name='Retrieve-Editor'),
     path('become-editor-faq/', BecomeEditorFAQView.as_view(), name='become-editor'),
     path('become-editor-faq/<int:id>', BecomeEditorFAQView.as_view(), name='become-editor'),
+    path('bank-details/<int:id>', BankDetailsView.as_view(), name='bank-details'),
+    path('check-deactivated-account/<int:id>', CheckDeactivatedAccount.as_view(), name='bank-details'),
+    path('user-data/<int:id>', GetUserdata.as_view(), name='User-Data'),
 ]

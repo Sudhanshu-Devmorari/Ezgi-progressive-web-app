@@ -67,7 +67,7 @@ const AccountStatus = () => {
     if (type) {
       axios
         .get(
-          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${type}`
+          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${selectSub}`
         )
         .then((res) => {
           if (res.status === 200) {
@@ -76,21 +76,28 @@ const AccountStatus = () => {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.status === 404 || error.response.status === 500) {
-          //   Swal.fire({
-          //     title: "Error",
-          //     text: error.response.data.error,
-          //     icon: "error",
-          //     backdrop: false,
-          //     customClass:
-          //       currentTheme === "dark"
-          //         ? "dark-mode-alert"
-          //         : "light-mode-alert",
-          //   });
-          // }
         });
     }
   }
+
+  const [expertLoading, setExpertLoading] = useState(false);
+  const [expertData, setExpertData] = useState([]);
+  useEffect(() => {
+    async function getExpertData() {
+      try {
+        setExpertLoading(true);
+        const res = await axios.get(
+          `${config?.apiUrl}/subscription-setting/?commentator_level=master`
+        );
+        console.log(res);
+        setExpertData(res?.data[0]);
+        setExpertLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getExpertData();
+  }, []);
 
   const fetchSubscriptionData = async () => {
     setSubLoading(true);
@@ -119,12 +126,31 @@ const AccountStatus = () => {
   };
 
   useEffect(() => {
-    fetchSubscriptionData();
+    console.log("===>>selectSub", selectSub);
+    selectSub && fetchSubscriptionData();
   }, [selectSub]);
 
   useEffect(() => {
     getEarnings();
   }, [selectSubRangeData]);
+
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [commentatorUser, setCommentatorUser] = useState([]);
+  const getUserdata = async () => {
+    try {
+      setRenewLoading(true);
+      const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
+      setCommentatorUser(res?.data?.data);
+      if (res.status === 200) {
+        setRenewLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getUserdata();
+  }, []);
 
   return (
     <>
@@ -316,37 +342,41 @@ const AccountStatus = () => {
               <span>Subscription</span>
               <span>Earnings</span>
             </div>
-            <div className="col-8 p-2">
-              <div className="row g-0">
-                <div className="col text-center">
-                  <div className="mb-1 d-flex flex-column">
-                    <span className="font-res">1 Month Subscription</span>
-                    <span className="number-font" style={{ color: "FFA200" }}>
-                      99.09₺
-                    </span>
+            <div className={`col-8 p-2 ${expertLoading ? "pt-4" : "pt-0"}`}>
+              {expertLoading ? (
+                "Loading..."
+              ) : (
+                <div className="row g-0">
+                  <div className="col text-center">
+                    <div className="mb-1 d-flex flex-column">
+                      <span className="font-res">1 Month Subscription</span>
+                      <span className="number-font" style={{ color: "FFA200" }}>
+                        {expertData?.month_1}₺
+                      </span>
+                    </div>
+                    <div className="d-flex flex-column">
+                      <span className="font-res">3 Month Subscription</span>
+                      <span className="number-font" style={{ color: "FFA200" }}>
+                        {expertData?.month_3}₺
+                      </span>
+                    </div>
                   </div>
-                  <div className="d-flex flex-column">
-                    <span className="font-res">1 Month Subscription</span>
-                    <span className="number-font" style={{ color: "FFA200" }}>
-                      129.90₺
-                    </span>
+                  <div className="col text-center">
+                    <div className="mb-1 d-flex flex-column">
+                      <span className="font-res">6 Month Subscription</span>
+                      <span className="number-font" style={{ color: "FFA200" }}>
+                        {expertData?.month_6}₺
+                      </span>
+                    </div>
+                    <div className="d-flex flex-column">
+                      <span className="font-res">12 Month Subscription</span>
+                      <span className="number-font" style={{ color: "FFA200" }}>
+                        {expertData?.year_1}₺
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="col text-center">
-                  <div className="mb-1 d-flex flex-column">
-                    <span className="font-res">1 Month Subscription</span>
-                    <span className="number-font" style={{ color: "FFA200" }}>
-                      229.90₺
-                    </span>
-                  </div>
-                  <div className="d-flex flex-column">
-                    <span className="font-res">1 Month Subscription</span>
-                    <span className="number-font" style={{ color: "FFA200" }}>
-                      409.90₺
-                    </span>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
           <div
@@ -528,44 +558,54 @@ const AccountStatus = () => {
             </div>
             <div className="col-7 fonts">
               <div
-                className="p-2"
+                className="p-2 h-100"
                 style={{
                   backgroundColor:
                     currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 }}
               >
-                Membership Date 15-04-2023
-                <div className="my-2 ms-2 d-flex flex-column">
-                  <span>
-                    {" "}
-                    Active Plan{" "}
-                    <span style={{ color: "#007BF6" }}>Journeyman</span>
+                {commentatorUser?.commentator_level !== "apprentice" ? (
+                  <>
+                    <div className="my-2 ms-2 d-flex flex-column">
+                      Membership Date 15-04-2023
+                      <span>
+                        {" "}
+                        Active Plan{" "}
+                        <span style={{ color: "#007BF6" }}>Journeyman</span>
+                      </span>
+                      <span>Membership Price 249.90₺</span>
+                    </div>
+                    <div className="d-flex justify-content-end m-2">
+                      <button
+                        onClick={() => setModalShow(true)}
+                        className="px-3"
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                          border:
+                            currentTheme === "dark"
+                              ? "1px solid  #D2DB08"
+                              : "1px solid #00659D",
+                          borderRadius: "3px",
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        {renewLoading ? "Loading" : "Renew"}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <span className="d-flex align-items-center justify-content-center h-100">
+                    No Membership found!
                   </span>
-                  <span>Membership Price 249.90₺</span>
-                </div>
-                <div className="d-flex justify-content-end m-2">
-                  <button
-                    onClick={() => setModalShow(true)}
-                    className="px-3"
-                    style={{
-                      color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                      border:
-                        currentTheme === "dark"
-                          ? "1px solid  #D2DB08"
-                          : "1px solid #00659D",
-                      borderRadius: "3px",
-                      backgroundColor: "transparent",
-                    }}
-                  >
-                    Renew
-                  </button>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
       <SubscribeModal
+        commentatorUser={commentatorUser}
         show={modalShow}
         onHide={() => setModalShow(false)}
         text="renew"

@@ -36,6 +36,7 @@ import Swal from "sweetalert2";
 import clapIcon1 from "../../assets/clap-svgrepo-com.png";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
+import { formatTimeDifference } from "../FormatTime";
 
 const FavComments = (props) => {
   const {
@@ -606,7 +607,8 @@ const FavComments = (props) => {
                       </button>
                     )}
 
-                    <span style={{ fontSize: "11px" }}>10 dk önce</span>
+                    <span style={{ fontSize: "11px" }}>{formatTimeDifference(res?.created)}</span>
+                    {/* <span style={{ fontSize: "11px" }}>10 dk önce</span> */}
                   </div>
                 </div>
               </div>

@@ -76,7 +76,7 @@ const SharedProfile = (props) => {
   }
 
   useEffect(() => {
-    console.log("data::::::::::::", data)
+    // console.log("data::::::::::::", data)
     // getfav(data?.value?.user?.id);
   }, []);
   useEffect(() => {

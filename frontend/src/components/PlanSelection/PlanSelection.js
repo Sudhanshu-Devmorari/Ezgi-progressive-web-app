@@ -58,7 +58,7 @@ function PlanSelection(props) {
 
   return (
     <div className="my-2" style={{ fontSize: "14px" }}>
-      <div className="my-2">Subscription Plans</div>
+      <div className="my-2">{props?.text === 'renew' ? 'Membership' : 'Subscription'} Plans</div>
       {renderPlan(
         "1 Month",
         `${subscriptionPlan?.month_1}₺`,

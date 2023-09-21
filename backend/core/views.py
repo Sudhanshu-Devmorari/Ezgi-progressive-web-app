@@ -31,14 +31,14 @@ from collections import Counter
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
-                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer)
+                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -1321,7 +1321,7 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
                     data_list['subscribers'] = serializer.data 
 
                 if Subscription.objects.filter(standard_user=user).exists():
-                    my_subscription = Subscription.objects.filter(standard_user=user)
+                    my_subscription = Subscription.objects.filter(standard_user=user, commentator_user__user_role='standard')
                     # for obj in my_subscription:
                     #     subscription.append(obj.commentator_user)
                     serializer1 = SubscriptionSerializer(my_subscription, many=True)
@@ -4632,3 +4632,107 @@ def create_reminder_notification():
         return True
     except:
         False
+
+class BankDetailsView(APIView):
+    def get(self, request, id=None, *args, **kwargs):
+        try:
+            if id is not None:
+                user = get_object_or_404(User, id=id)
+                bank_details = get_object_or_404(BankDetails, user=user)
+                bank_details_serializer = BankDetailsSerializer(bank_details).data
+                return Response({'data': bank_details_serializer}, status=status.HTTP_200_OK)
+            else:
+                data = {}
+                queryset = BankDetails.objects.all().order_by('-created')
+                bank_details_serializer = BankDetailsSerializer(queryset, many=True).data
+
+                # Get counts for each status value
+                bank_update_request_count = (
+                    BankDetails.objects.values('status')
+                    .annotate(status_count=Count('status'))
+                )
+
+                # Get counts for specific statuses
+                pending = bank_update_request_count.get(status='pending')['status_count']
+                approved = bank_update_request_count.get(status='approve')['status_count']
+
+                data.update({
+                    'bank_details': bank_details_serializer,
+                    'bank_update_request_count': bank_update_request_count,
+                    'pending': pending,
+                    'approved': approved,
+                })
+                return Response({'data': data}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except BankDetails.DoesNotExist:
+            return Response({'error': 'Bank details do not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+
+            if 'bank_iban' not in request.data:
+                return Response({'error' : 'bank_iban not found'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                bank_iban = request.data['bank_iban']
+
+                bank_details, created = BankDetails.objects.get_or_create(user=user, defaults={'bank_iban': bank_iban})
+
+                if not created:
+                    bank_details.bank_iban = bank_iban
+                    bank_details.save(update_fields=['bank_iban', 'updated'])
+                    return Response({'data': 'Bank Iban has been updated successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'data': 'Bank Iban has been created successfully'}, status=status.HTTP_201_CREATED)
+
+        except User.DoesNotExist:
+            return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self, request, id):
+        try:
+            try:
+                user = User.objects.get(id=id)  
+                action = request.data['action', None]
+                bank_id = request.data['bank_id', None]
+                if action and bank_id is not None:
+                    try:
+                        query = BankDetails.objects.get(id=bank_id,user=user) 
+                        query.update('action', action)
+                        return Response({'data' : 'Update Bank request successfully updated.'}, status=status.HTTP_200_OK)
+                    except BankDetails.DoesNotExist:
+                        return Response({'error' : 'Bank details doen not exist'}, status=status.HTTP_404_NOT_FOUND) 
+                else:
+                    return Response({'error' : 'Something went wrong'}, status=status.HTTP_404_NOT_FOUND)
+            except User.DoesNotExist:
+                return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)     
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)     
+
+class CheckDeactivatedAccount(APIView):
+    def get(self, request, id):
+        try:
+            try:
+                user = User.objects.get(id=id) 
+                if not user.is_active:
+                    return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'data' : 'Your account is activated.'}, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+          
+class GetUserdata(APIView):
+    def get(self, request, id):
+        try:
+            try:
+                user = User.objects.get(id=id) 
+                serializer = UserSerializer(user).data
+                return Response({'data' : serializer}, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)     

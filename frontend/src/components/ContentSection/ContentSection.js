@@ -40,6 +40,7 @@ import Light_Unselected_Like from "../../assets/Light - Unselected Like.svg";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+import { formatTimeDifference } from "../FormatTime";
 
 const ContentSection = ({
   data,
@@ -248,6 +249,21 @@ const ContentSection = ({
 
   // const truncated = truncateString("Hello D", 6);
   const truncated = truncateString(data?.value?.league, 6);
+
+  // function formatTimeDifference(timestamp) {
+  //   const now = moment();
+  //   const diff = moment(timestamp);
+  
+  //   if (now.diff(diff, 'years') >= 1) {
+  //     return diff.fromNow();
+  //   } else if (now.diff(diff, 'months') >= 1) {
+  //     return diff.fromNow();
+  //   } else if (now.diff(diff, 'days') >= 1) {
+  //     return diff.fromNow();
+  //   } else {
+  //     return diff.fromNow();
+  //   }
+  // }
 
   return (
     <>
@@ -555,10 +571,6 @@ const ContentSection = ({
                         "like",
                         data?.value?.total_reactions?.total_likes
                       );
-                      console.log(
-                        data?.value?.total_reactions?.total_likes,
-                        "====data?.value?.total_reactions?.total_likes"
-                      );
                     }}
                   >
                     <div>
@@ -794,7 +806,8 @@ const ContentSection = ({
                         Subscribe
                       </button>
                     )))}
-                <span style={{ fontSize: "11px" }}>10 dk önce</span>
+                <span style={{ fontSize: "11px" }}>{formatTimeDifference(data?.value?.created)}</span>
+                {/* <span style={{ fontSize: "11px" }}>{data?.value?.created} dk önce</span> */}
               </div>
             </div>
           </div>
