@@ -22,6 +22,8 @@ import BecomeEditor from "../BecomeEditor/BecomeEditor";
 import { userId } from "../GetUser";
 import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/Spinner";
+import moment from "moment";
+
 
 const MainPage = () => {
   // CHANGE THEME
@@ -61,6 +63,7 @@ const MainPage = () => {
     // console.log(res.data,"===============?>>");
     setProfileData(res.data.profile_pic);
     setIsLoading(false);
+    localStorage.setItem("user-active", res.data.is_active);
   }
   useEffect(() => {
     if (userId) {
@@ -78,9 +81,10 @@ const MainPage = () => {
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
         // console.log("res:::::::::::::", res.data);
-        setPublicComments(res?.data?.Public_Comments);
+        setPublicComments(res?.data?.Public_Comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
+        
         setHighlights(res?.data?.highlights);
-        setsubscriptionComments(res?.data?.Subscription_Comments);
+        setsubscriptionComments(res?.data?.Subscription_Comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
         setads(res?.data?.ads);
         const ads = res?.data?.ads;
         const leftCornerAdsFilter = ads.filter(

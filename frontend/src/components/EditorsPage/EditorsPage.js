@@ -28,7 +28,7 @@ const EditorsPage = ({
 
   const [adsId, setAdsId] = useState(null);
   useEffect(() => {
-    console.log("this page called");
+    // console.log("this page called");
 
     HandleCommentator();
   }, []);

@@ -71,6 +71,10 @@ const AddCommentModal = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
 
   const handleCategorySelection = async (category) => {
+    if(JSON.parse(localStorage.getItem("user-active"))==false){
+      errorSwal()
+      return
+    }
     setSelectedCategory(category);
     setCategoryError("");
 
@@ -299,6 +303,7 @@ const AddCommentModal = (props) => {
 
   // Add Comment pr Post comment API
   const postComment = async () => {
+    // console.log("toggleInput: ", toggleInput)
     setIsLoading(true);
     if (selectedCategory === "Select") {
       setCategoryError("Required*");
@@ -405,6 +410,19 @@ const AddCommentModal = (props) => {
     }
   };
 
+  const errorSwal = ()=>{
+    // console.log(localStorage.getItem("user-active"))
+    
+      Swal.fire({
+        title: "Error",
+        text: `Your account has been deactivated. Contact support for assistance.`,
+        icon: "error",
+        backdrop: false,
+        customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      });
+    
+  }
   useEffect(() => {
     const fetchData = async () => {
       let type;

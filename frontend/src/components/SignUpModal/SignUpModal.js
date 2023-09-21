@@ -128,7 +128,7 @@ const SignUpModal = (props) => {
       setAgeError("Please select your age.");
       setCheckboxError("Please select the checkbox to proceed.");
     } else if (selectedCity === "Select") {
-      console.log("if city true:::::::::::");
+      // console.log("if city true:::::::::::");
       setCityError("Please select your city.");
     } else if (selectedGender === "Select") {
       setGenderError("Please select your gender.");

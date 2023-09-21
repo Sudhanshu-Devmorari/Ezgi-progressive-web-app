@@ -81,7 +81,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
-              console.log(props.refresh)
+              // console.log(props.refresh)
               props.refresh && props.refresh()
               setshowDetails("/editors/");
               navigate("/editors/");

@@ -16,6 +16,7 @@ import Support from "../Support/Support";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
+import moment from "moment";
 
 const DashboardSU = (props) => {
   const [content, setContent] = useState("subscribers");
@@ -41,7 +42,7 @@ const DashboardSU = (props) => {
       );
       // console.log("=>>>", res.data);
       setFavEditorData(res.data.favEditors);
-      setFavCommentData(res.data.favComments);
+      setFavCommentData(res.data.favComments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
     } catch (error) {
       console.log(error);
     }

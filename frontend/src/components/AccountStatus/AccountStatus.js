@@ -35,7 +35,7 @@ const AccountStatus = () => {
       .catch((err) => {
         console.log(err);
         console.log(err.response);
-        if (err.response.status === 404) {
+        if (err.response.status === 400 || err.response.status === 404 || err.response.status === 500) {
           Swal.fire({
             title: "Error",
             text: err.response.data.message,

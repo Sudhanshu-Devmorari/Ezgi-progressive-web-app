@@ -128,6 +128,7 @@ const PromoteMeModal = (props) => {
                     </div>
                     <div className="d-flex justify-content-center my-3">
                       <button
+                      
                         style={{ fontSize: "14px" }}
                         className={`${
                           currentTheme === "dark"

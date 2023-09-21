@@ -18,7 +18,7 @@ const FavEditor = (props) => {
   const [favEditorCommentsLike, setFavEditorCommentsLike] = React.useState([]);
 
   useEffect(() => {
-    console.log("props?.favEditorData:::::::::::::", props?.favEditorData);
+    // console.log("props?.favEditorData:::::::::::::", props?.favEditorData);
     setFavEditorCommentsLike(props?.favEditorData);
     setTimeout(() => {
       setIsLoading(false);
@@ -38,7 +38,7 @@ const FavEditor = (props) => {
       const favEditorData = favEditorCommentsLike.filter(
         (res) => res?.data?.commentator_user?.id !== response.data.user_id
       );
-      console.log("filerdata:::::::::::::", favEditorData);
+      // console.log("filerdata:::::::::::::", favEditorData);
       setFavEditorCommentsLike(favEditorData);
 
       props?.setFavEditorData(favEditorData);
@@ -95,7 +95,7 @@ const FavEditor = (props) => {
                     height={22}
                     width={22}
                     onClick={() => {
-                      console.log("star click in fav editor:::::::::::::");
+                      // console.log("star click in fav editor:::::::::::::");
                       if (userId) {
                         onFavEditorSelect(res?.data?.commentator_user?.id);
                       }

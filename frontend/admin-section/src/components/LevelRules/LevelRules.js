@@ -23,7 +23,7 @@ const LevelRules = (props) => {
         setIsLoading(false);
         if (res.status === 200) {
           const data = res.data[0];
-          console.log(data);
+          // console.log(data);
           formik.setValues({
             daily_match_limit: data?.daily_match_limit,
             monthly_min_limit: data?.monthly_min_limit,

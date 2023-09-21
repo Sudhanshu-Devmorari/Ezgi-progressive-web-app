@@ -413,7 +413,7 @@ class RetrieveCommentatorView(APIView):
             data_list['following_user'] = []
 
         try:
-            data_list['verify_ids'] = list(BlueTick.objects.values_list('user_id', flat=True))
+            data_list['verify_ids'] = list(BlueTick.objects.filter(status='approve').values_list('user_id', flat=True))
         except:
             data_list['verify_ids'] = []
 
@@ -569,7 +569,7 @@ class CommentView(APIView):
                     public_content = True
                 else:
                     public_content = request.data.get('public_content')
-                    print('public_content: ', public_content)
+                    # print('public_content: ', public_content)
                 comment = request.data.get('comment')
                 # print('comment: ', comment)
 
@@ -591,6 +591,15 @@ class CommentView(APIView):
                 #     raise NotFound("Public Content not found.")
                 if not comment:
                     raise NotFound("Comment not found.")
+                
+                if Comments.objects.filter(commentator_user=user,
+                    category=[category],
+                    country=country,
+                    league=league,
+                    date=date,
+                    match_detail=match_detail).exists():
+                    return Response(data={'error': "You've already commented on this match. Try another one."}, status=status.HTTP_404_NOT_FOUND)
+                
                 comment_obj = Comments.objects.create(
                     commentator_user=user,
                     category=[category],
@@ -1469,7 +1478,7 @@ class VerifyUserView(APIView):
                 else:
                     return Response({'message': 'There are fewer than 250 subscribers for the user.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({'message': 'User does not have active membership for at least 3 months.'}, status=status.HTTP_200_OK)
+                return Response({'message': 'User does not have active membership for at least 3 months.'}, status=status.HTTP_400_BAD_REQUEST)
 
         except BecomeCommentator.DoesNotExist:
             return Response({'message': 'User does not have an active membership.'}, status=status.HTTP_404_NOT_FOUND)
@@ -2660,8 +2669,8 @@ class DeactivateCommentator(APIView):
             obj = User.objects.get(id=id)
             if deactivation_status == 'accept':
                 obj.deactivate_commentator = deactivation_status
-                obj.is_delete =True
-                obj.save(update_fields=['deactivate_commentator', 'is_delete', 'updated'])
+                obj.is_active = False
+                obj.save(update_fields=['deactivate_commentator', 'is_active', 'updated'])
             elif deactivation_status == 'reject':
                 print('deactivation_status: ', deactivation_status)
                 obj.deactivate_commentator = ''
@@ -4169,8 +4178,8 @@ class BecomeEditorView(APIView):
         """
         user = User.objects.get(id=id)
         
-        if not user.is_active:
-            return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
+        # if not user.is_active:
+        #     return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if user.user_role == "standard":
             if user.profile_pic == "":
@@ -4439,7 +4448,7 @@ class RetrievePageData():
 
     def get_verify_ids(self):
         """ Return verify ids data """
-        return list(BlueTick.objects.values_list('user_id', flat=True))
+        return list(BlueTick.objects.filter(status='approve').values_list('user_id', flat=True))
 
     def get_comment_reactions(self, id):
         """ Return comment reactions data """

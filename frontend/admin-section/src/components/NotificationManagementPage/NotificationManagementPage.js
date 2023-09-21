@@ -78,7 +78,7 @@ const NotificationManagementPage = () => {
         const res = await axios.get(
           `${config?.apiUrl}/notification-management/`
         );
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotifications(data.notification);
         setNotificationsCount({

@@ -300,7 +300,7 @@ const CommentsSettings = () => {
   const [clap, setClap] = useState("");
 
   const handleSubmit = async (e) => {
-    console.log("=>>>submit called");
+    // console.log("=>>>submit called");
     e.preventDefault();
     if (
       selectedEditor === "Select" &&

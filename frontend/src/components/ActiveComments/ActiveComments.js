@@ -78,7 +78,7 @@ const ActiveComments = (props) => {
             `${config.apiUrl}/profile/${user}`,
             formData
           );
-          console.log(res, "===>>>res");
+          // console.log(res, "===>>>res");
           if (res.status === 200) {
             setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
             setEditProfile(false);
@@ -151,7 +151,7 @@ const ActiveComments = (props) => {
           id: id,
         }
       );
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
       props?.setIsFavorite(!props?.isFavorite);
       props?.homeApiData(user_id);
     } catch (error) {
@@ -205,6 +205,8 @@ const ActiveComments = (props) => {
           cancelButtonColor: "#d33",
           confirmButtonText: "Yes",
           cancelButtonText: "Cancel",
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         });
         // console.log(confirmation.value);
         if (confirmation.value === true) {
@@ -237,7 +239,9 @@ const ActiveComments = (props) => {
         text: `${error.response.data}`,
         icon: "error",
         backdrop: false,
-        customClass: "dark-mode-alert",
+        // customClass: "dark-mode-alert",
+        customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
       console.error("Error fetching data.", error);
     }

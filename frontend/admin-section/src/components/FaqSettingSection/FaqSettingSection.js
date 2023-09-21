@@ -101,7 +101,7 @@ const FaqSettingSection = () => {
     ],
     validationSchema: ArrayOfCarsSchema,
     onSubmit: async (values) => {
-        console.log(values)
+        // console.log(values)
       try {
         const response = await axios.post(
           `${config.apiUrl}/become-editor-faq/`,
@@ -117,7 +117,7 @@ const FaqSettingSection = () => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
-          console.log(response.data)
+          // console.log(response.data)
           formik.setValues(response.data.data)
         }
       } catch (error) {

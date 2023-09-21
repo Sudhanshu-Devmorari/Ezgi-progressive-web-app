@@ -23,7 +23,7 @@ const WithdrawalModal = (props) => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       // Handle form submission here
-      console.log("Form submitted with values:", values);
+      // console.log("Form submitted with values:", values);
     },
   });
 

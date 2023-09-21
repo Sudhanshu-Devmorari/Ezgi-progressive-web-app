@@ -8,6 +8,7 @@ import axios from "axios";
 import config from "../../config";
 import Spinner from "react-bootstrap/esm/Spinner";
 import { userId } from "../GetUser";
+import moment from "moment";
 
 const EditorProfileActiveComments = (props) => {
   // console.log("props::::::::::::::", props);
@@ -22,13 +23,13 @@ const EditorProfileActiveComments = (props) => {
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
         `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
       );
-      console.log(
-        "res::::::::::::",
-        res.data.id,
-        ":::::::::::condition::::::::::",
-        res.data.id == userId
-      );
-      console.log("userId::::::::::::::::", userId);
+      // console.log(
+      //   "res::::::::::::",
+      //   res.data.id,
+      //   ":::::::::::condition::::::::::",
+      //   res.data.id == userId
+      // );
+      // console.log("userId::::::::::::::::", userId);
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);
       setIsLoading(false);
@@ -40,14 +41,14 @@ const EditorProfileActiveComments = (props) => {
   const [resolve, setResolve] = useState([]);
 
   const activeResolved = async (user_id) => {
-    console.log("userID::::::::::::", user_id);
+    // console.log("userID::::::::::::", user_id);
     try {
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
-          console.log("activeResolved::::::::::: ", res.data);
-          setActive(res.data?.active_comments);
-          setResolve(res.data?.resolved_comments);
+          // console.log("activeResolved::::::::::: ", res.data);
+          setActive(res.data?.active_comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
+          setResolve(res.data?.resolved_comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
         })
         .catch((error) => {
           console.error("Error fetching data.", error);

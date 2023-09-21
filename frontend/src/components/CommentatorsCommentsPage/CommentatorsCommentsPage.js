@@ -20,6 +20,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
+import moment from "moment";
 
 const CommentatorsCommentsPage = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
@@ -48,7 +49,7 @@ const CommentatorsCommentsPage = (props) => {
       );
       // console.log("=>>>", res.data);
       setFavEditorData(res.data.favEditors);
-      setFavCommentData(res.data.favComments);
+      setFavCommentData(res.data.favComments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
     } catch (error) {
       console.log(error);
     }
@@ -76,12 +77,12 @@ const CommentatorsCommentsPage = (props) => {
   const [resolve, setResolve] = useState([]);
 
   const activeResolved = async (user_id) => {
-    console.log("userID::::::::::::", user_id);
+    // console.log("userID::::::::::::", user_id);
     try {
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
-          console.log("activeResolved::::::::::: ", res.data);
+          // console.log("activeResolved::::::::::: ", res.data);
           setActive(res.data?.active_comments);
           setResolve(res.data?.resolved_comments);
         })

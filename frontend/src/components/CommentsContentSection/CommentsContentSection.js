@@ -91,7 +91,7 @@ const CommentsContentSection = (props) => {
   // };
   const handleCommentReaction = async (id, reaction, is_public) => {
     const user_id = localStorage.getItem("user-id");
-    console.log("publicComments:::::::::::", publicComments);
+    // console.log("publicComments:::::::::::", publicComments);
     try {
       const res = await axios.post(
         `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
@@ -112,7 +112,7 @@ const CommentsContentSection = (props) => {
             (response) => response.id == data?.comment_id
           )[0].total_reactions.total_likes = data?.total_likes;
 
-          console.log("active::::::::::::::", active);
+          // console.log("active::::::::::::::", active);
 
           setActive(active);
 
@@ -120,7 +120,7 @@ const CommentsContentSection = (props) => {
             (response) => response.id == data?.comment_id
           );
 
-          console.log("filterdata:::::::::::::::", filterdata);
+          // console.log("filterdata:::::::::::::::", filterdata);
           if (filterdata.length !== 0 && filterdata) {
             publicComments.filter(
               (response) => response.id == data?.comment_id
@@ -1176,7 +1176,7 @@ const CommentsContentSection = (props) => {
                     </span>
                   </div>
                   <div className="text-end mt-3 mb-2">
-                    <span
+                    {/* <span
                       className="p-1 px-2"
                       style={{
                         backgroundColor:
@@ -1204,7 +1204,7 @@ const CommentsContentSection = (props) => {
                           />
                         </>
                       )}
-                    </span>
+                    </span> */}
                     <span
                       className="p-1"
                       style={{

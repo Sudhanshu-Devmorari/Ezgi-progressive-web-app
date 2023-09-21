@@ -55,7 +55,7 @@ const AdsManagementPage = () => {
       try {
         setIsLoading(true);
         const res = await axios.get(`${config?.apiUrl}/ads-management/`);
-        console.log(res.data, "==========>>>res sub users");
+        // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setBanners(data.Banners);
         setActive(data.active);

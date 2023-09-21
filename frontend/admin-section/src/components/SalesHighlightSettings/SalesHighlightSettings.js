@@ -46,7 +46,7 @@ const SalesHighlightSettings = (props) => {
           }/highlight-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`
         );
         const data = res.data[0];
-        console.log(data);
+        // console.log(data);
         setIsLoading(false);
         if (res.status === 200) {
           formik.setValues({

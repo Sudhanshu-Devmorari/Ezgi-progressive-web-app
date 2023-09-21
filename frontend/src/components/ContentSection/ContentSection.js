@@ -117,7 +117,9 @@ const ContentSection = ({
         text: `${error.response.data}`,
         icon: "error",
         backdrop: false,
-        customClass: "dark-mode-alert",
+        // customClass: "dark-mode-alert",
+        customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
     }
   };
@@ -310,6 +312,7 @@ const ContentSection = ({
                 {verifyid?.includes(data?.value?.commentator_user?.id) && (
                   <img src={blueTick} alt="" width={16} height={16} />
                 )}
+                
               </div>
             </div>
             <div className="col p-0">

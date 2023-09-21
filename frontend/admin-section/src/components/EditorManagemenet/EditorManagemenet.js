@@ -76,13 +76,25 @@ const EditorManagemenet = (props) => {
       );
       if (res.status === 200) {
         props?.editorManagementApiData();
-        Swal.fire({
+        const confirm = await Swal.fire({
           title: "Success",
           text: res?.data?.data,
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
         });
+        const modalElement = document.getElementById("exampleModal");
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
+          }
+        }
+        if (confirm.value === true){
+          window.location.reload()
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -310,7 +322,7 @@ const EditorManagemenet = (props) => {
         if (response.status === 200) {
           clearEditorData();
           clearError();
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text: "Editor Created!",
             icon: "success",
@@ -329,6 +341,9 @@ const EditorManagemenet = (props) => {
             age: "",
             about: "",
           });
+          if (confirm.value === true){
+            window.location.reload()
+          }
         }
         // setDisplayUser(response.data);
       } catch (error) {
@@ -441,13 +456,16 @@ const EditorManagemenet = (props) => {
             age: "",
             about: "",
           });
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text: "Editor Updated!",
             icon: "success",
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          if (confirm.value === true){
+            window.location.reload()
+          }
         }
         const modalElement = document.getElementById("exampleModal");
         if (modalElement) {
@@ -1653,7 +1671,7 @@ const EditorManagemenet = (props) => {
                       {props.updateProfile === 2 ? (
                         <>
                           <button
-                            data-bs-dismiss="modal"
+                            // data-bs-dismiss="modal"
                             onClick={() => {
                               handleDeactive(
                                 partialData.editor_data?.id,
@@ -1706,7 +1724,7 @@ const EditorManagemenet = (props) => {
                                 about: "",
                               });
                             }}
-                            data-bs-dismiss="modal"
+                            // data-bs-dismiss="modal"
                             className="px-3 py-1"
                             style={{
                               color: "#FF9100",

@@ -113,7 +113,7 @@ const OTPModal = (props) => {
         phone: phone ? phone : props.forgotPsPhone,
         signup: "signup",
       });
-      console.log(res.data, "======>>otp resend");
+      // console.log(res.data, "======>>otp resend");
       if (res.data.status === 500) {
         setOtpError(res.data.error);
       }

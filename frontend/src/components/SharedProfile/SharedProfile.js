@@ -92,7 +92,7 @@ const SharedProfile = (props) => {
           id: id,
         }
       );
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
 
       if (mergedEditorResult) {
         // console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
