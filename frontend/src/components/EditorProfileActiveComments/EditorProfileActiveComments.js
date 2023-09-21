@@ -90,6 +90,8 @@ const EditorProfileActiveComments = (props) => {
             isFavorite={isFavorite}
             setIsFavorite={setIsFavorite}
             activeResolved={activeResolved}
+            selectContent={props.selectContent}
+            profileLoading={isLoading}
           />
           <SelectComments
             setSelectComment={setSelectComment}

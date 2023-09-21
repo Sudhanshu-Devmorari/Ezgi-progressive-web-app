@@ -64,9 +64,13 @@ const OTPModal = (props) => {
         props?.setSelectedCity("Select");
         props?.setSelectedGender("Select");
         props?.setSelectedAge("Select");
-        localStorage.setItem("user-role", res.data.user.user_role);
-        localStorage.setItem("user-id", res.data.user.id);
-        localStorage.setItem("username", res.data.user.username);
+        localStorage.setItem("priviouspage", "home");
+        localStorage.setItem("currentpage", "home");
+        localStorage.setItem("dashboardShow", false);
+        localStorage.setItem(
+          "subcurrentpage",
+          res.data.userRole == "standard" ? "subscribers" : "home"
+        );
         props.hide();
         await Swal.fire({
           title: "Success",

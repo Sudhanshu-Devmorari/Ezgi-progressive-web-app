@@ -19,7 +19,6 @@ const NavBar = (props) => {
 
   const [signUpModalShow, setSignUpModalShow] = useState(false);
   const [addCommentShow, setAddCommentShow] = useState(false);
-  // console.log(props.profileData,"Profile Datata")
 
   const handleTheme = (e) => {
     if (e === "dark") {
@@ -78,6 +77,9 @@ const NavBar = (props) => {
                   setSignUpModalShow(true);
                 } else {
                   props.setDashboardSUser(true);
+                  localStorage.setItem("currentpage", "notifications");
+                  localStorage.setItem("dashboardShow", true);
+                  localStorage.setItem("subcurrentpage", "notifications");
                   props.setSelectContent("notifications");
                 }
                 setShowModal(4);
@@ -89,6 +91,13 @@ const NavBar = (props) => {
               <span
                 onClick={() => {
                   props.setDashboardSUser(true);
+                  const currentPage = localStorage.getItem("currentpage");
+                  localStorage.setItem("dashboardShow", true);
+                  (currentPage !== "show-all-comments" ||
+                    currentPage !== "notifications") &&
+                    localStorage.setItem("priviouspage", currentPage);
+                  localStorage.setItem("currentpage", "show-all-comments");
+                  localStorage.setItem("subcurrentpage", "home");
                   props.setSelectContent("show-all-comments");
                 }}
                 className="py-2 px-3"

@@ -41,7 +41,6 @@ const SharedProfile = (props) => {
   const server_url = `${config.apiUrl}`;
   const [commentatorUser, setCommentatorUser] = useState([]);
 
-  // console.log("=>>>data", data?.value?.user);
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -50,11 +49,9 @@ const SharedProfile = (props) => {
   ];
 
   function getfav(e) {
-    // console.log(e,"=>>>e")
     axios
       .get(`${config.apiUrl}/fav-editor/${userId}/?commentator=${e}`)
       .then((res) => {
-        // console.log(res, "========>>>>>res");
         if (res.status === 200) {
           const favIs = res?.data[0]?.is_fav_editor;
           setIsFavorite(favIs);
@@ -76,7 +73,6 @@ const SharedProfile = (props) => {
   }
 
   useEffect(() => {
-    // console.log("data::::::::::::", data)
     // getfav(data?.value?.user?.id);
   }, []);
   useEffect(() => {
@@ -95,12 +91,10 @@ const SharedProfile = (props) => {
       // console.log("API Response:", response.data);
 
       if (mergedEditorResult) {
-        // console.log("mergedEditorResult:::::::::::::", mergedEditorResult);
 
         const filterArray = mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
         );
-        // console.log("filterArray::::::::::::::", filterArray);
 
         mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
@@ -143,7 +137,6 @@ const SharedProfile = (props) => {
 
   return (
     <>
-      {/* {props.data?.value?.highlights?.map((res, index) => ( */}
       <div
         className={`card p-1 my-2 border-0 rounded-0 ${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -164,7 +157,6 @@ const SharedProfile = (props) => {
           {data?.value?.is_fav_editor ? (
             <img
               onClick={() => {
-                // console.log("star click:::::::::::::", data);
                 if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
@@ -177,7 +169,6 @@ const SharedProfile = (props) => {
           ) : (
             <img
               onClick={() => {
-                // console.log("star click:::::::::::::", data);
                 if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
                 }
@@ -198,13 +189,18 @@ const SharedProfile = (props) => {
             className="col pe-0 d-flex position-relative"
             onClick={() => {
               if (userId) {
+                const currentPage = localStorage.getItem("currentpage");
+                localStorage.setItem("dashboardShow", true);
+                (currentPage !== "show-all-comments" ||
+                  currentPage !== "notifications") &&
+                  localStorage.setItem("priviouspage", currentPage);
+                localStorage.setItem("currentpage", "show-all-comments");
+                localStorage.setItem("subcurrentpage", "home");
                 setSelectContent("show-all-comments");
                 setActiveCommentsshow(data?.value?.user?.id);
               } else {
                 Swal.fire({
-                  // title: "Success",
                   text: "You need to become a member to be able to view it.",
-                  // icon: "success",
                   backdrop: false,
                   customClass: `${
                     currentTheme === "dark"
@@ -286,24 +282,26 @@ const SharedProfile = (props) => {
           </div>
           <div className="col d-flex justify-content-end flex-column align-items-end me-3">
             <div className="mt-1">
-              {data?.value?.user?.category.includes("Football") || data?.value?.user?.category.includes("Futbol") && (
-                <img
-                  src={football}
-                  alt=""
-                  height={38}
-                  width={38}
-                  style={{ color: "#00C936" }}
-                />
-              )}
-              {data?.value?.user?.category.includes("Basketball") || data?.value?.user?.category.includes("Basketbol") && (
-                <img
-                  src={basketball}
-                  alt=""
-                  height={38}
-                  width={38}
-                  style={{ color: "#FF9100" }}
-                />
-              )}
+              {data?.value?.user?.category.includes("Football") ||
+                (data?.value?.user?.category.includes("Futbol") && (
+                  <img
+                    src={football}
+                    alt=""
+                    height={38}
+                    width={38}
+                    style={{ color: "#00C936" }}
+                  />
+                ))}
+              {data?.value?.user?.category.includes("Basketball") ||
+                (data?.value?.user?.category.includes("Basketbol") && (
+                  <img
+                    src={basketball}
+                    alt=""
+                    height={38}
+                    width={38}
+                    style={{ color: "#FF9100" }}
+                  />
+                ))}
             </div>
             {data?.value?.user?.commentator_level !== "apprentice" && (
               <div className="" style={{ fontSize: "12px" }}>

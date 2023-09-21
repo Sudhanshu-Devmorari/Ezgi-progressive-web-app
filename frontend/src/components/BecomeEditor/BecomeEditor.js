@@ -5,7 +5,7 @@ import landingPage from "../../assets/landingPage.png";
 import FAQEditor from "../FAQEditor/FAQEditor";
 import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
 
-const BecomeEditor = () => {
+const BecomeEditor = ({ profileData }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const user_role = localStorage.getItem("user-role");
@@ -61,7 +61,7 @@ const BecomeEditor = () => {
         </div>
       )}
       <FAQEditor />
-      <BecomeAEditorModal show={modalShow} onHide={() => setModalShow(false)} />
+      <BecomeAEditorModal show={modalShow} onHide={() => setModalShow(false)} profileData={profileData}/>
     </>
   );
 };

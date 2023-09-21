@@ -9,6 +9,7 @@ import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
+import Spinner from "react-bootstrap/esm/Spinner";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -17,10 +18,13 @@ const ProfileSU = (props) => {
 
   // PROFILE API
   const [progileData, setProgileData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data, "===============?>>");
     setProgileData(res.data);
+    setIsLoading(false);
   }
   useEffect(() => {
     userId && getProfileData();
@@ -96,8 +100,27 @@ const ProfileSU = (props) => {
         <div className="d-flex justify-content-between pb-2">
           <BsArrowLeft
             onClick={() => {
-              props.setSelectContent("home");
-              props.setDashboardSUser(false);
+              const currentPage =
+                localStorage.getItem("priviouspage") || "home";
+              const deshboardShow =
+                localStorage.getItem("dashboardShow") || false;
+              localStorage.setItem(
+                "currentpage",
+                currentPage == "show-all-comments" ||
+                  currentPage == "notifications"
+                  ? currentPage
+                  : "home"
+              );
+              props.setSelectContent(
+                currentPage == "show-all-comments" ||
+                  currentPage == "notifications"
+                  ? "home"
+                  : currentPage || "home"
+              );
+              props.setDashboardSUser(
+                deshboardShow == "true" ? false : true || false
+              );
+              localStorage.setItem("dashboardShow", false);
             }}
             fontSize={"1.6rem"}
           />
@@ -105,27 +128,31 @@ const ProfileSU = (props) => {
         <div className="row g-0">
           <div className="col pe-0 d-flex">
             <div className="position-relative">
-              <img
-                src={
-                  preveiwProfilePic
-                    ? preveiwProfilePic
-                    : progileData?.profile_pic
-                    ? `${config.apiUrl}${progileData?.profile_pic}`
-                    : initialProfile
-                }
-                width={100}
-                height={100}
-                alt=""
-                style={{
-                  objectFit: "cover",
-                  borderRadius: "50%",
-                  opacity: editProfile
-                    ? currentTheme === "dark"
-                      ? "0.4"
-                      : "0.7"
-                    : "",
-                }}
-              />
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                <img
+                  src={
+                    preveiwProfilePic
+                      ? preveiwProfilePic
+                      : progileData?.profile_pic
+                      ? `${config.apiUrl}${progileData?.profile_pic}`
+                      : initialProfile
+                  }
+                  width={100}
+                  height={100}
+                  alt=""
+                  style={{
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    opacity: editProfile
+                      ? currentTheme === "dark"
+                        ? "0.4"
+                        : "0.7"
+                      : "",
+                  }}
+                />
+              )}
             </div>
             <div className="">
               {(preveiwProfilePic || editProfile) && (

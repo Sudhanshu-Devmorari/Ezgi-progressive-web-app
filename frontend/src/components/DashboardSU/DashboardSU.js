@@ -19,18 +19,23 @@ import config from "../../config";
 import moment from "moment";
 
 const DashboardSU = (props) => {
-  const [content, setContent] = useState("subscribers");
+  const subcurrentpage = localStorage.getItem("subcurrentpage");
+  const [content, setContent] = useState(subcurrentpage || "subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [favSelection, setFavSelection] = useState("fav editor");
-  // console.log("favSelection:::::::::::", favSelection)
 
   useEffect(() => {
     if (props.selectContent === "notifications") {
       setContent("notifications");
     } else if (props.selectContent === "fav") {
-      setContent("fav");
+      subcurrentpage == "fav" && setContent("fav");
+    } else if (
+      subcurrentpage == "home" &&
+      props.selectContent == "show-all-comments"
+    ) {
+      setContent("home");
     }
-  }, [props.selectContent]);
+  }, [props.selectContent, subcurrentpage]);
 
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
@@ -60,6 +65,7 @@ const DashboardSU = (props) => {
         setSelectContent={props.setSelectContent}
         setDashboardSUser={props.setDashboardSUser}
         homeApiData={props.homeApiData}
+        selectContent={props?.selectContent}
       />
       <CommentatorIcons
         setContent={setContent}

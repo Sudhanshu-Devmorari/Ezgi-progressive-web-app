@@ -15,20 +15,29 @@ const SelectContentForEditorPage = (props) => {
   const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
+
   const filterData = (e) => {
+    console.log("event true::::::::::::::", e.target.value);
     if (props.editor == true) {
-      props.setFilterData(null);
+      // props.setFilterData(null);
       const val = e.target.value;
-      const filteredArray = props.data.filter(
-        (obj) =>
-          obj?.value?.user?.username
-            ?.toLowerCase()
-            .startsWith(val.toLowerCase()) ||
-          obj?.value?.user?.username?.toLowerCase().includes(val.toLowerCase())
-      );
-      props.setDisplayData(filteredArray);
+      if (val !== "") {
+        const filteredArray = props.data.filter(
+          (obj) =>
+            obj?.value?.user?.username
+              ?.toLowerCase()
+              .startsWith(val.toLowerCase()) ||
+            obj?.value?.user?.username
+              ?.toLowerCase()
+              .includes(val.toLowerCase())
+        );
+        props.setFilterData(filteredArray);
+      } else {
+        props.setFilterData(props.data);
+      }
     } else {
       // console.log("*=======>>>>>>", props.comments)
+      console.log("props.data:::::::::::::::", props.data)
       props.setFilterCommentData(null);
       const val = e.target.value;
       const filteredArray = props.data.filter(
@@ -43,6 +52,7 @@ const SelectContentForEditorPage = (props) => {
       props.setDisplayData(filteredArray);
     }
   };
+
   return (
     <>
       <div
@@ -103,7 +113,7 @@ const SelectContentForEditorPage = (props) => {
             </span>
             <div
               onClick={() => {
-                handleOnlyPublicData(props.publicSelected)
+                handleOnlyPublicData(props.publicSelected);
                 props.setPublicSelected(!props.publicSelected);
                 props.publicSelected == true
                   ? props.setOnlyPublic("")

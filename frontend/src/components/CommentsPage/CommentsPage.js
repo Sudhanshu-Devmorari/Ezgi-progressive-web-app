@@ -180,6 +180,12 @@ const CommentsPage = ({
         <AdvertisementBanner data={adsdata} />
       </div>
       {onlyPublic == "" &&
+      (filterCommentData == null ? displayData : filterCommentData)?.length ==
+        0 ? (
+        <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+          No Record Found!
+        </div>
+      ) : (
         (filterCommentData == null ? displayData : filterCommentData)?.map(
           (val, index) => {
             let lastType = displayData[index == 0 ? 0 : index - 1]?.type;
@@ -226,7 +232,9 @@ const CommentsPage = ({
               );
             }
           }
-        )}
+        )
+      )}
+
       {onlyPublic == "only public" &&
         onlyPublicResult?.map((val, index) => {
           let lastType = onlyPublicResult[index == 0 ? 0 : index - 1]?.type;

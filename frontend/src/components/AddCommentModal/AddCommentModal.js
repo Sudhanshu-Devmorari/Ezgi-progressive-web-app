@@ -24,7 +24,7 @@ import Swal from "sweetalert2";
 import config from "../../config";
 
 const AddCommentModal = (props) => {
-  const { activeResolved } = props;
+  const { activeResolved, profileData } = props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // const matchDetailsOptions = [
@@ -41,7 +41,10 @@ const AddCommentModal = (props) => {
   const predictionTypeOptions = predictionType;
   const predictionOptions = predictionData;
 
-  const categoryOptions = ["Futbol", "Basketbol"];
+  const categoryOptions = profileData?.category
+    ? profileData?.category
+    : ["Futbol", "Basketbol"];
+
   const [countryOptions, setCountryOptions] = useState([]);
   // const leagueOptions = ["League 1", "League 2", "League 3"];
   const [leagueOptions, setLeagueOptions] = useState([]);
@@ -257,6 +260,15 @@ const AddCommentModal = (props) => {
 
   const [toggleInput, setToggleInput] = useState(false);
 
+  useEffect(() => {
+    profileData &&
+      console.log("profileData:::::::::::::", profileData.commentator_level);
+    profileData &&
+      setToggleInput(
+        profileData.commentator_level == "apprentice" ? true : false
+      );
+  }, [profileData]);
+
   const [termsOfUseShow, setTermsOfUseShow] = useState(false);
 
   const [commentText, setcommentText] = useState("");
@@ -269,6 +281,7 @@ const AddCommentModal = (props) => {
   const [predictionTypeError, setPredictionTypeError] = useState("");
   const [predictionError, setPredictionError] = useState("");
   const [commentError, setCommentError] = useState("");
+  const [selectCheckboxError, setSelectCheckboxError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   function closeModal() {
@@ -280,6 +293,7 @@ const AddCommentModal = (props) => {
     setPredictionTypeError("");
     setPredictionError("");
     setCommentError("");
+    setSelectCheckboxError("");
     setSelectCheckBox(false);
     props.onHide();
     setcommentText("");
@@ -303,8 +317,9 @@ const AddCommentModal = (props) => {
 
   // Add Comment pr Post comment API
   const postComment = async () => {
-    // console.log("toggleInput: ", toggleInput)
-    setIsLoading(true);
+    if (!selectCheckBox) {
+      setSelectCheckboxError("Required*");
+    }
     if (selectedCategory === "Select") {
       setCategoryError("Required*");
     }
@@ -344,8 +359,10 @@ const AddCommentModal = (props) => {
       selectedMatchDetails !== "Select" &&
       selectedPredictionType !== "Select" &&
       selectedPrediction !== "Select" &&
-      commentText !== ""
+      ((commentText.length > 100) & (commentText.length < 250) ||
+        commentText !== "")
     ) {
+      setIsLoading(true);
       try {
         setCategoryError("");
         setCountryError("");
@@ -355,6 +372,7 @@ const AddCommentModal = (props) => {
         setCommentError("");
         setPredictionTypeError("");
         setPredictionError("");
+        setSelectCheckboxError("");
         const res = await axios.post(
           `${config?.apiUrl}/post-comment/${userId}`,
           {
@@ -408,6 +426,7 @@ const AddCommentModal = (props) => {
         }
       }
     }
+    // setIsLoading(false);
   };
 
   const errorSwal = ()=>{
@@ -814,7 +833,10 @@ const AddCommentModal = (props) => {
             <div className="">
               {currentTheme === "dark" ? (
                 <img
-                  onClick={() => setToggleInput(!toggleInput)}
+                  onClick={() =>
+                    profileData.commentator_level !== "apprentice" &&
+                    setToggleInput(!toggleInput)
+                  }
                   src={!toggleInput ? SelecttoggleinputDark : toggleinputDark}
                   alt=""
                   height={23}
@@ -822,7 +844,10 @@ const AddCommentModal = (props) => {
                 />
               ) : (
                 <img
-                  onClick={() => setToggleInput(!toggleInput)}
+                  onClick={() =>
+                    profileData.commentator_level !== "apprentice" &&
+                    setToggleInput(!toggleInput)
+                  }
                   src={
                     !toggleInput ? toggleinputLight : toggleinputLightSelected
                   }
@@ -867,7 +892,7 @@ const AddCommentModal = (props) => {
             </div>
 
             <div className="text-center">
-              <div className="my-3" style={{ fontSize: "13px" }}>
+              <div className="mt-3" style={{ fontSize: "13px" }}>
                 {currentTheme === "dark" ? (
                   <img
                     alt=""
@@ -895,6 +920,12 @@ const AddCommentModal = (props) => {
                   Terms of use
                 </span>
               </div>
+              <small
+                className="text-danger ps-2"
+                style={{ fontSize: "0.78rem" }}
+              >
+                {selectCheckboxError}
+              </small>
               <div className="d-flex justify-content-center my-3">
                 <button
                   onClick={postComment}

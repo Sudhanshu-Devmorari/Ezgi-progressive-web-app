@@ -56,15 +56,12 @@ const Notifications = () => {
   }, []);
 
   useEffect(() => {
-    if (unreadNotificationsIds) {
+    if (unreadNotificationsIds && userId) {
       try {
         axios
-          .post(
-            `${config.apiUrl}/notification/${userId}`,
-            {
-              'update-status': unreadNotificationsIds
-            }
-          )
+          .post(`${config.apiUrl}/notification/${userId}`, {
+            "update-status": unreadNotificationsIds,
+          })
           .then((res) => {
             // console.log(res, "===========>>>post");
           })

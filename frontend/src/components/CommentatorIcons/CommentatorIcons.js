@@ -22,17 +22,17 @@ import lifebuoySelected from "../../assets/support selected.svg";
 const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const user = localStorage.getItem("user-role");
+  const homepage = localStorage.getItem("currentpage");
   return (
     <>
-      <div
-        className={`row my-2 g-0 gap-1 ${
-          user !== "commentator" && "mx-4"
-        }`}
-      >
+      <div className={`row my-2 g-0 gap-1 ${user !== "commentator" && "mx-4"}`}>
         {user === "commentator" && (
           <>
             <div
-              onClick={() => props.setContent("home")}
+              onClick={() => {
+                props.setContent("home");
+                localStorage.setItem("subcurrentpage", "home");
+              }}
               className={`${
                 currentTheme === "dark" ? "dark-mode" : "light-mode"
               } col d-flex justify-content-center p-1 py-2`}
@@ -53,7 +53,10 @@ const CommentatorIcons = (props) => {
           </>
         )}
         <div
-          onClick={() => props.setContent("subscribers")}
+          onClick={() => {
+            props.setContent("subscribers");
+            localStorage.setItem("subcurrentpage", "subscribers");
+          }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -72,7 +75,10 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("wallet")}
+          onClick={() => {
+            props.setContent("wallet");
+            localStorage.setItem("subcurrentpage", "wallet");
+          }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -91,7 +97,10 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("fav")}
+          onClick={() => {
+            props.setContent("fav");
+            localStorage.setItem("subcurrentpage", "fav");
+          }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -110,7 +119,10 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("notifications")}
+          onClick={() => {
+            props.setContent("notifications");
+            localStorage.setItem("subcurrentpage", "notifications");
+          }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}
@@ -129,7 +141,10 @@ const CommentatorIcons = (props) => {
           />
         </div>
         <div
-          onClick={() => props.setContent("support")}
+          onClick={() => {
+            props.setContent("support");
+            localStorage.setItem("subcurrentpage", "support");
+          }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           } col d-flex justify-content-center p-1 py-2`}

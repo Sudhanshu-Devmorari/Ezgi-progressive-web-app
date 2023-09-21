@@ -14,8 +14,10 @@ import Swal from "sweetalert2";
 import { userId } from "../GetUser";
 import axios from "axios";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import { useEffect } from "react";
 
 const BecomeAEditorModal = (props) => {
+  const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
@@ -56,6 +58,11 @@ const BecomeAEditorModal = (props) => {
 
   const [file, setFile] = useState(null);
 
+  useEffect(() => {
+    console.log("profileData:::::::::::::", profileData);
+    profileData && setPreveiwProfilePic(`${config.apiUrl}${profileData}`);
+  }, [profileData]);
+
   const formData = new FormData();
   function handleProfile(e) {
     try {
@@ -85,7 +92,8 @@ const BecomeAEditorModal = (props) => {
   const [checkboxError, setCheckboxError] = useState("");
   const [profileError, setProfileError] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  function handleSubmit(event) {
+
+  async function handleSubmit(event) {
     event.preventDefault();
     // console.log("form submittt");
     if (selectedKategori === "Select") {
@@ -103,16 +111,16 @@ const BecomeAEditorModal = (props) => {
       if (preveiwProfilePic) {
         formData.append("category", selectedKategori);
         formData.append("experience", selectedDeneyim);
-        formData.append("profile_pic", file);
+        file && formData.append("profile_pic", file);
         axios
           .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
-          .then((res) => {
+          .then(async (res) => {
             // console.log(res, "===========>>>>res");
             if (res.status === 200) {
               // setShowPaymentModal(true);
               localStorage.setItem("user-role", res.data.user_role);
               props.onHide();
-              Swal.fire({
+              await Swal.fire({
                 title: "Success",
                 text: "User has successfully become a commentator",
                 icon: "success",
@@ -122,6 +130,7 @@ const BecomeAEditorModal = (props) => {
                     ? "dark-mode-alert"
                     : "light-mode-alert",
               });
+              window.location.reload();
             }
           })
           .catch((error) => {

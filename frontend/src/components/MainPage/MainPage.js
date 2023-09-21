@@ -29,9 +29,15 @@ const MainPage = () => {
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // Select Content
-  const [selectContent, setSelectContent] = useState("home");
+  const [selectContent, setSelectContent] = useState(
+    localStorage.getItem("currentpage") || "home"
+  );
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
-  const [dashboardSUser, setDashboardSUser] = useState(false);
+  const dashboardShow = localStorage.getItem("dashboardShow");
+  console.log("dashboardShow", typeof dashboardShow);
+  const [dashboardSUser, setDashboardSUser] = useState(
+    dashboardShow == "true" ? true : false || false
+  );
   // console.log("--------", dashboardSUser)
 
   const themeMode = localStorage.getItem("CurrentTheme");
@@ -95,6 +101,8 @@ const MainPage = () => {
         );
         setLeftCornerAds(leftCornerAdsFilter);
         setRightCornerAds(rightCornerAdsFilter);
+
+        console.log("res?.data?.verify_ids:::::::::::::", res?.data?.verify_ids)
 
         setVerifyid(res?.data?.verify_ids);
         setFollowingList(res?.data?.following_user);
@@ -298,10 +306,7 @@ const MainPage = () => {
   };
 
   const handleOnlyPublicData = async (isPublic) => {
-    console.log("isPublic::::::::::", isPublic);
     let merged = [];
-    let remainingPublic = [...publicComments];
-    let remainingHighlights = [...highlights];
 
     if (!isPublic) {
       const filterData = publicComments.filter(
@@ -386,22 +391,15 @@ const MainPage = () => {
     mergeEditorArrays();
   }, [publicComments, highlights, subscriptionComments, arrayMerge]);
 
-  // const user = "c-";
-  // const user = localStorage.getItem("userPhone");
-  // console.log("-----user_id-----", user_id)
-
   const [activeCommentsshow, setActiveCommentsshow] = useState(null);
 
   const [contentData, setContentData] = useState([]);
   const [contentFilterData, setContentFilterData] = useState([]);
   const [commentsReactionsSports, setCommentsReactionsSports] = useState([]);
-  // console.log(contentFilterData, "=>>>contentFilterData");
 
   useEffect(() => {
     handlesportData();
   }, [contentData]);
-
-  // console.log("=>>contentData", contentData)
 
   const handlesportData = async () => {
     let merged = [];
@@ -812,7 +810,7 @@ const MainPage = () => {
                   setMergedEditorResult={setMergedEditorResult}
                 />
               )}
-              {selectContent === "become-editor" && <BecomeEditor />}
+              {selectContent === "become-editor" && <BecomeEditor profileData={profileData}/>}
               {selectContent === "category-content" && (
                 <>
                   {contentFilterData.length == 0 ? (

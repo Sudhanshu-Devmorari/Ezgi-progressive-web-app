@@ -18,7 +18,7 @@ const EditorsPage = ({
   setActiveCommentsshow,
   verifyid,
   highlights,
-  handleOnlyPublicData
+  handleOnlyPublicData,
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +43,6 @@ const EditorsPage = ({
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log("err:::", error);
     }
   };
 
@@ -62,6 +61,7 @@ const EditorsPage = ({
       }
 
       setMergedEditorResult(merged);
+      setFilterData(merged);
     }
   };
 
@@ -129,6 +129,7 @@ const EditorsPage = ({
         data={mergedEditorResult}
         setDisplayData={setDisplayData}
         setFilterData={setFilterData}
+        filterData={filterData}
         handleOnlyPublicData={handleOnlyPublicData}
       />
 
@@ -137,28 +138,37 @@ const EditorsPage = ({
           Loading…
         </div>
       ) : (
-        (filterData == null ? mergedEditorResult : filterData)?.map(
-          (val, index) => {
-            return (
-              <>
-                {index % 10 == 0 ? (
-                  <div className="" id={`banner`}>
-                    <AdvertisementBanner data={adsdata} />
-                  </div>
-                ) : null}
-                <SharedProfile
-                  setActiveCommentsshow={setActiveCommentsshow}
-                  data={val}
-                  setData={setData}
-                  setSelectContent={setSelectContent}
-                  verifyid={verifyid}
-                  mergedEditorResult={mergedEditorResult}
-                  setMergedEditorResult={setMergedEditorResult}
-                />
-              </>
-            );
-          }
-        )
+        <>
+          {(filterData == null ? mergedEditorResult : filterData)?.length ==
+          0 ? (
+            <div className="d-flex gap-1 my-2 pb-2 align-items-center justify-content-center">
+              No Record Found!
+            </div>
+          ) : (
+            (filterData == null ? mergedEditorResult : filterData)?.map(
+              (val, index) => {
+                return (
+                  <React.Fragment key={index}>
+                    {index % 10 == 0 ? (
+                      <div className="" id={`banner`}>
+                        <AdvertisementBanner data={adsdata} />
+                      </div>
+                    ) : null}
+                    <SharedProfile
+                      setActiveCommentsshow={setActiveCommentsshow}
+                      data={val}
+                      setData={setData}
+                      setSelectContent={setSelectContent}
+                      verifyid={verifyid}
+                      mergedEditorResult={mergedEditorResult}
+                      setMergedEditorResult={setMergedEditorResult}
+                    />
+                  </React.Fragment>
+                );
+              }
+            )
+          )}
+        </>
       )}
     </>
   );

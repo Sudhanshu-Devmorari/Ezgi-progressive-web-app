@@ -36,27 +36,27 @@ const Home = (props) => {
       );
       if (res.status === 200) {
         const modalElement = document.getElementById("exampleModal");
-          if (modalElement) {
-            const closeButton = modalElement.querySelector(
-              "[data-bs-dismiss='modal']"
-            );
-            if (closeButton) {
-              closeButton.click();
-            }
+        if (modalElement) {
+          const closeButton = modalElement.querySelector(
+            "[data-bs-dismiss='modal']"
+          );
+          if (closeButton) {
+            closeButton.click();
           }
-          setIsLoadingActions(false);
-          clearError();
-          props?.adminHomeApiData();
-          const confirmation = await Swal.fire({
-            title: "Success",
-            text: res?.data?.data,
-            icon: "success",
-            backdrop: false,
-            customClass: "dark-mode-alert",
-          });
-          if (confirmation.value === true) {
-          window.location.reload()
-          }
+        }
+        setIsLoadingActions(false);
+        clearError();
+        props?.adminHomeApiData();
+        const confirmation = await Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        });
+        if (confirmation.value === true) {
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -298,7 +298,7 @@ const Home = (props) => {
             closeButton.click();
           }
         }
-        window.location.reload()
+        window.location.reload();
         clearError();
         props?.userManagementApiData();
       } catch (error) {
@@ -421,8 +421,8 @@ const Home = (props) => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
-          if (confirm.value === true){
-            window.location.reload()
+          if (confirm.value === true) {
+            window.location.reload();
           }
         }
       } catch (error) {
@@ -863,11 +863,12 @@ const Home = (props) => {
                           width={25}
                         />
                         <img
-                          onClick={() => {
-                            // if (userData?.is_delete) {
+                          onClick={
+                            () => {
+                              // if (userData?.is_delete) {
                               handleDeactive(res.id, "delete");
                             }
-                          // }
+                            // }
                           }
                           className="cursor"
                           src={trash}
@@ -1254,7 +1255,7 @@ const Home = (props) => {
                     <div className="my-2 d-flex justify-content-center gap-3 mb-3 px-3">
                       <div className="">
                         <button
-                        // disabled={true}
+                          // disabled={true}
                           onClick={() => {
                             handleDeactive(userData?.id, "remove");
                             setAddUser({
@@ -1300,7 +1301,7 @@ const Home = (props) => {
                       </div>
                       <div className="">
                         <button
-                        // disabled={true}
+                          // disabled={true}
                           onClick={() => {
                             handleDeactive(
                               userData?.id,

@@ -48,6 +48,13 @@ const SignInModal = (props) => {
           localStorage.setItem("user-role", res.data.userRole);
           localStorage.setItem("user-id", res.data.userId);
           localStorage.setItem("username", res.data.username);
+          localStorage.setItem("priviouspage", "home");
+          localStorage.setItem("currentpage", "home");
+          localStorage.setItem("dashboardShow", false);
+          localStorage.setItem(
+            "subcurrentpage",
+            res.data.userRole == "standard" ? "subscribers" : "home"
+          );
           props?.hide();
           await Swal.fire({
             title: "Success",

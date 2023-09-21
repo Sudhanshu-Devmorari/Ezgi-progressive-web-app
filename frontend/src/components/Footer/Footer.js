@@ -14,8 +14,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 
 export const Footer = (props) => {
   const [showSignup, setShowSignup] = useState(false);
-  const { setShowModal } =
-    useContext(CurrentTheme);
+  const { setShowModal } = useContext(CurrentTheme);
   return (
     <>
       <nav
@@ -26,6 +25,8 @@ export const Footer = (props) => {
           <div className="col text-center">
             <img
               onClick={() => {
+                localStorage.setItem("dashboardShow", false);
+                localStorage.setItem("currentpage", "home");
                 props.setSelectContent("home");
                 props.setDashboardSUser(false);
               }}
@@ -38,6 +39,9 @@ export const Footer = (props) => {
           <div className="col text-center">
             <img
               onClick={() => {
+                localStorage.setItem("dashboardShow", false);
+                localStorage.setItem("priviouspage", props.selectContent);
+                localStorage.setItem("currentpage", "editor");
                 props.setSelectContent("editor");
                 props.setDashboardSUser(false);
               }}
@@ -54,6 +58,9 @@ export const Footer = (props) => {
           <div className="col text-center">
             <img
               onClick={() => {
+                localStorage.setItem("dashboardShow", false);
+                localStorage.setItem("priviouspage", props.selectContent);
+                localStorage.setItem("currentpage", "comments");
                 props.setSelectContent("comments");
                 props.setDashboardSUser(false);
               }}
@@ -71,12 +78,16 @@ export const Footer = (props) => {
               width={38}
               onClick={() => {
                 if (!userId) {
-                  setShowSignup(true)
+                  setShowSignup(true);
                 } else {
+                  localStorage.setItem("dashboardShow", true);
+                  localStorage.setItem("priviouspage", props.selectContent);
+                  localStorage.setItem("currentpage", "fav");
+                  localStorage.setItem("subcurrentpage", "fav");
                   props.setSelectContent("fav");
                   props.setDashboardSUser(true);
                 }
-                setShowModal(4)
+                setShowModal(4);
               }}
             />
           </div>

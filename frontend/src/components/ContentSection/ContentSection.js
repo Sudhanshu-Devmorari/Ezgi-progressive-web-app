@@ -279,6 +279,13 @@ const ContentSection = ({
               className="position-relative col p-0"
               onClick={() => {
                 if (userId) {
+                  const currentPage = localStorage.getItem("currentpage");
+                  localStorage.setItem("dashboardShow", true);
+                  (currentPage !== "show-all-comments" ||
+                    currentPage !== "notifications") &&
+                    localStorage.setItem("priviouspage", currentPage);
+                  localStorage.setItem("currentpage", "show-all-comments");
+                  localStorage.setItem("subcurrentpage", "home");
                   setSelectContent("show-all-comments");
                   setActiveCommentsshow(data?.value?.commentator_user?.id);
                 } else {

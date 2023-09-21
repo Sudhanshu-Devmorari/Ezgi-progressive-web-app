@@ -26,10 +26,11 @@ import initialProfile from "../../assets/profile.png";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+import Spinner from "react-bootstrap/esm/Spinner";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 
 const ActiveComments = (props) => {
-  const { activeResolved, profileData } = props;
+  const { activeResolved, profileData, profileLoading } = props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
   // const profileData = props?.profileData;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -172,25 +173,26 @@ const ActiveComments = (props) => {
   };
 
   useEffect(() => {
-    try {
-      axios
-        .get(`${config.apiUrl}/user-statistics/${user}/`)
-        .then((res) => {
-          setUserPoints({
-            success_rate: res.data.Success_rate,
-            score_point: res.data.Score_point,
-            winning: res.data.win_count,
-            lose: res.data.lose_count,
-            avg_odd: res.data.avg_odd,
-            league: res.data.leagues[0],
+    if (user)
+      try {
+        axios
+          .get(`${config.apiUrl}/user-statistics/${user}/`)
+          .then((res) => {
+            setUserPoints({
+              success_rate: res.data.Success_rate,
+              score_point: res.data.Score_point,
+              winning: res.data.win_count,
+              lose: res.data.lose_count,
+              avg_odd: res.data.avg_odd,
+              league: res.data.leagues[0],
+            });
+          })
+          .catch((error) => {
+            console.log(error);
           });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (error) {
-      console.log(error, "===========>>>");
-    }
+      } catch (error) {
+        console.log(error);
+      }
   }, [user]);
   const [followLabel, setFollowLabel] = useState("Follow");
 
@@ -390,8 +392,27 @@ const ActiveComments = (props) => {
         <div className="d-flex justify-content-between pb-2">
           <BsArrowLeft
             onClick={() => {
-              props.setSelectContent("home");
-              props.setDashboardSUser(false);
+              const currentPage =
+                localStorage.getItem("priviouspage") || "home";
+              const deshboardShow =
+                localStorage.getItem("dashboardShow") || false;
+              localStorage.setItem(
+                "currentpage",
+                currentPage == "show-all-comments" ||
+                  currentPage == "notifications"
+                  ? currentPage
+                  : "home"
+              );
+              props.setSelectContent(
+                currentPage == "show-all-comments" ||
+                  currentPage == "notifications"
+                  ? "home"
+                  : currentPage || "home"
+              );
+              props.setDashboardSUser(
+                deshboardShow == "true" ? false : true || false
+              );
+              localStorage.setItem("dashboardShow", false);
             }}
             fontSize={"1.6rem"}
           />
@@ -433,27 +454,33 @@ const ActiveComments = (props) => {
         <div className="row g-0 flex-nowrap">
           <div className="col pe-0 d-flex ">
             <div className="position-relative">
-              <img
-                src={
-                  preveiwProfilePic
-                    ? preveiwProfilePic
-                    : profileData?.profile_pic
-                    ? `${config?.apiUrl}${profileData?.profile_pic}`
-                    : initialProfile
-                }
-                width={100}
-                height={100}
-                alt=""
-                style={{
-                  objectFit: "cover",
-                  borderRadius: "50%",
-                  opacity: editProfile
-                    ? currentTheme === "dark"
-                      ? "0.4"
-                      : "0.7"
-                    : "",
-                }}
-              />
+              {profileLoading &&
+              preveiwProfilePic == null &&
+              profileData?.profile_pic == "" ? (
+                <Spinner />
+              ) : (
+                <img
+                  src={
+                    preveiwProfilePic
+                      ? preveiwProfilePic
+                      : profileData?.profile_pic
+                      ? `${config?.apiUrl}${profileData?.profile_pic}`
+                      : initialProfile
+                  }
+                  width={100}
+                  height={100}
+                  alt=""
+                  style={{
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    opacity: editProfile
+                      ? currentTheme === "dark"
+                        ? "0.4"
+                        : "0.7"
+                      : "",
+                  }}
+                />
+              )}
             </div>
             <div className="">
               <img
@@ -785,15 +812,19 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="flex-grow-1">Category</div>
-          {profileData?.category?.some((categoryItem) =>
-            categoryItem.includes("Basketball")
+          {profileData?.category?.some(
+            (categoryItem) =>
+              categoryItem.includes("Basketball") ||
+              categoryItem.includes("Basketbol")
           ) && (
             <div className="">
               <img src={basketball} alt="" height={45} width={45} />
             </div>
           )}
-          {profileData?.category?.some((categoryItem) =>
-            categoryItem.includes("Football")
+          {profileData?.category?.some(
+            (categoryItem) =>
+              categoryItem.includes("Football") ||
+              categoryItem.includes("Futbol")
           ) && (
             <div className="">
               <img src={football} alt="" height={45} width={45} />
@@ -958,6 +989,7 @@ const ActiveComments = (props) => {
         show={AddCommentModalModalShow}
         onHide={() => setAddCommentModalModalShow(false)}
         activeResolved={activeResolved}
+        profileData={profileData}
       />
       <WithdrawalModal
         bankDetails={bankDetails}

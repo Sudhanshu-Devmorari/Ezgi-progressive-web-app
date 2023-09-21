@@ -24,7 +24,8 @@ import moment from "moment";
 
 const CommentatorsCommentsPage = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
-  const [content, setContent] = useState("home");
+  const subcurrentpage = localStorage.getItem("subcurrentpage");
+  const [content, setContent] = useState(subcurrentpage || "home");
   const [subscribersOrSubscriptions, setSubscribersOrSubscriptions] =
     useState("My subscribers");
   const [walletSelection, setWalletSelection] = useState("My transactions");
@@ -35,9 +36,14 @@ const CommentatorsCommentsPage = (props) => {
     if (props.selectContent === "notifications") {
       setContent("notifications");
     } else if (props.selectContent === "fav") {
-      setContent("fav");
+      subcurrentpage == "fav" && setContent("fav");
+    } else if (
+      subcurrentpage == "home" &&
+      props.selectContent == "show-all-comments"
+    ) {
+      setContent("home");
     }
-  }, [props.selectContent]);
+  }, [props.selectContent, subcurrentpage]);
 
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
@@ -77,12 +83,10 @@ const CommentatorsCommentsPage = (props) => {
   const [resolve, setResolve] = useState([]);
 
   const activeResolved = async (user_id) => {
-    // console.log("userID::::::::::::", user_id);
     try {
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
-          // console.log("activeResolved::::::::::: ", res.data);
           setActive(res.data?.active_comments);
           setResolve(res.data?.resolved_comments);
         })
@@ -122,6 +126,8 @@ const CommentatorsCommentsPage = (props) => {
             profileData={profileData}
             getProfileData={props.getProfileData}
             activeResolved={activeResolved}
+            selectContent={props.selectContent}
+            profileLoading={isLoading}
           />
           <CommentatorIcons setContent={setContent} content={content} />
 
