@@ -74,9 +74,9 @@ const AddCommentModal = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
 
   const handleCategorySelection = async (category) => {
-    if(JSON.parse(localStorage.getItem("user-active"))==false){
-      errorSwal()
-      return
+    if (JSON.parse(localStorage.getItem("user-active")) == false) {
+      errorSwal();
+      return;
     }
     setSelectedCategory(category);
     setCategoryError("");
@@ -262,8 +262,7 @@ const AddCommentModal = (props) => {
 
   useEffect(() => {
     profileData &&
-      console.log("profileData:::::::::::::", profileData.commentator_level);
-    profileData &&
+      profileData &&
       setToggleInput(
         profileData.commentator_level == "apprentice" ? true : false
       );
@@ -429,19 +428,18 @@ const AddCommentModal = (props) => {
     // setIsLoading(false);
   };
 
-  const errorSwal = ()=>{
+  const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
-    
-      Swal.fire({
-        title: "Error",
-        text: `Your account has been deactivated. Contact support for assistance.`,
-        icon: "error",
-        backdrop: false,
-        customClass:
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-      });
-    
-  }
+    });
+  };
   useEffect(() => {
     const fetchData = async () => {
       let type;
@@ -481,41 +479,6 @@ const AddCommentModal = (props) => {
 
     fetchData();
   }, [selectedMatchDetails]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     let type;
-  //     if (selectedPredictionType !== "Select") {
-  //       if (selectedCategory === "Futbol") {
-  //         type = 1;
-  //       } else if (selectedCategory === "Basketbol") {
-  //         type = 2;
-  //       }
-
-  //       try {
-  //         const predictionsPromises = matchId.map(async (val) => {
-  //           const predictions = await axios.get(
-  //             `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustom?matchID=${val}&type=${selectedPredictionType}`,
-  //             { headers }
-  //           );
-  //           const gameNames = predictions.data.data[0].Bets.map((bet) => bet.gameName);
-  //           return gameNames;
-  //         });
-
-  //         // Wait for all API calls to complete
-  //         const predictionsData = await Promise.all(predictionsPromises);
-  //         // Flatten and remove duplicates from the gameNames array
-  //         const allGameNames = predictionsData.flat();
-  //         const uniqueGameNames = [...new Set(allGameNames)];
-  //         setPredictionData(uniqueGameNames);
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //       }
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [selectedPredictionType]);
 
   return (
     <>
@@ -562,7 +525,7 @@ const AddCommentModal = (props) => {
                   <RxCross2
                     onClick={() => {
                       closeModal();
-                      // setTermsOfUseShow(!termsOfUseShow);
+                      setSelectCheckBox(false);
                       setTermsOfUseShow(false);
                     }}
                     fontSize={"1.8rem"}
@@ -621,6 +584,7 @@ const AddCommentModal = (props) => {
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
                   onClick={() => {
+                    setSelectCheckBox(true);
                     setTermsOfUseShow(!termsOfUseShow);
                   }}
                 >
@@ -637,6 +601,7 @@ const AddCommentModal = (props) => {
               <span className="mb-2">
                 <RxCross2
                   onClick={() => {
+                    setSelectCheckBox(false);
                     closeModal();
                     clearData();
                   }}

@@ -3,11 +3,55 @@ import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
+import config from "../../config";
 
 const WithdrawalModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const { bankDetails } = props;
+
+  const [withdrawalLoading, setWithdrawalLoading] = useState(false);
+  const handleWithdraw = async () => {
+    try {
+      setWithdrawalLoading(true);
+      const res = await axios.patch(`${config.apiUrl}/bank-details/${userId}`, {
+        bank_iban: bankDetails?.bank_iban,
+        withdrawable_amount: bankDetails?.withdrawable_balance,
+      });
+      console.log(res);
+      if (res?.status === 200) {
+        setWithdrawalLoading(false);
+        Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((res) => {
+          if (res?.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      if (error?.response?.status === 404) {
+        setWithdrawalLoading(false);
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -49,7 +93,7 @@ const WithdrawalModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    12.650
+                    {bankDetails?.total_balance}
                   </span>
                 </div>
                 <div className="col d-flex flex-column">
@@ -61,7 +105,7 @@ const WithdrawalModal = (props) => {
                         currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                     }}
                   >
-                    12.650
+                    {bankDetails?.pending_balance}
                   </span>
                 </div>
               </div>
@@ -80,15 +124,16 @@ const WithdrawalModal = (props) => {
               </div>
               <div className="text-center">
                 <div className="h5">Withdrawable Balance</div>
-                <div className="h5">8.000₺</div>
+                <div className="h5">{bankDetails?.withdrawable_balance}₺</div>
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button
+                  onClick={handleWithdraw}
                   className={`${
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
                 >
-                  Withdrawal
+                  {withdrawalLoading ? "Loading..." : "Withdrawal"}
                 </button>
               </div>
               <div className="mb-4 text-center">

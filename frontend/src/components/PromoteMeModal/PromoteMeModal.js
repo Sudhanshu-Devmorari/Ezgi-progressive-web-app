@@ -46,6 +46,7 @@ const PromoteMeModal = (props) => {
             <span className="mb-2">
               <RxCross2
                 onClick={() => {
+                  setSelectCheckBox(false);
                   props.onHide();
                   setShowModal(7);
                 }}
@@ -153,7 +154,7 @@ const PromoteMeModal = (props) => {
               </>
             )}
           </div>
-          {ShowModal === 3 && <TermsOfUse hide={props.onHide} />}
+          {ShowModal === 3 && <TermsOfUse hide={props.onHide} setSelectCheckBox={setSelectCheckBox}/>}
         </Modal.Body>
       </Modal>
 

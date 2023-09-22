@@ -579,7 +579,6 @@ const CommentsContentSection = (props) => {
                                   Subscribe
                                 </button>
                               )}
-                              {/* 10 dk önce */}
                               {formatTimeDifference(val?.created)}
                             </div>
                           </div>
@@ -1420,7 +1419,6 @@ const CommentsContentSection = (props) => {
                     </div>
                   </div>
                   <div className="ms-auto" style={{ fontSize: "12px" }}>
-                    {/* 10 dk önce */}
                     {formatTimeDifference(res?.created)}
                   </div>
                 </div>

@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 import Spinner from "react-bootstrap/esm/Spinner";
+import moment from "moment";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -212,7 +213,7 @@ const ProfileSU = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                22.05.2022
+                {moment(progileData?.created).format("DD.MM.YYYY")}
               </div>
             </div>
           </div>

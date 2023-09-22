@@ -28,6 +28,7 @@ import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.sv
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Spinner from "react-bootstrap/esm/Spinner";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
+import moment from "moment";
 
 const ActiveComments = (props) => {
   const { activeResolved, profileData, profileLoading } = props;
@@ -51,10 +52,6 @@ const ActiveComments = (props) => {
   const [user, setUser] = useState(null);
 
   const [commentatorUser, setCommentatorUser] = useState([]);
-  const [winningOrLoseData, setWinningOrLoseData] = useState({
-    win: "",
-    lose: "",
-  });
 
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
@@ -257,7 +254,7 @@ const ActiveComments = (props) => {
         backdrop: false,
         // customClass: "dark-mode-alert",
         customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
       console.error("Error fetching data.", error);
     }
@@ -377,6 +374,12 @@ const ActiveComments = (props) => {
           setPromoteModalShow(true);
         } else if (value === "bank update") {
           handleBankUpdate();
+        } else if (value === "edit profile") {
+          setEditProfile(!editProfile);
+          setDescriptionShow(editProfile);
+        } else if (value === "subscribe model") {
+          setCommentatorUser(profileData);
+          setSubscribeModalShow(true);
         }
       }
     } catch (error) {
@@ -550,7 +553,6 @@ const ActiveComments = (props) => {
                 className="blueTick-responsive align-items-center mt-1 responsive-username"
                 style={{ fontSize: "14px" }}
               >
-                {/* {profileData?.username} */}
                 {truncated}
                 {props.verifyid?.includes(profileData?.id) && (
                   <img
@@ -576,7 +578,7 @@ const ActiveComments = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                22.05.2022
+                {moment(profileData?.created).format("DD.MM.YYYY")}
               </div>
             </div>
           </div>
@@ -628,15 +630,14 @@ const ActiveComments = (props) => {
               {props.profile === "commentator" ? (
                 <button
                   onClick={() => {
-                    if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                    setEditProfile(!editProfile);
-                    setDescriptionShow(editProfile);
+                    // if (
+                    //       JSON.parse(localStorage.getItem("user-active")) ==
+                    //       false
+                    //     ) {
+                    //       errorSwal();
+                    //       return;
+                    //     }
+                    checkDeactivation("edit profile");
                   }}
                   style={{
                     border: editProfile
@@ -883,20 +884,14 @@ const ActiveComments = (props) => {
               {userId != profileData?.id && (
                 <button
                   onClick={() => {
-                    if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                    setWinningOrLoseData({
-                      ...winningOrLoseData,
-                      win: userPoints?.winning,
-                      lose: userPoints?.lose,
-                    });
-                    setCommentatorUser(profileData);
-                    setSubscribeModalShow(true);
+                    // if (
+                    //       JSON.parse(localStorage.getItem("user-active")) ==
+                    //       false
+                    //     ) {
+                    //       errorSwal();
+                    //       return;
+                    //     }
+                    checkDeactivation("subscribe model");
                   }}
                   className="ms-1 px-3 py-1"
                   style={{

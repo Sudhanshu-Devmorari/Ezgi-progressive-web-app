@@ -387,7 +387,7 @@ BANK_UPDATE_CHOISE = (
 class BankDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bank_iban = models.CharField(unique=True)
-    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE, default='pending')
+    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE, null=True, blank=True)
     total_balance = models.FloatField(null=True, blank=True)
     pending_balance = models.FloatField(null=True, blank=True)
     withdrawable_balance = models.FloatField(null=True, blank=True)

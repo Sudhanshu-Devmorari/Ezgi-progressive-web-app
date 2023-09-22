@@ -99,6 +99,7 @@ urlpatterns = [
     path('retrieve-commentator-list/', RetrieveEditorView.as_view(), name='Retrieve-Editor'),
     path('become-editor-faq/', BecomeEditorFAQView.as_view(), name='become-editor'),
     path('become-editor-faq/<int:id>', BecomeEditorFAQView.as_view(), name='become-editor'),
+    path('bank-details/', BankDetailsView.as_view(), name='bank-details'),
     path('bank-details/<int:id>', BankDetailsView.as_view(), name='bank-details'),
     path('check-deactivated-account/<int:id>', CheckDeactivatedAccount.as_view(), name='bank-details'),
     path('user-data/<int:id>', GetUserdata.as_view(), name='User-Data'),

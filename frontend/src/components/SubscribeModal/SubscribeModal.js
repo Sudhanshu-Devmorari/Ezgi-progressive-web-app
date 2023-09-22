@@ -17,6 +17,7 @@ import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import moment from "moment";
 
 const SubscribeModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
@@ -30,7 +31,6 @@ const SubscribeModal = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscription = async () => {
-    // if (props?.text !== "renew") {
     if (selectCheckBox && selectedPlan) {
       setValidationError("");
       const money =
@@ -90,13 +90,14 @@ const SubscribeModal = (props) => {
     } else {
       setValidationError("Please select a Plan or Checkbox");
     }
-    // }
   };
 
+  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState([]);
   useEffect(() => {
     async function getData() {
       try {
+        setIsSubscriptionLoading(true);
         const res = await axios.get(
           `${
             config?.apiUrl
@@ -105,6 +106,7 @@ const SubscribeModal = (props) => {
         if (res.status === 200) {
           const data = res?.data[0];
           setSubscriptionPlan(data);
+          setIsSubscriptionLoading(false);
         }
       } catch (error) {
         console.log(error);
@@ -186,7 +188,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      256
+                      {commentatorUser?.win}
                     </div>
                   </div>
                   <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">
@@ -207,7 +209,12 @@ const SubscribeModal = (props) => {
                         }}
                       />
                       <img
-                        src={profile}
+                        style={{ borderRadius: "50%", objectFit: "cover" }}
+                        src={
+                          commentatorUser?.profile_pic
+                            ? `${config.apiUrl}${commentatorUser.profile_pic}`
+                            : profile
+                        }
                         width={105}
                         height={105}
                         alt=""
@@ -219,8 +226,8 @@ const SubscribeModal = (props) => {
                       style={{ fontSize: "15px" }}
                     >
                       <span className="">{commentatorUser?.username}</span>
-                      <span className="">{commentatorUser?.city}/Turkey</span>
-                      <span className="">22.04.2022</span>
+                      <span className="">{commentatorUser?.city}</span>
+                      <span className="">{moment(commentatorUser?.created).format("DD.MM.YYYY")}</span>
                       <div className="">
                         {commentatorUser?.category?.some((categoryItem) =>
                           categoryItem.includes("Basketball")
@@ -274,12 +281,13 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      256
+                      {commentatorUser?.lose}
                     </div>
                   </div>
                 </div>
 
                 <PlanSelection
+                  isSubscriptionLoading={isSubscriptionLoading}
                   text={props?.text}
                   subscriptionPlan={subscriptionPlan}
                   setSelectedPlan={setSelectedPlan}
@@ -371,7 +379,12 @@ const SubscribeModal = (props) => {
               </>
             )}
           </div>
-          {ShowModal === 3 && <TermsOfUse hide={props.onHide} />}
+          {ShowModal === 3 && (
+            <TermsOfUse
+              hide={props.onHide}
+              setSelectCheckBox={setSelectCheckBox}
+            />
+          )}
         </Modal.Body>
       </Modal>
     </>

@@ -3,7 +3,7 @@ import SideBar from "../SideBar/SideBar";
 import NavBar from "../NavBar/NavBar";
 import { HiArrowSmUp } from "react-icons/hi";
 import profile from "../../assets/profile.png";
-import user1 from "../../assets/user1.png";
+import user1 from "../../assets/profile.png";
 import UserTimeLine from "../UserTimeLine/UserTimeLine";
 import "./WithdrawalManagementPage.css";
 import { MainDiv } from "../CommonBgRow";
@@ -19,7 +19,11 @@ import user3 from "../../assets/user3.png";
 import user4 from "../../assets/user4.png";
 import user5 from "../../assets/user5.png";
 import user6 from "../../assets/user6.png";
-import './WithdrawalManagementPage.css'
+import "./WithdrawalManagementPage.css";
+import axios from "axios";
+import config from "../../config";
+import { useEffect } from "react";
+import moment from "moment";
 
 const WithdrawalManagementPage = () => {
   const users = [
@@ -60,12 +64,9 @@ const WithdrawalManagementPage = () => {
       icon: circle_b,
     },
   ];
-  const rqstArray = [
-    { name: "New" },
-    { name: "Pending" },
-    { name: "Approved" },
-  ];
+
   const [Requests, setRequests] = useState(false);
+  const [withdrawalIndex, setWithdrawalIndex] = useState(null);
   const notification = [
     {
       profile_pic: user3,
@@ -122,6 +123,46 @@ const WithdrawalManagementPage = () => {
       status: "10 min ago",
     },
   ];
+
+  const [countsRequest, setCountsRequest] = useState({
+    bank_request: 0,
+    pending: 0,
+    approved: 0,
+    new: 0,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [UpdateRequest, setUpdateRequest] = useState([]);
+  async function getWithdrawData() {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(`${config.apiUrl}/bank-details/`);
+      if (res?.status === 200) {
+        const data = res?.data?.data;
+        setUpdateRequest(data?.bank_details);
+        setCountsRequest({
+          ...countsRequest,
+          bank_request: data?.bank_details?.length,
+          pending: data?.pending,
+          approved: data?.approved,
+          new: data?.new,
+        });
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getWithdrawData();
+  }, []);
+
+  const rqstArray = [
+    { name: "New", count: countsRequest?.new },
+    { name: "Pending", count: countsRequest.pending },
+    { name: "Approved", count: countsRequest.approved },
+  ];
+
   return (
     <>
       <div className="container-fluid">
@@ -161,7 +202,7 @@ const WithdrawalManagementPage = () => {
                               >
                                 {res.name}
                               </span>
-                              <span className="number">127</span>
+                              <span className="number">{res.count}</span>
                             </div>
                           </div>
                         ))}
@@ -207,7 +248,9 @@ const WithdrawalManagementPage = () => {
                       style={{ height: "25vh" }}
                     >
                       <span className="heading">Bank Update Requests</span>
-                      <span className="number">127</span>
+                      <span className="number">
+                        {countsRequest?.bank_request}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -216,36 +259,87 @@ const WithdrawalManagementPage = () => {
                   style={{ height: "64vh" }}
                 >
                   <WithdrawalRqstFilter />
-                  {users.map((res, index) => (
+
+                  {isLoading ? (
+                    <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                      Loading...
+                    </div>
+                  ) : UpdateRequest?.length === 0 ? (
+                    <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                      No Record Found!
+                    </div>
+                  ) : (
                     <>
-                      <MainDiv>
+                      {UpdateRequest?.map((res, index) => (
                         <>
-                          <div className="col-3 d-flex align-items-center">
-                            <span className="pe-2">{res.sr}</span>
-                            <img src={user1} alt="" height={45} width={45} />
-                            <span className="ps-2">{res.name}</span>
-                          </div>
-                          <div className="col-4 d-flex align-items-center justify-content-center">
-                            <div
-                              onClick={() => setRequests(!Requests)}
-                              className="cursor"
-                            >
-                              {res.acc}
-                            </div>
-                          </div>
-                          <div className="col-1 d-flex align-items-center justify-content-center">
-                            <div>3.500</div>
-                          </div>
-                          <div className="col-4 d-flex align-items-center justify-content-end gap-1 pe-2">
-                            <div>15-06-2023 - 16:37</div>
-                            <img src={res.icon} alt="" height={22} width={22} />
-                            <img src={eye} alt="" height={22} width={22} />
-                          </div>
+                          <MainDiv>
+                            <>
+                              <div className="col-3 d-flex align-items-center">
+                                <span className="pe-2">{res.sr}</span>
+                                <img
+                                  style={{
+                                    borderRadius: "50%",
+                                    objectFit: "cover",
+                                  }}
+                                  src={
+                                    res?.user?.profile_pic
+                                      ? `${config.apiUrl}${res?.user?.profile_pic}`
+                                      : user1
+                                  }
+                                  alt=""
+                                  height={45}
+                                  width={45}
+                                />
+                                <span className="ps-2">{res.name}</span>
+                              </div>
+                              <div className="col-4 d-flex align-items-center justify-content-center">
+                                <div>TR {res?.bank_iban}</div>
+                              </div>
+                              <div className="col-1 d-flex align-items-center justify-content-center">
+                                <div>{res?.withdrawable_balance}</div>
+                              </div>
+                              <div className="col-4 d-flex align-items-center justify-content-end gap-1 pe-2">
+                                <div>
+                                  {moment(res?.created).format(
+                                    "DD-MM-YYYY - HH:mm"
+                                  )}
+                                </div>
+                                <img
+                                  src={
+                                    (res?.status === "pending" && circle_y) ||
+                                    (res?.status === "approve" && circle_y) ||
+                                    (res?.status === "reject" && circle_x)
+                                  }
+                                  alt=""
+                                  height={22}
+                                  width={22}
+                                />
+                                <img
+                                  onClick={() => {
+                                    setWithdrawalIndex(index);
+                                    setRequests(!Requests);
+                                  }}
+                                  className="cursor"
+                                  src={eye}
+                                  alt=""
+                                  height={22}
+                                  width={22}
+                                />
+                              </div>
+                            </>
+                          </MainDiv>
+                          {Requests && index === withdrawalIndex && (
+                            <VerificationRequestsBtns
+                              status={res?.status}
+                              from={"withdrawal"}
+                              id={res?.id}
+                              getWithdrawData={getWithdrawData}
+                            />
+                          )}
                         </>
-                      </MainDiv>
-                      {Requests && <VerificationRequestsBtns />}
+                      ))}
                     </>
-                  ))}
+                  )}
                 </div>
               </div>
               <div className="col-4">

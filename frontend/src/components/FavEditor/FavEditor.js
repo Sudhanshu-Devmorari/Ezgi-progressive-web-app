@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import crown from "../../assets/crown.png";
 import CurrentTheme from "../../context/CurrentTheme";
 import blueTick from "../../assets/blueTick.png";
@@ -10,6 +10,7 @@ import config from "../../config";
 import axios from "axios";
 import { userId } from "../GetUser";
 import { useEffect } from "react";
+import initialProfile from "../../assets/profile.png";
 import Swal from "sweetalert2";
 
 const FavEditor = (props) => {
@@ -19,7 +20,6 @@ const FavEditor = (props) => {
   const [favEditorCommentsLike, setFavEditorCommentsLike] = React.useState([]);
 
   useEffect(() => {
-    // console.log("props?.favEditorData:::::::::::::", props?.favEditorData);
     setFavEditorCommentsLike(props?.favEditorData);
     setTimeout(() => {
       setIsLoading(false);
@@ -65,7 +65,22 @@ const FavEditor = (props) => {
       }
     } catch (error) {
       console.error("Error making POST request:", error);
-      if (error.response.status === 400) {
+    }
+  };
+  const [commentatorUser, setcommentatorUser] = useState([]);
+
+  // check activation
+  const checkDeactivation = async (value) => {
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/check-deactivated-account/${userId}`
+      );
+      if (res.status === 200) {
+        setcommentatorUser(value);
+        setModalShow(true);
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
         Swal.fire({
           title: "Error",
           text: error?.response?.data?.error,
@@ -153,7 +168,11 @@ const FavEditor = (props) => {
                       />
                     </div>
                     <img
-                      src={`${config?.apiUrl}${res?.data?.commentator_user?.profile_pic}`}
+                      src={
+                        res?.data?.commentator_user?.profile_pic
+                          ? `${config?.apiUrl}${res?.data?.commentator_user?.profile_pic}`
+                          : initialProfile
+                      }
                       width={75}
                       height={75}
                       alt=""
@@ -182,7 +201,7 @@ const FavEditor = (props) => {
                           {res?.data?.commentator_user?.username}
                         </span>
                         {props?.verifyid?.includes(
-                          res?.data?.commentator_user.id
+                          res?.data?.commentator_user?.id
                         ) && (
                           <img
                             className="responsive-blue-tick"
@@ -206,47 +225,58 @@ const FavEditor = (props) => {
                   </div>
                   <div className="col d-flex justify-content-end flex-column align-items-end me-3">
                     <div className="mt-1">
-                      <img
-                        src={football}
-                        alt=""
-                        height={38}
-                        width={38}
-                        style={{ color: "#00C936" }}
-                      />
-                      <img
-                        src={basketball}
-                        alt=""
-                        height={38}
-                        width={38}
-                        style={{ color: "#FF9100" }}
-                      />
+                      {res?.data?.commentator_user?.category.includes(
+                        "Football"
+                      ) ||
+                        (res?.data?.commentator_user?.category.includes(
+                          "Futbol"
+                        ) && (
+                          <img
+                            src={football}
+                            alt=""
+                            height={38}
+                            width={38}
+                            style={{ color: "#00C936" }}
+                          />
+                        ))}
+                      {res?.data?.commentator_user?.category.includes(
+                        "Basketball"
+                      ) ||
+                        (res?.data?.commentator_user?.category.includes(
+                          "Basketbol"
+                        ) && (
+                          <img
+                            src={basketball}
+                            alt=""
+                            height={38}
+                            width={38}
+                            style={{ color: "#FF9100" }}
+                          />
+                        ))}
                     </div>
-                    <div className="" style={{ fontSize: "12px" }}>
-                      <button
-                        onClick={() => {
-                          if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                          setModalShow(true)}}
-                        className="my-2 px-2 py-1"
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #37FF80"
-                              : "1px solid #00659D",
-                          color:
-                            currentTheme === "dark" ? "#37FF80" : "#00659D",
-                          backgroundColor: "transparent",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        Subscribe
-                      </button>
-                    </div>
+                    {res?.data?.commentator_user?.commentator_level !==
+                      "apprentice" && (
+                      <div className="" style={{ fontSize: "12px" }}>
+                        <button
+                          onClick={() => {
+                            checkDeactivation(res?.data?.commentator_user);
+                          }}
+                          className="my-2 px-2 py-1"
+                          style={{
+                            border:
+                              currentTheme === "dark"
+                                ? "1px solid #37FF80"
+                                : "1px solid #00659D",
+                            color:
+                              currentTheme === "dark" ? "#37FF80" : "#00659D",
+                            backgroundColor: "transparent",
+                            borderRadius: "3px",
+                          }}
+                        >
+                          Subscribe
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -254,7 +284,11 @@ const FavEditor = (props) => {
         </>
       )}
 
-      <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
+      <SubscribeModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        commentatorUser={commentatorUser}
+      />
     </>
   );
 };

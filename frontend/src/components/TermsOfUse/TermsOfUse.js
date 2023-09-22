@@ -3,7 +3,8 @@ import { RxCross2 } from "react-icons/rx";
 import CurrentTheme from "../../context/CurrentTheme";
 
 const TermsOfUse = (props) => {
-  const { currentTheme, setCurrentTheme, ShowModal, setShowModal } = useContext(CurrentTheme);
+  const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
+    useContext(CurrentTheme);
   return (
     <>
       <div
@@ -88,6 +89,9 @@ const TermsOfUse = (props) => {
               currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
             } px-3 py-1`}
             onClick={() => {
+              if (props?.setSelectCheckBox) {
+                props?.setSelectCheckBox(true);
+              }
               setShowModal(2);
             }}
           >

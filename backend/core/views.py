@@ -885,8 +885,14 @@ class ProfileView(APIView):
                 subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=user_obj).count()
-                data['Comment_Count'] = comment_obj
+                comment_obj = Comments.objects.filter(commentator_user=user_obj)
+                data['Comment_Count'] = comment_obj.count()
+
+                win_count = comment_obj.filter(is_prediction=True).count()
+                lose_count = comment_obj.filter(is_prediction=False).count()
+                data['win'] = win_count
+                data['lose'] = lose_count
+
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
                 data['Subscription_Count'] = subscription_obj
@@ -1019,6 +1025,11 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
                 # FavEditor data
                 serializer = FavEditorsSerializer(obj)
+                data_c = Comments.objects.filter(commentator_user=obj.commentator_user).only('id','is_prediction')
+                win_count = data_c.filter(is_prediction=True).count()
+                lose_count = data_c.filter(is_prediction=False).count()
+                serializer.data['commentator_user']['win'] = win_count
+                serializer.data['commentator_user']['lose'] = lose_count
                 data = serializer.data
                 details['data'] = data
                 
@@ -1036,7 +1047,12 @@ class RetrieveFavEditorsAndFavComment(APIView):
             comment_obj = CommentReaction.objects.filter(user_id=id, favorite=1)
             details = []
             for obj in comment_obj:
+                data_c = Comments.objects.filter(commentator_user=obj.user).only('id','is_prediction')
+                win_count = data_c.filter(is_prediction=True).count()
+                lose_count = data_c.filter(is_prediction=False).count()
                 comment_data = CommentsSerializer(obj.comment).data
+                comment_data['commentator_user']['win'] = win_count
+                comment_data['commentator_user']['lose'] = lose_count
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
 
                 comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
@@ -4402,12 +4418,19 @@ class RetrievePageData():
         try:
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
+            print('standard_user_id: ', standard_user_id)
 
             # Get data
             all_highlights = Highlight.objects.filter(status='active').order_by('-created').only('id')
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
                 user_data = highlighted_data['user'] 
+
+                data = Comments.objects.filter(commentator_user=obj.user).only('id','is_prediction')
+                win_count = data.filter(is_prediction=True).count()
+                lose_count = data.filter(is_prediction=False).count()
+                highlighted_data['user'] ['win'] = win_count
+                highlighted_data['user'] ['lose'] = lose_count
 
                 count = Subscription.objects.filter(commentator_user=user_data['id']).count()
                 highlighted_data['subscriber_count'] = count
@@ -4651,21 +4674,16 @@ class BankDetailsView(APIView):
                 queryset = BankDetails.objects.all().order_by('-created')
                 bank_details_serializer = BankDetailsSerializer(queryset, many=True).data
 
-                # Get counts for each status value
-                bank_update_request_count = (
-                    BankDetails.objects.values('status')
-                    .annotate(status_count=Count('status'))
-                )
-
                 # Get counts for specific statuses
-                pending = bank_update_request_count.get(status='pending')['status_count']
-                approved = bank_update_request_count.get(status='approve')['status_count']
+                pending = BankDetails.objects.filter(status='pending').count()
+                approved = BankDetails.objects.filter(status='approve').count()
+                new = BankDetails.objects.filter(status='pending',created__date=datetime.today()).count()
 
                 data.update({
                     'bank_details': bank_details_serializer,
-                    'bank_update_request_count': bank_update_request_count,
                     'pending': pending,
                     'approved': approved,
+                    'new': new,
                 })
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -4691,6 +4709,10 @@ class BankDetailsView(APIView):
                     bank_details.save(update_fields=['bank_iban', 'updated'])
                     return Response({'data': 'Bank Iban has been updated successfully'}, status=status.HTTP_200_OK)
                 else:
+                    bank_details.total_balance = 12.650
+                    bank_details.pending_balance = 12.650
+                    bank_details.withdrawable_balance = 8.000
+                    bank_details.save(update_fields=['total_balance', 'pending_balance', 'withdrawable_balance', 'updated'])
                     return Response({'data': 'Bank Iban has been created successfully'}, status=status.HTTP_201_CREATED)
 
         except User.DoesNotExist:
@@ -4698,23 +4720,46 @@ class BankDetailsView(APIView):
     
     def patch(self, request, id):
         try:
-            try:
-                user = User.objects.get(id=id)  
-                action = request.data['action', None]
-                bank_id = request.data['bank_id', None]
-                if action and bank_id is not None:
+            user = User.objects.get(id=id) 
+            is_admin = user.is_admin
+
+            if is_admin:
+                action = request.data['action'] if 'action' in request.data else None
+                print('action: ', action)
+                bank_id = request.data['bank_id'] if 'bank_id' in request.data else None
+                print('bank_id: ', bank_id)
+                if action is not None and bank_id is not None:
                     try:
                         query = BankDetails.objects.get(id=bank_id,user=user) 
-                        query.update('action', action)
-                        return Response({'data' : 'Update Bank request successfully updated.'}, status=status.HTTP_200_OK)
+                        query.status = action
+                        query.save(update_fields=['status', 'updated'])
+                        return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
                         return Response({'error' : 'Bank details doen not exist'}, status=status.HTTP_404_NOT_FOUND) 
                 else:
                     return Response({'error' : 'Something went wrong'}, status=status.HTTP_404_NOT_FOUND)
-            except User.DoesNotExist:
-                return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)     
-        except Exception as e:
-            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)     
+            else:
+
+                withdrawable_amount = request.data['withdrawable_amount'] if 'withdrawable_amount' in request.data else None
+                print('withdrawable_amount: ', withdrawable_amount)
+                bank_iban = request.data['bank_iban'] if 'bank_iban' in request.data else None
+                print('bank_iban: ', bank_iban)
+
+                print('withdrawable_amount is not None and bank_iban is not None: ', withdrawable_amount is not None and bank_iban is not None)
+                if withdrawable_amount is not None and bank_iban is not None:
+                    query = BankDetails.objects.get(user=user,bank_iban=bank_iban)
+                    print('query.status: ', query.status)
+                    if query.status == None:
+                        query.status = 'pending'
+                        query.save(update_fields=['status','updated'])
+                        return Response({'data': 'Your withdrawal request has been successfully submitted!'}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({'data': 'Your withdrawal request is currently in progress. Please await the first response before generating another request.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error' : 'Failed to process withdrawal request. Please try again later.'}, status=status.HTTP_404_NOT_FOUND) 
+
+        except User.DoesNotExist:
+            return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)     
 
 class CheckDeactivatedAccount(APIView):
     def get(self, request, id):
@@ -4735,7 +4780,12 @@ class GetUserdata(APIView):
         try:
             try:
                 user = User.objects.get(id=id) 
+                data = Comments.objects.filter(commentator_user=user).only('id','is_prediction')
+                win_count = data.filter(is_prediction=True).count()
+                lose_count = data.filter(is_prediction=False).count()
                 serializer = UserSerializer(user).data
+                serializer['win'] = win_count
+                serializer['lose'] = lose_count
                 return Response({'data' : serializer}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)

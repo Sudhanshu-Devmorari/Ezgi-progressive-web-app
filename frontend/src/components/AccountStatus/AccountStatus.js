@@ -145,7 +145,6 @@ const AccountStatus = () => {
   };
 
   useEffect(() => {
-    console.log("===>>selectSub", selectSub);
     selectSub && fetchSubscriptionData();
   }, [selectSub]);
 

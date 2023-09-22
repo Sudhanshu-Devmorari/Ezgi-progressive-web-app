@@ -115,15 +115,16 @@ const FavComments = (props) => {
       }
     } catch (error) {
       console.error("Error fetching data.", error);
-      Swal.fire({
-        title: "Error",
-        text: `${error.response.data}`,
-        icon: "error",
-        backdrop: false,
-        // customClass: "dark-mode-alert",
-        customClass:
-          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-      });
+      if (error?.response?.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: `${error.response.data}`,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
@@ -214,6 +215,31 @@ const FavComments = (props) => {
   };
 
   const [modalShow, setModalShow] = React.useState(false);
+  const [commentatorUser, setcommentatorUser] = useState([]);
+
+  // check activation
+  const checkDeactivation = async (value) => {
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/check-deactivated-account/${userId}`
+      );
+      if (res.status === 200) {
+        setcommentatorUser(value);
+        setModalShow(true);
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -399,7 +425,7 @@ const FavComments = (props) => {
                       style={{ width: "140px" }}
                     >
                       <span className="w-100">
-                        {res?.match_detail.split(" - ")[0]}
+                        {res?.match_detail?.split(" - ")[0]}
                       </span>
                     </span>
                     <div
@@ -610,35 +636,34 @@ const FavComments = (props) => {
                     </div>
                   </div>
                   <div className="ms-auto" style={{ fontSize: "12px" }}>
-                    {userId != res?.commentator_user?.id && (
-                      <button
-                        onClick={() => {
-                          if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                          setModalShow(true)}}
-                        className="me-2 px-2 py-1"
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #37FF80"
-                              : "1px solid #00659D",
-                          color:
-                            currentTheme === "dark" ? "#37FF80" : "#00659D",
-                          backgroundColor: "transparent",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        Subscribe
-                      </button>
+                    {res?.commentator_user?.commentator_level !==
+                      "apprentice" && (
+                      <>
+                        {userId != res?.commentator_user?.id && (
+                          <button
+                            onClick={() => {
+                              checkDeactivation(res?.commentator_user);
+                            }}
+                            className="me-2 px-2 py-1"
+                            style={{
+                              border:
+                                currentTheme === "dark"
+                                  ? "1px solid #37FF80"
+                                  : "1px solid #00659D",
+                              color:
+                                currentTheme === "dark" ? "#37FF80" : "#00659D",
+                              backgroundColor: "transparent",
+                              borderRadius: "3px",
+                            }}
+                          >
+                            Subscribe
+                          </button>
+                        )}
+                      </>
                     )}
-
-                    <span style={{ fontSize: "11px" }}>{formatTimeDifference(res?.created)}</span>
-                    {/* <span style={{ fontSize: "11px" }}>10 dk önce</span> */}
+                    <span style={{ fontSize: "11px" }}>
+                      {formatTimeDifference(res?.created)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -646,7 +671,11 @@ const FavComments = (props) => {
           );
         })
       )}
-      <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
+      <SubscribeModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        commentatorUser={commentatorUser}
+      />
     </>
   );
 };

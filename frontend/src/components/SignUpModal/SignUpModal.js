@@ -348,6 +348,7 @@ const SignUpModal = (props) => {
                   <span>
                     <RxCross2
                       onClick={() => {
+                        setSelectCheckBox(false);
                         props.onHide();
                         formik.resetForm();
                       }}
@@ -724,7 +725,7 @@ const SignUpModal = (props) => {
             </div>
           )}
 
-          {ShowModal === 3 && <TermsOfUse hide={props.onHide} />}
+          {ShowModal === 3 && <TermsOfUse hide={props.onHide} setSelectCheckBox={setSelectCheckBox}/>}
 
           {ShowModal === 4 && <SignInModal hide={props.onHide} />}
 

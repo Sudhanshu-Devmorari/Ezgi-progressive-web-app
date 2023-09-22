@@ -10,34 +10,69 @@ const VerificationRequestsBtns = (props) => {
   const [isLoadingApprove, setIsLoadingApprove] = useState(false);
 
   const handleApproveOrReject = async (action) => {
-    try {
-      if (action === "approve") {
-        setIsLoadingApprove(true);
-      } else {
-        setIsLoading(true);
-      }
-      const res = await axios.post(`${config.apiUrl}/verify-user/${id}/`, {
-        status: action,
-      });
-      if (res.status === 200) {
+    if (props?.from === "withdrawal") {
+      try {
         if (action === "approve") {
-          setIsLoadingApprove(false);
+          setIsLoadingApprove(true);
         } else {
-          setIsLoading(false);
+          setIsLoading(true);
         }
-        props?.editorManagementApiData();
-        Swal.fire({
-          title: "Success",
-          text:
-            (action === "approve" && "Request successfully approved.") ||
-            (action === "reject" && "Request successfully rejected."),
-          icon: "success",
-          backdrop: false,
-          customClass: "dark-mode-alert",
+        const adminId = localStorage.getItem('admin-user-id')
+        const res = await axios.post(`${config.apiUrl}/bank-details/${adminId}/`, {
+          id: id,
+          status: action,
         });
+        console.log(res,"=========>>res")
+        if (res.status === 200) {
+          if (action === "approve") {
+            setIsLoadingApprove(false);
+          } else {
+            setIsLoading(false);
+          }
+          props?.getWithdrawData();
+          Swal.fire({
+            title: "Success",
+            text:
+              (action === "approve" && "Request successfully approved.") ||
+              (action === "reject" && "Request successfully rejected."),
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      try {
+        if (action === "approve") {
+          setIsLoadingApprove(true);
+        } else {
+          setIsLoading(true);
+        }
+        const res = await axios.post(`${config.apiUrl}/verify-user/${id}/`, {
+          status: action,
+        });
+        if (res.status === 200) {
+          if (action === "approve") {
+            setIsLoadingApprove(false);
+          } else {
+            setIsLoading(false);
+          }
+          props?.editorManagementApiData();
+          Swal.fire({
+            title: "Success",
+            text:
+              (action === "approve" && "Request successfully approved.") ||
+              (action === "reject" && "Request successfully rejected."),
+            icon: "success",
+            backdrop: false,
+            customClass: "dark-mode-alert",
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

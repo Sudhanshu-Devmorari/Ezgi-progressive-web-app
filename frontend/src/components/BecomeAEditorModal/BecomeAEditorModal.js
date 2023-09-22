@@ -59,7 +59,6 @@ const BecomeAEditorModal = (props) => {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    console.log("profileData:::::::::::::", profileData);
     profileData && setPreveiwProfilePic(`${config.apiUrl}${profileData}`);
   }, [profileData]);
 
@@ -115,7 +114,6 @@ const BecomeAEditorModal = (props) => {
         axios
           .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
           .then(async (res) => {
-            // console.log(res, "===========>>>>res");
             if (res.status === 200) {
               // setShowPaymentModal(true);
               localStorage.setItem("user-role", res.data.user_role);
@@ -182,6 +180,7 @@ const BecomeAEditorModal = (props) => {
             <>
               <RxCross2
                 onClick={() => {
+                  setSelectCheckBox(false);
                   props.onHide();
                 }}
                 fontSize={"1.5rem"}
@@ -191,8 +190,6 @@ const BecomeAEditorModal = (props) => {
                 style={{ zIndex: 1 }}
               />
               <form onSubmit={handleSubmit}>
-                {/* <span> */}
-                {/* </span> */}
                 <div className="position-relative d-flex justify-content-center align-items-center">
                   <img
                     src={
@@ -411,6 +408,7 @@ const BecomeAEditorModal = (props) => {
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
                     onClick={() => {
+                      setSelectCheckBox(true);
                       setShowTermsOfUse(1);
                     }}
                   >

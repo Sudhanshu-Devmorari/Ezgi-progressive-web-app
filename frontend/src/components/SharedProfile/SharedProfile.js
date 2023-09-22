@@ -42,19 +42,6 @@ const SharedProfile = (props) => {
   const server_url = `${config.apiUrl}`;
   const [commentatorUser, setCommentatorUser] = useState([]);
 
-  const errorSwal = () => {
-    // console.log(localStorage.getItem("user-active"))
-
-    Swal.fire({
-      title: "Error",
-      text: `Your account has been deactivated. Contact support for assistance.`,
-      icon: "error",
-      backdrop: false,
-      customClass:
-        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-    });
-  };
-
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
     { name: "adnankeser", rate: "%67.5" },
@@ -135,6 +122,30 @@ const SharedProfile = (props) => {
     } catch (error) {
       console.error("Error making POST request:", error);
       if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
+
+  // check activation
+  const checkDeactivation = async (value) => {
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/check-deactivated-account/${userId}`
+      );
+      if (res.status === 200) {
+        setCommentatorUser(data?.value?.user);
+        setShowModal(true);
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
         Swal.fire({
           title: "Error",
           text: error?.response?.data?.error,
@@ -331,14 +342,7 @@ const SharedProfile = (props) => {
               <div className="" style={{ fontSize: "12px" }}>
                 <button
                   onClick={() => {
-                    if (
-                      JSON.parse(localStorage.getItem("user-active")) == false
-                    ) {
-                      errorSwal();
-                      return;
-                    }
-                    setCommentatorUser(data?.value?.user);
-                    setShowModal(true);
+                    checkDeactivation();
                   }}
                   className="my-2 px-2 py-1"
                   style={{

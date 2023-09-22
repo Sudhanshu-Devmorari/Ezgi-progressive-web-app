@@ -132,7 +132,6 @@ const ContentSection = ({
         text: `${error.response.data}`,
         icon: "error",
         backdrop: false,
-        // customClass: "dark-mode-alert",
         customClass:
           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
@@ -261,23 +260,30 @@ const ContentSection = ({
     }
   };
 
-  // const truncated = truncateString("Hello D", 6);
   const truncated = truncateString(data?.value?.league, 6);
 
-  // function formatTimeDifference(timestamp) {
-  //   const now = moment();
-  //   const diff = moment(timestamp);
-
-  //   if (now.diff(diff, 'years') >= 1) {
-  //     return diff.fromNow();
-  //   } else if (now.diff(diff, 'months') >= 1) {
-  //     return diff.fromNow();
-  //   } else if (now.diff(diff, 'days') >= 1) {
-  //     return diff.fromNow();
-  //   } else {
-  //     return diff.fromNow();
-  //   }
-  // }
+  // check activation
+  const checkDeactivation = async (value) => {
+    try {
+      const res = await axios.get(
+        `${config.apiUrl}/check-deactivated-account/${userId}`
+      );
+      if (res.status === 200) {
+        setModalShow(true);
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -804,56 +810,35 @@ const ContentSection = ({
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
                 {(selectContent === "for you" ||
-                  selectContent === "comments") &&
-                  (userPhone ? (
-                    <button
-                      onClick={() => {
-                        if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                        // setSelectContent("show-all-comments");
-                        setModalShow(true);
-                      }}
-                      className="me-2 px-2 py-1"
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #37FF80"
-                            : "1px solid #00659D",
-                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                        backgroundColor: "transparent",
-                        borderRadius: "3px",
-                      }}
-                    >
-                      Subscribe
-                    </button>
-                  ) : (
-                    <button
-                      // onClick={() => setSelectContent("show-all-comments")}
-                      onClick={() => setModalShow(true)}
-                      className="me-2 px-2 py-1"
-                      style={{
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid #37FF80"
-                            : "1px solid #00659D",
-                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                        backgroundColor: "transparent",
-                        borderRadius: "3px",
-                      }}
-                    >
-                      Subscribe
-                    </button>
-                  ))}
-                <span style={{ fontSize: "11px" }}>
-                  {formatTimeDifference(data?.value?.created)}
-                </span>
-                {/* <span style={{ fontSize: "11px" }}>{data?.value?.created} dk önce</span> */}
+                  selectContent === "comments") && (
+                  <>
+                    {data?.value?.commentator_user?.commentator_level !==
+                      "apprentice" && (
+                      <button
+                        onClick={() => {
+                          checkDeactivation();
+                        }}
+                        className="me-2 px-2 py-1"
+                        style={{
+                          border:
+                            currentTheme === "dark"
+                              ? "1px solid #37FF80"
+                              : "1px solid #00659D",
+                          color:
+                            currentTheme === "dark" ? "#37FF80" : "#00659D",
+                          backgroundColor: "transparent",
+                          borderRadius: "3px",
+                        }}
+                      >
+                        Subscribe
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
+              <span style={{ fontSize: "11px" }}>
+                {formatTimeDifference(data?.value?.created)}
+              </span>
             </div>
           </div>
         </div>

@@ -34,11 +34,10 @@ const MainPage = () => {
   );
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
-  console.log("dashboardShow", typeof dashboardShow);
+  
   const [dashboardSUser, setDashboardSUser] = useState(
     dashboardShow == "true" ? true : false || false
   );
-  // console.log("--------", dashboardSUser)
 
   const themeMode = localStorage.getItem("CurrentTheme");
   const [publicSelected, setPublicSelected] = useState(false);
@@ -101,9 +100,6 @@ const MainPage = () => {
         );
         setLeftCornerAds(leftCornerAdsFilter);
         setRightCornerAds(rightCornerAdsFilter);
-
-        console.log("res?.data?.verify_ids:::::::::::::", res?.data?.verify_ids)
-
         setVerifyid(res?.data?.verify_ids);
         setFollowingList(res?.data?.following_user);
         setFollowingId(res?.data?.following_user?.map((item) => item?.id));
