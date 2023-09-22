@@ -65,12 +65,26 @@ const ContentSection = ({
   contentData,
   subscriptionResult,
   setSubscriptionResult,
+  setDashboardSUser
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const userPhone = localStorage.getItem("user-id");
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
+
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
 
   const followCommentator = async (commentator_id, isFollowing) => {
     try {
@@ -120,7 +134,7 @@ const ContentSection = ({
         backdrop: false,
         // customClass: "dark-mode-alert",
         customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
     }
   };
@@ -253,7 +267,7 @@ const ContentSection = ({
   // function formatTimeDifference(timestamp) {
   //   const now = moment();
   //   const diff = moment(timestamp);
-  
+
   //   if (now.diff(diff, 'years') >= 1) {
   //     return diff.fromNow();
   //   } else if (now.diff(diff, 'months') >= 1) {
@@ -278,7 +292,21 @@ const ContentSection = ({
             <div
               className="position-relative col p-0"
               onClick={() => {
+                console.log("^^^^^^userId ", userId)
+                console.log("^^^^^^data?.value?.commentator_user?.id ", data?.value?.commentator_user?.id)
                 if (userId) {
+                  if(userId==data?.value?.commentator_user?.id){
+                    setDashboardSUser(true);
+                  const currentPage = localStorage.getItem("currentpage");
+                  localStorage.setItem("dashboardShow", true);
+                  (currentPage !== "show-all-comments" ||
+                    currentPage !== "notifications") &&
+                    localStorage.setItem("priviouspage", currentPage);
+                  localStorage.setItem("currentpage", "show-all-comments");
+                  localStorage.setItem("subcurrentpage", "home");
+                  setSelectContent("show-all-comments");
+                  }else{
+
                   const currentPage = localStorage.getItem("currentpage");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
@@ -288,6 +316,7 @@ const ContentSection = ({
                   localStorage.setItem("subcurrentpage", "home");
                   setSelectContent("show-all-comments");
                   setActiveCommentsshow(data?.value?.commentator_user?.id);
+                  }
                 } else {
                   Swal.fire({
                     // title: "Success",
@@ -315,7 +344,10 @@ const ContentSection = ({
                   position: "absolute",
                 }}
               />
-              <div className="col">
+              <div
+                className="col"
+                style={{ display: "flex", alignItems: "center" }}
+              >
                 <img
                   src={`${
                     data?.value?.commentator_user?.profile_pic
@@ -335,7 +367,6 @@ const ContentSection = ({
                 {verifyid?.includes(data?.value?.commentator_user?.id) && (
                   <img src={blueTick} alt="" width={16} height={16} />
                 )}
-                
               </div>
             </div>
             <div className="col p-0">
@@ -772,48 +803,55 @@ const ContentSection = ({
                 )}
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
-                {selectContent === "for you" ||
-                  (selectContent === "comments" &&
-                    (userPhone ? (
-                      <button
-                        onClick={() => {
-                          // setSelectContent("show-all-comments");
-                          setModalShow(true);
-                        }}
-                        className="me-2 px-2 py-1"
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #37FF80"
-                              : "1px solid #00659D",
-                          color:
-                            currentTheme === "dark" ? "#37FF80" : "#00659D",
-                          backgroundColor: "transparent",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        Subscribe
-                      </button>
-                    ) : (
-                      <button
-                        // onClick={() => setSelectContent("show-all-comments")}
-                        onClick={() => setModalShow(true)}
-                        className="me-2 px-2 py-1"
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #37FF80"
-                              : "1px solid #00659D",
-                          color:
-                            currentTheme === "dark" ? "#37FF80" : "#00659D",
-                          backgroundColor: "transparent",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        Subscribe
-                      </button>
-                    )))}
-                <span style={{ fontSize: "11px" }}>{formatTimeDifference(data?.value?.created)}</span>
+                {(selectContent === "for you" ||
+                  selectContent === "comments") &&
+                  (userPhone ? (
+                    <button
+                      onClick={() => {
+                        if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                        // setSelectContent("show-all-comments");
+                        setModalShow(true);
+                      }}
+                      className="me-2 px-2 py-1"
+                      style={{
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid #37FF80"
+                            : "1px solid #00659D",
+                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                        backgroundColor: "transparent",
+                        borderRadius: "3px",
+                      }}
+                    >
+                      Subscribe
+                    </button>
+                  ) : (
+                    <button
+                      // onClick={() => setSelectContent("show-all-comments")}
+                      onClick={() => setModalShow(true)}
+                      className="me-2 px-2 py-1"
+                      style={{
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid #37FF80"
+                            : "1px solid #00659D",
+                        color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                        backgroundColor: "transparent",
+                        borderRadius: "3px",
+                      }}
+                    >
+                      Subscribe
+                    </button>
+                  ))}
+                <span style={{ fontSize: "11px" }}>
+                  {formatTimeDifference(data?.value?.created)}
+                </span>
                 {/* <span style={{ fontSize: "11px" }}>{data?.value?.created} dk önce</span> */}
               </div>
             </div>

@@ -25,6 +25,7 @@ const CommentsPage = ({
   setCmtReact,
   mergeArrays,
   handleOnlyPublicData,
+  setDashboardSUser,
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   const [filterCommentData, setFilterCommentData] = useState(null);
@@ -213,6 +214,7 @@ const CommentsPage = ({
                     setPublicComments={setPublicComments}
                     mergeArrays={mergeArrays}
                     setCmtReact={setCmtReact}
+                    setDashboardSUser={setDashboardSUser}
                   />
                 </>
               );
@@ -262,6 +264,7 @@ const CommentsPage = ({
                   setPublicComments={setPublicComments}
                   mergeArrays={mergeArrays}
                   setCmtReact={setCmtReact}
+                  setDashboardSUser={setDashboardSUser}
                 />
               </>
             );

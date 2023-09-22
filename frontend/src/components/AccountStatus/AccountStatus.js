@@ -25,8 +25,23 @@ const AccountStatus = () => {
   const [subLoading, setSubLoading] = React.useState(false);
   const [commentatorSubscriptionData, setCommentatorSubscriptionData] =
     React.useState({});
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
 
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
   const handleVerification = () => {
+    if (JSON.parse(localStorage.getItem("user-active")) == false) {
+      errorSwal();
+      return;
+    }
     axios
       .get(`${config?.apiUrl}/verify/${userId}`)
       .then((res) => {
@@ -35,7 +50,11 @@ const AccountStatus = () => {
       .catch((err) => {
         console.log(err);
         console.log(err.response);
-        if (err.response.status === 400 || err.response.status === 404 || err.response.status === 500) {
+        if (
+          err.response.status === 400 ||
+          err.response.status === 404 ||
+          err.response.status === 500
+        ) {
           Swal.fire({
             title: "Error",
             text: err.response.data.message,
@@ -577,7 +596,16 @@ const AccountStatus = () => {
                     </div>
                     <div className="d-flex justify-content-end m-2">
                       <button
-                        onClick={() => setModalShow(true)}
+                        onClick={() => {
+                          if (
+                            JSON.parse(localStorage.getItem("user-active")) ==
+                            false
+                          ) {
+                            errorSwal();
+                            return;
+                          }
+                          setModalShow(true);
+                        }}
                         className="px-3"
                         style={{
                           color:

@@ -128,6 +128,8 @@ const CommentatorsCommentsPage = (props) => {
             activeResolved={activeResolved}
             selectContent={props.selectContent}
             profileLoading={isLoading}
+            verifyid={props.verifyid}
+
           />
           <CommentatorIcons setContent={setContent} content={content} />
 

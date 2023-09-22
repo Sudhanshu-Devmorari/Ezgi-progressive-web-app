@@ -65,6 +65,19 @@ const FavComments = (props) => {
 
   const [followLabel, setFollowLabel] = useState("Follow");
 
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
+
   const followCommentator = async (commentator_id, isFollowing) => {
     try {
       if (isFollowing) {
@@ -102,6 +115,15 @@ const FavComments = (props) => {
       }
     } catch (error) {
       console.error("Error fetching data.", error);
+      Swal.fire({
+        title: "Error",
+        text: `${error.response.data}`,
+        icon: "error",
+        backdrop: false,
+        // customClass: "dark-mode-alert",
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      });
     }
   };
 
@@ -590,7 +612,15 @@ const FavComments = (props) => {
                   <div className="ms-auto" style={{ fontSize: "12px" }}>
                     {userId != res?.commentator_user?.id && (
                       <button
-                        onClick={() => setModalShow(true)}
+                        onClick={() => {
+                          if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                          setModalShow(true)}}
                         className="me-2 px-2 py-1"
                         style={{
                           border:

@@ -135,6 +135,18 @@ const ActiveComments = (props) => {
     }
   }
   const userPhone = localStorage.getItem("user-id");
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
 
   const [userPoints, setUserPoints] = useState({
     success_rate: "",
@@ -540,13 +552,15 @@ const ActiveComments = (props) => {
               >
                 {/* {profileData?.username} */}
                 {truncated}
-                <img
+                {props.verifyid?.includes(profileData?.id) && (
+                  <img
                   className="responsive-blue-tick"
                   src={blueTick}
                   alt=""
                   width={19}
                   height={19}
                 />
+                )}
               </div>
               <div
                 style={{
@@ -614,6 +628,13 @@ const ActiveComments = (props) => {
               {props.profile === "commentator" ? (
                 <button
                   onClick={() => {
+                    if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
                     setEditProfile(!editProfile);
                     setDescriptionShow(editProfile);
                   }}
@@ -862,6 +883,13 @@ const ActiveComments = (props) => {
               {userId != profileData?.id && (
                 <button
                   onClick={() => {
+                    if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
                     setWinningOrLoseData({
                       ...winningOrLoseData,
                       win: userPoints?.winning,

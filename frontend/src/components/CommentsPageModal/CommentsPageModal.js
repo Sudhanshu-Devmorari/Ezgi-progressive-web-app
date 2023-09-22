@@ -45,7 +45,8 @@ const CommentsPageModal = (props) => {
           date: dateData,
           filter_type: blueSelect,
           filter_type0: yellowSelect,
-          level:selectedLevel
+          level:selectedLevel,
+          mobile:'True'
         }
       );
       const editorData = response.data.map((item) => ({

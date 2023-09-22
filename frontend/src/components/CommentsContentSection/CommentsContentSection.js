@@ -220,7 +220,10 @@ const CommentsContentSection = (props) => {
                                 position: "absolute",
                               }}
                             />
-                            <div className="col">
+                            <div
+                              className="col"
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
                               <img
                                 src={`${
                                   server_url +
@@ -250,7 +253,25 @@ const CommentsContentSection = (props) => {
                             </div>
                           </div>
                           <div className="col p-0">
-                            <div className="d-flex justify-content-end pe-2">
+                            <div className="text-end mt-3 mb-2">
+                              <span
+                                className={`p-1 px-2`}
+                                style={{
+                                  backgroundColor:
+                                  val?.status === "approve"
+                                      ? "#00DE51"
+                                      : "rgb(195 168 0)",
+                                  color:
+                                  val?.status === "approve"
+                                      // ? "#0D2A53"
+                                      ? "#FFFFFF"
+                                      : "#FFFFFF",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {val?.status == 'approve' ? 'Published' : "Awaiting Approval"}
+                              </span>
+                            
                               <img
                                 src={`${
                                   currentTheme === "dark"

@@ -78,6 +78,7 @@ const CommentsManagement = (props) => {
         prediction_type: selectedPredictionType,
         filter_type: status,
         filter_type0: secondStatus,
+        mobile:'False'
       })
       .then((res) => {
         // console.log(res.data,"=====>>filter");
@@ -863,9 +864,9 @@ const CommentsManagement = (props) => {
                       className="pe-1"
                       style={{ borderRight: "2px solid #0B2447" }}
                     >
-                      FT - Home - 2.5 Over
+                      {currentData?.prediction_type}
                     </span>
-                    <span className="ps-1">2.40</span>
+                    <span className="ps-1">{currentData?.prediction}</span>
                   </span>
                 </div>
               </div>

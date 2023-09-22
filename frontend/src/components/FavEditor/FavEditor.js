@@ -10,6 +10,7 @@ import config from "../../config";
 import axios from "axios";
 import { userId } from "../GetUser";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 
 const FavEditor = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -24,6 +25,19 @@ const FavEditor = (props) => {
       setIsLoading(false);
     }, 500);
   }, [props?.favEditorData]);
+
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
 
   const onFavEditorSelect = async (id) => {
     const user_id = localStorage.getItem("user-id");
@@ -51,6 +65,16 @@ const FavEditor = (props) => {
       }
     } catch (error) {
       console.error("Error making POST request:", error);
+      if (error.response.status === 400) {
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.error,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
     }
   };
 
@@ -199,7 +223,15 @@ const FavEditor = (props) => {
                     </div>
                     <div className="" style={{ fontSize: "12px" }}>
                       <button
-                        onClick={() => setModalShow(true)}
+                        onClick={() => {
+                          if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                          setModalShow(true)}}
                         className="my-2 px-2 py-1"
                         style={{
                           border:

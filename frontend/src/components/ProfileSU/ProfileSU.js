@@ -20,6 +20,19 @@ const ProfileSU = (props) => {
   const [progileData, setProgileData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
+
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data, "===============?>>");
@@ -235,7 +248,15 @@ const ProfileSU = (props) => {
             </div>
             <div className="mt-2 d-flex justify-content-end">
               <button
-                onClick={() => setEditProfile(!editProfile)}
+                onClick={() => {
+                  if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                  setEditProfile(!editProfile)}}
                 className="edit-profile-btn"
                 style={{
                   border: editProfile

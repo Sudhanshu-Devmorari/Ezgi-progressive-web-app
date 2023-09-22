@@ -565,6 +565,7 @@ const MainPage = () => {
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
                               setCmtReact={setCmtReact}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -595,6 +596,7 @@ const MainPage = () => {
                               mergeArrays={mergeArrays}
                               setMergedEditorResult={setMergedEditorResult}
                               mergedEditorResult={mergedEditorResult}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -654,6 +656,7 @@ const MainPage = () => {
                               contentData={contentData}
                               subscriptionResult={subscriptionResult}
                               setSubscriptionResult={setSubscriptionResult}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -670,6 +673,7 @@ const MainPage = () => {
                               setData={setData}
                               setSelectContent={setSelectContent}
                               verifyid={verifyid}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -705,6 +709,7 @@ const MainPage = () => {
                               setData={setData}
                               setSelectContent={setSelectContent}
                               verifyid={verifyid}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -740,6 +745,7 @@ const MainPage = () => {
                               setPublicComments={setPublicComments}
                               mergeArrays={mergeArrays}
                               setCmtReact={setCmtReact}
+                              setDashboardSUser={setDashboardSUser}
                             />
                           </>
                         );
@@ -759,6 +765,7 @@ const MainPage = () => {
                   verifyid={verifyid}
                   highlights={highlights}
                   handleOnlyPublicData={handleOnlyPublicData}
+                  setDashboardSUser={setDashboardSUser}
                 />
               )}
               {selectContent === "comments" && (
@@ -783,6 +790,7 @@ const MainPage = () => {
                   mergedEditorResult={mergedEditorResult}
                   setMergedEditorResult={setMergedEditorResult}
                   handleOnlyPublicData={handleOnlyPublicData}
+                  setDashboardSUser={setDashboardSUser}
                 />
               )}
               {selectContent === "show-all-comments" && (

@@ -19,6 +19,7 @@ const EditorsPage = ({
   verifyid,
   highlights,
   handleOnlyPublicData,
+  setDashboardSUser
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,6 +163,7 @@ const EditorsPage = ({
                       verifyid={verifyid}
                       mergedEditorResult={mergedEditorResult}
                       setMergedEditorResult={setMergedEditorResult}
+                      setDashboardSUser={setDashboardSUser}
                     />
                   </React.Fragment>
                 );

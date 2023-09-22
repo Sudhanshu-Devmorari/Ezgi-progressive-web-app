@@ -1254,7 +1254,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_active_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=False).only('id').order_by('-created')
+            all_active_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=False).exclude(status='reject').only('id').order_by('-created')
             for obj in all_active_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -1904,6 +1904,7 @@ class CommentsManagement(APIView):
         if serializer.is_valid():
             try:
                 serializer.save()
+                
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1925,10 +1926,11 @@ class FilterComments(APIView):
                     filters['commentator_user__commentator_level'] = request.data.get('level').lower()
 
             if 'category' in request.data and request.data.get('category') != None and request.data.get('category') != "" and request.data.get('category') != "Select" and request.data.get('category')[0] != '':
-                if request.data.get('category') == "Futbol":
-                     filters['category__icontains'] = "Football"
-                if request.data.get('category') == "Basketbol":
-                     filters['category__icontains'] = "Basketball"
+                # if request.data.get('category') == "Futbol":
+                #      filters['category__icontains'] = "Football"
+                # if request.data.get('category') == "Basketbol":
+                #      filters['category__icontains'] = "Basketball"
+                filters['category__icontains'] = request.data.get('category')
 
             if 'country' in request.data  and request.data.get('country') != None and request.data.get('country') != "" and request.data.get('country') != "Select":
                 filters['country'] = request.data.get('country')
@@ -1950,6 +1952,9 @@ class FilterComments(APIView):
 
             if 'date' in request.data  and request.data.get('date') != None and request.data.get('date') != "" and request.data.get('date') != "Select":
                 filters['date'] = request.data.get('date')
+
+            if request.data.get("mobile") == 'True':
+                filters['status'] = 'approve'
 
             filter_type = request.data.get('filter_type')  # This will contain 'public_content', 'finished', 'winning'
             if filter_type in ('public_content', 'finished', 'winning', 'published'):
@@ -2204,7 +2209,7 @@ class FilterComments(APIView):
                         data_list.append(comment_data)
                     # data_list.append(data1)
                     # return Response(data=data1, status=status.HTTP_200_OK)
-            
+
             if filter_type == "" and filter_type0 == "":
 
                 query_filters = Q(**filters)
@@ -2235,7 +2240,7 @@ class FilterComments(APIView):
                 # serializer = CommentsSerializer(filtered_comments, many=True)
                 # data = serializer.data
                 # data_list.append(data)
-            
+            print("data", request.data)
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:

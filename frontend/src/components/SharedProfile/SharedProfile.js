@@ -32,6 +32,7 @@ const SharedProfile = (props) => {
     setHighlights,
     highlights,
     mergeArrays,
+    setDashboardSUser,
   } = props;
   const [highlightdata, setHighlightData] = useState([]);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -41,6 +42,18 @@ const SharedProfile = (props) => {
   const server_url = `${config.apiUrl}`;
   const [commentatorUser, setCommentatorUser] = useState([]);
 
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -91,7 +104,6 @@ const SharedProfile = (props) => {
       // console.log("API Response:", response.data);
 
       if (mergedEditorResult) {
-
         const filterArray = mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id
         );
@@ -189,15 +201,27 @@ const SharedProfile = (props) => {
             className="col pe-0 d-flex position-relative"
             onClick={() => {
               if (userId) {
-                const currentPage = localStorage.getItem("currentpage");
-                localStorage.setItem("dashboardShow", true);
-                (currentPage !== "show-all-comments" ||
-                  currentPage !== "notifications") &&
-                  localStorage.setItem("priviouspage", currentPage);
-                localStorage.setItem("currentpage", "show-all-comments");
-                localStorage.setItem("subcurrentpage", "home");
-                setSelectContent("show-all-comments");
-                setActiveCommentsshow(data?.value?.user?.id);
+                if (userId == data?.value?.user?.id) {
+                  setDashboardSUser(true);
+                  const currentPage = localStorage.getItem("currentpage");
+                  localStorage.setItem("dashboardShow", true);
+                  (currentPage !== "show-all-comments" ||
+                    currentPage !== "notifications") &&
+                    localStorage.setItem("priviouspage", currentPage);
+                  localStorage.setItem("currentpage", "show-all-comments");
+                  localStorage.setItem("subcurrentpage", "home");
+                  setSelectContent("show-all-comments");
+                } else {
+                  const currentPage = localStorage.getItem("currentpage");
+                  localStorage.setItem("dashboardShow", true);
+                  (currentPage !== "show-all-comments" ||
+                    currentPage !== "notifications") &&
+                    localStorage.setItem("priviouspage", currentPage);
+                  localStorage.setItem("currentpage", "show-all-comments");
+                  localStorage.setItem("subcurrentpage", "home");
+                  setSelectContent("show-all-comments");
+                  setActiveCommentsshow(data?.value?.user?.id);
+                }
               } else {
                 Swal.fire({
                   text: "You need to become a member to be able to view it.",
@@ -307,6 +331,12 @@ const SharedProfile = (props) => {
               <div className="" style={{ fontSize: "12px" }}>
                 <button
                   onClick={() => {
+                    if (
+                      JSON.parse(localStorage.getItem("user-active")) == false
+                    ) {
+                      errorSwal();
+                      return;
+                    }
                     setCommentatorUser(data?.value?.user);
                     setShowModal(true);
                   }}

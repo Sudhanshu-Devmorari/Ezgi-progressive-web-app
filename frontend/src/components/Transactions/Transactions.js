@@ -7,6 +7,7 @@ import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -19,6 +20,18 @@ const Transactions = () => {
     { name: "Las", color: "#0CC6FF", height: "4rem", darkcolor: "#0CC6FF" },
     { name: "Ara", color: "#FFFFFF", height: "4rem", darkcolor: "#0D2A53" },
   ];
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
 
   const [bankDetails, setBankDetails] = useState([]);
   async function getBankIban() {
@@ -131,7 +144,13 @@ const Transactions = () => {
           </span>
           {/* <span>TR00 2151 2532 0000 3315 1200 58</span> */}
           <button
-            onClick={() => setModalShow(true)}
+            onClick={() => {
+              if (JSON.parse(localStorage.getItem("user-active")) == false) {
+                errorSwal();
+                return;
+              }
+              setModalShow(true);
+            }}
             className="px-2"
             style={{
               backgroundColor: "transparent",

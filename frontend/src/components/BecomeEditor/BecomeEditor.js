@@ -4,11 +4,25 @@ import "./BecomeEditor.css";
 import landingPage from "../../assets/landingPage.png";
 import FAQEditor from "../FAQEditor/FAQEditor";
 import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
+import Swal from "sweetalert2";
 
 const BecomeEditor = ({ profileData }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const user_role = localStorage.getItem("user-role");
+  const errorSwal = () => {
+    // console.log(localStorage.getItem("user-active"))
+
+    Swal.fire({
+      title: "Error",
+      text: `Your account has been deactivated. Contact support for assistance.`,
+      icon: "error",
+      backdrop: false,
+      customClass:
+        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    });
+  };
+
   return (
     <>
       <div
@@ -46,7 +60,13 @@ const BecomeEditor = ({ profileData }) => {
           style={{ fontSize: "15px" }}
         >
           <button
-            onClick={() => setModalShow(true)}
+            onClick={() => {
+              if (JSON.parse(localStorage.getItem("user-active")) == false) {
+                errorSwal();
+                return;
+              }
+              setModalShow(true);
+            }}
             style={{
               border: "1px solid #00DE51",
               color: "#00DE51",
@@ -61,7 +81,11 @@ const BecomeEditor = ({ profileData }) => {
         </div>
       )}
       <FAQEditor />
-      <BecomeAEditorModal show={modalShow} onHide={() => setModalShow(false)} profileData={profileData}/>
+      <BecomeAEditorModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        profileData={profileData}
+      />
     </>
   );
 };
