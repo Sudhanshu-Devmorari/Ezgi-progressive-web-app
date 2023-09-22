@@ -31,7 +31,8 @@ import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import moment from "moment";
 
 const ActiveComments = (props) => {
-  const { activeResolved, profileData, profileLoading } = props;
+  const { activeResolved, profileData, profileLoading, setActiveCommentsshow } =
+    props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
   // const profileData = props?.profileData;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -55,10 +56,13 @@ const ActiveComments = (props) => {
 
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
+      console.log("if true:::::::::::::::");
       setUser(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
+      console.log("else if true::::::::::::::");
       setUser(userId);
     } else {
+      console.log("else true:::::::::::::::");
       const user = localStorage.getItem("user-id");
       setUser(user);
     }
@@ -182,6 +186,7 @@ const ActiveComments = (props) => {
   };
 
   useEffect(() => {
+    console.log("user::::::::::::::", user);
     if (user)
       try {
         axios
@@ -428,6 +433,8 @@ const ActiveComments = (props) => {
                 deshboardShow == "true" ? false : true || false
               );
               localStorage.setItem("dashboardShow", false);
+              localStorage.removeItem("activeCommentId");
+              setActiveCommentsshow && setActiveCommentsshow(null);
             }}
             fontSize={"1.6rem"}
           />

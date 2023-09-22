@@ -25,6 +25,7 @@ const CommentsPage = ({
   setCmtReact,
   mergeArrays,
   handleOnlyPublicData,
+  followingList,
   setDashboardSUser,
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
@@ -34,8 +35,9 @@ const CommentsPage = ({
   const [adsdata, setAdsdata] = useState([]);
 
   useEffect(() => {
-    setDisplayData(mergedResult);
-  }, [mergedResult]);
+    setDisplayData(publicSelected ? onlyPublicResult : mergedResult);
+    setFilterCommentData(publicSelected ? onlyPublicResult : mergedResult);
+  }, [mergedResult, publicSelected]);
 
   // ADS viewsssssssss-----------------
   const [adsId, setAdsId] = useState(null);
@@ -168,7 +170,7 @@ const CommentsPage = ({
   return (
     <>
       <SelectContentForEditorPage
-        data={mergedResult}
+        data={displayData}
         comments={true}
         setOnlyPublic={setOnlyPublic}
         setFilterCommentData={setFilterCommentData}
@@ -180,61 +182,58 @@ const CommentsPage = ({
       <div className="" id="banner1">
         <AdvertisementBanner data={adsdata} />
       </div>
-      {onlyPublic == "" &&
-      (filterCommentData == null ? displayData : filterCommentData)?.length ==
-        0 ? (
+      {onlyPublic == "" && filterCommentData?.length == 0 ? (
         <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
           No Record Found!
         </div>
       ) : (
-        (filterCommentData == null ? displayData : filterCommentData)?.map(
-          (val, index) => {
-            let lastType = displayData[index == 0 ? 0 : index - 1]?.type;
+        filterCommentData?.map((val, index) => {
+          let lastType = displayData[index == 0 ? 0 : index - 1]?.type;
 
-            if (val.type == "comment") {
-              return (
-                <>
-                  {lastType == "highlight" && (
-                    <div className="" id="banner2">
-                      <AdvertisementBanner data={adsdata} />
-                    </div>
-                  )}
-                  <ContentSection
-                    setActiveCommentsshow={setActiveCommentsshow}
-                    data={val}
-                    setData={setData}
-                    selectContent={selectContent}
-                    setSelectContent={setSelectContent}
-                    followingid={followingid}
-                    verifyid={verifyid}
-                    cmtReact={cmtReact}
-                    homeApiData={homeApiData}
-                    setArrayMerge={setArrayMerge}
-                    publicComments={publicComments}
-                    setPublicComments={setPublicComments}
-                    mergeArrays={mergeArrays}
-                    setCmtReact={setCmtReact}
+          if (val.type == "comment") {
+            return (
+              <>
+                {lastType == "highlight" && (
+                  <div className="" id="banner2">
+                    <AdvertisementBanner data={adsdata} />
+                  </div>
+                )}
+                <ContentSection
+                  setActiveCommentsshow={setActiveCommentsshow}
+                  data={val}
+                  setData={setData}
+                  selectContent={selectContent}
+                  setSelectContent={setSelectContent}
+                  followingid={followingid}
+                  verifyid={verifyid}
+                  cmtReact={cmtReact}
+                  homeApiData={homeApiData}
+                  setArrayMerge={setArrayMerge}
+                  publicComments={publicComments}
+                  setPublicComments={setPublicComments}
+                  mergeArrays={mergeArrays}
+                  setCmtReact={setCmtReact}
+                  followingList={followingList}
                     setDashboardSUser={setDashboardSUser}
-                  />
-                </>
-              );
-            }
-            if (val.type == "highlight") {
-              return (
-                <>
-                  {lastType == "comment" && <HighlightMainPage />}
-                  <SharedProfile
-                    setActiveCommentsshow={setActiveCommentsshow}
-                    data={val}
-                    setData={setData}
-                    setSelectContent={setSelectContent}
-                    verifyid={verifyid}
-                  />
-                </>
-              );
-            }
+                />
+              </>
+            );
           }
-        )
+          if (val.type == "highlight") {
+            return (
+              <>
+                {lastType == "comment" && <HighlightMainPage />}
+                <SharedProfile
+                  setActiveCommentsshow={setActiveCommentsshow}
+                  data={val}
+                  setData={setData}
+                  setSelectContent={setSelectContent}
+                  verifyid={verifyid}
+                />
+              </>
+            );
+          }
+        })
       )}
 
       {onlyPublic == "only public" &&
@@ -264,6 +263,7 @@ const CommentsPage = ({
                   setPublicComments={setPublicComments}
                   mergeArrays={mergeArrays}
                   setCmtReact={setCmtReact}
+                  followingList={followingList}
                   setDashboardSUser={setDashboardSUser}
                 />
               </>

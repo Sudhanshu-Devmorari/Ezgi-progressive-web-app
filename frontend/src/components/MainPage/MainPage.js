@@ -24,7 +24,6 @@ import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
 
-
 const MainPage = () => {
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -34,7 +33,6 @@ const MainPage = () => {
   );
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
-  
   const [dashboardSUser, setDashboardSUser] = useState(
     dashboardShow == "true" ? true : false || false
   );
@@ -85,11 +83,19 @@ const MainPage = () => {
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        // console.log("res:::::::::::::", res.data);
-        setPublicComments(res?.data?.Public_Comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
-        
+        console.log("res:::::::::::::", res.data.Subscription_Comments);
+        setPublicComments(
+          res?.data?.Public_Comments.sort(
+            (a, b) => moment(b.created).unix() - moment(a.created).unix()
+          )
+        );
+
         setHighlights(res?.data?.highlights);
-        setsubscriptionComments(res?.data?.Subscription_Comments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
+        setsubscriptionComments(
+          res?.data?.Subscription_Comments.sort(
+            (a, b) => moment(b.created).unix() - moment(a.created).unix()
+          )
+        );
         setads(res?.data?.ads);
         const ads = res?.data?.ads;
         const leftCornerAdsFilter = ads.filter(
@@ -100,6 +106,7 @@ const MainPage = () => {
         );
         setLeftCornerAds(leftCornerAdsFilter);
         setRightCornerAds(rightCornerAdsFilter);
+
         setVerifyid(res?.data?.verify_ids);
         setFollowingList(res?.data?.following_user);
         setFollowingId(res?.data?.following_user?.map((item) => item?.id));
@@ -122,12 +129,12 @@ const MainPage = () => {
       let merged = [];
       let remainingPublic = [...publicComments];
       let remainingHighlights = [...highlights];
-      let remainingSubscription = [...subscriptionComments];
+      // let remainingSubscription = [...subscriptionComments];
 
       while (
         remainingPublic.length > 0 &&
-        remainingHighlights.length > 0 &&
-        remainingSubscription.length > 0
+        remainingHighlights.length > 0
+        // remainingSubscription.length > 0
       ) {
         merged = [
           ...merged,
@@ -137,12 +144,12 @@ const MainPage = () => {
           ...remainingHighlights
             .splice(0, highlightCount)
             .map((highlight) => ({ type: "highlight", value: highlight })),
-          ...remainingSubscription
-            .splice(0, SubscriptionCount)
-            .map((remainingSubscription) => ({
-              type: "comment",
-              value: remainingSubscription,
-            })),
+          // ...remainingSubscription
+          //   .splice(0, SubscriptionCount)
+          //   .map((remainingSubscription) => ({
+          //     type: "comment",
+          //     value: remainingSubscription,
+          //   })),
         ];
       }
 
@@ -166,15 +173,15 @@ const MainPage = () => {
         ];
       }
 
-      if (remainingSubscription.length > 0) {
-        merged = [
-          ...merged,
-          ...remainingSubscription.map((Subscription) => ({
-            type: "comment",
-            value: Subscription,
-          })),
-        ];
-      }
+      // if (remainingSubscription.length > 0) {
+      //   merged = [
+      //     ...merged,
+      //     ...remainingSubscription.map((Subscription) => ({
+      //       type: "comment",
+      //       value: Subscription,
+      //     })),
+      //   ];
+      // }
       setMergedResult(merged);
     }
 
@@ -192,7 +199,7 @@ const MainPage = () => {
               value: remainingPublic,
             })),
           ...remainingHighlights
-            .splice(0, highlightCount)
+            // .splice(0, highlightCount)
             .map((highlight) => ({ type: "highlight", value: highlight })),
         ];
       }
@@ -335,8 +342,9 @@ const MainPage = () => {
   };
 
   useEffect(() => {
-    selectPublicorForYou == "only public" && handleOnlyPublicData();
-  }, [selectPublicorForYou]);
+    selectPublicorForYou == "only public" &&
+      handleOnlyPublicData(publicSelected);
+  }, [selectPublicorForYou, publicSelected]);
 
   useEffect(() => {
     if (themeMode === "dark") {
@@ -387,7 +395,11 @@ const MainPage = () => {
     mergeEditorArrays();
   }, [publicComments, highlights, subscriptionComments, arrayMerge]);
 
-  const [activeCommentsshow, setActiveCommentsshow] = useState(null);
+  const activeCommentId = localStorage.getItem("activeCommentId");
+
+  const [activeCommentsshow, setActiveCommentsshow] = useState(
+    activeCommentId || null
+  );
 
   const [contentData, setContentData] = useState([]);
   const [contentFilterData, setContentFilterData] = useState([]);
@@ -430,6 +442,7 @@ const MainPage = () => {
             selectContent={selectContent}
             profileData={profileData}
             isLoading={isLoading}
+            setActiveCommentsshow={setActiveCommentsshow}
           />
 
           {dashboardSUser ? (
@@ -449,50 +462,108 @@ const MainPage = () => {
                 </div>
               </>
             ) : user !== "standard" ? (
-              <CommentatorsCommentsPage
-                setActiveCommentsshow={setActiveCommentsshow}
-                setSelectContent={setSelectContent}
-                setDashboardSUser={setDashboardSUser}
-                dashboardSUser={dashboardSUser}
-                selectContent={selectContent}
-                getProfileData={getProfileData}
-                verifyid={verifyid}
-                homeApiData={homeApiData}
-                followingList={followingList}
-                followingid={followingid}
-                cmtReact={cmtReact}
-                setArrayMerge={setArrayMerge}
-                setCmtReact={setCmtReact}
-                publicComments={publicComments}
-                setPublicComments={setPublicComments}
-                subscriptionComments={subscriptionComments}
-                setsubscriptionComments={setsubscriptionComments}
-                mergeArrays={mergeArrays}
-                setMergedEditorResult={setMergedEditorResult}
-                mergedEditorResult={mergedEditorResult}
-                handleOnlyPublicData={handleOnlyPublicData}
-              />
+              <>
+                {activeCommentsshow !== null ? (
+                  <EditorProfileActiveComments
+                    activeCommentsshow={activeCommentsshow}
+                    selectContent={selectContent}
+                    setSelectContent={setSelectContent}
+                    setDashboardSUser={setDashboardSUser}
+                    verifyid={verifyid}
+                    cmtReact={cmtReact}
+                    homeApiData={homeApiData}
+                    followingid={followingid}
+                    setCmtReact={setCmtReact}
+                    setActiveCommentsshow={setActiveCommentsshow}
+                    mergedResult={mergedResult}
+                    onlyPublicResult={onlyPublicResult}
+                    ads={ads}
+                    setData={setData}
+                    followingList={followingList}
+                    setArrayMerge={setArrayMerge}
+                    publicComments={publicComments}
+                    setPublicComments={setPublicComments}
+                    mergeArrays={mergeArrays}
+                    mergedEditorResult={mergedEditorResult}
+                    setMergedEditorResult={setMergedEditorResult}
+                  />
+                ) : (
+                  <CommentatorsCommentsPage
+                    activeCommentsshow={activeCommentsshow}
+                    setActiveCommentsshow={setActiveCommentsshow}
+                    setSelectContent={setSelectContent}
+                    setDashboardSUser={setDashboardSUser}
+                    dashboardSUser={dashboardSUser}
+                    selectContent={selectContent}
+                    getProfileData={getProfileData}
+                    verifyid={verifyid}
+                    homeApiData={homeApiData}
+                    followingList={followingList}
+                    followingid={followingid}
+                    cmtReact={cmtReact}
+                    setArrayMerge={setArrayMerge}
+                    setCmtReact={setCmtReact}
+                    publicComments={publicComments}
+                    setPublicComments={setPublicComments}
+                    subscriptionComments={subscriptionComments}
+                    setsubscriptionComments={setsubscriptionComments}
+                    mergeArrays={mergeArrays}
+                    setMergedEditorResult={setMergedEditorResult}
+                    mergedEditorResult={mergedEditorResult}
+                    handleOnlyPublicData={handleOnlyPublicData}
+                  />
+                )}
+              </>
             ) : (
-              <DashboardSU
-                setActiveCommentsshow={setActiveCommentsshow}
-                setSelectContent={setSelectContent}
-                setDashboardSUser={setDashboardSUser}
-                selectContent={selectContent}
-                getProfileData={getProfileData}
-                verifyid={verifyid}
-                homeApiData={homeApiData}
-                followingList={followingList}
-                followingid={followingid}
-                cmtReact={cmtReact}
-                setCmtReact={setCmtReact}
-                setArrayMerge={setArrayMerge}
-                publicComments={publicComments}
-                setPublicComments={setPublicComments}
-                mergeArrays={mergeArrays}
-                setMergedEditorResult={setMergedEditorResult}
-                mergedEditorResult={mergedEditorResult}
-                handleOnlyPublicData={handleOnlyPublicData}
-              />
+              <>
+                {activeCommentsshow !== null ? (
+                  <EditorProfileActiveComments
+                    activeCommentsshow={activeCommentsshow}
+                    selectContent={selectContent}
+                    setSelectContent={setSelectContent}
+                    setDashboardSUser={setDashboardSUser}
+                    verifyid={verifyid}
+                    cmtReact={cmtReact}
+                    homeApiData={homeApiData}
+                    followingid={followingid}
+                    setCmtReact={setCmtReact}
+                    setActiveCommentsshow={setActiveCommentsshow}
+                    mergedResult={mergedResult}
+                    onlyPublicResult={onlyPublicResult}
+                    ads={ads}
+                    setData={setData}
+                    followingList={followingList}
+                    setArrayMerge={setArrayMerge}
+                    publicComments={publicComments}
+                    setPublicComments={setPublicComments}
+                    mergeArrays={mergeArrays}
+                    mergedEditorResult={mergedEditorResult}
+                    setMergedEditorResult={setMergedEditorResult}
+                  />
+                ) : (
+                  <DashboardSU
+                    activeCommentsshow={activeCommentsshow}
+                    setActiveCommentsshow={setActiveCommentsshow}
+                    setSelectContent={setSelectContent}
+                    setDashboardSUser={setDashboardSUser}
+                    selectContent={selectContent}
+                    getProfileData={getProfileData}
+                    verifyid={verifyid}
+                    homeApiData={homeApiData}
+                    followingList={followingList}
+                    followingid={followingid}
+                    cmtReact={cmtReact}
+                    setCmtReact={setCmtReact}
+                    setArrayMerge={setArrayMerge}
+                    publicComments={publicComments}
+                    setPublicComments={setPublicComments}
+                    mergeArrays={mergeArrays}
+                    setMergedEditorResult={setMergedEditorResult}
+                    mergedEditorResult={mergedEditorResult}
+                    handleOnlyPublicData={handleOnlyPublicData}
+                  />
+                )}
+              </>
             )
           ) : (
             <>
@@ -613,6 +684,7 @@ const MainPage = () => {
                     />
 
                     {subscriptionResult.map((val, index) => {
+                      console.log("values:::::::::::::::", val);
                       let lastType =
                         subscriptionResult[index == 0 ? 0 : index - 1]?.type;
 
@@ -814,7 +886,9 @@ const MainPage = () => {
                   setMergedEditorResult={setMergedEditorResult}
                 />
               )}
-              {selectContent === "become-editor" && <BecomeEditor profileData={profileData}/>}
+              {selectContent === "become-editor" && (
+                <BecomeEditor profileData={profileData} />
+              )}
               {selectContent === "category-content" && (
                 <>
                   {contentFilterData.length == 0 ? (

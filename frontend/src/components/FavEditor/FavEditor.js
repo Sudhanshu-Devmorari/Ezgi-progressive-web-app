@@ -145,6 +145,21 @@ const FavEditor = (props) => {
                   <div
                     className="col pe-0 d-flex position-relative"
                     onClick={() => {
+                      const currentPage = localStorage.getItem("currentpage");
+                      const currentuser = localStorage.getItem("user-role");
+                      localStorage.setItem("dashboardShow", true);
+                      (currentPage !== "show-all-comments" ||
+                        currentPage !== "notifications") &&
+                        localStorage.setItem("priviouspage", currentPage);
+                      localStorage.setItem("currentpage", "show-all-comments");
+                      localStorage.setItem(
+                        "subcurrentpage",
+                        currentuser == "standard" ? "subscribers" : "home"
+                      );
+                      localStorage.setItem(
+                        "activeCommentId",
+                        res?.data?.commentator_user?.id
+                      );
                       props?.setActiveCommentsshow(
                         res?.data?.commentator_user?.id
                       );
@@ -190,7 +205,7 @@ const FavEditor = (props) => {
                             fontSize: "13px",
                           }}
                         >
-                          Expert
+                          {res?.data?.commentator_user?.commentator_level}
                         </button>
                       </div>
                       <div

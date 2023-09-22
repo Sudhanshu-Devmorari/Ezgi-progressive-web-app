@@ -4328,7 +4328,7 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
-    def get_public_comments(self, unique_comment_ids):
+    def get_public_comments(self):
         """ Return public comments data """
         public_comments = []
 
@@ -4355,33 +4355,31 @@ class RetrievePageData():
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 
-                if comment.id not in unique_comment_ids:
-                    unique_comment_ids.add(comment.id)
-                    public_comments.append(comment_data)
+                public_comments.append(comment_data)
 
         except:
             public_comments = []
 
-        return public_comments, unique_comment_ids
+        return public_comments
     
-    def get_subscription_comments(self, id, unique_comment_ids):
+    def get_subscription_comments(self, id):
         """ Return subscription comments data """
         subscription_comments = []
 
         try:
             # Id validation
             if id == 'null':
-                return subscription_comments, unique_comment_ids
+                return subscription_comments
 
             # Is user exist validation
             is_user_exist = User.objects.filter(id=id).exists()
             if not is_user_exist:
-                return subscription_comments, unique_comment_ids
+                return subscription_comments
             
             subscription_obj = Subscription.objects.filter(standard_user_id=id, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
             for obj in subscription_obj:
                 if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
-                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').order_by('-created')
+                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False).order_by('-created')
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
@@ -4401,14 +4399,12 @@ class RetrievePageData():
                             'total_clap': total_reactions['total_clap'] or 0
                         }
 
-                        if comment.id not in unique_comment_ids:
-                            unique_comment_ids.add(comment.id)
-                            subscription_comments.append(comment_data)
+                        subscription_comments.append(comment_data)
 
         except:
             subscription_comments = []
         
-        return subscription_comments, unique_comment_ids
+        return subscription_comments
     
     def get_highlights(self, id):
         """ Return highlights data """
@@ -4543,13 +4539,12 @@ class RetrieveHomeView(APIView):
         
         # Instantiate RetrievePageData object
         retrieve_data = RetrievePageData()
-        self.unique_comment_ids = set()
 
         # Get public comments data
-        data_list['Public_Comments'], self.unique_comment_ids  = retrieve_data.get_public_comments(self.unique_comment_ids)
+        data_list['Public_Comments']  = retrieve_data.get_public_comments()
 
         # Get subscription comments data
-        data_list['Subscription_Comments'], self.unique_comment_ids  = retrieve_data.get_subscription_comments(request.query_params.get('id', None), self.unique_comment_ids)
+        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None))
       
         # Get highlights data
         data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None))

@@ -25,6 +25,8 @@ const DashboardSU = (props) => {
   const [favSelection, setFavSelection] = useState("fav editor");
 
   useEffect(() => {
+  console.log("props.activeCommentsshow:::::::::::::", props.activeCommentsshow)
+
     if (props.selectContent === "notifications") {
       setContent("notifications");
     } else if (props.selectContent === "fav") {

@@ -17,9 +17,8 @@ const SelectContentForEditorPage = (props) => {
   const [modalShow, setModalShow] = React.useState(false);
 
   const filterData = (e) => {
-    console.log("event true::::::::::::::", e.target.value);
+    props.setPublicSelected && props?.setPublicSelected(false);
     if (props.editor == true) {
-      // props.setFilterData(null);
       const val = e.target.value;
       if (val !== "") {
         const filteredArray = props.data.filter(
@@ -36,20 +35,21 @@ const SelectContentForEditorPage = (props) => {
         props.setFilterData(props.data);
       }
     } else {
-      // console.log("*=======>>>>>>", props.comments)
-      console.log("props.data:::::::::::::::", props.data)
-      props.setFilterCommentData(null);
       const val = e.target.value;
-      const filteredArray = props.data.filter(
-        (obj) =>
-          obj?.value?.commentator_user?.username
-            ?.toLowerCase()
-            .startsWith(val.toLowerCase()) ||
-          obj?.value?.commentator_user?.username
-            ?.toLowerCase()
-            .includes(val.toLowerCase())
-      );
-      props.setDisplayData(filteredArray);
+      if (val !== "") {
+        const filteredArray = props.data.filter(
+          (obj) =>
+            obj?.value?.commentator_user?.username
+              ?.toLowerCase()
+              .startsWith(val.toLowerCase()) ||
+            obj?.value?.user?.username
+              ?.toLowerCase()
+              .includes(val.toLowerCase())
+        );
+        props?.setFilterCommentData(filteredArray);
+      } else {
+        props?.setFilterCommentData(props.data);
+      }
     }
   };
 

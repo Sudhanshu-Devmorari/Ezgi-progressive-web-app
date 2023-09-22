@@ -24,20 +24,26 @@ export const EditorBanner = (props) => {
           .then((res) => {
             // console.log(res.data.data, "=>>>>5555sports btn");
             // console.log(res,"=>>>>sports btn");
-            if(res.status === 200){
-              props?.setContentData(res?.data?.data)
+            if (res.status === 200) {
+              props?.setContentData(res?.data?.data);
               // props?.setCommentsReactionsSports()
             }
           })
           .catch((error) => {
             console.log(error);
-            if (error?.response?.status === 400 || error?.response?.status === 500){
+            if (
+              error?.response?.status === 400 ||
+              error?.response?.status === 500
+            ) {
               Swal.fire({
                 title: "Error",
                 text: error?.response?.data?.error,
                 icon: "error",
                 backdrop: false,
-                customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
               });
             }
           });
@@ -48,8 +54,9 @@ export const EditorBanner = (props) => {
   return (
     <>
       <div
-        className={`row g-0 bannerText font-responsive ${ 'mb-2'
-          // userId ? "mb-0" : "mb-2" 
+        className={`row g-0 bannerText font-responsive ${
+          "mb-2"
+          // userId ? "mb-0" : "mb-2"
         }`}
       >
         <div className={`col-3`}>
@@ -97,6 +104,17 @@ export const EditorBanner = (props) => {
         <div
           onClick={() => {
             if (userId) {
+              const currentPage = localStorage.getItem("currentpage");
+              const currentuser = localStorage.getItem("user-role");
+              localStorage.setItem("dashboardShow", false);
+              (currentPage !== "show-all-comments" ||
+                currentPage !== "notifications") &&
+                localStorage.setItem("priviouspage", currentPage);
+              localStorage.setItem("currentpage", "become-editor");
+              localStorage.setItem(
+                "subcurrentpage",
+                currentuser == "standard" ? "subscribers" : "home"
+              );
               props?.setSelectContent("become-editor");
             }
           }}

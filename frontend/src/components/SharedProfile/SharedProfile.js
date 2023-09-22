@@ -212,27 +212,20 @@ const SharedProfile = (props) => {
             className="col pe-0 d-flex position-relative"
             onClick={() => {
               if (userId) {
-                if (userId == data?.value?.user?.id) {
-                  setDashboardSUser(true);
-                  const currentPage = localStorage.getItem("currentpage");
-                  localStorage.setItem("dashboardShow", true);
-                  (currentPage !== "show-all-comments" ||
-                    currentPage !== "notifications") &&
-                    localStorage.setItem("priviouspage", currentPage);
-                  localStorage.setItem("currentpage", "show-all-comments");
-                  localStorage.setItem("subcurrentpage", "home");
-                  setSelectContent("show-all-comments");
-                } else {
-                  const currentPage = localStorage.getItem("currentpage");
-                  localStorage.setItem("dashboardShow", true);
-                  (currentPage !== "show-all-comments" ||
-                    currentPage !== "notifications") &&
-                    localStorage.setItem("priviouspage", currentPage);
-                  localStorage.setItem("currentpage", "show-all-comments");
-                  localStorage.setItem("subcurrentpage", "home");
-                  setSelectContent("show-all-comments");
-                  setActiveCommentsshow(data?.value?.user?.id);
-                }
+                const currentPage = localStorage.getItem("currentpage");
+                const currentuser = localStorage.getItem("user-role");
+                localStorage.setItem("dashboardShow", true);
+                (currentPage !== "show-all-comments" ||
+                  currentPage !== "notifications") &&
+                  localStorage.setItem("priviouspage", currentPage);
+                localStorage.setItem("currentpage", "show-all-comments");
+                localStorage.setItem(
+                  "subcurrentpage",
+                  currentuser == "standard" ? "subscribers" : "home"
+                );
+                localStorage.setItem("activeCommentId", data?.value?.user?.id);
+                setSelectContent("show-all-comments");
+                setActiveCommentsshow(data?.value?.user?.id);
               } else {
                 Swal.fire({
                   text: "You need to become a member to be able to view it.",

@@ -43,7 +43,7 @@ const CommentatorsCommentsPage = (props) => {
     ) {
       setContent("home");
     }
-  }, [props.selectContent, subcurrentpage]);
+  }, [props.selectContent, subcurrentpage, props]);
 
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
@@ -55,7 +55,11 @@ const CommentatorsCommentsPage = (props) => {
       );
       // console.log("=>>>", res.data);
       setFavEditorData(res.data.favEditors);
-      setFavCommentData(res.data.favComments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
+      setFavCommentData(
+        res.data.favComments.sort(
+          (a, b) => moment(b.created).unix() - moment(a.created).unix()
+        )
+      );
     } catch (error) {
       console.log(error);
     }
@@ -118,7 +122,7 @@ const CommentatorsCommentsPage = (props) => {
       ) : (
         <>
           <ActiveComments
-            from={"dashboard"}
+            from={props.activeCommentsshow !== null ? "editor" : "dashboard"}
             content={content}
             profile={"commentator"}
             setDashboardSUser={props.setDashboardSUser}
@@ -128,6 +132,7 @@ const CommentatorsCommentsPage = (props) => {
             activeResolved={activeResolved}
             selectContent={props.selectContent}
             profileLoading={isLoading}
+            setActiveCommentsshow={props.setActiveCommentsshow}
             verifyid={props.verifyid}
 
           />
@@ -168,7 +173,7 @@ const CommentatorsCommentsPage = (props) => {
                 />
               )}
               {SelectComment === "statistics" && (
-                <EditorProfileStatisticsSection from={"dashboard"} />
+                <EditorProfileStatisticsSection from={"dashboard"} profileData={profileData}/>
               )}
             </>
           )}

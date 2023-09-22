@@ -103,25 +103,43 @@ const CommentsContentSection = (props) => {
       if (res.status == 200) {
         let data = res?.data?.data;
         if (data && publicComments) {
-          active.filter(
+          const activeDatafilter = active.filter(
             (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_clap = data?.total_clap;
-          active.filter(
-            (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_favorite = data?.total_favorite;
-          active.filter(
-            (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_likes = data?.total_likes;
+          );
+          if (activeDatafilter.length !== 0 && activeDatafilter) {
+            active.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_clap = data?.total_clap;
+            active.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_favorite = data?.total_favorite;
+            active.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_likes = data?.total_likes;
+            setActive(active);
+          }
 
-          // console.log("active::::::::::::::", active);
+          const resolvedDatafilter = resolve.filter(
+            (response) => response.id == data?.comment_id
+          );
 
-          setActive(active);
+          if (resolvedDatafilter.length !== 0 && resolvedDatafilter) {
+            resolve.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_clap = data?.total_clap;
+            resolve.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_favorite = data?.total_favorite;
+            resolve.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_likes = data?.total_likes;
+            setResolve(resolve);
+          }
 
           const filterdata = publicComments.filter(
             (response) => response.id == data?.comment_id
           );
 
-          // console.log("filterdata:::::::::::::::", filterdata);
           if (filterdata.length !== 0 && filterdata) {
             publicComments.filter(
               (response) => response.id == data?.comment_id
@@ -192,7 +210,12 @@ const CommentsContentSection = (props) => {
     <>
       {props.SelectComment === "activeComments" && (
         <>
-          {active &&
+          {active.length == 0 ? (
+            <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+              No Record Found!
+            </div>
+          ) : (
+            active &&
             active.map((val, index) => {
               return (
                 <React.Fragment key={index}>
@@ -968,7 +991,7 @@ const CommentsContentSection = (props) => {
                                 </button>
                               )}
                               {formatTimeDifference(val?.created)}
-                              10 dk önce
+                              {/* 10 dk önce */}
                             </div>
                           </div>
                         </div>
@@ -977,454 +1000,447 @@ const CommentsContentSection = (props) => {
                   )}
                 </React.Fragment>
               );
-            })}
+            })
+          )}
         </>
       )}
 
       {props.SelectComment === "resolvedComments" && (
         <>
-          {resolve?.map((res, index) => (
-            <div
-              key={index}
-              className={`card border-0 rounded-0 mb-2 ${
-                currentTheme === "dark" ? "dark-mode" : "light-mode"
-              }`}
-            >
-              <div className="row m-2">
-                <div className="position-relative col p-0">
-                  <img
-                    src={crown}
-                    alt=""
-                    height={19}
-                    width={19}
-                    style={{
-                      background:
-                        currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                      borderRadius: "50%",
-                      left: "3.3rem",
-                      position: "absolute",
-                    }}
-                  />
-                  <div className="col">
-                    <img
-                      src={`${server_url + res?.commentator_user?.profile_pic}`}
-                      className="rounded-circle"
-                      width={75}
-                      height={75}
-                      alt=""
-                    />
-                    <span className="p-1 autorname-responsive">
-                      {truncateString(res?.commentator_user?.username, 11)}
-                    </span>
-                    {props.verifyid?.includes(res?.commentator_user?.id) && (
-                      <img src={blueTick} alt="" width={14} height={14} />
-                    )}
-                  </div>
-                </div>
-                <div className="col p-0">
-                  {props.SelectComment === "resolvedComments" && (
-                    <div className="d-flex justify-content-end pe-2">
-                      <>
-                        {res?.public_content == true && (
-                          <img
-                            src={`${
-                              currentTheme === "dark"
-                                ? world_check
-                                : world_check_light
-                            }`}
-                            alt=""
-                            height={31}
-                            width={31}
-                          />
-                        )}
-                        {res?.is_prediction == true && (
-                          <img
-                            src={circle_check}
-                            alt=""
-                            height={31}
-                            width={31}
-                          />
-                        )}
-                      </>
-                      {/* )} */}
-                      {(res.is_prediction != true ||
-                        res.status === "yellow") && (
-                        <img
-                          src={
-                            (res.is_prediction != true && circle_x) ||
-                            (res.status === "yellow" && clock_pause)
-                          }
-                          alt=""
-                          height={31}
-                          width={31}
-                        />
-                      )}
-                    </div>
-                  )}
-
-                  <div
-                    className={`${
-                      props.SelectComment === "activeComments" ? "mt-5" : "mt-3"
-                    } row gap-1 g-0 text-center`}
-                  >
-                    <div className="col">
-                      <div className="rate-fonts">Success Rate</div>
-                      <div
+          {resolve.length == 0 ? (
+            <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+              No Record Found!
+            </div>
+          ) : (
+            resolve &&
+            resolve?.map((res, index) => {
+              console.log("res:::::::::::::", res);
+              return (
+                <div
+                  key={index}
+                  className={`card border-0 rounded-0 mb-2 ${
+                    currentTheme === "dark" ? "dark-mode" : "light-mode"
+                  }`}
+                >
+                  <div className="row m-2">
+                    <div className="position-relative col p-0">
+                      <img
+                        src={crown}
+                        alt=""
+                        height={19}
+                        width={19}
                         style={{
-                          fontSize: "1rem",
-                          color:
-                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                          background:
+                            currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                          borderRadius: "50%",
+                          left: "3.3rem",
+                          position: "absolute",
+                        }}
+                      />
+                      <div className="col">
+                        <img
+                          src={`${
+                            server_url + res?.commentator_user?.profile_pic
+                          }`}
+                          className="rounded-circle"
+                          width={75}
+                          height={75}
+                          alt=""
+                        />
+                        <span className="p-1 autorname-responsive">
+                          {truncateString(res?.commentator_user?.username, 11)}
+                        </span>
+                        {props.verifyid?.includes(
+                          res?.commentator_user?.id
+                        ) && (
+                          <img src={blueTick} alt="" width={14} height={14} />
+                        )}
+                      </div>
+                    </div>
+                    <div className="col p-0">
+                      {props.SelectComment === "resolvedComments" && (
+                        <div className="d-flex justify-content-end pe-2">
+                          <>
+                            {res?.public_content == true && (
+                              <img
+                                src={`${
+                                  currentTheme === "dark"
+                                    ? world_check
+                                    : world_check_light
+                                }`}
+                                alt=""
+                                height={31}
+                                width={31}
+                              />
+                            )}
+                            {res?.is_prediction == true && (
+                              <img
+                                src={circle_check}
+                                alt=""
+                                height={31}
+                                width={31}
+                              />
+                            )}
+                          </>
+                          {/* )} */}
+                          {(res.is_prediction != true ||
+                            res.status === "yellow") && (
+                            <img
+                              src={
+                                (res.is_prediction != true && circle_x) ||
+                                (res.status === "yellow" && clock_pause)
+                              }
+                              alt=""
+                              height={31}
+                              width={31}
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      <div
+                        className={`${
+                          props.SelectComment === "activeComments"
+                            ? "mt-5"
+                            : "mt-3"
+                        } row gap-1 g-0 text-center`}
+                      >
+                        <div className="col">
+                          <div className="rate-fonts">Success Rate</div>
+                          <div
+                            style={{
+                              fontSize: "1rem",
+                              color:
+                                currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                            }}
+                          >
+                            %{res?.commentator_user?.success_rate}
+                          </div>
+                        </div>
+                        <div className="col">
+                          <div className="rate-fonts">Score Points</div>
+                          <div style={{ fontSize: "1rem", color: "#FFA200" }}>
+                            {res?.commentator_user?.score_points}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {user_id == res?.commentator_user?.id ||
+                    res.public_content ? (
+                      <div
+                        className="p-1 my-2 content-font"
+                        style={{
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                         }}
                       >
-                        %{res?.commentator_user?.success_rate}
+                        {res?.comment}
                       </div>
-                    </div>
-                    <div className="col">
-                      <div className="rate-fonts">Score Points</div>
-                      <div style={{ fontSize: "1rem", color: "#FFA200" }}>
-                        {res?.commentator_user?.score_points}
+                    ) : (
+                      <div
+                        className="px-2 py-3 my-2 d-flex justify-content-center"
+                        style={{
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                        }}
+                      >
+                        <img
+                          src={`${currentTheme === "dark" ? lock : darklock}`}
+                          alt=""
+                          height={32}
+                          width={32}
+                        />
                       </div>
-                    </div>
-                  </div>
-                </div>
-                {user_id == res?.commentator_user?.id || res.public_content ? (
-                  <div
-                    className="p-1 my-2 content-font"
-                    style={{
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    }}
-                  >
-                    {res?.comment}
-                  </div>
-                ) : (
-                  <div
-                    className="px-2 py-3 my-2 d-flex justify-content-center"
-                    style={{
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    }}
-                  >
-                    <img
-                      src={`${currentTheme === "dark" ? lock : darklock}`}
-                      alt=""
-                      height={32}
-                      width={32}
-                    />
-                  </div>
-                )}
-                <div
-                  className="p-1"
-                  style={{
-                    backgroundColor:
-                      currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    fontSize: "13px",
-                  }}
-                >
-                  <div className="d-flex justify-content-between align-items-center gap-1">
-                    <span>
-                      <img
-                        className="pe-1"
-                        src={TurkeyFalg}
-                        alt=""
-                        height={25}
-                        width={27}
-                      />
-                      <span className="ps-1">
-                        {truncateString(res?.league, 6)}
-                      </span>
-                    </span>
-                    <span
-                      style={{
-                        paddingRight:
-                          props.SelectComment === "activeComments"
-                            ? "83px"
-                            : "83px",
-                      }}
-                    >
-                      {res?.date}
-                    </span>
-                    <span></span>
-                  </div>
-                  <div className="d-flex justify-content-center align-items-center">
-                    <span
-                      className="mt-2 pt-1 text-end"
-                      style={{ width: "140px" }}
-                    >
-                      <span className="w-100">
-                        {res?.match_detail.split(" - ")[0]}
-                      </span>
-                    </span>
+                    )}
                     <div
-                      className="px-2"
-                      style={{
-                        width: "66px",
-                        height: "38px",
-                      }}
-                    >
-                      <CircularProgressbar
-                        circleRatio={0.75}
-                        strokeWidth={3}
-                        value={100}
-                        // text={res.time}
-                        text="1-1"
-                        styles={buildStyles({
-                          rotation: 1 / 2 + 1 / 8,
-                          textColor:
-                            currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                          textSize: "26px",
-                          pathColor:
-                            currentTheme === "dark"
-                              ? res.is_prediction == true
-                                ? "#37FF80"
-                                : res.status === "yellow"
-                                ? "#FFCC00"
-                                : res.is_prediction != true
-                                ? "#FF5757"
-                                : ""
-                              : res.is_prediction == true
-                              ? "#37FF80"
-                              : res.status === "yellow"
-                              ? res.color
-                              : res.is_prediction != true
-                              ? "#FF5757"
-                              : "",
-                        })}
-                      />
-                    </div>
-                    <span className="mt-2 pt-1" style={{ width: "156px" }}>
-                      <span className="w-100">
-                        {res?.match_detail.split(" - ")[1]}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="text-end mt-3 mb-2">
-                    {/* <span
-                      className="p-1 px-2"
-                      style={{
-                        backgroundColor:
-                          props.SelectComment === "resolvedComments"
-                            ? "#00DE51"
-                            : "#00659D",
-                        color:
-                          props.SelectComment === "resolvedComments"
-                            ? "#0D2A53"
-                            : "#FFFFFF",
-                        fontSize: "12px",
-                      }}
-                    >
-                      {user_id == res?.commentator_user?.id ? (
-                        <>{`${res?.prediction_type} & ${res?.prediction}`}</>
-                      ) : (
-                        <>
-                          Subscribers Only{" "}
-                          <img
-                            className="mb-1"
-                            src={lock}
-                            alt=""
-                            height={15}
-                            width={15}
-                          />
-                        </>
-                      )}
-                    </span> */}
-                    <span
                       className="p-1"
                       style={{
                         backgroundColor:
-                          currentTheme === "dark"
-                            ? res.is_prediction == true
-                              ? "#37FF80"
-                              : res.status === "yellow"
-                              ? "#FFCC00"
-                              : res.is_prediction != true
-                              ? "#FF5757"
-                              : ""
-                            : res.is_prediction == true
-                            ? "#37FF80"
-                            : res.status === "yellow"
-                            ? res.color
-                            : res.is_prediction != true
-                            ? "#FF5757"
-                            : "",
-                        color:
-                          props.SelectComment === "resolvedComments"
-                            ? "#0D2A53"
-                            : "#FFFFFF",
-                        fontSize: "12px",
+                          currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                        fontSize: "13px",
                       }}
                     >
-                      {user_id == res?.commentator_user?.id ||
-                      res.public_content ? (
-                        <>{`${res?.prediction_type} & ${res?.prediction}`}</>
-                      ) : (
-                        <>
-                          Subscribers Only{" "}
+                      <div className="d-flex justify-content-between align-items-center gap-1">
+                        <span>
                           <img
-                            className="mb-1"
-                            src={lock}
+                            className="pe-1"
+                            src={TurkeyFalg}
                             alt=""
-                            height={15}
-                            width={15}
+                            height={25}
+                            width={27}
                           />
-                        </>
-                      )}
-                    </span>
+                          <span className="ps-1">
+                            {truncateString(res?.league, 6)}
+                          </span>
+                        </span>
+                        <span
+                          style={{
+                            paddingRight:
+                              props.SelectComment === "activeComments"
+                                ? "83px"
+                                : "83px",
+                          }}
+                        >
+                          {res?.date}
+                        </span>
+                        <span></span>
+                      </div>
+                      <div className="d-flex justify-content-center align-items-center">
+                        <span
+                          className="mt-2 pt-1 text-end"
+                          style={{ width: "140px" }}
+                        >
+                          <span className="w-100">
+                            {res?.match_detail.split(" - ")[0]}
+                          </span>
+                        </span>
+                        <div
+                          className="px-2"
+                          style={{
+                            width: "66px",
+                            height: "38px",
+                          }}
+                        >
+                          <CircularProgressbar
+                            circleRatio={0.75}
+                            strokeWidth={3}
+                            value={100}
+                            // text={res.time}
+                            text="1-1"
+                            styles={buildStyles({
+                              rotation: 1 / 2 + 1 / 8,
+                              textColor:
+                                currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                              textSize: "26px",
+                              pathColor:
+                                currentTheme === "dark"
+                                  ? res.is_prediction == true
+                                    ? "#37FF80"
+                                    : res.status === "yellow"
+                                    ? "#FFCC00"
+                                    : res.is_prediction != true
+                                    ? "#FF5757"
+                                    : ""
+                                  : res.is_prediction == true
+                                  ? "#37FF80"
+                                  : res.status === "yellow"
+                                  ? res.color
+                                  : res.is_prediction != true
+                                  ? "#FF5757"
+                                  : "",
+                            })}
+                          />
+                        </div>
+                        <span className="mt-2 pt-1" style={{ width: "156px" }}>
+                          <span className="w-100">
+                            {res?.match_detail.split(" - ")[1]}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="text-end mt-3 mb-2">
+                        <span
+                          className="p-1"
+                          style={{
+                            backgroundColor:
+                              currentTheme === "dark"
+                                ? res.is_prediction == true
+                                  ? "#37FF80"
+                                  : res.status === "yellow"
+                                  ? "#FFCC00"
+                                  : res.is_prediction != true
+                                  ? "#FF5757"
+                                  : ""
+                                : res.is_prediction == true
+                                ? "#37FF80"
+                                : res.status === "yellow"
+                                ? res.color
+                                : res.is_prediction != true
+                                ? "#FF5757"
+                                : "",
+                            color:
+                              props.SelectComment === "resolvedComments"
+                                ? "#0D2A53"
+                                : "#FFFFFF",
+                            fontSize: "12px",
+                          }}
+                        >
+                          {user_id == res?.commentator_user?.id ||
+                          res.public_content ? (
+                            <>{`${res?.prediction_type} & ${res?.prediction}`}</>
+                          ) : (
+                            <>
+                              Subscribers Only{" "}
+                              <img
+                                className="mb-1"
+                                src={lock}
+                                alt=""
+                                height={15}
+                                width={15}
+                              />
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="d-flex mt-2 align-items-center">
+                      <div
+                        className="gap-2 d-flex align-items-center"
+                        style={{ fontSize: "13px" }}
+                      >
+                        <div
+                          onClick={() => {
+                            handleCommentReaction(
+                              res?.id,
+                              "like",
+                              res.public_content
+                            );
+                          }}
+                        >
+                          {props.cmtReact
+                            ?.map((e) => e.comment_id)
+                            ?.includes(res?.id) ? (
+                            props.cmtReact.filter(
+                              (e) => e.comment_id == res?.id
+                            )[0].like == 1 ? (
+                              <img
+                                src={Selected_Like}
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            ) : (
+                              <img
+                                src={
+                                  currentTheme === "dark"
+                                    ? Dark_Unselected_Like
+                                    : Light_Unselected_Like
+                                }
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            )
+                          ) : (
+                            <img
+                              src={
+                                currentTheme === "dark"
+                                  ? Dark_Unselected_Like
+                                  : Light_Unselected_Like
+                              }
+                              alt=""
+                              height={20}
+                              width={20}
+                            />
+                          )}{" "}
+                          {res?.total_reactions?.total_likes}
+                        </div>
+                        <div
+                          onClick={() => {
+                            if (user_id != res?.commentator_user?.id) {
+                              handleCommentReaction(
+                                res?.id,
+                                "favorite",
+                                res.public_content
+                              );
+                            }
+                          }}
+                        >
+                          {props.cmtReact
+                            ?.map((e) => e.comment_id)
+                            ?.includes(res?.id) ? (
+                            props.cmtReact.filter(
+                              (e) => e.comment_id == res?.id
+                            )[0].favorite == 1 ? (
+                              <img
+                                src={Selected_Favorite}
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            ) : (
+                              <img
+                                src={
+                                  currentTheme === "dark"
+                                    ? Dark_Unselected_Favorite
+                                    : Light_Unselected_Favorite
+                                }
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            )
+                          ) : (
+                            <img
+                              src={
+                                currentTheme === "dark"
+                                  ? Dark_Unselected_Favorite
+                                  : Light_Unselected_Favorite
+                              }
+                              alt=""
+                              height={20}
+                              width={20}
+                            />
+                          )}{" "}
+                          {res?.total_reactions?.total_favorite}
+                        </div>
+                        <div
+                          onClick={() => {
+                            handleCommentReaction(
+                              res?.id,
+                              "clap",
+                              res.public_content
+                            );
+                          }}
+                        >
+                          {props.cmtReact
+                            ?.map((e) => e.comment_id)
+                            ?.includes(res?.id) ? (
+                            props.cmtReact.filter(
+                              (e) => e.comment_id == res?.id
+                            )[0].clap == 1 ? (
+                              <img
+                                src={Selected_Clap}
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            ) : (
+                              <img
+                                src={
+                                  currentTheme === "dark"
+                                    ? Dark_Unselected_Clap
+                                    : Light_Unselected_Clap
+                                }
+                                alt=""
+                                height={20}
+                                width={20}
+                              />
+                            )
+                          ) : (
+                            <img
+                              src={
+                                currentTheme === "dark"
+                                  ? Dark_Unselected_Clap
+                                  : Light_Unselected_Clap
+                              }
+                              alt=""
+                              height={20}
+                              width={20}
+                            />
+                          )}{" "}
+                          {res?.total_reactions?.total_clap}
+                        </div>
+                      </div>
+                      <div className="ms-auto" style={{ fontSize: "12px" }}>
+                        {/* 10 dk önce */}
+                        {formatTimeDifference(res?.created)}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="d-flex mt-2 align-items-center">
-                  <div
-                    className="gap-2 d-flex align-items-center"
-                    style={{ fontSize: "13px" }}
-                  >
-                    <div
-                      onClick={() => {
-                        handleCommentReaction(
-                          res?.id,
-                          "like",
-                          res.public_content
-                        );
-                      }}
-                    >
-                      {props.cmtReact
-                        ?.map((e) => e.comment_id)
-                        ?.includes(res?.id) ? (
-                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
-                          .like == 1 ? (
-                          <img
-                            src={Selected_Like}
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        ) : (
-                          <img
-                            src={
-                              currentTheme === "dark"
-                                ? Dark_Unselected_Like
-                                : Light_Unselected_Like
-                            }
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        )
-                      ) : (
-                        <img
-                          src={
-                            currentTheme === "dark"
-                              ? Dark_Unselected_Like
-                              : Light_Unselected_Like
-                          }
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      )}{" "}
-                      {res?.total_reactions?.total_likes}
-                    </div>
-                    <div
-                      onClick={() => {
-                        if (user_id != res?.commentator_user?.id) {
-                          handleCommentReaction(
-                            res?.id,
-                            "favorite",
-                            res.public_content
-                          );
-                        }
-                      }}
-                    >
-                      {props.cmtReact
-                        ?.map((e) => e.comment_id)
-                        ?.includes(res?.id) ? (
-                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
-                          .favorite == 1 ? (
-                          <img
-                            src={Selected_Favorite}
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        ) : (
-                          <img
-                            src={
-                              currentTheme === "dark"
-                                ? Dark_Unselected_Favorite
-                                : Light_Unselected_Favorite
-                            }
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        )
-                      ) : (
-                        <img
-                          src={
-                            currentTheme === "dark"
-                              ? Dark_Unselected_Favorite
-                              : Light_Unselected_Favorite
-                          }
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      )}{" "}
-                      {res?.total_reactions?.total_favorite}
-                    </div>
-                    <div
-                      onClick={() => {
-                        handleCommentReaction(
-                          res?.id,
-                          "clap",
-                          res.public_content
-                        );
-                      }}
-                    >
-                      {props.cmtReact
-                        ?.map((e) => e.comment_id)
-                        ?.includes(res?.id) ? (
-                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
-                          .clap == 1 ? (
-                          <img
-                            src={Selected_Clap}
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        ) : (
-                          <img
-                            src={
-                              currentTheme === "dark"
-                                ? Dark_Unselected_Clap
-                                : Light_Unselected_Clap
-                            }
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        )
-                      ) : (
-                        <img
-                          src={
-                            currentTheme === "dark"
-                              ? Dark_Unselected_Clap
-                              : Light_Unselected_Clap
-                          }
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      )}{" "}
-                      {res?.total_reactions?.total_clap}
-                    </div>
-                  </div>
-                  <div className="ms-auto" style={{ fontSize: "12px" }}>
-                    {formatTimeDifference(res?.created)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          )}
         </>
       )}
     </>

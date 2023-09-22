@@ -65,7 +65,7 @@ const ContentSection = ({
   contentData,
   subscriptionResult,
   setSubscriptionResult,
-  setDashboardSUser
+  setDashboardSUser,
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
@@ -73,18 +73,7 @@ const ContentSection = ({
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
 
-  const errorSwal = () => {
-    // console.log(localStorage.getItem("user-active"))
-
-    Swal.fire({
-      title: "Error",
-      text: `Your account has been deactivated. Contact support for assistance.`,
-      icon: "error",
-      backdrop: false,
-      customClass:
-        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-    });
-  };
+  // console.log("subscriptionResult:::::::::::::::content section called", subscriptionResult)
 
   const followCommentator = async (commentator_id, isFollowing) => {
     try {
@@ -298,31 +287,24 @@ const ContentSection = ({
             <div
               className="position-relative col p-0"
               onClick={() => {
-                console.log("^^^^^^userId ", userId)
-                console.log("^^^^^^data?.value?.commentator_user?.id ", data?.value?.commentator_user?.id)
                 if (userId) {
-                  if(userId==data?.value?.commentator_user?.id){
-                    setDashboardSUser(true);
                   const currentPage = localStorage.getItem("currentpage");
+                  const currentuser = localStorage.getItem("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&
                     localStorage.setItem("priviouspage", currentPage);
                   localStorage.setItem("currentpage", "show-all-comments");
-                  localStorage.setItem("subcurrentpage", "home");
-                  setSelectContent("show-all-comments");
-                  }else{
-
-                  const currentPage = localStorage.getItem("currentpage");
-                  localStorage.setItem("dashboardShow", true);
-                  (currentPage !== "show-all-comments" ||
-                    currentPage !== "notifications") &&
-                    localStorage.setItem("priviouspage", currentPage);
-                  localStorage.setItem("currentpage", "show-all-comments");
-                  localStorage.setItem("subcurrentpage", "home");
+                  localStorage.setItem(
+                    "subcurrentpage",
+                    currentuser == "standard" ? "subscribers" : "home"
+                  );
                   setSelectContent("show-all-comments");
                   setActiveCommentsshow(data?.value?.commentator_user?.id);
-                  }
+                  localStorage.setItem(
+                    "activeCommentId",
+                    data?.value?.commentator_user?.id
+                  );
                 } else {
                   Swal.fire({
                     // title: "Success",
@@ -368,7 +350,7 @@ const ContentSection = ({
                   style={{ objectFit: "cover" }}
                 />
                 <span className="p-1 autorname-responsive">
-                  {truncateString(data?.value?.commentator_user?.username, 11)}
+                  {truncateString(data?.value?.commentator_user?.username, 7)}
                 </span>
                 {verifyid?.includes(data?.value?.commentator_user?.id) && (
                   <img src={blueTick} alt="" width={16} height={16} />

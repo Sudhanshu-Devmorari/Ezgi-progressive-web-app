@@ -15,6 +15,7 @@ import { country_code } from "./_data";
 import Spinner from "react-bootstrap/esm/Spinner";
 
 const EditorProfileStatisticsSection = (props) => {
+  const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SelectSport, setSelectSport] = useState("football");
   const progressBarFootball = [
@@ -48,7 +49,7 @@ const EditorProfileStatisticsSection = (props) => {
       user = userId;
     } else {
       // Handle the case where neither condition is met
-      user = localStorage.getItem("user-role"); // Set a default value if needed
+      user = localStorage.getItem("user-id"); // Set a default value if needed
     }
   }, []);
 
@@ -156,20 +157,32 @@ const EditorProfileStatisticsSection = (props) => {
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } p-2 pb-5`}
       >
-        <div className="text-end">
-          <span
-            style={{ color: SelectSport === "football" && "#D2DB08" }}
-            onClick={() => setSelectSport("football")}
-          >
-            Football
-          </span>
-          <span
-            className="ps-2"
-            style={{ color: SelectSport === "basketball" && "#D2DB08" }}
-            onClick={() => setSelectSport("basketball")}
-          >
-            Basketball
-          </span>
+        <div className="text-end d-flex justify-content-end gap-3">
+          {profileData &&
+            profileData?.category.map((res) => {
+              return (
+                <span
+                  style={{
+                    color:
+                      SelectSport ===
+                        (res == "Futbol" || res == "Football"
+                          ? "football"
+                          : "basketball") && "#D2DB08",
+                  }}
+                  onClick={() =>
+                    setSelectSport(
+                      res == "Futbol" || res == "Football"
+                        ? "football"
+                        : "basketball"
+                    )
+                  }
+                >
+                  {res == "Futbol" || res == "Football"
+                    ? "Football"
+                    : "Basketball"}
+                </span>
+              );
+            })}
         </div>
         {isLoading ? (
           <div
@@ -186,185 +199,208 @@ const EditorProfileStatisticsSection = (props) => {
           </div>
         ) : (
           <>
-            <div className="my-2">
-              <div className="my-2">Comments Type</div>
-              <div
-                className="row g-0 my-2 justify-content-evenly"
-                >
-                {SelectSport === "football"
-                  ? footballCommentType.map((res, index) => (
-                      <div className="col-3">
-                        <CircularProgressbarWithChildren
-                          value={res.calculation}
-                          strokeWidth={5}
-                          styles={buildStyles({
-                            height:"100px",
-                            textColor:
-                              currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                            pathColor: res.pathColor,
-                            trailColor:
-                              currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                          })}
-                        >
-                          <span
-                            style={{
-                              color:
-                                currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                            }}
-                          >
-                            {res.calculation}
-                          </span>
-                          <div style={{ fontSize: 9, marginTop: -5 }}>
-                            {res.prediction_type}
+            {(footballCommentType.length !== 0 && SelectSport === "football") ||
+            (basketballCommentType.length !== 0 &&
+              SelectSport === "basketball") ? (
+              <>
+                <div className="my-2">
+                  <div className="my-2">Comments Type</div>
+                  <div className="row g-0 my-2 justify-content-evenly">
+                    {SelectSport === "football"
+                      ? footballCommentType.map((res, index) => (
+                          <div className="col-3">
+                            <CircularProgressbarWithChildren
+                              value={res.calculation}
+                              strokeWidth={5}
+                              styles={buildStyles({
+                                height: "100px",
+                                textColor:
+                                  currentTheme === "dark"
+                                    ? "#E6E6E6"
+                                    : "#0D2A53",
+                                pathColor: res.pathColor,
+                                trailColor:
+                                  currentTheme === "dark"
+                                    ? "#0B2447"
+                                    : "#F6F6F6",
+                              })}
+                            >
+                              <span
+                                style={{
+                                  color:
+                                    currentTheme === "dark"
+                                      ? "#E6E6E6"
+                                      : "#0D2A53",
+                                }}
+                              >
+                                {res.calculation}
+                              </span>
+                              <div style={{ fontSize: 9, marginTop: -5 }}>
+                                {res.prediction_type}
+                              </div>
+                            </CircularProgressbarWithChildren>
                           </div>
-                        </CircularProgressbarWithChildren>
-                      </div>
-                    ))
-                  : SelectSport === "basketball"
-                  ? basketballCommentType.map((res, index) => (
-                      <div className="col-3">
-                        <CircularProgressbarWithChildren
-                          value={res.calculation}
-                          strokeWidth={5}
-                          styles={buildStyles({
-                            height:"100px",
-                            textColor:
-                              currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                            pathColor: res.pathColor,
-                            trailColor:
-                              currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                          })}
-                        >
-                          <span
-                            style={{
-                              color:
-                                currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
-                            }}
-                          >
-                            {res.calculation}
-                          </span>
-                          <div style={{ fontSize: 10, marginTop: -5 }}>
-                            {res.prediction_type}
+                        ))
+                      : SelectSport === "basketball"
+                      ? basketballCommentType.map((res, index) => (
+                          <div className="col-3">
+                            <CircularProgressbarWithChildren
+                              value={res.calculation}
+                              strokeWidth={5}
+                              styles={buildStyles({
+                                height: "100px",
+                                textColor:
+                                  currentTheme === "dark"
+                                    ? "#E6E6E6"
+                                    : "#0D2A53",
+                                pathColor: res.pathColor,
+                                trailColor:
+                                  currentTheme === "dark"
+                                    ? "#0B2447"
+                                    : "#F6F6F6",
+                              })}
+                            >
+                              <span
+                                style={{
+                                  color:
+                                    currentTheme === "dark"
+                                      ? "#E6E6E6"
+                                      : "#0D2A53",
+                                }}
+                              >
+                                {res.calculation}
+                              </span>
+                              <div style={{ fontSize: 10, marginTop: -5 }}>
+                                {res.prediction_type}
+                              </div>
+                            </CircularProgressbarWithChildren>
                           </div>
-                        </CircularProgressbarWithChildren>
-                      </div>
-                    ))
-                  : null}
-              </div>
-            </div>
-            <div className="my-4">
-              <span className="my-2">Comments Journey</span>
-              <div className="my-2 text-end">
-                <span style={{ fontSize: "12px" }}>
-                  Son 30 Tahmine Göre{" "}
-                  <span style={{ fontSize: "16px", color: "#37FF80" }}>
-                    {" "}
-                    {SelectSport === "football" &&
-                      ` %${footballStats?.football_calculation}`}
-                    {SelectSport === "basketball" &&
-                      ` %${basketballStats?.basketball_calculation}`}
-                  </span>
-                </span>
-                <div className="d-flex">
-                  {SelectSport === "football" &&
-                    footballStats?.Comments_Journey_football?.map(
-                      (isGreen, index) => (
-                        <div
-                          className={isGreen ? "green-block" : "red-block"}
-                          key={index}
-                        ></div>
-                      )
-                    )}
-                  {SelectSport === "basketball" &&
-                    basketballStats?.Comments_Journey_basketball?.map(
-                      (isGreen, index) => (
-                        <div
-                          className={isGreen ? "green-block" : "red-block"}
-                          key={index}
-                        ></div>
-                      )
-                    )}
+                        ))
+                      : null}
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="mb-2 mt-3">
-              <div className="my-2 pb-1">Countries - Leagues</div>
-              <div className="d-flex justify-content-between">
-                {displayLeague?.slice(0, 3)?.map((res, index) => (
-                  <div
-                    className=""
-                    style={{
-                      fontSize: "14px",
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                      borderRadius: "13px",
-                    }}
-                  >
-                    <img
-                      style={{ borderRadius: "50%", objectFit: "cover" }}
-                      className="flag-responsive"
-                      src={res?.flagUrl}
-                      alt=""
-                      height={25}
-                      width={25}
-                    />
-                    <span className="p-2 ps-1 Flag-content-font">
-                      {res?.league}
+                <div className="my-4">
+                  <span className="my-2">Comments Journey</span>
+                  <div className="my-2 text-end">
+                    <span style={{ fontSize: "12px" }}>
+                      Son 30 Tahmine Göre{" "}
+                      <span style={{ fontSize: "16px", color: "#37FF80" }}>
+                        {" "}
+                        {SelectSport === "football" &&
+                          ` %${footballStats?.football_calculation}`}
+                        {SelectSport === "basketball" &&
+                          ` %${basketballStats?.basketball_calculation}`}
+                      </span>
                     </span>
+                    <div className="d-flex">
+                      {SelectSport === "football" &&
+                        footballStats?.Comments_Journey_football?.map(
+                          (isGreen, index) => (
+                            <div
+                              className={isGreen ? "green-block" : "red-block"}
+                              key={index}
+                            ></div>
+                          )
+                        )}
+                      {SelectSport === "basketball" &&
+                        basketballStats?.Comments_Journey_basketball?.map(
+                          (isGreen, index) => (
+                            <div
+                              className={isGreen ? "green-block" : "red-block"}
+                              key={index}
+                            ></div>
+                          )
+                        )}
+                    </div>
                   </div>
-                ))}
-              </div>
-              <div className="d-flex justify-content-center gap-2 my-3">
-                {displayLeague?.slice(3, 5)?.map((res, index) => (
-                  <div
-                    className=""
-                    style={{
-                      fontSize: "14px",
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                      borderRadius: "13px",
-                    }}
-                  >
-                    <img
-                      style={{ borderRadius: "50%", objectFit: "cover" }}
-                      className="flag-responsive"
-                      src={res?.flagURL}
-                      alt=""
-                      height={25}
-                      width={25}
-                    />
-                    <span className="p-2 ps-1 Flag-content-font">
-                      {res?.leagueName}
-                    </span>
+                </div>
+                <div className="mb-2 mt-3">
+                  <div className="my-2 pb-1">Countries - Leagues</div>
+                  <div className="d-flex justify-content-between">
+                    {displayLeague?.slice(0, 3)?.map((res, index) => (
+                      <div
+                        className=""
+                        style={{
+                          fontSize: "14px",
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                          borderRadius: "13px",
+                        }}
+                      >
+                        <img
+                          style={{ borderRadius: "50%", objectFit: "cover" }}
+                          className="flag-responsive"
+                          src={res?.flagUrl}
+                          alt=""
+                          height={25}
+                          width={25}
+                        />
+                        <span className="p-2 ps-1 Flag-content-font">
+                          {res?.league}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="d-flex justify-content-between">
-                {displayLeague?.slice(5, 8)?.map((res, index) => (
-                  <div
-                    className=""
-                    style={{
-                      fontSize: "14px",
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                      borderRadius: "13px",
-                    }}
-                  >
-                    <img
-                      style={{ borderRadius: "50%", objectFit: "cover" }}
-                      className="flag-responsive"
-                      src={res?.flagURL}
-                      alt=""
-                      height={25}
-                      width={25}
-                    />
-                    <span className="p-2 ps-1 Flag-content-font">
-                      {res?.leagueName}
-                    </span>
+                  <div className="d-flex justify-content-center gap-2 my-3">
+                    {displayLeague?.slice(3, 5)?.map((res, index) => (
+                      <div
+                        className=""
+                        style={{
+                          fontSize: "14px",
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                          borderRadius: "13px",
+                        }}
+                      >
+                        <img
+                          style={{ borderRadius: "50%", objectFit: "cover" }}
+                          className="flag-responsive"
+                          src={res?.flagURL}
+                          alt=""
+                          height={25}
+                          width={25}
+                        />
+                        <span className="p-2 ps-1 Flag-content-font">
+                          {res?.leagueName}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  <div className="d-flex justify-content-between">
+                    {displayLeague?.slice(5, 8)?.map((res, index) => (
+                      <div
+                        className=""
+                        style={{
+                          fontSize: "14px",
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                          borderRadius: "13px",
+                        }}
+                      >
+                        <img
+                          style={{ borderRadius: "50%", objectFit: "cover" }}
+                          className="flag-responsive"
+                          src={res?.flagURL}
+                          alt=""
+                          height={25}
+                          width={25}
+                        />
+                        <span className="p-2 ps-1 Flag-content-font">
+                          {res?.leagueName}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div
+                className="d-flex gap-1 my-2 pb-2 align-items-center justify-content-center"
+                style={{ height: "200px" }}
+              >
+                No Record Found!
               </div>
-            </div>
+            )}
           </>
         )}
       </div>

@@ -73,6 +73,11 @@ const AddCommentModal = (props) => {
   const [leagueDropdown, setLeagueDropdown] = useState(false);
   const [dateDropdown, setDateDropdown] = useState(false);
 
+  useEffect(() => {
+    profileData?.category.length == 1 &&
+      setSelectedCategory(profileData?.category[0]);
+  }, [profileData?.category, props?.show]);
+
   const handleCategorySelection = async (category) => {
     if (JSON.parse(localStorage.getItem("user-active")) == false) {
       errorSwal();
@@ -795,34 +800,36 @@ const AddCommentModal = (props) => {
                 </small>
               </div>
             </div>
-            <div className="">
-              {currentTheme === "dark" ? (
-                <img
-                  onClick={() =>
-                    profileData.commentator_level !== "apprentice" &&
-                    setToggleInput(!toggleInput)
-                  }
-                  src={!toggleInput ? SelecttoggleinputDark : toggleinputDark}
-                  alt=""
-                  height={23}
-                  width={55}
-                />
-              ) : (
-                <img
-                  onClick={() =>
-                    profileData.commentator_level !== "apprentice" &&
-                    setToggleInput(!toggleInput)
-                  }
-                  src={
-                    !toggleInput ? toggleinputLight : toggleinputLightSelected
-                  }
-                  alt=""
-                  height={23}
-                  width={55}
-                />
-              )}
-              <span className="ps-2">Public Content</span>
-            </div>
+            {profileData?.commentator_level !== "apprentice" && (
+              <div className="">
+                {currentTheme === "dark" ? (
+                  <img
+                    onClick={() =>
+                      profileData.commentator_level !== "apprentice" &&
+                      setToggleInput(!toggleInput)
+                    }
+                    src={!toggleInput ? SelecttoggleinputDark : toggleinputDark}
+                    alt=""
+                    height={23}
+                    width={55}
+                  />
+                ) : (
+                  <img
+                    onClick={() =>
+                      profileData.commentator_level !== "apprentice" &&
+                      setToggleInput(!toggleInput)
+                    }
+                    src={
+                      !toggleInput ? toggleinputLight : toggleinputLightSelected
+                    }
+                    alt=""
+                    height={23}
+                    width={55}
+                  />
+                )}
+                <span className="ps-2">Public Content</span>
+              </div>
+            )}
             <div className="">
               <span style={{ fontSize: "10px" }}>
                 Comment

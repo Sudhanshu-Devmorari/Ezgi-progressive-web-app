@@ -81,6 +81,8 @@ const NavBar = (props) => {
                   localStorage.setItem("dashboardShow", true);
                   localStorage.setItem("subcurrentpage", "notifications");
                   props.setSelectContent("notifications");
+                  props.setActiveCommentsshow(null);
+                  localStorage.removeItem("activeCommentId");
                 }
                 setShowModal(4);
               }}
@@ -92,13 +94,19 @@ const NavBar = (props) => {
                 onClick={() => {
                   props.setDashboardSUser(true);
                   const currentPage = localStorage.getItem("currentpage");
+                  const currentuser = localStorage.getItem("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&
                     localStorage.setItem("priviouspage", currentPage);
                   localStorage.setItem("currentpage", "show-all-comments");
-                  localStorage.setItem("subcurrentpage", "home");
+                  localStorage.setItem(
+                    "subcurrentpage",
+                    currentuser == "standard" ? "subscribers" : "home"
+                  );
                   props.setSelectContent("show-all-comments");
+                  props.setActiveCommentsshow(null);
+                  localStorage.removeItem("activeCommentId");
                 }}
                 className="py-2 px-3"
                 style={{

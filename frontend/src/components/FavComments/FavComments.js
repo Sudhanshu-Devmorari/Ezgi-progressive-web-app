@@ -261,6 +261,21 @@ const FavComments = (props) => {
                 <div
                   className="position-relative col p-0"
                   onClick={() => {
+                    const currentPage = localStorage.getItem("currentpage");
+                    const currentuser = localStorage.getItem("user-role");
+                    localStorage.setItem("dashboardShow", true);
+                    (currentPage !== "show-all-comments" ||
+                      currentPage !== "notifications") &&
+                      localStorage.setItem("priviouspage", currentPage);
+                    localStorage.setItem("currentpage", "show-all-comments");
+                    localStorage.setItem(
+                      "subcurrentpage",
+                      currentuser == "standard" ? "subscribers" : "home"
+                    );
+                    localStorage.setItem(
+                      "activeCommentId",
+                      res?.commentator_user?.id
+                    );
                     props?.setActiveCommentsshow(res?.commentator_user?.id);
                     props?.setDashboardSUser(false);
                     props?.setSelectContent("show-all-comments");
@@ -292,7 +307,7 @@ const FavComments = (props) => {
                       alt=""
                     />
                     <span className="p-1 autorname-responsive">
-                      {truncateString(res?.commentator_user?.username, 11)}
+                      {truncateString(res?.commentator_user?.username, 7)}
                     </span>
                     {props.verifyid?.includes(res?.commentator_user?.id) && (
                       <img src={blueTick} alt="" width={16} height={16} />
