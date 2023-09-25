@@ -56,13 +56,10 @@ const ActiveComments = (props) => {
 
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
-      console.log("if true:::::::::::::::");
       setUser(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
-      console.log("else if true::::::::::::::");
       setUser(userId);
     } else {
-      console.log("else true:::::::::::::::");
       const user = localStorage.getItem("user-id");
       setUser(user);
     }
@@ -186,7 +183,6 @@ const ActiveComments = (props) => {
   };
 
   useEffect(() => {
-    console.log("user::::::::::::::", user);
     if (user)
       try {
         axios
@@ -366,6 +362,8 @@ const ActiveComments = (props) => {
     }
   };
 
+  const [commentatorLevel, setCommentatorLevel] = useState(null);
+
   // check activation
   const checkDeactivation = async (value) => {
     try {
@@ -376,6 +374,7 @@ const ActiveComments = (props) => {
         if (value === "add comment") {
           setAddCommentModalModalShow(true);
         } else if (value === "promote me") {
+          setCommentatorLevel(profileData);
           setPromoteModalShow(true);
         } else if (value === "bank update") {
           handleBankUpdate();
@@ -563,12 +562,12 @@ const ActiveComments = (props) => {
                 {truncated}
                 {props.verifyid?.includes(profileData?.id) && (
                   <img
-                  className="responsive-blue-tick"
-                  src={blueTick}
-                  alt=""
-                  width={19}
-                  height={19}
-                />
+                    className="responsive-blue-tick"
+                    src={blueTick}
+                    alt=""
+                    width={19}
+                    height={19}
+                  />
                 )}
               </div>
               <div
@@ -1012,6 +1011,7 @@ const ActiveComments = (props) => {
         onHide={() => setSubscribeModalShow(false)}
       />
       <PromoteMeModal
+        commentatorUser={commentatorLevel}
         show={PromoteModalShow}
         onHide={() => setPromoteModalShow(false)}
       />

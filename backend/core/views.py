@@ -700,6 +700,11 @@ class SubscriptionView(APIView):
                 Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=user, duration=duration, subscription=True,
                                                             start_date=start_date, end_date=end_date, status='active', money=money)
                 
+            if not FollowCommentator.objects.filter(commentator_user=commentator, standard_user=user).exists():
+                follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator, standard_user=user)
+                # send follow notification:
+                notification_obj = Notification.objects.create(sender=user, receiver=commentator,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+        
             # send Subscription notification:
             notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{request.user.username} Subscribe you.')
             if Subscription_obj != None:
@@ -1019,7 +1024,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
         
         try:
             editor = []
-            editor_obj = FavEditors.objects.filter(standard_user_id=id)
+            editor_obj = FavEditors.objects.filter(standard_user_id=id, commentator_user__is_delete=False)
             for obj in editor_obj:
                 details = {}
 
@@ -1034,7 +1039,7 @@ class RetrieveFavEditorsAndFavComment(APIView):
                 details['data'] = data
                 
                 # Subscribe count
-                count = Subscription.objects.filter(commentator_user=obj.commentator_user).count()
+                count = Subscription.objects.filter(commentator_user=obj.commentator_user, standard_user__is_delete=False).count()
                 details['subscriber_count'] = count
 
                 editor.append(details)
@@ -1044,10 +1049,12 @@ class RetrieveFavEditorsAndFavComment(APIView):
             return Response(data={'error': 'Error retrieving favorite editors'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            comment_obj = CommentReaction.objects.filter(user_id=id, favorite=1)
+            comment_obj = CommentReaction.objects.filter(user_id=id, favorite=1, comment__commentator_user__is_delete=False)
+            print('comment_obj: ', comment_obj)
             details = []
             for obj in comment_obj:
-                data_c = Comments.objects.filter(commentator_user=obj.user).only('id','is_prediction')
+                data_c = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
+                print('data_c: ', data_c)
                 win_count = data_c.filter(is_prediction=True).count()
                 lose_count = data_c.filter(is_prediction=False).count()
                 comment_data = CommentsSerializer(obj.comment).data
@@ -1383,7 +1390,6 @@ class HighlightPurchaseView(APIView):
         """
         if highlight purchase sucessfull then below code work
         """
-        user = request.user
         if request.data:
             try:
                 if 'id' not in request.data:
@@ -1406,11 +1412,16 @@ class HighlightPurchaseView(APIView):
                     end_date = start_date + timezone.timedelta(days=14)
                 else:  # duration == "1 Month"
                     end_date = start_date + timezone.timedelta(days=30)
+                
+                user = User.objects.get(id=request.data['id'])
+
+                if Highlight.objects.filter(user=user,status='active').exists():
+                    return Response({'data':'Your highlight plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
                 if highlight_obj != None:
-                    if DataCount.objects.filter(id=1).exists():
-                        obj = DataCount.objects.get(id=1)
+                    if DataCount.objects.filter(id=user.id).exists():
+                        obj = DataCount.objects.get(id=user.id)
                         obj.highlight += 1
                         obj.save()
                     else:
@@ -4349,9 +4360,8 @@ class FootbalAndBasketballContentView(APIView):
         try:
             category = request.query_params.get('category')
             if category:
-                queryset = Comments.objects.filter(category=[category]).order_by('-created')  # Remove square brackets around category
-                data = CommentsSerializer(queryset, many=True).data  # Serialize queryset
-
+                queryset = Comments.objects.filter(category=[category], commentator_user__is_delete=False, is_resolve=False).order_by('-created')
+                data = CommentsSerializer(queryset, many=True).data  
                 # Create a list to store comments with their total reactions
                 comments_with_reactions = []
 
@@ -4364,29 +4374,15 @@ class FootbalAndBasketballContentView(APIView):
                         total_clap=Sum('clap')
                     )
 
-                    # total_reactions = {
-                    #     'total_likes': total_reactions['total_likes'] or 0,
-                    #     'total_favorite': total_reactions['total_favorite'] or 0,
-                    #     'total_clap': total_reactions['total_clap'] or 0
-                    # }
                     comment_data['total_reactions'] = {
                     'total_likes': total_reactions['total_likes'] or 0,
                     'total_favorite': total_reactions['total_favorite'] or 0,
                     'total_clap': total_reactions['total_clap'] or 0
                 }
-
-                    # Include comment data and total reactions in the list
-                    # comments_with_reactions.append({
-                    #     'comment_data': CommentsSerializer(comment).data,
-                    #     'reactions': reactions
-                    # })
-                    # data['reactions'] = reactions
                 
                     comments_with_reactions.append(comment_data)
 
-                # return Response({'data': data}, status=status.HTTP_200_OK)
                 return Response({'data': comments_with_reactions}, status=status.HTTP_200_OK)
-                # return Response({'data': data}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Something went wrong'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -4412,7 +4408,7 @@ class RetrievePageData():
         public_comments = []
 
         try:
-            all_comments = Comments.objects.filter(status='approve').order_by('-created').only('id')
+            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False).order_by('-created').only('id')
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -4455,10 +4451,10 @@ class RetrievePageData():
             if not is_user_exist:
                 return subscription_comments
             
-            subscription_obj = Subscription.objects.filter(standard_user_id=id, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
+            subscription_obj = Subscription.objects.filter(standard_user_id=id, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
             for obj in subscription_obj:
-                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve').exists():
-                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False).order_by('-created')
+                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
+                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False, commentator_user__is_delete=False, is_resolve=False).order_by('-created')
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
@@ -4493,21 +4489,21 @@ class RetrievePageData():
         try:
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
-            print('standard_user_id: ', standard_user_id)
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active').order_by('-created').only('id')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False).order_by('-created').only('id')
+            print('all_highlights: ', all_highlights)
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
                 user_data = highlighted_data['user'] 
 
-                data = Comments.objects.filter(commentator_user=obj.user).only('id','is_prediction')
+                data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
                 win_count = data.filter(is_prediction=True).count()
                 lose_count = data.filter(is_prediction=False).count()
                 highlighted_data['user'] ['win'] = win_count
                 highlighted_data['user'] ['lose'] = lose_count
 
-                count = Subscription.objects.filter(commentator_user=user_data['id']).count()
+                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
                 highlighted_data['subscriber_count'] = count
 
                 if standard_user_id:
@@ -4539,7 +4535,7 @@ class RetrievePageData():
         try:
             if id != 'null':
                 if FollowCommentator.objects.filter(standard_user__id=id).exists():
-                    following = FollowCommentator.objects.filter(standard_user__id=id).only('id', 'commentator_user')
+                    following = FollowCommentator.objects.filter(standard_user__id=id, commentator_user__is_delete=False).only('id', 'commentator_user')
                     for obj in following:
                         serializer = UserSerializer(obj.commentator_user).data
                         following_user.append(serializer)
@@ -4551,7 +4547,7 @@ class RetrievePageData():
 
     def get_verify_ids(self):
         """ Return verify ids data """
-        return list(BlueTick.objects.filter(status='approve').values_list('user_id', flat=True))
+        return list(BlueTick.objects.filter(status='approve', user__is_delete=False).values_list('user_id', flat=True))
 
     def get_comment_reactions(self, id):
         """ Return comment reactions data """
@@ -4582,14 +4578,14 @@ class RetrievePageData():
             user_id = user_id if User.objects.filter(id=user_id).exists() else None
 
             # Get data
-            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator').order_by('-created').only('id')
+            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator', is_delete=False).order_by('-created').only('id')
             for obj in all_commentator:
                 detail = {}
-                count = Subscription.objects.filter(commentator_user_id=obj.id).count()
+                count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
                 user_data = UserSerializer(obj).data
 
                 if user_id:
-                    detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id).exists()
+                    detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id, commentator_user__is_delete=False).exists()
                 else:
                     detail['is_fav_editor'] = False
                 

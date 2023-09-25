@@ -28,7 +28,10 @@ export const SelectContent = (props) => {
                 style={{
                   color: props.selectContent === "for you" ? "#D2DB08" : "",
                 }}
-                onClick={() => props.setSelectContent("for you")}
+                onClick={() => {
+                  props.setSelectContent("for you");
+                  props.setPublicSelected(false);
+                }}
               >
                 For You
               </div>
@@ -38,7 +41,10 @@ export const SelectContent = (props) => {
                   color:
                     props.selectContent === "subscription" ? "#D2DB08" : "",
                 }}
-                onClick={() => props.setSelectContent("subscription")}
+                onClick={() => {
+                  props.setSelectContent("subscription");
+                  props.setPublicSelected(false);
+                }}
               >
                 My Subscriptions
               </div>

@@ -79,9 +79,13 @@ const AddCommentModal = (props) => {
   }, [profileData?.category, props?.show]);
 
   const handleCategorySelection = async (category) => {
-    if (JSON.parse(localStorage.getItem("user-active")) == false) {
-      errorSwal();
-      return;
+    if (selectedCategory !== category) {
+      setSelectedCountry("select");
+      setSelectedLeague("Select");
+      setSelectedDate("Select");
+      setSelectedMatchDetails("Select");
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
     }
     setSelectedCategory(category);
     setCategoryError("");
@@ -109,6 +113,13 @@ const AddCommentModal = (props) => {
   };
 
   const handleCountrySelection = (country) => {
+    if (selectedCountry !== country) {
+      setSelectedLeague("Select");
+      setSelectedDate("Select");
+      setSelectedMatchDetails("Select");
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
+    }
     setSelectedCountry(country);
     setCountryError("");
 
@@ -121,6 +132,12 @@ const AddCommentModal = (props) => {
   };
 
   const handleLeagueSelection = (league) => {
+    if (selectedLeague !== league) {
+      setSelectedDate("Select");
+      setSelectedMatchDetails("Select");
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
+    }
     setSelectedLeague(league);
     setLeagueError("");
 
@@ -134,6 +151,11 @@ const AddCommentModal = (props) => {
   };
 
   const handleDateSelection = (date) => {
+    if (selectedDate !== date) {
+      setSelectedMatchDetails("Select");
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
+    }
     setSelectedDate(date);
     setDateError("");
 
@@ -150,6 +172,10 @@ const AddCommentModal = (props) => {
   };
 
   const handleMatchDetailsSelection = (matchDetails) => {
+    if (selectedCountry !== matchDetails) {
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
+    }
     setMatchId(
       matchList
         .filter((data) => matchDetails == data.takimlar)
@@ -175,6 +201,9 @@ const AddCommentModal = (props) => {
     setMatchDetailsDropdown(!matchDetailsDropdown);
   };
   const handlePredictionTypeSelection = (predictionType) => {
+    if (selectedPredictionType !== predictionType) {
+      setSelectedPrediction("Select");
+    }
     setSelectedPredictionType(predictionType);
     setPredictionData([
       ...new Set(
@@ -433,18 +462,6 @@ const AddCommentModal = (props) => {
     // setIsLoading(false);
   };
 
-  const errorSwal = () => {
-    // console.log(localStorage.getItem("user-active"))
-
-    Swal.fire({
-      title: "Error",
-      text: `Your account has been deactivated. Contact support for assistance.`,
-      icon: "error",
-      backdrop: false,
-      customClass:
-        currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-    });
-  };
   useEffect(() => {
     const fetchData = async () => {
       let type;

@@ -15,18 +15,111 @@ import darkradioSelected from "../../assets/Ellipse 217 (1).svg";
 import darkradio from "../../assets/Ellipse 216.svg";
 import PromoteMeSubScription from "./PromoteMeSubScription";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
+import config from "../../config";
+import axios from "axios";
+import { userId } from "../GetUser";
+import Swal from "sweetalert2";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
-  // const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
   const [planSelected, setplanSelected] = useState(false);
 
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const [validationError, setValidationError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     setShowModal(7);
   }, []);
+
+  const { commentatorUser } = props;
+
+  const [isHighlightLoading, setIsHighlightLoading] = useState(false);
+  const [highlightPlan, setHighlightPlan] = useState([]);
+  useEffect(() => {
+    async function getData() {
+      try {
+        setIsHighlightLoading(true);
+        const res = await axios.get(
+          `${
+            config?.apiUrl
+          }/highlight-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
+        );
+        if (res.status === 200) {
+          const data = res?.data[0];
+          setHighlightPlan(data);
+          setIsHighlightLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    commentatorUser?.commentator_level && getData();
+  }, [commentatorUser]);
+
+  const handleHighlight = async () => {
+    if (selectCheckBox && selectedPlan) {
+      setValidationError("");
+      const money =
+        (selectedPlan === "1 Month" && highlightPlan?.month_1) ||
+        (selectedPlan === "1 Week" && highlightPlan?.week_1) ||
+        (selectedPlan === "2 Week" && highlightPlan?.week_2);
+      try {
+        setIsLoading(true);
+        const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
+          duration: selectedPlan,
+          amount: money,
+          id: userId,
+        });
+        console.log(res, "=====<<<<MMMMMMMMM");
+        if (res?.status === 200) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Success",
+            text: `You've successfully purchase highlight.`,
+            icon: "sucess",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 500) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: "something went wrong",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+        if (error?.response?.status === 400) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.data,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+      }
+    } else {
+      setValidationError("Please select a Plan or Checkbox");
+    }
+  };
 
   return (
     <>
@@ -46,6 +139,7 @@ const PromoteMeModal = (props) => {
             <span className="mb-2">
               <RxCross2
                 onClick={() => {
+                  setSelectedPlan("");
                   setSelectCheckBox(false);
                   props.onHide();
                   setShowModal(7);
@@ -83,12 +177,26 @@ const PromoteMeModal = (props) => {
                   </div>
                 </div>
 
-                <PromoteMeSubScription />
+                <PromoteMeSubScription
+                  selectedPlan={selectedPlan}
+                  setSelectedPlan={setSelectedPlan}
+                  highlightPlan={highlightPlan}
+                  isHighlightLoading={isHighlightLoading}
+                />
                 <div className="">
-                  <div className="text-center my-2">
-                    <div>Total Amount</div>
-                    <div style={{ fontSize: "19px" }}>329.90₺</div>
-                  </div>
+                  {selectedPlan && (
+                    <div className="text-center my-2">
+                      <div>Total Amount</div>
+                      <div style={{ fontSize: "19px" }}>
+                        {(selectedPlan === "1 Week" && highlightPlan?.week_1) ||
+                          (selectedPlan === "2 Week" &&
+                            highlightPlan?.week_2) ||
+                          (selectedPlan === "1 Month" &&
+                            highlightPlan?.month_1)}
+                        ₺
+                      </div>
+                    </div>
+                  )}
                   <div className="text-center">
                     <div className="my-3" style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
@@ -127,9 +235,10 @@ const PromoteMeModal = (props) => {
                         Terms of use
                       </span>
                     </div>
+                    <small className="text-danger">{validationError}</small>
                     <div className="d-flex justify-content-center my-3">
                       <button
-                      
+                        onClick={handleHighlight}
                         style={{ fontSize: "14px" }}
                         className={`${
                           currentTheme === "dark"
@@ -137,7 +246,7 @@ const PromoteMeModal = (props) => {
                             : "lightMode-btn"
                         } px-3 py-1`}
                       >
-                        Checkout
+                        {isLoading ? "Loading..." : "Checkout"}
                       </button>
                     </div>
                     <div className="text-center" style={{ fontSize: "11px" }}>
@@ -154,7 +263,12 @@ const PromoteMeModal = (props) => {
               </>
             )}
           </div>
-          {ShowModal === 3 && <TermsOfUse hide={props.onHide} setSelectCheckBox={setSelectCheckBox}/>}
+          {ShowModal === 3 && (
+            <TermsOfUse
+              hide={props.onHide}
+              setSelectCheckBox={setSelectCheckBox}
+            />
+          )}
         </Modal.Body>
       </Modal>
 

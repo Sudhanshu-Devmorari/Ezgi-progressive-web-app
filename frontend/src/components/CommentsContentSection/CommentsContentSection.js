@@ -29,6 +29,7 @@ import starDarkLogin from "../../assets/star-1.png";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import config from "../../config";
+import initialProfile from "../../assets/profile.png";
 
 import Selected_Clap from "../../assets/Selected Clap.svg";
 import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
@@ -42,7 +43,7 @@ import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Swal from "sweetalert2";
-import { truncateString } from "../GetUser";
+import { truncateString, userId } from "../GetUser";
 import { formatTimeDifference } from "../FormatTime";
 
 const CommentsContentSection = (props) => {
@@ -248,10 +249,15 @@ const CommentsContentSection = (props) => {
                               style={{ display: "flex", alignItems: "center" }}
                             >
                               <img
-                                src={`${
-                                  server_url +
+                                style={{ objectFit: "cover" }}
+                                src={
                                   val?.commentator_user?.profile_pic
-                                }`}
+                                    ? `${
+                                        server_url +
+                                        val?.commentator_user?.profile_pic
+                                      }`
+                                    : initialProfile
+                                }
                                 className="rounded-circle"
                                 width={75}
                                 height={75}
@@ -277,25 +283,27 @@ const CommentsContentSection = (props) => {
                           </div>
                           <div className="col p-0">
                             <div className="text-end mt-3 mb-2">
-                              <span
-                                className={`p-1 px-2`}
-                                style={{
-                                  backgroundColor:
-                                    val?.status === "approve"
-                                      ? "#00DE51"
-                                      : "rgb(195 168 0)",
-                                  color:
-                                    val?.status === "approve"
-                                      ? // ? "#0D2A53"
-                                        "#FFFFFF"
-                                      : "#FFFFFF",
-                                  fontSize: "12px",
-                                }}
-                              >
-                                {val?.status == "approve"
-                                  ? "Published"
-                                  : "Awaiting Approval"}
-                              </span>
+                              {val?.commentator_user?.id === userId && (
+                                <span
+                                  className={`p-1 px-2`}
+                                  style={{
+                                    backgroundColor:
+                                      val?.status === "approve"
+                                        ? "#00DE51"
+                                        : "rgb(195 168 0)",
+                                    color:
+                                      val?.status === "approve"
+                                        ? // ? "#0D2A53"
+                                          "#FFFFFF"
+                                        : "#FFFFFF",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  {val?.status == "approve"
+                                    ? "Published"
+                                    : "Awaiting Approval"}
+                                </span>
+                              )}
 
                               <img
                                 src={`${
@@ -636,10 +644,15 @@ const CommentsContentSection = (props) => {
                             />
                             <div className="col">
                               <img
-                                src={`${
-                                  server_url +
+                                style={{ objectFit: "cover" }}
+                                src={
                                   val?.commentator_user?.profile_pic
-                                }`}
+                                    ? `${
+                                        server_url +
+                                        val?.commentator_user?.profile_pic
+                                      }`
+                                    : initialProfile
+                                }
                                 className="rounded-circle"
                                 width={75}
                                 height={75}
@@ -1037,7 +1050,6 @@ const CommentsContentSection = (props) => {
           ) : (
             resolve &&
             resolve?.map((res, index) => {
-              console.log("res:::::::::::::", res);
               return (
                 <div
                   key={index}
@@ -1062,9 +1074,15 @@ const CommentsContentSection = (props) => {
                       />
                       <div className="col">
                         <img
-                          src={`${
-                            server_url + res?.commentator_user?.profile_pic
-                          }`}
+                          style={{ objectFit: "cover" }}
+                          src={
+                            res?.commentator_user?.profile_pic
+                              ? `${
+                                  server_url +
+                                  res?.commentator_user?.profile_pic
+                                }`
+                              : initialProfile
+                          }
                           className="rounded-circle"
                           width={75}
                           height={75}

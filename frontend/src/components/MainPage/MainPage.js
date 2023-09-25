@@ -83,7 +83,7 @@ const MainPage = () => {
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log("res:::::::::::::", res.data.Subscription_Comments);
+        // console.log("res:::::::::::::", res.data.Subscription_Comments);
         setPublicComments(
           res?.data?.Public_Comments.sort(
             (a, b) => moment(b.created).unix() - moment(a.created).unix()
@@ -682,71 +682,78 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
+                    {subscriptionResult?.length === 0 ? (
+                      <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                        No Record Found!
+                      </div>
+                    ) : (
+                      <>
+                        {subscriptionResult.map((val, index) => {
+                          let lastType =
+                            subscriptionResult[index == 0 ? 0 : index - 1]
+                              ?.type;
 
-                    {subscriptionResult.map((val, index) => {
-                      console.log("values:::::::::::::::", val);
-                      let lastType =
-                        subscriptionResult[index == 0 ? 0 : index - 1]?.type;
-
-                      if (val.type == "comment") {
-                        return (
-                          <>
-                            {lastType == "highlight" ? (
-                              <AdvertisementBanner
-                                data={
-                                  ads[
-                                    (
-                                      Math.random() * (ads.length - 1) +
-                                      1
-                                    ).toFixed(0)
-                                  ]
-                                }
-                              />
-                            ) : null}
-                            <ContentSection
-                              setActiveCommentsshow={setActiveCommentsshow}
-                              homeApiData={homeApiData}
-                              data={val}
-                              setData={setData}
-                              selectContent={selectPublicorForYou}
-                              setSelectContent={setSelectContent}
-                              followingList={followingList}
-                              followingid={followingid}
-                              verifyid={verifyid}
-                              cmtReact={cmtReact}
-                              publicComments={publicComments}
-                              setPublicComments={setPublicComments}
-                              mergeArrays={mergeArrays}
-                              setCmtReact={setCmtReact}
-                              key={index}
-                              handlesportData={handlesportData}
-                              setContentData={setContentData}
-                              contentData={contentData}
-                              subscriptionResult={subscriptionResult}
-                              setSubscriptionResult={setSubscriptionResult}
-                              setDashboardSUser={setDashboardSUser}
-                            />
-                          </>
-                        );
-                      }
-                      if (val.type == "highlight") {
-                        return (
-                          <>
-                            {lastType == "comment" ? (
-                              <HighlightMainPage />
-                            ) : null}
-                            <SharedProfile
-                              setActiveCommentsshow={setActiveCommentsshow}
-                              data={val}
-                              setData={setData}
-                              setSelectContent={setSelectContent}
-                              verifyid={verifyid}
-                              setDashboardSUser={setDashboardSUser}
-                            />
-                          </>
-                        );
-                      }
-                    })}
+                          if (val.type == "comment") {
+                            return (
+                              <>
+                                {lastType == "highlight" ? (
+                                  <AdvertisementBanner
+                                    data={
+                                      ads[
+                                        (
+                                          Math.random() * (ads.length - 1) +
+                                          1
+                                        ).toFixed(0)
+                                      ]
+                                    }
+                                  />
+                                ) : null}
+                                <ContentSection
+                                  setActiveCommentsshow={setActiveCommentsshow}
+                                  homeApiData={homeApiData}
+                                  data={val}
+                                  setData={setData}
+                                  selectContent={selectPublicorForYou}
+                                  setSelectContent={setSelectContent}
+                                  followingList={followingList}
+                                  followingid={followingid}
+                                  verifyid={verifyid}
+                                  cmtReact={cmtReact}
+                                  publicComments={publicComments}
+                                  setPublicComments={setPublicComments}
+                                  mergeArrays={mergeArrays}
+                                  setCmtReact={setCmtReact}
+                                  key={index}
+                                  handlesportData={handlesportData}
+                                  setContentData={setContentData}
+                                  contentData={contentData}
+                                  subscriptionResult={subscriptionResult}
+                                  setSubscriptionResult={setSubscriptionResult}
+                                  setDashboardSUser={setDashboardSUser}
+                                />
+                              </>
+                            );
+                          }
+                          if (val.type == "highlight") {
+                            return (
+                              <>
+                                {lastType == "comment" ? (
+                                  <HighlightMainPage />
+                                ) : null}
+                                <SharedProfile
+                                  setActiveCommentsshow={setActiveCommentsshow}
+                                  data={val}
+                                  setData={setData}
+                                  setSelectContent={setSelectContent}
+                                  verifyid={verifyid}
+                                  setDashboardSUser={setDashboardSUser}
+                                />
+                              </>
+                            );
+                          }
+                        })}
+                      </>
+                    )}
                   </>
                 )}
 

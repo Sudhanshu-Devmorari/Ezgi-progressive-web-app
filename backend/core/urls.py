@@ -5,7 +5,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
-                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata)
+                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView)
 
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
@@ -103,4 +103,5 @@ urlpatterns = [
     path('bank-details/<int:id>', BankDetailsView.as_view(), name='bank-details'),
     path('check-deactivated-account/<int:id>', CheckDeactivatedAccount.as_view(), name='bank-details'),
     path('user-data/<int:id>', GetUserdata.as_view(), name='User-Data'),
+    path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
 ]

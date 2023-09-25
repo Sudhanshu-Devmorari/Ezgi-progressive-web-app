@@ -5,16 +5,18 @@ import darkradioSelected from "../../assets/Ellipse 217 (1).svg";
 import darkradio from "../../assets/Ellipse 216.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 
-function PromoteMeSubScription() {
-  const [selectedPlan, setSelectedPlan] = useState(null);
+function PromoteMeSubScription(props) {
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
+  const { highlightPlan } = props;
+
   const handlePlanClick = (plan) => {
-    setSelectedPlan(plan);
+    props?.setSelectedPlan(plan);
   };
 
   const isPlanSelected = (plan) => {
-    return selectedPlan === plan;
+    return props?.selectedPlan === plan;
   };
 
   const renderPlan = (plan, price, discountText, backgroundColor) => (
@@ -56,9 +58,30 @@ function PromoteMeSubScription() {
   return (
     <div className="my-2" style={{ fontSize: "14px" }}>
       <div className="my-2">Highlights Plans</div>
-      {renderPlan("1 Week", "69.90₺", null, currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
-      {renderPlan("2 Week", "179.90₺", "%20 Save!", currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
-      {renderPlan("1 Month", "329.90₺", "%30 Save!", currentTheme === "dark" ? "#0B2447" : "#F6F6F6")}
+      {props?.isHighlightLoading ? (
+        <div className="text-center py-3">Loading...</div>
+      ) : (
+        <>
+          {renderPlan(
+            "1 Week",
+            `${highlightPlan?.week_1}₺`,
+            null,
+            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+          )}
+          {renderPlan(
+            "2 Week",
+            `${highlightPlan?.week_2}₺`,
+            "%20 Save!",
+            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+          )}
+          {renderPlan(
+            "1 Month",
+            `${highlightPlan?.month_1}₺`,
+            "%30 Save!",
+            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+          )}
+        </>
+      )}
     </div>
   );
 }
