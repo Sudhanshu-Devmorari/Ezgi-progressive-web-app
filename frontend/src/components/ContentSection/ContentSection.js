@@ -441,8 +441,8 @@ const ContentSection = ({
                 </div>
               </div>
             </div>
-            {(userPhone === null || !data?.value?.public_content) &&
-            selectContent !== "subscription" ? (
+            {(userPhone === null || !data?.value?.public_content ) &&
+            selectContent !== "subscription" && userId != data?.value?.commentator_user?.id? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -575,7 +575,7 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {userPhone && data?.value?.public_content
+                  {(userPhone && data?.value?.public_content) || userPhone == data?.value?.commentator_user?.id
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>
@@ -589,7 +589,7 @@ const ContentSection = ({
               >
                 {userPhone &&
                 (data?.value?.public_content ||
-                  selectContent == "subscription") ? (
+                  (selectContent == "subscription" || userId == data?.value?.commentator_user?.id)) ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -725,7 +725,7 @@ const ContentSection = ({
 
                 {userPhone &&
                 (data?.value?.public_content ||
-                  selectContent == "subscription") ? (
+                  (selectContent == "subscription" || userId == data?.value?.commentator_user?.id)) ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -794,8 +794,7 @@ const ContentSection = ({
                 {(selectContent === "for you" ||
                   selectContent === "comments") && (
                   <>
-                    {data?.value?.commentator_user?.commentator_level !==
-                      "apprentice" && (
+                    {(userId != data?.value?.commentator_user?.id && data?.value?.commentator_user?.commentator_level !== "apprentice") && (
                       <button
                         onClick={() => {
                           checkDeactivation();

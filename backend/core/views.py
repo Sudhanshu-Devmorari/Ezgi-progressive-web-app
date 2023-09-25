@@ -1875,7 +1875,7 @@ class CommentsManagement(APIView):
             comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
             management['comments_percentage'] = comments_percentage
         except:
-            management['comments_percentage'] = comments_percentage
+            management['comments_percentage'] = 0
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -2308,7 +2308,7 @@ class EditorManagement(APIView):
 
             editor_list = []
             # all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
-            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True).order_by('created')
+            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True).order_by('-created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2946,7 +2946,7 @@ class SupportManagement(APIView):
                 all_data['total_ticket_percentage'] = total_tickets_percentage
             except:
                 all_data['total_ticket_percentage'] = 0
-                
+
             current_datetime = timezone.now()
 
             twenty_four_hours_ago = current_datetime - timedelta(hours=24)
@@ -3262,7 +3262,7 @@ class SubUserManagement(APIView):
         data_list = {}
 
         try:
-            subuser_count = User.objects.filter(user_role='sub_user',is_delete=False, is_active=True)
+            subuser_count = User.objects.filter(user_role='sub_user',is_delete=False, is_active=True).order_by("-created")
             data_list['subuser_count'] = subuser_count.count()
             serializer = UserSerializer(subuser_count, many=True)
             data_list['subuser_list'] = serializer.data
