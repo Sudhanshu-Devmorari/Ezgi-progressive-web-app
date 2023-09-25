@@ -281,20 +281,22 @@ const CommentsContentSection = (props) => {
                                 className={`p-1 px-2`}
                                 style={{
                                   backgroundColor:
-                                  val?.status === "approve"
+                                    val?.status === "approve"
                                       ? "#00DE51"
                                       : "rgb(195 168 0)",
                                   color:
-                                  val?.status === "approve"
-                                      // ? "#0D2A53"
-                                      ? "#FFFFFF"
+                                    val?.status === "approve"
+                                      ? // ? "#0D2A53"
+                                        "#FFFFFF"
                                       : "#FFFFFF",
                                   fontSize: "12px",
                                 }}
                               >
-                                {val?.status == 'approve' ? 'Published' : "Awaiting Approval"}
+                                {val?.status == "approve"
+                                  ? "Published"
+                                  : "Awaiting Approval"}
                               </span>
-                            
+
                               <img
                                 src={`${
                                   currentTheme === "dark"
@@ -655,9 +657,30 @@ const CommentsContentSection = (props) => {
                             </div>
                           </div>
                           <div className="col p-0">
+                            <div className="text-end mt-3 mb-2">
+                              <span
+                                className={`p-1 px-2`}
+                                style={{
+                                  backgroundColor:
+                                    val?.status === "approve"
+                                      ? "#00DE51"
+                                      : "rgb(195 168 0)",
+                                  color:
+                                    val?.status === "approve"
+                                      ? // ? "#0D2A53"
+                                        "#FFFFFF"
+                                      : "#FFFFFF",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {val?.status == "approve"
+                                  ? "Published"
+                                  : "Awaiting Approval"}
+                              </span>
+                            </div>
                             <div
                               className={`
-                    mt-5 row gap-1 g-0 text-center`}
+                    row gap-1 g-0 text-center`}
                             >
                               <div className="col">
                                 <div className="rate-fonts">Success Rate</div>

@@ -83,13 +83,16 @@ const SubUserManagementPage = () => {
       );
       if (res.status === 200) {
         getSubUsers();
-        Swal.fire({
+        const confirm = await Swal.fire({
           title: "Success",
           text: res?.data?.data,
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
         });
+        if (confirm.value === true) {
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.log(error);
@@ -276,8 +279,8 @@ const SubUserManagementPage = () => {
                                     alt=""
                                     height={22}
                                     width={22}
-                                    onClick={() =>
-                                      handleDeleteUser(res.id, "delete")
+                                    onClick={(e) =>
+                                      handleDeleteUser(res.id, "delete", e)
                                     }
                                   />
                                 </div>

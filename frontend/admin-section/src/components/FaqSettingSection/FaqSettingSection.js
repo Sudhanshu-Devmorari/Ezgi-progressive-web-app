@@ -110,7 +110,7 @@ const FaqSettingSection = () => {
           }
         );
         if (response.status == 200) {
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text: "FAQs Update successfully!",
             icon: "success",
@@ -119,6 +119,9 @@ const FaqSettingSection = () => {
           });
           // console.log(response.data)
           formik.setValues(response.data.data)
+          // if (confirm.value === true) {
+          //   window.location.reload();
+          // }
         }
       } catch (error) {
         Swal.fire({
@@ -150,13 +153,16 @@ const FaqSettingSection = () => {
         `${config.apiUrl}/become-editor-faq/${deleteId}`
       );
       if (response.status == 200) {
-        Swal.fire({
+        const confirm = await Swal.fire({
           title: "Success",
           text: "FAQ Delete successfully!",
           icon: "success",
           backdrop: false,
           customClass: "dark-mode-alert",
         });
+        // if (confirm.value === true) {
+        //   window.location.reload();
+        // }
       }
       const rows = [...formik.values];
       rows.splice(index, 1);

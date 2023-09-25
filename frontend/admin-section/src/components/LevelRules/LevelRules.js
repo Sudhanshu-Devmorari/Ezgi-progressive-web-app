@@ -92,13 +92,16 @@ const LevelRules = (props) => {
         );
         setIsLoading(false);
         if (res.status === 201) {
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text: "Level Rules setting Updated!",
             icon: "success",
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          // if (confirm.value === true) {
+          //   window.location.reload();
+          // }
         }
       } catch (error) {
         console.log(error);

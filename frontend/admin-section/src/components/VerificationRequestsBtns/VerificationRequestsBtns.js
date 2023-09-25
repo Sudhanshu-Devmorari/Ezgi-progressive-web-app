@@ -60,7 +60,7 @@ const VerificationRequestsBtns = (props) => {
             setIsLoading(false);
           }
           props?.editorManagementApiData();
-          Swal.fire({
+          const confirm = await Swal.fire({
             title: "Success",
             text:
               (action === "approve" && "Request successfully approved.") ||
@@ -69,6 +69,9 @@ const VerificationRequestsBtns = (props) => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          if (confirm.value === true) {
+            window.location.reload();
+          }
         }
       } catch (error) {
         console.log(error);

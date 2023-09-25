@@ -751,10 +751,7 @@ const Home = (props) => {
                 No Record Found!
               </div>
             ) : (
-              allFilterData
-                ?.slice()
-                .reverse()
-                .map((res, index) => (
+              allFilterData?.map((res, index) => (
                   <React.Fragment key={index}>
                     <MainDiv>
                       <div className="col">

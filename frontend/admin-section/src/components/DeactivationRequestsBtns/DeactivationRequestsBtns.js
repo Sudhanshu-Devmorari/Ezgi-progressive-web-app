@@ -30,7 +30,7 @@ const DeactivationRequestsBtns = (props) => {
           setIsLoading(false);
         }
         props?.editorManagementApiData();
-        Swal.fire({
+        const confirm = await Swal.fire({
           title: "Success",
           text:
             (action === "accept" &&
@@ -41,6 +41,9 @@ const DeactivationRequestsBtns = (props) => {
           backdrop: false,
           customClass: "dark-mode-alert",
         });
+        if (confirm.value === true) {
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);

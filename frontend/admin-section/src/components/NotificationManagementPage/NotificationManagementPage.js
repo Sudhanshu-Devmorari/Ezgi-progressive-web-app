@@ -74,9 +74,10 @@ const NotificationManagementPage = () => {
   // Get Notification API
   useEffect(() => {
     async function getNotificationsData() {
+      const user_id = localStorage.getItem("admin-user-id")
       try {
         const res = await axios.get(
-          `${config?.apiUrl}/notification-management/`
+          `${config?.apiUrl}/notification-management/?admin_id=${user_id}`
         );
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;

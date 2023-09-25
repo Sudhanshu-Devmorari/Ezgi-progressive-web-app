@@ -1509,38 +1509,49 @@ class AdminMainPage(APIView):
         previous_24_hours = timezone.now() - timedelta(hours=24)
 
         try:
-            """user percentage"""
-            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
-            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
-            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
-            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
-            data_list['new_user_percentage'] = user_percentage
+            try:
+                """user percentage"""
+                deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+                users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+                users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+                user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+                data_list['new_user_percentage'] = user_percentage
+            except:
+                data_list['new_user_percentage'] = 0
             
-            """editor percentage"""
-            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
-            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
-            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
-            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
-            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
-            data_list['new_editor_percentage'] = editor_percentage
+            try:
+                """editor percentage"""
+                deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+                editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+                editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+                count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+                editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+                data_list['new_editor_percentage'] = editor_percentage
+            except:
+                data_list['new_editor_percentage'] = 0
 
+            try:
+                """Subscribers percentage"""
+                status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            except:
+                data_list['new_subscriptions_percentage'] = 0
 
-            """Subscribers percentage"""
-            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
-            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
-            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
-            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
-            data_list['new_subscriptions_percentage'] = subscriptions_percentage
-
-            """Comments percentage"""
-            status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
-            new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
-            comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
-            comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
-            data_list['comments_percentage'] = comments_percentage
+            try:
+                """Comments percentage"""
+                status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+                new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+                comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+                comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+                data_list['comments_percentage'] = comments_percentage
+            except:
+                data_list['comments_percentage'] = 0
 
 
             new_user = User.objects.all().count()
@@ -1576,31 +1587,38 @@ class UserManagement(APIView):
 
 
         try:
-            """user percentage"""
-            deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
-            users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
-            users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
-            user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
-            data_list['new_user_percentage'] = user_percentage
-
+            try:
+                """user percentage"""
+                deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
+                users_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False).count()
+                users_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (users_before_24_hours - deleted_users_count) + users_previous_24_hours
+                user_percentage = ((count-users_before_24_hours)/users_before_24_hours) * 100
+                data_list['new_user_percentage'] = user_percentage
+            except:
+                data_list['new_user_percentage'] = 0
             
-            """editor percentage"""
-            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
-            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
-            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
-            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
-            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
-            data_list['new_editor_percentage'] = editor_percentage
+            try:
+                """editor percentage"""
+                deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+                editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+                editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+                count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+                editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+                data_list['new_editor_percentage'] = editor_percentage
+            except:
+                data_list['new_editor_percentage'] = 0
 
-
-            """Subscribers percentage"""
-            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
-            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
-            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
-            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
-            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            try:
+                """Subscribers percentage"""
+                status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            except:
+                data_list['new_subscriptions_percentage'] = 0
 
 
             new_user = User.objects.all().count()
@@ -1848,13 +1866,16 @@ class CommentsManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         
-        """Comments percentage"""
-        status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
-        new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
-        comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-        count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
-        comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
-        management['comments_percentage'] = comments_percentage
+        try:
+            """Comments percentage"""
+            status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
+            new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+            comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+            comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+            management['comments_percentage'] = comments_percentage
+        except:
+            management['comments_percentage'] = comments_percentage
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -1919,8 +1940,13 @@ class CommentsManagement(APIView):
         serializer = CommentsSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid():
             try:
+                admin_id = request.query_params.get('admin_id')
+                admin_user = User.objects.get(id=admin_id)
+                if request.data.get('status') == 'approve':
+                    notification_obj = Notification.objects.create(sender=admin_user,receiver=comment.commentator_user,date=datetime.today().date(), status=False, context=f"{comment.match_detail} comment has been approved by admin and is now visible to other users.")
+                else:
+                    notification_obj = Notification.objects.create(sender=admin_user,receiver=comment.commentator_user,date=datetime.today().date(), status=False, context=f'{comment.match_detail} comment has been removed by admin.')
                 serializer.save()
-                
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2268,13 +2294,16 @@ class EditorManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         try:
-            """editor percentage"""
-            deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
-            editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
-            editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
-            count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
-            editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
-            data_list['new_editor_percentage'] = editor_percentage
+            try:
+                """editor percentage"""
+                deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
+                editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
+                editor_before_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours, user_role='commentator').count()
+                count = (editor_before_24_hours - deleted_editor_count) + editor_previous_24_hours
+                editor_percentage = ((count-editor_before_24_hours)/editor_before_24_hours) * 100
+                data_list['new_editor_percentage'] = editor_percentage
+            except:
+                data_list['new_editor_percentage'] = 0
 
 
             editor_list = []
@@ -2417,7 +2446,7 @@ class EditorManagement(APIView):
         except Exception as e:
             print(e,"===================>>>>>e")
             # Handle the exception here (e.g., log the error, return a specific error response, etc.)
-            return Response(data={'error': 'An error occurred while processing the request.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'An error occurred while processing the request.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -2726,21 +2755,27 @@ class SalesManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         try:
-            """Subscribers percentage"""
-            status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
-            new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
-            subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
-            subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
-            data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            try:
+                """Subscribers percentage"""
+                status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            except:
+                data_list['new_subscriptions_percentage'] = 0
 
-            """Highlights percentage"""
-            highlights_status_changed_to_pending = Highlight.objects.annotate(date_updated=TruncDate('updated')).filter(status='pending', date_updated__gte=previous_24_hours).count()
-            highlights_purchased = Highlight.objects.annotate(date_created=TruncDate('created')).filter(status='active', highlight=True, date_created__gte=previous_24_hours).count()
-            highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
-            highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
-            data_list['new_highlights_percentage'] = highlights_percentage
+            try:
+                """Highlights percentage"""
+                highlights_status_changed_to_pending = Highlight.objects.annotate(date_updated=TruncDate('updated')).filter(status='pending', date_updated__gte=previous_24_hours).count()
+                highlights_purchased = Highlight.objects.annotate(date_created=TruncDate('created')).filter(status='active', highlight=True, date_created__gte=previous_24_hours).count()
+                highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
+                highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
+                data_list['new_highlights_percentage'] = highlights_percentage
+            except:
+                data_list['new_highlights_percentage'] = 0
 
             # Subscription objects handling
             subscription_obj = Subscription.objects.filter(subscription=True)
@@ -2890,22 +2925,28 @@ class SupportManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         try:
-            """Ticket percentage"""
-            status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
-            new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
-            tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            count = (tickets_before_24_hours - status_changed_to_resolved) + new_tickets_progress
-            tickets_percentage = ((count-tickets_before_24_hours)/tickets_before_24_hours) * 100
-            all_data['new_tickets_percentage'] = tickets_percentage
+            try:
+                """Ticket percentage"""
+                status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
+                new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+                tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (tickets_before_24_hours - status_changed_to_resolved) + new_tickets_progress
+                tickets_percentage = ((count-tickets_before_24_hours)/tickets_before_24_hours) * 100
+                all_data['new_tickets_percentage'] = tickets_percentage
+            except:
+                all_data['new_tickets_percentage'] = 0
 
-            """Total Ticket percentage"""
-            total_status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
-            total_new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
-            total_tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
-            total_count = (total_tickets_before_24_hours - total_status_changed_to_resolved) + total_new_tickets_progress
-            total_tickets_percentage = ((total_count-total_tickets_before_24_hours)/total_tickets_before_24_hours) * 100
-            all_data['total_ticket_percentage'] = total_tickets_percentage
-
+            try:
+                """Total Ticket percentage"""
+                total_status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
+                total_new_tickets_progress = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
+                total_tickets_before_24_hours = TicketSupport.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                total_count = (total_tickets_before_24_hours - total_status_changed_to_resolved) + total_new_tickets_progress
+                total_tickets_percentage = ((total_count-total_tickets_before_24_hours)/total_tickets_before_24_hours) * 100
+                all_data['total_ticket_percentage'] = total_tickets_percentage
+            except:
+                all_data['total_ticket_percentage'] = 0
+                
             current_datetime = timezone.now()
 
             twenty_four_hours_ago = current_datetime - timedelta(hours=24)
@@ -3152,7 +3193,8 @@ class NotificationManagement(APIView):
 
             # Retrieve all notification objects
             # notification_obj = Notification.objects.all()
-            admin_user = User.objects.get(is_admin=True)
+            admin_id = request.query_params.get('admin_id')
+            admin_user = User.objects.get(id=admin_id,is_admin=True)
             
             notification_obj = Notification.objects.filter(
                 Q(subject='Subscription Purchase') |
@@ -3220,7 +3262,7 @@ class SubUserManagement(APIView):
         data_list = {}
 
         try:
-            subuser_count = User.objects.filter(user_role='sub_user',is_delete=False)
+            subuser_count = User.objects.filter(user_role='sub_user',is_delete=False, is_active=True)
             data_list['subuser_count'] = subuser_count.count()
             serializer = UserSerializer(subuser_count, many=True)
             data_list['subuser_list'] = serializer.data
@@ -3573,12 +3615,19 @@ class MembershipSettingView(APIView):
             if not level:
                 return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
             
+            if level.lower() == 'expert':
+                level = 'master'
+            
             level_obj = MembershipSetting.objects.filter(commentator_level=level)
             
             if not level_obj.exists():
                 return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
             
             serializer = MembershipSettingSerializer(level_obj, many=True)
+            if level.lower() == 'expert':
+                for data in serializer.data:
+                    if data['commentator_level'].lower() == 'master':
+                        data['commentator_level'] = 'expert'
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         
         except Exception as e:
@@ -3586,18 +3635,25 @@ class MembershipSettingView(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
+        data = request.data.copy()
+        if commentator_level.lower() == 'expert':
+            data["commentator_level"] = 'master'
+            commentator_level = 'master' 
+        else:
+            data["commentator_level"] = commentator_level
+
         existing_record = MembershipSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
-            serializer = MembershipSettingSerializer(existing_record, data=request.data, partial=True)
+            serializer = MembershipSettingSerializer(existing_record, data=data, partial=True)
         else:
             request.data['commentator_level'] = commentator_level
-            serializer = MembershipSettingSerializer(data=request.data)
+            serializer = MembershipSettingSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
             promotion_rate = request.data['promotion_rate']
-            notification_list = {}
+            notification_list = []
             standard_users = User.objects.filter(user_role='standard')
             for user in standard_users:
                 notification_obj = Notification(
@@ -3622,13 +3678,18 @@ class SubscriptionSettingView(APIView):
             
             if not level:
                 return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            if level.lower() == 'expert':
+                level = 'master'
             level_obj = SubscriptionSetting.objects.filter(commentator_level=level)
             
             if not level_obj.exists():
                 return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
             
             serializer = SubscriptionSettingSerializer(level_obj, many=True)
+            if level.lower() == 'expert':
+                for data in serializer.data:
+                    if data['commentator_level'].lower() == 'master':
+                        data['commentator_level'] = 'expert'
             return Response(data=serializer.data, status=status.HTTP_200_OK)
     
         except Exception as e:
@@ -3636,15 +3697,22 @@ class SubscriptionSettingView(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
+        data = request.data.copy()
+        if commentator_level.lower() == 'expert':
+            data["commentator_level"] = 'master'
+            commentator_level = 'master' 
+        else:
+            data["commentator_level"] = commentator_level
+
         existing_record = SubscriptionSetting.objects.filter(commentator_level=commentator_level).first()
 
-        data = request.data
-        data.update({'commentator_level': commentator_level})
+        # data = request.data
+        # data.update({'commentator_level': commentator_level})
         if existing_record:
             serializer = SubscriptionSettingSerializer(existing_record, data=data, partial=True)
         else:
             request.data['commentator_level'] = commentator_level
-            serializer = SubscriptionSettingSerializer(data=request.data)
+            serializer = SubscriptionSettingSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -3660,13 +3728,18 @@ class HighlightSettingView(APIView):
             
             if not level:
                 return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
-            
+            if level.lower() == 'expert':
+                level = 'master'
             level_obj = HighlightSetting.objects.filter(commentator_level=level)
             
             if not level_obj.exists():
                 return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
             
             serializer = HighlightSettingSerializer(level_obj, many=True)
+            if level.lower() == 'expert':
+                for data in serializer.data:
+                    if data['commentator_level'].lower() == 'master':
+                        data['commentator_level'] = 'expert'
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         
         except Exception as e:
@@ -3674,12 +3747,18 @@ class HighlightSettingView(APIView):
         
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
+        data = request.data.copy()
+        if commentator_level.lower() == 'expert':
+            data["commentator_level"] = 'master'
+            commentator_level = 'master' 
+        else:
+            data["commentator_level"] = commentator_level
         existing_record = HighlightSetting.objects.filter(commentator_level=commentator_level).first()
 
         if existing_record:
-            serializer = HighlightSettingSerializer(existing_record, data=request.data, partial=True)
+            serializer = HighlightSettingSerializer(existing_record, data=data, partial=True)
         else:
-            serializer = HighlightSettingSerializer(data=request.data)
+            serializer = HighlightSettingSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()

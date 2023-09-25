@@ -26,7 +26,7 @@ const SalesMembershipSettings = (props) => {
   useEffect(() => {
     async function getData() {
       try {
-        setIsLoading(true);
+        // setIsLoading(true);
         const res = await axios.get(
           `${
             config?.apiUrl

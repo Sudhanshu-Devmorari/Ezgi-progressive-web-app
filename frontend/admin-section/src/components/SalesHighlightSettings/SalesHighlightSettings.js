@@ -38,7 +38,7 @@ const SalesHighlightSettings = (props) => {
 
   useEffect(() => {
     async function getData() {
-      setIsLoading(true);
+      // setIsLoading(true);
       try {
         const res = await axios.get(
           `${

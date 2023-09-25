@@ -682,7 +682,7 @@ const EditorManagemenet = (props) => {
   ];
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const categoryOptions = ["Football", "Basketball"];
+  const categoryOptions = ["Futbol", "Basketbol"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
 

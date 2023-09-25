@@ -121,9 +121,10 @@ const CommentsManagement = (props) => {
     setCountryDropDown(!countryDropDown);
   };
   const handleStatus = async (id, status) => {
+    const user_id = localStorage.getItem("admin-user-id")
     try {
       const res = await axios.patch(
-        `${config?.apiUrl}/comments-management/${id}/`,
+        `${config?.apiUrl}/comments-management/${id}/?admin_id=${user_id}`,
         { status: `${status}` }
       );
       window.location.reload()

@@ -74,16 +74,19 @@ const TicketReplyModal = (props) => {
             message: ticketRepltOrRedirect.reply,
             ticket_id: tickeview?.id,
           })
-          .then((res) => {
+          .then(async(res) => {
             // console.log(res);
             if (res.status === 200) {
-              Swal.fire({
+              const confirm = await Swal.fire({
                 title: "Success",
                 text: "Reply sent successfully",
                 icon: "success",
                 backdrop: false,
                 customClass: "dark-mode-alert",
               });
+              if (confirm.value === true) {
+                window.location.reload();
+              }
             }
           })
           .catch((error) => {
