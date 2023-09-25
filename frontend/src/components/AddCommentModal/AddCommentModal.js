@@ -76,6 +76,8 @@ const AddCommentModal = (props) => {
   useEffect(() => {
     profileData?.category.length == 1 &&
       setSelectedCategory(profileData?.category[0]);
+    profileData?.category.length == 1 &&
+      handleCategorySelection(profileData?.category[0]);
   }, [profileData?.category, props?.show]);
 
   const handleCategorySelection = async (category) => {
@@ -448,14 +450,15 @@ const AddCommentModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         } else if (error.response.status === 400) {
-          Swal.fire({
-            title: "Error",
-            text: `${error.response.data.data}`,
-            icon: "error",
-            backdrop: false,
-            customClass:
-              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-          });
+          console.log("error.response.data:::::::::::", error)
+          // Swal.fire({
+          //   title: "Error",
+          //   text: `${error.response.data.data}`,
+          //   icon: "error",
+          //   backdrop: false,
+          //   customClass:
+          //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          // });
         }
       }
     }
@@ -651,35 +654,37 @@ const AddCommentModal = (props) => {
                   >
                     <span>{selectedCategory}</span>
                   </div>
-                  <div
-                    className={`${
-                      currentTheme === "dark"
-                        ? "customDropdown-content-dark-mode"
-                        : "customDropdown-content-light-mode"
-                    } pt-2 flex-column d-flex text-center ${
-                      categoryDropdown ? "d-block" : "d-none"
-                    }`}
-                    style={{
-                      width: "48%",
-                    }}
-                  >
-                    {categoryOptions.map((option, index) => (
-                      <span
-                        className={`${
-                          currentTheme === "dark"
-                            ? "dpcontent-dark-mode"
-                            : "dpcontent-light-mode"
-                        } my-1 p-2`}
-                        key={index}
-                        onClick={() => {
-                          handleCategorySelection(option);
-                          toggleCategoryDropdown();
-                        }}
-                      >
-                        {option}
-                      </span>
-                    ))}
-                  </div>
+                  {categoryOptions.length == 2 && (
+                    <div
+                      className={`${
+                        currentTheme === "dark"
+                          ? "customDropdown-content-dark-mode"
+                          : "customDropdown-content-light-mode"
+                      } pt-2 flex-column d-flex text-center ${
+                        categoryDropdown ? "d-block" : "d-none"
+                      }`}
+                      style={{
+                        width: "48%",
+                      }}
+                    >
+                      {categoryOptions.map((option, index) => (
+                        <span
+                          className={`${
+                            currentTheme === "dark"
+                              ? "dpcontent-dark-mode"
+                              : "dpcontent-light-mode"
+                          } my-1 p-2`}
+                          key={index}
+                          onClick={() => {
+                            handleCategorySelection(option);
+                            toggleCategoryDropdown();
+                          }}
+                        >
+                          {option}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <small
                     className="text-danger"
                     style={{ fontSize: "0.78rem" }}

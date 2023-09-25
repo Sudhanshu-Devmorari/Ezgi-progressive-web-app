@@ -114,16 +114,16 @@ const FavComments = (props) => {
         props.homeApiData(user_id);
       }
     } catch (error) {
-      console.error("Error fetching data.", error);
+      console.log("Error fetching data.", error);
       if (error?.response?.status === 400) {
-        Swal.fire({
-          title: "Error",
-          text: `${error.response.data}`,
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
+        // Swal.fire({
+        //   title: "Error",
+        //   text: `${error.response.data}`,
+        //   icon: "error",
+        //   backdrop: false,
+        //   customClass:
+        //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        // });
       }
     }
   };

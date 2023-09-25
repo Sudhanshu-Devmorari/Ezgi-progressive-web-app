@@ -76,6 +76,17 @@ const ContentSection = ({
   // console.log("subscriptionResult:::::::::::::::content section called", subscriptionResult)
 
   const followCommentator = async (commentator_id, isFollowing) => {
+    if(userId == null){
+      await Swal.fire({
+        title: "Error",
+        text: `Please log in to continue.`,
+        icon: "error",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      });
+      return;
+    }
     try {
       // console.log("isFollowing",isFollowing)
       if (isFollowing) {
@@ -115,7 +126,6 @@ const ContentSection = ({
         homeApiData(user_id);
       }
     } catch (error) {
-      console.error("Error fetching data.", error);
       Swal.fire({
         title: "Error",
         text: `${error.response.data}`,

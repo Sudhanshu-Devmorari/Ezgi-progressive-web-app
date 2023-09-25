@@ -4020,7 +4020,7 @@ class SportsStatisticsView(APIView):
             p_type_lst = []
             details = {}
             Comments_Journey_basketball = []
-            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
+            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol')
             total_user_cmt = user_all_cmt.count()
             
             p_type_lst = [obj.prediction_type for obj in user_all_cmt]
@@ -4033,7 +4033,7 @@ class SportsStatisticsView(APIView):
 
             prediction_types_data = []
             for i in top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketball').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketbol').count()
 
                 cal = (predict_type / total_user_cmt)* 100
                 data ={
@@ -4055,21 +4055,23 @@ class SportsStatisticsView(APIView):
                 }
                 prediction_types_data.append(other_data)
                 
-            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball').order_by('-created')[:30]
+            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol').order_by('-created')[:30]
             for obj in recent_30_comments:
                 Comments_Journey_basketball.append(obj.is_prediction)
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketball').order_by('-created')[:30]
+            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketbol').order_by('-created')[:30]
 
             basketball_calculation = (len(correct_prediction_basketball)/30)*100
             details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
-            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketball')
+            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol')
             for obj in Countries_Leagues_basketball:
+                translator= Translator(from_lang="turkish",to_lang="english")
+                translation_coutry = translator.translate(obj.country)
                 data = {
-                    "country":obj.country,
+                    "country":translation_coutry,
                     "league":obj.league,
                 }
                 basketball_Leagues.append(data)
@@ -4092,7 +4094,7 @@ class SportsStatisticsView(APIView):
             fb_p_type_lst = []
             Fb_details = {}
             Comments_Journey_football = []
-            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
+            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol')
             fb_total_user_cmt = fb_user_all_cmt.count()
             
             fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
@@ -4105,7 +4107,7 @@ class SportsStatisticsView(APIView):
 
             fb_prediction_types_data = []
             for i in fb_top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Football').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Futbol').count()
 
                 cal = (predict_type / fb_total_user_cmt)* 100
                 data ={
@@ -4126,18 +4128,18 @@ class SportsStatisticsView(APIView):
                 }
                 fb_prediction_types_data.append(fb_other_data)
 
-            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Football').order_by('-created')[:30]
+            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol').order_by('-created')[:30]
             for obj in fb_recent_30_comments:
                 Comments_Journey_football.append(obj.is_prediction)
             Fb_details['Comments_Journey_football'] = Comments_Journey_football
 
-            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Football').order_by('-created')[:30]
+            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Futbol').order_by('-created')[:30]
 
             football_calculation = (len(correct_prediction_football)/30)*100
             Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
-            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Football')
+            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol')
             for obj in Countries_Leagues_football:
                 # football_Leagues.append(obj.league)
                 translator= Translator(from_lang="turkish",to_lang="english")

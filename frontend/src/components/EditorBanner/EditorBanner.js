@@ -115,6 +115,7 @@ export const EditorBanner = (props) => {
                 "subcurrentpage",
                 currentuser == "standard" ? "subscribers" : "home"
               );
+              localStorage.removeItem("activeCommentId");
               props?.setSelectContent("become-editor");
             }
           }}

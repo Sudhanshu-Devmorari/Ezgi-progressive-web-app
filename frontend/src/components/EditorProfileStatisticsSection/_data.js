@@ -135,6 +135,11 @@ export const country_code = [
     code: "BO",
   },
   {
+    name: "Bolivia",
+    dial_code: "+591",
+    code: "BO",
+  },
+  {
     name: "Bosnia and Herzegovina",
     dial_code: "+387",
     code: "BA",
@@ -565,7 +570,7 @@ export const country_code = [
     code: "KP",
   },
   {
-    name: "Korea, Republic of South Korea",
+    name: "South Korea",
     dial_code: "+82",
     code: "KR",
   },
@@ -1145,12 +1150,22 @@ export const country_code = [
     code: "AE",
   },
   {
+    name: "UAE",
+    dial_code: "+971",
+    code: "AE",
+  },
+  {
     name: "United Kingdom",
     dial_code: "+44",
     code: "GB",
   },
   {
-    name: "United States",
+    name: "UK",
+    dial_code: "+44",
+    code: "GB",
+  },
+  {
+    name: "USA",
     dial_code: "+1",
     code: "US",
   },

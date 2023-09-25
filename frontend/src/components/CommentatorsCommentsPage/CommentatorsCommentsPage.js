@@ -30,7 +30,7 @@ const CommentatorsCommentsPage = (props) => {
     useState("My subscribers");
   const [walletSelection, setWalletSelection] = useState("My transactions");
   const [favSelection, setFavSelection] = useState("fav editor");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (props.selectContent === "notifications") {
@@ -73,7 +73,6 @@ const CommentatorsCommentsPage = (props) => {
   // PROFILE API
   const [profileData, setProfileData] = useState();
   useEffect(() => {
-    setIsLoading(true);
     async function getProfileData() {
       const res = await axios.get(`${config?.apiUrl}/profile/${userId}`);
       // console.log(res.data,"========>>>");
@@ -134,7 +133,6 @@ const CommentatorsCommentsPage = (props) => {
             profileLoading={isLoading}
             setActiveCommentsshow={props.setActiveCommentsshow}
             verifyid={props.verifyid}
-
           />
           <CommentatorIcons setContent={setContent} content={content} />
 
@@ -173,7 +171,10 @@ const CommentatorsCommentsPage = (props) => {
                 />
               )}
               {SelectComment === "statistics" && (
-                <EditorProfileStatisticsSection from={"dashboard"} profileData={profileData}/>
+                <EditorProfileStatisticsSection
+                  from={"dashboard"}
+                  profileData={profileData}
+                />
               )}
             </>
           )}

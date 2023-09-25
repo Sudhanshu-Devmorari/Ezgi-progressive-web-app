@@ -18,6 +18,7 @@ const SelectContentForEditorPage = (props) => {
 
   const filterData = (e) => {
     props.setPublicSelected && props?.setPublicSelected(false);
+    console.log("props:::::::::", props.data)
     if (props.editor == true) {
       const val = e.target.value;
       if (val !== "") {
@@ -43,6 +44,12 @@ const SelectContentForEditorPage = (props) => {
               ?.toLowerCase()
               .startsWith(val.toLowerCase()) ||
             obj?.value?.user?.username
+              ?.toLowerCase()
+              .includes(val.toLowerCase()) || 
+            obj?.value?.match_detail
+              ?.toLowerCase()
+              .startsWith(val.toLowerCase()) ||
+            obj?.value?.match_detail
               ?.toLowerCase()
               .includes(val.toLowerCase())
         );

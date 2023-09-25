@@ -110,7 +110,9 @@ const EditorProfileStatisticsSection = (props) => {
             }
           });
           setLeagueFootballData(updatedFootball);
-          const basketball = res.data[1].basketball_Leagues;
+          console.log("res", res.data);
+          const basketball = res.data[0].basketball_Leagues;
+
           const updatedBasktetball = basketball?.map((item) => {
             const countryCode = country_code?.find(
               (code) => code?.name === item?.country
@@ -125,6 +127,7 @@ const EditorProfileStatisticsSection = (props) => {
               return item;
             }
           });
+
           setLeagueBasketballData(updatedBasktetball);
           setIsLoading(false);
         }
@@ -316,10 +319,11 @@ const EditorProfileStatisticsSection = (props) => {
                 </div>
                 <div className="mb-2 mt-3">
                   <div className="my-2 pb-1">Countries - Leagues</div>
-                  <div className="d-flex justify-content-between">
-                    {displayLeague?.slice(0, 3)?.map((res, index) => (
+                  <div className="d-flex flex-wrap gap-2">
+                    {displayLeague?.map((res, index) => (
                       <div
-                        className=""
+                        key={index}
+                        className="p-3"
                         style={{
                           fontSize: "14px",
                           backgroundColor:
@@ -335,13 +339,13 @@ const EditorProfileStatisticsSection = (props) => {
                           height={25}
                           width={25}
                         />
-                        <span className="p-2 ps-1 Flag-content-font">
+                        <span className="p-2 ps-2 Flag-content-font">
                           {res?.league}
                         </span>
                       </div>
                     ))}
                   </div>
-                  <div className="d-flex justify-content-center gap-2 my-3">
+                  {/* <div className="d-flex justify-content-center gap-2 my-3">
                     {displayLeague?.slice(3, 5)?.map((res, index) => (
                       <div
                         className=""
@@ -365,8 +369,8 @@ const EditorProfileStatisticsSection = (props) => {
                         </span>
                       </div>
                     ))}
-                  </div>
-                  <div className="d-flex justify-content-between">
+                  </div> */}
+                  {/* <div className="d-flex justify-content-between">
                     {displayLeague?.slice(5, 8)?.map((res, index) => (
                       <div
                         className=""
@@ -390,7 +394,7 @@ const EditorProfileStatisticsSection = (props) => {
                         </span>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </>
             ) : (

@@ -207,8 +207,18 @@ const ActiveComments = (props) => {
   const [followLabel, setFollowLabel] = useState("Follow");
 
   const followCommentator = async (commentator_id, isFollowing) => {
+    if (userId == null) {
+      await Swal.fire({
+        title: "Error",
+        text: `Please log in to continue.`,
+        icon: "error",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      });
+      return;
+    }
     try {
-      // console.log("isFollowing",isFollowing)
       if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
@@ -236,6 +246,7 @@ const ActiveComments = (props) => {
             title: "You have Unfollowed",
             icon: "success",
           });
+          profileData.Follower_Count = profileData?.Follower_Count - 1;
           const user_id = localStorage.getItem("user-id");
           props?.homeApiData(user_id);
         }
@@ -246,6 +257,7 @@ const ActiveComments = (props) => {
         // console.log("On Follow",res)
         const user_id = localStorage.getItem("user-id");
         props?.homeApiData(user_id);
+        profileData.Follower_Count = profileData?.Follower_Count + 1;
       }
     } catch (error) {
       Swal.fire({
@@ -636,13 +648,6 @@ const ActiveComments = (props) => {
               {props.profile === "commentator" ? (
                 <button
                   onClick={() => {
-                    // if (
-                    //       JSON.parse(localStorage.getItem("user-active")) ==
-                    //       false
-                    //     ) {
-                    //       errorSwal();
-                    //       return;
-                    //     }
                     checkDeactivation("edit profile");
                   }}
                   style={{

@@ -27,6 +27,7 @@ export const Footer = (props) => {
               onClick={() => {
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("currentpage", "home");
+                localStorage.removeItem("activeCommentId");
                 props.setSelectContent("home");
                 props.setDashboardSUser(false);
               }}
@@ -42,6 +43,7 @@ export const Footer = (props) => {
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("priviouspage", props.selectContent);
                 localStorage.setItem("currentpage", "editor");
+                localStorage.removeItem("activeCommentId");
                 props.setSelectContent("editor");
                 props.setDashboardSUser(false);
               }}
@@ -61,6 +63,7 @@ export const Footer = (props) => {
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("priviouspage", props.selectContent);
                 localStorage.setItem("currentpage", "comments");
+                localStorage.removeItem("activeCommentId");
                 props.setSelectContent("comments");
                 props.setDashboardSUser(false);
               }}
@@ -84,8 +87,10 @@ export const Footer = (props) => {
                   localStorage.setItem("priviouspage", props.selectContent);
                   localStorage.setItem("currentpage", "fav");
                   localStorage.setItem("subcurrentpage", "fav");
+                  localStorage.removeItem("activeCommentId");
                   props.setSelectContent("fav");
                   props.setDashboardSUser(true);
+                  // window.location.reload()
                 }
                 setShowModal(4);
               }}

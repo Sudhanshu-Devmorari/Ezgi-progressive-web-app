@@ -214,7 +214,7 @@ const CommentsPage = ({
                   mergeArrays={mergeArrays}
                   setCmtReact={setCmtReact}
                   followingList={followingList}
-                    setDashboardSUser={setDashboardSUser}
+                  setDashboardSUser={setDashboardSUser}
                 />
               </>
             );

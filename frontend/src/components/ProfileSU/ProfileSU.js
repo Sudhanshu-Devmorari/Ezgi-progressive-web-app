@@ -125,6 +125,7 @@ const ProfileSU = (props) => {
                   ? currentPage
                   : "home"
               );
+              localStorage.removeItem("activeCommentId");
               props.setSelectContent(
                 currentPage == "show-all-comments" ||
                   currentPage == "notifications"

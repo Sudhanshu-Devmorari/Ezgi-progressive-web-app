@@ -83,7 +83,6 @@ const MainPage = () => {
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        // console.log("res:::::::::::::", res.data.Subscription_Comments);
         setPublicComments(
           res?.data?.Public_Comments.sort(
             (a, b) => moment(b.created).unix() - moment(a.created).unix()
@@ -400,6 +399,10 @@ const MainPage = () => {
   const [activeCommentsshow, setActiveCommentsshow] = useState(
     activeCommentId || null
   );
+
+  useEffect(() => {
+    setActiveCommentsshow(activeCommentId);
+  }, [activeCommentId, activeCommentsshow]);
 
   const [contentData, setContentData] = useState([]);
   const [contentFilterData, setContentFilterData] = useState([]);
