@@ -52,14 +52,15 @@ export const EditorBanner = (props) => {
     } catch (error) {}
   }, [selectCategory]);
 
-
+const [editorBannerImg, setEditorBannerImg] = useState(null);
   useEffect(() => {
     async function getBannerImg() {
       try {
         const res = await axios.get(
           `${config.apiUrl}/editor-banner/`
         );
-        console.log(res);
+        console.log(res?.data)
+        setEditorBannerImg(res?.data?.data[0]?.editor_banner)
       } catch (error) {
         console.log(error);
       }
@@ -142,8 +143,8 @@ export const EditorBanner = (props) => {
         >
           {/* Become a Editor Banner */}
           <img
-            src={`${bannerimg}`}
-            alt="Main Page Left Corner"
+            src={editorBannerImg ? `${config.apiUrl}${editorBannerImg}` : bannerimg}
+            alt="Become a Editor Banner"
             style={{ height: "100%", width: "100%", objectFit: "cover" }}
           />
         </div>

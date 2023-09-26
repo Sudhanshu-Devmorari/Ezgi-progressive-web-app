@@ -105,5 +105,4 @@ urlpatterns = [
     path('user-data/<int:id>', GetUserdata.as_view(), name='User-Data'),
     path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
     path('editor-banner/', EditorBannerView.as_view(), name='Editor-banner'),
-    path('editor-banner/<int:id>', EditorBannerView.as_view(), name='Editor-banner'),
 ]

@@ -4822,9 +4822,7 @@ class BankDetailsView(APIView):
 
             if is_admin:
                 action = request.data['action'] if 'action' in request.data else None
-                print('action: ', action)
                 bank_id = request.data['bank_id'] if 'bank_id' in request.data else None
-                print('bank_id: ', bank_id)
                 if action is not None and bank_id is not None:
                     try:
                         query = BankDetails.objects.get(id=bank_id,user=user) 
@@ -4838,14 +4836,10 @@ class BankDetailsView(APIView):
             else:
 
                 withdrawable_amount = request.data['withdrawable_amount'] if 'withdrawable_amount' in request.data else None
-                print('withdrawable_amount: ', withdrawable_amount)
                 bank_iban = request.data['bank_iban'] if 'bank_iban' in request.data else None
-                print('bank_iban: ', bank_iban)
 
-                print('withdrawable_amount is not None and bank_iban is not None: ', withdrawable_amount is not None and bank_iban is not None)
                 if withdrawable_amount is not None and bank_iban is not None:
                     query = BankDetails.objects.get(user=user,bank_iban=bank_iban)
-                    print('query.status: ', query.status)
                     if query.status == None:
                         query.status = 'pending'
                         query.save(update_fields=['status','updated'])
@@ -4892,7 +4886,7 @@ class GetUserdata(APIView):
 class EditorBannerView(APIView):
     def get(self, request):
         try:
-            banner =  EditorBanner.object.all()    
+            banner =  EditorBanner.objects.all()    
             data = EditorBannerSerializer(banner, many=True).data
             return Response({'data' : data}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -4900,22 +4894,20 @@ class EditorBannerView(APIView):
 
     def patch(self, request): 
         try:
-            print( request.data,"=========>>> request.data")
             if 'editor_banner' not in request.data:
                 return Response({'data' : 'Editor banner is required.'}, status=status.HTTP_404_NOT_FOUND)
             
             editor_banner = request.data['editor_banner']
             bannerId = request.data['bannerId'] if 'bannerId' in request.data else None
-            print(bannerId,"=>>>>bannerId")
 
             if bannerId is not None:
-                banner =  EditorBanner.object.get(id=id)
+                banner =  EditorBanner.objects.get(id=int(bannerId))
                 banner.editor_banner = editor_banner
-                EditorBanner.save(update_fields=['editor_banner','updated'])
+                banner.save(update_fields=['editor_banner','updated'])
                 return Response({'data' : 'Editor banner updated successfully.'}, status=status.HTTP_200_OK) 
-            
-            EditorBanner.object.create(editor_banner=editor_banner)
-            return Response({'data' : 'Editor banner created successfully.'}, status=status.HTTP_200_OK) 
+            else:
+                data = EditorBanner.objects.create(editor_banner=editor_banner)
+                return Response({'data' : 'Editor banner created successfully.'}, status=status.HTTP_200_OK) 
 
         except Exception as e:
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  

@@ -11,18 +11,23 @@ const EditorBanner = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [bannerId, setbannerId] = useState(null);
+
   const formData = new FormData();
 
   useEffect(() => {
     async function getBannerImg() {
       try {
         const res = await axios.get(`${config.apiUrl}/editor-banner/`);
-        console.log(res);
-        // formik.setValues({
-        //   editorBanner: props.adsEditData.picture,
-        // });
-        // formData.append("editor_banner", bannerId);
-        // setBannerPreview(`${config.apiUrl}${props.adsEditData.picture}`);
+        const img = res?.data?.data[0]?.editor_banner
+        const id = res?.data?.data[0]?.id
+        console.log("===========>>>id", id)
+        setbannerId(id)
+        formik.setValues({
+          editorBanner: `${config.apiUrl}${img}`,
+        });
+        
+        setBannerPreview(`${config.apiUrl}${img}`);
       } catch (error) {
         console.log(error);
       }
@@ -42,6 +47,9 @@ const EditorBanner = () => {
     onSubmit: async (values) => {
       console.log(values);
       formData.append("editor_banner", values.editorBanner);
+      if (bannerId){
+        formData.append("bannerId", bannerId);
+      }
       try {
         const res = await axios.patch(
           `${config.apiUrl}/editor-banner/`,
@@ -71,8 +79,8 @@ const EditorBanner = () => {
     const allowedTypes = ["image/jpeg", "image/png"];
     const file = e.target.files[0];
     if (allowedTypes.includes(file.type)) {
-      formik.setFieldValue("editorBanner", file);
-      setBannerPreview(URL.createObjectURL(file));
+      // setBannerPreview(URL.createObjectURL(file));
+      formik.setFieldValue("editorBanner", URL.createObjectURL(file));
     } else {
       Swal.fire({
         title: "Error",
@@ -104,7 +112,7 @@ const EditorBanner = () => {
                 <div className="mx-2 my-3">
                   {formik.values.editorBanner !== null && (
                     <img
-                      src={URL.createObjectURL(formik.values.editorBanner)}
+                      src={formik.values.editorBanner}
                       alt=""
                       height={100}
                       width={100}
