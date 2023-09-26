@@ -53,6 +53,7 @@ const MainPage = () => {
   const [highlights, setHighlights] = useState([]);
   const [ads, setads] = useState([]);
   const [arrayMerge, setArrayMerge] = useState("Select");
+  const [membershipDate, setMembershipDate] = useState("");
   const [commentator, setCommentator] = useState([]);
   const publicCount = 3;
   const SubscriptionCount = 3;
@@ -65,6 +66,7 @@ const MainPage = () => {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data.profile_pic);
+    setMembershipDate(res.data.membership_date)
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
   }
@@ -502,6 +504,7 @@ const MainPage = () => {
                     setMergedEditorResult={setMergedEditorResult}
                     mergedEditorResult={mergedEditorResult}
                     handleOnlyPublicData={handleOnlyPublicData}
+                    membershipDate={membershipDate}
                   />
                 )}
               </>

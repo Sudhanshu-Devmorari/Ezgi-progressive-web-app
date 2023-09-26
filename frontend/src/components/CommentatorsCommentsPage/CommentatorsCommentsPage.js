@@ -201,7 +201,7 @@ const CommentatorsCommentsPage = (props) => {
               />
               {walletSelection === "My transactions" && <Transactions />}
               {walletSelection === "pending balance" && <PendingBalance />}
-              {walletSelection === "account status" && <AccountStatus />}
+              {walletSelection === "account status" && <AccountStatus membershipDate={props.membershipDate}/>}
             </>
           )}
           {content === "fav" && (

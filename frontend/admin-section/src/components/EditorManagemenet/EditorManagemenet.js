@@ -28,6 +28,8 @@ import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import { CustomDropdownEditor } from "../CustomDropdownEditor";
 
 const EditorManagemenet = (props) => {
+  const [addUser, setAddUser] = useState({});
+  console.log(addUser.country);
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);
 
@@ -35,7 +37,7 @@ const EditorManagemenet = (props) => {
   const [validUsername, setValidUsername] = useState(null);
   const [validPhone, setValidPhone] = useState(null);
   const [validPassword, setValidPassword] = useState(null);
-  const [validCountry, setValidCountry] = useState(null);
+  const [validExp, setValidExp] = useState(null);
   const [validCity, setValidCity] = useState(null);
   const [validCategory, setValidCategory] = useState(null);
   const [validGender, setValidGender] = useState(null);
@@ -49,7 +51,7 @@ const EditorManagemenet = (props) => {
     setValidUsername(null);
     setValidPhone(null);
     setValidPassword(null);
-    setValidCountry(null);
+    setValidExp(null);
     setValidCity(null);
     setValidCategory(null);
     setValidGender(null);
@@ -62,7 +64,7 @@ const EditorManagemenet = (props) => {
     setSelectedAge("Select");
     setSelectedCategory("Select");
     setSelectedCity("Select");
-    setSelectedCountry("Select");
+    setSelectedDeneyim("Select");
     setSelectedGender("Select");
   };
 
@@ -92,8 +94,8 @@ const EditorManagemenet = (props) => {
             closeButton.click();
           }
         }
-        if (confirm.value === true){
-          window.location.reload()
+        if (confirm.value === true) {
+          window.location.reload();
         }
       }
     } catch (error) {
@@ -155,7 +157,6 @@ const EditorManagemenet = (props) => {
     fetchData();
   }, []);
 
-  const [addUser, setAddUser] = useState({});
   const submitEditorData = (e, val) => {
     let name, value;
     name = e.target.name;
@@ -216,11 +217,42 @@ const EditorManagemenet = (props) => {
       setAllFilterData(props?.users);
     }
     // setDisplayUser(props?.users==undefined?[]:props?.users)
-  }, [props.users,props?.deactiveRqst]);
+  }, [props.users, props?.deactiveRqst]);
 
   const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
   const [selectedImage, setSelectedImage] = useState(false);
+
+  const [kategoriDropdown, setKategoriDropdown] = useState(false);
+  const [experienceError, setExperienceError] = useState("");
+  const deneyimOptions = ["1-2 years", "3-4 years", "5+ years", "10+ years"];
+  const [selectedDeneyim, setSelectedDeneyim] = useState("Select");
+  const [deneyimDropdown, setDeneyimDropdown] = useState(false);
+
+  const handleDeneyimSelection = (name, value) => {
+    setSelectedDeneyim(value);
+    setAddUser({ ...addUser, [name]: value });
+    // setExperienceError("");
+  };
+
+  const toggleDeneyimDropdown = () => {
+    // setKategoriDropdown(false);
+    // setDeneyimDropdown(!deneyimDropdown);
+    if (cityDropDown) {
+      setCityDropDown(false);
+    }
+    if (categoryDropdown) {
+      setCategoryDropdown(false);
+    }
+    if (genderDropDown) {
+      setGenderDropDown(false);
+    }
+    if (ageDropDown) {
+      setAgeDropDown(false);
+    }
+    setDeneyimDropdown(!deneyimDropdown);
+  };
+
 
   function handleAddProfile(e) {
     const imageFile = e.target.files[0];
@@ -242,10 +274,10 @@ const EditorManagemenet = (props) => {
       setValidPassword("Password must be at least 8 characters.");
     }
 
-    if (selectedCountry == "Select") {
-      setValidCountry("Please select Country.");
+    if (selectedDeneyim == "Select") {
+      setValidExp("Please select Experience.");
     } else {
-      setValidCountry(null);
+      setValidExp(null);
     }
 
     if (selectedCity == "Select") {
@@ -284,7 +316,7 @@ const EditorManagemenet = (props) => {
       validUsername == null &&
       validPhone == null &&
       validPassword == null &&
-      validCountry == null &&
+      validExp == null &&
       validCity == null &&
       validCategory == null &&
       validAge == null &&
@@ -298,12 +330,16 @@ const EditorManagemenet = (props) => {
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("about", addUser.about);
-      formData.append("country", addUser.country);
+      formData.append("experience", addUser.experience);
       formData.append("city", addUser.city);
-      formData.append("category", `{"${addUser.category}"}`);
+      formData.append(
+        "category",
+        `{"${addUser.category?.split(", ")?.join('","')}"}`
+      );
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
       formData.append("level", addUser.level);
+      formData.append("membership_date", addUser.membership_date);
       const id = 1; // temp
       try {
         const response = await axios.post(
@@ -334,15 +370,15 @@ const EditorManagemenet = (props) => {
             username: "",
             phone: "",
             password: "",
-            country: "",
+            experience: "",
             city: "",
             category: "",
             gender: "",
             age: "",
             about: "",
           });
-          if (confirm.value === true){
-            window.location.reload()
+          if (confirm.value === true) {
+            window.location.reload();
           }
         }
         // setDisplayUser(response.data);
@@ -377,10 +413,10 @@ const EditorManagemenet = (props) => {
     setUpdateEditor({ ...updateEditor, [name]: value });
   };
   const handleUpdateEditor = async (id, editor_id) => {
-    if (addUser.country == "" || addUser.country == "Select") {
-      setValidCountry("Please select Country.");
+    if (addUser.experience == "" || addUser.experience == "Select") {
+      setValidExp("Please select Experience.");
     } else {
-      setValidCountry(null);
+      setValidExp(null);
     }
 
     if (addUser.city == "" || addUser.city == "Select") {
@@ -417,7 +453,7 @@ const EditorManagemenet = (props) => {
       validUsername == null &&
       validPhone == null &&
       validPassword == null &&
-      validCountry == null &&
+      validExp == null &&
       validCity == null &&
       validCategory == null &&
       validAge == null &&
@@ -430,12 +466,16 @@ const EditorManagemenet = (props) => {
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("about", addUser.about);
-      formData.append("country", addUser.country);
+      formData.append("experience", addUser.experience);
       formData.append("city", addUser.city);
-      formData.append("category", addUser.category);
+      formData.append(
+        "category",
+        `${addUser?.category?.split(", ")?.join(",")}`
+      );
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
       formData.append("editor_id", editor_id);
+      formData.append("membership_date", addUser.membership_date);
       try {
         const response = await axios.patch(
           `${config?.apiUrl}/editor-management/${id}/`,
@@ -449,7 +489,7 @@ const EditorManagemenet = (props) => {
             username: "",
             phone: "",
             password: "",
-            country: "",
+            experience: "",
             city: "",
             category: "",
             gender: "",
@@ -463,8 +503,8 @@ const EditorManagemenet = (props) => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
-          if (confirm.value === true){
-            window.location.reload()
+          if (confirm.value === true) {
+            window.location.reload();
           }
         }
         const modalElement = document.getElementById("exampleModal");
@@ -542,7 +582,7 @@ const EditorManagemenet = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [countryDropDown, setCountryDropDown] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("Select");
+  const [selectedCountry, setSelectedCountry] = useState("Türkiye");
   const [cityDropDown, setCityDropDown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Select");
   const [genderDropDown, setGenderDropDown] = useState(false);
@@ -682,7 +722,7 @@ const EditorManagemenet = (props) => {
   ];
   const genderOptions = ["Male", "Female", "I don't want to specify"];
   const ageOptions = ["18 - 24", "25 - 34", "35 - 44", "44+"];
-  const categoryOptions = ["Futbol", "Basketbol"];
+  const categoryOptions = ["Futbol", "Basketbol", "Futbol, Basketbol"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
 
@@ -955,7 +995,7 @@ const EditorManagemenet = (props) => {
               editorsArray?.map((res, index) => (
                 <div
                   key={index}
-                  onClick={() => {
+                  onClick={() => { 
                     props.setupdateProfile(2);
                     setPartialData(res);
                     setAddUser(res.editor_data);
@@ -1176,8 +1216,12 @@ const EditorManagemenet = (props) => {
                             fontSize: "0.9rem",
                           }}
                         >
-                          {partialData?.editor_data?.commentator_level?.charAt(0).toUpperCase() +
-                            partialData?.editor_data?.commentator_level?.slice(1).toLowerCase()}
+                          {partialData?.editor_data?.commentator_level
+                            ?.charAt(0)
+                            .toUpperCase() +
+                            partialData?.editor_data?.commentator_level
+                              ?.slice(1)
+                              .toLowerCase()}
                         </button>
                       </div>
                     )}
@@ -1199,15 +1243,31 @@ const EditorManagemenet = (props) => {
                         <span className="ps-2">Upload</span>
                       </span>
                     </div>
-                    <div
+                    <input
+                      type="date"
+                      onChange={(e) => {
+                        console.log(
+                          "date:",
+                          moment(e.target.value).format(
+                            "YYYY-MM-DD HH:mm:SS.SSSSSSZ"
+                          )
+                        );
+                        setAddUser({
+                          ...addUser,
+                          membership_date: moment(e.target.value).format(
+                            "YYYY-MM-DD"
+                          ),
+                        });
+                      }}
+                      value={addUser.membership_date}
                       className="px-2 py-1"
+                      name="membership_date"
                       style={{
+                        color: "white",
                         backgroundColor: "#0B2447",
                         borderRadius: "2px",
                       }}
-                    >
-                      Membership Date
-                    </div>
+                    />
                   </div>
                 </div>
                 {props.updateProfile === 2 && (
@@ -1480,7 +1540,7 @@ const EditorManagemenet = (props) => {
                       ) : null}
                     </div>
                     <div className="col">
-                      <CustomDropdownEditor
+                      {/* <CustomDropdownEditor
                         onChange={submitEditorData}
                         name="country"
                         value={addUser.selectedCountry}
@@ -1492,9 +1552,20 @@ const EditorManagemenet = (props) => {
                         onSelectOption={handleCountrySelection}
                         isOpen={countryDropDown}
                         toggleDropdown={toggleCountryDropdown}
+                      /> */}
+                      <CustomDropdownEditor
+                        label="Experience"
+                        name="experience"
+                        value={addUser.selectedDeneyim}
+                        onChange={submitEditorData}
+                        options={deneyimOptions}
+                        selectedOption={addUser.experience ? addUser.experience : selectedDeneyim}
+                        onSelectOption={handleDeneyimSelection}
+                        isOpen={deneyimDropdown}
+                        toggleDropdown={toggleDeneyimDropdown}
                       />
-                      {validCountry ? (
-                        <small className="text-danger">{validCountry}</small>
+                      {validExp ? (
+                        <small className="text-danger">{validExp}</small>
                       ) : null}
                     </div>
                     <div className="col">
@@ -1525,7 +1596,7 @@ const EditorManagemenet = (props) => {
                         label="Category"
                         options={categoryOptions}
                         selectedOption={
-                          addUser.category ? addUser.category : selectedCategory
+                          addUser.category ? Array.isArray(addUser.category)?addUser.category.join(", "):addUser.category : selectedCategory
                         }
                         onSelectOption={handleCategorySelection}
                         isOpen={categoryDropdown}
@@ -1683,7 +1754,7 @@ const EditorManagemenet = (props) => {
                                 username: "",
                                 phone: "",
                                 password: "",
-                                country: "",
+                                experience: "",
                                 city: "",
                                 category: "",
                                 gender: "",
@@ -1716,7 +1787,7 @@ const EditorManagemenet = (props) => {
                                 username: "",
                                 phone: "",
                                 password: "",
-                                country: "",
+                                experience: "",
                                 city: "",
                                 category: "",
                                 gender: "",
@@ -1790,7 +1861,7 @@ const EditorManagemenet = (props) => {
                     username: "",
                     phone: "",
                     password: "",
-                    country: "",
+                    experience: "",
                     city: "",
                     category: "",
                     gender: "",

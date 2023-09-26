@@ -58,6 +58,7 @@ class User(AbstractBaseUser):
     authorization_type = models.CharField(max_length=100,null=True, blank=True)
     department = models.CharField(max_length=100,null=True, blank=True)
     experience = models.CharField(max_length=20, choices=Experience, null=True, blank=True)
+    membership_date = models.DateField(default=date.today)
     success_rate = models.FloatField(null=True, blank=True)
     score_points = models.IntegerField(null=True, blank=True)
     is_transaction = models.BooleanField(default=False)
@@ -146,6 +147,7 @@ class Notification(models.Model):
     status = models.BooleanField()
     date = models.DateField()
     context = models.CharField(max_length = 500)
+    admin_context = models.CharField(max_length = 500, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

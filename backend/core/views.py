@@ -468,7 +468,7 @@ class FollowCommentatorView(APIView):
                 else:
                     follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator_obj, standard_user=user)
                     # send follow notification:
-                    notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+                    notification_obj = Notification.objects.create(sender=user, receiver=commentator_obj,date=datetime.today().date(), status=False, context=f'{user.username} started following you.', admin_context=f'{user.username} started following user {commentator_obj.username}.')
                     serializer = FollowCommentatorSerializer(follow_commentator_obj)
                     data = serializer.data
                     return Response(data=data, status=status.HTTP_200_OK)
@@ -703,10 +703,10 @@ class SubscriptionView(APIView):
             if not FollowCommentator.objects.filter(commentator_user=commentator, standard_user=user).exists():
                 follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator, standard_user=user)
                 # send follow notification:
-                notification_obj = Notification.objects.create(sender=user, receiver=commentator,date=datetime.today().date(), status=False, context=f'{user.username} started following you.')
+                notification_obj = Notification.objects.create(sender=user, receiver=commentator,date=datetime.today().date(), status=False, context=f'{user.username} started following you.', admin_context=f'{user.username} started following user {commentator.username}.')
         
             # send Subscription notification:
-            notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{request.user.username} Subscribe you.')
+            notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{user.username} Subscribe you.', admin_context=f'{user.username} subscribed to user {commentator.username} for {duration}.')
             if Subscription_obj != None:
                 if DataCount.objects.filter(id=1).exists():
                     obj = DataCount.objects.get(id=1)
@@ -778,7 +778,7 @@ class CommentReactionView(APIView):
         comment = Comments.objects.filter(id=comment_id).exists()
         if not comment:
             return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        comment_obj_ = Comments.objects.get(id=comment_id)
         # User object validation
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
@@ -809,6 +809,7 @@ class CommentReactionView(APIView):
                     total_favorite=Sum('favorite'),
                     total_clap=Sum('clap')
                 )
+                notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
                 data = {'comment_id': comment_id,
                         'total_likes': total_reactions['total_likes'] or 0,
@@ -828,6 +829,7 @@ class CommentReactionView(APIView):
             # User clicked the same button again, remove the reaction
             setattr(comment_reaction, reaction_type, None)
             comment_reaction.save(update_fields=[reaction_type,'updated'])
+            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} removed the {reaction_type} for comment {comment_obj_.match_detail}.', admin_context=f'{user.username} removed the {reaction_type} for comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
             if comment_reaction.like is None and comment_reaction.favorite is None and comment_reaction.clap is None:
                 comment_reaction.delete()
@@ -855,6 +857,7 @@ class CommentReactionView(APIView):
             # User clicked a different button, update the reaction
             setattr(comment_reaction, reaction_type, 1)
             comment_reaction.save(update_fields=[reaction_type,'updated'])
+            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
             comment_reactions = CommentReaction.objects.filter(comment_id=comment_id).values('like', 'favorite', 'clap')
             total_reactions = comment_reactions.aggregate(
@@ -1565,17 +1568,17 @@ class AdminMainPage(APIView):
                 data_list['comments_percentage'] = 0
 
 
-            new_user = User.objects.all().count()
+            new_user = User.objects.filter(created__gte=previous_24_hours).count()
             data_list['new_user'] = new_user
 
-            new_editor = User.objects.filter(user_role='commentator').count()
+            new_editor = User.objects.filter(user_role='commentator', created__gte=previous_24_hours).count()
             data_list['new_editor'] = new_editor
 
-            new_subscriber = Subscription.objects.all().count()
+            new_subscriber = Subscription.objects.filter(created__gte=previous_24_hours).count()
             data_list['new_subscriber'] = new_subscriber
 
             # new_comment = Comments.objects.filter(status='approve').count()
-            new_comment = Comments.objects.all().count()
+            new_comment = Comments.objects.filter(created__gte=previous_24_hours).count()
             data_list['new_comment'] = new_comment
 
             all_user = User.objects.filter(is_delete=False,is_admin=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
@@ -1647,7 +1650,7 @@ class UserManagement(APIView):
             data = serializer.data
             data_list['users_list'] = data
 
-            all_notification = Notification.objects.all().order_by('-created')
+            all_notification = Notification.objects.all().exclude(admin_context = None).order_by('-created')
             serializer1 = NotificationSerializer(all_notification, many=True)
             data_list['user_timeline'] = serializer1.data
 
@@ -2343,7 +2346,8 @@ class EditorManagement(APIView):
 
 
 
-            editor_count = commentator.count()
+            # editor_count = commentator.count()
+            editor_count = User.objects.filter(user_role='commentator').count()
             data_list['editor_count'] = editor_count
 
             apprentice = User.objects.filter(commentator_level='apprentice').count()
@@ -2480,7 +2484,7 @@ class EditorManagement(APIView):
             password = request.data['password']
             gender = request.data['gender']
             age = request.data['age']
-            country = request.data['country']
+            experience = request.data['experience']
             city = request.data['city']
             category = request.data['category']
             role = 'commentator'
@@ -2488,15 +2492,21 @@ class EditorManagement(APIView):
             if commentator_level == "expert":
                 commentator_level = 'master'
 
-
-            # Any additional validations or processing can be done here
-
-            user_obj = User.objects.create(profile_pic=profile,
-                name=name, username=username, phone=phone,
-                password=password, gender=gender, age=age,
-                user_role=role, commentator_level=commentator_level,
-                country=country, city=city, category=category
-            )
+            if request.data.get('membership_date') != 'undefined':
+                membership_date = request.data.get('membership_date')
+                user_obj = User.objects.create(profile_pic=profile,
+                    name=name, username=username, phone=phone,
+                    password=password, gender=gender, age=age,
+                    user_role=role, commentator_level=commentator_level,
+                    experience=experience, city=city, category=category, membership_date=membership_date
+                )
+            else:
+                user_obj = User.objects.create(profile_pic=profile,
+                    name=name, username=username, phone=phone,
+                    password=password, gender=gender, age=age,
+                    user_role=role, commentator_level=commentator_level,
+                    experience=experience, city=city, category=category
+                )
             # user_obj.set_password(password)
             user_obj.save()
             if user_obj != None:
@@ -2523,25 +2533,40 @@ class EditorManagement(APIView):
 
 
     def patch(self, request, pk, format=None, *args, **kwargs):
+        data = {}
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        if User.objects.filter(id=request.data['editor_id']).exists():
-            user_obj = User.objects.get(id=request.data['editor_id'])
-            if user_obj.phone != request.data['phone']:
-                if User.objects.filter(phone=request.data['phone']).exists():
+        data['editor_id'] = request.data.get('editor_id')
+        data['name'] = request.data.get('name')
+        data['username'] = request.data.get('username')
+        data['phone'] = request.data.get('phone')
+        data['password'] = request.data.get('password')
+        data['about'] = request.data.get('about')
+        data['country'] = request.data.get('country')
+        data['city'] = request.data.get('city')
+        data['category'] = request.data.get('category').split(',')
+        data['gender'] = request.data.get('gender')
+        data['age'] = request.data.get('age')
+
+        if User.objects.filter(id=data['editor_id']).exists():
+            user_obj = User.objects.get(id=data['editor_id'])
+            if user_obj.phone != data['phone']:
+                if User.objects.filter(phone=data['phone']).exists():
                     return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-        serializer = UserSerializer(user, data=request.data, partial=True)
+
+        serializer = UserSerializer(user, data=data, partial=True)
         if serializer.is_valid():
             try:
                 serializer.save()
             except Exception as e:
+                print("error: ", e)
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(serializer.data)
         else:
+            print("ERROR: ", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request, pk, format=None, *args, **kwargs):
@@ -2796,7 +2821,8 @@ class SalesManagement(APIView):
 
             serializer = SubscriptionSerializer(subscription_obj, many=True)
             data_list['subscription'] = serializer.data
-            data_list['subscription_count'] = subscription_cal
+            # data_list['subscription_count'] = subscription_cal
+            data_list['subscription_count'] = subscription_obj.count()
 
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching subscription data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2809,7 +2835,8 @@ class SalesManagement(APIView):
                 highlights_cal += obj.money
 
             serializer1 = HighlightSerializer(highlights_obj, many=True)
-            data_list['highlight_count'] = highlights_cal
+            # data_list['highlight_count'] = highlights_cal
+            data_list['highlight_count'] = highlights_obj.count()
             data_list['highlight'] = serializer1.data
 
         except Exception as e:

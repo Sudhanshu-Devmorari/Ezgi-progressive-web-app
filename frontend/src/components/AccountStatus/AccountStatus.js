@@ -18,7 +18,7 @@ import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { Range, getTrackBackground } from "react-range";
 
-const AccountStatus = () => {
+const AccountStatus = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [verifyShow, setVerifyShow] = React.useState(false);
@@ -585,7 +585,7 @@ const AccountStatus = () => {
                 {commentatorUser?.commentator_level !== "apprentice" ? (
                   <>
                     <div className="my-2 ms-2 d-flex flex-column">
-                      Membership Date 15-04-2023
+                      Membership Date {props.membershipDate}
                       <span>
                         {" "}
                         Active Plan{" "}
