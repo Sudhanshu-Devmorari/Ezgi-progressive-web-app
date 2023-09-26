@@ -335,7 +335,20 @@ const SharedProfile = (props) => {
               <div className="" style={{ fontSize: "12px" }}>
                 <button
                   onClick={() => {
-                    checkDeactivation();
+                    if (userId) {
+                      checkDeactivation();
+                    } else {
+                      Swal.fire({
+                        title: "Error",
+                        text: "Please log in to continue.",
+                        icon: "error",
+                        backdrop: false,
+                        customClass:
+                          currentTheme === "dark"
+                            ? "dark-mode-alert"
+                            : "light-mode-alert",
+                      });
+                    }
                   }}
                   className="my-2 px-2 py-1"
                   style={{

@@ -80,51 +80,45 @@ const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
   return (
     <>
       <div className={`row g-0 mt-2 mb-2 bannerText gap-2`}>
-        <div
-          className={`col d-flex align-items-center justify-content-center ${
+        <Link
+          className={`col ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}
           style={{ height: "135px" }}
+          to={adsLeftdata[0]?.link}
+          onClick={() => handleLinkClick(adsLeftdata[0]?.id)}
+          target="_blank"
         >
-          <Link
-            to={adsLeftdata[0]?.link}
-            onClick={() => handleLinkClick(adsLeftdata[0]?.id)}
-            target="_blank"
-          >
-            <img
-              src={`${
-                adsLeftdata[0]?.picture
-                  ? server_url + adsLeftdata[0]?.picture
-                  : bannerimg
-              }`}
-              alt="Main Page Left Corner"
-              style={{ height: "100%", width: "100%", objectFit: "cover" }}
-            />
-          </Link>
-        </div>
+          <img
+            src={`${
+              adsLeftdata[0]?.picture
+                ? server_url + adsLeftdata[0]?.picture
+                : bannerimg
+            }`}
+            alt="Main Page Left Corner"
+            style={{ height: "100%", width: "100%", objectFit: "cover" }}
+          />
+        </Link>
 
-        <div
-          className={`col d-flex align-items-center justify-content-center ${
+        <Link
+          className={`col ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}
           style={{ height: "135px" }}
+          to={adsRightdata[0]?.link}
+          onClick={() => handleLinkClick(adsRightdata[0]?.id)}
+          target="_blank"
         >
-          <Link
-            to={adsRightdata[0]?.link}
-            onClick={() => handleLinkClick(adsRightdata[0]?.id)}
-            target="_blank"
-          >
-            <img
-              style={{ height: "100%", width: "100%", objectFit: "cover" }}
-              src={`${
-                adsRightdata[0]?.picture
-                  ? server_url + adsRightdata[0]?.picture
-                  : bannerimg
-              }`}
-              alt="Main Page Right Corner"
-            />
-          </Link>
-        </div>
+          <img
+            style={{ height: "100%", width: "100%", objectFit: "cover" }}
+            src={`${
+              adsRightdata[0]?.picture
+                ? server_url + adsRightdata[0]?.picture
+                : bannerimg
+            }`}
+            alt="Main Page Right Corner"
+          />
+        </Link>
       </div>
     </>
   );

@@ -4416,6 +4416,13 @@ class RetrievePageData():
                 comment_data = CommentsSerializer(comment).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
         
+                data = Comments.objects.filter(commentator_user=comment.commentator_user, commentator_user__is_delete=False).only('id','is_prediction')
+
+                win_count = data.filter(is_prediction=True).count()
+                lose_count = data.filter(is_prediction=False).count()
+                comment_data['commentator_user'] ['win'] = win_count
+                comment_data['commentator_user'] ['lose'] = lose_count
+
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
                 total_reactions = comment_reactions.aggregate(
@@ -4467,6 +4474,8 @@ class RetrievePageData():
                             total_favorite=Sum('favorite'),
                             total_clap=Sum('clap')
                         )
+
+                        comment_data['commentator_user']['is_subscribed'] = True
                         
                         # Update comment data
                         comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
@@ -4494,7 +4503,7 @@ class RetrievePageData():
 
             # Get data
             all_highlights = Highlight.objects.filter(status='active', user__is_delete=False).order_by('-created').only('id')
-            print('all_highlights: ', all_highlights)
+            
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
                 user_data = highlighted_data['user'] 

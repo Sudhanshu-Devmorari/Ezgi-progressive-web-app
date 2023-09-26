@@ -114,7 +114,7 @@ const SubscribeModal = (props) => {
     }
 
     commentatorUser?.commentator_level && getData();
-  }, []);
+  }, [commentatorUser?.commentator_level]);
 
   return (
     <>

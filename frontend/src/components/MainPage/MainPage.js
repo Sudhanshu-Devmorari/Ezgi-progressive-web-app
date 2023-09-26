@@ -128,13 +128,8 @@ const MainPage = () => {
       let merged = [];
       let remainingPublic = [...publicComments];
       let remainingHighlights = [...highlights];
-      // let remainingSubscription = [...subscriptionComments];
 
-      while (
-        remainingPublic.length > 0 &&
-        remainingHighlights.length > 0
-        // remainingSubscription.length > 0
-      ) {
+      while (remainingPublic.length > 0 && remainingHighlights.length > 0) {
         merged = [
           ...merged,
           ...remainingPublic
@@ -143,12 +138,6 @@ const MainPage = () => {
           ...remainingHighlights
             .splice(0, highlightCount)
             .map((highlight) => ({ type: "highlight", value: highlight })),
-          // ...remainingSubscription
-          //   .splice(0, SubscriptionCount)
-          //   .map((remainingSubscription) => ({
-          //     type: "comment",
-          //     value: remainingSubscription,
-          //   })),
         ];
       }
 
@@ -171,16 +160,6 @@ const MainPage = () => {
           })),
         ];
       }
-
-      // if (remainingSubscription.length > 0) {
-      //   merged = [
-      //     ...merged,
-      //     ...remainingSubscription.map((Subscription) => ({
-      //       type: "comment",
-      //       value: Subscription,
-      //     })),
-      //   ];
-      // }
       setMergedResult(merged);
     }
 
@@ -198,7 +177,7 @@ const MainPage = () => {
               value: remainingPublic,
             })),
           ...remainingHighlights
-            // .splice(0, highlightCount)
+            .splice(0, highlightCount)
             .map((highlight) => ({ type: "highlight", value: highlight })),
         ];
       }
@@ -229,20 +208,9 @@ const MainPage = () => {
     let merged = [];
     let remainingSubscription = [...subscriptionComments];
     let remainingHighlights = [...highlights];
+    let followingData = [...followingList];
+    let remainingPublic = [...publicComments];
 
-    while (remainingHighlights.length > 0 && remainingSubscription.length > 0) {
-      merged = [
-        ...remainingSubscription
-          .splice(0, SubscriptionCount)
-          .map((remainingSubscription) => ({
-            type: "comment",
-            value: remainingSubscription,
-          })),
-        ...remainingHighlights
-          .splice(0, highlightCount)
-          .map((highlight) => ({ type: "highlight", value: highlight })),
-      ];
-    }
     if (remainingSubscription.length > 0) {
       merged = [
         ...merged,
@@ -258,6 +226,26 @@ const MainPage = () => {
         ...merged,
         ...remainingHighlights.map((highlight) => ({
           type: "highlight",
+          value: highlight,
+        })),
+      ];
+    }
+
+    const followingDataIndex = followingData.map((res) => res.id);
+
+    const subScriptionIndex = remainingSubscription.map((res) => res.id);
+
+    const filterData = remainingPublic.filter(
+      (res) =>
+        followingDataIndex.includes(res?.commentator_user?.id) &&
+        !subScriptionIndex.includes(res.id)
+    );
+
+    if (filterData.length > 0) {
+      merged = [
+        ...merged,
+        ...filterData.map((highlight) => ({
+          type: "comment",
           value: highlight,
         })),
       ];
@@ -685,6 +673,10 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
+                    {console.log(
+                      subscriptionResult,
+                      "===============>>subscriptionResult"
+                    )}
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!

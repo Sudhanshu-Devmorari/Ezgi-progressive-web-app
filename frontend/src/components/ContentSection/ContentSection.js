@@ -73,10 +73,8 @@ const ContentSection = ({
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
 
-  // console.log("subscriptionResult:::::::::::::::content section called", subscriptionResult)
-
   const followCommentator = async (commentator_id, isFollowing) => {
-    if(userId == null){
+    if (userId == null) {
       await Swal.fire({
         title: "Error",
         text: `Please log in to continue.`,
@@ -88,7 +86,6 @@ const ContentSection = ({
       return;
     }
     try {
-      // console.log("isFollowing",isFollowing)
       if (isFollowing) {
         const confirmation = await Swal.fire({
           title: "Unfollow?",
@@ -261,6 +258,7 @@ const ContentSection = ({
 
   const truncated = truncateString(data?.value?.league, 6);
 
+  const [commentatorUser, setCommentatorUser] = useState([]);
   // check activation
   const checkDeactivation = async (value) => {
     try {
@@ -268,6 +266,7 @@ const ContentSection = ({
         `${config.apiUrl}/check-deactivated-account/${userId}`
       );
       if (res.status === 200) {
+        setCommentatorUser(data?.value?.commentator_user);
         setModalShow(true);
       }
     } catch (error) {
@@ -371,7 +370,8 @@ const ContentSection = ({
               {(selectContent === "for you" ||
                 selectContent === "only public" ||
                 userComments ||
-                selectContent === "comments") && (
+                selectContent === "comments" ||
+                !data?.value?.commentator_user?.is_subscribed) && (
                 <>
                   {userId != data?.value?.commentator_user?.id && (
                     <div
@@ -451,8 +451,9 @@ const ContentSection = ({
                 </div>
               </div>
             </div>
-            {(userPhone === null || !data?.value?.public_content ) &&
-            selectContent !== "subscription" && userId != data?.value?.commentator_user?.id? (
+            {(userPhone === null || !data?.value?.public_content) &&
+            selectContent !== "subscription" &&
+            userId != data?.value?.commentator_user?.id ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -585,7 +586,8 @@ const ContentSection = ({
                     fontSize: "12px",
                   }}
                 >
-                  {(userPhone && data?.value?.public_content) || userPhone == data?.value?.commentator_user?.id
+                  {(userPhone && data?.value?.public_content) ||
+                  userPhone == data?.value?.commentator_user?.id
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>
@@ -599,7 +601,8 @@ const ContentSection = ({
               >
                 {userPhone &&
                 (data?.value?.public_content ||
-                  (selectContent == "subscription" || userId == data?.value?.commentator_user?.id)) ? (
+                  selectContent == "subscription" ||
+                  userId == data?.value?.commentator_user?.id) ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -735,7 +738,8 @@ const ContentSection = ({
 
                 {userPhone &&
                 (data?.value?.public_content ||
-                  (selectContent == "subscription" || userId == data?.value?.commentator_user?.id)) ? (
+                  selectContent == "subscription" ||
+                  userId == data?.value?.commentator_user?.id) ? (
                   <div
                     onClick={() => {
                       handleCommentReaction(
@@ -804,26 +808,41 @@ const ContentSection = ({
                 {(selectContent === "for you" ||
                   selectContent === "comments") && (
                   <>
-                    {(userId != data?.value?.commentator_user?.id && data?.value?.commentator_user?.commentator_level !== "apprentice") && (
-                      <button
-                        onClick={() => {
-                          checkDeactivation();
-                        }}
-                        className="me-2 px-2 py-1"
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #37FF80"
-                              : "1px solid #00659D",
-                          color:
-                            currentTheme === "dark" ? "#37FF80" : "#00659D",
-                          backgroundColor: "transparent",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        Subscribe
-                      </button>
-                    )}
+                    {userId != data?.value?.commentator_user?.id &&
+                      data?.value?.commentator_user?.commentator_level !==
+                        "apprentice" && (
+                        <button
+                          onClick={() => {
+                            if (userId) {
+                              checkDeactivation();
+                            } else {
+                              Swal.fire({
+                                title: "Error",
+                                text: "Please log in to continue.",
+                                icon: "error",
+                                backdrop: false,
+                                customClass:
+                                  currentTheme === "dark"
+                                    ? "dark-mode-alert"
+                                    : "light-mode-alert",
+                              });
+                            }
+                          }}
+                          className="me-2 px-2 py-1"
+                          style={{
+                            border:
+                              currentTheme === "dark"
+                                ? "1px solid #37FF80"
+                                : "1px solid #00659D",
+                            color:
+                              currentTheme === "dark" ? "#37FF80" : "#00659D",
+                            backgroundColor: "transparent",
+                            borderRadius: "3px",
+                          }}
+                        >
+                          Subscribe
+                        </button>
+                      )}
                   </>
                 )}
               </div>
@@ -834,7 +853,11 @@ const ContentSection = ({
           </div>
         </div>
       </>
-      <SubscribeModal show={modalShow} onHide={() => setModalShow(false)} />
+      <SubscribeModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        commentatorUser={commentatorUser}
+      />
     </>
   );
 };

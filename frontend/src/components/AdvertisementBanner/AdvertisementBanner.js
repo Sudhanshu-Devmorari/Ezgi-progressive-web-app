@@ -3,6 +3,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import config from "../../config";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import resize from "../../assets/resize-16957191194402187617e45f878782891a9fbe48c5fbaa7a2d.jpg";
 
 export const AdvertisementBanner = ({ data, setAdsId }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -41,14 +42,14 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
           onClick={() => {
             handleLinkClick(data?.id);
           }}
+          style={{ width: "100%", height: "180px" }}
         >
-          <div style={{ width: "300px", height: "150px" }}>
-            <img
-              style={{ width: "100%", height: "100%" }}
-              src={`${server_url + data?.picture}`}
-              alt=""
-            />
-          </div>
+          <img
+            style={{ width: "100%", height: "100%" }}
+            // src={`${server_url + data?.picture}`}
+            src={resize}
+            alt=""
+          />
         </Link>
       </div>
     </>

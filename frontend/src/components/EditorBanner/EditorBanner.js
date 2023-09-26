@@ -8,6 +8,7 @@ import { userId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
+import bannerimg from "../../assets/ree.jpg";
 
 export const EditorBanner = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -124,7 +125,12 @@ export const EditorBanner = (props) => {
           }`}
           style={{ color: "#D2DB08" }}
         >
-          Become a Editor Banner
+          {/* Become a Editor Banner */}
+          <img
+            src={`${bannerimg}`}
+            alt="Main Page Left Corner"
+            style={{ height: "100%", width: "100%", objectFit: "cover" }}
+          />
         </div>
       </div>
     </>

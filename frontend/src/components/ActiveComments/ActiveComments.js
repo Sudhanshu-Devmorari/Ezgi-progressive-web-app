@@ -895,14 +895,9 @@ const ActiveComments = (props) => {
               {userId != profileData?.id && (
                 <button
                   onClick={() => {
-                    // if (
-                    //       JSON.parse(localStorage.getItem("user-active")) ==
-                    //       false
-                    //     ) {
-                    //       errorSwal();
-                    //       return;
-                    //     }
-                    checkDeactivation("subscribe model");
+                    if (userId) {
+                      checkDeactivation("subscribe model");
+                    }
                   }}
                   className="ms-1 px-3 py-1"
                   style={{
@@ -968,24 +963,28 @@ const ActiveComments = (props) => {
             {(props.content === "home" ||
               props.content === "wallet" ||
               props.content === "subscribers") && (
-              <button
-                onClick={() => {
-                  checkDeactivation("promote me");
-                }}
-                className="p-1 px-2"
-                style={{
-                  color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #6BFFC4"
-                      : "1px solid #C66EF8",
-                  backgroundColor: "transparent",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                }}
-              >
-                Promote Me
-              </button>
+              <>
+                {profileData?.commentator_level !== "apprentice" && (
+                  <button
+                    onClick={() => {
+                      checkDeactivation("promote me");
+                    }}
+                    className="p-1 px-2"
+                    style={{
+                      color: currentTheme === "dark" ? "#6BFFC4" : "#C66EF8",
+                      border:
+                        currentTheme === "dark"
+                          ? "1px solid #6BFFC4"
+                          : "1px solid #C66EF8",
+                      backgroundColor: "transparent",
+                      borderRadius: "4px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Promote Me
+                  </button>
+                )}
+              </>
             )}
             {editProfile && (
               <button
