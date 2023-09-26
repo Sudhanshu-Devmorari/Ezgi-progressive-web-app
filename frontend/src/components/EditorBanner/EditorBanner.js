@@ -52,6 +52,21 @@ export const EditorBanner = (props) => {
     } catch (error) {}
   }, [selectCategory]);
 
+
+  useEffect(() => {
+    async function getBannerImg() {
+      try {
+        const res = await axios.get(
+          `${config.apiUrl}/editor-banner/`
+        );
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getBannerImg();
+  }, []);
+
   return (
     <>
       <div

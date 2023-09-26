@@ -283,7 +283,7 @@ const CommentsContentSection = (props) => {
                           </div>
                           <div className="col p-0">
                             <div className="text-end mt-3 mb-2">
-                              {val?.commentator_user?.id === userId && (
+                              {val?.commentator_user?.id == userId && (
                                 <span
                                   className={`p-1 px-2`}
                                   style={{
@@ -671,25 +671,27 @@ const CommentsContentSection = (props) => {
                           </div>
                           <div className="col p-0">
                             <div className="text-end mt-3 mb-2">
-                              <span
-                                className={`p-1 px-2`}
-                                style={{
-                                  backgroundColor:
-                                    val?.status === "approve"
-                                      ? "#00DE51"
-                                      : "rgb(195 168 0)",
-                                  color:
-                                    val?.status === "approve"
-                                      ? // ? "#0D2A53"
-                                        "#FFFFFF"
-                                      : "#FFFFFF",
-                                  fontSize: "12px",
-                                }}
-                              >
-                                {val?.status == "approve"
-                                  ? "Published"
-                                  : "Awaiting Approval"}
-                              </span>
+                              {val?.commentator_user?.id == userId && (
+                                <span
+                                  className={`p-1 px-2`}
+                                  style={{
+                                    backgroundColor:
+                                      val?.status === "approve"
+                                        ? "#00DE51"
+                                        : "rgb(195 168 0)",
+                                    color:
+                                      val?.status === "approve"
+                                        ? // ? "#0D2A53"
+                                          "#FFFFFF"
+                                        : "#FFFFFF",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  {val?.status == "approve"
+                                    ? "Published"
+                                    : "Awaiting Approval"}
+                                </span>
+                              )}
                             </div>
                             <div
                               className={`

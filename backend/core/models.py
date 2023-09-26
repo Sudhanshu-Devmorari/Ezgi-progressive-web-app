@@ -103,6 +103,7 @@ class Comments(models.Model):
     country = models.CharField(max_length=50)
     league = models.CharField(max_length=120)
     date = models.DateField(default=date.today)
+    match_time = models.TimeField(null=True, blank=True)
     match_detail = models.CharField(max_length=120)
     prediction_type = models.CharField(max_length=120)
     prediction = models.CharField(max_length=120)
@@ -391,5 +392,10 @@ class BankDetails(models.Model):
     total_balance = models.FloatField(null=True, blank=True)
     pending_balance = models.FloatField(null=True, blank=True)
     withdrawable_balance = models.FloatField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+class EditorBanner(models.Model):
+    editor_banner = models.ImageField(upload_to='Editor_banner', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

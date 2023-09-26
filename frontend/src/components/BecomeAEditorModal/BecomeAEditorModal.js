@@ -95,20 +95,32 @@ const BecomeAEditorModal = (props) => {
   async function handleSubmit(event) {
     event.preventDefault();
     // console.log("form submittt");
+    if (
+      selectedKategori === "Select" &&
+      !preveiwProfilePic &&
+      selectedDeneyim === "Select" &&
+      !selectCheckBox
+    ) {
+      setCategoryError("Please select a Kategori");
+      setExperienceError("Please select a Deneyim");
+      setProfileError("Please add a profile");
+      setCheckboxError("Please select a checkbox");
+      return;
+    }
     if (selectedKategori === "Select") {
       setCategoryError("Please select a Kategori");
-    }
-    if (!preveiwProfilePic) {
+    } else if (!preveiwProfilePic) {
       setProfileError("Please add a profile");
-    }
-    if (selectedDeneyim === "Select") {
+    } else if (selectedDeneyim === "Select") {
       setExperienceError("Please select a Deneyim");
-    }
-    if (!selectCheckBox) {
+    } else if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
       if (preveiwProfilePic) {
-        formData.append("category", selectedKategori);
+        console.log("selectedKategori::::::::::", selectedKategori);
+        const splitdata = selectedKategori.split(", ");
+        console.log("splitdata::::::::::::", splitdata);
+        formData.append("category", splitdata);
         formData.append("experience", selectedDeneyim);
         file && formData.append("profile_pic", file);
         axios

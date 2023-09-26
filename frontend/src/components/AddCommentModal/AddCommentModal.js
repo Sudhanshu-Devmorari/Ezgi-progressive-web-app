@@ -74,6 +74,7 @@ const AddCommentModal = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
 
   useEffect(() => {
+    console.log("profileData?.category:::::::::::::", profileData?.category);
     profileData?.category.length == 1 &&
       setSelectedCategory(profileData?.category[0]);
     profileData?.category.length == 1 &&
@@ -101,13 +102,15 @@ const AddCommentModal = (props) => {
           type = 2;
         }
         setCategoryType(type);
-        const res = await axios.get(
-          `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
-          { headers }
-        );
-        // console.log(res,"=>>res")
-        const countryData = res.data.data;
-        setCountryOptions(countryData.map((item) => item.country));
+        if (type) {
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+            { headers }
+          );
+          // console.log(res,"=>>res")
+          const countryData = res.data.data;
+          setCountryOptions(countryData.map((item) => item.country));
+        }
       } catch (error) {
         console.log(error);
       }
@@ -450,7 +453,7 @@ const AddCommentModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         } else if (error.response.status === 400) {
-          console.log("error.response.data:::::::::::", error)
+          console.log("error.response.data:::::::::::", error);
           // Swal.fire({
           //   title: "Error",
           //   text: `${error.response.data.data}`,

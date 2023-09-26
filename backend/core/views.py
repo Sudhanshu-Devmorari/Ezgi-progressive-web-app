@@ -31,14 +31,14 @@ from collections import Counter
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
-                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer)
+                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer, EditorBannerSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -4282,35 +4282,51 @@ class BecomeEditorEarnDetailsview(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class BecomeEditorView(APIView):
     def patch(self, request, id, format=None, *args, **kwargs):
         """
         Payment gateway code here.
         After sucessfully payment below code execute.
         """
-        user = User.objects.get(id=id)
-        
-        # if not user.is_active:
-        #     return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.filter(id=id).first()
+            if not user:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # if not user.is_active:
+            #     return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.user_role == "standard":
-            if user.profile_pic == "":
-                if 'profile_pic' not in request.data:
-                    return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
-            user.user_role = "commentator"
-            user.commentator_level = "apprentice"
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                try:
-                    serializer.save()
-                except Exception as e:
-                    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                return Response(serializer.data)
+            if user.user_role == "standard":
+                # Get data
+                data =  dict(request.data)
+                category_data = request.data.get('category', '').split(',')
+
+                # Profile pic validation
+                if user.profile_pic == "":
+                    if 'profile_pic' not in request.data:
+                        return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Update data to pass in serializer 
+                data["user_role"] = "commentator"
+                data["commentator_level"] = "apprentice"
+                data['category'] = category_data  
+                data['experience'] = request.data.get('experience', None)
+                
+                # Update
+                serializer = UserSerializer(user, data=data, partial=True)
+                if serializer.is_valid():
+                    try:
+                        serializer.save()
+                    except Exception as e:
+                        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'error':"You are not Standard user."},status=status.HTTP_404_NOT_FOUND)
+                return Response({'error':"You are not Standard user."},status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
 # class OtpVerify(APIView):
 #     def post(self, request, format=None, *args, **kwargs):
 #         try:
@@ -4871,4 +4887,35 @@ class GetUserdata(APIView):
             except User.DoesNotExist:
                 return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)     
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+
+class EditorBannerView(APIView):
+    def get(self, request):
+        try:
+            banner =  EditorBanner.object.all()    
+            data = EditorBannerSerializer(banner, many=True).data
+            return Response({'data' : data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def patch(self, request): 
+        try:
+            print( request.data,"=========>>> request.data")
+            if 'editor_banner' not in request.data:
+                return Response({'data' : 'Editor banner is required.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            editor_banner = request.data['editor_banner']
+            bannerId = request.data['bannerId'] if 'bannerId' in request.data else None
+            print(bannerId,"=>>>>bannerId")
+
+            if bannerId is not None:
+                banner =  EditorBanner.object.get(id=id)
+                banner.editor_banner = editor_banner
+                EditorBanner.save(update_fields=['editor_banner','updated'])
+                return Response({'data' : 'Editor banner updated successfully.'}, status=status.HTTP_200_OK) 
+            
+            EditorBanner.object.create(editor_banner=editor_banner)
+            return Response({'data' : 'Editor banner created successfully.'}, status=status.HTTP_200_OK) 
+
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  

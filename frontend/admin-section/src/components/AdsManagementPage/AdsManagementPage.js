@@ -18,6 +18,7 @@ import axios from "axios";
 import CreateAdsModal from "../CreateAdsModal/CreateAdsModal";
 import config from "../../config";
 import Export from "../Export/Export";
+import EditorBanner from "../EditorBanner/EditorBanner";
 
 const AdsManagementPage = () => {
   const [editTrue, setEditTrue] = useState(false);
@@ -151,6 +152,19 @@ const AdsManagementPage = () => {
             </div>
             <div className="dark-mode p-2 m-2 mb-0 home-height">
               <div className="my-2 d-flex justify-content-end">
+                <button
+                  data-bs-toggle="modal"
+                  data-bs-target="#EditorBanner"
+                  className="px-2 me-2"
+                  style={{
+                    border: "1px solid #D2DB08",
+                    color: "#D2DB08",
+                    borderRadius: "4px",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  Editor banner
+                </button>
                 <button
                   onClick={() => setEditTrue(false)}
                   data-bs-toggle="modal"
@@ -468,7 +482,9 @@ const AdsManagementPage = () => {
         editTrue={editTrue}
         adsEditData={adsEditData}
       />
-      <Export exportList={ads} exportData={'Ads'}/>
+      <Export exportList={ads} exportData={"Ads"} />
+
+      <EditorBanner />
     </>
   );
 };

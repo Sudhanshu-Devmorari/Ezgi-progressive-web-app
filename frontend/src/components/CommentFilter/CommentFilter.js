@@ -6,13 +6,11 @@ import { LeagueAPI } from "../GetLeagueAPI";
 import { DateAPI } from "../GetDateAPI";
 import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
 
-
-
 export const CommentFilter = (props) => {
   const [countryDropDown, setCountryDropDown] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("Select");
   const [categoryType, setCategoryType] = useState(null);
-  
+
   const [LeagueValue, setLeagueValue] = useState([]);
   const [DateValue, setDateValue] = useState([]);
   const [countryOptions, setCountryOptions] = useState([]);
@@ -50,12 +48,14 @@ export const CommentFilter = (props) => {
           type = 2;
         }
         setCategoryType(type);
-        const res = await axios.get(
-          `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
-          { headers }
-        );
-        const countryData = res.data.data;
-        setCountryOptions(countryData.map((item) => item.country));
+        if (type) {
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+            { headers }
+          );
+          const countryData = res.data.data;
+          setCountryOptions(countryData.map((item) => item.country));
+        }
       } catch (error) {
         console.log(error);
       }
@@ -67,11 +67,11 @@ export const CommentFilter = (props) => {
     setSelectedCountry(country);
 
     LeagueAPI(categoryType, country)
-    .then((res) => {
-      const LeagueList = res.data;
-      setLeagueValue(LeagueList.map((item) => item.league));
-    })
-    .catch((error) => {});
+      .then((res) => {
+        const LeagueList = res.data;
+        setLeagueValue(LeagueList.map((item) => item.league));
+      })
+      .catch((error) => {});
   };
 
   const handleLeagueSelection = (league) => {
@@ -92,12 +92,12 @@ export const CommentFilter = (props) => {
     setSelectedDate(date);
 
     MatchDetailsAPI(categoryType, selectedLeague, date)
-    .then((res) => {
-      const MatchList = res.data;
-      props.setMatchdetailsValue(MatchList.map((item) => item.takimlar));
-          setMatchId(MatchList.map((item) => item.MatchID));
-    })
-    .catch((err) => {});
+      .then((res) => {
+        const MatchList = res.data;
+        props.setMatchdetailsValue(MatchList.map((item) => item.takimlar));
+        setMatchId(MatchList.map((item) => item.MatchID));
+      })
+      .catch((err) => {});
   };
 
   const toggleCountryDropdown = () => {
@@ -125,81 +125,79 @@ export const CommentFilter = (props) => {
   useEffect(() => {
     async function getLeague() {
       // if (selectedCountry !== "Select") {
-        try {
-          const headers = {
-            // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
-            Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`,
-          };
-          // contriesAPi(categoryType, selectedCountry);
-          // const res = await axios.get(
-          //   `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
-          //   { headers }
-          // );
-          // const leagueValue = res.data.data.map((item) => item.league);
-          // setLeagueValue(leagueValue);
-          // if (selectedLeague !== "Select") {
-          //   const res = await axios.get(
-          //     `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
-          //     { headers }
-          //   );
-          //   setDateValue(res?.data?.data.map((item) => item.date));
+      try {
+        const headers = {
+          // Authorization: `Bearer ${process.env.REACT_APP_NOISYAPIKEY}`,
+          Authorization: `Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np`,
+        };
+        // contriesAPi(categoryType, selectedCountry);
+        // const res = await axios.get(
+        //   `https://www.nosyapi.com/apiv2/bets/getMatchesLeague?type=${categoryType}&country=${selectedCountry}`,
+        //   { headers }
+        // );
+        // const leagueValue = res.data.data.map((item) => item.league);
+        // setLeagueValue(leagueValue);
+        // if (selectedLeague !== "Select") {
+        //   const res = await axios.get(
+        //     `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${selectedLeague}`,
+        //     { headers }
+        //   );
+        //   setDateValue(res?.data?.data.map((item) => item.date));
 
-            // if (selectedDate !== "Select") {
-            //   const res1 = await axios.get(
-            //     `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
-            //     { headers }
-            //   );
+        // if (selectedDate !== "Select") {
+        //   const res1 = await axios.get(
+        //     `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${selectedDate}`,
+        //     { headers }
+        //   );
 
-            //   props.setMatchdetailsValue(
-            //     res1?.data?.data?.map((item) => item.takimlar)
-            //   );
-            //   // props.setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
-            // }
-            let type;
-            if (props.selectedMatchDetails !== "Select") {
-              if (selectedCategory === "Futbol") {
-                type = 1;
-              } else if (selectedCategory === "Basketbol") {
-                type = 2;
-              }
-              const res11 = await axios.get(
-                `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
-                { headers }
-              );
-              setMatchId(res11?.data?.data.map((item) => item.MatchID));
-              
-              const predictionsPromises = await Promise.all(
-                res11?.data?.data.map((item) => item.MatchID).map(async (val) => {
-                  const predictions = await axios.get(
-                    `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
-                    { headers }
-                  );
-                  return predictions.data.data.gameType // Assuming you want to return the data from each API call
-                })
-              );
+        //   props.setMatchdetailsValue(
+        //     res1?.data?.data?.map((item) => item.takimlar)
+        //   );
+        //   // props.setSelectedMatchDetails(res1?.data?.data?.map((item) => item.takimlar));
+        // }
+        let type;
+        if (props.selectedMatchDetails !== "Select") {
+          if (selectedCategory === "Futbol") {
+            type = 1;
+          } else if (selectedCategory === "Basketbol") {
+            type = 2;
+          }
+          const res11 = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${type}&league=${selectedLeague}&t=${selectedDate}`,
+            { headers }
+          );
+          setMatchId(res11?.data?.data.map((item) => item.MatchID));
 
-              // Wait for all API calls to complete
-              // const predictionsData = await Promise.all(predictionsPromises);
+          const predictionsPromises = await Promise.all(
+            res11?.data?.data
+              .map((item) => item.MatchID)
+              .map(async (val) => {
+                const predictions = await axios.get(
+                  `https://www.nosyapi.com/apiv2/service/bettable-matches/detailsCustomv2?matchID=${val}`,
+                  { headers }
+                );
+                return predictions.data.data.gameType; // Assuming you want to return the data from each API call
+              })
+          );
 
-              // Flatten and remove duplicates from the predictionsData array
-              const uniquePredictions = [
-                ...new Set(predictionsPromises.flat()),
-              ];
+          // Wait for all API calls to complete
+          // const predictionsData = await Promise.all(predictionsPromises);
 
-              // console.log("Unique Predictions:", uniquePredictions);
-              // Now you can work with the uniquePredictions array as needed
-              props.setPredictionType(uniquePredictions);
-            }
-          // }
-        } catch (error) {
-          console.log(error);
+          // Flatten and remove duplicates from the predictionsData array
+          const uniquePredictions = [...new Set(predictionsPromises.flat())];
+
+          // console.log("Unique Predictions:", uniquePredictions);
+          // Now you can work with the uniquePredictions array as needed
+          props.setPredictionType(uniquePredictions);
         }
+        // }
+      } catch (error) {
+        console.log(error);
+      }
       // }
     }
     getLeague();
-  }, [
-    props.selectedMatchDetails,
-  ]);
+  }, [props.selectedMatchDetails]);
 
   const toggleCategoryDropdown = () => {
     if (countryDropDown) {
@@ -214,7 +212,6 @@ export const CommentFilter = (props) => {
     setCategoryDropdown(!categoryDropdown);
   };
 
-
   const toggleDateDropdown = () => {
     if (countryDropDown) {
       setCountryDropDown(false);
@@ -227,7 +224,6 @@ export const CommentFilter = (props) => {
     }
     setDateDropdown(!dateDropdown);
   };
-
 
   const toggleLeagueDropdown = () => {
     if (countryDropDown) {

@@ -241,12 +241,14 @@ const CommentsSettings = () => {
           type = 2;
         }
         setCategoryType(type);
-        const res = await axios.get(
-          `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
-          { headers }
-        );
-        const countryData = res.data.data;
-        setCountryOptions(countryData.map((item) => item.country));
+        if (type) {
+          const res = await axios.get(
+            `https://www.nosyapi.com/apiv2/bets/getMatchesCountryList?type=${type}`,
+            { headers }
+          );
+          const countryData = res.data.data;
+          setCountryOptions(countryData.map((item) => item.country));
+        }
       } catch (error) {
         console.log(error);
       }
@@ -422,18 +424,18 @@ const CommentsSettings = () => {
   };
 
   const data = {
-    "editor": "selectedEditor",
-    "category": ["selectedCategory"],
-    "country": "selectedCountry",
-    "league": "selectedLeague",
-    "match_detail": "selectedMatchDetails",
-    "prediction_type": "selectedPredictionType",
-    "prediction": "selectedPrediction",
-    "public_content": "isPublicSelected" ? true : false,
-    "comment": "comment",
-    "like": "like",
-    "favorite": fav,
-    "clap": clap,
+    editor: "selectedEditor",
+    category: ["selectedCategory"],
+    country: "selectedCountry",
+    league: "selectedLeague",
+    match_detail: "selectedMatchDetails",
+    prediction_type: "selectedPredictionType",
+    prediction: "selectedPrediction",
+    public_content: "isPublicSelected" ? true : false,
+    comment: "comment",
+    like: "like",
+    favorite: fav,
+    clap: clap,
   };
 
   return (
