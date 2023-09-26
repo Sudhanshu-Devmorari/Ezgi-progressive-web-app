@@ -503,7 +503,6 @@ const ContentSection = ({
                     width={26}
                   />
                   <span className="ps-1">{truncated}</span>
-                  {/* <span className="ps-1">{data?.value?.league}</span> */}
                 </span>
                 <span
                   style={{
@@ -599,44 +598,33 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-                {userPhone &&
+                {/* {userPhone &&
                 (data?.value?.public_content ||
                   selectContent == "subscription" ||
-                  userId == data?.value?.commentator_user?.id) ? (
-                  <div
-                    onClick={() => {
+                  userId == data?.value?.commentator_user?.id) ? ( */}
+                <div
+                  onClick={() => {
+                    userId &&
                       handleCommentReaction(
                         data?.value?.id,
                         "like",
                         data?.value?.total_reactions?.total_likes
                       );
-                    }}
-                  >
-                    <div>
-                      {cmtReact
-                        ?.map((e) => e?.comment_id)
-                        ?.includes(data?.value?.id) ? (
-                        cmtReact?.filter(
-                          (e) => e?.comment_id == data?.value?.id
-                        )[0].like == 1 ? (
-                          <img
-                            src={Selected_Like}
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        ) : (
-                          <img
-                            src={
-                              currentTheme === "dark"
-                                ? Dark_Unselected_Like
-                                : Light_Unselected_Like
-                            }
-                            alt=""
-                            height={20}
-                            width={20}
-                          />
-                        )
+                  }}
+                >
+                  <div>
+                    {cmtReact
+                      ?.map((e) => e?.comment_id)
+                      ?.includes(data?.value?.id) ? (
+                      cmtReact?.filter(
+                        (e) => e?.comment_id == data?.value?.id
+                      )[0].like == 1 ? (
+                        <img
+                          src={Selected_Like}
+                          alt=""
+                          height={20}
+                          width={20}
+                        />
                       ) : (
                         <img
                           src={
@@ -648,11 +636,23 @@ const ContentSection = ({
                           height={20}
                           width={20}
                         />
-                      )}{" "}
-                      {data?.value?.total_reactions?.total_likes}
-                    </div>
+                      )
+                    ) : (
+                      <img
+                        src={
+                          currentTheme === "dark"
+                            ? Dark_Unselected_Like
+                            : Light_Unselected_Like
+                        }
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
+                    )}{" "}
+                    {data?.value?.total_reactions?.total_likes}
                   </div>
-                ) : (
+                </div>
+                {/* ) : (
                   <div>
                     <img
                       src={
@@ -666,46 +666,35 @@ const ContentSection = ({
                     />{" "}
                     {data?.value?.total_reactions?.total_likes}
                   </div>
-                )}
-
-                {userPhone &&
+                )} */}
+                {/* {userPhone &&
                 (data?.value?.public_content ||
-                  selectContent == "subscription") ? (
-                  <div
-                    onClick={() => {
-                      if (userPhone != data?.value?.commentator_user?.id) {
-                        handleCommentReaction(
-                          data?.value?.id,
-                          "favorite",
-                          data?.value?.total_reactions?.total_favorite
-                        );
-                      }
-                    }}
-                  >
-                    {cmtReact
-                      ?.map((e) => e?.comment_id)
-                      ?.includes(data?.value?.id) ? (
-                      cmtReact?.filter(
-                        (e) => e?.comment_id == data?.value?.id
-                      )[0].favorite == 1 ? (
-                        <img
-                          src={Selected_Favorite}
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      ) : (
-                        <img
-                          src={
-                            currentTheme === "dark"
-                              ? Dark_Unselected_Favorite
-                              : Light_Unselected_Favorite
-                          }
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      )
+                  selectContent == "subscription") ? ( */}
+                <div
+                  onClick={() => {
+                    if (
+                      userPhone != data?.value?.commentator_user?.id &&
+                      userId
+                    ) {
+                      handleCommentReaction(
+                        data?.value?.id,
+                        "favorite",
+                        data?.value?.total_reactions?.total_favorite
+                      );
+                    }
+                  }}
+                >
+                  {cmtReact
+                    ?.map((e) => e?.comment_id)
+                    ?.includes(data?.value?.id) ? (
+                    cmtReact?.filter((e) => e?.comment_id == data?.value?.id)[0]
+                      .favorite == 1 ? (
+                      <img
+                        src={Selected_Favorite}
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
                     ) : (
                       <img
                         src={
@@ -717,10 +706,22 @@ const ContentSection = ({
                         height={20}
                         width={20}
                       />
-                    )}{" "}
-                    {data?.value?.total_reactions?.total_favorite}
-                  </div>
-                ) : (
+                    )
+                  ) : (
+                    <img
+                      src={
+                        currentTheme === "dark"
+                          ? Dark_Unselected_Favorite
+                          : Light_Unselected_Favorite
+                      }
+                      alt=""
+                      height={20}
+                      width={20}
+                    />
+                  )}{" "}
+                  {data?.value?.total_reactions?.total_favorite}
+                </div>
+                {/* ) : (
                   <div>
                     <img
                       src={
@@ -734,45 +735,27 @@ const ContentSection = ({
                     />{" "}
                     {data?.value?.total_reactions?.total_favorite}
                   </div>
-                )}
-
-                {userPhone &&
+                )} */}
+                {/* {userPhone &&
                 (data?.value?.public_content ||
                   selectContent == "subscription" ||
-                  userId == data?.value?.commentator_user?.id) ? (
-                  <div
-                    onClick={() => {
+                  userId == data?.value?.commentator_user?.id) ? ( */}
+                <div
+                  onClick={() => {
+                    userId &&
                       handleCommentReaction(
                         data?.value?.id,
                         "clap",
                         data?.value?.total_reactions?.total_clap
                       );
-                    }}
-                  >
-                    {cmtReact
-                      ?.map((e) => e?.comment_id)
-                      ?.includes(data?.value?.id) ? (
-                      cmtReact?.filter(
-                        (e) => e?.comment_id == data?.value?.id
-                      )[0].clap == 1 ? (
-                        <img
-                          src={Selected_Clap}
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      ) : (
-                        <img
-                          src={
-                            currentTheme === "dark"
-                              ? Dark_Unselected_Clap
-                              : Light_Unselected_Clap
-                          }
-                          alt=""
-                          height={20}
-                          width={20}
-                        />
-                      )
+                  }}
+                >
+                  {cmtReact
+                    ?.map((e) => e?.comment_id)
+                    ?.includes(data?.value?.id) ? (
+                    cmtReact?.filter((e) => e?.comment_id == data?.value?.id)[0]
+                      .clap == 1 ? (
+                      <img src={Selected_Clap} alt="" height={20} width={20} />
                     ) : (
                       <img
                         src={
@@ -784,25 +767,37 @@ const ContentSection = ({
                         height={20}
                         width={20}
                       />
-                    )}{" "}
-                    {data?.value?.total_reactions?.total_clap}
-                  </div>
-                ) : (
-                  <div>
+                    )
+                  ) : (
                     <img
                       src={
                         currentTheme === "dark"
                           ? Dark_Unselected_Clap
                           : Light_Unselected_Clap
                       }
-                      P
                       alt=""
                       height={20}
                       width={20}
-                    />{" "}
-                    {data?.value?.total_reactions?.total_clap}
-                  </div>
-                )}
+                    />
+                  )}{" "}
+                  {data?.value?.total_reactions?.total_clap}
+                </div>
+                {/* ) : (
+                <div>
+                  <img
+                    src={
+                      currentTheme === "dark"
+                        ? Dark_Unselected_Clap
+                        : Light_Unselected_Clap
+                    }
+                    P
+                    alt=""
+                    height={20}
+                    width={20}
+                  />{" "}
+                  {data?.value?.total_reactions?.total_clap}
+                </div>
+                )} */}
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
                 {(selectContent === "for you" ||
