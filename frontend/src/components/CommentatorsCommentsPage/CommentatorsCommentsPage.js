@@ -54,6 +54,10 @@ const CommentatorsCommentsPage = (props) => {
         `${config?.apiUrl}/fav-editor-comment/${userId}`
       );
       // console.log("=>>>", res.data);
+      if (res.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       setFavEditorData(res.data.favEditors);
       setFavCommentData(
         res.data.favComments.sort(
@@ -90,9 +94,14 @@ const CommentatorsCommentsPage = (props) => {
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
+          if (res.status == 204) {
+            localStorage.clear();
+          window.location.reload();
+          }
           setActive(res.data?.active_comments);
           setResolve(res.data?.resolved_comments);
         })
+
         .catch((error) => {
           console.error("Error fetching data.", error);
         });

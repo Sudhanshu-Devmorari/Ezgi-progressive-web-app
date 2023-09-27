@@ -167,6 +167,10 @@ const ActiveComments = (props) => {
       // console.log("API Response:", response);
       props?.setIsFavorite(!props?.isFavorite);
       props?.homeApiData(user_id);
+      if (response.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
     } catch (error) {
       console.error("Error making POST request:", error);
       if (error.response.status === 400) {

@@ -456,7 +456,7 @@ const CommentsManagement = (props) => {
                   </div>
                   <span className="ps-2">{res.commentator_user?.name}</span>
                 </div>
-                <div className="col-2">
+                <div className="col-3">
                   <img
                     className="flag-icon"
                     src={flag}
@@ -467,7 +467,7 @@ const CommentsManagement = (props) => {
                   <span className="ps-1">{res.league}</span>
                 </div>
                 <div className="col-4 ps-2">{res.match_detail}</div>
-                <div className="col-3 justify-content-end d-flex">
+                <div className="col-2 justify-content-end d-flex">
                   <span className="pe-1">
                     {moment(res.date).format("DD-MM.YYYY - HH:mm")}
                   </span>

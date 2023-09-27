@@ -466,7 +466,7 @@ const SalesManagementPage = () => {
                       Daily Total
                     </span>
                     <span className="number">
-                      12.700 <small>₺</small>
+                      {salesData.daily_total} <small>₺</small>
                     </span>
                     <div className="w-100 pt-3">
                       <span className="rate-font">
@@ -489,7 +489,7 @@ const SalesManagementPage = () => {
                       All Time Total
                     </span>
                     <span className="number">
-                      12.860 <small>₺</small>
+                      {salesData.all_time_total} <small>₺</small>
                     </span>
                   </div>
                 </div>
@@ -510,7 +510,7 @@ const SalesManagementPage = () => {
                 >
                   <span className="heading">Net Revenue</span>
                   <span className="number">
-                    12.645 <small>₺</small>
+                  {salesData.net_revenue} <small>₺</small>
                   </span>
                   <div className="w-100 pt-5">
                     <span className="rate-font">

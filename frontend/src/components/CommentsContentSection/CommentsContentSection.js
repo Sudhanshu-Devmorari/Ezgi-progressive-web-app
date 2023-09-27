@@ -183,6 +183,10 @@ const CommentsContentSection = (props) => {
           mergeArrays();
         }
       }
+      if (res.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       // activeResolved(user_id);
     } catch (error) {
       console.log(error);

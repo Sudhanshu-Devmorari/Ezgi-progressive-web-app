@@ -443,6 +443,8 @@ class FollowCommentatorView(APIView):
 
         # user = request.user
         try:
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if user.is_active == False:
                 return Response("Your account has been deactivated. Contact support for assistance.", status=status.HTTP_400_BAD_REQUEST)
             commentator_id = request.query_params.get('id')
@@ -506,6 +508,8 @@ class CommentView(APIView):
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if user.is_active == False:
                 return Response({'data' : "Your account has been deactivated. Contact support for assistance."}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -785,6 +789,8 @@ class CommentReactionView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         
         user = User.objects.get(id=id)
+        if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         if not user.is_active:
             return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -883,6 +889,8 @@ class ProfileView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user_obj = User.objects.get(id=id)
+            if user_obj.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
@@ -928,6 +936,8 @@ class ProfileView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
+        if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         if not user.is_active:
             return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -976,6 +986,9 @@ class FavEditorsCreateView(APIView):
             if request.data:
                 user = User.objects.get(id=id)
 
+                if user.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                
                 if not user.is_active:
                     return Response({'error' : 'Your account has been deactivated. Contact support for assistance..'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1024,7 +1037,9 @@ class RetrieveFavEditorsAndFavComment(APIView):
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
+            return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         try:
             editor = []
             editor_obj = FavEditors.objects.filter(standard_user_id=id, commentator_user__is_delete=False)
@@ -1093,7 +1108,8 @@ class SupportView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
-
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             support_obj = TicketSupport.objects.filter(user=user).order_by('-created')
             serializer = TicketSupportSerializer(support_obj, many=True)
             data = serializer.data
@@ -1114,6 +1130,8 @@ class SupportView(APIView):
                         return Response({'error': 'Message not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 # user = request.user
                 user = User.objects.get(id=id)
+                if user.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 if support_obj != None:
@@ -1241,7 +1259,8 @@ class ResolvedTicket(APIView):
         try:
             # user = request.user
             user = User.objects.get(id=id)
-
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if request.data:
                 if 'ticket_id' not in request.data:
                     return Response({'error': 'Ticket-id not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1276,6 +1295,9 @@ class ActiveResolvedCommentRetrieveView(APIView):
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        user = User.objects.get(id=id)
+        if user.is_delete == True:
+            return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         data_list = {}
 
         try:
@@ -1334,6 +1356,8 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         # user = request.user
         user = User.objects.get(id=id)
+        if user.is_delete == True:
+            return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         data_list = {}
         subscribers = []
         subscription = []
@@ -1521,6 +1545,7 @@ class AdminMainPage(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         previous_24_hours = timezone.now() - timedelta(hours=24)
+        previous_day = datetime.now() - timedelta(days=1)
 
         try:
             try:
@@ -1568,17 +1593,17 @@ class AdminMainPage(APIView):
                 data_list['comments_percentage'] = 0
 
 
-            new_user = User.objects.filter(created__gte=previous_24_hours).count()
+            new_user = User.objects.filter(created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_user'] = new_user
 
-            new_editor = User.objects.filter(user_role='commentator', created__gte=previous_24_hours).count()
+            new_editor = User.objects.filter(user_role='commentator', created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_editor'] = new_editor
 
-            new_subscriber = Subscription.objects.filter(created__gte=previous_24_hours).count()
+            new_subscriber = Subscription.objects.filter(created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_subscriber'] = new_subscriber
 
             # new_comment = Comments.objects.filter(status='approve').count()
-            new_comment = Comments.objects.filter(created__gte=previous_24_hours).count()
+            new_comment = Comments.objects.filter(created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_comment'] = new_comment
 
             all_user = User.objects.filter(is_delete=False,is_admin=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
@@ -1974,6 +1999,8 @@ class FilterComments(APIView):
         data_list = []
         filters = {}
         user = User.objects.get(id=id)
+        if user.is_delete == True:
+            return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         try:
             if 'level' in request.data  and request.data.get('level') != None and request.data.get('level') != "" and request.data.get('level') != "Select":
                 if request.data.get('level').lower() == 'expert':
@@ -2790,6 +2817,7 @@ class SalesManagement(APIView):
         """
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
+        previous_day = datetime.now() - timedelta(days=1)
         try:
             try:
                 """Subscribers percentage"""
@@ -2813,16 +2841,18 @@ class SalesManagement(APIView):
             except:
                 data_list['new_highlights_percentage'] = 0
 
-            # Subscription objects handling
+            # Subscription objects handling 
+
             subscription_obj = Subscription.objects.filter(subscription=True)
+            subscription_obj_cal = Subscription.objects.filter(subscription=True, created__gte=previous_day, created__lt=datetime.now())
             subscription_cal = 0
-            for obj in subscription_obj:
+            for obj in subscription_obj_cal:
                 subscription_cal += obj.money
 
             serializer = SubscriptionSerializer(subscription_obj, many=True)
             data_list['subscription'] = serializer.data
-            # data_list['subscription_count'] = subscription_cal
-            data_list['subscription_count'] = subscription_obj.count()
+            data_list['subscription_count'] = subscription_cal
+            # data_list['subscription_count'] = subscription_obj.count()
 
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching subscription data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2830,17 +2860,36 @@ class SalesManagement(APIView):
         try:
             # Highlight objects handling
             highlights_obj = Highlight.objects.filter(highlight=True)
+            highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
             highlights_cal = 0
-            for obj in highlights_obj:
+            for obj in highlights_obj_cal:
                 highlights_cal += obj.money
 
             serializer1 = HighlightSerializer(highlights_obj, many=True)
-            # data_list['highlight_count'] = highlights_cal
-            data_list['highlight_count'] = highlights_obj.count()
+            data_list['highlight_count'] = highlights_cal
+            # data_list['highlight_count'] = highlights_obj.count()
             data_list['highlight'] = serializer1.data
 
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        data_list['daily_total'] = subscription_cal + highlights_cal
+        data_list['net_revenue'] = subscription_cal + highlights_cal
+
+        try:
+            subscription_obj = Subscription.objects.filter(subscription=True)
+            subscription_cal = 0
+            for obj in subscription_obj:
+                subscription_cal += obj.money
+            highlights_obj = Highlight.objects.filter(highlight=True)
+            highlights_cal = 0
+            for obj in highlights_obj:
+                highlights_cal += obj.money
+            data_list['all_time_total'] = subscription_cal + highlights_cal
+
+        except Exception as e:
+            return Response(data={'error': f'{e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
         return Response(data=data_list, status=status.HTTP_200_OK)
     
@@ -4403,9 +4452,14 @@ class BecomeEditorView(APIView):
 class FootbalAndBasketballContentView(APIView):
     def get(self, request, *args, **kwargs):
         try:
+            uid = request.query_params.get('id')
+            user = User.objects.get(id=uid)
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+
             category = request.query_params.get('category')
             if category:
-                queryset = Comments.objects.filter(category=[category], commentator_user__is_delete=False, is_resolve=False).order_by('-created')
+                queryset = Comments.objects.filter(status='approve', category=[category], commentator_user__is_delete=False, is_resolve=False).order_by('-created')
                 data = CommentsSerializer(queryset, many=True).data  
                 # Create a list to store comments with their total reactions
                 comments_with_reactions = []
@@ -4713,6 +4767,10 @@ class RetrieveEditorView(APIView):
 class BecomeEditorFAQView(APIView):
 
     def get(self, request, id=None):
+        if request.query_params.get("id"):
+            user = User.objects.get(id=request.query_params.get('id'))
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         if id != None:
             try:
                 data = BecomeEditor.objects.get(id=id)
@@ -4884,6 +4942,8 @@ class CheckDeactivatedAccount(APIView):
         try:
             try:
                 user = User.objects.get(id=id) 
+                if user.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
                 if not user.is_active:
                     return Response({'error' : 'Your account has been deactivated. Contact support for assistance.'}, status=status.HTTP_400_BAD_REQUEST)
                 else:

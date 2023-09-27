@@ -138,9 +138,6 @@ const UserTimeLine = (props) => {
                   <span
                     className="support-history-fonts"
                     style={{ fontSize: "0.8rem" }}>
-                  // {console.log("data: ",res?.receiver?.username)}
-                  // {console.log("data2: ",res?.receiver)}
-                  // {console.log("data3: ",res?.admin_context)}
                     {res.admin_context != null && highlightUsername(
                       res?.admin_context,
                       `@${res?.receiver?.username}`

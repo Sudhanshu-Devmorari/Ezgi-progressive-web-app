@@ -26,10 +26,12 @@ import home from "../../assets/home.svg";
 import logout from "../../assets/logout.svg";
 import "./SideBar.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 const SideBar = (props) => {
   const navigate = useNavigate();
   const [showDetails, setshowDetails] = useState("home");
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const location = useLocation();
   const path = location.pathname;
@@ -182,6 +184,7 @@ const SideBar = (props) => {
           <img
             onClick={() => {
               localStorage.clear();
+              removeCookie("admin-user-id")
               navigate('/')
               window.location.reload();
             }}

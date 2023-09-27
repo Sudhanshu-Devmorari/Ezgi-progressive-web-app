@@ -8,10 +8,11 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-
+import {useCookies} from "react-cookie"
 const LoginModal = () => {
   const [isLoading, setisLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies(['cookie-name']);
 
   const validationSchema = Yup.object({
     phone: Yup.string()
@@ -55,6 +56,7 @@ const LoginModal = () => {
           } else if (res.data.status === 200) {
             const userId = res.data.userId;
             localStorage.setItem("admin-user-id", userId);
+            setCookie("admin-user-id", userId,{expires:new Date(new Date().getTime()+7200000)})
             window.location.reload();
           }
           setisLoading(false);

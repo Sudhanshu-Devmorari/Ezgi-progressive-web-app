@@ -774,10 +774,11 @@ const Home = (props) => {
                         />
                         <span className="ps-1">{res?.name}</span>
                       </div>
-                      <div className="d-flex gap-2 align-items-center col ">
-                        <div>{res?.username?.trim()}</div>
-                        <div className="">
-                          {res.gender == "Male" && (
+                      <div className="d-flex justify-content-between gap-2 align-items-center col ">
+                        <div style={{width:"33%"}}>{res?.username?.trim()}</div>
+                        <div className="d-flex" style={{width:"33%"}}>
+                        <span style={{display:"block", minWidth:"fit-content", textWrap:"nowrap"}}>
+                        {res.gender == "Male" && (
                             <img
                               src={gender_male}
                               alt=""
@@ -793,13 +794,14 @@ const Home = (props) => {
                               width={22}
                             />
                           )}
-                          <span>{res.age}</span>
+                          {res.age}
+                          </span>
                         </div>
-                        <div className="">{res.country?.trim()}</div>
+                        <div className="" style={{width:"33%"}}>{res.country?.trim()}</div>
                       </div>
                       {usersPart === "users" && (
                         <div
-                          className="d-flex align-items-center block-width col justify-content-center"
+                          className="d-flex  align-items-center block-width col justify-content-center"
                           style={{ minWidth: "7.5rem" }}
                         >
                           {res.commentator_level &&
@@ -1460,9 +1462,10 @@ const Home = (props) => {
                 ))}
               </div>
               <img
-                // onClick={()=>{
-                //   setNumberDropDown(false)
-                // }}
+                onClick={()=>{
+                  // setNumberDropDown(false)
+                  setshowTransactionHistory(1)
+                }}
                 data-bs-dismiss="modal"
                 src={cross}
                 alt=""

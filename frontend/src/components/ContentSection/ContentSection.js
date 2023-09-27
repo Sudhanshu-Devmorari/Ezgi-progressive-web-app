@@ -240,6 +240,10 @@ const ContentSection = ({
           mergeArrays();
         }
       }
+      if (res.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       localStorage.setItem(`${id}_${reaction}`, count);
     } catch (error) {
       console.log(error);

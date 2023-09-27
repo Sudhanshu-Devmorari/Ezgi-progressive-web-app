@@ -89,7 +89,10 @@ const SharedProfile = (props) => {
         }
       );
       // console.log("API Response:", response.data);
-
+      if (response.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       if (mergedEditorResult) {
         const filterArray = mergedEditorResult.filter(
           (res) => res?.value?.user?.id == response.data.user_id

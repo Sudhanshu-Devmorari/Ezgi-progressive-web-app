@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import MainPage from "./components/MainPage/MainPage";
 import WithdrawalManagementPage from "./components/WithdrawalManagementPage/WithdrawalManagementPage";
 import UserManagementPage from "./components/UserManagementPage/UserManagementPage";
@@ -12,11 +13,23 @@ import AdsManagementPage from "./components/AdsManagementPage/AdsManagementPage"
 import SettingsPage from "./components/SettingsPage/SettingsPage";
 import EditorSettingsPage from "./components/EditorSettingsPage/EditorSettingsPage";
 import LoginModal from "./components/LoginModal/LoginModal";
+import { useCookies } from "react-cookie";
 
 function App() {
-  const isAuthenticated = localStorage.getItem("admin-user-id");
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const isAuthenticated = cookies["admin-user-id"]
+  const navigate = useNavigate()
+  useEffect(() => {
+    // Update the cookie when the route changes
+    if (isAuthenticated) {
+      setCookie("admin-user-id", isAuthenticated, {
+        expires: new Date(new Date().getTime() + 7200000),
+      });
+    }
+  }, [isAuthenticated, navigate]);
   return (
     <>
+    
       <Routes>
         {!isAuthenticated ? (
           <Route path="/" element={<LoginModal />} />

@@ -200,6 +200,10 @@ const FavComments = (props) => {
           mergeArrays();
         }
       }
+      if (res.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
     } catch (error) {
       if (error?.response?.status === 400) {
         Swal.fire({

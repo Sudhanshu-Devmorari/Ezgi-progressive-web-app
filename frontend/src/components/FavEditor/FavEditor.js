@@ -48,7 +48,11 @@ const FavEditor = (props) => {
           id: id,
         }
       );
-
+      
+      if (response.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       const favEditorData = favEditorCommentsLike.filter(
         (res) => res?.data?.commentator_user?.id !== response.data.user_id
       );

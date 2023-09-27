@@ -29,7 +29,7 @@ import { CustomDropdownEditor } from "../CustomDropdownEditor";
 
 const EditorManagemenet = (props) => {
   const [addUser, setAddUser] = useState({});
-  console.log(addUser.country);
+  // console.log(addUser.country);
   const [partialData, setPartialData] = useState([]);
   const [cities, setCities] = useState([]);
 
@@ -470,7 +470,7 @@ const EditorManagemenet = (props) => {
       formData.append("city", addUser.city);
       formData.append(
         "category",
-        `${addUser?.category?.split(", ")?.join(",")}`
+        `${Array.isArray(addUser?.category)?addUser?.category?.join(","):addUser?.category?.split(", ")?.join(",")}`
       );
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
@@ -1307,7 +1307,7 @@ const EditorManagemenet = (props) => {
                 <div className="p-2">
                   <div className="d-flex justify-content-between">
                     <div className="p-1 gap-3 d-flex ">
-                      <img src={leftArrow} alt="" height={20} width={20} />
+                      <img src={leftArrow} alt="" height={20} width={20} onClick={() => setshowHistory(false)}/>
                       <div
                         onClick={() => setselectedHisory("subscriber")}
                         className=""
@@ -1856,6 +1856,7 @@ const EditorManagemenet = (props) => {
                   props.setupdateProfile(1);
                   clearError();
                   clearEditorData();
+                  setshowHistory(false);
                   setAddUser({
                     name: "",
                     username: "",

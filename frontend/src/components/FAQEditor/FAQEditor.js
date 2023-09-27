@@ -217,7 +217,12 @@ const FAQEditor = () => {
 
   const fetchFaqs = async () => {
     try {
-      const response = await axios.get(`${config.apiUrl}/become-editor-faq/`);
+      const userId = localStorage.getItem("user-id");
+      const response = await axios.get(`${config.apiUrl}/become-editor-faq/?id=${userId}`);
+      if (response.status == 204) {
+        localStorage.clear();
+      window.location.reload();
+      }
       if (response.data.length > 2) {
         response.data.splice(2, 0, staticFaq);
       } else {

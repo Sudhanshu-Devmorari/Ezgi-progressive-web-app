@@ -17,7 +17,26 @@
     outline: none!important;
     box-shadow: none!important;
 }
-@media (min-width: 1024px) and (max-width: 1583px) {
+
+@media (min-width: 1221px) and (max-width: 1541px) {
+    /* .home-height {
+        height: 63vh!important;
+    } */
+    .users-section-fonts{
+        font-size: 0.7rem!important;
+    }
+    .btn-user{
+        width: 7.5rem!important;
+    }
+    .block-width{
+        min-width: none!important;
+    }
+    .edit-icon-gap{
+        gap: 0rem!important;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1221px) {
     /* .home-height {
         height: 63vh!important;
     } */

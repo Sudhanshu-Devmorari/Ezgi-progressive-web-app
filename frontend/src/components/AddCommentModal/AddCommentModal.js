@@ -74,7 +74,7 @@ const AddCommentModal = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
 
   useEffect(() => {
-    console.log("profileData?.category:::::::::::::", profileData?.category);
+    // console.log("profileData?.category:::::::::::::", profileData?.category);
     profileData?.category.length == 1 &&
       setSelectedCategory(profileData?.category[0]);
     profileData?.category.length == 1 &&
