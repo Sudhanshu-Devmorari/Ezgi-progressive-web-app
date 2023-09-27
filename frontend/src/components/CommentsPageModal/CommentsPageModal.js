@@ -19,16 +19,16 @@ import config from "../../config";
 
 const CommentsPageModal = (props) => {
   const handleClearData = () => {
-    setCategoryData("")
-    setCountryData("")
-    setLeagueData("")
-    setDateData("")
-    setSelectedMatchDetails("Select")
-    setSelectedLevel("Select")
-    setSelectedPredictionType("Select")
-    setBlueSelect("")
-    setYellowSelect("")
-  }
+    setCategoryData("");
+    setCountryData("");
+    setLeagueData("");
+    setDateData("");
+    setSelectedMatchDetails("Select");
+    setSelectedLevel("Select");
+    setSelectedPredictionType("Select");
+    setBlueSelect("");
+    setYellowSelect("");
+  };
   const handleShowButtonClick = async () => {
     const user_id = localStorage.getItem("user-id");
     try {
@@ -45,8 +45,8 @@ const CommentsPageModal = (props) => {
           date: dateData,
           filter_type: blueSelect,
           filter_type0: yellowSelect,
-          level:selectedLevel,
-          mobile:'True'
+          level: selectedLevel,
+          mobile: "True",
         }
       );
       const editorData = response.data.map((item) => ({
@@ -54,7 +54,7 @@ const CommentsPageModal = (props) => {
         value: item,
       }));
       props.setFilterCommentData(editorData);
-      handleClearData()
+      handleClearData();
       // Handle the response here if needed
       // console.log('API Response:', response.data);
     } catch (error) {
@@ -117,12 +117,7 @@ const CommentsPageModal = (props) => {
     setPredictionTypeDropDown(false);
   };
 
-  const levelOptions = [
-    "Apprentice",
-    "Journeyman",
-    "Master",
-    "Grandmaster",
-  ];
+  const levelOptions = ["Apprentice", "Journeyman", "Master", "Grandmaster"];
 
   const [predictionTypeDropDown, setPredictionTypeDropDown] = useState(false);
   const [selectedPredictionType, setSelectedPredictionType] =
@@ -199,17 +194,17 @@ const CommentsPageModal = (props) => {
               <span className="mb-2">
                 <RxCross2
                   onClick={() => {
-                    handleClearData()
+                    handleClearData();
                     props.onHide();
-                    setMatchDetailsDropDown(false)
-                    setLevelDropDown(false)
-                    setPredictionTypeDropDown(false)
-                    setIsNotStartedSelected(false)
-                    setIsSubscriberSelected(false)
-                    setIsLosingSelected(false)
-                    setIsPublicSelected(false)
-                    setIsFinishedSelected(false)
-                    setIsWinningSelected(false)
+                    setMatchDetailsDropDown(false);
+                    setLevelDropDown(false);
+                    setPredictionTypeDropDown(false);
+                    setIsNotStartedSelected(false);
+                    setIsSubscriberSelected(false);
+                    setIsLosingSelected(false);
+                    setIsPublicSelected(false);
+                    setIsFinishedSelected(false);
+                    setIsWinningSelected(false);
                   }}
                   fontSize={"1.8rem"}
                   className={`${
@@ -264,6 +259,7 @@ const CommentsPageModal = (props) => {
               <div className="row">
                 <div className="col d-flex align-items-center">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleRadioBlue("public");
                     }}
@@ -280,11 +276,14 @@ const CommentsPageModal = (props) => {
                     height={31}
                     width={31}
                   />
-                  <span className="ps-1" style={{ width: "max-content" }}>Only Public</span>
+                  <span className="ps-1" style={{ width: "max-content" }}>
+                    Only Public
+                  </span>
                 </div>
                 <div className="col d-flex align-items-center justify-content-end">
                   <span className="pe-1">Only Subscriber</span>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleYellowRadio("subscribe");
                     }}
@@ -306,6 +305,7 @@ const CommentsPageModal = (props) => {
               <div className="row my-3">
                 <div className="col d-flex align-items-center">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleRadioBlue("finished");
                     }}
@@ -327,6 +327,7 @@ const CommentsPageModal = (props) => {
                 <div className="col d-flex align-items-center justify-content-end">
                   <span className="pe-1">Not Started</span>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleYellowRadio("not started");
                     }}
@@ -348,6 +349,7 @@ const CommentsPageModal = (props) => {
               <div className="row mb-3">
                 <div className="col d-flex align-items-center">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleRadioBlue("winning");
                     }}
@@ -369,6 +371,7 @@ const CommentsPageModal = (props) => {
                 <div className="col d-flex align-items-center justify-content-end">
                   <span className="">Lose</span>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() => {
                       handleYellowRadio("lose");
                     }}

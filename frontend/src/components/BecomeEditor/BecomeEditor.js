@@ -52,7 +52,12 @@ const BecomeEditor = ({ profileData }) => {
         </span>
       </div>
       <div className="my-2 px-4">
-        <img src={landingPage} alt="" className="img-fluid" />
+        <img
+          src={landingPage}
+          alt=""
+          className="img-fluid"
+          onContextMenu={(e) => e.preventDefault()}
+        />
       </div>
       {user_role !== "commentator" && (
         <div

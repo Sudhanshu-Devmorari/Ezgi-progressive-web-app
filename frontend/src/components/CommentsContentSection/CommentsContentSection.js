@@ -234,6 +234,7 @@ const CommentsContentSection = (props) => {
                         <div className="row m-2">
                           <div className="position-relative col p-0">
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={crown}
                               alt=""
                               height={19}
@@ -253,6 +254,7 @@ const CommentsContentSection = (props) => {
                               style={{ display: "flex", alignItems: "center" }}
                             >
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 style={{ objectFit: "cover" }}
                                 src={
                                   val?.commentator_user?.profile_pic
@@ -277,6 +279,7 @@ const CommentsContentSection = (props) => {
                                 val?.commentator_user?.id
                               ) && (
                                 <img
+                                  onContextMenu={(e) => e.preventDefault()}
                                   src={blueTick}
                                   alt=""
                                   width={14}
@@ -310,6 +313,7 @@ const CommentsContentSection = (props) => {
                               )}
 
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={`${
                                   currentTheme === "dark"
                                     ? world_check
@@ -368,6 +372,7 @@ const CommentsContentSection = (props) => {
                             <div className="d-flex justify-content-between align-items-center gap-1">
                               <span>
                                 <img
+                                  onContextMenu={(e) => e.preventDefault()}
                                   className=""
                                   src={TurkeyFalg}
                                   alt=""
@@ -402,7 +407,7 @@ const CommentsContentSection = (props) => {
                                   circleRatio={0.75}
                                   strokeWidth={3}
                                   value={100}
-                                  text="14:30"
+                                  text={val?.match_time || "00:00"}
                                   styles={buildStyles({
                                     rotation: 1 / 2 + 1 / 8,
                                     textColor:
@@ -466,6 +471,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].like == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Like}
                                       alt=""
                                       height={20}
@@ -473,6 +479,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Like
@@ -485,6 +492,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Like
@@ -514,6 +522,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].favorite == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Favorite}
                                       alt=""
                                       height={20}
@@ -521,6 +530,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Favorite
@@ -533,6 +543,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Favorite
@@ -561,6 +572,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].clap == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Clap}
                                       alt=""
                                       height={20}
@@ -568,6 +580,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Clap
@@ -580,6 +593,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Clap
@@ -632,6 +646,7 @@ const CommentsContentSection = (props) => {
                         <div className="row m-2">
                           <div className="position-relative col p-0">
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={crown}
                               alt=""
                               height={19}
@@ -648,6 +663,7 @@ const CommentsContentSection = (props) => {
                             />
                             <div className="col">
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 style={{ objectFit: "cover" }}
                                 src={
                                   val?.commentator_user?.profile_pic
@@ -666,6 +682,7 @@ const CommentsContentSection = (props) => {
                                 {val?.commentator_user?.username}
                               </span>
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={blueTick}
                                 alt=""
                                 width={16}
@@ -751,6 +768,7 @@ const CommentsContentSection = (props) => {
                               }}
                             >
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={`${
                                   currentTheme === "dark" ? lock : darklock
                                 }`}
@@ -772,6 +790,7 @@ const CommentsContentSection = (props) => {
                             <div className="d-flex justify-content-between align-items-center gap-1">
                               <span>
                                 <img
+                                  onContextMenu={(e) => e.preventDefault()}
                                   className=""
                                   src={TurkeyFalg}
                                   alt=""
@@ -805,7 +824,7 @@ const CommentsContentSection = (props) => {
                                   circleRatio={0.75}
                                   strokeWidth={3}
                                   value={100}
-                                  text="14:30"
+                                  text={val?.match_time || "00:00"}
                                   styles={buildStyles({
                                     rotation: 1 / 2 + 1 / 8,
                                     textColor:
@@ -848,6 +867,7 @@ const CommentsContentSection = (props) => {
                                   <>
                                     Subscribers Only{" "}
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       className="mb-1"
                                       src={lock}
                                       alt=""
@@ -881,6 +901,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].like == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Like}
                                       alt=""
                                       height={20}
@@ -888,6 +909,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Like
@@ -900,6 +922,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Like
@@ -930,6 +953,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].favorite == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Favorite}
                                       alt=""
                                       height={20}
@@ -937,6 +961,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Favorite
@@ -949,6 +974,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Favorite
@@ -977,6 +1003,7 @@ const CommentsContentSection = (props) => {
                                     (e) => e.comment_id == val?.id
                                   )[0].clap == 1 ? (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={Selected_Clap}
                                       alt=""
                                       height={20}
@@ -984,6 +1011,7 @@ const CommentsContentSection = (props) => {
                                     />
                                   ) : (
                                     <img
+                                      onContextMenu={(e) => e.preventDefault()}
                                       src={
                                         currentTheme === "dark"
                                           ? Dark_Unselected_Clap
@@ -996,6 +1024,7 @@ const CommentsContentSection = (props) => {
                                   )
                                 ) : (
                                   <img
+                                    onContextMenu={(e) => e.preventDefault()}
                                     src={
                                       currentTheme === "dark"
                                         ? Dark_Unselected_Clap
@@ -1033,7 +1062,6 @@ const CommentsContentSection = (props) => {
                                 </button>
                               )}
                               {formatTimeDifference(val?.created)}
-                              {/* 10 dk önce */}
                             </div>
                           </div>
                         </div>
@@ -1066,6 +1094,7 @@ const CommentsContentSection = (props) => {
                   <div className="row m-2">
                     <div className="position-relative col p-0">
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={crown}
                         alt=""
                         height={19}
@@ -1080,6 +1109,7 @@ const CommentsContentSection = (props) => {
                       />
                       <div className="col">
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           style={{ objectFit: "cover" }}
                           src={
                             res?.commentator_user?.profile_pic
@@ -1100,7 +1130,13 @@ const CommentsContentSection = (props) => {
                         {props.verifyid?.includes(
                           res?.commentator_user?.id
                         ) && (
-                          <img src={blueTick} alt="" width={14} height={14} />
+                          <img
+                            onContextMenu={(e) => e.preventDefault()}
+                            src={blueTick}
+                            alt=""
+                            width={14}
+                            height={14}
+                          />
                         )}
                       </div>
                     </div>
@@ -1110,6 +1146,7 @@ const CommentsContentSection = (props) => {
                           <>
                             {res?.public_content == true && (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={`${
                                   currentTheme === "dark"
                                     ? world_check
@@ -1122,6 +1159,7 @@ const CommentsContentSection = (props) => {
                             )}
                             {res?.is_prediction == true && (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={circle_check}
                                 alt=""
                                 height={31}
@@ -1133,6 +1171,7 @@ const CommentsContentSection = (props) => {
                           {(res.is_prediction != true ||
                             res.status === "yellow") && (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 (res.is_prediction != true && circle_x) ||
                                 (res.status === "yellow" && clock_pause)
@@ -1192,6 +1231,7 @@ const CommentsContentSection = (props) => {
                         }}
                       >
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={`${currentTheme === "dark" ? lock : darklock}`}
                           alt=""
                           height={32}
@@ -1210,6 +1250,7 @@ const CommentsContentSection = (props) => {
                       <div className="d-flex justify-content-between align-items-center gap-1">
                         <span>
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             className="pe-1"
                             src={TurkeyFalg}
                             alt=""
@@ -1318,6 +1359,7 @@ const CommentsContentSection = (props) => {
                             <>
                               Subscribers Only{" "}
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 className="mb-1"
                                 src={lock}
                                 alt=""
@@ -1350,6 +1392,7 @@ const CommentsContentSection = (props) => {
                               (e) => e.comment_id == res?.id
                             )[0].like == 1 ? (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={Selected_Like}
                                 alt=""
                                 height={20}
@@ -1357,6 +1400,7 @@ const CommentsContentSection = (props) => {
                               />
                             ) : (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={
                                   currentTheme === "dark"
                                     ? Dark_Unselected_Like
@@ -1369,6 +1413,7 @@ const CommentsContentSection = (props) => {
                             )
                           ) : (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 currentTheme === "dark"
                                   ? Dark_Unselected_Like
@@ -1399,6 +1444,7 @@ const CommentsContentSection = (props) => {
                               (e) => e.comment_id == res?.id
                             )[0].favorite == 1 ? (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={Selected_Favorite}
                                 alt=""
                                 height={20}
@@ -1406,6 +1452,7 @@ const CommentsContentSection = (props) => {
                               />
                             ) : (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={
                                   currentTheme === "dark"
                                     ? Dark_Unselected_Favorite
@@ -1418,6 +1465,7 @@ const CommentsContentSection = (props) => {
                             )
                           ) : (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 currentTheme === "dark"
                                   ? Dark_Unselected_Favorite
@@ -1446,6 +1494,7 @@ const CommentsContentSection = (props) => {
                               (e) => e.comment_id == res?.id
                             )[0].clap == 1 ? (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={Selected_Clap}
                                 alt=""
                                 height={20}
@@ -1453,6 +1502,7 @@ const CommentsContentSection = (props) => {
                               />
                             ) : (
                               <img
+                                onContextMenu={(e) => e.preventDefault()}
                                 src={
                                   currentTheme === "dark"
                                     ? Dark_Unselected_Clap
@@ -1465,6 +1515,7 @@ const CommentsContentSection = (props) => {
                             )
                           ) : (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 currentTheme === "dark"
                                   ? Dark_Unselected_Clap
@@ -1479,7 +1530,6 @@ const CommentsContentSection = (props) => {
                         </div>
                       </div>
                       <div className="ms-auto" style={{ fontSize: "12px" }}>
-                        {/* 10 dk önce */}
                         {formatTimeDifference(res?.created)}
                       </div>
                     </div>

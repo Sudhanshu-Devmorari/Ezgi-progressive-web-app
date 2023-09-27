@@ -132,6 +132,7 @@ const FavEditor = (props) => {
                     Kişi abone oldu
                   </span>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     className=""
                     src={yellowStarIcon}
                     alt=""
@@ -173,6 +174,7 @@ const FavEditor = (props) => {
                   >
                     <div className="position-absolute">
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={crown}
                         alt=""
                         height={21}
@@ -187,6 +189,7 @@ const FavEditor = (props) => {
                       />
                     </div>
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       src={
                         res?.data?.commentator_user?.profile_pic
                           ? `${config?.apiUrl}${res?.data?.commentator_user?.profile_pic}`
@@ -223,6 +226,7 @@ const FavEditor = (props) => {
                           res?.data?.commentator_user?.id
                         ) && (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             className="responsive-blue-tick"
                             src={blueTick}
                             alt=""
@@ -251,6 +255,7 @@ const FavEditor = (props) => {
                           "Futbol"
                         ) && (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={football}
                             alt=""
                             height={38}
@@ -265,6 +270,7 @@ const FavEditor = (props) => {
                           "Basketbol"
                         ) && (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={basketball}
                             alt=""
                             height={38}

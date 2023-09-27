@@ -5,7 +5,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 
 const LandingPage = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  
+
   return (
     <>
       <div
@@ -55,6 +55,7 @@ const LandingPage = () => {
           </div>
           <div className="col p-0">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               src={landingPage}
               alt=""
               style={{ height: "90%", width: "80%" }}

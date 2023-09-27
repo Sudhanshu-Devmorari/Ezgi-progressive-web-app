@@ -202,6 +202,7 @@ const BecomeAEditorModal = (props) => {
               <form onSubmit={handleSubmit}>
                 <div className="position-relative d-flex justify-content-center align-items-center">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={
                       preveiwProfilePic
                         ? preveiwProfilePic
@@ -224,6 +225,7 @@ const BecomeAEditorModal = (props) => {
                     style={{ display: "flex", justifyContent: "center" }}
                   >
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       src={camera}
                       alt=""
                       style={{
@@ -275,6 +277,7 @@ const BecomeAEditorModal = (props) => {
                 <div className="my-3 mb-2 d-flex justify-content-center">
                   {currentTheme === "dark" ? (
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       alt=""
                       src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
                       style={{ width: "25px", cursor: "pointer" }}
@@ -283,6 +286,7 @@ const BecomeAEditorModal = (props) => {
                     />
                   ) : (
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       src={
                         !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
                       }

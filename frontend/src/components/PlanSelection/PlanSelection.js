@@ -22,6 +22,7 @@ function PlanSelection(props) {
   const renderPlan = (plan, price, discountText, backgroundColor) => (
     <div className="d-flex mb-2" key={plan}>
       <img
+        onContextMenu={(e) => e.preventDefault()}
         onClick={() => handlePlanClick(plan)}
         src={
           isPlanSelected(plan)

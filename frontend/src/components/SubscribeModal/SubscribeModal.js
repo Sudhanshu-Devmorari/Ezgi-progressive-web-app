@@ -194,6 +194,7 @@ const SubscribeModal = (props) => {
                   <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">
                     <div className="position-relative">
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={crown}
                         alt=""
                         height={27}
@@ -209,6 +210,7 @@ const SubscribeModal = (props) => {
                         }}
                       />
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         style={{ borderRadius: "50%", objectFit: "cover" }}
                         src={
                           commentatorUser?.profile_pic
@@ -227,17 +229,31 @@ const SubscribeModal = (props) => {
                     >
                       <span className="">{commentatorUser?.username}</span>
                       <span className="">{commentatorUser?.city}</span>
-                      <span className="">{moment(commentatorUser?.created).format("DD.MM.YYYY")}</span>
+                      <span className="">
+                        {moment(commentatorUser?.created).format("DD.MM.YYYY")}
+                      </span>
                       <div className="">
                         {commentatorUser?.category?.some((categoryItem) =>
                           categoryItem.includes("Basketball")
                         ) && (
-                          <img src={basketball} alt="" height={40} width={40} />
+                          <img
+                            onContextMenu={(e) => e.preventDefault()}
+                            src={basketball}
+                            alt=""
+                            height={40}
+                            width={40}
+                          />
                         )}
                         {commentatorUser?.category?.some((categoryItem) =>
                           categoryItem.includes("Football")
                         ) && (
-                          <img src={football} alt="" height={40} width={40} />
+                          <img
+                            onContextMenu={(e) => e.preventDefault()}
+                            src={football}
+                            alt=""
+                            height={40}
+                            width={40}
+                          />
                         )}
                       </div>
                     </div>
@@ -314,6 +330,7 @@ const SubscribeModal = (props) => {
                     <div className="my-3" style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           alt=""
                           src={
                             !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
@@ -324,6 +341,7 @@ const SubscribeModal = (props) => {
                         />
                       ) : (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={
                             !selectCheckBox
                               ? CheckBoxLight

@@ -334,6 +334,7 @@ const ContentSection = ({
               }}
             >
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={crown}
                 alt=""
                 height={21}
@@ -350,6 +351,7 @@ const ContentSection = ({
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   src={`${
                     data?.value?.commentator_user?.profile_pic
                       ? config.apiUrl +
@@ -366,7 +368,13 @@ const ContentSection = ({
                   {truncateString(data?.value?.commentator_user?.username, 7)}
                 </span>
                 {verifyid?.includes(data?.value?.commentator_user?.id) && (
-                  <img src={blueTick} alt="" width={16} height={16} />
+                  <img
+                    onContextMenu={(e) => e.preventDefault()}
+                    src={blueTick}
+                    alt=""
+                    width={16}
+                    height={16}
+                  />
                 )}
               </div>
             </div>
@@ -405,13 +413,11 @@ const ContentSection = ({
                             fontSize: "13px",
                           }}
                         >
-                          {/* {followLabel ? followLabel : "Follow"} */}
                           {followingid?.includes(
                             data?.value?.commentator_user?.id
                           )
                             ? "Followed"
                             : "Follow"}
-                          {/* {(followingid).includes(data?.value.commentator_user.id) ? setFollowLabel('Followed') : setFollowLabel('Follow')} */}
                         </button>
                       ) : (
                         <button
@@ -467,6 +473,7 @@ const ContentSection = ({
                   }}
                 >
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={`${currentTheme === "dark" ? lock : darklock}`}
                     alt=""
                     height={32}
@@ -477,7 +484,6 @@ const ContentSection = ({
             ) : (
               <>
                 <div
-                  // onClick={() => setSelectContent("show-all-comments")}
                   className="p-1 my-2 content-font"
                   style={{
                     backgroundColor:
@@ -500,6 +506,7 @@ const ContentSection = ({
               <div className="d-flex justify-content-between align-items-center gap-1">
                 <span>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     className=""
                     src={TurkeyFalg}
                     alt=""
@@ -525,6 +532,7 @@ const ContentSection = ({
                       {data?.value?.public_content ? (
                         <>
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={`${
                               currentTheme === "dark"
                                 ? world_check
@@ -557,7 +565,7 @@ const ContentSection = ({
                     circleRatio={0.75}
                     strokeWidth={3}
                     value={100}
-                    text="14:30"
+                    text={data?.value?.match_time || "00:00"}
                     styles={buildStyles({
                       rotation: 1 / 2 + 1 / 8,
                       textColor:
@@ -602,10 +610,6 @@ const ContentSection = ({
                 className="gap-2 d-flex align-items-center"
                 style={{ fontSize: "13px" }}
               >
-                {/* {userPhone &&
-                (data?.value?.public_content ||
-                  selectContent == "subscription" ||
-                  userId == data?.value?.commentator_user?.id) ? ( */}
                 <div
                   onClick={() => {
                     userId &&
@@ -624,6 +628,7 @@ const ContentSection = ({
                         (e) => e?.comment_id == data?.value?.id
                       )[0].like == 1 ? (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={Selected_Like}
                           alt=""
                           height={20}
@@ -631,6 +636,7 @@ const ContentSection = ({
                         />
                       ) : (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={
                             currentTheme === "dark"
                               ? Dark_Unselected_Like
@@ -643,6 +649,7 @@ const ContentSection = ({
                       )
                     ) : (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={
                           currentTheme === "dark"
                             ? Dark_Unselected_Like
@@ -656,24 +663,7 @@ const ContentSection = ({
                     {data?.value?.total_reactions?.total_likes}
                   </div>
                 </div>
-                {/* ) : (
-                  <div>
-                    <img
-                      src={
-                        currentTheme === "dark"
-                          ? Dark_Unselected_Like
-                          : Light_Unselected_Like
-                      }
-                      alt=""
-                      height={20}
-                      width={20}
-                    />{" "}
-                    {data?.value?.total_reactions?.total_likes}
-                  </div>
-                )} */}
-                {/* {userPhone &&
-                (data?.value?.public_content ||
-                  selectContent == "subscription") ? ( */}
+
                 <div
                   onClick={() => {
                     if (
@@ -694,6 +684,7 @@ const ContentSection = ({
                     cmtReact?.filter((e) => e?.comment_id == data?.value?.id)[0]
                       .favorite == 1 ? (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={Selected_Favorite}
                         alt=""
                         height={20}
@@ -701,6 +692,7 @@ const ContentSection = ({
                       />
                     ) : (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={
                           currentTheme === "dark"
                             ? Dark_Unselected_Favorite
@@ -713,6 +705,7 @@ const ContentSection = ({
                     )
                   ) : (
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       src={
                         currentTheme === "dark"
                           ? Dark_Unselected_Favorite
@@ -725,25 +718,7 @@ const ContentSection = ({
                   )}{" "}
                   {data?.value?.total_reactions?.total_favorite}
                 </div>
-                {/* ) : (
-                  <div>
-                    <img
-                      src={
-                        currentTheme === "dark"
-                          ? Dark_Unselected_Favorite
-                          : Light_Unselected_Favorite
-                      }
-                      alt=""
-                      height={20}
-                      width={20}
-                    />{" "}
-                    {data?.value?.total_reactions?.total_favorite}
-                  </div>
-                )} */}
-                {/* {userPhone &&
-                (data?.value?.public_content ||
-                  selectContent == "subscription" ||
-                  userId == data?.value?.commentator_user?.id) ? ( */}
+
                 <div
                   onClick={() => {
                     userId &&
@@ -759,9 +734,16 @@ const ContentSection = ({
                     ?.includes(data?.value?.id) ? (
                     cmtReact?.filter((e) => e?.comment_id == data?.value?.id)[0]
                       .clap == 1 ? (
-                      <img src={Selected_Clap} alt="" height={20} width={20} />
+                      <img
+                        onContextMenu={(e) => e.preventDefault()}
+                        src={Selected_Clap}
+                        alt=""
+                        height={20}
+                        width={20}
+                      />
                     ) : (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={
                           currentTheme === "dark"
                             ? Dark_Unselected_Clap
@@ -774,6 +756,7 @@ const ContentSection = ({
                     )
                   ) : (
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       src={
                         currentTheme === "dark"
                           ? Dark_Unselected_Clap
@@ -786,22 +769,6 @@ const ContentSection = ({
                   )}{" "}
                   {data?.value?.total_reactions?.total_clap}
                 </div>
-                {/* ) : (
-                <div>
-                  <img
-                    src={
-                      currentTheme === "dark"
-                        ? Dark_Unselected_Clap
-                        : Light_Unselected_Clap
-                    }
-                    P
-                    alt=""
-                    height={20}
-                    width={20}
-                  />{" "}
-                  {data?.value?.total_reactions?.total_clap}
-                </div>
-                )} */}
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
                 {(selectContent === "for you" ||

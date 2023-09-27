@@ -13,6 +13,7 @@ import SignUpModal from "../SignUpModal/SignUpModal";
 import CurrentTheme from "../../context/CurrentTheme";
 
 export const Footer = (props) => {
+  const { homeApiData } = props;
   const [showSignup, setShowSignup] = useState(false);
   const { setShowModal } = useContext(CurrentTheme);
   return (
@@ -24,12 +25,16 @@ export const Footer = (props) => {
         <div className="container-fluid py-2">
           <div className="col text-center">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
+                console.log("click event fire", userId);
+
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("currentpage", "home");
                 localStorage.removeItem("activeCommentId");
                 props.setSelectContent("home");
                 props.setDashboardSUser(false);
+                userId && props.selectContent !== "home" && homeApiData(userId);
               }}
               src={props.selectContent === "home" ? selectedHomeIcon : HomeIcon}
               alt=""
@@ -39,6 +44,7 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("priviouspage", props.selectContent);
@@ -59,6 +65,7 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("priviouspage", props.selectContent);
@@ -66,6 +73,9 @@ export const Footer = (props) => {
                 localStorage.removeItem("activeCommentId");
                 props.setSelectContent("comments");
                 props.setDashboardSUser(false);
+                userId &&
+                  props.selectContent !== "comments" &&
+                  homeApiData(userId);
               }}
               src={props.selectContent === "comments" ? SelectedBow : BowIcon}
               alt=""
@@ -75,6 +85,7 @@ export const Footer = (props) => {
           </div>
           <div className="col text-center">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               src={props.selectContent === "fav" ? selectedFav : startFooter}
               alt=""
               height={38}
@@ -99,6 +110,7 @@ export const Footer = (props) => {
           {userId && (
             <div className="col text-center">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={logout}
                 alt=""
                 height={38}

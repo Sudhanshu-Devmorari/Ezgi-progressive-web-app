@@ -61,7 +61,6 @@ export const EditorBanner = (props) => {
     async function getBannerImg() {
       try {
         const res = await axios.get(`${config.apiUrl}/editor-banner/`);
-        console.log(res?.data);
         setEditorBannerImg(res?.data?.data[0]?.editor_banner);
       } catch (error) {
         console.log(error);
@@ -90,7 +89,13 @@ export const EditorBanner = (props) => {
           >
             <div className=" d-flex justify-content-center">Futbol</div>
             <div className="d-flex justify-content-center">
-              <img src={football} alt="" height={50} width={50} />
+              <img
+                onContextMenu={(e) => e.preventDefault()}
+                src={football}
+                alt=""
+                height={50}
+                width={50}
+              />
             </div>
             <div className="d-flex justify-content-center">
               <span>
@@ -111,7 +116,13 @@ export const EditorBanner = (props) => {
           >
             <div className="d-flex justify-content-center">Basketbol</div>
             <div className="d-flex justify-content-center">
-              <img src={basketball} alt="" height={50} width={50} />
+              <img
+                onContextMenu={(e) => e.preventDefault()}
+                src={basketball}
+                alt=""
+                height={50}
+                width={50}
+              />
             </div>
             <div className="d-flex justify-content-center">
               <span>

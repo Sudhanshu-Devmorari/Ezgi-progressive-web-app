@@ -1,5 +1,11 @@
 import requests, os
 import xml.etree.ElementTree as ET
+from datetime import datetime
+from django.db.models import Q
+
+# Models
+from core.models import Comments
+
 
 def create_response(stts,msg,data=None):
     if stts != 200:
@@ -47,3 +53,43 @@ def sms_send(number, msg):
             return "Failure"
     else:
         return "Code element not found in the response."
+    
+
+def get_league_data(match_type, league, date):
+    try:
+        match_data = None    
+        access_token = "lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+        match_type_data = {
+            'Futbol': 1,
+            'Basketbol': 2,
+        }
+        match_type = match_type_data.get(match_type, None)
+
+        # URL and headers to make API request
+        url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type={match_type}&league={league}&date={date}"
+        headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+
+        # Make the GET request
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            response_data = response.json() 
+            match_data = response_data.get('data', None)
+    
+        return match_data
+    except:
+        return None
+
+
+def on_match_time_update_comment_status(view_func):
+    def wrapped_view(*args, **kwargs):
+        try:
+            current_time = datetime.now()
+            Comments.objects.filter(Q(date=current_time.date(), match_time__lte=current_time.time()) | Q(date__lt=current_time.date()), is_resolve=False).update(is_resolve=True)
+            return view_func(*args, **kwargs)
+        except:
+            return view_func(*args, **kwargs)
+    
+    return wrapped_view

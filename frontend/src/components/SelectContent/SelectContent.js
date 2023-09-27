@@ -57,6 +57,7 @@ export const SelectContent = (props) => {
           >
             <div className="d-flex align-items-center">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={`${
                   currentTheme === "dark" ? world_check : world_check_light
                 }`}
@@ -79,6 +80,7 @@ export const SelectContent = (props) => {
                 }}
               >
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   src={
                     currentTheme === "dark"
                       ? props.publicSelected

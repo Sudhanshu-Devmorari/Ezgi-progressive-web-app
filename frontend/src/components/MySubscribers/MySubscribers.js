@@ -66,7 +66,13 @@ const MySubscribers = (props) => {
                     }}
                   >
                     <div className="">
-                      <img src={profile} alt="" height={35} width={35} />
+                      <img
+                        onContextMenu={(e) => e.preventDefault()}
+                        src={profile}
+                        alt=""
+                        height={35}
+                        width={35}
+                      />
                       <span className="ps-1">{sub.name}</span>
                     </div>
                     <div className="">
@@ -121,6 +127,7 @@ const MySubscribers = (props) => {
                     <div className="">
                       <div className="position-relative">
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           style={{
                             position: "absolute",
                             background:
@@ -134,7 +141,13 @@ const MySubscribers = (props) => {
                           width={13}
                         />
                       </div>
-                      <img src={profile} alt="" height={38} width={38} />
+                      <img
+                        onContextMenu={(e) => e.preventDefault()}
+                        src={profile}
+                        alt=""
+                        height={38}
+                        width={38}
+                      />
                       <span className="ps-1">{sub.name}</span>
                     </div>
                     <div className="">
@@ -194,6 +207,7 @@ const MySubscribers = (props) => {
                 <div className="">
                   <div className="position-relative">
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       style={{
                         position: "absolute",
                         background:
@@ -208,6 +222,7 @@ const MySubscribers = (props) => {
                     />
                   </div>
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={`${config?.apiUrl}${sub?.commentator_user.profile_pic}`}
                     alt=""
                     height={38}
@@ -264,7 +279,7 @@ const MySubscribers = (props) => {
       <SubscribeModal
         show={RenewModalShow}
         onHide={() => setRenewModalShow(false)}
-        text='renew'
+        text="renew"
       />
       {/* <SubscribeRenewModal
         show={RenewModalShow}

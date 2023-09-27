@@ -6,7 +6,6 @@ import darkradio from "../../assets/Ellipse 216.svg";
 import CurrentTheme from "../../context/CurrentTheme";
 
 function PromoteMeSubScription(props) {
-
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const { highlightPlan } = props;
@@ -22,6 +21,7 @@ function PromoteMeSubScription(props) {
   const renderPlan = (plan, price, discountText, backgroundColor) => (
     <div className="d-flex mb-2" key={plan}>
       <img
+        onContextMenu={(e) => e.preventDefault()}
         onClick={() => handlePlanClick(plan)}
         src={
           isPlanSelected(plan)

@@ -289,6 +289,7 @@ const FavComments = (props) => {
                   }}
                 >
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={crown}
                     alt=""
                     height={21}
@@ -303,6 +304,7 @@ const FavComments = (props) => {
                   />
                   <div className="col">
                     <img
+                      onContextMenu={(e) => e.preventDefault()}
                       style={{ objectFit: "cover", borderRadius: "50%" }}
                       src={
                         res?.commentator_user?.profile_pic
@@ -317,7 +319,13 @@ const FavComments = (props) => {
                       {truncateString(res?.commentator_user?.username, 7)}
                     </span>
                     {props.verifyid?.includes(res?.commentator_user?.id) && (
-                      <img src={blueTick} alt="" width={16} height={16} />
+                      <img
+                        onContextMenu={(e) => e.preventDefault()}
+                        src={blueTick}
+                        alt=""
+                        width={16}
+                        height={16}
+                      />
                     )}
                   </div>
                 </div>
@@ -397,6 +405,7 @@ const FavComments = (props) => {
                       }}
                     >
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={`${currentTheme === "dark" ? lock : darklock}`}
                         alt=""
                         height={32}
@@ -417,6 +426,7 @@ const FavComments = (props) => {
                   <div className="d-flex justify-content-between align-items-center gap-1">
                     <span>
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         className=""
                         src={TurkeyFalg}
                         alt=""
@@ -429,6 +439,7 @@ const FavComments = (props) => {
                     <span>
                       {res.public_content === true ? (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={`${
                             currentTheme === "dark"
                               ? world_check
@@ -486,7 +497,7 @@ const FavComments = (props) => {
                         circleRatio={0.75}
                         strokeWidth={3}
                         value={100}
-                        text={res?.is_resolve ? "1-1" : "14:30"}
+                        text={res?.is_resolve ? "1-1" : res?.match_time || "00:00"}
                         styles={buildStyles({
                           rotation: 1 / 2 + 1 / 8,
                           textColor:
@@ -566,13 +577,11 @@ const FavComments = (props) => {
                   >
                     <div
                       onClick={() => {
-                        if (res.public_content === true) {
-                          handleCommentReaction(
-                            res?.id,
-                            "like",
-                            res?.total_reactions.total_likes
-                          );
-                        }
+                        handleCommentReaction(
+                          res?.id,
+                          "like",
+                          res?.total_reactions.total_likes
+                        );
                       }}
                       className="d-flex align-items-center gap-2"
                     >
@@ -584,6 +593,7 @@ const FavComments = (props) => {
                             (e) => e.comment_id == res?.id
                           )[0].like == 1 ? (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={Selected_Like}
                               alt=""
                               height={20}
@@ -591,6 +601,7 @@ const FavComments = (props) => {
                             />
                           ) : (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 currentTheme === "dark"
                                   ? Dark_Unselected_Like
@@ -603,6 +614,7 @@ const FavComments = (props) => {
                           )
                         ) : (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={
                               currentTheme === "dark"
                                 ? Dark_Unselected_Like
@@ -618,7 +630,7 @@ const FavComments = (props) => {
                     </div>
                     <div
                       onClick={() => {
-                        if (res.public_content === true) {
+                        if (userId != res?.commentator_user?.id) {
                           handleCommentReaction(
                             res?.id,
                             "favorite",
@@ -635,6 +647,7 @@ const FavComments = (props) => {
                             (e) => e.comment_id == res?.id
                           )[0].favorite == 1 ? (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={Selected_Favorite}
                               alt=""
                               height={20}
@@ -642,6 +655,7 @@ const FavComments = (props) => {
                             />
                           ) : (
                             <img
+                              onContextMenu={(e) => e.preventDefault()}
                               src={
                                 currentTheme === "dark"
                                   ? Dark_Unselected_Favorite
@@ -654,6 +668,7 @@ const FavComments = (props) => {
                           )
                         ) : (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={
                               currentTheme === "dark"
                                 ? Dark_Unselected_Favorite
@@ -669,13 +684,11 @@ const FavComments = (props) => {
                     </div>
                     <div
                       onClick={() => {
-                        if (res.public_content === true) {
-                          handleCommentReaction(
-                            res?.id,
-                            "clap",
-                            res?.total_reactions?.total_clap
-                          );
-                        }
+                        handleCommentReaction(
+                          res?.id,
+                          "clap",
+                          res?.total_reactions?.total_clap
+                        );
                       }}
                     >
                       {props.cmtReact
@@ -684,6 +697,7 @@ const FavComments = (props) => {
                         props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
                           .clap == 1 ? (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={Selected_Clap}
                             alt=""
                             height={20}
@@ -691,6 +705,7 @@ const FavComments = (props) => {
                           />
                         ) : (
                           <img
+                            onContextMenu={(e) => e.preventDefault()}
                             src={
                               currentTheme === "dark"
                                 ? Dark_Unselected_Clap
@@ -703,6 +718,7 @@ const FavComments = (props) => {
                         )
                       ) : (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={
                             currentTheme === "dark"
                               ? Dark_Unselected_Clap

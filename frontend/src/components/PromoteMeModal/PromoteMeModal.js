@@ -201,6 +201,7 @@ const PromoteMeModal = (props) => {
                     <div className="my-3" style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           alt=""
                           src={
                             !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
@@ -211,6 +212,7 @@ const PromoteMeModal = (props) => {
                         />
                       ) : (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={
                             !selectCheckBox
                               ? CheckBoxLight

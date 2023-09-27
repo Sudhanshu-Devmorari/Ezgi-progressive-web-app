@@ -35,7 +35,13 @@ const FacebookLogin = () => {
           console.log(error);
         }}
       >
-        <img className="mx-3" src={facebook} alt="" height={50} />
+        <img
+          onContextMenu={(e) => e.preventDefault()}
+          className="mx-3"
+          src={facebook}
+          alt=""
+          height={50}
+        />
       </LoginSocialFacebook>
     </>
   );

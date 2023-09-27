@@ -101,6 +101,7 @@ const SubscribeRenewModal = (props) => {
                   <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">
                     <div className="position-relative">
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={crown}
                         alt=""
                         height={27}
@@ -116,6 +117,7 @@ const SubscribeRenewModal = (props) => {
                         }}
                       />
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={profile}
                         width={105}
                         height={105}
@@ -131,8 +133,20 @@ const SubscribeRenewModal = (props) => {
                       <span className="">Ankara/Turkey</span>
                       <span className="">22.04.2022</span>
                       <div className="">
-                        <img src={basketball} alt="" height={40} width={40} />
-                        <img src={football} alt="" height={40} width={40} />
+                        <img
+                          onContextMenu={(e) => e.preventDefault()}
+                          src={basketball}
+                          alt=""
+                          height={40}
+                          width={40}
+                        />
+                        <img
+                          onContextMenu={(e) => e.preventDefault()}
+                          src={football}
+                          alt=""
+                          height={40}
+                          width={40}
+                        />
                       </div>
                     </div>
                   </div>
@@ -254,6 +268,7 @@ const SubscribeRenewModal = (props) => {
                     <div className="my-3" style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           alt=""
                           src={
                             !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
@@ -264,6 +279,7 @@ const SubscribeRenewModal = (props) => {
                         />
                       ) : (
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           src={
                             !selectCheckBox
                               ? CheckBoxLight

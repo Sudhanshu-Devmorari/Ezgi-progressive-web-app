@@ -644,6 +644,7 @@ const SignUpModal = (props) => {
                   <div className="mt-3" style={{ fontSize: "13px" }}>
                     {currentTheme === "dark" ? (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         alt=""
                         src={
                           !selectCheckBox ? CheckBoxDark : CheckBoxSelectDark
@@ -657,6 +658,7 @@ const SignUpModal = (props) => {
                       />
                     ) : (
                       <img
+                        onContextMenu={(e) => e.preventDefault()}
                         src={
                           !selectCheckBox ? CheckBoxLight : CheckBoxSelectLight
                         }
@@ -725,7 +727,12 @@ const SignUpModal = (props) => {
             </div>
           )}
 
-          {ShowModal === 3 && <TermsOfUse hide={props.onHide} setSelectCheckBox={setSelectCheckBox}/>}
+          {ShowModal === 3 && (
+            <TermsOfUse
+              hide={props.onHide}
+              setSelectCheckBox={setSelectCheckBox}
+            />
+          )}
 
           {ShowModal === 4 && <SignInModal hide={props.onHide} />}
 

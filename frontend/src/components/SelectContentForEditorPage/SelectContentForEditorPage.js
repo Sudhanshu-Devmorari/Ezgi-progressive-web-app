@@ -44,13 +44,11 @@ const SelectContentForEditorPage = (props) => {
               .startsWith(val.toLowerCase()) ||
             obj?.value?.user?.username
               ?.toLowerCase()
-              .includes(val.toLowerCase()) || 
+              .includes(val.toLowerCase()) ||
             obj?.value?.match_detail
               ?.toLowerCase()
               .startsWith(val.toLowerCase()) ||
-            obj?.value?.match_detail
-              ?.toLowerCase()
-              .includes(val.toLowerCase())
+            obj?.value?.match_detail?.toLowerCase().includes(val.toLowerCase())
         );
         props?.setFilterCommentData(filteredArray);
       } else {
@@ -108,6 +106,7 @@ const SelectContentForEditorPage = (props) => {
         {props.comments && (
           <div className="ms-auto d-flex align-items-center px-2">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               src={currentTheme === "dark" ? world_check : publicIcon}
               alt=""
               style={{ color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6" }}
@@ -127,6 +126,7 @@ const SelectContentForEditorPage = (props) => {
               }}
             >
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 // src={currentTheme === "dark" ? darkGrp : lighGrp}
                 src={
                   currentTheme === "dark"

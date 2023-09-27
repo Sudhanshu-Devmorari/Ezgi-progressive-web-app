@@ -77,7 +77,13 @@ const Support = () => {
         {showModal === 1 && (
           <>
             <div className="my-2 d-flex justify-content-center align-items-center flex-column">
-              <img src={lifebuoy} alt="" height={50} width={50} />
+              <img
+                onContextMenu={(e) => e.preventDefault()}
+                src={lifebuoy}
+                alt=""
+                height={50}
+                width={50}
+              />
               <span>Do you need help?</span>
               <span className="my-2">
                 <button
@@ -147,7 +153,10 @@ const Support = () => {
 
         {showModal === 2 && (
           <>
-            <CreateNewTicket setShowModal={setShowModal} ticketsData={ticketsData}/>
+            <CreateNewTicket
+              setShowModal={setShowModal}
+              ticketsData={ticketsData}
+            />
           </>
         )}
 

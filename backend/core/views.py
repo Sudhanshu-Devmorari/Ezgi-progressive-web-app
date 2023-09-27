@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from core.utils import create_response, sms_send
+from core.utils import create_response, sms_send, get_league_data, on_match_time_update_comment_status
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -596,6 +596,10 @@ class CommentView(APIView):
                 if not comment:
                     raise NotFound("Comment not found.")
                 
+                match_data = get_league_data(category, league, date)
+                match_time = match_data[0].get('Time', None) if match_data else None
+                match_time_obj =  datetime.strptime(match_time, '%H:%M:%S').time() if match_time else None
+                
                 if Comments.objects.filter(commentator_user=user,
                     category=[category],
                     country=country,
@@ -614,7 +618,8 @@ class CommentView(APIView):
                     prediction_type=prediction_type,
                     prediction=prediction,
                     public_content=public_content,
-                    comment=comment
+                    comment=comment,
+                    match_time=match_time_obj
                 )
 
                 if comment_obj != None:
@@ -4610,7 +4615,7 @@ class RetrievePageData():
         public_comments = []
 
         try:
-            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False).order_by('-created').only('id')
+            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False).order_by('-created').only('id')
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -4812,6 +4817,7 @@ class RetrieveHomeView(APIView):
     """
     for Home page:
     """
+    @on_match_time_update_comment_status
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
             "Public_Comments": [],

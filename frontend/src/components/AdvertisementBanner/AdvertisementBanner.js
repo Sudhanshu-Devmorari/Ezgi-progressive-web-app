@@ -45,6 +45,7 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
           style={{ width: "100%", height: "180px" }}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             style={{ width: "100%", height: "100%" }}
             src={`${server_url + data?.picture}`}
             // src={resize}

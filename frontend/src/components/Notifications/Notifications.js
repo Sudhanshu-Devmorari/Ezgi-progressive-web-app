@@ -85,6 +85,7 @@ const Notifications = () => {
         >
           <div className="d-flex">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               src={
                 res?.sender?.profile_pic
                   ? `${config.apiUrl}${res?.sender?.profile_pic}`

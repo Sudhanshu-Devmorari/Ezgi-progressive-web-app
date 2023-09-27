@@ -147,6 +147,7 @@ const ProfileSU = (props) => {
                 <Spinner />
               ) : (
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   src={
                     preveiwProfilePic
                       ? preveiwProfilePic
@@ -173,6 +174,7 @@ const ProfileSU = (props) => {
               {(preveiwProfilePic || editProfile) && (
                 <label htmlFor="camera-icon">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={camera}
                     alt=""
                     style={{
@@ -252,13 +254,13 @@ const ProfileSU = (props) => {
               <button
                 onClick={() => {
                   if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                  setEditProfile(!editProfile)}}
+                    JSON.parse(localStorage.getItem("user-active")) == false
+                  ) {
+                    errorSwal();
+                    return;
+                  }
+                  setEditProfile(!editProfile);
+                }}
                 className="edit-profile-btn"
                 style={{
                   border: editProfile

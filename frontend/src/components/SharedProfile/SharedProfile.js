@@ -182,6 +182,7 @@ const SharedProfile = (props) => {
           </span>
           {data?.value?.is_fav_editor ? (
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
                 if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
@@ -194,6 +195,7 @@ const SharedProfile = (props) => {
             />
           ) : (
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
                 if (userId && userId != data?.value?.user?.id) {
                   favEditor(data?.value?.user?.id);
@@ -244,6 +246,7 @@ const SharedProfile = (props) => {
           >
             <div className="position-absolute">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={crown}
                 alt=""
                 height={21}
@@ -257,6 +260,7 @@ const SharedProfile = (props) => {
               />
             </div>
             <img
+              onContextMenu={(e) => e.preventDefault()}
               style={{ objectFit: "cover" }}
               src={`${
                 data?.value?.user?.profile_pic
@@ -293,6 +297,7 @@ const SharedProfile = (props) => {
                 <span className="pe-1">{data?.value?.user?.username}</span>
                 {verifyid?.includes(data?.value?.user?.id) && (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     className="responsive-blue-tick"
                     src={blueTick}
                     alt=""
@@ -316,6 +321,7 @@ const SharedProfile = (props) => {
               {data?.value?.user?.category.includes("Football") ||
                 (data?.value?.user?.category.includes("Futbol") && (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={football}
                     alt=""
                     height={38}
@@ -326,6 +332,7 @@ const SharedProfile = (props) => {
               {data?.value?.user?.category.includes("Basketball") ||
                 (data?.value?.user?.category.includes("Basketbol") && (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={basketball}
                     alt=""
                     height={38}

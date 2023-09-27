@@ -54,16 +54,16 @@ const CommentsManagement = (props) => {
   }, [props?.commentData]);
 
   const handleFilterState = () => {
-    setSelectedCategory('Select')
-    setSelectedCountry('Select')
-    setSelectedDate('Select')
-    setSelectedLeague('Select')
-    setSelectedMatchDetails('Select')
-    setSelectedPrediction('Select')
-    setSelectedPredictionType('Select')
-    setStatus("")
-    setSecondStatus("")
-  }
+    setSelectedCategory("Select");
+    setSelectedCountry("Select");
+    setSelectedDate("Select");
+    setSelectedLeague("Select");
+    setSelectedMatchDetails("Select");
+    setSelectedPrediction("Select");
+    setSelectedPredictionType("Select");
+    setStatus("");
+    setSecondStatus("");
+  };
 
   const updateCommentApiData = async () => {
     const user_id = localStorage.getItem("admin-user-id");
@@ -78,13 +78,13 @@ const CommentsManagement = (props) => {
         prediction_type: selectedPredictionType,
         filter_type: status,
         filter_type0: secondStatus,
-        mobile:'False'
+        mobile: "False",
       })
       .then((res) => {
         // console.log(res.data,"=====>>filter");
         setFdata(res.data);
         setDisplayUser(res.data);
-        handleFilterState()
+        handleFilterState();
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
@@ -121,13 +121,13 @@ const CommentsManagement = (props) => {
     setCountryDropDown(!countryDropDown);
   };
   const handleStatus = async (id, status) => {
-    const user_id = localStorage.getItem("admin-user-id")
+    const user_id = localStorage.getItem("admin-user-id");
     try {
       const res = await axios.patch(
         `${config?.apiUrl}/comments-management/${id}/?admin_id=${user_id}`,
         { status: `${status}` }
       );
-      window.location.reload()
+      window.location.reload();
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
@@ -421,9 +421,9 @@ const CommentsManagement = (props) => {
             {displayUser?.map((res, index) => (
               <MainDiv>
                 <div className="col-3 d-flex align-items-center cursor">
-                <span className="pe-1">{`# ${(index + 1)
-                          .toString()
-                          .padStart(4, "0")}`}</span>
+                  <span className="pe-1">{`# ${(index + 1)
+                    .toString()
+                    .padStart(4, "0")}`}</span>
                   <div className="position-relative">
                     <img
                       className="rounded-circle profile-icon"
@@ -632,7 +632,9 @@ const CommentsManagement = (props) => {
                       alt=""
                       style={{ cursor: "pointer" }}
                     />
-                    <span className="px-2" style={{ width: "max-content" }}>Only Public</span>
+                    <span className="px-2" style={{ width: "max-content" }}>
+                      Only Public
+                    </span>
                   </div>
                   <div className="">
                     <span className="px-2">Only Subscribers</span>
@@ -758,7 +760,7 @@ const CommentsManagement = (props) => {
                   setSecondStatus("");
                   setThirdStatus("");
                   setFourthStatus("");
-                  handleFilterState()
+                  handleFilterState();
                 }}
                 data-bs-dismiss="modal"
                 src={cross}
@@ -838,7 +840,7 @@ const CommentsManagement = (props) => {
                       circleRatio={0.75}
                       strokeWidth={3}
                       value={100}
-                      text="14:30"
+                      text={currentData?.match_time || "00:00"}
                       styles={buildStyles({
                         rotation: 1 / 2 + 1 / 8,
                         textColor: "#E6E6E6",

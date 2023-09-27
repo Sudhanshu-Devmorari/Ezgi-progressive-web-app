@@ -74,7 +74,6 @@ const AddCommentModal = (props) => {
   const [dateDropdown, setDateDropdown] = useState(false);
 
   useEffect(() => {
-    // console.log("profileData?.category:::::::::::::", profileData?.category);
     profileData?.category.length == 1 &&
       setSelectedCategory(profileData?.category[0]);
     profileData?.category.length == 1 &&
@@ -829,6 +828,7 @@ const AddCommentModal = (props) => {
               <div className="">
                 {currentTheme === "dark" ? (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() =>
                       profileData.commentator_level !== "apprentice" &&
                       setToggleInput(!toggleInput)
@@ -840,6 +840,7 @@ const AddCommentModal = (props) => {
                   />
                 ) : (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     onClick={() =>
                       profileData.commentator_level !== "apprentice" &&
                       setToggleInput(!toggleInput)
@@ -892,6 +893,7 @@ const AddCommentModal = (props) => {
               <div className="mt-3" style={{ fontSize: "13px" }}>
                 {currentTheme === "dark" ? (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     alt=""
                     src={!selectCheckBox ? CheckBoxDark : CheckBoxSelectDark}
                     style={{ width: "25px", cursor: "pointer" }}
@@ -900,6 +902,7 @@ const AddCommentModal = (props) => {
                   />
                 ) : (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={!selectCheckBox ? CheckBoxLight : CheckBoxSelectLight}
                     style={{ width: "25px", cursor: "pointer" }}
                     className="me-2"

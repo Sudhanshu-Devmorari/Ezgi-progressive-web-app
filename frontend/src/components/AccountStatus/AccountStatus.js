@@ -552,7 +552,13 @@ const AccountStatus = (props) => {
                     currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 }}
               >
-                <img src={buletick} alt="" height={50} width={50} />
+                <img
+                  src={buletick}
+                  alt=""
+                  height={50}
+                  width={50}
+                  onContextMenu={(e) => e.preventDefault()}
+                />
                 <span>Unverified Account</span>
                 <span>
                   <button

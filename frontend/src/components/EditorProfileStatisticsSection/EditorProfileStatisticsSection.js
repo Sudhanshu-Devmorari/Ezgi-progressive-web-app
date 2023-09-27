@@ -350,6 +350,7 @@ const EditorProfileStatisticsSection = (props) => {
                         }}
                       >
                         <img
+                          onContextMenu={(e) => e.preventDefault()}
                           style={{ borderRadius: "50%", objectFit: "cover" }}
                           className="flag-responsive"
                           src={res?.flagUrl}

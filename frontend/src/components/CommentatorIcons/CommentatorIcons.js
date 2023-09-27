@@ -38,6 +38,7 @@ const CommentatorIcons = (props) => {
               } col d-flex justify-content-center p-1 py-2`}
             >
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={
                   props.content === "home"
                     ? bow_Selected
@@ -62,6 +63,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             src={
               props.content === "subscribers"
                 ? user_check_selected
@@ -84,6 +86,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             src={
               props.content === "wallet"
                 ? walletSelected
@@ -106,6 +109,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             src={
               props.content === "fav"
                 ? starSelected
@@ -128,6 +132,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             src={
               props.content === "notifications"
                 ? bellSelected
@@ -150,6 +155,7 @@ const CommentatorIcons = (props) => {
           } col d-flex justify-content-center p-1 py-2`}
         >
           <img
+            onContextMenu={(e) => e.preventDefault()}
             src={
               props.content === "support"
                 ? lifebuoySelected

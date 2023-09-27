@@ -57,6 +57,7 @@ const GoogleLogin = () => {
   return (
     <>
       <img
+        onContextMenu={(e) => e.preventDefault()}
         onClick={() => login()}
         className="mx-3"
         src={google}

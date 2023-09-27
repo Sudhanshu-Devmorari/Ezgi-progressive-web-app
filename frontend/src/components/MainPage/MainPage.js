@@ -81,7 +81,6 @@ const MainPage = () => {
   const [rightCornerAds, setRightCornerAds] = useState([]);
 
   function homeApiData(user_id) {
-    // console.log("userId::::::::::::", user_id);
     axios
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
@@ -711,6 +710,7 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
+                   
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!
@@ -970,6 +970,7 @@ const MainPage = () => {
           setDashboardSUser={setDashboardSUser}
           setSelectContent={setSelectContent}
           selectContent={selectContent}
+          homeApiData={homeApiData}
         />
       </div>
     </>

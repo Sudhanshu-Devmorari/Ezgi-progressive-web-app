@@ -135,7 +135,13 @@ const Transactions = () => {
           }}
         >
           <span>
-            <img src={bankLogo} alt="" height={15} width={50} />
+            <img
+              onContextMenu={(e) => e.preventDefault()}
+              src={bankLogo}
+              alt=""
+              height={15}
+              width={50}
+            />
           </span>
           <span>
             {bankDetails.bank_iban

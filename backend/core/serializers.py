@@ -24,14 +24,16 @@ class FollowCommentatorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CustomDateField(serializers.Field):
+class CustomTimeField(serializers.TimeField):
     def to_representation(self, value):
         if value:
-            return value.strftime("%d.%m.%Y")
+            return value.strftime('%H:%M')
         return None
+    
 class CommentsSerializer(serializers.ModelSerializer):
     commentator_user = UserSerializer(required=False)
-    # date = CustomDateField()
+    match_time = CustomTimeField(format='%H:%M', required=False)
+    
     class Meta:
         model = Comments
         fields = '__all__'

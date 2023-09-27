@@ -89,7 +89,8 @@ const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
           onClick={() => handleLinkClick(adsLeftdata[0]?.id)}
           target="_blank"
         >
-          <img
+          <img 
+            onContextMenu={(e) => e.preventDefault()}
             src={`${
               adsLeftdata[0]?.picture
                 ? server_url + adsLeftdata[0]?.picture
@@ -109,7 +110,8 @@ const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
           onClick={() => handleLinkClick(adsRightdata[0]?.id)}
           target="_blank"
         >
-          <img
+          <img 
+            onContextMenu={(e) => e.preventDefault()}
             style={{ height: "100%", width: "100%", objectFit: "cover" }}
             src={`${
               adsRightdata[0]?.picture

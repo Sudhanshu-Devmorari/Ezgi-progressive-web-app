@@ -26,6 +26,7 @@ const VerificationModal = (props) => {
         >
           <div className="d-flex justify-content-end">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               onClick={props.onHide}
               src={currentTheme === "dark" ? crossDark : crossLight}
               alt=""
@@ -37,7 +38,13 @@ const VerificationModal = (props) => {
             className="d-flex justify-content-center flex-column align-items-center"
             style={{ fontSize: "14px" }}
           >
-            <img src={buletick} alt="" height={50} width={50} />
+            <img
+              onContextMenu={(e) => e.preventDefault()}
+              src={buletick}
+              alt=""
+              height={50}
+              width={50}
+            />
             <p className="text-center">Doğrulanmış Hesap Rozeti</p>
             <p className="text-center">
               Doğrulanmış hesap rozeti talep edebilmen için hesabın uygun değil.

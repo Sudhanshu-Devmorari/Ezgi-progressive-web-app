@@ -457,6 +457,7 @@ const ActiveComments = (props) => {
             <>
               {props?.isFavorite ? (
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   onClick={() => {
                     if (userId) {
                       props?.profileData?.id != userId &&
@@ -470,6 +471,7 @@ const ActiveComments = (props) => {
                 />
               ) : (
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   onClick={() => {
                     if (userId && userPhone != profileData?.id) {
                       favEditor(profileData?.id);
@@ -497,6 +499,7 @@ const ActiveComments = (props) => {
                 <Spinner />
               ) : (
                 <img
+                  onContextMenu={(e) => e.preventDefault()}
                   src={
                     preveiwProfilePic
                       ? preveiwProfilePic
@@ -521,6 +524,7 @@ const ActiveComments = (props) => {
             </div>
             <div className="">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 className="crown-img-Editor"
                 src={crown}
                 alt=""
@@ -533,6 +537,7 @@ const ActiveComments = (props) => {
               {(preveiwProfilePic || editProfile) && (
                 <label htmlFor="camera-icon">
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={camera}
                     alt=""
                     style={{
@@ -578,6 +583,7 @@ const ActiveComments = (props) => {
                 {truncated}
                 {props.verifyid?.includes(profileData?.id) && (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     className="responsive-blue-tick"
                     src={blueTick}
                     alt=""
@@ -735,6 +741,7 @@ const ActiveComments = (props) => {
           </div>
         )}
         <img
+          onContextMenu={(e) => e.preventDefault()}
           onClick={() => setDescriptionShow(!descriptionShow)}
           src={currentTheme === "dark" ? edit : editLight}
           alt=""
@@ -855,7 +862,8 @@ const ActiveComments = (props) => {
               categoryItem.includes("Basketbol")
           ) && (
             <div className="">
-              <img src={basketball} alt="" height={45} width={45} />
+              <img  onContextMenu={(e) => e.preventDefault()} src={basketball} alt="" height={45} width={45} />
+             
             </div>
           )}
           {profileData?.category?.some(
@@ -864,7 +872,8 @@ const ActiveComments = (props) => {
               categoryItem.includes("Futbol")
           ) && (
             <div className="">
-              <img src={football} alt="" height={45} width={45} />
+              <img  onContextMenu={(e) => e.preventDefault()} src={football} alt="" height={45} width={45} />
+             
             </div>
           )}
         </div>

@@ -46,6 +46,7 @@ const NavBar = (props) => {
           {currentTheme === "light" ? (
             <span className="px-2">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={moon}
                 alt=""
                 height={35}
@@ -56,6 +57,7 @@ const NavBar = (props) => {
           ) : (
             <span className="px-2">
               <img
+                onContextMenu={(e) => e.preventDefault()}
                 src={darkmode}
                 alt=""
                 height={35}
@@ -68,6 +70,7 @@ const NavBar = (props) => {
           )}
           <span className="pe-2 ps-0">
             <img
+              onContextMenu={(e) => e.preventDefault()}
               src={currentTheme === "dark" ? bell : bellLight}
               alt=""
               height={35}
@@ -124,6 +127,7 @@ const NavBar = (props) => {
                   />
                 ) : (
                   <img
+                    onContextMenu={(e) => e.preventDefault()}
                     src={
                       props?.profileData
                         ? `${config.apiUrl}${props?.profileData}`
