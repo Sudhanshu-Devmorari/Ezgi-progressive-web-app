@@ -56,15 +56,13 @@ export const EditorBanner = (props) => {
     } catch (error) {}
   }, [selectCategory]);
 
-const [editorBannerImg, setEditorBannerImg] = useState(null);
+  const [editorBannerImg, setEditorBannerImg] = useState(null);
   useEffect(() => {
     async function getBannerImg() {
       try {
-        const res = await axios.get(
-          `${config.apiUrl}/editor-banner/`
-        );
-        console.log(res?.data)
-        setEditorBannerImg(res?.data?.data[0]?.editor_banner)
+        const res = await axios.get(`${config.apiUrl}/editor-banner/`);
+        console.log(res?.data);
+        setEditorBannerImg(res?.data?.data[0]?.editor_banner);
       } catch (error) {
         console.log(error);
       }
@@ -143,14 +141,18 @@ const [editorBannerImg, setEditorBannerImg] = useState(null);
           className={`col-6 d-flex align-items-center justify-content-center ${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
           }`}
-          style={{ color: "#D2DB08" }}
+          style={{ color: "#D2DB08", height: "125px" }}
         >
           {/* Become a Editor Banner */}
-          <img
-            src={editorBannerImg ? `${config.apiUrl}${editorBannerImg}` : bannerimg}
-            alt="Become a Editor Banner"
-            style={{ height: "100%", width: "100%", objectFit: "cover" }}
-          />
+          {editorBannerImg ? (
+            <img
+              src={`${config.apiUrl}${editorBannerImg}`}
+              alt="Become a Editor Banner"
+              style={{ height: "100%", width: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            "Become a Editor Banner"
+          )}
         </div>
       </div>
     </>

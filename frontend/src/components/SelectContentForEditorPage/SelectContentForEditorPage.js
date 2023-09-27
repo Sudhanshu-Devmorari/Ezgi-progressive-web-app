@@ -18,7 +18,6 @@ const SelectContentForEditorPage = (props) => {
 
   const filterData = (e) => {
     props.setPublicSelected && props?.setPublicSelected(false);
-    console.log("props:::::::::", props.data)
     if (props.editor == true) {
       const val = e.target.value;
       if (val !== "") {

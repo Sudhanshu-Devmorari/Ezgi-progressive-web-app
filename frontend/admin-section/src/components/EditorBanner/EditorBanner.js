@@ -9,7 +9,6 @@ import config from "../../config";
 
 const EditorBanner = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const [bannerId, setbannerId] = useState(null);
 
@@ -19,14 +18,13 @@ const EditorBanner = () => {
     async function getBannerImg() {
       try {
         const res = await axios.get(`${config.apiUrl}/editor-banner/`);
-        const img = res?.data?.data[0]?.editor_banner
-        const id = res?.data?.data[0]?.id
-        console.log("===========>>>id", id)
-        setbannerId(id)
+        const img = res?.data?.data[0]?.editor_banner;
+        const id = res?.data?.data[0]?.id;
+        setbannerId(id);
         formik.setValues({
-          editorBanner: `${config.apiUrl}${img}`,
+          editorBanner: img,
         });
-        
+
         setBannerPreview(`${config.apiUrl}${img}`);
       } catch (error) {
         console.log(error);
@@ -45,9 +43,8 @@ const EditorBanner = () => {
     },
     validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
       formData.append("editor_banner", values.editorBanner);
-      if (bannerId){
+      if (bannerId) {
         formData.append("bannerId", bannerId);
       }
       try {
@@ -79,8 +76,8 @@ const EditorBanner = () => {
     const allowedTypes = ["image/jpeg", "image/png"];
     const file = e.target.files[0];
     if (allowedTypes.includes(file.type)) {
-      // setBannerPreview(URL.createObjectURL(file));
-      formik.setFieldValue("editorBanner", URL.createObjectURL(file));
+      setBannerPreview(URL.createObjectURL(file));
+      formik.setFieldValue("editorBanner", file);
     } else {
       Swal.fire({
         title: "Error",
@@ -110,9 +107,9 @@ const EditorBanner = () => {
               <div className="modal-body p-3 dark-mode">
                 <span>Add or Update Editor Banner</span>
                 <div className="mx-2 my-3">
-                  {formik.values.editorBanner !== null && (
+                  {bannerPreview !== null && (
                     <img
-                      src={formik.values.editorBanner}
+                      src={bannerPreview}
                       alt=""
                       height={100}
                       width={100}

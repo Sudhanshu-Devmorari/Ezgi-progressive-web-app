@@ -23,6 +23,7 @@ import { userId } from "../GetUser";
 import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
+import CategoryFilter from "../CategoryFilter/CategoryFilter";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -66,7 +67,7 @@ const MainPage = () => {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data.profile_pic);
-    setMembershipDate(res.data.membership_date)
+    setMembershipDate(res.data.membership_date);
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
   }
@@ -418,6 +419,40 @@ const MainPage = () => {
     setContentFilterData(merged);
   };
 
+  const [onlyPubliccategory, setOnlyPubliccategory] = useState(false);
+  const [filteredcategoryData, setFilteredcategoryData] = useState([]);
+
+  const filterCategoryData = (value) => {
+    const filteredArray = contentFilterData.filter(
+      (obj) =>
+        obj?.value?.commentator_user?.username
+          ?.toLowerCase()
+          .includes(value.toLowerCase()) ||
+        obj?.value?.match_detail?.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredcategoryData(filteredArray);
+  };
+  const categoryData =
+    filteredcategoryData.length > 0 ? filteredcategoryData : contentFilterData;
+
+  useEffect(() => {
+    if (onlyPubliccategory) {
+      if (filteredcategoryData.length > 0) {
+        const data = filteredcategoryData.filter(
+          (obj) => obj?.value?.public_content == true
+        );
+        setFilteredcategoryData(data);
+      } else {
+        const data = contentFilterData.filter(
+          (obj) => obj?.value?.public_content == true
+        );
+        setContentFilterData(data);
+      }
+    } else {
+      handlesportData();
+    }
+  }, [onlyPubliccategory]);
+
   return (
     <>
       <div className="landing-page">
@@ -676,10 +711,6 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
-                    {console.log(
-                      subscriptionResult,
-                      "===============>>subscriptionResult"
-                    )}
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!
@@ -896,12 +927,17 @@ const MainPage = () => {
               )}
               {selectContent === "category-content" && (
                 <>
-                  {contentFilterData.length == 0 ? (
+                  <CategoryFilter
+                    filterCategoryData={filterCategoryData}
+                    setOnlyPubliccategory={setOnlyPubliccategory}
+                    onlyPubliccategory={onlyPubliccategory}
+                  />
+                  {categoryData.length == 0 ? (
                     <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                       No Record Found!
                     </div>
                   ) : (
-                    contentFilterData?.map((res, index) => (
+                    categoryData?.map((res, index) => (
                       <ContentSection
                         key={index}
                         data={res}

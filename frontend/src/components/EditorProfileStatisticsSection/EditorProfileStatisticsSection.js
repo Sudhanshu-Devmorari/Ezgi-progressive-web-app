@@ -57,6 +57,7 @@ const EditorProfileStatisticsSection = (props) => {
     axios
       .get(`${config.apiUrl}/sports-statistics/${user}/`)
       .then((res) => {
+        console.log(res?.data, "================>>>>>resssss stats");
         if (res.status === 200) {
           setBasketballStats(res.data[0]);
           setFootballStats(res.data[1]);
@@ -146,12 +147,29 @@ const EditorProfileStatisticsSection = (props) => {
     return null;
   }
 
+  useEffect(() => {
+    if (profileData?.category?.length != 2) {
+      profileData?.category.map((res) =>
+        setSelectSport(
+          res == "Futbol" || res == "Football" ? "football" : "basketball"
+        )
+      );
+    }
+  }, [profileData && profileData?.category]);
+
   const displayLeague =
     SelectSport === "football"
       ? leagueFootballData
       : SelectSport === "basketball"
       ? leagueBasketballData
       : [];
+
+  console.log(
+    SelectSport,
+    "============>>selected sopprt",
+    profileData?.category,
+    profileData?.category.length
+  );
 
   return (
     <>
@@ -203,7 +221,7 @@ const EditorProfileStatisticsSection = (props) => {
         ) : (
           <>
             {(footballCommentType.length !== 0 && SelectSport === "football") ||
-            (basketballCommentType.length !== 0 &&
+            (basketballCommentType.length != 0 &&
               SelectSport === "basketball") ? (
               <>
                 <div className="my-2">
@@ -345,56 +363,6 @@ const EditorProfileStatisticsSection = (props) => {
                       </div>
                     ))}
                   </div>
-                  {/* <div className="d-flex justify-content-center gap-2 my-3">
-                    {displayLeague?.slice(3, 5)?.map((res, index) => (
-                      <div
-                        className=""
-                        style={{
-                          fontSize: "14px",
-                          backgroundColor:
-                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                          borderRadius: "13px",
-                        }}
-                      >
-                        <img
-                          style={{ borderRadius: "50%", objectFit: "cover" }}
-                          className="flag-responsive"
-                          src={res?.flagURL}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
-                        <span className="p-2 ps-1 Flag-content-font">
-                          {res?.leagueName}
-                        </span>
-                      </div>
-                    ))}
-                  </div> */}
-                  {/* <div className="d-flex justify-content-between">
-                    {displayLeague?.slice(5, 8)?.map((res, index) => (
-                      <div
-                        className=""
-                        style={{
-                          fontSize: "14px",
-                          backgroundColor:
-                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                          borderRadius: "13px",
-                        }}
-                      >
-                        <img
-                          style={{ borderRadius: "50%", objectFit: "cover" }}
-                          className="flag-responsive"
-                          src={res?.flagURL}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
-                        <span className="p-2 ps-1 Flag-content-font">
-                          {res?.leagueName}
-                        </span>
-                      </div>
-                    ))}
-                  </div> */}
                 </div>
               </>
             ) : (

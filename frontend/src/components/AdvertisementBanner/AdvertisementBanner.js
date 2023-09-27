@@ -46,8 +46,8 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
         >
           <img
             style={{ width: "100%", height: "100%" }}
-            // src={`${server_url + data?.picture}`}
-            src={resize}
+            src={`${server_url + data?.picture}`}
+            // src={resize}
             alt=""
           />
         </Link>

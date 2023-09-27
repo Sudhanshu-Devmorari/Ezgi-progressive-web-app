@@ -25,50 +25,31 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now=True)),
             ],
         ),
-        migrations.CreateModel(
-            name='EditorBanner',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('editor_banner', models.ImageField(blank=True, null=True, upload_to='Editor_banner')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-            ],
-        ),
-        migrations.AddField(
-            model_name='advertisement',
-            name='ad_clicks_and_redirected_count',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AddField(
-            model_name='advertisement',
-            name='ad_views_count',
-            field=models.IntegerField(default=0),
-        ),
-        migrations.AddField(
-            model_name='comments',
-            name='match_time',
-            field=models.TimeField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='notification',
-            name='admin_context',
-            field=models.CharField(blank=True, max_length=500, null=True),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='description',
-            field=models.CharField(blank=True, max_length=255, null=True),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='is_active',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='membership_date',
-            field=models.DateField(default=datetime.date.today),
-        ),
+        # migrations.AddField(
+        #     model_name='advertisement',
+        #     name='ad_clicks_and_redirected_count',
+        #     field=models.IntegerField(default=0),
+        # ),
+        # migrations.AddField(
+        #     model_name='advertisement',
+        #     name='ad_views_count',
+        #     field=models.IntegerField(default=0),
+        # ),
+        # migrations.AddField(
+        #     model_name='comments',
+        #     name='match_time',
+        #     field=models.TimeField(blank=True, null=True),
+        # ),
+        # migrations.AddField(
+        #     model_name='user',
+        #     name='description',
+        #     field=models.CharField(blank=True, max_length=255, null=True),
+        # ),
+        # migrations.AddField(
+        #     model_name='user',
+        #     name='is_active',
+        #     field=models.BooleanField(default=True),
+        # ),
         migrations.AlterField(
             model_name='advertisement',
             name='end_date',

@@ -31,7 +31,7 @@ from collections import Counter
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
@@ -895,10 +895,11 @@ class ProfileView(APIView):
             data = serializer.data
 
             if user_obj.user_role == 'commentator':
-                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj).count()
+                follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj, standard_user__is_delete=False).count()
                 data['Follower_Count'] = follow_obj
 
-                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
+                # subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj, standard_user__is_delete=False).count()
                 data['Subscriber_Count'] = subscriber_obj
 
                 comment_obj = Comments.objects.filter(commentator_user=user_obj)
@@ -1068,7 +1069,6 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
         try:
             comment_obj = CommentReaction.objects.filter(user_id=id, favorite=1, comment__commentator_user__is_delete=False)
-            print('comment_obj: ', comment_obj)
             details = []
             for obj in comment_obj:
                 data_c = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
@@ -1835,14 +1835,67 @@ class UserManagement(APIView):
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
             elif action == 'remove':
-                if user.user_role == "standard":
-                    user.is_delete = True
-                    user.save(update_fields=['is_delete', 'updated'])
-                    return Response({'data': "User profile removed sucessfully."}, status=status.HTTP_200_OK)
-                else:
-                    user.is_delete = True
-                    user.save(update_fields=['is_delete', 'updated'])
-                    return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+                # if user.user_role == "standard":
+
+                # delete  match
+                is_match_exist = MatchDetail.objects.filter(comment__commentator_user=user).exists()
+                if is_match_exist:
+                    MatchDetail.objects.filter(comment__commentator_user=user).delete()
+
+                # delete comments reactions
+                is_comments_reac_exist = CommentReaction.objects.filter(comment__commentator_user=user).exists()
+                if is_comments_reac_exist:
+                    CommentReaction.objects.filter(comment__commentator_user=user).delete()
+                    
+                # delete comments
+                is_comments_exist = Comments.objects.filter(commentator_user=user).exists()
+                if is_comments_exist:
+                    Comments.objects.filter(commentator_user=user).delete()
+
+                # delete subscription 
+                is_subcription_exist = Subscription.objects.filter(standard_user=user).exists()
+                if is_subcription_exist:
+                    Subscription.objects.filter(standard_user=user).update(status='deactive')   
+                    # Subscription.objects.filter(standard_user=user).delete()  
+                                        
+                # delete notifications 
+                is_notifications_exist = Notification.objects.filter(sender=user,receiver=user).exists()
+                if is_notifications_exist:
+                    Notification.objects.filter(sender=user,receiver=user).delete()
+
+                # delete tickets response
+                is_tickets_res_exist = ResponseTicket.objects.filter(user=user).exists()
+                if is_tickets_res_exist:
+                    ResponseTicket.objects.filter(user=user).delete()   
+
+                # delete tickets history
+                is_tickets_history_exist = TicketHistory.objects.filter(user=user).exists()
+                if is_tickets_history_exist:
+                    TicketHistory.objects.filter(user=user).delete()  
+
+                # delete tickets 
+                is_tickets_exist = TicketSupport.objects.filter(user=user).exists()
+                if is_tickets_exist:
+                    TicketSupport.objects.filter(user=user).delete()      
+
+                    # deactive subscription 
+                is_highlight_exist = Highlight.objects.filter(user=user).exists()
+                if is_highlight_exist:
+                    Highlight.objects.filter(user=user).update(status='deactive')   
+
+                    # blue tick 
+                is_bluetick_exist = BlueTick.objects.filter(user=user).exists()
+                if is_bluetick_exist:
+                    BlueTick.objects.filter(user=user).delete()   
+
+
+                user.is_delete = True
+                user.save(update_fields=['is_delete', 'updated'])
+                return Response({'data': "User profile removed sucessfully."}, status=status.HTTP_200_OK)
+                # else:
+                #     user.is_delete = True
+                #     user.save(update_fields=['is_delete', 'updated'])
+                #     return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
             elif action == 'deactive':
                 user.is_active = False
                 user.save(update_fields=['is_active', 'updated'])
@@ -2613,6 +2666,56 @@ class EditorManagement(APIView):
                     return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 
             elif action == 'remove':
+                # delete  match
+                is_match_exist = MatchDetail.objects.filter(comment__commentator_user=user).exists()
+                if is_match_exist:
+                    MatchDetail.objects.filter(comment__commentator_user=user).delete()
+
+                # delete comments reactions
+                is_comments_reac_exist = CommentReaction.objects.filter(comment__commentator_user=user).exists()
+                if is_comments_reac_exist:
+                    CommentReaction.objects.filter(comment__commentator_user=user).delete()
+                    
+                # delete comments
+                is_comments_exist = Comments.objects.filter(commentator_user=user).exists()
+                if is_comments_exist:
+                    Comments.objects.filter(commentator_user=user).delete()
+
+                # delete subscription 
+                is_subcription_exist = Subscription.objects.filter(standard_user=user).exists()
+                if is_subcription_exist:
+                    Subscription.objects.filter(standard_user=user).update(status='deactive')   
+                    # Subscription.objects.filter(standard_user=user).delete()  
+                                        
+                # delete notifications 
+                is_notifications_exist = Notification.objects.filter(sender=user,receiver=user).exists()
+                if is_notifications_exist:
+                    Notification.objects.filter(sender=user,receiver=user).delete()
+
+                # delete tickets response
+                is_tickets_res_exist = ResponseTicket.objects.filter(user=user).exists()
+                if is_tickets_res_exist:
+                    ResponseTicket.objects.filter(user=user).delete()   
+
+                # delete tickets history
+                is_tickets_history_exist = TicketHistory.objects.filter(user=user).exists()
+                if is_tickets_history_exist:
+                    TicketHistory.objects.filter(user=user).delete()  
+
+                # delete tickets 
+                is_tickets_exist = TicketSupport.objects.filter(user=user).exists()
+                if is_tickets_exist:
+                    TicketSupport.objects.filter(user=user).delete()      
+
+                    # deactive subscription 
+                is_highlight_exist = Highlight.objects.filter(user=user).exists()
+                if is_highlight_exist:
+                    Highlight.objects.filter(user=user).update(status='deactive')   
+
+                    # blue tick 
+                is_bluetick_exist = BlueTick.objects.filter(user=user).exists()
+                if is_bluetick_exist:
+                    BlueTick.objects.filter(user=user).delete()   
                 user.is_delete = True
                 user.save(update_fields=['is_delete', 'updated'])
                 return Response({"data": "User profile removed sucessfully."}, status=status.HTTP_200_OK)
@@ -4096,7 +4199,7 @@ class SportsStatisticsView(APIView):
             p_type_lst = []
             details = {}
             Comments_Journey_basketball = []
-            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol')
+            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
             total_user_cmt = user_all_cmt.count()
             
             p_type_lst = [obj.prediction_type for obj in user_all_cmt]
@@ -4109,7 +4212,7 @@ class SportsStatisticsView(APIView):
 
             prediction_types_data = []
             for i in top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketbol').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketbol', status='approve').count()
 
                 cal = (predict_type / total_user_cmt)* 100
                 data ={
@@ -4131,18 +4234,18 @@ class SportsStatisticsView(APIView):
                 }
                 prediction_types_data.append(other_data)
                 
-            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol').order_by('-created')[:30]
+            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve').order_by('-created')[:20]
             for obj in recent_30_comments:
                 Comments_Journey_basketball.append(obj.is_prediction)
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketbol').order_by('-created')[:30]
+            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketbol', status='approve').order_by('-created')[:20]
 
             basketball_calculation = (len(correct_prediction_basketball)/30)*100
             details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
-            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol')
+            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
             for obj in Countries_Leagues_basketball:
                 translator= Translator(from_lang="turkish",to_lang="english")
                 translation_coutry = translator.translate(obj.country)
@@ -4154,7 +4257,7 @@ class SportsStatisticsView(APIView):
                 # basketball_Leagues.append(obj.league)
             frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
             counter = Counter(frozen_dicts)
-            most_common_duplicates = counter.most_common(8)
+            most_common_duplicates = counter.most_common(5)
             result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
 
 
@@ -4170,7 +4273,7 @@ class SportsStatisticsView(APIView):
             fb_p_type_lst = []
             Fb_details = {}
             Comments_Journey_football = []
-            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol')
+            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             fb_total_user_cmt = fb_user_all_cmt.count()
             
             fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
@@ -4183,7 +4286,7 @@ class SportsStatisticsView(APIView):
 
             fb_prediction_types_data = []
             for i in fb_top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Futbol').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Futbol', status='approve').count()
 
                 cal = (predict_type / fb_total_user_cmt)* 100
                 data ={
@@ -4204,18 +4307,18 @@ class SportsStatisticsView(APIView):
                 }
                 fb_prediction_types_data.append(fb_other_data)
 
-            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol').order_by('-created')[:30]
+            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve').order_by('-created')[:20]
             for obj in fb_recent_30_comments:
                 Comments_Journey_football.append(obj.is_prediction)
             Fb_details['Comments_Journey_football'] = Comments_Journey_football
 
-            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Futbol').order_by('-created')[:30]
+            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Futbol', status='approve').order_by('-created')[:20]
 
             football_calculation = (len(correct_prediction_football)/30)*100
             Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
-            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol')
+            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             for obj in Countries_Leagues_football:
                 # football_Leagues.append(obj.league)
                 translator= Translator(from_lang="turkish",to_lang="english")
@@ -4981,6 +5084,7 @@ class EditorBannerView(APIView):
 
     def patch(self, request): 
         try:
+            print('request.data: ', request.data)
             if 'editor_banner' not in request.data:
                 return Response({'data' : 'Editor banner is required.'}, status=status.HTTP_404_NOT_FOUND)
             

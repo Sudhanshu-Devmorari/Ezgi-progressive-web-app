@@ -37,6 +37,9 @@ import clapIcon1 from "../../assets/clap-svgrepo-com.png";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import { formatTimeDifference } from "../FormatTime";
+import circle_check from "../../assets/circle-check.png";
+import clock_pause from "../../assets/clock-pause.svg";
+import circle_x from "../../assets/circle-x.png";
 
 const FavComments = (props) => {
   const {
@@ -435,7 +438,32 @@ const FavComments = (props) => {
                           height={31}
                           width={31}
                         />
-                      ) : null}{" "}
+                      ) : null}
+                      {res?.is_resolve && (
+                        <>
+                          {res?.is_prediction == true && (
+                            <img
+                              src={circle_check}
+                              alt=""
+                              height={31}
+                              width={31}
+                            />
+                          )}
+
+                          {(res?.is_prediction != true ||
+                            res?.status === "yellow") && (
+                            <img
+                              src={
+                                (res?.is_prediction != true && circle_x) ||
+                                (res?.status === "yellow" && clock_pause)
+                              }
+                              alt=""
+                              height={31}
+                              width={31}
+                            />
+                          )}
+                        </>
+                      )}
                     </span>
                   </div>
                   <div className="d-flex justify-content-center">
@@ -458,14 +486,33 @@ const FavComments = (props) => {
                         circleRatio={0.75}
                         strokeWidth={3}
                         value={100}
-                        text="14:30"
+                        text={res?.is_resolve ? "1-1" : "14:30"}
                         styles={buildStyles({
                           rotation: 1 / 2 + 1 / 8,
                           textColor:
                             currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                           textSize: "26px",
-                          pathColor:
-                            currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                          // pathColor:
+                          //   currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
+                          pathColor: res?.is_resolve
+                            ? currentTheme === "dark"
+                              ? res.is_prediction == true
+                                ? "#37FF80"
+                                : res.status === "yellow"
+                                ? "#FFCC00"
+                                : res.is_prediction != true
+                                ? "#FF5757"
+                                : ""
+                              : res.is_prediction == true
+                              ? "#37FF80"
+                              : res.status === "yellow"
+                              ? res.color
+                              : res.is_prediction != true
+                              ? "#FF5757"
+                              : ""
+                            : currentTheme === "dark"
+                            ? "#E6E6E6"
+                            : "#0D2A53",
                         })}
                       />
                     </div>
@@ -479,10 +526,25 @@ const FavComments = (props) => {
                     <span
                       className="p-1 px-2"
                       style={{
-                        backgroundColor:
-                          props.SelectComment === "resolvedComments"
-                            ? "#00DE51"
-                            : "#00659D",
+                        backgroundColor: res?.is_resolve
+                          ? currentTheme === "dark"
+                            ? res?.is_prediction == true
+                              ? "#37FF80"
+                              : res?.status === "yellow"
+                              ? "#FFCC00"
+                              : res?.is_prediction != true
+                              ? "#FF5757"
+                              : ""
+                            : res?.is_prediction == true
+                            ? "#37FF80"
+                            : res?.status === "yellow"
+                            ? res?.color
+                            : res?.is_prediction != true
+                            ? "#FF5757"
+                            : ""
+                          : props.SelectComment === "resolvedComments"
+                          ? "#00DE51"
+                          : "#00659D",
                         color:
                           props.SelectComment === "resolvedComments"
                             ? "#0D2A53"

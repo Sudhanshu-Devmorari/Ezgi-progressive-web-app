@@ -117,9 +117,7 @@ const BecomeAEditorModal = (props) => {
       setCheckboxError("Please select a checkbox");
     } else {
       if (preveiwProfilePic) {
-        console.log("selectedKategori::::::::::", selectedKategori);
         const splitdata = selectedKategori.split(", ");
-        console.log("splitdata::::::::::::", splitdata);
         formData.append("category", splitdata);
         formData.append("experience", selectedDeneyim);
         file && formData.append("profile_pic", file);
