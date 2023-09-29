@@ -31,7 +31,7 @@ export const EditorBanner = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
-            window.location.reload();
+              window.location.reload();
             }
           })
           .catch((error) => {
@@ -69,6 +69,26 @@ export const EditorBanner = (props) => {
     getBannerImg();
   }, []);
 
+  const [categoryCounts, setCategoryCounts] = useState({
+    futbol: 0,
+    basketbol: 0,
+  });
+  useEffect(() => {
+    async function getFutbolOrBasketbolCounts() {
+      try {
+        const res = await axios.get(`${config.apiUrl}/futbol-basketbol-count/`);
+        setCategoryCounts({
+          ...categoryCounts,
+          futbol: res?.data?.futbol,
+          basketbol: res?.data?.basketbol,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getFutbolOrBasketbolCounts();
+  }, []);
+
   return (
     <>
       <div
@@ -99,7 +119,7 @@ export const EditorBanner = (props) => {
             </div>
             <div className="d-flex justify-content-center">
               <span>
-                <span style={{ color: "#00C936" }}>2.655 </span>Yorum
+                <span style={{ color: "#00C936" }}>{categoryCounts.futbol} </span>Yorum
               </span>
             </div>
           </div>
@@ -126,7 +146,7 @@ export const EditorBanner = (props) => {
             </div>
             <div className="d-flex justify-content-center">
               <span>
-                <span style={{ color: "#FF9100" }}>2.655 </span>Yorum
+                <span style={{ color: "#FF9100" }}>{categoryCounts.basketbol} </span>Yorum
               </span>
             </div>
           </div>

@@ -169,7 +169,7 @@ const ActiveComments = (props) => {
       props?.homeApiData(user_id);
       if (response.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error making POST request:", error);
@@ -862,8 +862,13 @@ const ActiveComments = (props) => {
               categoryItem.includes("Basketbol")
           ) && (
             <div className="">
-              <img  onContextMenu={(e) => e.preventDefault()} src={basketball} alt="" height={45} width={45} />
-             
+              <img
+                onContextMenu={(e) => e.preventDefault()}
+                src={basketball}
+                alt=""
+                height={45}
+                width={45}
+              />
             </div>
           )}
           {profileData?.category?.some(
@@ -872,8 +877,13 @@ const ActiveComments = (props) => {
               categoryItem.includes("Futbol")
           ) && (
             <div className="">
-              <img  onContextMenu={(e) => e.preventDefault()} src={football} alt="" height={45} width={45} />
-             
+              <img
+                onContextMenu={(e) => e.preventDefault()}
+                src={football}
+                alt=""
+                height={45}
+                width={45}
+              />
             </div>
           )}
         </div>
@@ -904,12 +914,19 @@ const ActiveComments = (props) => {
                 props.content === ("home" || "wallet") && "mb-5"
               }`}
             >
-              Month/29.90₺
+              {/* Month/29.90₺ */}
+              {profileData?.is_subscribe && (
+                <>
+                  {profileData?.plan}/{profileData?.plan_price}₺
+                </>
+              )}
               {userId != profileData?.id && (
                 <button
                   onClick={() => {
                     if (userId) {
-                      checkDeactivation("subscribe model");
+                      if (!profileData?.is_subscribe) {
+                        checkDeactivation("subscribe model");
+                      }
                     }
                   }}
                   className="ms-1 px-3 py-1"
@@ -923,7 +940,9 @@ const ActiveComments = (props) => {
                     borderRadius: "3px",
                   }}
                 >
-                  Subscribe
+                  {profileData?.is_subscribe
+                    ? "Cancel Subcription"
+                    : "Subscribe"}
                 </button>
               )}
             </div>

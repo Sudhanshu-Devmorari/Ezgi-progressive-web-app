@@ -94,6 +94,7 @@ const SubscribeModal = (props) => {
 
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState([]);
+  const [renewPlan, setRenewPlan] = useState([]);
   useEffect(() => {
     async function getData() {
       try {
@@ -112,9 +113,35 @@ const SubscribeModal = (props) => {
         console.log(error);
       }
     }
+    async function getRenewData() {
+      try {
+        setIsSubscriptionLoading(true);
+        const res = await axios.get(
+          `${
+            config?.apiUrl
+          }/membership-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
+        );
+        if (res.status === 200) {
+          const data = res?.data[0];
+          setRenewPlan(data);
+          setIsSubscriptionLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
-    commentatorUser?.commentator_level && getData();
+    if (props?.text === "renew") {
+      commentatorUser?.commentator_level && getRenewData();
+    } else {
+      commentatorUser?.commentator_level && getData();
+    }
   }, [commentatorUser?.commentator_level]);
+
+  useEffect(() => {
+    setSelectedPlan(renewPlan?.promotion_duration)
+  }, [props?.text, renewPlan?.promotion_duration])
+  
 
   return (
     <>
@@ -303,6 +330,7 @@ const SubscribeModal = (props) => {
                 </div>
 
                 <PlanSelection
+                  renewPlan={renewPlan}
                   isSubscriptionLoading={isSubscriptionLoading}
                   text={props?.text}
                   subscriptionPlan={subscriptionPlan}
@@ -310,24 +338,39 @@ const SubscribeModal = (props) => {
                   selectedPlan={selectedPlan}
                 />
                 <div className="">
-                  {selectedPlan && (
-                    <div className="text-center my-2">
-                      <div>Total Amount</div>
-                      <div style={{ fontSize: "19px" }}>
-                        {(selectedPlan === "1 Year" &&
-                          subscriptionPlan?.year_1) ||
-                          (selectedPlan === "1 Month" &&
-                            subscriptionPlan?.month_1) ||
-                          (selectedPlan === "3 Month" &&
-                            subscriptionPlan?.month_3) ||
-                          (selectedPlan === "6 Month" &&
-                            subscriptionPlan?.month_6)}
-                        ₺
-                      </div>
-                    </div>
+                  {props?.text === "renew" ? (
+                    <>
+                      {selectedPlan && (
+                        <div className="text-center my-2">
+                          <div>Total Amount</div>
+                          <div style={{ fontSize: "19px" }}>
+                            {renewPlan?.plan_price}₺
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {selectedPlan && (
+                        <div className="text-center my-2">
+                          <div>Total Amount</div>
+                          <div style={{ fontSize: "19px" }}>
+                            {(selectedPlan === "1 Year" &&
+                              subscriptionPlan?.year_1) ||
+                              (selectedPlan === "1 Month" &&
+                                subscriptionPlan?.month_1) ||
+                              (selectedPlan === "3 Month" &&
+                                subscriptionPlan?.month_3) ||
+                              (selectedPlan === "6 Month" &&
+                                subscriptionPlan?.month_6)}
+                            ₺
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                   <div className="text-center">
-                    <div className="my-3" style={{ fontSize: "13px" }}>
+                    <div className={`${validationError && 'mb-0'} 'my-3'`} style={{ fontSize: "13px" }}>
                       {currentTheme === "dark" ? (
                         <img
                           onContextMenu={(e) => e.preventDefault()}

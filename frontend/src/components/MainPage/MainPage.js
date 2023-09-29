@@ -79,10 +79,11 @@ const MainPage = () => {
 
   const [leftCornerAds, setLeftCornerAds] = useState([]);
   const [rightCornerAds, setRightCornerAds] = useState([]);
-
+  const [category, setCategory] = useState('Futbol');
   function homeApiData(user_id) {
     axios
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
+      // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
         setPublicComments(

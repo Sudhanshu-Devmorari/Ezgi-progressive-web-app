@@ -242,7 +242,7 @@ const ContentSection = ({
       }
       if (res.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       localStorage.setItem(`${id}_${reaction}`, count);
     } catch (error) {
@@ -463,7 +463,7 @@ const ContentSection = ({
             </div>
             {(userPhone === null || !data?.value?.public_content) &&
             selectContent !== "subscription" &&
-            userId != data?.value?.commentator_user?.id ? (
+            userId != data?.value?.commentator_user?.id && !data.value.is_subscribe ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -806,7 +806,9 @@ const ContentSection = ({
                             borderRadius: "3px",
                           }}
                         >
-                          Subscribe
+                          {data?.value?.is_subscribe
+                            ? "Subscribed"
+                            : "Subscribe"}
                         </button>
                       )}
                   </>

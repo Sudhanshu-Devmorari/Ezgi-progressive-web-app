@@ -8,10 +8,12 @@ import CurrentTheme from "../../context/CurrentTheme";
 function PlanSelection(props) {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
-  const { subscriptionPlan } = props;
-  // console.log(subscriptionPlan,"===>>>subscriptionPlan")
+  const { subscriptionPlan, renewPlan } = props;
+
+  console.log(renewPlan, "==>>>renewPlan");
 
   const handlePlanClick = (plan) => {
+    console.log("=============plan", plan)
     props?.setSelectedPlan(plan);
   };
 
@@ -65,29 +67,42 @@ function PlanSelection(props) {
         <div className="text-center py-3">Loading...</div>
       ) : (
         <>
-          {renderPlan(
-            "1 Month",
-            `${subscriptionPlan?.month_1}₺`,
-            null,
-            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-          )}
-          {renderPlan(
-            "3 Month",
-            `${subscriptionPlan?.month_3}₺`,
-            "%20 Save!",
-            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-          )}
-          {renderPlan(
-            "6 Month",
-            `${subscriptionPlan?.month_6}₺`,
-            "%30 Save!",
-            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-          )}
-          {renderPlan(
-            "1 Year",
-            `${subscriptionPlan?.year_1}₺`,
-            "%40 Save!",
-            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+          {props?.text === "renew" ? (
+            <>
+              {renderPlan(
+                `${renewPlan?.promotion_duration}`,
+                `${renewPlan?.plan_price}₺`,
+                null,
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+            </>
+          ) : (
+            <>
+              {renderPlan(
+                "1 Month",
+                `${subscriptionPlan?.month_1}₺`,
+                null,
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "3 Month",
+                `${subscriptionPlan?.month_3}₺`,
+                "%20 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "6 Month",
+                `${subscriptionPlan?.month_6}₺`,
+                "%30 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "1 Year",
+                `${subscriptionPlan?.year_1}₺`,
+                "%40 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+            </>
           )}
         </>
       )}

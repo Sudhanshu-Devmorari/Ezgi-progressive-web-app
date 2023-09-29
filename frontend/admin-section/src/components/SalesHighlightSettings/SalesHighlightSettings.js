@@ -84,7 +84,7 @@ const SalesHighlightSettings = (props) => {
         const res = await axios.post(
           `${
             config?.apiUrl
-          }/highlight-setting/? =${props?.selectLevel?.toLowerCase()}`,
+          }/highlight-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`,
           formData
         );
         setIsLoading(false);

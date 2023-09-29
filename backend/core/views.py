@@ -899,6 +899,8 @@ class ProfileView(APIView):
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
+            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
+
             if user_obj.user_role == 'commentator':
                 follow_obj = FollowCommentator.objects.filter(commentator_user=user_obj, standard_user__is_delete=False).count()
                 data['Follower_Count'] = follow_obj
@@ -914,6 +916,17 @@ class ProfileView(APIView):
                 lose_count = comment_obj.filter(is_prediction=False).count()
                 data['win'] = win_count
                 data['lose'] = lose_count
+                
+                if standard_user_id:
+                    logged_in_user = User.objects.get(id=standard_user_id)
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, status='active', commentator_user=user_obj).exists()
+                    data['is_subscribe'] = is_subscribe
+                    if is_subscribe:
+                        subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
+                        plan_price = subscription.money
+                        plan = subscription.duration
+                        data['plan_price'] = plan_price
+                        data['plan'] = plan
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -922,7 +935,6 @@ class ProfileView(APIView):
                 following_obj = FollowCommentator.objects.filter(standard_user=user_obj).count()
                 data['Follow_Up_Count'] = following_obj         
 
-            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
             if standard_user_id:
                data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=data['id'], standard_user_id=standard_user_id).exists()
             else:
@@ -3964,8 +3976,8 @@ class HighlightSettingView(APIView):
     def post(self, request, format=None, *args, **kwargs):
         commentator_level = request.query_params.get('commentator_level')
         data = request.data.copy()
-        if commentator_level.lower() == 'expert':
-            data["commentator_level"] = 'master'
+        if commentator_level.lower() == 'master':
+            # data["commentator_level"] = 'master'
             commentator_level = 'master' 
         else:
             data["commentator_level"] = commentator_level
@@ -4080,7 +4092,7 @@ def Statistics(user_obj=None, user_id=None):
     try:
         user = User.objects.get(id=user_id) if not user_obj else user_obj
         
-        data = Comments.objects.filter(commentator_user=user)
+        data = Comments.objects.filter(commentator_user=user, is_resolve=True)
         win_count = data.filter(is_prediction=True).count()
         lose_count = data.filter(is_prediction=False).count()
 
@@ -4494,6 +4506,9 @@ class BecomeEditorView(APIView):
         After sucessfully payment below code execute.
         """
         try:
+
+            print()
+            print("================>>>>>>>>>>>>>>>.request.data", request.data)
             user = User.objects.filter(id=id).first()
             if not user:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -4519,7 +4534,7 @@ class BecomeEditorView(APIView):
                 data["commentator_status"] = "active"
                 
                 # Update
-                serializer = UserSerializer(user, data=data, partial=True)
+                serializer = UserSerializer(user, data=request.data, partial=True)
                 if serializer.is_valid():
                     try:
                         serializer.save()
@@ -4632,12 +4647,13 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
-    def get_public_comments(self):
+    def get_public_comments(self, id):
         """ Return public comments data """
         public_comments = []
 
         try:
             all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False).order_by('-created').only('id')
+            # all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created').only('id')
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -4649,6 +4665,12 @@ class RetrievePageData():
                 lose_count = data.filter(is_prediction=False).count()
                 comment_data['commentator_user'] ['win'] = win_count
                 comment_data['commentator_user'] ['lose'] = lose_count
+
+                logged_in_user = User.objects.get(id=id)
+                
+                if comment.public_content == False:
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
+                    comment_data['is_subscribe'] = is_subscribe
 
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
@@ -4852,10 +4874,12 @@ class RetrieveHomeView(APIView):
         } # data_list to return in response
         
         # Instantiate RetrievePageData object
+
+        # category = request.query_params.get('category', None)
         retrieve_data = RetrievePageData()
 
         # Get public comments data
-        data_list['Public_Comments']  = retrieve_data.get_public_comments()
+        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None))
 
         # Get subscription comments data
         data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None))
@@ -5095,6 +5119,15 @@ class GetUserdata(APIView):
                 serializer = UserSerializer(user).data
                 serializer['win'] = win_count
                 serializer['lose'] = lose_count
+
+                # plan_expires = timezone.now() + timedelta(days=3)
+                # renew_reminder = Subscription.objects.filter(end_date__date=plan_expires.date(), status='active', )
+
+                # data = {
+                #     'renew_reminder' : renew_reminder | 'active',
+                #     'data' : serializer,
+                # }
+
                 return Response({'data' : serializer}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
@@ -5129,4 +5162,13 @@ class EditorBannerView(APIView):
                 return Response({'data' : 'Editor banner created successfully.'}, status=status.HTTP_200_OK) 
 
         except Exception as e:
-            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+            
+class GetFutbolAndBasketbolCountView(APIView):
+    def get(self, request):
+        try:
+            futbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Futbol'], is_resolve=False).exclude(status='reject').count()
+            basketbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Basketbol'], is_resolve=False).exclude(status='reject').count()
+            return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

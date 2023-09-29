@@ -266,7 +266,8 @@ const SignUpModal = (props) => {
   const validationSchema = Yup.object({
     name: Yup.string()
       .required("Name is required")
-      .matches(/^[a-zA-Z\s]*$/, "Name must contain only letters and spaces")
+      // .matches(/^[a-zA-Z\s]*$/, "Name must contain only letters and spaces")
+      .matches(/^[a-zA-ZçğıiöşüÇĞIİÖŞÜ\s]*$/, "Name must contain only letters and spaces")
       .min(5, "Name must be at least 5 characters")
       .max(20, "Name must be at most 20 characters"),
     username: Yup.string()

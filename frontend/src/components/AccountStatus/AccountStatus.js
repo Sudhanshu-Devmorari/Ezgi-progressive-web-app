@@ -158,6 +158,7 @@ const AccountStatus = (props) => {
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
+      // console.log(res,"=>>>>renew res")
       setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
         setRenewLoading(false);
@@ -588,7 +589,7 @@ const AccountStatus = (props) => {
                     currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 }}
               >
-                {commentatorUser?.commentator_level !== "apprentice" ? (
+                {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
                   <>
                     <div className="my-2 ms-2 d-flex flex-column">
                       Membership Date {props.membershipDate}
@@ -627,11 +628,11 @@ const AccountStatus = (props) => {
                       </button>
                     </div>
                   </>
-                ) : (
+                {/* ) : (
                   <span className="d-flex align-items-center justify-content-center h-100">
                     No Membership found!
                   </span>
-                )}
+                )} */}
               </div>
             </div>
           </div>

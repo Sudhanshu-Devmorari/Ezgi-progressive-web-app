@@ -5,6 +5,8 @@ import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const PasswordReset = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -12,6 +14,50 @@ const PasswordReset = (props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const initialValues = {
+    password: "",
+  };
+
+  const validationSchema = Yup.object({
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password must be at least 8 characters"),
+  });
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        setIsLoading(true);
+        const res = await axios.post(`${config?.apiUrl}/password-reset/`, {
+          new_ps: values.password,
+          phone: props.forgotPsPhone,
+        });
+        if (res.data.status === 200) {
+          setIsLoading(false);
+          Swal.fire({
+            title: "Success",
+            text: res.data.data,
+            icon: "success",
+            backdrop: false,
+            customClass: `${
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+            }`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              props.hide();
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
 
   // PASSWORD RESET API
   const handlePasswordReset = async () => {
@@ -59,16 +105,14 @@ const PasswordReset = (props) => {
           <div className="">You can create your new password</div>
           <div className="">
             <div className="d-flex flex-column my-2">
-              <label htmlFor="Password">New Password</label>
+              <label htmlFor="password">New Password</label>
               <input
                 className={`${
                   currentTheme === "dark" ? "darkMode-input" : "lightMode-input"
                 } form-control`}
                 type={showPassword ? "text" : "password"}
-                name=""
-                id="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="password"
+                {...formik.getFieldProps("password")}
               />
               {showPassword ? (
                 <AiOutlineEyeInvisible
@@ -93,19 +137,18 @@ const PasswordReset = (props) => {
               )}
             </div>
             <small className="text-danger" style={{ fontSize: "0.71rem" }}>
-              {passwordError}
+              {formik.errors.password}
             </small>
           </div>
           <div className="d-flex flex-column align-items-center my-4">
             <button
-              onClick={() => {
-                handlePasswordReset();
-              }}
+              type="submit"
+              onClick={formik.handleSubmit}
               className={`${
                 currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
               } px-3 py-1`}
             >
-              Create
+              {isLoading ? "Loading..." : "Create"}
             </button>
           </div>
         </div>

@@ -47,8 +47,8 @@ const EditorFilter = (props) => {
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const countryOptions = [
-    "Football",
-    "Basketball",
+    "Futbol",
+    "Basketbol",
   ];
   const levelOptions = ["Apprentice", "Journeyman", "Master","Grandmaster"];
   const scorePointOptions = ["0 - 400", "400 - 600", "600 - 800", "800+"];
