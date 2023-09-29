@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from core.utils import create_response, sms_send, get_league_data, on_match_time_update_comment_status
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -374,7 +374,7 @@ class RetrieveCommentatorView(APIView):
         try:
             # for retrieving Highlights:
             standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
-            all_highlights = Highlight.objects.filter(status='active').order_by('-created').only('id')
+            all_highlights = Highlight.objects.filter(status='active', user__is_admin=False).order_by('-created').only('id')
             data_list['highlights'] = []
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
@@ -2392,6 +2392,8 @@ class EditorManagement(APIView):
         data_list = {}
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
+        today = date.today()
+
         try:
             try:
                 """editor percentage"""
@@ -2407,7 +2409,7 @@ class EditorManagement(APIView):
 
             editor_list = []
             # all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
-            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True).order_by('-created')
+            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True, is_admin=False).order_by('-created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2432,7 +2434,7 @@ class EditorManagement(APIView):
 
 
             # editor_count = commentator.count()
-            editor_count = User.objects.filter(user_role='commentator').count()
+            editor_count = User.objects.filter(user_role='commentator', created__date=today).count()
             data_list['editor_count'] = editor_count
 
             apprentice = User.objects.filter(commentator_level='apprentice').count()
@@ -2582,14 +2584,14 @@ class EditorManagement(APIView):
                 user_obj = User.objects.create(profile_pic=profile,
                     name=name, username=username, phone=phone,
                     password=password, gender=gender, age=age,
-                    user_role=role, commentator_level=commentator_level,
+                    user_role=role, commentator_level=commentator_level, commentator_status='active',
                     experience=experience, city=city, category=category, membership_date=membership_date
                 )
             else:
                 user_obj = User.objects.create(profile_pic=profile,
                     name=name, username=username, phone=phone,
                     password=password, gender=gender, age=age,
-                    user_role=role, commentator_level=commentator_level,
+                    user_role=role, commentator_level=commentator_level, commentator_status='active',
                     experience=experience, city=city, category=category
                 )
             # user_obj.set_password(password)
@@ -2630,11 +2632,12 @@ class EditorManagement(APIView):
         data['phone'] = request.data.get('phone')
         data['password'] = request.data.get('password')
         data['about'] = request.data.get('about')
-        data['country'] = request.data.get('country')
+        data['experience'] = request.data.get('experience')
         data['city'] = request.data.get('city')
         data['category'] = request.data.get('category').split(',')
         data['gender'] = request.data.get('gender')
         data['age'] = request.data.get('age')
+        data['membership_date'] = request.data.get('membership_date')
 
         if User.objects.filter(id=data['editor_id']).exists():
             user_obj = User.objects.get(id=data['editor_id'])
@@ -2727,7 +2730,8 @@ class EditorManagement(APIView):
             
             elif action == 'deactive':
                 user.is_active = False
-                user.save(update_fields=['is_active', 'updated'])
+                user.commentator_status = 'deactive'
+                user.save(update_fields=['is_active', 'commentator_status', 'updated'])
                 return Response({'data' : 'User profile deactivated sucessfully.'}, status=status.HTTP_200_OK)
             
             elif action == 'active':
@@ -2879,7 +2883,7 @@ class DeactivateCommentator(APIView):
         try:
             # Validations
             deactivation_status = request.data.get('status')
-            print("----- ", deactivation_status)
+            # print("----- ", deactivation_status)
             if deactivation_status is None:
                 return Response({'error': 'Status not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2891,7 +2895,8 @@ class DeactivateCommentator(APIView):
             if deactivation_status == 'accept':
                 obj.deactivate_commentator = deactivation_status
                 obj.is_active = False
-                obj.save(update_fields=['deactivate_commentator', 'is_active', 'updated'])
+                obj.commentator_status = 'deactive'
+                obj.save(update_fields=['deactivate_commentator','commentator_status', 'is_active', 'updated'])
             elif deactivation_status == 'reject':
                 print('deactivation_status: ', deactivation_status)
                 obj.deactivate_commentator = ''
@@ -2969,20 +2974,19 @@ class SalesManagement(APIView):
             # Highlight objects handling
             highlights_obj = Highlight.objects.filter(highlight=True)
             highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
-            highlights_cal = 0
+            highlights_cal_ = 0
             for obj in highlights_obj_cal:
-                highlights_cal += obj.money
+                highlights_cal_ += obj.money
 
             serializer1 = HighlightSerializer(highlights_obj, many=True)
-            data_list['highlight_count'] = highlights_cal
+            data_list['highlight_count'] = highlights_cal_
             # data_list['highlight_count'] = highlights_obj.count()
             data_list['highlight'] = serializer1.data
 
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        data_list['daily_total'] = subscription_cal + highlights_cal
-        data_list['net_revenue'] = subscription_cal + highlights_cal
+        data_list['daily_total'] = subscription_cal + highlights_cal_
 
         try:
             subscription_obj = Subscription.objects.filter(subscription=True)
@@ -2993,11 +2997,28 @@ class SalesManagement(APIView):
             highlights_cal = 0
             for obj in highlights_obj:
                 highlights_cal += obj.money
+
+            print("-----", subscription_cal + highlights_cal)
             data_list['all_time_total'] = subscription_cal + highlights_cal
 
         except Exception as e:
             return Response(data={'error': f'{e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        try:
+            today = date.today()
+            today_created_subscriptions = Subscription.objects.filter(created__date=today, subscription=True)
 
+            total_cal = 0.0
+            for obj in today_created_subscriptions:
+                commission_rate = MembershipSetting.objects.get(commentator_level = obj.commentator_user.commentator_level)
+                total_cal += float(float(obj.money) * float(commission_rate.commission_rate))/100
+            
+            data_list['commission_earnings'] = total_cal
+
+        except Exception as e:
+            return Response(data={'error': f'{e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        data_list['net_revenue'] = total_cal + highlights_cal_
 
         return Response(data=data_list, status=status.HTTP_200_OK)
     
@@ -3523,7 +3544,7 @@ class SubUserManagement(APIView):
                                                         password=password, authorization_type=request.data.get('authorization_type'),
                                                         department=request.data.get('department'), is_transaction=transaction, is_process_withdrawal_request=process_withdrawal,
                                                         is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
-                                                        is_sales_export=sales_export, is_all_permission=all_permission)
+                                                        is_sales_export=sales_export, is_all_permission=all_permission, is_admin=True)
                 elif permission_type == 'only_view':
                     view_only = True
                     process_withdrawal = False
@@ -3536,7 +3557,7 @@ class SubUserManagement(APIView):
                                                         password=password, authorization_type=request.data.get('authorization_type'),
                                                         department=request.data.get('department'), is_view_only=view_only, is_process_withdrawal_request=process_withdrawal,
                                                         is_rule_update=rule_update, is_price_update=price_update, is_withdrawal_export=withdrawal_export,
-                                                        is_sales_export=sales_export, is_all_permission=all_permission)
+                                                        is_sales_export=sales_export, is_all_permission=all_permission, is_admin=True)
 
                 sub_user_obj.save()
 
@@ -3793,7 +3814,7 @@ class LevelRule(APIView):
         if existing_record:
             serializer = CommentatorLevelRuleSerializer(existing_record, data=data,  partial=True)
         else:
-            request.data['commentator_level'] = commentator_level
+            # request.data['commentator_level'] = commentator_level
             serializer = CommentatorLevelRuleSerializer(data=data)
 
         if serializer.is_valid():
@@ -4495,6 +4516,7 @@ class BecomeEditorView(APIView):
                 data["commentator_level"] = "apprentice"
                 data['category'] = category_data  
                 data['experience'] = request.data.get('experience', None)
+                data["commentator_status"] = "active"
                 
                 # Update
                 serializer = UserSerializer(user, data=data, partial=True)
@@ -4707,7 +4729,7 @@ class RetrievePageData():
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False).order_by('-created').only('id')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False).order_by('-created').only('id')
             
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
@@ -4794,7 +4816,7 @@ class RetrievePageData():
             user_id = user_id if User.objects.filter(id=user_id).exists() else None
 
             # Get data
-            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator', is_delete=False).order_by('-created').only('id')
+            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
             for obj in all_commentator:
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()

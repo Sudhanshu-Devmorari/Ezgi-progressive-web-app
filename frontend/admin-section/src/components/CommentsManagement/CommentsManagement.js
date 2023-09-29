@@ -411,6 +411,8 @@ const CommentsManagement = (props) => {
         <CommentsManagementFilter
           commentData={props?.commentData}
           setDisplayUser={setDisplayUser}
+          selectedOption={props.selectedOption}
+          setSelectedOption = {props.setSelectedOption}
         />
         {props?.isLoading ? (
           <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">

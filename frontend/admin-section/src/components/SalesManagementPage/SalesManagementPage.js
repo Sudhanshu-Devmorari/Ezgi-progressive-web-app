@@ -66,8 +66,8 @@ const SalesManagementPage = () => {
     },
   ];
   const adsArray = [
-    { icon: adsIcon, name: "Ads Revenues" },
-    { icon: perIcon, name: "Ads Revenues" },
+    { icon: adsIcon, name: "Ads Revenues", value:"0" },
+    { icon: perIcon, name: "Commission Revenues", value:salesData?.commission_earnings?.toFixed(2) },
   ];
 
   const filteredData = (e) => {
@@ -284,16 +284,16 @@ const SalesManagementPage = () => {
   };
   const displayTickets = recordsDisplay
   // Sales management API
-  useEffect(() => {
-    async function getSalesData() {
-      try {
-        const res = await axios.get(`${config?.apiUrl}/sales-management`);
-        updateRecordsDisplay(res?.data);
-        setSalesData(res?.data);
-      } catch (error) {
-        console.log(error);
-      }
+  async function getSalesData() {
+    try {
+      const res = await axios.get(`${config?.apiUrl}/sales-management`);
+      updateRecordsDisplay(res?.data);
+      setSalesData(res?.data);
+    } catch (error) {
+      console.log(error);
     }
+  }
+  useEffect(() => {
     getSalesData();
   }, []);
 
@@ -303,7 +303,7 @@ const SalesManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar refreshComments={getSalesData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -499,7 +499,7 @@ const SalesManagementPage = () => {
                       <img src={res.icon} alt="" className="icon" />
                       <span className="heading">{res.name}</span>
                       <span className="number">
-                        12.645 <small>₺</small>
+                      {res.value} <small>₺</small>
                       </span>
                     </div>
                   ))}
@@ -510,7 +510,7 @@ const SalesManagementPage = () => {
                 >
                   <span className="heading">Net Revenue</span>
                   <span className="number">
-                  {salesData.net_revenue} <small>₺</small>
+                  {salesData.net_revenue?.toFixed(2)} <small>₺</small>
                   </span>
                   <div className="w-100 pt-5">
                     <span className="rate-font">

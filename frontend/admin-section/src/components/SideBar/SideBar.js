@@ -61,6 +61,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.refreshComments && props.refreshComments()
               setshowDetails("/users/");
               navigate("/users/");
             }}
@@ -72,6 +73,8 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.setSelectedOption && props.setSelectedOption("All")
+              props.refreshComments && props.refreshComments()
               setshowDetails("/comments/");
               navigate("/comments/");
             }}
@@ -84,6 +87,7 @@ const SideBar = (props) => {
             width={32}
             onClick={() => {
               // console.log(props.refresh)
+              props.refreshComments && props.refreshComments()
               props.refresh && props.refresh()
               setshowDetails("/editors/");
               navigate("/editors/");
@@ -107,6 +111,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.refreshComments && props.refreshComments()
               setshowDetails("/sales/");
               navigate("/sales/");
             }}
@@ -118,6 +123,8 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.setSelectedOption && props.setSelectedOption("All")
+              props.refreshComments && props.refreshComments()
               setshowDetails("/support/");
               navigate("/support/");
             }}
@@ -129,6 +136,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.refreshComments && props.refreshComments()
               setshowDetails("/subuser/");
               navigate("/subuser/");
             }}

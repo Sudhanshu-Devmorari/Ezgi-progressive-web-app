@@ -3,14 +3,14 @@ import { GoSearch } from "react-icons/go";
 
 const CommentsManagementFilter = (props) => {
   // console.log("***:::::***", props?.commentData)
-  const [selectedOption, setSelectedOption] = useState("All");
+  
 
   const options = ["All", "Published", "Pending", "Stopped"];
 
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
+    props.setSelectedOption(option);
     setShowDropdown(false);
   };
   const filterCommentData = (e) => {
@@ -67,7 +67,7 @@ const CommentsManagementFilter = (props) => {
                 : "1px solid #E6E6E6",
             }}
           >
-            {selectedOption}
+            {props.selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
@@ -81,7 +81,7 @@ const CommentsManagementFilter = (props) => {
             }}
           >
             {options
-              .filter((option) => option !== selectedOption)
+              .filter((option) => option !== props.selectedOption)
               .map((option) => (
                 <span
                   key={option}

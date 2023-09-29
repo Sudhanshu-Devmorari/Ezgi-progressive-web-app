@@ -25,31 +25,31 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now=True)),
             ],
         ),
-        # migrations.AddField(
-        #     model_name='advertisement',
-        #     name='ad_clicks_and_redirected_count',
-        #     field=models.IntegerField(default=0),
-        # ),
-        # migrations.AddField(
-        #     model_name='advertisement',
-        #     name='ad_views_count',
-        #     field=models.IntegerField(default=0),
-        # ),
-        # migrations.AddField(
-        #     model_name='comments',
-        #     name='match_time',
-        #     field=models.TimeField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='description',
-        #     field=models.CharField(blank=True, max_length=255, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='user',
-        #     name='is_active',
-        #     field=models.BooleanField(default=True),
-        # ),
+        migrations.AddField(
+            model_name='advertisement',
+            name='ad_clicks_and_redirected_count',
+            field=models.IntegerField(default=0),
+        ),
+        migrations.AddField(
+            model_name='advertisement',
+            name='ad_views_count',
+            field=models.IntegerField(default=0),
+        ),
+        migrations.AddField(
+            model_name='comments',
+            name='match_time',
+            field=models.TimeField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='description',
+            field=models.CharField(blank=True, max_length=255, null=True),
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='is_active',
+            field=models.BooleanField(default=True),
+        ),
         migrations.AlterField(
             model_name='advertisement',
             name='end_date',

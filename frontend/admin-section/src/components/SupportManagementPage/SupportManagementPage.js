@@ -48,26 +48,26 @@ const SupportManagementPage = () => {
       });
   }
 
-  useEffect(() => {
-    async function getSupportData() {
-      try {
-        const res = await axios.get(`${config?.apiUrl}/support-management`);
-        const formattedPercentage = Math.round(
-          res?.data?.new_tickets_percentage
-        );
-        // console.log("=?????", res.data);
-        setPerNewRequest(formattedPercentage);
-        setTotalRequest(Math.round(res?.data?.total_ticket_percentage));
-        setTickets(res?.data?.tickets);
-        setNewRequest(res?.data?.new_request);
-        setPendingRequest(res?.data?.pending_request);
-        setResolvedRequest(res?.data?.resolved_request);
-        setTotal(res?.data?.total);
-        setSupportHistory(res?.data?.support_history);
-      } catch (error) {
-        console.log(error);
-      }
+  async function getSupportData() {
+    try {
+      const res = await axios.get(`${config?.apiUrl}/support-management`);
+      const formattedPercentage = Math.round(
+        res?.data?.new_tickets_percentage
+      );
+      // console.log("=?????", res.data);
+      setPerNewRequest(formattedPercentage);
+      setTotalRequest(Math.round(res?.data?.total_ticket_percentage));
+      setTickets(res?.data?.tickets);
+      setNewRequest(res?.data?.new_request);
+      setPendingRequest(res?.data?.pending_request);
+      setResolvedRequest(res?.data?.resolved_request);
+      setTotal(res?.data?.total);
+      setSupportHistory(res?.data?.support_history);
+    } catch (error) {
+      console.log(error);
     }
+  }
+  useEffect(() => {
     getSupportData();
   }, []);
 
@@ -140,7 +140,7 @@ const SupportManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setSelectedOption={setSelectedOption} refreshComments={getSupportData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

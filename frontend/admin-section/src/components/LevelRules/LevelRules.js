@@ -99,9 +99,9 @@ const LevelRules = (props) => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
-          // if (confirm.value === true) {
-          //   window.location.reload();
-          // }
+          if (confirm.value === true) {
+            window.location.reload();
+          }
         }
       } catch (error) {
         console.log(error);

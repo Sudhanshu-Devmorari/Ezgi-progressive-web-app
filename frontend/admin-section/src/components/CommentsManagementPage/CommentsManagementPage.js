@@ -15,6 +15,7 @@ const CommentsManagementPage = () => {
   const [mostLike, setMostLike] = useState([]);
   const [commentData, setCommentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedOption, setSelectedOption] = useState("All");
 
   const commentManagementApiData = async () => {
     // console.log(data)
@@ -86,7 +87,7 @@ const CommentsManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setSelectedOption={setSelectedOption} refreshComments={commentManagementApiData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -116,6 +117,8 @@ const CommentsManagementPage = () => {
                 <CommentsManagement
                   commentData={commentData}
                   isLoading={isLoading}
+                  selectedOption={selectedOption}
+                  setSelectedOption = {setSelectedOption}
                 />
               </div>
               <div className="col-4">

@@ -139,7 +139,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
 
 CRONJOBS = [
-    ('*/5 * * * *', 'core.cron.Userst'),
+    ('* */2 * * *', 'core.cron.Userst'),
     ('* * * * *', 'core.cron.subscription_reminder_cron')
 ]
 LOGGING = {

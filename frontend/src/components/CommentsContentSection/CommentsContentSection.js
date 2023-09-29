@@ -73,11 +73,18 @@ const CommentsContentSection = (props) => {
     resolve,
     setResolve,
   } = props;
-  const userPhone = localStorage.getItem("user-id");
+  const userId = localStorage.getItem("user-id");
 
   // const [active, setActive] = useState([]);
   // const [resolve, setResolve] = useState([]);
   const server_url = `${config?.apiUrl}`;
+
+  const [displayComment, setDisplayComment] = useState([])
+
+  useEffect(() => {
+    const comment = active.filter((x) => userId == x.commentator_user.id || x.status !== "pending");
+    setDisplayComment(comment);
+  }, [active]);
 
   // const activeResolved = async (user_id) => {
   //   const res = await axios
@@ -215,13 +222,13 @@ const CommentsContentSection = (props) => {
     <>
       {props.SelectComment === "activeComments" && (
         <>
-          {active.length == 0 ? (
+          {displayComment.length == 0 ? (
             <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
               No Record Found!
             </div>
           ) : (
             active &&
-            active.map((val, index) => {
+            displayComment.map((val, index) => {
               return (
                 <React.Fragment key={index}>
                   {val?.public_content ? (
