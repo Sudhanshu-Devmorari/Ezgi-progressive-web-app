@@ -56,7 +56,7 @@ const CommentatorsCommentsPage = (props) => {
       // console.log("=>>>", res.data);
       if (res.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       setFavEditorData(res.data.favEditors);
       setFavCommentData(
@@ -88,25 +88,30 @@ const CommentatorsCommentsPage = (props) => {
 
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
+  const [commentLoading, setCommentLoading] = useState(false);
 
   const activeResolved = async (user_id) => {
+    setCommentLoading(true);
     try {
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
           if (res.status == 204) {
             localStorage.clear();
-          window.location.reload();
+            window.location.reload();
           }
           setActive(res.data?.active_comments);
           setResolve(res.data?.resolved_comments);
+          setCommentLoading(false);
         })
 
         .catch((error) => {
           console.error("Error fetching data.", error);
+          setCommentLoading(false);
         });
     } catch (error) {
       console.error("Error fetching data.", error);
+      setCommentLoading(false);
     }
   };
 
@@ -177,6 +182,7 @@ const CommentatorsCommentsPage = (props) => {
                   active={active}
                   setResolve={setResolve}
                   resolve={resolve}
+                  commentLoading={commentLoading}
                 />
               )}
               {SelectComment === "statistics" && (
@@ -210,7 +216,9 @@ const CommentatorsCommentsPage = (props) => {
               />
               {walletSelection === "My transactions" && <Transactions />}
               {walletSelection === "pending balance" && <PendingBalance />}
-              {walletSelection === "account status" && <AccountStatus membershipDate={props.membershipDate}/>}
+              {walletSelection === "account status" && (
+                <AccountStatus membershipDate={props.membershipDate} />
+              )}
             </>
           )}
           {content === "fav" && (

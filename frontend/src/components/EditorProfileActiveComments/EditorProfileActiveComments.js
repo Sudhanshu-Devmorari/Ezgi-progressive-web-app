@@ -15,6 +15,7 @@ const EditorProfileActiveComments = (props) => {
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [commentLoading, setCommentLoading] = useState(false);
 
   const [profileData, setProfileData] = useState([]);
   useEffect(() => {
@@ -35,25 +36,43 @@ const EditorProfileActiveComments = (props) => {
 
   const activeResolved = async (user_id) => {
     try {
+      setCommentLoading(true);
       const res = await axios
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
         .then((res) => {
-          setActive(
-            res.data?.active_comments.sort(
-              (a, b) => moment(b.created).unix() - moment(a.created).unix()
-            )
+          const userIds = res?.data?.active_comments?.map(
+            (response) => response?.commentator_user?.id
           );
+          if (userIds.includes(Number(userId))) {
+            setActive(
+              res.data?.active_comments.sort(
+                (a, b) => moment(b.created).unix() - moment(a.created).unix()
+              )
+            );
+          } else {
+            const filterdata = res.data?.active_comments?.filter(
+              (response) => response.status == "approve"
+            );
+            setActive(
+              filterdata?.sort(
+                (a, b) => moment(b.created).unix() - moment(a.created).unix()
+              )
+            );
+          }
           setResolve(
             res.data?.resolved_comments.sort(
               (a, b) => moment(b.created).unix() - moment(a.created).unix()
             )
           );
+          setCommentLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching data.", error);
+          setCommentLoading(false);
         });
     } catch (error) {
       console.error("Error fetching data.", error);
+      setCommentLoading(false);
     }
   };
 
@@ -120,6 +139,7 @@ const EditorProfileActiveComments = (props) => {
               active={active}
               setResolve={setResolve}
               resolve={resolve}
+              commentLoading={commentLoading}
             />
           )}
           {SelectComment === "statistics" && (

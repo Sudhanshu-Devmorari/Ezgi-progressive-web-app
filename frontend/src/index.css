@@ -1,14 +1,18 @@
 body {
   margin: 0;
-  font-family: 'Roboto';
+  font-family: "Roboto";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-/* img {
-  pointer-events: none !important
-} */
+img {
+  /* pointer-events: none !important */
+  -webkit-touch-callout: none;
+}
+input {
+  -webkit-touch-callout: none;
+}

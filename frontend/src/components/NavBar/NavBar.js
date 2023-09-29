@@ -33,7 +33,6 @@ const NavBar = (props) => {
       setCurrentTheme("light");
     }
   };
-  const userPhone = localStorage.getItem("user-role");
 
   return (
     <>
@@ -91,7 +90,7 @@ const NavBar = (props) => {
               }}
             />
           </span>
-          {userPhone ? (
+          {props?.profileData?.user_role ? (
             <>
               <span
                 onClick={() => {
@@ -129,8 +128,8 @@ const NavBar = (props) => {
                   <img
                     onContextMenu={(e) => e.preventDefault()}
                     src={
-                      props?.profileData
-                        ? `${config.apiUrl}${props?.profileData}`
+                      props?.profileData?.profile_pic
+                        ? `${config.apiUrl}${props?.profileData?.profile_pic}`
                         : initialProfile
                     }
                     alt="profile"

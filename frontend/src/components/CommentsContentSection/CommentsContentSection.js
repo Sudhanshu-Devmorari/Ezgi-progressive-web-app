@@ -72,6 +72,7 @@ const CommentsContentSection = (props) => {
     setActive,
     resolve,
     setResolve,
+    commentLoading,
   } = props;
   const userId = localStorage.getItem("user-id");
 
@@ -81,10 +82,10 @@ const CommentsContentSection = (props) => {
 
   const [displayComment, setDisplayComment] = useState([])
 
-  useEffect(() => {
-    const comment = active.filter((x) => userId == x.commentator_user.id || x.status !== "pending");
-    setDisplayComment(comment);
-  }, [active]);
+  // useEffect(() => {
+  //   const comment = active.filter((x) => userId == x.commentator_user.id || x.status !== "pending");
+  //   setDisplayComment(comment);
+  // }, [active]);
 
   // const activeResolved = async (user_id) => {
   //   const res = await axios
@@ -192,7 +193,7 @@ const CommentsContentSection = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       // activeResolved(user_id);
     } catch (error) {
@@ -222,13 +223,17 @@ const CommentsContentSection = (props) => {
     <>
       {props.SelectComment === "activeComments" && (
         <>
-          {displayComment.length == 0 ? (
+          {commentLoading ? (
+            <div className="d-flex justify-content-center align-items-center">
+              Loading…
+            </div>
+          ) : active.length == 0 ? (
             <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
               No Record Found!
             </div>
           ) : (
             active &&
-            displayComment.map((val, index) => {
+            active.map((val, index) => {
               return (
                 <React.Fragment key={index}>
                   {val?.public_content ? (
@@ -1084,7 +1089,11 @@ const CommentsContentSection = (props) => {
 
       {props.SelectComment === "resolvedComments" && (
         <>
-          {resolve.length == 0 ? (
+          {commentLoading ? (
+            <div className="d-flex justify-content-center align-items-center">
+              Loading…
+            </div>
+          ) : resolve.length == 0 ? (
             <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
               No Record Found!
             </div>

@@ -54,12 +54,10 @@ const BecomeAEditorModal = (props) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
 
   const [showTermsOfUse, setShowTermsOfUse] = useState(1);
-  const username = localStorage.getItem("username");
-
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    profileData && setPreveiwProfilePic(`${config.apiUrl}${profileData}`);
+    profileData && setPreveiwProfilePic(`${config.apiUrl}${profileData.profile_pic}`);
   }, [profileData]);
 
   const formData = new FormData();
@@ -91,10 +89,10 @@ const BecomeAEditorModal = (props) => {
   const [checkboxError, setCheckboxError] = useState("");
   const [profileError, setProfileError] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    // console.log("form submittt");
     if (
       selectedKategori === "Select" &&
       !preveiwProfilePic &&
@@ -117,6 +115,7 @@ const BecomeAEditorModal = (props) => {
       setCheckboxError("Please select a checkbox");
     } else {
       if (preveiwProfilePic) {
+        setIsLoading(true);
         const splitdata = selectedKategori.split(", ");
         formData.append("category", splitdata);
         formData.append("experience", selectedDeneyim);
@@ -138,11 +137,13 @@ const BecomeAEditorModal = (props) => {
                     ? "dark-mode-alert"
                     : "light-mode-alert",
               });
+              setIsLoading(false);
               window.location.reload();
             }
           })
           .catch((error) => {
             console.log(error);
+            setIsLoading(false);
             if (error.response.status === 404) {
               Swal.fire({
                 title: "Error",
@@ -192,6 +193,9 @@ const BecomeAEditorModal = (props) => {
                 onClick={() => {
                   setSelectCheckBox(false);
                   props.onHide();
+                  setPreveiwProfilePic(null);
+                  setSelectedKategori("Select");
+                  setSelectedDeneyim("Select");
                 }}
                 fontSize={"1.5rem"}
                 className={`position-absolute ${
@@ -201,23 +205,33 @@ const BecomeAEditorModal = (props) => {
               />
               <form onSubmit={handleSubmit}>
                 <div className="position-relative d-flex justify-content-center align-items-center">
-                  <img
-                    onContextMenu={(e) => e.preventDefault()}
-                    src={
-                      preveiwProfilePic
-                        ? preveiwProfilePic
-                        : // : progileData?.profile_pic ? `${config.apiUrl}${progileData?.profile_pic}` : initialProfile
-                          initialProfile
-                    }
-                    width={100}
-                    height={100}
-                    alt=""
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: "50%",
-                      opacity: currentTheme === "dark" ? "0.4" : "0.7",
-                    }}
-                  />
+                  {preveiwProfilePic !== null ? (
+                    <img
+                      onContextMenu={(e) => e.preventDefault()}
+                      src={preveiwProfilePic}
+                      width={100}
+                      height={100}
+                      alt="profile image"
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: "50%",
+                        opacity: currentTheme === "dark" ? "0.4" : "0.7",
+                      }}
+                    />
+                  ) : (
+                    <img
+                      onContextMenu={(e) => e.preventDefault()}
+                      src={initialProfile}
+                      width={100}
+                      height={100}
+                      alt="default profile image"
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: "50%",
+                        opacity: currentTheme === "dark" ? "0.4" : "0.7",
+                      }}
+                    />
+                  )}
                 </div>
                 <div className="">
                   <label
@@ -243,11 +257,11 @@ const BecomeAEditorModal = (props) => {
                     id="camera-icon"
                     className="d-none"
                     accept=".jpg, .jpeg, .png"
-                    onChange={handleProfile}
+                    onChange={(e) => handleProfile(e)}
                   />
                 </div>
                 <div className="text-center">
-                  <span>{username}</span>
+                  <span>{profileData?.username}</span>
                 </div>
                 <div className="text-center">
                   <small className="text-danger">{profileError}</small>
@@ -321,7 +335,7 @@ const BecomeAEditorModal = (props) => {
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
                   >
-                    Continue
+                    {isLoading ? "Loading..." : "Continue"}
                   </button>
                 </div>
                 <div className="d-flex flex-column text-center my-3">

@@ -743,7 +743,7 @@ class NotificationView(APIView):
         user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(receiver=user)
+            notification_obj = Notification.objects.filter(receiver=user).order_by('-created')
             # notification_obj = Notification.objects.filter(receiver=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
@@ -909,7 +909,7 @@ class ProfileView(APIView):
                 subscriber_obj = Subscription.objects.filter(commentator_user=user_obj, standard_user__is_delete=False).count()
                 data['Subscriber_Count'] = subscriber_obj
 
-                comment_obj = Comments.objects.filter(commentator_user=user_obj)
+                comment_obj = Comments.objects.filter(commentator_user=user_obj).exclude(status='reject')
                 data['Comment_Count'] = comment_obj.count()
 
                 win_count = comment_obj.filter(is_prediction=True).count()
@@ -1343,7 +1343,7 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
         try:
             details =[]
-            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, status='approve', is_resolve=True).only('id').order_by('-created')
+            all_resolved_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=True).exclude(status='reject').only('id').order_by('-created')
             for obj in all_resolved_comment:
                 comment_data = CommentsSerializer(obj).data
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
@@ -4069,7 +4069,7 @@ class CommentSetting(APIView):
         # print('comment_serializer.errors: ', comment_serializer.errors)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-totp = pyotp.TOTP('base32secret3232', interval=45)
+totp = pyotp.TOTP('base32secret3232')
 class OtpSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
@@ -4518,13 +4518,13 @@ class BecomeEditorView(APIView):
 
             if user.user_role == "standard":
                 # Get data
-                data =  dict(request.data)
+                data = dict(request.data)
                 category_data = request.data.get('category', '').split(',')
 
                 # Profile pic validation
-                if user.profile_pic == "":
-                    if 'profile_pic' not in request.data:
-                        return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                data["profile_pic"] = request.data.get('profile_pic', user.profile_pic)
+                if not data["profile_pic"]:
+                    return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Update data to pass in serializer 
                 data["user_role"] = "commentator"
@@ -4597,10 +4597,10 @@ class BecomeEditorView(APIView):
 class FootbalAndBasketballContentView(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            uid = request.query_params.get('id')
-            user = User.objects.get(id=uid)
-            if user.is_delete == True:
-                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            # uid = request.query_params.get('id')
+            # user = User.objects.get(id=uid)
+            # if user.is_delete == True:
+            #     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
 
             category = request.query_params.get('category')
             if category:

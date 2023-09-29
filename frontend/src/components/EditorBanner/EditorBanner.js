@@ -20,7 +20,7 @@ export const EditorBanner = (props) => {
       if (selectCategory !== "") {
         axios
           .get(
-            `${config.apiUrl}/football-basketball-content/?category=${selectCategory}&id=${userId}`
+            `${config.apiUrl}/football-basketball-content/?category=${selectCategory}`
           )
           .then((res) => {
             // console.log(res.data.data, "=>>>>5555sports btn");
@@ -31,7 +31,7 @@ export const EditorBanner = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
-              window.location.reload();
+            // window.location.reload();
             }
           })
           .catch((error) => {

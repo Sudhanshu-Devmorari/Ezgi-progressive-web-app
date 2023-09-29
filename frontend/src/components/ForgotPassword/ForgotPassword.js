@@ -55,83 +55,78 @@ const ForgotPassword = (props) => {
 
   return (
     <>
-      <div>
-        <form onSubmit={formik.handleSubmit}>
-          <div className="m-3 mt-4">
-            <div className="d-flex justify-content-center">
-              <span>
-                <RxCross2
-                  onClick={props.hide}
-                  fontSize={"1.8rem"}
-                  className={`${
-                    currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
-                  }`}
-                />
-              </span>
-            </div>
-            <div className="">
-              We will send an SMS verification code to your phone.
-            </div>
-            <div className="">
-              <div className="d-flex flex-column my-2">
-                <label htmlFor="phone">Phone</label>
-                <div className="input-group">
-                  <span
-                    className={`input-group-text ${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    }`}
-                    id="basic-addon1"
-                    style={{ padding: ".375rem 0 .375rem .5rem" }}
-                  >
-                    +90
-                  </span>
-                  <input
-                    onChange={(e) => setPhone(e.target.value)}
-                    id="phone"
-                    type="text"
-                    className={`${
-                      currentTheme === "dark"
-                        ? "darkMode-input"
-                        : "lightMode-input"
-                    } form-control`}
-                    aria-label="Username"
-                    aria-describedby="basic-addon1"
-                    {...formik.getFieldProps("phone")}
-                  />
-                </div>
-                {formik.touched.phone && formik.errors.phone ? (
-                  <small
-                    style={{ fontSize: "0.71rem" }}
-                    className="error text-danger"
-                  >
-                    {formik.errors.phone}
-                  </small>
-                ) : null}
-                <small className="text-danger" style={{ fontSize: "0.71rem" }}>
-                  {phoneError}
-                </small>
-              </div>
-            </div>
-            <div className="d-flex flex-column align-items-center my-4">
-              <button
-                type="submit"
-                // onClick={() => {
-                //   handleForgotPS();
-                // }}
+      <form onSubmit={formik.handleSubmit}>
+        <div className="m-3 mt-4">
+          <div className="d-flex justify-content-center">
+            <span>
+              <RxCross2
+                onClick={props.hide}
+                fontSize={"1.8rem"}
                 className={`${
-                  currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
-                } px-4 py-1`}
-                disabled={btnLoading}
-              >
-                {btnLoading ? "Loading…" : "Send"}
-              </button>
+                  currentTheme === "dark" ? "closeBtn-dark" : "closeBtn-light"
+                }`}
+              />
+            </span>
+          </div>
+          <div className="">
+            We will send an SMS verification code to your phone.
+          </div>
+          <div className="">
+            <div className="d-flex flex-column my-2">
+              <label htmlFor="phone">Phone</label>
+              <div className="input-group">
+                <span
+                  className={`input-group-text ${
+                    currentTheme === "dark"
+                      ? "darkMode-input"
+                      : "lightMode-input"
+                  }`}
+                  id="basic-addon1"
+                  style={{ padding: ".375rem 0 .375rem .5rem" }}
+                >
+                  +90
+                </span>
+                <input
+                  onChange={(e) => setPhone(e.target.value)}
+                  id="phone"
+                  type="text"
+                  className={`${
+                    currentTheme === "dark"
+                      ? "darkMode-input"
+                      : "lightMode-input"
+                  } form-control`}
+                  aria-label="Username"
+                  aria-describedby="basic-addon1"
+                  {...formik.getFieldProps("phone")}
+                />
+              </div>
+              {formik.touched.phone && formik.errors.phone ? (
+                <small
+                  style={{ fontSize: "0.71rem" }}
+                  className="error text-danger"
+                >
+                  {formik.errors.phone}
+                </small>
+              ) : null}
+              <small className="text-danger" style={{ fontSize: "0.71rem" }}>
+                {phoneError}
+              </small>
             </div>
           </div>
-        </form>
-        {alert}
-      </div>
+          <div className="d-flex flex-column align-items-center my-4">
+            <button
+              type="submit"
+              className={`${
+                currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
+              } px-4 py-1`}
+              disabled={btnLoading}
+            >
+              {btnLoading ? "Loading…" : "Send"}
+            </button>
+          </div>
+        </div>
+      </form>
+      {alert}
     </>
   );
 };

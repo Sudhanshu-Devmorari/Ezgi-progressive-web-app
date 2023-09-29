@@ -59,14 +59,14 @@ const MainPage = () => {
   const publicCount = 3;
   const SubscriptionCount = 3;
   const highlightCount = 5;
-  const [profileData, setProfileData] = useState(initialProfile);
+  const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const user_id = localStorage.getItem("user-id");
 
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
-    setProfileData(res.data.profile_pic);
+    setProfileData(res.data);
     setMembershipDate(res.data.membership_date);
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
