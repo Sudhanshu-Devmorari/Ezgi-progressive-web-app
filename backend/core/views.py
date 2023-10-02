@@ -685,10 +685,18 @@ class SubscriptionView(APIView):
         """
         try:
             user = User.objects.get(id=id)
+            print('user: ', user)
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
+            print('commentator: ', commentator)
             
-            if Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists():
-                return Response({'data':'Your subscription plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
+            is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
+            print('is_subscription: ', is_subscription)
+            if is_subscription:
+                subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
+                subscription_obj.status = 'deactive'
+                subscription_obj.save(update_fields=['status', 'updated'])
+                return Response({'data':'Your subscription plan has been canceled.'}, status=status.HTTP_200_OK)
+            
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
@@ -743,7 +751,7 @@ class NotificationView(APIView):
         user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(receiver=user).order_by('-created')
+            notification_obj = Notification.objects.filter(receiver=user).exclude(sender=user).order_by('-created')
             # notification_obj = Notification.objects.filter(receiver=id, status=False, created__gte=ten_days_ago)
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
@@ -921,12 +929,6 @@ class ProfileView(APIView):
                     logged_in_user = User.objects.get(id=standard_user_id)
                     is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, status='active', commentator_user=user_obj).exists()
                     data['is_subscribe'] = is_subscribe
-                    if is_subscribe:
-                        subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
-                        plan_price = subscription.money
-                        plan = subscription.duration
-                        data['plan_price'] = plan_price
-                        data['plan'] = plan
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -1073,6 +1075,9 @@ class RetrieveFavEditorsAndFavComment(APIView):
                 serializer.data['commentator_user']['lose'] = lose_count
                 data = serializer.data
                 details['data'] = data
+
+                is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.commentator_user, status='active').exists()
+                details['is_subscribe'] = is_subscribe
                 
                 # Subscribe count
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user, standard_user__is_delete=False).count()
@@ -1089,13 +1094,15 @@ class RetrieveFavEditorsAndFavComment(APIView):
             details = []
             for obj in comment_obj:
                 data_c = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
-                print('data_c: ', data_c)
                 win_count = data_c.filter(is_prediction=True).count()
                 lose_count = data_c.filter(is_prediction=False).count()
                 comment_data = CommentsSerializer(obj.comment).data
                 comment_data['commentator_user']['win'] = win_count
                 comment_data['commentator_user']['lose'] = lose_count
                 date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
+
+                is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.comment.commentator_user, status='active').exists()
+                comment_data['is_subscribe'] = is_subscribe
 
                 comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
                 total_reactions = comment_reactions.aggregate(
@@ -1337,6 +1344,16 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     'total_clap': total_reactions['total_clap'] or 0
                 }
                 details.append(comment_data)
+
+                logged_in_user = request.query_params.get('logged_in_user', None)
+
+                if logged_in_user is not None:
+                    logged_in_user_instance = User.objects.get(id=logged_in_user)
+
+                    if obj.public_content == False:
+                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
+                        comment_data['is_subscribe'] = is_subscribe
+
             data_list['active_comments'] = details
         except Comments.DoesNotExist:
             data_list['active_comments'] = []
@@ -1361,6 +1378,11 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     'total_favorite': total_reactions['total_favorite'] or 0,
                     'total_clap': total_reactions['total_clap'] or 0
                 }
+
+                if obj.public_content == False:
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
+                    comment_data['is_subscribe'] = is_subscribe
+
                 details.append(comment_data)
             data_list['resolved_comments'] = details
         except Comments.DoesNotExist:
@@ -4507,8 +4529,6 @@ class BecomeEditorView(APIView):
         """
         try:
 
-            print()
-            print("================>>>>>>>>>>>>>>>.request.data", request.data)
             user = User.objects.filter(id=id).first()
             if not user:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -4534,7 +4554,7 @@ class BecomeEditorView(APIView):
                 data["commentator_status"] = "active"
                 
                 # Update
-                serializer = UserSerializer(user, data=request.data, partial=True)
+                serializer = UserSerializer(user, data=data, partial=True)
                 if serializer.is_valid():
                     try:
                         serializer.save()
@@ -4749,6 +4769,7 @@ class RetrievePageData():
         try:
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
+            logged_in_user = User.objects.get(id=standard_user_id)
 
             # Get data
             all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False).order_by('-created').only('id')
@@ -4762,6 +4783,9 @@ class RetrievePageData():
                 lose_count = data.filter(is_prediction=False).count()
                 highlighted_data['user'] ['win'] = win_count
                 highlighted_data['user'] ['lose'] = lose_count
+
+                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
+                highlighted_data['is_subscribe'] = is_subscribe
 
                 count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
                 highlighted_data['subscriber_count'] = count
@@ -4836,6 +4860,8 @@ class RetrievePageData():
         try:
             # Validation
             user_id = user_id if User.objects.filter(id=user_id).exists() else None
+            
+            user = User.objects.get(id=user_id) if id is not None else None        
 
             # Get data
             all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
@@ -4843,6 +4869,10 @@ class RetrievePageData():
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
                 user_data = UserSerializer(obj).data
+
+                if user is not None:
+                    is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.id, status='active').exists()
+                    detail['is_subscribe'] = is_subscribe
 
                 if user_id:
                     detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id, commentator_user__is_delete=False).exists()
@@ -5167,8 +5197,8 @@ class EditorBannerView(APIView):
 class GetFutbolAndBasketbolCountView(APIView):
     def get(self, request):
         try:
-            futbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Futbol'], is_resolve=False).exclude(status='reject').count()
-            basketbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Basketbol'], is_resolve=False).exclude(status='reject').count()
+            futbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Futbol'], is_resolve=False, status='approve').count()
+            basketbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Basketbol'], is_resolve=False, status='approve').count()
             return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

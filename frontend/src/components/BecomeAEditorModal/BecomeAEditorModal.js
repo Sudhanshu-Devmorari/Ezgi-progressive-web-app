@@ -57,7 +57,7 @@ const BecomeAEditorModal = (props) => {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    profileData && setPreveiwProfilePic(`${config.apiUrl}${profileData.profile_pic}`);
+    profileData?.profile_pic && setPreveiwProfilePic(`${config.apiUrl}${profileData.profile_pic}`);
   }, [profileData]);
 
   const formData = new FormData();

@@ -38,7 +38,7 @@ const EditorProfileActiveComments = (props) => {
     try {
       setCommentLoading(true);
       const res = await axios
-        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
+        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`)
         .then((res) => {
           const userIds = res?.data?.active_comments?.map(
             (response) => response?.commentator_user?.id

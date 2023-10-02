@@ -757,7 +757,7 @@ const CommentsContentSection = (props) => {
                               </div>
                             </div>
                           </div>
-                          {user_id == val?.commentator_user?.id ? (
+                          {user_id == val?.commentator_user?.id || val?.is_subscribe ? (
                             <div
                               className="p-1 my-2 content-font"
                               style={{
@@ -873,7 +873,7 @@ const CommentsContentSection = (props) => {
                                   fontSize: "12px",
                                 }}
                               >
-                                {user_id == val?.commentator_user?.id ? (
+                                {user_id == val?.commentator_user?.id || val?.is_subscribe ? (
                                   <>{`${val?.prediction_type} & ${val?.prediction}`}</>
                                 ) : (
                                   <>
@@ -1227,8 +1227,8 @@ const CommentsContentSection = (props) => {
                         </div>
                       </div>
                     </div>
-                    {user_id == res?.commentator_user?.id ||
-                    res.public_content ? (
+                    {user_id == res?.commentator_user?.id || 
+                    res.public_content || res.is_subscribe ? (
                       <div
                         className="p-1 my-2 content-font"
                         style={{
@@ -1369,7 +1369,7 @@ const CommentsContentSection = (props) => {
                           }}
                         >
                           {user_id == res?.commentator_user?.id ||
-                          res.public_content ? (
+                          res.public_content || res?.is_subscribe ? (
                             <>{`${res?.prediction_type} & ${res?.prediction}`}</>
                           ) : (
                             <>

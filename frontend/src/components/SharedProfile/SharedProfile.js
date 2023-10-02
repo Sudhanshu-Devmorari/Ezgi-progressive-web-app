@@ -91,7 +91,7 @@ const SharedProfile = (props) => {
       // console.log("API Response:", response.data);
       if (response.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       if (mergedEditorResult) {
         const filterArray = mergedEditorResult.filter(
@@ -341,12 +341,14 @@ const SharedProfile = (props) => {
                   />
                 ))}
             </div>
-            {data?.value?.user?.commentator_level !== "apprentice" && (
+            {data?.value?.user?.commentator_level !== "apprentice" && userId != data?.value?.user?.id && (
               <div className="" style={{ fontSize: "12px" }}>
                 <button
                   onClick={() => {
                     if (userId) {
-                      checkDeactivation();
+                      if (!data?.value?.is_subscribe) {
+                        checkDeactivation();
+                      }
                     } else {
                       Swal.fire({
                         title: "Error",
@@ -371,7 +373,7 @@ const SharedProfile = (props) => {
                     borderRadius: "3px",
                   }}
                 >
-                  Subscribe
+                  {data?.value?.is_subscribe ? "Subscribed" : "Subscribe"}
                 </button>
               </div>
             )}

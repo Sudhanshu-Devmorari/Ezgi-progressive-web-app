@@ -463,7 +463,8 @@ const ContentSection = ({
             </div>
             {(userPhone === null || !data?.value?.public_content) &&
             selectContent !== "subscription" &&
-            userId != data?.value?.commentator_user?.id && !data.value.is_subscribe ? (
+            userId != data?.value?.commentator_user?.id &&
+            !data.value.is_subscribe ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -780,7 +781,9 @@ const ContentSection = ({
                         <button
                           onClick={() => {
                             if (userId) {
-                              checkDeactivation();
+                              if (!data?.value?.is_subscribe) {
+                                checkDeactivation();
+                              }
                             } else {
                               Swal.fire({
                                 title: "Error",

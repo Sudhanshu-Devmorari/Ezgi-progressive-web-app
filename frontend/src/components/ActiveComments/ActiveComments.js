@@ -400,6 +400,20 @@ const ActiveComments = (props) => {
         } else if (value === "subscribe model") {
           setCommentatorUser(profileData);
           setSubscribeModalShow(true);
+        } else if (value === "cancel subscription") {
+          Swal.fire({
+            title: "Are you sure to cancel your subscription??",
+            // text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              cancelSubcription();
+            }
+          });
         }
       }
     } catch (error) {
@@ -413,6 +427,31 @@ const ActiveComments = (props) => {
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         });
       }
+    }
+  };
+
+  // Cancel Subcription
+  const cancelSubcription = async () => {
+    try {
+      const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
+        commentator_id: profileData?.id,
+      });
+      if (res?.status === 200) {
+        Swal.fire({
+          title: "Success",
+          text: res?.data?.data,
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((res) => {
+          if (res.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -914,18 +953,14 @@ const ActiveComments = (props) => {
                 props.content === ("home" || "wallet") && "mb-5"
               }`}
             >
-              {/* Month/29.90₺ */}
-              {profileData?.is_subscribe && (
-                <>
-                  {profileData?.plan}/{profileData?.plan_price}₺
-                </>
-              )}
               {userId != profileData?.id && (
                 <button
                   onClick={() => {
                     if (userId) {
                       if (!profileData?.is_subscribe) {
                         checkDeactivation("subscribe model");
+                      } else {
+                        checkDeactivation("cancel subscription");
                       }
                     }
                   }}

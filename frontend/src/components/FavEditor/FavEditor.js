@@ -48,10 +48,10 @@ const FavEditor = (props) => {
           id: id,
         }
       );
-      
+
       if (response.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       const favEditorData = favEditorCommentsLike.filter(
         (res) => res?.data?.commentator_user?.id !== response.data.user_id
@@ -74,14 +74,16 @@ const FavEditor = (props) => {
   const [commentatorUser, setcommentatorUser] = useState([]);
 
   // check activation
-  const checkDeactivation = async (value) => {
+  const checkDeactivation = async (value, is_subscribe) => {
     try {
       const res = await axios.get(
         `${config.apiUrl}/check-deactivated-account/${userId}`
       );
       if (res.status === 200) {
-        setcommentatorUser(value);
-        setModalShow(true);
+        if (!is_subscribe) {
+          setcommentatorUser(value);
+          setModalShow(true);
+        }
       }
     } catch (error) {
       if (error?.response?.status === 400) {
@@ -284,7 +286,10 @@ const FavEditor = (props) => {
                       <div className="" style={{ fontSize: "12px" }}>
                         <button
                           onClick={() => {
-                            checkDeactivation(res?.data?.commentator_user);
+                            checkDeactivation(
+                              res?.commentator_user,
+                              res?.is_subscribe
+                            );
                           }}
                           className="my-2 px-2 py-1"
                           style={{
@@ -298,7 +303,7 @@ const FavEditor = (props) => {
                             borderRadius: "3px",
                           }}
                         >
-                          Subscribe
+                          {res?.is_subscribe ? "Subscribed" : "Subscribe"}
                         </button>
                       </div>
                     )}

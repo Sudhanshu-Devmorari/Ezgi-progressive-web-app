@@ -205,7 +205,7 @@ const FavComments = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
     } catch (error) {
       if (error?.response?.status === 400) {
@@ -225,14 +225,16 @@ const FavComments = (props) => {
   const [commentatorUser, setcommentatorUser] = useState([]);
 
   // check activation
-  const checkDeactivation = async (value) => {
+  const checkDeactivation = async (value, is_subscribe) => {
     try {
       const res = await axios.get(
         `${config.apiUrl}/check-deactivated-account/${userId}`
       );
       if (res.status === 200) {
-        setcommentatorUser(value);
-        setModalShow(true);
+        if (!is_subscribe) {
+          setcommentatorUser(value);
+          setModalShow(true);
+        }
       }
     } catch (error) {
       if (error?.response?.status === 400) {
@@ -383,35 +385,49 @@ const FavComments = (props) => {
                   </div>
                 </div>
 
-                {res.public_content === true ? (
-                  <>
-                    <div
-                      className="p-1 my-2 content-font"
-                      style={{
-                        backgroundColor:
-                          currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                      }}
-                    >
-                      {res.comment}
-                    </div>
-                  </>
+                {res.public_content === false && res.is_subscribe ? (
+                  <div
+                    className="p-1 my-2 content-font"
+                    style={{
+                      backgroundColor:
+                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                    }}
+                  >
+                    {res.comment}
+                  </div>
                 ) : (
                   <>
-                    <div
-                      className="px-2 py-3 my-2 d-flex justify-content-center"
-                      style={{
-                        backgroundColor:
-                          currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                      }}
-                    >
-                      <img
-                        onContextMenu={(e) => e.preventDefault()}
-                        src={`${currentTheme === "dark" ? lock : darklock}`}
-                        alt=""
-                        height={32}
-                        width={32}
-                      />
-                    </div>
+                    {res.public_content === true ? (
+                      <>
+                        <div
+                          className="p-1 my-2 content-font"
+                          style={{
+                            backgroundColor:
+                              currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                          }}
+                        >
+                          {res.comment}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className="px-2 py-3 my-2 d-flex justify-content-center"
+                          style={{
+                            backgroundColor:
+                              currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                          }}
+                        >
+                          <img
+                            onContextMenu={(e) => e.preventDefault()}
+                            src={`${currentTheme === "dark" ? lock : darklock}`}
+                            alt=""
+                            height={32}
+                            width={32}
+                          />
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
 
@@ -497,7 +513,9 @@ const FavComments = (props) => {
                         circleRatio={0.75}
                         strokeWidth={3}
                         value={100}
-                        text={res?.is_resolve ? "1-1" : res?.match_time || "00:00"}
+                        text={
+                          res?.is_resolve ? "1-1" : res?.match_time || "00:00"
+                        }
                         styles={buildStyles({
                           rotation: 1 / 2 + 1 / 8,
                           textColor:
@@ -563,7 +581,7 @@ const FavComments = (props) => {
                         fontSize: "12px",
                       }}
                     >
-                      {res.public_content
+                      {res.public_content || res.is_subscribe
                         ? `${res?.prediction_type} & ${res?.prediction}`
                         : "Subscribers Only"}
                     </span>
@@ -739,7 +757,10 @@ const FavComments = (props) => {
                         {userId != res?.commentator_user?.id && (
                           <button
                             onClick={() => {
-                              checkDeactivation(res?.commentator_user);
+                              checkDeactivation(
+                                res?.commentator_user,
+                                res?.is_subscribe
+                              );
                             }}
                             className="me-2 px-2 py-1"
                             style={{
@@ -753,7 +774,7 @@ const FavComments = (props) => {
                               borderRadius: "3px",
                             }}
                           >
-                            Subscribe
+                            {res?.is_subscribe ? "Subscribed" : "Subscribe"}
                           </button>
                         )}
                       </>

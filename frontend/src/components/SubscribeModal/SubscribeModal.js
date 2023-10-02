@@ -50,15 +50,17 @@ const SubscribeModal = (props) => {
         );
         if (res?.status === 200) {
           setIsLoading(false);
-          props.onHide();
-          Swal.fire({
+          // props.onHide();
+          await Swal.fire({
             title: "Success",
             text: `You've subscribe to ${commentatorUser?.username}`,
             icon: "sucess",
             backdrop: false,
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-          });
+            timer: 2000,
+          })
+          window.location.reload()
         }
       } catch (error) {
         console.log(error);
@@ -139,9 +141,8 @@ const SubscribeModal = (props) => {
   }, [commentatorUser?.commentator_level]);
 
   useEffect(() => {
-    setSelectedPlan(renewPlan?.promotion_duration)
-  }, [props?.text, renewPlan?.promotion_duration])
-  
+    setSelectedPlan(renewPlan?.promotion_duration);
+  }, [props?.text, renewPlan?.promotion_duration]);
 
   return (
     <>
@@ -370,7 +371,10 @@ const SubscribeModal = (props) => {
                     </>
                   )}
                   <div className="text-center">
-                    <div className={`${validationError && 'mb-0'} 'my-3'`} style={{ fontSize: "13px" }}>
+                    <div
+                      className={`${validationError && "mb-0"} 'my-3'`}
+                      style={{ fontSize: "13px" }}
+                    >
                       {currentTheme === "dark" ? (
                         <img
                           onContextMenu={(e) => e.preventDefault()}

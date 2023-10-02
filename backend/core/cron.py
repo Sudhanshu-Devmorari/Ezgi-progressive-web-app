@@ -166,12 +166,20 @@ def Userst():
                                 for obj in bettableResult:
 
                                     if obj['gameName'] == i.prediction_type:
-                                        if obj['game_result'][0]['value'] == i.prediction:
-                                            i.is_prediction = True
-                                            i.save()
-                                        else:
-                                            i.is_prediction = False
-                                            i.save()
+                                        # if obj['game_result'][0]['value'] == i.prediction:
+                                        #     i.is_prediction = True
+                                        #     i.save()
+                                        # else:
+                                        #     i.is_prediction = False
+                                        #     i.save()
+                                        for obj_data in obj['game_result']:
+                                            if obj_data['value'] == i.prediction:
+                                                i.is_prediction = True
+                                                i.save()
+                                                break
+                                            else:
+                                                i.is_prediction = False
+                                                i.save()
 
                                 HomeWin = float(match['HomeWin'])
                                 Draw = float(match['Draw'])
