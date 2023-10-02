@@ -79,7 +79,7 @@ const MainPage = () => {
 
   const [leftCornerAds, setLeftCornerAds] = useState([]);
   const [rightCornerAds, setRightCornerAds] = useState([]);
-  const [category, setCategory] = useState('Futbol');
+  const [category, setCategory] = useState("Futbol");
   function homeApiData(user_id) {
     axios
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
@@ -711,7 +711,7 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
-                   
+
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!
@@ -924,7 +924,12 @@ const MainPage = () => {
                 />
               )}
               {selectContent === "become-editor" && (
-                <BecomeEditor profileData={profileData} />
+                <BecomeEditor
+                  profileData={profileData}
+                  setDashboardSUser={setDashboardSUser}
+                  setSelectContent={setSelectContent}
+                  setActiveCommentsshow={setActiveCommentsshow}
+                />
               )}
               {selectContent === "category-content" && (
                 <>

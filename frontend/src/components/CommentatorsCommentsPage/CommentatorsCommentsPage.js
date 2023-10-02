@@ -34,7 +34,7 @@ const CommentatorsCommentsPage = (props) => {
 
   useEffect(() => {
     if (props.selectContent === "notifications") {
-      setContent("notifications");
+      subcurrentpage == "notifications" && setContent("notifications");
     } else if (props.selectContent === "fav") {
       subcurrentpage == "fav" && setContent("fav");
     } else if (

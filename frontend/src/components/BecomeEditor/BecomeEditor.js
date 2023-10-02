@@ -6,7 +6,12 @@ import FAQEditor from "../FAQEditor/FAQEditor";
 import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
 import Swal from "sweetalert2";
 
-const BecomeEditor = ({ profileData }) => {
+const BecomeEditor = ({
+  profileData,
+  setDashboardSUser,
+  setSelectContent,
+  setActiveCommentsshow,
+}) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const user_role = localStorage.getItem("user-role");
@@ -90,6 +95,9 @@ const BecomeEditor = ({ profileData }) => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         profileData={profileData}
+        setDashboardSUser={setDashboardSUser}
+        setSelectContent={setSelectContent}
+        setActiveCommentsshow={setActiveCommentsshow}
       />
     </>
   );

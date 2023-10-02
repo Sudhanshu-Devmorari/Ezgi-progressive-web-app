@@ -80,7 +80,7 @@ const CommentsContentSection = (props) => {
   // const [resolve, setResolve] = useState([]);
   const server_url = `${config?.apiUrl}`;
 
-  const [displayComment, setDisplayComment] = useState([])
+  const [displayComment, setDisplayComment] = useState([]);
 
   // useEffect(() => {
   //   const comment = active.filter((x) => userId == x.commentator_user.id || x.status !== "pending");
@@ -1183,14 +1183,16 @@ const CommentsContentSection = (props) => {
                               />
                             )}
                           </>
-                          {/* )} */}
                           {(res.is_prediction != true ||
-                            res.status === "yellow") && (
+                            res.is_prediction == null) && (
                             <img
                               onContextMenu={(e) => e.preventDefault()}
                               src={
-                                (res.is_prediction != true && circle_x) ||
-                                (res.status === "yellow" && clock_pause)
+                                res.is_prediction == false
+                                  ? circle_x
+                                  : res.is_prediction == null
+                                  ? clock_pause
+                                  : ""
                               }
                               alt=""
                               height={31}
@@ -1320,15 +1322,15 @@ const CommentsContentSection = (props) => {
                                 currentTheme === "dark"
                                   ? res.is_prediction == true
                                     ? "#37FF80"
-                                    : res.status === "yellow"
+                                    : res.is_prediction == null
                                     ? "#FFCC00"
                                     : res.is_prediction != true
                                     ? "#FF5757"
                                     : ""
                                   : res.is_prediction == true
                                   ? "#37FF80"
-                                  : res.status === "yellow"
-                                  ? res.color
+                                  : res.is_prediction == null
+                                  ? "#FFCC00"
                                   : res.is_prediction != true
                                   ? "#FF5757"
                                   : "",
@@ -1342,6 +1344,10 @@ const CommentsContentSection = (props) => {
                         </span>
                       </div>
                       <div className="text-end mt-3 mb-2">
+                        {console.log(
+                          "respnse:::::::::::::::",
+                          res.is_prediction
+                        )}
                         <span
                           className="p-1"
                           style={{
@@ -1349,15 +1355,15 @@ const CommentsContentSection = (props) => {
                               currentTheme === "dark"
                                 ? res.is_prediction == true
                                   ? "#37FF80"
-                                  : res.status === "yellow"
+                                  : res.is_prediction == null
                                   ? "#FFCC00"
                                   : res.is_prediction != true
                                   ? "#FF5757"
                                   : ""
                                 : res.is_prediction == true
                                 ? "#37FF80"
-                                : res.status === "yellow"
-                                ? res.color
+                                : res.is_prediction == null
+                                ? "#FFCC00"
                                 : res.is_prediction != true
                                 ? "#FF5757"
                                 : "",
@@ -1445,11 +1451,16 @@ const CommentsContentSection = (props) => {
                         <div
                           onClick={() => {
                             if (user_id != res?.commentator_user?.id) {
-                              handleCommentReaction(
-                                res?.id,
-                                "favorite",
-                                res.public_content
-                              );
+                              Swal.fire({
+                                title: "Error",
+                                text: "You cannot favorite this resolved commit.",
+                                icon: "error",
+                                backdrop: false,
+                                customClass:
+                                  currentTheme === "dark"
+                                    ? "dark-mode-alert"
+                                    : "light-mode-alert",
+                              });
                             }
                           }}
                         >

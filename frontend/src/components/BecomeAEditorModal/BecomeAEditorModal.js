@@ -114,63 +114,163 @@ const BecomeAEditorModal = (props) => {
     } else if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
-      if (preveiwProfilePic) {
-        setIsLoading(true);
-        const splitdata = selectedKategori.split(", ");
-        formData.append("category", splitdata);
-        formData.append("experience", selectedDeneyim);
-        file && formData.append("profile_pic", file);
-        axios
-          .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
-          .then(async (res) => {
-            if (res.status === 200) {
-              // setShowPaymentModal(true);
-              localStorage.setItem("user-role", res.data.user_role);
-              props.onHide();
-              await Swal.fire({
-                title: "Success",
-                text: "User has successfully become a commentator",
-                icon: "success",
-                backdrop: false,
-                customClass:
-                  currentTheme === "dark"
-                    ? "dark-mode-alert"
-                    : "light-mode-alert",
-              });
-              setIsLoading(false);
-              window.location.reload();
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            setIsLoading(false);
-            if (error.response.status === 404) {
-              Swal.fire({
-                title: "Error",
-                text: error.response.data.error,
-                icon: "error",
-                backdrop: false,
-                customClass:
-                  currentTheme === "dark"
-                    ? "dark-mode-alert"
-                    : "light-mode-alert",
-              });
-            } else if (error.response.status === 400) {
-              Swal.fire({
-                title: "Error",
-                text: error?.response?.data?.error,
-                icon: "error",
-                backdrop: false,
-                customClass:
-                  currentTheme === "dark"
-                    ? "dark-mode-alert"
-                    : "light-mode-alert",
-              });
-            }
-          });
-      }
+      setShowPaymentModal(true);
+      // if (preveiwProfilePic) {
+      //   setIsLoading(true);
+      //   const splitdata = selectedKategori.split(", ");
+      //   formData.append("category", splitdata);
+      //   formData.append("experience", selectedDeneyim);
+      //   file && formData.append("profile_pic", file);
+      //   axios
+      //     .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
+      //     .then(async (res) => {
+      //       if (res.status === 200) {
+      //         // setShowPaymentModal(true);
+      //         localStorage.setItem("user-role", res.data.user_role);
+      //         props.onHide();
+      //         await Swal.fire({
+      //           title: "Success",
+      //           text: "User has successfully become a commentator",
+      //           icon: "success",
+      //           backdrop: false,
+      //           customClass:
+      //             currentTheme === "dark"
+      //               ? "dark-mode-alert"
+      //               : "light-mode-alert",
+      //         });
+      //         setIsLoading(false);
+      //         const currentPage = localStorage.getItem("currentpage");
+      //         localStorage.setItem("dashboardShow", true);
+      //         (currentPage !== "show-all-comments" ||
+      //         currentPage !== "notifications") &&
+      //         localStorage.setItem("priviouspage", currentPage);
+      //         localStorage.setItem("currentpage", "show-all-comments");
+      //         localStorage.setItem("subcurrentpage", "home");
+      //         localStorage.removeItem("activeCommentId");
+      //         props?.setSelectContent("show-all-comments");
+      //         props?.setActiveCommentsshow(null);
+      //         props?.setDashboardSUser(true);
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.log(error);
+      //       setIsLoading(false);
+      //       if (error.response.status === 404) {
+      //         Swal.fire({
+      //           title: "Error",
+      //           text: error.response.data.error,
+      //           icon: "error",
+      //           backdrop: false,
+      //           customClass:
+      //             currentTheme === "dark"
+      //               ? "dark-mode-alert"
+      //               : "light-mode-alert",
+      //         });
+      //       } else if (error.response.status === 400) {
+      //         Swal.fire({
+      //           title: "Error",
+      //           text: error?.response?.data?.error,
+      //           icon: "error",
+      //           backdrop: false,
+      //           customClass:
+      //             currentTheme === "dark"
+      //               ? "dark-mode-alert"
+      //               : "light-mode-alert",
+      //         });
+      //       }
+      //     });
+      // }
     }
   }
+
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [commentatorUser, setCommentatorUser] = useState([]);
+  const getUserdata = async () => {
+    try {
+      setRenewLoading(true);
+      const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
+      // console.log(res,"=>>>>renew res")
+      setCommentatorUser(res?.data?.data);
+      if (res.status === 200) {
+        setRenewLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getUserdata();
+  }, []);
+
+  const handleMambership = async () => {
+    console.log("handle membership work");
+    if (preveiwProfilePic) {
+      setIsLoading(true);
+      const splitdata = selectedKategori.split(", ");
+      formData.append("category", splitdata);
+      formData.append("experience", selectedDeneyim);
+      file && formData.append("profile_pic", file);
+      axios
+        .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
+        .then(async (res) => {
+          if (res.status === 200) {
+            // setShowPaymentModal(true);
+            localStorage.setItem("user-role", res.data.user_role);
+            props.onHide();
+            setShowPaymentModal(false);
+            await Swal.fire({
+              title: "Success",
+              text: "User has successfully become a commentator",
+              icon: "success",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+            setIsLoading(false);
+            const currentPage = localStorage.getItem("currentpage");
+            localStorage.setItem("dashboardShow", true);
+            (currentPage !== "show-all-comments" ||
+              currentPage !== "notifications") &&
+              localStorage.setItem("priviouspage", currentPage);
+            localStorage.setItem("currentpage", "show-all-comments");
+            localStorage.setItem("subcurrentpage", "home");
+            localStorage.removeItem("activeCommentId");
+            props?.setSelectContent("show-all-comments");
+            props?.setActiveCommentsshow(null);
+            props?.setDashboardSUser(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          setIsLoading(false);
+          if (error.response.status === 404) {
+            Swal.fire({
+              title: "Error",
+              text: error.response.data.error,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          } else if (error.response.status === 400) {
+            Swal.fire({
+              title: "Error",
+              text: error?.response?.data?.error,
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          }
+        });
+    }
+  };
 
   return (
     <>
@@ -452,6 +552,10 @@ const BecomeAEditorModal = (props) => {
       <SubscribeModal
         show={showPaymentModal}
         onHide={() => setShowPaymentModal(false)}
+        commentatorUser={commentatorUser}
+        text="renew"
+        handleMambership={handleMambership}
+        isRenewLoading={isLoading}
       />
     </>
   );

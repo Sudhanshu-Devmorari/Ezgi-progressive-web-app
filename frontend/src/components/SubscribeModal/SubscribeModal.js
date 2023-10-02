@@ -27,7 +27,7 @@ const SubscribeModal = (props) => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [validationError, setValidationError] = useState("");
 
-  const { commentatorUser } = props;
+  const { commentatorUser, handleMambership, isRenewLoading } = props;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscription = async () => {
@@ -416,7 +416,11 @@ const SubscribeModal = (props) => {
                     <small className="text-danger">{validationError}</small>
                     <div className="d-flex justify-content-center my-3">
                       <button
-                        onClick={handleSubscription}
+                        onClick={() =>
+                          props.text == "renew"
+                            ? handleMambership()
+                            : handleSubscription()
+                        }
                         style={{ fontSize: "14px" }}
                         className={`${
                           currentTheme === "dark"
@@ -425,7 +429,9 @@ const SubscribeModal = (props) => {
                         } px-3 py-1`}
                       >
                         {props.text == "renew"
-                          ? "Renew "
+                          ? isRenewLoading
+                            ? "Loading..."
+                            : "Renew "
                           : isLoading
                           ? "Loading"
                           : "Checkout"}

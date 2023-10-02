@@ -32,7 +32,7 @@ const Notifications = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (unreadNotificationsIds && userId) {
+    if (unreadNotificationsIds.length !== 0 && userId) {
       try {
         axios
           .post(`${config.apiUrl}/notification/${userId}`, {
@@ -71,12 +71,9 @@ const Notifications = () => {
               alt=""
               height={42}
               width={42}
-              style={{ borderRadius: "50%" }} 
+              style={{ borderRadius: "50%" }}
             />
-            <div
-              className="d-flex flex-column ps-1"
-              style={{ width: "66%" }}
-            >
+            <div className="d-flex flex-column ps-1" style={{ width: "66%" }}>
               <span>{res?.sender?.username}</span>
               <span style={{ fontSize: "10px" }}>{res?.context}</span>
             </div>

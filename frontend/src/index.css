@@ -10,9 +10,14 @@ code {
     monospace;
 }
 img {
-  /* pointer-events: none !important */
   -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 input {
   -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+a {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
