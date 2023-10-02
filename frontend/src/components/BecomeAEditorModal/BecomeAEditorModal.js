@@ -199,8 +199,8 @@ const BecomeAEditorModal = (props) => {
     }
   };
   useEffect(() => {
-    getUserdata();
-  }, []);
+    userId && getUserdata();
+  }, [userId]);
 
   const handleMambership = async () => {
     console.log("handle membership work");
