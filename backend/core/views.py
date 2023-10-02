@@ -4122,12 +4122,13 @@ def Statistics(user_obj=None, user_id=None):
             Success_rate = round((win_count/len(data))*100, 2)
         else:
             Success_rate = 0
-        
+
         Score_point = ((10*win_count)- (10*lose_count))
 
-        if win_count >= 60:
-            user.commentator_level = "journeyman"
-            user.save(update_fields=['commentator_level','updated'])
+
+        # if win_count >= 60:
+        #     user.commentator_level = "journeyman"
+        #     user.save(update_fields=['commentator_level','updated'])
 
         # Match_result = data.filter(prediction_type="Match Result")
         # Goal_count = data.filter(prediction_type="Goal Count")
@@ -4149,15 +4150,33 @@ def Statistics(user_obj=None, user_id=None):
                 country_leagues[country].append(league)
             else:
                 country_leagues[country] = [league]
+        
+        level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
 
-        if 0 < Success_rate < 60:
-            user.commentator_level = "apprentice"
-        if 60 < Success_rate< 65:
-            user.commentator_level = "journeyman"
-        if 65 < Success_rate < 70:
-            user.commentator_level = "master"
-        if 70 < Success_rate < 100:
-            user.commentator_level = "grandmaster"
+        if level.winning_limit < win_count:
+            if int(level.sucess_rate) < Success_rate :
+
+                if user.commentator_level == 'apprentice':
+                    user.commentator_level = "journeyman"
+                    user.save()
+
+                elif user.commentator_level == 'journeyman':
+                    user.commentator_level = "master"
+                    user.save()
+
+                elif user.commentator_level == 'master':
+                    user.commentator_level = "grandmaster"
+                    user.save()
+                    
+                # user.save()
+        # if 0 < Success_rate < 60:
+        #     user.commentator_level = "apprentice"
+        # if 60 < Success_rate< 65:
+        #     user.commentator_level = "journeyman"
+        # if 65 < Success_rate < 70:
+        #     user.commentator_level = "master"
+        # if 70 < Success_rate < 100:
+        #     user.commentator_level = "grandmaster"
 
         if len(data) != 0:
             avg_odd = round(avg_odd/len(data), 2)
@@ -4772,7 +4791,7 @@ class RetrievePageData():
             logged_in_user = User.objects.get(id=standard_user_id)
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False).order_by('-created').only('id')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False).order_by('?').only('id')
             
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
