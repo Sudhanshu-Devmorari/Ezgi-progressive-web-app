@@ -337,6 +337,7 @@ const SubscribeModal = (props) => {
                   subscriptionPlan={subscriptionPlan}
                   setSelectedPlan={setSelectedPlan}
                   selectedPlan={selectedPlan}
+                  commentatorUser={commentatorUser}
                 />
                 <div className="">
                   {props?.text === "renew" ? (

@@ -1,4 +1,4 @@
-from core.models import Subscription, Notification
+from core.models import Subscription, Notification, CommentatorLevelRule
 from datetime import datetime, timedelta, timezone
 import pytz
 import requests
@@ -112,15 +112,33 @@ def Userst():
             Success_rate = round((len(correct_prediction)/len(data))*100, 2)
             user.success_rate = Success_rate
             user.score_points = Score_point
-            if 0 < Success_rate < 60:
-                user.commentator_level = "apprentice"
-            if 60 < Success_rate< 65:
-                user.commentator_level = "journeyman"
-            if 65 < Success_rate < 70:
-                user.commentator_level = "master"
-            if 70 < Success_rate < 100:
-                user.commentator_level = "grandmaster"
-            user.save()
+
+            level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            
+            if level.winning_limit < correct_prediction.count():
+                if int(level.sucess_rate) < Success_rate :
+
+                    if user.commentator_level == 'apprentice':
+                        user.commentator_level = "journeyman"
+                        user.save()
+
+                    elif user.commentator_level == 'journeyman':
+                        user.commentator_level = "master"
+                        user.save()
+
+                    elif user.commentator_level == 'master':
+                        user.commentator_level = "grandmaster"
+                        user.save()
+ 
+            # if 0 < Success_rate < 60:
+            #     user.commentator_level = "apprentice"
+            # if 60 < Success_rate< 65:
+            #     user.commentator_level = "journeyman"
+            # if 65 < Success_rate < 70:
+            #     user.commentator_level = "master"
+            # if 70 < Success_rate < 100:
+            #     user.commentator_level = "grandmaster"
+            # user.save()
 
             for i in data:
                 logger.info("i.category[0] : %s", i.category[0])
@@ -196,3 +214,32 @@ def Userst():
                                     i.save()
     except Exception as e:
         logger.error('\n Error occurred in comment prediction check cron: %s', str(e))
+
+
+def weekly_comment_count_check(): 
+    # try:
+    all_user = User.objects.filter(user_role='commentator')
+
+    now = datetime.now()
+    last_week_start = now - timedelta(days=7)
+
+    for user in all_user:
+        logger.info("user: %s", user.username)
+
+        last_week_comments_count = Comments.objects.filter(
+                commentator_user=user,
+                created__date__gte=last_week_start.date(),
+                created__date__lte=now.date()
+            ).count()
+        if last_week_comments_count < 5:
+            notification_obj = Notification.objects.create(
+                receiver=user, 
+                subject='Weekly shared comment count',
+                date=datetime.now().date(), 
+                status=False,
+                context=f"{user.username}, we noticed you haven't reached the required comment count. You should share comments as soon as possible."
+            )
+            notification_obj.save()
+         
+    # except Exception as e:
+    #     logger.error('\n Error occurred during check weeky comment count: %s', str(e))

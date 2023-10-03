@@ -645,7 +645,7 @@ const ActiveComments = (props) => {
                   color: currentTheme === "dark" ? "#E6E6E6" : "#0D2A53",
                 }}
               >
-                {moment(profileData?.created).format("DD.MM.YYYY")}
+                {moment(profileData?.membership_date).format("DD.MM.YYYY")}
               </div>
             </div>
           </div>
@@ -933,7 +933,7 @@ const ActiveComments = (props) => {
           }}
         >
           <div className="py-1">Experience</div>
-          <div className="py-1">{userPoints?.experience || 0}</div>
+          <div className="py-1">{profileData?.experience || 0}</div>
         </div>
         <div
           className="d-flex justify-content-between p-2"

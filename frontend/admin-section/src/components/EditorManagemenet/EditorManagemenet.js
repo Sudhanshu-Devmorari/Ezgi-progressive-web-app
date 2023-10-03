@@ -376,6 +376,7 @@ const EditorManagemenet = (props) => {
             gender: "",
             age: "",
             about: "",
+            membership_date: "",
           });
           if (confirm.value === true) {
             window.location.reload();
@@ -495,6 +496,7 @@ const EditorManagemenet = (props) => {
             gender: "",
             age: "",
             about: "",
+            membership_date: "",
           });
           const confirm = await Swal.fire({
             title: "Success",
@@ -1760,6 +1762,7 @@ const EditorManagemenet = (props) => {
                                 gender: "",
                                 age: "",
                                 about: "",
+                                membership_date: "",
                               });
                               clearError();
                             }}
@@ -1793,6 +1796,7 @@ const EditorManagemenet = (props) => {
                                 gender: "",
                                 age: "",
                                 about: "",
+                                membership_date: "",
                               });
                             }}
                             // data-bs-dismiss="modal"
@@ -1868,6 +1872,7 @@ const EditorManagemenet = (props) => {
                     gender: "",
                     age: "",
                     about: "",
+                    membership_date: "",
                   });
                 }}
                 data-bs-dismiss="modal"

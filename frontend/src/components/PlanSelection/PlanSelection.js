@@ -8,12 +8,12 @@ import CurrentTheme from "../../context/CurrentTheme";
 function PlanSelection(props) {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
-  const { subscriptionPlan, renewPlan } = props;
-
-  console.log(renewPlan, "==>>>renewPlan");
+  const { subscriptionPlan, renewPlan, commentatorUser } = props;
+  // console.log("commentatorUser------", commentatorUser.commentator_level)
+  // console.log(renewPlan, "==>>>renewPlan");
 
   const handlePlanClick = (plan) => {
-    console.log("=============plan", plan)
+    // console.log("=============plan", plan)
     props?.setSelectedPlan(plan);
   };
 
@@ -78,6 +78,23 @@ function PlanSelection(props) {
             </>
           ) : (
             <>
+            {commentatorUser.commentator_level == 'journeyman' ? 
+            <>
+            {renderPlan(
+                "1 Month",
+                `${subscriptionPlan?.month_1}₺`,
+                null,
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "3 Month",
+                `${subscriptionPlan?.month_3}₺`,
+                "%20 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              </>
+              :
+              <>
               {renderPlan(
                 "1 Month",
                 `${subscriptionPlan?.month_1}₺`,
@@ -102,6 +119,8 @@ function PlanSelection(props) {
                 "%40 Save!",
                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
               )}
+              </>
+              }
             </>
           )}
         </>
