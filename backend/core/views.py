@@ -685,16 +685,20 @@ class SubscriptionView(APIView):
         """
         try:
             user = User.objects.get(id=id)
-            print('user: ', user)
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
-            print('commentator: ', commentator)
             
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
-            print('is_subscription: ', is_subscription)
             if is_subscription:
                 subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
                 subscription_obj.status = 'deactive'
                 subscription_obj.save(update_fields=['status', 'updated'])
+
+                Notification.objects.create(
+                        sender=user,receiver=commentator, 
+                        subject='Subscription Purchase', 
+                        date=datetime.today().date(), 
+                        status=False, context=f'{user.username}, subscription has been terminated due to non-renewal.', 
+                    )
                 return Response({'data':'Your subscription plan has been canceled.'}, status=status.HTTP_200_OK)
             
             duration = request.data.get('duration')
@@ -897,7 +901,7 @@ class CommentReactionView(APIView):
                              'new_total_clap': total_reactions['total_clap'] or 0,
                              'status': status.HTTP_200_OK, 'data': data})
    
-
+from PIL import Image
 class ProfileView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -914,7 +918,7 @@ class ProfileView(APIView):
                 data['Follower_Count'] = follow_obj
 
                 # subscriber_obj = Subscription.objects.filter(commentator_user=user_obj).count()
-                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj, standard_user__is_delete=False).count()
+                subscriber_obj = Subscription.objects.filter(commentator_user=user_obj, standard_user__is_delete=False, status='active').count()
                 data['Subscriber_Count'] = subscriber_obj
 
                 comment_obj = Comments.objects.filter(commentator_user=user_obj).exclude(status='reject')
@@ -967,7 +971,11 @@ class ProfileView(APIView):
                 return Response({'error': 'No file found', 'status' : status.HTTP_400_BAD_REQUEST})
             elif 'file' in request.data:
                 profile_pic = request.data['file']
+
+                # image = Image.open(profile_pic)
+                # image.thumbnail((300, 300))
                 user.profile_pic = profile_pic
+                # user.save()
                 
         elif 'comment' in request.data['update']:
 
@@ -976,7 +984,7 @@ class ProfileView(APIView):
                 user.description = description
             if 'description' not in request.data:
                 return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
-        user.save(update_fields=['profile_pic', 'description', 'updated'])
+        # user.save(update_fields=['profile_pic', 'description', 'updated'])
 
         serializer = UserSerializer(user)
         return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
@@ -1324,6 +1332,10 @@ class ActiveResolvedCommentRetrieveView(APIView):
             return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         data_list = {}
 
+        logged_in_user = request.query_params.get('logged_in_user', None)
+        if logged_in_user is not None:
+            logged_in_user_instance = User.objects.get(id=logged_in_user)
+
         try:
             details =[]
             all_active_comment = Comments.objects.filter(commentator_user_id=id, is_resolve=False).exclude(status='reject').only('id').order_by('-created')
@@ -1343,16 +1355,10 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     'total_favorite': total_reactions['total_favorite'] or 0,
                     'total_clap': total_reactions['total_clap'] or 0
                 }
-                details.append(comment_data)
+                details.append(comment_data)                
 
-                logged_in_user = request.query_params.get('logged_in_user', None)
-
-                if logged_in_user is not None:
-                    logged_in_user_instance = User.objects.get(id=logged_in_user)
-
-                    if obj.public_content == False:
-                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
-                        comment_data['is_subscribe'] = is_subscribe
+                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
+                comment_data['is_subscribe'] = is_subscribe
 
             data_list['active_comments'] = details
         except Comments.DoesNotExist:
@@ -1379,9 +1385,8 @@ class ActiveResolvedCommentRetrieveView(APIView):
                     'total_clap': total_reactions['total_clap'] or 0
                 }
 
-                if obj.public_content == False:
-                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
-                    comment_data['is_subscribe'] = is_subscribe
+                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_instance, commentator_user=obj.commentator_user, status='active').exists()
+                comment_data['is_subscribe'] = is_subscribe
 
                 details.append(comment_data)
             data_list['resolved_comments'] = details
@@ -4642,6 +4647,8 @@ class FootbalAndBasketballContentView(APIView):
             #     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
 
             category = request.query_params.get('category')
+            logged_in_user = request.query_params.get('userId', None)
+
             if category:
                 queryset = Comments.objects.filter(status='approve', category=[category], commentator_user__is_delete=False, is_resolve=False).order_by('-created')
                 data = CommentsSerializer(queryset, many=True).data  
@@ -4658,12 +4665,17 @@ class FootbalAndBasketballContentView(APIView):
                     )
 
                     comment_data['total_reactions'] = {
-                    'total_likes': total_reactions['total_likes'] or 0,
-                    'total_favorite': total_reactions['total_favorite'] or 0,
-                    'total_clap': total_reactions['total_clap'] or 0
-                }
-                
+                        'total_likes': total_reactions['total_likes'] or 0,
+                        'total_favorite': total_reactions['total_favorite'] or 0,
+                        'total_clap': total_reactions['total_clap'] or 0
+                    }
+
                     comments_with_reactions.append(comment_data)
+
+                    if logged_in_user != 'null':
+                        logged_in_user_id = User.objects.get(id=logged_in_user)
+                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user_id, status='active', commentator_user=comment.commentator_user).exists()
+                        comment_data['is_subscribe'] = is_subscribe
 
                 return Response({'data': comments_with_reactions}, status=status.HTTP_200_OK)
             else:
@@ -4707,9 +4719,8 @@ class RetrievePageData():
 
                 logged_in_user = User.objects.get(id=id)
                 
-                if comment.public_content == False:
-                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
-                    comment_data['is_subscribe'] = is_subscribe
+                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
+                comment_data['is_subscribe'] = is_subscribe
 
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')

@@ -757,7 +757,8 @@ const CommentsContentSection = (props) => {
                               </div>
                             </div>
                           </div>
-                          {user_id == val?.commentator_user?.id || val?.is_subscribe ? (
+                          {user_id == val?.commentator_user?.id ||
+                          val?.is_subscribe ? (
                             <div
                               className="p-1 my-2 content-font"
                               style={{
@@ -873,7 +874,8 @@ const CommentsContentSection = (props) => {
                                   fontSize: "12px",
                                 }}
                               >
-                                {user_id == val?.commentator_user?.id || val?.is_subscribe ? (
+                                {user_id == val?.commentator_user?.id ||
+                                val?.is_subscribe ? (
                                   <>{`${val?.prediction_type} & ${val?.prediction}`}</>
                                 ) : (
                                   <>
@@ -1158,8 +1160,22 @@ const CommentsContentSection = (props) => {
                     </div>
                     <div className="col p-0">
                       {props.SelectComment === "resolvedComments" && (
-                        <div className="d-flex justify-content-end pe-2">
+                        <div className="d-flex justify-content-end pe-2 align-items-center">
                           <>
+                            {res?.commentator_user?.id == userId &&
+                              res?.status == "pending" && (
+                                <span
+                                  className={`p-1 px-2`}
+                                  style={{
+                                    backgroundColor: "rgb(195 168 0)",
+                                    color: "#FFFFFF",
+                                    fontSize: "12px",
+                                    // height: '26px'
+                                  }}
+                                >
+                                  Awaiting Approval
+                                </span>
+                              )}
                             {res?.public_content == true && (
                               <img
                                 onContextMenu={(e) => e.preventDefault()}
@@ -1229,8 +1245,9 @@ const CommentsContentSection = (props) => {
                         </div>
                       </div>
                     </div>
-                    {user_id == res?.commentator_user?.id || 
-                    res.public_content || res.is_subscribe ? (
+                    {user_id == res?.commentator_user?.id ||
+                    res.public_content ||
+                    res.is_subscribe ? (
                       <div
                         className="p-1 my-2 content-font"
                         style={{
@@ -1312,7 +1329,7 @@ const CommentsContentSection = (props) => {
                             strokeWidth={3}
                             value={100}
                             // text={res.time}
-                            text="1-1"
+                            text={res?.match_score}
                             styles={buildStyles({
                               rotation: 1 / 2 + 1 / 8,
                               textColor:
@@ -1344,10 +1361,6 @@ const CommentsContentSection = (props) => {
                         </span>
                       </div>
                       <div className="text-end mt-3 mb-2">
-                        {console.log(
-                          "respnse:::::::::::::::",
-                          res.is_prediction
-                        )}
                         <span
                           className="p-1"
                           style={{
@@ -1375,7 +1388,8 @@ const CommentsContentSection = (props) => {
                           }}
                         >
                           {user_id == res?.commentator_user?.id ||
-                          res.public_content || res?.is_subscribe ? (
+                          res.public_content ||
+                          res?.is_subscribe ? (
                             <>{`${res?.prediction_type} & ${res?.prediction}`}</>
                           ) : (
                             <>

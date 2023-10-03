@@ -130,15 +130,15 @@ def Userst():
                         user.commentator_level = "grandmaster"
                         user.save()
  
-            # if 0 < Success_rate < 60:
-            #     user.commentator_level = "apprentice"
-            # if 60 < Success_rate< 65:
-            #     user.commentator_level = "journeyman"
-            # if 65 < Success_rate < 70:
-            #     user.commentator_level = "master"
-            # if 70 < Success_rate < 100:
-            #     user.commentator_level = "grandmaster"
-            # user.save()
+            if 0 < Success_rate < 60:
+                user.commentator_level = "apprentice"
+            if 60 < Success_rate< 65:
+                user.commentator_level = "journeyman"
+            if 65 < Success_rate < 70:
+                user.commentator_level = "master"
+            if 70 < Success_rate < 100:
+                user.commentator_level = "grandmaster"
+            user.save()
 
             for i in data:
                 logger.info("i.category[0] : %s", i.category[0])
@@ -169,6 +169,25 @@ def Userst():
 
                             matchID = match.get("MatchID")
                             logger.info("matchID : %s", matchID)
+
+                            # Save match score 
+                            match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
+
+                            get_match_score = requests.get(match_score_url, headers=headers)
+                            matchScore_data = get_match_score.json()
+                            matchScore_data_list = matchScore_data["data"]
+
+                            team_1 = 0
+                            team_2 = 0
+                            for value in matchScore_data_list[0]['matchResult']:
+                                if value['metaName'] == 'msHomeScore':                                    
+                                    team_1 = value['value']
+                                elif value['metaName'] == 'msAwayScore':                                    
+                                    team_2 = value['value']
+
+                            i.match_score = f'{team_1} - {team_2}'
+
+                            i.save(update_fields=['match_score', 'updated'])
                             
                             matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
 
@@ -243,3 +262,6 @@ def weekly_comment_count_check():
          
     # except Exception as e:
     #     logger.error('\n Error occurred during check weeky comment count: %s', str(e))
+
+def match_score():
+    comments = Comments.objects.all().exclude(status='reject')

@@ -94,7 +94,7 @@ const CommentatorsCommentsPage = (props) => {
     setCommentLoading(true);
     try {
       const res = await axios
-        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}`)
+        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`)
         .then((res) => {
           if (res.status == 204) {
             localStorage.clear();

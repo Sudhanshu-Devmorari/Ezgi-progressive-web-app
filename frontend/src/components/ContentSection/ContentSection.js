@@ -599,7 +599,7 @@ const ContentSection = ({
                   }}
                 >
                   {(userPhone && data?.value?.public_content) ||
-                  userPhone == data?.value?.commentator_user?.id
+                  userPhone == data?.value?.commentator_user?.id || data?.value?.is_subscribe
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>

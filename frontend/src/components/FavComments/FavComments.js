@@ -514,7 +514,7 @@ const FavComments = (props) => {
                         strokeWidth={3}
                         value={100}
                         text={
-                          res?.is_resolve ? "1-1" : res?.match_time || "00:00"
+                          res?.is_resolve ? res?.match_score : res?.match_time || "00:00"
                         }
                         styles={buildStyles({
                           rotation: 1 / 2 + 1 / 8,

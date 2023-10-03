@@ -105,6 +105,7 @@ class Comments(models.Model):
     league = models.CharField(max_length=120)
     date = models.DateField(default=date.today)
     match_time = models.TimeField(null=True, blank=True)
+    match_score = models.CharField(null=True, blank=True, default='0 - 0')
     match_detail = models.CharField(max_length=120)
     prediction_type = models.CharField(max_length=120)
     prediction = models.CharField(max_length=120)

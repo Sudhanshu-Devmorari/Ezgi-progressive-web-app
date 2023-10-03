@@ -87,7 +87,8 @@ def on_match_time_update_comment_status(view_func):
     def wrapped_view(*args, **kwargs):
         try:
             current_time = datetime.now()
-            Comments.objects.filter(Q(date=current_time.date(), match_time__lte=current_time.time()) | Q(date__lt=current_time.date()), is_resolve=False).update(is_resolve=True)
+            formatted_time = current_time.time().strftime('%H:%M:%S')
+            Comments.objects.filter(Q(date=current_time.date(), match_time__lte=current_time.time()) | Q(date__lt=current_time.date()), is_resolve=False).update(is_resolve=True, match_score='0 - 0')
             return view_func(*args, **kwargs)
         except:
             return view_func(*args, **kwargs)

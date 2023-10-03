@@ -20,7 +20,7 @@ export const EditorBanner = (props) => {
       if (selectCategory !== "") {
         axios
           .get(
-            `${config.apiUrl}/football-basketball-content/?category=${selectCategory}`
+            `${config.apiUrl}/football-basketball-content/?category=${selectCategory}&userId=${userId}`
           )
           .then((res) => {
             // console.log(res.data.data, "=>>>>5555sports btn");
