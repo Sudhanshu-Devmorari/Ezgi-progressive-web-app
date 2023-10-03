@@ -114,6 +114,7 @@ const BecomeAEditorModal = (props) => {
     } else if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
+      props.onHide();
       setShowPaymentModal(true);
       // if (preveiwProfilePic) {
       //   setIsLoading(true);
@@ -189,7 +190,7 @@ const BecomeAEditorModal = (props) => {
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
-      // console.log(res,"=>>>>renew res")
+      console.log(res,"=>>>>renew res")
       setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
         setRenewLoading(false);
@@ -203,7 +204,6 @@ const BecomeAEditorModal = (props) => {
   }, [userId]);
 
   const handleMambership = async () => {
-    console.log("handle membership work");
     if (preveiwProfilePic) {
       setIsLoading(true);
       const splitdata = selectedKategori.split(", ");
@@ -556,6 +556,8 @@ const BecomeAEditorModal = (props) => {
         text="renew"
         handleMambership={handleMambership}
         isRenewLoading={isLoading}
+        isRenewTerms={selectCheckBox}
+        preveiwProfilePic={preveiwProfilePic}
       />
     </>
   );

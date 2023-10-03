@@ -933,6 +933,9 @@ class ProfileView(APIView):
                     logged_in_user = User.objects.get(id=standard_user_id)
                     is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, status='active', commentator_user=user_obj).exists()
                     data['is_subscribe'] = is_subscribe
+                    if is_subscribe:
+                        subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
+                        data['subscription_end_date'] = subscription.end_date
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()

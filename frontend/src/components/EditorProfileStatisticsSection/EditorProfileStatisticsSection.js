@@ -57,7 +57,6 @@ const EditorProfileStatisticsSection = (props) => {
     axios
       .get(`${config.apiUrl}/sports-statistics/${user}/`)
       .then((res) => {
-        console.log(res?.data, "================>>>>>resssss stats");
         if (res.status === 200) {
           setBasketballStats(res.data[0]);
           setFootballStats(res.data[1]);
@@ -111,7 +110,6 @@ const EditorProfileStatisticsSection = (props) => {
             }
           });
           setLeagueFootballData(updatedFootball);
-          console.log("res", res.data);
           const basketball = res.data[0].basketball_Leagues;
 
           const updatedBasktetball = basketball?.map((item) => {
@@ -163,13 +161,6 @@ const EditorProfileStatisticsSection = (props) => {
       : SelectSport === "basketball"
       ? leagueBasketballData
       : [];
-
-  console.log(
-    SelectSport,
-    "============>>selected sopprt",
-    profileData?.category,
-    profileData?.category.length
-  );
 
   return (
     <>

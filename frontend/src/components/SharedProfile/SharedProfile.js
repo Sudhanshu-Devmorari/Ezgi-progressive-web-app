@@ -217,6 +217,9 @@ const SharedProfile = (props) => {
             className="col pe-0 d-flex position-relative"
             onClick={() => {
               if (userId) {
+                setDashboardSUser(
+                  userId == data?.value?.user?.id ? true : false
+                );
                 const currentPage = localStorage.getItem("currentpage");
                 const currentuser = localStorage.getItem("user-role");
                 localStorage.setItem("dashboardShow", true);
@@ -228,9 +231,15 @@ const SharedProfile = (props) => {
                   "subcurrentpage",
                   currentuser == "standard" ? "subscribers" : "home"
                 );
-                localStorage.setItem("activeCommentId", data?.value?.user?.id);
+                userId != data?.value?.user?.id &&
+                  localStorage.setItem(
+                    "activeCommentId",
+                    data?.value?.user?.id
+                  );
                 setSelectContent("show-all-comments");
-                setActiveCommentsshow(data?.value?.user?.id);
+                setActiveCommentsshow(
+                  userId != data?.value?.user?.id ? data?.value?.user?.id : null
+                );
               } else {
                 Swal.fire({
                   text: "You need to become a member to be able to view it.",
@@ -341,42 +350,43 @@ const SharedProfile = (props) => {
                   />
                 ))}
             </div>
-            {data?.value?.user?.commentator_level !== "apprentice" && userId != data?.value?.user?.id && (
-              <div className="" style={{ fontSize: "12px" }}>
-                <button
-                  onClick={() => {
-                    if (userId) {
-                      if (!data?.value?.is_subscribe) {
-                        checkDeactivation();
+            {data?.value?.user?.commentator_level !== "apprentice" &&
+              userId != data?.value?.user?.id && (
+                <div className="" style={{ fontSize: "12px" }}>
+                  <button
+                    onClick={() => {
+                      if (userId) {
+                        if (!data?.value?.is_subscribe) {
+                          checkDeactivation();
+                        }
+                      } else {
+                        Swal.fire({
+                          title: "Error",
+                          text: "Please log in to continue.",
+                          icon: "error",
+                          backdrop: false,
+                          customClass:
+                            currentTheme === "dark"
+                              ? "dark-mode-alert"
+                              : "light-mode-alert",
+                        });
                       }
-                    } else {
-                      Swal.fire({
-                        title: "Error",
-                        text: "Please log in to continue.",
-                        icon: "error",
-                        backdrop: false,
-                        customClass:
-                          currentTheme === "dark"
-                            ? "dark-mode-alert"
-                            : "light-mode-alert",
-                      });
-                    }
-                  }}
-                  className="my-2 px-2 py-1"
-                  style={{
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #37FF80"
-                        : "1px solid #00659D",
-                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                    backgroundColor: "transparent",
-                    borderRadius: "3px",
-                  }}
-                >
-                  {data?.value?.is_subscribe ? "Subscribed" : "Subscribe"}
-                </button>
-              </div>
-            )}
+                    }}
+                    className="my-2 px-2 py-1"
+                    style={{
+                      border:
+                        currentTheme === "dark"
+                          ? "1px solid #37FF80"
+                          : "1px solid #00659D",
+                      color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                      backgroundColor: "transparent",
+                      borderRadius: "3px",
+                    }}
+                  >
+                    {data?.value?.is_subscribe ? "Subscribed" : "Subscribe"}
+                  </button>
+                </div>
+              )}
           </div>
         </div>
       </div>

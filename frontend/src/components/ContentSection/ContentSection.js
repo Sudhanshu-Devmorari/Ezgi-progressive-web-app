@@ -312,12 +312,20 @@ const ContentSection = ({
                     "subcurrentpage",
                     currentuser == "standard" ? "subscribers" : "home"
                   );
-                  setSelectContent("show-all-comments");
-                  setActiveCommentsshow(data?.value?.commentator_user?.id);
-                  localStorage.setItem(
-                    "activeCommentId",
-                    data?.value?.commentator_user?.id
+                  setDashboardSUser(
+                    userId == data?.value?.commentator_user?.id ? true : false
                   );
+                  setSelectContent("show-all-comments");
+                  setActiveCommentsshow(
+                    userId == data?.value?.commentator_user?.id
+                      ? null
+                      : data?.value?.commentator_user?.id
+                  );
+                  userId != data?.value?.commentator_user?.id &&
+                    localStorage.setItem(
+                      "activeCommentId",
+                      data?.value?.commentator_user?.id
+                    );
                 } else {
                   Swal.fire({
                     // title: "Success",

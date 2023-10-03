@@ -437,23 +437,39 @@ const ActiveComments = (props) => {
         commentator_id: profileData?.id,
       });
       if (res?.status === 200) {
-        Swal.fire({
-          title: "Success",
-          text: res?.data?.data,
-          icon: "success",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        }).then((res) => {
-          if (res.isConfirmed) {
             window.location.reload();
-          }
-        });
+        // Swal.fire({
+        //   title: "Success",
+        //   text: res?.data?.data,
+        //   icon: "success",
+        //   backdrop: false,
+        //   customClass:
+        //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        // }).then((res) => {
+        //   if (res.isConfirmed) {
+        //   }
+        // });
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (!profileData || !profileData?.is_subscribe) {
+      return; // No need to continue if not subscribed
+    }
+  
+    const currentTime = Date.now();
+    const subExpDate = new Date(profileData?.subscription_end_date).getTime();
+  
+    if (currentTime >= subExpDate) {
+      cancelSubcription();
+      console.log("Subscription expired - cancelling");
+    } else {
+      console.log("Subscription is active");
+    }
+  }, [profileData]);
 
   return (
     <>
@@ -953,7 +969,8 @@ const ActiveComments = (props) => {
                 props.content === ("home" || "wallet") && "mb-5"
               }`}
             >
-              {userId != profileData?.id && (
+              {Number(userId) !== profileData?.id &&
+              !profileData?.is_subscribe ? (
                 <button
                   onClick={() => {
                     if (userId) {
@@ -975,10 +992,18 @@ const ActiveComments = (props) => {
                     borderRadius: "3px",
                   }}
                 >
-                  {profileData?.is_subscribe
-                    ? "Cancel Subcription"
-                    : "Subscribe"}
+                  Subscribe
                 </button>
+              ) : (
+                <span>
+                  Your subscription will end on{" "}
+                  <span style={{ color: "red" }}>
+                    {new Date(
+                      profileData?.subscription_end_date
+                    ).toLocaleDateString()}{" "}
+                  </span>
+                  date.
+                </span>
               )}
             </div>
           )}

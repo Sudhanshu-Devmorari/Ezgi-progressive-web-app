@@ -527,18 +527,18 @@ const FavComments = (props) => {
                             ? currentTheme === "dark"
                               ? res.is_prediction == true
                                 ? "#37FF80"
-                                : res.status === "yellow"
-                                ? "#FFCC00"
-                                : res.is_prediction != true
+                                // : res.status === "yellow"
+                                // ? "#FFCC00"
+                                : res.is_prediction == false
                                 ? "#FF5757"
-                                : ""
+                                : "#00659D"
                               : res.is_prediction == true
                               ? "#37FF80"
-                              : res.status === "yellow"
-                              ? res.color
-                              : res.is_prediction != true
+                              // : res.status === "yellow"
+                              // ? res.color
+                              : res.is_prediction == false
                               ? "#FF5757"
-                              : ""
+                              : "#00659D"
                             : currentTheme === "dark"
                             ? "#E6E6E6"
                             : "#0D2A53",
@@ -559,18 +559,18 @@ const FavComments = (props) => {
                           ? currentTheme === "dark"
                             ? res?.is_prediction == true
                               ? "#37FF80"
-                              : res?.status === "yellow"
-                              ? "#FFCC00"
-                              : res?.is_prediction != true
+                              // : res?.status === "yellow"
+                              // ? "#FFCC00"
+                              : res?.is_prediction == false
                               ? "#FF5757"
-                              : ""
+                              : "#00659D"
                             : res?.is_prediction == true
                             ? "#37FF80"
-                            : res?.status === "yellow"
-                            ? res?.color
-                            : res?.is_prediction != true
+                            // : res?.status === "yellow"
+                            // ? res?.color
+                            : res?.is_prediction == false
                             ? "#FF5757"
-                            : ""
+                            : "#00659D"
                           : props.SelectComment === "resolvedComments"
                           ? "#00DE51"
                           : "#00659D",

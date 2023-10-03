@@ -1199,16 +1199,16 @@ const CommentsContentSection = (props) => {
                               />
                             )}
                           </>
-                          {(res.is_prediction != true ||
-                            res.is_prediction == null) && (
+                          {(res.is_prediction != true &&
+                            res.is_prediction != null) && (
                             <img
                               onContextMenu={(e) => e.preventDefault()}
                               src={
                                 res.is_prediction == false
                                   ? circle_x
-                                  : res.is_prediction == null
-                                  ? clock_pause
-                                  : ""
+                                  : // : res.is_prediction == null
+                                    // ? clock_pause
+                                    ""
                               }
                               alt=""
                               height={31}
@@ -1339,16 +1339,16 @@ const CommentsContentSection = (props) => {
                                 currentTheme === "dark"
                                   ? res.is_prediction == true
                                     ? "#37FF80"
-                                    : res.is_prediction == null
-                                    ? "#FFCC00"
-                                    : res.is_prediction != true
+                                    : // : res.is_prediction == null
+                                    // ? "#FFCC00"
+                                    res.is_prediction == false
                                     ? "#FF5757"
                                     : ""
                                   : res.is_prediction == true
                                   ? "#37FF80"
-                                  : res.is_prediction == null
-                                  ? "#FFCC00"
-                                  : res.is_prediction != true
+                                  : // : res.is_prediction == null
+                                  // ? "#FFCC00"
+                                  res.is_prediction == false
                                   ? "#FF5757"
                                   : "",
                             })}
@@ -1368,21 +1368,21 @@ const CommentsContentSection = (props) => {
                               currentTheme === "dark"
                                 ? res.is_prediction == true
                                   ? "#37FF80"
-                                  : res.is_prediction == null
-                                  ? "#FFCC00"
-                                  : res.is_prediction != true
+                                  : // : res.is_prediction == null
+                                  // ? "#FFCC00"
+                                  res.is_prediction == false
                                   ? "#FF5757"
-                                  : ""
+                                  : "#00659D"
                                 : res.is_prediction == true
                                 ? "#37FF80"
-                                : res.is_prediction == null
-                                ? "#FFCC00"
-                                : res.is_prediction != true
+                                : // : res.is_prediction == null
+                                // ? "#FFCC00"
+                                res.is_prediction == false
                                 ? "#FF5757"
-                                : "",
+                                : "#00659D",
                             color:
                               props.SelectComment === "resolvedComments"
-                                ? "#0D2A53"
+                                ? res.is_prediction == null ? "#fff" : "#0D2A53"
                                 : "#FFFFFF",
                             fontSize: "12px",
                           }}

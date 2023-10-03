@@ -20,14 +20,19 @@ import Swal from "sweetalert2";
 import moment from "moment";
 
 const SubscribeModal = (props) => {
+  const { commentatorUser, handleMambership, isRenewLoading, isRenewTerms, preveiwProfilePic } =
+    props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
+  useEffect(() => {
+    isRenewTerms && setSelectCheckBox(isRenewTerms);
+  }, [isRenewTerms]);
+
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [validationError, setValidationError] = useState("");
 
-  const { commentatorUser, handleMambership, isRenewLoading } = props;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscription = async () => {
@@ -59,8 +64,8 @@ const SubscribeModal = (props) => {
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
             timer: 2000,
-          })
-          window.location.reload()
+          });
+          window.location.reload();
         }
       } catch (error) {
         console.log(error);
@@ -116,12 +121,16 @@ const SubscribeModal = (props) => {
       }
     }
     async function getRenewData() {
+      const level =
+        commentatorUser?.commentator_level == null
+          ? "apprentice"
+          : commentatorUser?.commentator_level;
       try {
         setIsSubscriptionLoading(true);
         const res = await axios.get(
           `${
             config?.apiUrl
-          }/membership-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
+          }/membership-setting/?commentator_level=${level?.toLowerCase()}`
         );
         if (res.status === 200) {
           const data = res?.data[0];
@@ -134,7 +143,7 @@ const SubscribeModal = (props) => {
     }
 
     if (props?.text === "renew") {
-      commentatorUser?.commentator_level && getRenewData();
+      getRenewData();
     } else {
       commentatorUser?.commentator_level && getData();
     }
@@ -243,7 +252,7 @@ const SubscribeModal = (props) => {
                         src={
                           commentatorUser?.profile_pic
                             ? `${config.apiUrl}${commentatorUser.profile_pic}`
-                            : profile
+                            : preveiwProfilePic ? preveiwProfilePic : profile
                         }
                         width={105}
                         height={105}
@@ -432,7 +441,7 @@ const SubscribeModal = (props) => {
                         {props.text == "renew"
                           ? isRenewLoading
                             ? "Loading..."
-                            : "Renew "
+                            : "Renew"
                           : isLoading
                           ? "Loading"
                           : "Checkout"}

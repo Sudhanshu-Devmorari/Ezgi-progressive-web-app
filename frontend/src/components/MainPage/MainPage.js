@@ -72,10 +72,10 @@ const MainPage = () => {
     localStorage.setItem("user-active", res.data.is_active);
   }
   useEffect(() => {
-    if (userId) {
+    if (userId || selectContent == "show-all-comments") {
       getProfileData();
     }
-  }, []);
+  }, [userId, selectContent == "show-all-comments"]);
 
   const [leftCornerAds, setLeftCornerAds] = useState([]);
   const [rightCornerAds, setRightCornerAds] = useState([]);
@@ -964,6 +964,7 @@ const MainPage = () => {
                         handlesportData={handlesportData}
                         setContentData={setContentData}
                         contentData={contentData}
+                        setDashboardSUser={setDashboardSUser}
                       />
                     ))
                   )}
