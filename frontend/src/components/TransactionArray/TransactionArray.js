@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import './TransactionArray.css'
+import "./TransactionArray.css";
 import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
@@ -71,19 +71,24 @@ const TransactionArray = (props) => {
       total: "485.00₺",
     },
   ];
-    // // Subscription API
-    // const [transactionsData, setTransactionsData] = useState([]);
-    // useEffect(() => {
-    //   async function getSubscriptions(){
-    //     const res = await axios.get(`${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`)
-    //     console.log("resL ",res.data);
-    //   }
-    //   getSubscriptions();
-    // }, [])
+  // // Subscription API
+  // const [transactionsData, setTransactionsData] = useState([]);
+  // useEffect(() => {
+  //   async function getSubscriptions(){
+  //     const res = await axios.get(`${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`)
+  //     console.log("resL ",res.data);
+  //   }
+  //   getSubscriptions();
+  // }, [])
   return (
     <>
       {props.user !== "standard user" &&
-        transactionsHistory.map((tran, index) => (
+      (props.transactionHistory?.length == 0 ? (
+        <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+          No Record Found!
+        </div>
+      ) : (
+        props.transactionHistory.map((tran, index) => (
           <div
             className="my-2 p-2 row g-0"
             style={{
@@ -91,29 +96,34 @@ const TransactionArray = (props) => {
               fontSize: "12px",
             }}
           >
-            <div className="col-4">{tran.name}</div>
-            <div className="col-2">{tran.days}</div>
+            <div className="col-4">{tran.type}</div>
+            <div className="col-2">{tran.duration}</div>
             <div className="col-4">{tran.date}</div>
             <div
               className="col-2 text-end"
               style={{
                 color:
                   currentTheme === "dark"
-                    ? tran.name === "Highlight"
+                    ? tran.type === "Highlight"
                       ? "#FF5757"
                       : "#37FF80"
-                    : tran.name === "Highlight"
+                    : tran.type === "Highlight"
                     ? "#FF5757"
                     : "#00DE51",
               }}
             >
-              {tran.total}
+              {tran.amount}₺
             </div>
           </div>
-        ))}
+        ))
+      ))}
 
       {props.user === "standard user" &&
-        transactions.map((tran) => (
+      (props.transactionHistory?.length == 0 ? (
+        <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+          No Record Found!
+        </div>
+      ) : ( props.transactionHistory.map((tran) => (
           <div
             className="my-2 p-2 row g-0 fonts-transactions"
             style={{
@@ -126,25 +136,25 @@ const TransactionArray = (props) => {
               style={{
                 color:
                   currentTheme === "dark"
-                    ? tran.name === "New Subscription"
+                    ? tran.type === "New Subscription"
                       ? "#37FF80"
-                      : tran.name === "Renew Subscription"
+                      : tran.type === "Renew Subscription"
                       ? "#4DD5FF"
                       : ""
-                    : tran.name === "New Subscription"
+                    : tran.type === "New Subscription"
                     ? "#00DE51"
-                    : tran.name === "Renew Subscription"
+                    : tran.type === "Renew Subscription"
                     ? "#00659D"
                     : "",
               }}
             >
-              {tran.name}
+              {tran.type}
             </div>
-            <div className="col-2">{tran.days}</div>
+            <div className="col-2">{tran.duration}</div>
             <div className="col-4">{tran.date}</div>
-            <div className="col-2 text-end">{tran.total}</div>
+            <div className="col-2 text-end">{tran.amount}₺</div>
           </div>
-        ))}
+        ))))}
     </>
   );
 };

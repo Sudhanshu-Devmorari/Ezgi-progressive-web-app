@@ -3,7 +3,8 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           CommentReaction, FavEditors, TicketSupport, ResponseTicket,
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
                           SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner,
+                          PendingBalanceHistory, CommissionEarning)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -243,4 +244,18 @@ class BankDetailsSerializer(serializers.ModelSerializer):
 class EditorBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = EditorBanner
+        fields = '__all__'
+
+class PendingBalanceHistorySerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    editor = UserSerializer()
+    class Meta:
+        model = PendingBalanceHistory
+        fields = '__all__'
+
+
+class CommissionEarningSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = CommissionEarning
         fields = '__all__'

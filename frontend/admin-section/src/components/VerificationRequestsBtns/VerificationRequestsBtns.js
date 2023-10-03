@@ -22,7 +22,7 @@ const VerificationRequestsBtns = (props) => {
           id: id,
           status: action,
         });
-        console.log(res,"=========>>res")
+        // console.log(res,"=========>>res")
         if (res.status === 200) {
           if (action === "approve") {
             setIsLoadingApprove(false);

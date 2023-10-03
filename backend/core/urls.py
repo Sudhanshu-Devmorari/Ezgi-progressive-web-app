@@ -3,6 +3,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
+                         GetPendingBalance,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -52,6 +53,7 @@ urlpatterns = [
     # path("monthly_subscription_chart/<int:id>", MonthlySubScriptionChart.as_view(), name='monthly_subscription_chart'),
     path('sports-statistics/<int:id>/', SportsStatisticsView.as_view(), name='Sports-State'), 
     path('football-basketball-content/', FootbalAndBasketballContentView.as_view(), name='Football-Basketball-Content'), 
+    path('pending-balance/<int:id>/', GetPendingBalance.as_view(), name='Pending-Balance'), 
 
 
     # Admin Panel's api

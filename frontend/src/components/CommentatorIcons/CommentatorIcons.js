@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import bow_dark from "../../assets/Comments Page.svg";
 import bow_Selected from "../../assets/Menu Icon (1).svg";
@@ -18,11 +18,33 @@ import bell_1 from "../../assets/Header Notification (2).svg";
 import lifebuoydark from "../../assets/Support.svg";
 import lifebuoy from "../../assets/support unselected.svg";
 import lifebuoySelected from "../../assets/support selected.svg";
+import { userId } from "../GetUser";
+import axios from "axios";
+import config from "../../config";
+import moment from "moment";
 
 const CommentatorIcons = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const user = localStorage.getItem("user-role");
   const homepage = localStorage.getItem("currentpage");
+
+  async function getBankIban() {
+    try {
+      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      if (res?.status === 200) {
+        // console.log("res: ", res)
+        const data = res?.data;
+        data.sort((a, b) => moment(b.date, 'DD.MM.YYYY - HH:mm').unix() - moment(a.date, 'DD.MM.YYYY - HH:mm').unix());
+        props.setTransactionHistory(data)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getBankIban();
+  }, []);
+
   return (
     <>
       <div className={`row my-2 g-0 gap-1 ${user !== "commentator" && "mx-4"}`}>
@@ -78,6 +100,7 @@ const CommentatorIcons = (props) => {
         </div>
         <div
           onClick={() => {
+            getBankIban()
             props.setContent("wallet");
             localStorage.setItem("subcurrentpage", "wallet");
           }}

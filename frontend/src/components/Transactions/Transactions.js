@@ -8,6 +8,7 @@ import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import moment from "moment";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -34,11 +35,16 @@ const Transactions = () => {
   };
 
   const [bankDetails, setBankDetails] = useState([]);
+  const [transactionHistory, setTransactionHistory] = useState([]);
   async function getBankIban() {
     try {
       const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
       if (res?.status === 200) {
         setBankDetails(res?.data?.data);
+
+        const data = res?.data?.data?.Transection_history;
+        data.sort((a, b) => moment(b.date, 'DD.MM.YYYY - HH:mm').unix() - moment(a.date, 'DD.MM.YYYY - HH:mm').unix());
+        setTransactionHistory(data);
       }
     } catch (error) {
       console.log(error);
@@ -67,7 +73,7 @@ const Transactions = () => {
               <div>Total Balance</div>
               <div className="text-center">
                 <span className="total-balance" style={{ fontSize: "15px" }}>
-                  12.650₺
+                  {bankDetails?.total_balance}₺
                 </span>
               </div>
               <div className="d-flex justify-content-between">
@@ -76,13 +82,13 @@ const Transactions = () => {
                   className="balance-font"
                   style={{ fontSize: "14px", color: "#37FF80" }}
                 >
-                  8.750₺
+                  {bankDetails?.withdrawable_balance}₺
                 </span>
               </div>
               <div className="d-flex justify-content-between">
                 <span>Pending</span>
                 <span className="balance-font" style={{ fontSize: "14px" }}>
-                  3.900₺
+                  {bankDetails?.pending_balance}₺
                 </span>
               </div>
             </div>
@@ -172,7 +178,7 @@ const Transactions = () => {
           </button>
         </div>
         <div className="my-2">Transaction History</div>
-        <TransactionArray />
+        <TransactionArray transactionHistory={transactionHistory} />
       </div>
 
       <BankUpdateModal

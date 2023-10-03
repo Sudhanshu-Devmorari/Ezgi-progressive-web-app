@@ -92,11 +92,11 @@ const OTPModal = (props) => {
         setOtpError(res.data.error);
       }
     } else {
-      console.log("inside else condition:::::::::::")
+      // console.log("inside else condition:::::::::::")
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
         otp: otp,
       });
-      console.log("res:::::::::::::", res);
+      // console.log("res:::::::::::::", res);
 
       if (res.data.status === 200) {
         setOtpLoading(false);

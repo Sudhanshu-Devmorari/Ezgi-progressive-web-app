@@ -1,4 +1,4 @@
-from core.models import Subscription, Notification, CommentatorLevelRule
+from core.models import Subscription, Notification, CommentatorLevelRule, PendingBalanceHistory, BankDetails
 from datetime import datetime, timedelta, timezone
 import pytz
 import requests
@@ -263,5 +263,19 @@ def weekly_comment_count_check():
     # except Exception as e:
     #     logger.error('\n Error occurred during check weeky comment count: %s', str(e))
 
-def match_score():
-    comments = Comments.objects.all().exclude(status='reject')
+
+def withdrawable_balance_update():
+    today_date = datetime.now().date()
+    pending_history = PendingBalanceHistory.objects.filter(date=today_date)
+
+    for obj in pending_history:
+        
+        bank_obj = BankDetails.objects.get(user=obj.editor)
+        
+        if bank_obj.withdrawable_balance is None:
+            bank_obj.withdrawable_balance = 0.0
+
+        bank_obj.pending_balance -= obj.amount
+        bank_obj.withdrawable_balance += obj.amount
+
+        bank_obj.save()

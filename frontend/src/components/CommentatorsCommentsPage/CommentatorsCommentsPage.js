@@ -86,6 +86,8 @@ const CommentatorsCommentsPage = (props) => {
     getProfileData();
   }, []);
 
+  const [pendingBalance, setPendingBalance] = useState([]);
+
   const [active, setActive] = useState([]);
   const [resolve, setResolve] = useState([]);
   const [commentLoading, setCommentLoading] = useState(false);
@@ -212,10 +214,11 @@ const CommentatorsCommentsPage = (props) => {
               <WalletSelection
                 setWalletSelection={setWalletSelection}
                 walletSelection={walletSelection}
+                setPendingBalance={setPendingBalance}
                 user={"commentator"}
               />
               {walletSelection === "My transactions" && <Transactions />}
-              {walletSelection === "pending balance" && <PendingBalance />}
+              {walletSelection === "pending balance" && <PendingBalance pendingBalance={pendingBalance}/>}
               {walletSelection === "account status" && (
                 <AccountStatus membershipDate={props.membershipDate} />
               )}

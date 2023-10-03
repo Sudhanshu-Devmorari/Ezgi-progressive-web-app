@@ -21,7 +21,7 @@ const WithdrawalModal = (props) => {
         bank_iban: bankDetails?.bank_iban,
         withdrawable_amount: bankDetails?.withdrawable_balance,
       });
-      console.log(res);
+      // console.log(res);
       if (res?.status === 200) {
         setWithdrawalLoading(false);
         Swal.fire({

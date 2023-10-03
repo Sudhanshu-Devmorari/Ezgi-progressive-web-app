@@ -25,20 +25,22 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ParseError, APIException
 
-from collections import Counter
+from collections import Counter, defaultdict
 
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
-                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail)
+                          TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail,
+                          PendingBalanceHistory, CommissionEarning)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
                              SubscriptionSerializer, NotificationSerializer, CommentReactionSerializer, FavEditorsSerializer, 
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
-                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer, EditorBannerSerializer)
+                             TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer,
+                             EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -701,6 +703,9 @@ class SubscriptionView(APIView):
                     )
                 return Response({'data':'Your subscription plan has been canceled.'}, status=status.HTTP_200_OK)
             
+            # if not BankDetails.objects.filter(user=commentator).exists():
+            #     return Response({'data':f'You can not purchase the subscription for {commentator.username} because editor does not provide bank detail.'}, status=status.HTTP_200_OK)
+            
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
@@ -708,8 +713,8 @@ class SubscriptionView(APIView):
                     end_date = start_date + timedelta(days=30)
                 if duration == "3 Month":
                     end_date = start_date + timedelta(days=90)
-                if duration == "9 Month":
-                    end_date = start_date + timedelta(days=270)
+                if duration == "6 Month":
+                    end_date = start_date + timedelta(days=180)
                 if duration == "1 Year":
                     end_date = start_date + timedelta(days=365)
 
@@ -735,6 +740,52 @@ class SubscriptionView(APIView):
                     obj.save()
                 else:
                     obj = DataCount.objects.create(subscription=1)
+
+            if Subscription_obj is not None:
+                level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
+                calculation = (float(level_obj.commission_rate) * float(money)) / 100
+                
+                commission_obj = CommissionEarning.objects.create(user=commentator, total_amount=calculation)
+                commission_obj.save()
+
+                money_cal = money - calculation
+
+                durations = {
+                    "1 Month": 1,
+                    "3 Month": 3,
+                    "6 Month": 6,
+                    "1 Year": 12
+                }
+
+                duration_months = durations.get(duration)
+                
+                if duration_months:
+                    monthly_cal = money_cal / duration_months
+                    start_date = datetime.now().date()
+                    for i in range(duration_months):
+                        days = (i + 1) * 30
+
+                        end_date = start_date + timedelta(days=days)
+
+                        duration_label = f'{i + 1}-{duration_months}'
+                        pending_history = PendingBalanceHistory.objects.create(date=end_date, user=user, editor=commentator, duration=duration_label, amount=monthly_cal)
+                        pending_history.save()
+
+                if BankDetails.objects.filter(user=commentator).exists():
+                    level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
+                    calculation = (float(level_obj.commission_rate) * float(money)) / 100
+                    final_cal = money - calculation
+                    balance_obj = BankDetails.objects.get(user=commentator)
+                    balance_obj.total_balance += final_cal
+                    balance_obj.pending_balance += final_cal
+                    balance_obj.save()
+
+                else:
+                    level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
+                    calculation = (float(level_obj.commission_rate) * float(money)) / 100
+                    final_cal = money - calculation
+                    balance_obj = BankDetails.objects.create(user=commentator, total_balance=final_cal, pending_balance=final_cal)
+                    balance_obj.save()
 
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
@@ -5066,9 +5117,48 @@ class BankDetailsView(APIView):
         try:
             if id is not None:
                 user = get_object_or_404(User, id=id)
-                bank_details = get_object_or_404(BankDetails, user=user)
-                bank_details_serializer = BankDetailsSerializer(bank_details).data
-                return Response({'data': bank_details_serializer}, status=status.HTTP_200_OK)
+                if user.user_role == 'commentator':
+                    bank_details = get_object_or_404(BankDetails, user=user)
+                    bank_details_serializer = BankDetailsSerializer(bank_details).data
+
+                    transactions = []
+                    subscription_obj = Subscription.objects.filter(commentator_user=user)
+                    for obj in subscription_obj:
+                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"New Subscriber",
+                            "duration":obj.duration,
+                            "date":formatted_date,
+                            "amount":obj.money
+                        }
+                        transactions.append(details)
+
+                    highlight_obj = Highlight.objects.filter(user=user)
+                    for obj in highlight_obj:
+                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"Highlight",
+                            "duration":obj.duration,
+                            "date":formatted_date,
+                            "amount":obj.money
+                        }
+                        transactions.append(details)
+
+                    bank_details_serializer['Transection_history'] = transactions
+                    return Response({'data': bank_details_serializer}, status=status.HTTP_200_OK)
+                if user.user_role == 'standard':
+                    transactions = []
+                    subscription_obj = Subscription.objects.filter(standard_user=user)
+                    for obj in subscription_obj:
+                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"New Subscriber",
+                            "duration":obj.duration,
+                            "date":formatted_date,
+                            "amount":obj.money
+                        }
+                        transactions.append(details)
+                    return Response(data = transactions , status=status.HTTP_200_OK)
             else:
                 data = {}
                 queryset = BankDetails.objects.all().order_by('-created')
@@ -5235,3 +5325,46 @@ class GetFutbolAndBasketbolCountView(APIView):
             return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GetPendingBalance(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            if id is not None:
+                data_list = []
+                editor_user = get_object_or_404(User, id=id)
+                data = PendingBalanceHistory.objects.filter(editor=editor_user)
+
+                monthwise_data = defaultdict(list)
+                monthwise_amount_sum = defaultdict(float)
+
+                for record in data:
+                    if record.date:
+                        month_year = record.date.strftime("%B %Y")
+                        monthwise_data[month_year].append(record)
+                        monthwise_amount_sum[month_year] += record.amount
+
+                for month_year, records in monthwise_data.items():
+                    data = {
+                        "month_year": month_year,
+                        "total_amount": monthwise_amount_sum[month_year],
+                    }
+                    monthly_data = []
+                    for record in sorted(records, key=lambda x: x.date):
+                        details = {
+                            "date": record.date.strftime("%d.%m.%Y"),
+                            "user": record.user.username,
+                            "duration": record.duration,
+                            "amount": record.amount,
+                        }
+                        monthly_data.append(details)
+
+                    data['data'] = monthly_data
+                    data_list.append(data)
+                return Response(data=data_list, status=status.HTTP_200_OK)
+            else:
+                return Response(data={"message": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

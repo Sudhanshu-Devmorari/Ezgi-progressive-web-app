@@ -145,6 +145,8 @@ CRONJOBS = [
     # ('* */2 * * *', 'core.cron.Userst'),
     ('* * * * *', 'core.cron.subscription_reminder_cron'),
     ('0 0 * * 1', 'core.cron.weekly_comment_count_check'),
+    ('0 0 * * *', 'core.cron.withdrawable_balance_update'),
+    # ('*/1 * * * *', 'core.cron.withdrawable_balance_update'),
 ]
 LOGGING = {
     'version': 1,

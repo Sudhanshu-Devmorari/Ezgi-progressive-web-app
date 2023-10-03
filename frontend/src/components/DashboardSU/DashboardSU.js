@@ -25,7 +25,7 @@ const DashboardSU = (props) => {
   const [favSelection, setFavSelection] = useState("fav editor");
 
   useEffect(() => {
-  console.log("props.activeCommentsshow:::::::::::::", props.activeCommentsshow)
+  // console.log("props.activeCommentsshow:::::::::::::", props.activeCommentsshow)
 
     if (props.selectContent === "notifications") {
       setContent("notifications");
@@ -38,6 +38,9 @@ const DashboardSU = (props) => {
       setContent("home");
     }
   }, [props.selectContent, subcurrentpage]);
+
+  const [transactionHistory, setTransactionHistory] = useState([]);
+
 
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
@@ -73,6 +76,7 @@ const DashboardSU = (props) => {
         setContent={setContent}
         content={content}
         user={"standard user"}
+        setTransactionHistory={setTransactionHistory}
       />
       {content === "subscribers" && (
         <>
@@ -88,7 +92,7 @@ const DashboardSU = (props) => {
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } my-2 p-2`}
           >
-            <TransactionArray user={"standard user"} />
+            <TransactionArray user={"standard user"} transactionHistory={transactionHistory}/>
           </div>
         </>
       )}

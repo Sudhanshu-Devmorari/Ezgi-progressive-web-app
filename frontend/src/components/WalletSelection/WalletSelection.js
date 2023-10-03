@@ -1,8 +1,23 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
+import axios from "axios";
+import config from "../../config";
 
 const WalletSelection = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const pendingBalanceHistory = async () => {
+    const userId = localStorage.getItem("user-id");
+    try {
+      const res = await axios.get(
+        `${config?.apiUrl}/pending-balance/${userId}/`
+      );
+      if(res.status == 200){
+        props.setPendingBalance(res.data)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <div
@@ -26,7 +41,7 @@ const WalletSelection = (props) => {
                 color:
                   props.walletSelection === "pending balance" ? "#D2DB08" : "",
               }}
-              onClick={() => props.setWalletSelection("pending balance")}
+              onClick={() => {props.setWalletSelection("pending balance"); pendingBalanceHistory()}}
             >
               Pending Balance
             </div>

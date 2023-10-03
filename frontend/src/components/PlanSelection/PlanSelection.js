@@ -78,6 +78,33 @@ function PlanSelection(props) {
             </>
           ) : (
             <>
+              {renderPlan(
+                "1 Month",
+                `${subscriptionPlan?.month_1}₺`,
+                null,
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "3 Month",
+                `${subscriptionPlan?.month_3}₺`,
+                "%20 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "6 Month",
+                `${subscriptionPlan?.month_6}₺`,
+                "%30 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              {renderPlan(
+                "1 Year",
+                `${subscriptionPlan?.year_1}₺`,
+                "%40 Save!",
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+              
+              
+            {/* <>
             {commentatorUser.commentator_level == 'journeyman' ? 
             <>
             {renderPlan(
@@ -121,7 +148,7 @@ function PlanSelection(props) {
               )}
               </>
               }
-            </>
+            </> */}</>
           )}
         </>
       )}

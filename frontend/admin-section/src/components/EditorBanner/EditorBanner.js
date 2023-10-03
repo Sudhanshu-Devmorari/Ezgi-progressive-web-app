@@ -52,7 +52,7 @@ const EditorBanner = () => {
           `${config.apiUrl}/editor-banner/`,
           formData
         );
-        console.log(res);
+        // console.log(res);
         if (res?.status === 200) {
           Swal.fire({
             title: "Success",

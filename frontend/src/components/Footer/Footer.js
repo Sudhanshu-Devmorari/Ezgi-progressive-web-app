@@ -27,7 +27,7 @@ export const Footer = (props) => {
             <img
               onContextMenu={(e) => e.preventDefault()}
               onClick={() => {
-                console.log("click event fire", userId);
+                // console.log("click event fire", userId);
 
                 localStorage.setItem("dashboardShow", false);
                 localStorage.setItem("currentpage", "home");

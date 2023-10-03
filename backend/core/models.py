@@ -390,8 +390,8 @@ BANK_UPDATE_CHOISE = (
     )
 class BankDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bank_iban = models.CharField(unique=True)
-    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE, null=True, blank=True)
+    bank_iban = models.CharField(unique=True, null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE,default="", null=True, blank=True)
     total_balance = models.FloatField(null=True, blank=True)
     pending_balance = models.FloatField(null=True, blank=True)
     withdrawable_balance = models.FloatField(null=True, blank=True)
@@ -400,5 +400,21 @@ class BankDetails(models.Model):
 
 class EditorBanner(models.Model):
     editor_banner = models.ImageField(upload_to='Editor_banner', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+class PendingBalanceHistory(models.Model):
+    date = models.DateField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="user")
+    editor = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="editor")
+    duration = models.CharField(max_length=100, null=True, blank=True)
+    amount = models.FloatField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class CommissionEarning(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    total_amount = models.FloatField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -76,7 +76,7 @@ const PromoteMeModal = (props) => {
           amount: money,
           id: userId,
         });
-        console.log(res, "=====<<<<MMMMMMMMM");
+        // console.log(res, "=====<<<<MMMMMMMMM");
         if (res?.status === 200) {
           setIsLoading(false);
           props.onHide();
