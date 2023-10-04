@@ -4829,6 +4829,9 @@ class RetrievePageData():
                         )
 
                         comment_data['commentator_user']['is_subscribed'] = True
+
+                        # is_subscribe = Subscription.objects.filter(standard_user=id, commentator_user=comment.commentator_user, status='active').exists()
+                        # comment_data['is_subscribe'] = is_subscribe
                         
                         # Update comment data
                         comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
