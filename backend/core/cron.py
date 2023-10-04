@@ -98,6 +98,7 @@ def Userst():
         all_user = User.objects.filter(user_role='commentator')
         for individual in all_user:
             user = User.objects.get(id=individual.id)
+            logger.info("cron starttttttttt: %s", 'cron starttttt')
             logger.info("Processing user: %s", user.username)
 
             if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
@@ -105,40 +106,41 @@ def Userst():
             data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
             logger.info("Processing Comment data: %s", data)
 
-            correct_prediction = data.filter(is_prediction=True)
-            incorrect_prediction = data.filter(is_prediction=False)
-            Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+            # correct_prediction = data.filter(is_prediction=True)
+            # incorrect_prediction = data.filter(is_prediction=False)
+            # Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
 
-            Success_rate = round((len(correct_prediction)/len(data))*100, 2)
-            user.success_rate = Success_rate
-            user.score_points = Score_point
+            # total_predictions = len(correct_prediction) + len(incorrect_prediction)
+            # Success_rate = round((len(correct_prediction)/total_predictions)*100, 2)
+            # user.success_rate = Success_rate
+            # user.score_points = Score_point
 
-            level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            # level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
             
-            if level.winning_limit < correct_prediction.count():
-                if int(level.sucess_rate) < Success_rate :
+            # if level.winning_limit < correct_prediction.count():
+            #     if int(level.sucess_rate) < Success_rate :
 
-                    if user.commentator_level == 'apprentice':
-                        user.commentator_level = "journeyman"
-                        user.save()
+            #         if user.commentator_level == 'apprentice':
+            #             user.commentator_level = "journeyman"
+            #             user.save()
 
-                    elif user.commentator_level == 'journeyman':
-                        user.commentator_level = "master"
-                        user.save()
+            #         elif user.commentator_level == 'journeyman':
+            #             user.commentator_level = "master"
+            #             user.save()
 
-                    elif user.commentator_level == 'master':
-                        user.commentator_level = "grandmaster"
-                        user.save()
+            #         elif user.commentator_level == 'master':
+            #             user.commentator_level = "grandmaster"
+            #             user.save()
  
-            if 0 < Success_rate < 60:
-                user.commentator_level = "apprentice"
-            if 60 < Success_rate< 65:
-                user.commentator_level = "journeyman"
-            if 65 < Success_rate < 70:
-                user.commentator_level = "master"
-            if 70 < Success_rate < 100:
-                user.commentator_level = "grandmaster"
-            user.save()
+            # if 0 < Success_rate < 60:
+            #     user.commentator_level = "apprentice"
+            # if 60 < Success_rate< 65:
+            #     user.commentator_level = "journeyman"
+            # if 65 < Success_rate < 70:
+            #     user.commentator_level = "master"
+            # if 70 < Success_rate < 100:
+            #     user.commentator_level = "grandmaster"
+            # user.save()
 
             for i in data:
                 logger.info("i.category[0] : %s", i.category[0])
@@ -186,6 +188,7 @@ def Userst():
                                     team_2 = value['value']
 
                             i.match_score = f'{team_1} - {team_2}'
+                            logger.info("match_score: %s" % i.match_score)
 
                             i.save(update_fields=['match_score', 'updated'])
                             
@@ -203,12 +206,6 @@ def Userst():
                                 for obj in bettableResult:
 
                                     if obj['gameName'] == i.prediction_type:
-                                        # if obj['game_result'][0]['value'] == i.prediction:
-                                        #     i.is_prediction = True
-                                        #     i.save()
-                                        # else:
-                                        #     i.is_prediction = False
-                                        #     i.save()
                                         for obj_data in obj['game_result']:
                                             if obj_data['value'] == i.prediction:
                                                 i.is_prediction = True
@@ -218,11 +215,11 @@ def Userst():
                                                 i.is_prediction = False
                                                 i.save()
 
-                                HomeWin = float(match['HomeWin'])
-                                Draw = float(match['Draw'])
-                                AwayWin = float(match['AwayWin'])
-                                GoalUnder = float(match['Under25'])
-                                GoalOver = float(match['Over25'])
+                                HomeWin = float(match['HomeWin']) if match['HomeWin'] is not None else 0.0
+                                Draw = float(match['Draw'])  if match['Draw'] is not None else 0.0
+                                AwayWin = float(match['AwayWin']) if match['AwayWin'] is not None else 0.0
+                                GoalUnder = float(match['Under25']) if match['Under25'] is not None else 0.0
+                                GoalOver = float(match['Over25']) if match['Over25'] is not None else 0.0
                                 avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
                                 
                                 i.average_odds =round(avg, 2)
@@ -231,6 +228,42 @@ def Userst():
                                 if match['LiveStatus'] != 0:
                                     i.is_resolve = True
                                     i.save()
+
+            correct_prediction = data.filter(is_prediction=True)
+            incorrect_prediction = data.filter(is_prediction=False)
+            Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+            total_predictions = len(correct_prediction) + len(incorrect_prediction)
+            Success_rate = round((len(correct_prediction)/total_predictions)*100, 2)
+            user.success_rate = Success_rate
+            user.score_points = Score_point
+
+            level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            
+            if level.winning_limit < correct_prediction.count():
+                if int(level.sucess_rate) < Success_rate :
+
+                    if user.commentator_level == 'apprentice':
+                        user.commentator_level = "journeyman"
+                        user.save()
+
+                    elif user.commentator_level == 'journeyman':
+                        user.commentator_level = "master"
+                        user.save()
+
+                    elif user.commentator_level == 'master':
+                        user.commentator_level = "grandmaster"
+                        user.save()
+ 
+            if 0 < Success_rate < 60:
+                user.commentator_level = "apprentice"
+            if 60 < Success_rate< 65:
+                user.commentator_level = "journeyman"
+            if 65 < Success_rate < 70:
+                user.commentator_level = "master"
+            if 70 < Success_rate < 100:
+                user.commentator_level = "grandmaster"
+            user.save()
     except Exception as e:
         logger.error('\n Error occurred in comment prediction check cron: %s', str(e))
 

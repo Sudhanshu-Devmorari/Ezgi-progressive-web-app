@@ -9,16 +9,13 @@ function PlanSelection(props) {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const { subscriptionPlan, renewPlan, commentatorUser } = props;
-  // console.log("commentatorUser------", commentatorUser.commentator_level)
-  // console.log(renewPlan, "==>>>renewPlan");
 
   const handlePlanClick = (plan) => {
-    // console.log("=============plan", plan)
     props?.setSelectedPlan(plan);
   };
 
   const isPlanSelected = (plan) => {
-    return props?.selectedPlan === plan;
+    return props?.text === "renew" ? `${props?.selectedPlan} Month` === plan : `${props?.selectedPlan}` === plan
   };
 
   const renderPlan = (plan, price, discountText, backgroundColor) => (
@@ -70,7 +67,7 @@ function PlanSelection(props) {
           {props?.text === "renew" ? (
             <>
               {renderPlan(
-                `${renewPlan?.promotion_duration}`,
+                `${renewPlan?.promotion_duration} Month`,
                 `${renewPlan?.plan_price}₺`,
                 null,
                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
@@ -102,9 +99,8 @@ function PlanSelection(props) {
                 "%40 Save!",
                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
               )}
-              
-              
-            {/* <>
+
+              {/* <>
             {commentatorUser.commentator_level == 'journeyman' ? 
             <>
             {renderPlan(
@@ -148,7 +144,8 @@ function PlanSelection(props) {
               )}
               </>
               }
-            </> */}</>
+            </> */}
+            </>
           )}
         </>
       )}

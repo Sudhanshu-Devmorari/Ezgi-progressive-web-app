@@ -59,6 +59,7 @@ class User(AbstractBaseUser):
     department = models.CharField(max_length=100,null=True, blank=True)
     experience = models.CharField(max_length=20, choices=Experience, null=True, blank=True)
     membership_date = models.DateField(default=date.today)
+    membership_end_date = models.DateField(null=True, blank=True)
     success_rate = models.FloatField(null=True, blank=True)
     score_points = models.IntegerField(null=True, blank=True)
     is_transaction = models.BooleanField(default=False)
@@ -390,7 +391,7 @@ BANK_UPDATE_CHOISE = (
     )
 class BankDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bank_iban = models.CharField(unique=True, null=True, blank=True)
+    bank_iban = models.CharField(null=True, blank=True)
     status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE,default="", null=True, blank=True)
     total_balance = models.FloatField(null=True, blank=True)
     pending_balance = models.FloatField(null=True, blank=True)

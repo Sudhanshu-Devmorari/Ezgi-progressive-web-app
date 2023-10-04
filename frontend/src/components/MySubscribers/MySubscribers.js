@@ -30,21 +30,29 @@ const MySubscribers = (props) => {
   ];
 
   // Subscription API
-  const [subscriptiosData, setSubscriptiosData] = useState([]);
+  const [mySubscribers, setMySubscribers] = useState([]);
+  const [mySubscriptions, setMySubscriptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     async function getSubscriptions() {
+      setIsLoading(true);
       try {
         const res = await axios.get(
           `${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`
         );
-        // console.log("res", res.data);
-        setSubscriptiosData(res.data.data);
+        if (res?.status === 200) {
+          setMySubscribers(res?.data?.subscribers);
+          setMySubscriptions(res?.data?.subscription);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.log(error);
       }
     }
     getSubscriptions();
   }, []);
+
+  console.log(props?.profileData,"=======>>profileData")
 
   return (
     <>
@@ -55,147 +63,193 @@ const MySubscribers = (props) => {
       >
         {props.user === "commentator" && (
           <>
-            {props?.subscribersOrSubscriptions === "My subscribers" && (
+            {props?.subscribersOrSubscriptions === "My subscribers" && props?.profileData?.commentator_level != "apprentice" && (
               <>
-                {subscribers.map((sub, index) => (
-                  <div
-                    className="p-1 d-flex justify-content-between align-items-center mb-2"
-                    style={{
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    }}
-                  >
-                    <div className="">
-                      <img
-                        onContextMenu={(e) => e.preventDefault()}
-                        src={profile}
-                        alt=""
-                        height={35}
-                        width={35}
-                      />
-                      <span className="ps-1">{sub.name}</span>
-                    </div>
-                    <div className="">
-                      <span>3 Ay</span>
-                      <span className="px-2">22.04.2023 - 16:41</span>
-                      <button
-                        className="px-2 me-2"
-                        style={{
-                          color:
-                            currentTheme === "dark"
-                              ? sub.status === "Active"
-                                ? "#37FF80"
-                                : sub.status === "Pending"
-                                ? "#4DD5FF"
-                                : sub.status === "Ended"
-                                ? "#FF5757"
-                                : "#007BFC"
-                              : sub.status === "Active"
-                              ? "#00DE51"
-                              : sub.status === "Pending"
-                              ? "#007BFC"
-                              : sub.status === "Ended"
-                              ? "#FF5757"
-                              : "#007BFC",
-                          backgroundColor:
-                            currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #0D2A53"
-                              : "1px solid #FFFFFF",
-                          borderRadius: "3px",
-                          width: "4.4rem",
-                        }}
-                      >
-                        {sub.status}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                {isLoading ? (
+                  <div className="text-center mt-3">Loading...</div>
+                ) : (
+                  <>
+                    {mySubscribers?.length == 0 ? (
+                      <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                        No Record Found!
+                      </div>
+                    ) : (
+                      <>
+                        {mySubscribers?.map((sub, index) => (
+                          <div
+                            className="p-1 d-flex justify-content-between align-items-center mb-2"
+                            style={{
+                              backgroundColor:
+                                currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                            }}
+                          >
+                            <div className="">
+                              <img
+                                onContextMenu={(e) => e.preventDefault()}
+                                src={profile}
+                                alt=""
+                                height={35}
+                                width={35}
+                              />
+                              <span className="ps-1">{sub.name}</span>
+                            </div>
+                            <div className="">
+                              <span>3 Ay</span>
+                              <span className="px-2">22.04.2023 - 16:41</span>
+                              <button
+                                className="px-2 me-2"
+                                style={{
+                                  color:
+                                    currentTheme === "dark"
+                                      ? sub.status === "Active"
+                                        ? "#37FF80"
+                                        : sub.status === "Pending"
+                                        ? "#4DD5FF"
+                                        : sub.status === "Ended"
+                                        ? "#FF5757"
+                                        : "#007BFC"
+                                      : sub.status === "Active"
+                                      ? "#00DE51"
+                                      : sub.status === "Pending"
+                                      ? "#007BFC"
+                                      : sub.status === "Ended"
+                                      ? "#FF5757"
+                                      : "#007BFC",
+                                  backgroundColor:
+                                    currentTheme === "dark"
+                                      ? "#0D2A53"
+                                      : "#FFFFFF",
+                                  border:
+                                    currentTheme === "dark"
+                                      ? "1px solid #0D2A53"
+                                      : "1px solid #FFFFFF",
+                                  borderRadius: "3px",
+                                  width: "4.4rem",
+                                }}
+                              >
+                                {sub.status}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </>
+                )}
               </>
             )}
             {props?.subscribersOrSubscriptions === "My subscriptions" && (
               <>
-                {subscriptions.map((sub, index) => (
-                  <div
-                    className="p-1 d-flex justify-content-between align-items-center mb-2"
-                    style={{
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                    }}
-                  >
-                    <div className="">
-                      <div className="position-relative">
-                        <img
-                          onContextMenu={(e) => e.preventDefault()}
-                          style={{
-                            position: "absolute",
-                            background:
-                              currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                            borderRadius: "50%",
-                            left: "1.5rem",
-                          }}
-                          src={crown}
-                          alt=""
-                          height={13}
-                          width={13}
-                        />
+                {isLoading ? (
+                  <div className="text-center mt-3">Loading...</div>
+                ) : (
+                  <>
+                    {mySubscriptions?.length == 0 ? (
+                      <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                        No Record Found!
                       </div>
-                      <img
-                        onContextMenu={(e) => e.preventDefault()}
-                        src={profile}
-                        alt=""
-                        height={38}
-                        width={38}
-                      />
-                      <span className="ps-1">{sub.name}</span>
-                    </div>
-                    <div className="">
-                      <span>3 Ay</span>
-                      <span className="px-2">22.04.2023 - 16:41</span>
-                      <button
-                        onClick={() => {
-                          sub.status === "Renew" && setRenewModalShow(true);
-                        }}
-                        className="px-3 me-2 button-status"
-                        style={{
-                          color:
-                            currentTheme === "dark"
-                              ? sub.status === "Pending"
-                                ? "#FFCC00"
-                                : sub.status === "Active"
-                                ? "#37FF80"
-                                : sub.status === "Renew"
-                                ? "#4DD5FF"
-                                : ""
-                              : sub.status === "Pending"
-                              ? "#FFCC00"
-                              : sub.status === "Renew"
-                              ? "#00659D"
-                              : sub.status === "Active"
-                              ? "#00DE51"
-                              : "",
-                          backgroundColor:
-                            currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #0D2A53"
-                              : "1px solid #FFFFFF",
-                          borderRadius: "3px",
-                        }}
-                      >
-                        {sub.status}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    ) : (
+                      <>
+                        {mySubscriptions?.map((res, index) => (
+                          <div
+                            className="p-1 d-flex justify-content-between align-items-center mb-2"
+                            style={{
+                              backgroundColor:
+                                currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                            }}
+                          >
+                            <div className="">
+                              <div className="position-relative">
+                                <img
+                                  onContextMenu={(e) => e.preventDefault()}
+                                  style={{
+                                    position: "absolute",
+                                    background:
+                                      currentTheme === "dark"
+                                        ? "#0D2A53"
+                                        : "#FFFFFF",
+                                    borderRadius: "50%",
+                                    left: "1.5rem",
+                                  }}
+                                  src={crown}
+                                  alt=""
+                                  height={13}
+                                  width={13}
+                                />
+                              </div>
+                              <img
+                                style={{
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                                onContextMenu={(e) => e.preventDefault()}
+                                src={
+                                  res?.commentator_user?.profile_pic
+                                    ? `${config.apiUrl}${res?.commentator_user?.profile_pic}`
+                                    : profile
+                                }
+                                alt=""
+                                height={38}
+                                width={38}
+                              />
+                              <span className="ps-1">
+                                {res?.commentator_user?.username}
+                              </span>
+                            </div>
+                            <div className="">
+                              <span>{res?.duration}</span>
+                              {/* <span>3 Ay</span> */}
+                              <span className="px-2">{res?.start_date}</span>
+                              <button
+                                // onClick={() => {
+                                //   res.status === "Renew" &&
+                                //     setRenewModalShow(true);
+                                // }}
+                                className="px-3 me-2 button-status text-capitalize"
+                                style={{
+                                  color:
+                                    currentTheme === "dark"
+                                      ? res?.status === "pending"
+                                        ? "#FFCC00"
+                                        : res?.status === "active"
+                                        ? "#37FF80"
+                                        : res?.status === "renew"
+                                        ? "#4DD5FF"
+                                        : ""
+                                      : res?.status === "pending"
+                                      ? "#FFCC00"
+                                      : res?.status === "renew"
+                                      ? "#00659D"
+                                      : res?.status === "active"
+                                      ? "#00DE51"
+                                      : "",
+                                  backgroundColor:
+                                    currentTheme === "dark"
+                                      ? "#0D2A53"
+                                      : "#FFFFFF",
+                                  border:
+                                    currentTheme === "dark"
+                                      ? "1px solid #0D2A53"
+                                      : "1px solid #FFFFFF",
+                                  borderRadius: "3px",
+                                }}
+                              >
+                                {res?.status}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </>
+                )}
               </>
             )}
           </>
         )}
         {props.user === "standard user" && (
           <>
-            {subscriptiosData?.map((sub, index) => (
+            {mySubscribers?.map((sub, index) => (
               <div
                 key={index}
                 className="p-1 d-flex justify-content-between align-items-center my-2"

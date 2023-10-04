@@ -12,9 +12,15 @@ const SalesMembershipSettings = (props) => {
     plan_price: Yup.number()
       .required("Plan Price is required")
       .positive("Plan Price must be a positive number"),
-    commission_rate: Yup.string().required("Commission Rate is required"),
-    promotion_rate: Yup.string().required("Promotion Rate is required"),
-    promotion_duration: Yup.string().required("Promotion Duration is required"),
+    commission_rate: Yup.string()
+      .required("Commission Rate is required")
+      .matches(/^\d+$/, "Promotion Rate must be a valid number"),
+    promotion_rate: Yup.string()
+      .required("Promotion Rate is required")
+      .matches(/^\d+$/, "Promotion Rate must be a valid number"),
+    promotion_duration: Yup.string()
+      .required("Promotion Duration is required")
+      .matches(/^\d+$/, "Promotion Rate must be a valid number"),
   });
   const initialValues = {
     plan_price: "",
@@ -115,7 +121,7 @@ const SalesMembershipSettings = (props) => {
             </div>
             <div className="col-2">
               <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Commision Rate</span>
+                <span className="p-1 ps-0">Commision Rate <small>(%)</small></span>
                 <input
                   onChange={formik.handleChange}
                   type="text"
@@ -132,7 +138,7 @@ const SalesMembershipSettings = (props) => {
             </div>
             <div className="col-2">
               <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Promotion Rate</span>
+                <span className="p-1 ps-0">Promotion Rate <small>(%)</small></span>
                 <input
                   onChange={formik.handleChange}
                   type="text"
@@ -149,7 +155,9 @@ const SalesMembershipSettings = (props) => {
             </div>
             <div className="col-2">
               <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Promotion Duration</span>
+                <span className="p-1 ps-0">
+                  Promotion Duration <small>(Months)</small>
+                </span>
                 <input
                   onChange={formik.handleChange}
                   type="text"

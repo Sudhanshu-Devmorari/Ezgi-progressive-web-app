@@ -204,7 +204,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      %{commentatorUser?.success_rate}
+                      %{commentatorUser?.success_rate || 0}
                     </div>
                     <div className="">
                       <span
@@ -225,7 +225,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      {commentatorUser?.win}
+                      {commentatorUser?.win || 0}
                     </div>
                   </div>
                   <div className="col gap-1 d-flex justify-content-center flex-column text-center px-0">
@@ -252,7 +252,9 @@ const SubscribeModal = (props) => {
                         src={
                           commentatorUser?.profile_pic
                             ? `${config.apiUrl}${commentatorUser.profile_pic}`
-                            : preveiwProfilePic ? preveiwProfilePic : profile
+                            : preveiwProfilePic
+                            ? preveiwProfilePic
+                            : profile
                         }
                         width={105}
                         height={105}
@@ -313,7 +315,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      {commentatorUser?.score_points}
+                      {commentatorUser?.score_points || 0}
                     </div>
                     <div className="">
                       <span
@@ -334,7 +336,7 @@ const SubscribeModal = (props) => {
                         fontSize: "1.3rem",
                       }}
                     >
-                      {commentatorUser?.lose}
+                      {commentatorUser?.lose || 0}
                     </div>
                   </div>
                 </div>
@@ -428,7 +430,7 @@ const SubscribeModal = (props) => {
                       <button
                         onClick={() =>
                           props.text == "renew"
-                            ? handleMambership()
+                            ? handleMambership(renewPlan?.promotion_duration, renewPlan?.plan_price)
                             : handleSubscription()
                         }
                         style={{ fontSize: "14px" }}

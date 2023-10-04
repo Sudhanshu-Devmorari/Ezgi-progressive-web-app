@@ -57,7 +57,8 @@ const BecomeAEditorModal = (props) => {
   const [file, setFile] = useState(null);
 
   useEffect(() => {
-    profileData?.profile_pic && setPreveiwProfilePic(`${config.apiUrl}${profileData.profile_pic}`);
+    profileData?.profile_pic &&
+      setPreveiwProfilePic(`${config.apiUrl}${profileData.profile_pic}`);
   }, [profileData]);
 
   const formData = new FormData();
@@ -190,7 +191,6 @@ const BecomeAEditorModal = (props) => {
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
-      console.log(res,"=>>>>renew res")
       setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
         setRenewLoading(false);
@@ -203,13 +203,17 @@ const BecomeAEditorModal = (props) => {
     userId && getUserdata();
   }, [userId]);
 
-  const handleMambership = async () => {
+  const handleMambership = async (promotion, plan_price) => {
+    console.log(promotion, 'promotion')
+    console.log(plan_price, 'plan_price')
     if (preveiwProfilePic) {
       setIsLoading(true);
       const splitdata = selectedKategori.split(", ");
       formData.append("category", splitdata);
       formData.append("experience", selectedDeneyim);
       file && formData.append("profile_pic", file);
+      formData.append("promotion_duration", promotion);
+      formData.append("plan_price", plan_price);
       axios
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then(async (res) => {
@@ -550,6 +554,7 @@ const BecomeAEditorModal = (props) => {
       </Modal>
 
       <SubscribeModal
+        formData={formData}
         show={showPaymentModal}
         onHide={() => setShowPaymentModal(false)}
         commentatorUser={commentatorUser}

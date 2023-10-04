@@ -6,7 +6,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          GetPendingBalance,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
-                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
+                         GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView, TestCronView)
 
 
 from core.views import (AdminMainPage, UserManagement, FilterUserManagement, CommentsManagement, FilterComments, EditorManagement, EditorSubscriptionDetails,
@@ -108,4 +108,5 @@ urlpatterns = [
     path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
     path('editor-banner/', EditorBannerView.as_view(), name='Editor-banner'),
     path('futbol-basketbol-count/', GetFutbolAndBasketbolCountView.as_view(), name='futbol-basketbol-count'),
+    path('test-cron/', TestCronView.as_view(), name='test-cron'),
 ]

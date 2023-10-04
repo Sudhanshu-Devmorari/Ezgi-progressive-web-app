@@ -86,7 +86,6 @@ const MainPage = () => {
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        console.log(res?.data?.Subscription_Comments,"========>>>res?.data?.Subscription_Comments")
         setPublicComments(
           res?.data?.Public_Comments.sort(
             (a, b) => moment(b.created).unix() - moment(a.created).unix()

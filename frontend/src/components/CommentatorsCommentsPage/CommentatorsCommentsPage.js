@@ -96,7 +96,9 @@ const CommentatorsCommentsPage = (props) => {
     setCommentLoading(true);
     try {
       const res = await axios
-        .get(`${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`)
+        .get(
+          `${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`
+        )
         .then((res) => {
           if (res.status == 204) {
             localStorage.clear();
@@ -202,8 +204,10 @@ const CommentatorsCommentsPage = (props) => {
                 setSubscribersOrSubscriptions={setSubscribersOrSubscriptions}
                 subscribersOrSubscriptions={subscribersOrSubscriptions}
                 user={"commentator"}
+                profileData={profileData}
               />
               <MySubscribers
+                profileData={profileData}
                 subscribersOrSubscriptions={subscribersOrSubscriptions}
                 user={"commentator"}
               />
@@ -218,7 +222,9 @@ const CommentatorsCommentsPage = (props) => {
                 user={"commentator"}
               />
               {walletSelection === "My transactions" && <Transactions />}
-              {walletSelection === "pending balance" && <PendingBalance pendingBalance={pendingBalance}/>}
+              {walletSelection === "pending balance" && (
+                <PendingBalance pendingBalance={pendingBalance} />
+              )}
               {walletSelection === "account status" && (
                 <AccountStatus membershipDate={props.membershipDate} />
               )}

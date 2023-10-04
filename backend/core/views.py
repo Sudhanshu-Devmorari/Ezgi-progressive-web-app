@@ -952,7 +952,6 @@ class CommentReactionView(APIView):
                              'new_total_clap': total_reactions['total_clap'] or 0,
                              'status': status.HTTP_200_OK, 'data': data})
    
-from PIL import Image
 class ProfileView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -1452,36 +1451,25 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
-        # user = request.user
+        print('==get')
         user = User.objects.get(id=id)
         if user.is_delete == True:
             return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         data_list = {}
-        subscribers = []
-        subscription = []
         try:
             if user.user_role == 'commentator':
-                if Subscription.objects.filter(commentator_user=user).exists():
-                    my_subscribers = Subscription.objects.filter(commentator_user=user)
-                    # for obj in my_subscribers:
-                    #     subscribers.append(obj.standard_user)
-                    serializer = SubscriptionSerializer(my_subscribers, many=True)
-                    data_list['subscribers'] = serializer.data 
+                my_subscribers = Subscription.objects.filter(commentator_user=user)
+                serializer = SubscriptionSerializer(my_subscribers, many=True)
+                data_list['subscribers'] = serializer.data 
 
-                if Subscription.objects.filter(standard_user=user).exists():
-                    my_subscription = Subscription.objects.filter(standard_user=user, commentator_user__user_role='standard')
-                    # for obj in my_subscription:
-                    #     subscription.append(obj.commentator_user)
-                    serializer1 = SubscriptionSerializer(my_subscription, many=True)
-                    data_list['subscription'] = serializer1.data
+                my_subscription = Subscription.objects.filter(standard_user=user)
+                serializer1 = SubscriptionSerializer(my_subscription, many=True)
+                data_list['subscription'] = serializer1.data
             else:
-                if Subscription.objects.filter(standard_user=user).exists():
-                    my_subscription = Subscription.objects.filter(standard_user=user)
-                    # for obj in my_subscription:
-                    #     subscription.append(obj.commentator_user)
-                    serializer = SubscriptionSerializer(my_subscription, many=True)
-                    data_list['subscription'] = serializer.data
-                   
+                my_subscription = Subscription.objects.filter(standard_user=user)
+                serializer = SubscriptionSerializer(my_subscription, many=True)
+                data_list['subscription'] = serializer.data
+                    
             return Response(data=data_list, status=status.HTTP_200_OK) 
              
         except ObjectDoesNotExist as e:
@@ -4616,6 +4604,7 @@ class BecomeEditorView(APIView):
 
             if user.user_role == "standard":
                 # Get data
+                print('request.data: ', request.data)
                 data = dict(request.data)
                 category_data = request.data.get('category', '').split(',')
 
@@ -4630,6 +4619,14 @@ class BecomeEditorView(APIView):
                 data['category'] = category_data  
                 data['experience'] = request.data.get('experience', None)
                 data["commentator_status"] = "active"
+
+                # update or add membership date
+                membership_start_date = request.data.get('promotion_duration', None)
+                start_date = datetime.now()
+                days = int(membership_start_date) * 30
+                membership_end_date = start_date + timedelta(days=days)
+                data["membership_date"] = start_date.date()
+                data["membership_end_date"] = membership_end_date.date()
                 
                 # Update
                 serializer = UserSerializer(user, data=data, partial=True)
@@ -5371,3 +5368,267 @@ class GetPendingBalance(APIView):
             return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# def Userst():
+
+#     data = Comments.objects.filter(id=55)
+
+
+#     for i in data:
+#         if (i.category[0].lower()) == 'futbol':
+#             url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={i.league}&date={i.date}"
+#         else:
+#             url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={i.league}&date={i.date}"
+
+#         headers = {
+#             "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+#         }
+#         response = requests.get(url, headers=headers)
+#         json_data = response.json()
+#         match_data_list = json_data["data"]
+        
+#         if len(match_data_list) <= 0:
+#             continue
+        
+#         for match in match_data_list:
+#             if match['LiveStatus'] != 0:
+#                 teams = match.get("Teams")
+
+#                 if teams == i.match_detail:
+
+#                     matchID = match.get("MatchID")
+#                     print('matchID: ', matchID)
+
+#                     # Save match score 
+#                     match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
+
+#                     get_match_score = requests.get(match_score_url, headers=headers)
+#                     matchScore_data = get_match_score.json()
+#                     matchScore_data_list = matchScore_data["data"]
+
+#                     team_1 = 0
+#                     team_2 = 0
+#                     for value in matchScore_data_list[0]['matchResult']:
+#                         print('value: ', value)
+#                         if value['metaName'] == 'msHomeScore':                                    
+#                             team_1 = value['value']
+#                         elif value['metaName'] == 'msAwayScore':                                    
+#                             team_2 = value['value']
+
+#                     i.match_score = f'{team_1} - {team_2}'
+#                     print()
+#                     print()
+#                     print()
+#                     print()
+#                     print(f'{team_1} - {team_2}')
+#                     print()
+#                     print()
+#                     print()
+#                     print()
+
+#                     # i.save(update_fields=['match_score', 'updated'])
+                    
+#                     matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
+
+#                     data = requests.get(matchid_url, headers=headers)
+#                     matchID_data = data.json()
+#                     matchID_data_list = matchID_data["data"]
+
+#                     for match in matchID_data_list:
+
+#                         bettableResult = match.get("bettableResult")
+
+#                         for obj in bettableResult:
+
+#                             if obj['gameName'] == i.prediction_type:
+#                                 # if obj['game_result'][0]['value'] == i.prediction:
+#                                 #     i.is_prediction = True
+#                                 #     i.save()
+#                                 # else:
+#                                 #     i.is_prediction = False
+#                                 #     i.save()
+#                                 for obj_data in obj['game_result']:
+#                                     if obj_data['value'] == i.prediction:
+#                                         i.is_prediction = True
+#                                         # i.save()
+#                                         break
+#                                     else:
+#                                         i.is_prediction = False
+#                                         # i.save()
+
+#                         HomeWin = float(match['HomeWin'])
+#                         Draw = float(match['Draw'])
+#                         AwayWin = float(match['AwayWin'])
+#                         GoalUnder = float(match['Under25'])
+#                         GoalOver = float(match['Over25'])
+#                         avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                        
+#                         i.average_odds =round(avg, 2)
+#                         # i.save()
+
+#                         if match['LiveStatus'] != 0:
+#                             i.is_resolve = True
+#                             # i.save()
+
+# Userst()
+
+from core.cron import Userst
+class TestCronView(APIView):
+    def get(self, request, *args, **kwargs):
+        Userst()
+        # all_user = User.objects.filter(user_role='commentator')
+        # for individual in all_user:
+        #     user = User.objects.get(id=individual.id)
+        #     print("cron starttttttttt: %s", 'cron starttttt')
+        #     print("Processing user: %s", user.username)
+
+        #     if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
+        #         continue
+        #     data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
+        #     print("Processing Comment data: %s", data)
+
+            
+
+        #     for i in data:
+        #         print('data: ', data)
+        #         print("i.category[0] : %s", i.category[0])
+        #         if (i.category[0].lower()) == 'futbol':
+        #             url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={i.league}&date={i.date}"
+        #             print("url : %s", url)
+        #         else:
+        #             url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={i.league}&date={i.date}"
+        #             print("url : %s", url)
+
+        #         headers = {
+        #             "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+        #         }
+        #         response = requests.get(url, headers=headers)
+        #         json_data = response.json()
+        #         match_data_list = json_data["data"]
+        #         print("match_data_list : %s", match_data_list)
+                
+        #         if len(match_data_list) <= 0:
+        #             continue
+                
+        #         # print('match_data_list: ', match_data_list)
+        #         print()
+        #         print()
+        #         print()
+        #         print()
+        #         for match in match_data_list:
+        #             print('match: ', match)
+        #             print("LiveStatus : %s", match['LiveStatus'])
+        #             if match['LiveStatus'] != 0:
+        #                 teams = match.get("Teams")
+
+        #                 if teams == i.match_detail:
+
+        #                     matchID = match.get("MatchID")
+        #                     print("matchID : %s", matchID)
+
+        #                     # Save match score 
+        #                     match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
+
+        #                     get_match_score = requests.get(match_score_url, headers=headers)
+        #                     matchScore_data = get_match_score.json()
+        #                     matchScore_data_list = matchScore_data["data"]
+
+        #                     team_1 = 0
+        #                     team_2 = 0
+        #                     for value in matchScore_data_list[0]['matchResult']:
+        #                         if value['metaName'] == 'msHomeScore':                                    
+        #                             team_1 = value['value']
+        #                         elif value['metaName'] == 'msAwayScore':                                    
+        #                             team_2 = value['value']
+
+        #                     i.match_score = f'{team_1} - {team_2}'
+        #                     print("match_score: %s" % i.match_score)
+
+        #                     i.save(update_fields=['match_score', 'updated'])
+                            
+        #                     matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
+
+        #                     data = requests.get(matchid_url, headers=headers)
+        #                     matchID_data = data.json()
+        #                     matchID_data_list = matchID_data["data"]
+        #                     print("matchID_data_list : %s", matchID_data_list)
+
+        #                     for match in matchID_data_list:
+
+        #                         bettableResult = match.get("bettableResult")
+
+        #                         for obj in bettableResult:
+
+        #                             if obj['gameName'] == i.prediction_type:
+        #                                 # if obj['game_result'][0]['value'] == i.prediction:
+        #                                 #     i.is_prediction = True
+        #                                 #     i.save()
+        #                                 # else:
+        #                                 #     i.is_prediction = False
+        #                                 #     i.save()
+        #                                 for obj_data in obj['game_result']:
+        #                                     if obj_data['value'] == i.prediction:
+        #                                         i.is_prediction = True
+        #                                         i.save()
+        #                                         break
+        #                                     else:
+        #                                         i.is_prediction = False
+        #                                         i.save()
+                                        
+
+
+        #                         HomeWin = float(match['HomeWin']) if match['HomeWin'] is not None else 0.0
+        #                         Draw = float(match['Draw'])  if match['Draw'] is not None else 0.0
+        #                         AwayWin = float(match['AwayWin']) if match['AwayWin'] is not None else 0.0
+        #                         GoalUnder = float(match['Under25']) if match['Under25'] is not None else 0.0
+        #                         GoalOver = float(match['Over25']) if match['Over25'] is not None else 0.0
+        #                         avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                                
+        #                         i.average_odds =round(avg, 2)
+        #                         i.save()
+
+        #                         if match['LiveStatus'] != 0:
+        #                             i.is_resolve = True
+        #                             i.save()
+                                
+        #                         correct_prediction = data.filter(is_prediction=True)
+        #                         incorrect_prediction = data.filter(is_prediction=False)
+        #                         Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+        #                         print(' len(correct_prediction): ',  len(correct_prediction))
+        #                         total_predictions = len(correct_prediction) + len(incorrect_prediction)
+        #                         print('total_predictions: ', total_predictions)
+        #                         Success_rate = round((len(correct_prediction)/total_predictions)*100, 2)
+        #                         user.success_rate = Success_rate
+        #                         user.score_points = Score_point
+
+        #                         level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+                                
+        #                         if level.winning_limit < correct_prediction.count():
+        #                             if int(level.sucess_rate) < Success_rate :
+
+        #                                 if user.commentator_level == 'apprentice':
+        #                                     user.commentator_level = "journeyman"
+        #                                     user.save()
+
+        #                                 elif user.commentator_level == 'journeyman':
+        #                                     user.commentator_level = "master"
+        #                                     user.save()
+
+        #                                 elif user.commentator_level == 'master':
+        #                                     user.commentator_level = "grandmaster"
+        #                                     user.save()
+                    
+        #                         if 0 < Success_rate < 60:
+        #                             user.commentator_level = "apprentice"
+        #                         if 60 < Success_rate< 65:
+        #                             user.commentator_level = "journeyman"
+        #                         if 65 < Success_rate < 70:
+        #                             user.commentator_level = "master"
+        #                         if 70 < Success_rate < 100:
+        #                             user.commentator_level = "grandmaster"
+        #                         user.save()
+
+        return Response({'data' : 'API successfull test!'}, status=status.HTTP_200_OK)
+
+
