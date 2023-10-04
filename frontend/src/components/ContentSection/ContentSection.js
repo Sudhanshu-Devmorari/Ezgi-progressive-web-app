@@ -312,9 +312,10 @@ const ContentSection = ({
                     "subcurrentpage",
                     currentuser == "standard" ? "subscribers" : "home"
                   );
-                  setDashboardSUser(
-                    userId == data?.value?.commentator_user?.id ? true : false
-                  );
+                  setDashboardSUser &&
+                    setDashboardSUser(
+                      userId == data?.value?.commentator_user?.id ? true : false
+                    );
                   setSelectContent("show-all-comments");
                   setActiveCommentsshow(
                     userId == data?.value?.commentator_user?.id
@@ -471,8 +472,8 @@ const ContentSection = ({
             </div>
             {(userPhone === null || !data?.value?.public_content) &&
             // selectContent !== "subscription" &&
-            userId != data?.value?.commentator_user?.id &&
-            !data.value.is_subscribe ? (
+            !data?.value?.is_subscribe &&
+            userId != data?.value?.commentator_user?.id ? (
               <>
                 <div
                   className="px-2 py-3 my-2 d-flex justify-content-center"
@@ -607,7 +608,9 @@ const ContentSection = ({
                   }}
                 >
                   {(userPhone && data?.value?.public_content) ||
-                  userPhone == data?.value?.commentator_user?.id || data?.value?.is_subscribe
+                  userPhone == data?.value?.commentator_user?.id ||
+                  data?.value?.is_subscribe ||
+                  data?.value?.commentator_user?.is_subscribed
                     ? `${data?.value?.prediction_type} & ${data?.value?.prediction}`
                     : "Subscribers Only"}
                 </span>
@@ -781,7 +784,8 @@ const ContentSection = ({
               </div>
               <div className="ms-auto" style={{ fontSize: "12px" }}>
                 {(selectContent === "for you" ||
-                  selectContent === "comments") && (
+                  selectContent === "comments" ||
+                  !data?.value?.is_subscribe) && (
                   <>
                     {userId != data?.value?.commentator_user?.id &&
                       data?.value?.commentator_user?.commentator_level !==

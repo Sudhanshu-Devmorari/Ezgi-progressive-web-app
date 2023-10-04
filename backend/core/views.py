@@ -4070,19 +4070,24 @@ class HighlightSettingView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CommentSetting(APIView):
-    def post(self, request, format=None, *args, **kwargs):
-        data = request.data.copy() 
+    try:
+        
+        def post(self, request, format=None, *args, **kwargs):
+            print('=========================post calledd')
+            data = request.data.copy() 
 
-        comment_serializer = CommentsSerializer(data=data)
-        if comment_serializer.is_valid():
+            comment_serializer = CommentsSerializer(data=data)
+            # if comment_serializer.is_valid():
 
             editor = request.data['editor']
 
             user = User.objects.get(username=editor)
-
+            
             category = request.data.get('category')
+            print('category: ', category)
             country = request.data.get('country')
             league = request.data.get('league')
+            date = request.data.get('date')
             match_detail = request.data.get('match_detail')
             prediction_type = request.data.get('prediction_type')
             prediction = request.data.get('prediction')
@@ -4092,16 +4097,24 @@ class CommentSetting(APIView):
                 public_content = request.data.get('public_content')
             comment_1 = request.data.get('comment')
 
+            match_data = get_league_data(category, league, date)
+            match_time = match_data[0].get('Time', None) if match_data else None
+            print('match_time: ', match_time)
+            match_time_obj =  datetime.strptime(match_time, '%H:%M:%S').time() if match_time else None
+            print('match_time_obj: ', match_time_obj)
+
             comment = Comments.objects.create(
+                    comment=comment_1,
                     commentator_user=user,
                     category=[category],
                     country=country,
                     league=league,
+                    date=date,
                     match_detail=match_detail,
                     prediction_type=prediction_type,
                     prediction=prediction,
                     public_content=public_content,
-                    comment=comment_1
+                    match_time=match_time_obj
                 )
 
             if DataCount.objects.filter(id=1).exists():
@@ -4128,16 +4141,19 @@ class CommentSetting(APIView):
             if comment_reaction_serializer.is_valid():
                 comment_reaction_serializer.save()
 
-                response_data = {
-                    'comment': comment_serializer.data,
-                    'comment_reaction': comment_reaction_serializer.data,
-                }
+                # response_data = {
+                #     'comment': comment_serializer.data,
+                #     'comment_reaction': comment_reaction_serializer.data,
+                # }
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        # print("==========")
-        # print('comment_serializer.errors: ', comment_serializer.errors)
-        return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data' : 'success'}, status=status.HTTP_201_CREATED)
+            # print("==========")
+            # print('comment_serializer.errors: ', comment_serializer.errors)
+            # return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    except:
+        pass
+
 totp = pyotp.TOTP('base32secret3232')
 class OtpSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
@@ -4824,6 +4840,8 @@ class RetrievePageData():
                             total_favorite=Sum('favorite'),
                             total_clap=Sum('clap')
                         )
+
+                        comment_data['is_subscribe'] = True
 
                         comment_data['commentator_user']['is_subscribed'] = True
 

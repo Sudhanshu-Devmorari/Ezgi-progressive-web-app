@@ -11,23 +11,23 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='EditorBanner',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('editor_banner', models.ImageField(blank=True, null=True, upload_to='Editor_banner')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-            ],
-        ),
-        migrations.AddField(
-            model_name='notification',
-            name='admin_context',
-            field=models.CharField(blank=True, max_length=500, null=True),
-        ),
-        migrations.AddField(
-            model_name='user',
-            name='membership_date',
-            field=models.DateField(default=datetime.date.today),
-        ),
+        # migrations.CreateModel(
+        #     name='EditorBanner',
+        #     fields=[
+        #         ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('editor_banner', models.ImageField(blank=True, null=True, upload_to='Editor_banner')),
+        #         ('created', models.DateTimeField(auto_now_add=True)),
+        #         ('updated', models.DateTimeField(auto_now=True)),
+        #     ],
+        # ),
+        # migrations.AddField(
+        #     model_name='notification',
+        #     name='admin_context',
+        #     field=models.CharField(blank=True, max_length=500, null=True),
+        # ),
+        # migrations.AddField(
+        #     model_name='user',
+        #     name='membership_date',
+        #     field=models.DateField(default=datetime.date.today),
+        # ),
     ]

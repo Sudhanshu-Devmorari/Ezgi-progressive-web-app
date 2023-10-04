@@ -71,33 +71,10 @@ const ActiveComments = (props) => {
       if (file) {
         const allowedTypes = ["image/jpeg", "image/png"];
         if (allowedTypes.includes(file.type)) {
-          const formData = new FormData();
-          formData.append("file", e.target.files[0]);
-          formData.append("update", "profile");
-
-          const res = await axios.post(
-            `${config.apiUrl}/profile/${user}`,
-            formData
-          );
-          // console.log(res, "===>>>res");
-          if (res.status === 200) {
-            setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
-            setEditProfile(false);
-            props.getProfileData();
-            Swal.fire({
-              title: "Success",
-              text: "Profile Updated!",
-              icon: "success",
-              backdrop: false,
-              customClass:
-                currentTheme === "dark"
-                  ? "dark-mode-alert"
-                  : "light-mode-alert",
-            });
-          } else if (res.status === 400) {
+          if (file.size >= 5000000) {
             Swal.fire({
               title: "Error",
-              text: "Failed",
+              text: "Please select a image file less than 5MB.",
               icon: "error",
               backdrop: false,
               customClass:
@@ -105,6 +82,41 @@ const ActiveComments = (props) => {
                   ? "dark-mode-alert"
                   : "light-mode-alert",
             });
+          } else {
+            const formData = new FormData();
+            formData.append("file", e.target.files[0]);
+            formData.append("update", "profile");
+
+            const res = await axios.post(
+              `${config.apiUrl}/profile/${user}`,
+              formData
+            );
+            if (res.status === 200) {
+              setPreveiwProfilePic(URL.createObjectURL(e.target.files[0]));
+              setEditProfile(false);
+              props.getProfileData();
+              Swal.fire({
+                title: "Success",
+                text: "Profile Updated!",
+                icon: "success",
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            } else if (res.status === 400) {
+              Swal.fire({
+                title: "Error",
+                text: "Failed",
+                icon: "error",
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            }
           }
         } else {
           Swal.fire({
@@ -437,7 +449,7 @@ const ActiveComments = (props) => {
         commentator_id: profileData?.id,
       });
       if (res?.status === 200) {
-            window.location.reload();
+        window.location.reload();
         // Swal.fire({
         //   title: "Success",
         //   text: res?.data?.data,
@@ -459,10 +471,10 @@ const ActiveComments = (props) => {
     if (!profileData || !profileData?.is_subscribe) {
       return; // No need to continue if not subscribed
     }
-  
+
     const currentTime = Date.now();
     const subExpDate = new Date(profileData?.subscription_end_date).getTime();
-  
+
     if (currentTime >= subExpDate) {
       cancelSubcription();
       console.log("Subscription expired - cancelling");

@@ -439,7 +439,7 @@ const BecomeAEditorModal = (props) => {
                       currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                     } px-3 py-1`}
                   >
-                    {isLoading ? "Loading..." : "Continue"}
+                    {isLoading ? "Loading..." : "Proceed to payment"}
                   </button>
                 </div>
                 <div className="d-flex flex-column text-center my-3">

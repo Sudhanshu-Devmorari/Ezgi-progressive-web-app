@@ -165,7 +165,7 @@ const AddCommentModal = (props) => {
 
     MatchDetailsAPI(categoryType, selectedLeague, date)
       .then((res) => {
-        // console.log("======data=======", res.data);
+        console.log("======data=======", res.data);
 
         const MatchList = res.data;
         setMatchList(MatchList);

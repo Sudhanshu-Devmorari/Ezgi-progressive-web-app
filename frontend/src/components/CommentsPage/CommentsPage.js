@@ -229,6 +229,7 @@ const CommentsPage = ({
                   setData={setData}
                   setSelectContent={setSelectContent}
                   verifyid={verifyid}
+                  setDashboardSUser={setDashboardSUser}
                 />
               </>
             );
@@ -278,6 +279,7 @@ const CommentsPage = ({
                   data={val}
                   setData={setData}
                   setSelectContent={setSelectContent}
+                  setDashboardSUser={setDashboardSUser}
                 />
               </>
             );

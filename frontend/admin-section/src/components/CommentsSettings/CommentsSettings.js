@@ -52,6 +52,12 @@ const CommentsSettings = () => {
   const [selectedPrediction, setSelectedPrediction] = useState("Select");
   const [predictionDropdown, setPredictionDropdown] = useState(false);
 
+  const [selectedDate, setSelectedDate] = useState("Select");
+  const [dateOptions, setDateOptions] = useState([]);
+  const [dateDropdown, setDateDropdown] = useState(false);
+  const [alluserData, setAlluserData] = useState([]);
+  const [userCategory, setUserCategory] = useState([]);
+
   useEffect(() => {
     try {
       axios
@@ -61,6 +67,7 @@ const CommentsSettings = () => {
           if (data.length === 0) {
             setEditorOptions(["Editor not found"]);
           } else {
+            setAlluserData(res?.data?.data);
             const names = (res?.data?.data).map((user) => user.username);
             setEditorOptions(names);
           }
@@ -79,27 +86,16 @@ const CommentsSettings = () => {
       ...dropdownError,
       league: "",
     });
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate()).padStart(2, "0");
 
-    const formattedDate = `${year}-${month}-${day}`;
     try {
       const res = await axios.get(
-        `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${formattedDate}`,
+        `https://www.nosyapi.com/apiv2/bets/getMatchesDateList?type=${categoryType}&league=${league}`,
         { headers }
       );
-      const matchListData = res?.data?.data;
-      if (matchListData.length === 0) {
-        setmatchDetailsOptions(["No match available"]);
-      } else {
-        setMatchList(matchListData);
-        setmatchDetailsOptions(matchListData.map((item) => item.takimlar));
-      }
-    } catch (error) {
-      console.log(error);
-    }
+      const DateList = await res.data.data;
+      setDateOptions(DateList.map((item) => item.date));
+      // console.log(res,"MMM");
+    } catch (error) {}
   };
   const toggleLeagueDropdown = async () => {
     setMatchDetailsDropdown(false);
@@ -266,11 +262,19 @@ const CommentsSettings = () => {
   };
 
   const handleEditorSelection = async (editor) => {
+    console.log("editor:::::::::::::", editor);
     setSelectedEditor(editor);
     setDropdownError({
       ...dropdownError,
       editor: "",
     });
+    const filterData = alluserData.filter((res) => res.username == editor);
+    console.log("    filterData::::::::::    ", filterData);
+    if (filterData.length !== 0) {
+      filterData.map((res) => {
+        setUserCategory(res.category);
+      });
+    }
   };
 
   const toggleEditorDropdown = () => {
@@ -294,6 +298,7 @@ const CommentsSettings = () => {
     like: "",
     fav: "",
     clap: "",
+    dateError: "",
   });
 
   const [comment, setComment] = useState("");
@@ -312,6 +317,7 @@ const CommentsSettings = () => {
       selectedMatchDetails === "Select" &&
       selectedPredictionType === "Select" &&
       selectedPrediction === "Select" &&
+      selectedDate === "Select" &&
       comment === "" &&
       like === "" &&
       fav === "" &&
@@ -329,6 +335,7 @@ const CommentsSettings = () => {
         like: "*Required",
         fav: "*Required",
         clap: "*Required",
+        dateError: "*Required",
       });
     } else if (selectedEditor === "Select") {
       setDropdownError({
@@ -349,6 +356,11 @@ const CommentsSettings = () => {
       setDropdownError({
         ...dropdownError,
         league: "*Required",
+      });
+    } else if (selectedDate === "Select") {
+      setDropdownError({
+        ...dropdownError,
+        dateError: "*Required",
       });
     } else if (selectedMatchDetails === "Select") {
       setDropdownError({
@@ -391,7 +403,7 @@ const CommentsSettings = () => {
       try {
         let data = {
           editor: selectedEditor,
-          category: [selectedCategory],
+          category: selectedCategory,
           country: selectedCountry,
           league: selectedLeague,
           match_detail: selectedMatchDetails,
@@ -402,6 +414,7 @@ const CommentsSettings = () => {
           like: like,
           favorite: fav,
           clap: clap,
+          date: selectedDate,
         };
         const res = await axios.post(
           `${config?.apiUrl}/comment-setting/`,
@@ -416,6 +429,18 @@ const CommentsSettings = () => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          setSelectedEditor("Select");
+          setSelectedCategory("Select");
+          setSelectedCountry("Select");
+          setSelectedLeague("Select");
+          setSelectedMatchDetails("Select");
+          setSelectedPredictionType("Select");
+          setSelectedPrediction("Select");
+          setComment("");
+          setLike("");
+          setFav("");
+          setClap("");
+          setSelectedDate("Select");
         }
       } catch (error) {
         console.log(error);
@@ -436,6 +461,41 @@ const CommentsSettings = () => {
     like: "like",
     favorite: fav,
     clap: clap,
+  };
+
+  const handleDateSelection = async (date) => {
+    if (selectedDate !== date) {
+      setSelectedMatchDetails("Select");
+      setSelectedPrediction("Select");
+      setSelectedPredictionType("Select");
+    }
+    setSelectedDate(date);
+    // setDateError("");
+    try {
+      const res = await axios.get(
+        `https://www.nosyapi.com/apiv2/bets/getMatchesListv9?type=${categoryType}&league=${selectedLeague}&t=${date}`,
+        { headers }
+      );
+      const matchListData = res?.data?.data;
+      if (matchListData.length === 0) {
+        setmatchDetailsOptions(["No match available"]);
+      } else {
+        setMatchList(matchListData);
+        setmatchDetailsOptions(matchListData.map((item) => item.takimlar));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const toggleDateDropdown = () => {
+    setMatchDetailsDropdown(false);
+    setPredictionDropdown(false);
+    setPredictionTypeDropdown(false);
+    setCountryDropDown(false);
+    setLeagueDropdown(false);
+    setCategoryDropDown(false);
+    setDateDropdown(!dateDropdown);
   };
 
   return (
@@ -460,7 +520,8 @@ const CommentsSettings = () => {
               <div className="col cursor">
                 <CustomDropDownForCommentsCreatetion
                   label="Category"
-                  options={categoryOptions}
+                  // options={categoryOptions}
+                  options={userCategory}
                   selectedOption={selectedCategory}
                   onSelectOption={handleCategorySelection}
                   isOpen={categoryDropDown}
@@ -491,6 +552,17 @@ const CommentsSettings = () => {
                   toggleDropdown={toggleLeagueDropdown}
                 />
                 <span className="text-danger">{dropdownError.league}</span>
+              </div>
+              <div className="col">
+                <CustomDropDownForCommentsCreatetion
+                  options={dateOptions}
+                  label="Date"
+                  selectedOption={selectedDate}
+                  onSelectOption={handleDateSelection}
+                  isOpen={dateDropdown}
+                  toggleDropdown={toggleDateDropdown}
+                />
+                <span className="text-danger">{dropdownError.dateError}</span>
               </div>
               <div className="col cursor">
                 <CustomDropDownForCommentsCreatetion
@@ -574,6 +646,7 @@ const CommentsSettings = () => {
                 });
               }}
               name="comment"
+              value={comment}
               style={{ height: "128px" }}
               className="darkMode-input form-control"
             />
@@ -593,6 +666,7 @@ const CommentsSettings = () => {
                     type="number"
                     className="darkMode-input form-control"
                     name="like"
+                    value={like}
                   />
                   <span className="text-danger">{dropdownError.like}</span>
                 </div>
@@ -608,6 +682,7 @@ const CommentsSettings = () => {
                         fav: "",
                       });
                     }}
+                    value={fav}
                     type="number"
                     className="darkMode-input form-control"
                     name="favorite"
@@ -626,6 +701,7 @@ const CommentsSettings = () => {
                         clap: "",
                       });
                     }}
+                    value={clap}
                     type="number"
                     className="darkMode-input form-control"
                     name="clap"
