@@ -882,7 +882,7 @@ const CommentsManagement = (props) => {
                   className="darkMode-input form-control"
                 ></textarea>
               </div>
-              <div className="my-3 d-flex justify-content-center gap-3">
+              {currentData.status == 'pending' && <div className="my-3 d-flex justify-content-center gap-3">
                 <div className="">
                   <button
                     data-bs-dismiss="modal"
@@ -913,7 +913,7 @@ const CommentsManagement = (props) => {
                     Reject
                   </button>
                 </div>
-              </div>
+              </div>}
             </div>
             <img
               data-bs-dismiss="modal"

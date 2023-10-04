@@ -5,8 +5,22 @@ import { useFormik } from "formik";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import UserTagList from "../UserTagList/UserTagList";
 
 const NotificationModel = () => {
+  const [selectedOption, setSelectedOption] = useState("");
+  const [userList, setUserList] = useState([]);
+
+  const handleClearData = () => {
+    setUserList([]);
+    setSelectedOption("")
+    setSelectedUserType("Select")
+  };
+
+  // useEffect(() => {
+  //   console.log("NotificationModel userList-", userList)
+  // }, [userList]);
+
   const userTypeOptions = ["Standard", "Commentator", "Sub User"];
   const [userTypeDropdown, setUserTypeDropdown] = useState(false);
   const [toDropdown, setToDropdown] = useState(false);
@@ -22,7 +36,7 @@ const NotificationModel = () => {
 
   const handleToSelection = (option) => {
     formik.values.to = option;
-    toggleToDropdown(); 
+    toggleToDropdown();
   };
 
   const toggleToDropdown = () => {
@@ -63,7 +77,7 @@ const NotificationModel = () => {
     getUsers();
   }, [selectedUserType]);
 
-  const adminUserId = localStorage.getItem('admin-user-id');
+  const adminUserId = localStorage.getItem("admin-user-id");
   const formik = useFormik({
     initialValues: {
       subject: "",
@@ -72,10 +86,11 @@ const NotificationModel = () => {
       sending_type: "",
       date: "",
       message: "",
+      data: "",
     },
-    onSubmit: async (values) => {
+    onSubmit: async (values,{resetForm}) => {
       try {
-        // console.log(values);
+        values.data = userList;
         const res = await axios.post(
           `${config?.apiUrl}/notification-management/?sender=${adminUserId}`,
           values
@@ -90,6 +105,16 @@ const NotificationModel = () => {
             backdrop: false,
             customClass: "dark-mode-alert",
           });
+          resetForm({
+            subject: "",
+            user_type: "Select",
+            to: "Select",
+            sending_type: "",
+            date: "",
+            message: "",
+            data: "",
+          });
+          handleClearData()
         } else {
           // console.log(res);
         }
@@ -135,7 +160,10 @@ const NotificationModel = () => {
           <div className="modal-content">
             <div className="modal-body p-3 dark-mode gap-2">
               <form onSubmit={formik.handleSubmit}>
-                <div className="row my-2 g-0 gap-2">
+                <div
+                  className="row d-flex my-2 g-0 gap-2"
+                  style={{ alignItems: "center" }}
+                >
                   <div className="col d-flex flex-column">
                     <span>Subject</span>
                     <input
@@ -168,6 +196,16 @@ const NotificationModel = () => {
                     ) : null}
                   </div>
                 </div>
+
+                <div>
+                  <UserTagList
+                    usernames={usernames}
+                    setUserList={setUserList}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                  />
+                </div>
+
                 <div className="row my-2 g-0 gap-2">
                   <div className="col d-flex flex-column cursor">
                     {/* <span>To</span>
@@ -184,7 +222,7 @@ const NotificationModel = () => {
                         {formik.errors.to}
                       </div>
                     ) : null} */}
-                    <CustomDropdown
+                    {/* <CustomDropdown
                       label="To"
                       options={usernames}
                       selectedOption={formik.values.to}
@@ -195,6 +233,20 @@ const NotificationModel = () => {
                     {formik.touched.to && formik.errors.to ? (
                       <div className="error text-danger">
                         {formik.errors.to}
+                      </div>
+                    ) : null} */}
+                    <span>Date</span>
+                    <input
+                      type="date"
+                      className="darkMode-input form-control"
+                      name="date"
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      value={formik.values.date}
+                    />
+                    {formik.touched.date && formik.errors.date ? (
+                      <div className="error text-danger">
+                        {formik.errors.date}
                       </div>
                     ) : null}
                   </div>
@@ -216,7 +268,7 @@ const NotificationModel = () => {
                     ) : null}
                   </div>
                 </div>
-                <div className="my-2">
+                {/* <div className="my-2">
                   <div className="col-6">
                     <span>Date</span>
                     <input
@@ -233,7 +285,7 @@ const NotificationModel = () => {
                       </div>
                     ) : null}
                   </div>
-                </div>
+                </div> */}
                 <div className="my-2">
                   <span>Message</span>
                   <textarea
@@ -272,6 +324,16 @@ const NotificationModel = () => {
               onClick={() => {
                 setUserTypeDropdown(false);
                 setToDropdown(false);
+                formik.resetForm({
+                  subject: "",
+                  user_type: "Select",
+                  to: "Select",
+                  sending_type: "",
+                  date: "",
+                  message: "",
+                  data: "",
+                });
+                handleClearData()
               }}
               src={cross}
               alt=""

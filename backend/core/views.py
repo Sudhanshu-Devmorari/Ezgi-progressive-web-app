@@ -3516,7 +3516,7 @@ class NotificationManagement(APIView):
             return Response(data=error_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request, format=None, *args, **kwargs):
-        # print('request.data: ', request.data)
+        # print('request.data: ', request.data.get('data'))
         try:
             subject = request.data.get('subject')
             user_type = request.data.get('user_type')
@@ -3527,27 +3527,48 @@ class NotificationManagement(APIView):
             sender = request.query_params.get('sender')
             sender_instance = User.objects.get(id=sender)
 
+            user_list = request.data.get('data')
+
+            if len(user_list) == 0:
+                return Response({'error': 'Username not found'}, status=status.HTTP_400_BAD_REQUEST)
+
             if not subject:
                 return Response({'error': 'Subject not found.'}, status=status.HTTP_400_BAD_REQUEST)
-            if not to:
-                return Response({'error': 'Receiver User not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            # if not to:
+            #     return Response({'error': 'Receiver User not found.'}, status=status.HTTP_400_BAD_REQUEST)
             if not date:
                 return Response({'error': 'Date not found.'}, status=status.HTTP_400_BAD_REQUEST)
             if not message:
                 return Response({'error': 'Message not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                user = User.objects.get(username=to)
-                # print('user: ', user)
-            except User.DoesNotExist:
-                return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            # try:
+            #     user = User.objects.get(username=to)
+            #     # print('user: ', user)
+            # except User.DoesNotExist:
+            #     return Response({'error': 'Receiver User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            """sender and receiver baki.."""
+            notification_list = []
+            for user in user_list:
+                try:
+                    receiver = User.objects.get(username=user)
+                    notification_obj = Notification(
+                        receiver=receiver,
+                        subject=subject,
+                        date=date,
+                        status=False,
+                        context=message,
+                        sender=sender_instance
+                    )
+                    notification_list.append(notification_obj)
+                except User.DoesNotExist:
+                    return Response({'error': f'Receiver User with username "{user}" does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            Notification.objects.bulk_create(notification_list)
+            
+            # notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message, sender=sender_instance)
 
-            notification_obj = Notification.objects.create(receiver=user, subject=subject, status=False, date=date, context=message, sender=sender_instance)
-
-            serializer = NotificationSerializer(notification_obj)
-            return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
+            # serializer = NotificationSerializer(notification_obj)
+            # return Response({'data' : serializer.data, 'status' : status.HTTP_200_OK})
+            return Response({'data' : 'Notifications sent sucessfully', 'status' : status.HTTP_200_OK})
 
         except Exception as e:
             return Response({'error': f'An error occurred: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -5365,7 +5386,7 @@ class GetPendingBalance(APIView):
                 for month_year, records in monthwise_data.items():
                     data = {
                         "month_year": month_year,
-                        "total_amount": monthwise_amount_sum[month_year],
+                        "total_amount": round(monthwise_amount_sum[month_year], 2),
                     }
                     monthly_data = []
                     for record in sorted(records, key=lambda x: x.date):
@@ -5373,7 +5394,7 @@ class GetPendingBalance(APIView):
                             "date": record.date.strftime("%d.%m.%Y"),
                             "user": record.user.username,
                             "duration": record.duration,
-                            "amount": record.amount,
+                            "amount": round(record.amount, 2),
                         }
                         monthly_data.append(details)
 
