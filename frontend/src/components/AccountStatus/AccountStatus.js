@@ -592,11 +592,11 @@ const AccountStatus = (props) => {
                 {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
                   <>
                     <div className="my-2 ms-2 d-flex flex-column">
-                      Membership Date {props.membershipDate}
+                      Membership Date {props?.membershipDate}
                       <span>
                         {" "}
                         Active Plan{" "}
-                        <span style={{ color: "#007BF6" }}>Journeyman</span>
+                        <span className="text-capitalize" style={{ color: "#007BF6" }}>{props?.commentator_level}</span>
                       </span>
                       <span>Membership Price 249.90₺</span>
                     </div>

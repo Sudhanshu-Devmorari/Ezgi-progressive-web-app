@@ -81,6 +81,9 @@ const CommentatorsCommentsPage = (props) => {
       const res = await axios.get(`${config?.apiUrl}/profile/${userId}`);
       // console.log(res.data,"========>>>");
       setProfileData(res.data);
+      if (res?.data?.commentator_level == "apprentice") {
+        setSubscribersOrSubscriptions("My subscriptions");
+      }
       setIsLoading(false);
     }
     getProfileData();
@@ -118,6 +121,7 @@ const CommentatorsCommentsPage = (props) => {
       setCommentLoading(false);
     }
   };
+  console.log(profileData, "============>>profileData");
 
   return (
     <>
@@ -204,10 +208,9 @@ const CommentatorsCommentsPage = (props) => {
                 setSubscribersOrSubscriptions={setSubscribersOrSubscriptions}
                 subscribersOrSubscriptions={subscribersOrSubscriptions}
                 user={"commentator"}
-                profileData={profileData}
+                commentator_level={profileData?.commentator_level}
               />
               <MySubscribers
-                profileData={profileData}
                 subscribersOrSubscriptions={subscribersOrSubscriptions}
                 user={"commentator"}
               />
@@ -226,7 +229,10 @@ const CommentatorsCommentsPage = (props) => {
                 <PendingBalance pendingBalance={pendingBalance} />
               )}
               {walletSelection === "account status" && (
-                <AccountStatus membershipDate={props.membershipDate} />
+                <AccountStatus
+                  membershipDate={profileData?.membership_date}
+                  commentator_level={profileData?.commentator_level}
+                />
               )}
             </>
           )}

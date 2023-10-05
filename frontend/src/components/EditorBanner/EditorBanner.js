@@ -31,7 +31,7 @@ export const EditorBanner = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
-            // window.location.reload();
+              // window.location.reload();
             }
           })
           .catch((error) => {
@@ -91,23 +91,22 @@ export const EditorBanner = (props) => {
 
   return (
     <>
-      <div
-        className={`row g-0 bannerText font-responsive ${
-          "mb-2"
-          // userId ? "mb-0" : "mb-2"
-        }`}
-      >
+      <div className={`row g-0 bannerText font-responsive ${"mb-2"}`}>
         <div className={`col-3`}>
           <div
             onClick={() => {
-              setSelectCategory("Futbol");
-              props?.setSelectContent("category-content");
+              props?.setCategory("Futbol");
             }}
             className={`${
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } gap-1 me-2 d-flex py-3 flex-column`}
           >
-            <div className=" d-flex justify-content-center">Futbol</div>
+            <div
+              className=" d-flex justify-content-center"
+              style={{ color: props?.category == "Futbol" && "#D2DB08" }}
+            >
+              Futbol
+            </div>
             <div className="d-flex justify-content-center">
               <img
                 onContextMenu={(e) => e.preventDefault()}
@@ -119,7 +118,10 @@ export const EditorBanner = (props) => {
             </div>
             <div className="d-flex justify-content-center">
               <span>
-                <span style={{ color: "#00C936" }}>{categoryCounts.futbol} </span>Yorum
+                <span style={{ color: "#00C936" }}>
+                  {categoryCounts.futbol}{" "}
+                </span>
+                Yorum
               </span>
             </div>
           </div>
@@ -127,14 +129,18 @@ export const EditorBanner = (props) => {
         <div className={`col-3`}>
           <div
             onClick={() => {
-              setSelectCategory("Basketbol");
-              props?.setSelectContent("category-content");
+              props?.setCategory("Basketbol");
             }}
             className={`${
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } d-flex gap-1 me-2 py-3 flex-column`}
           >
-            <div className="d-flex justify-content-center">Basketbol</div>
+            <div
+              className="d-flex justify-content-center"
+              style={{ color: props?.category == "Basketbol" && "#D2DB08" }}
+            >
+              Basketbol
+            </div>
             <div className="d-flex justify-content-center">
               <img
                 onContextMenu={(e) => e.preventDefault()}
@@ -146,7 +152,10 @@ export const EditorBanner = (props) => {
             </div>
             <div className="d-flex justify-content-center">
               <span>
-                <span style={{ color: "#FF9100" }}>{categoryCounts.basketbol} </span>Yorum
+                <span style={{ color: "#FF9100" }}>
+                  {categoryCounts.basketbol}{" "}
+                </span>
+                Yorum
               </span>
             </div>
           </div>

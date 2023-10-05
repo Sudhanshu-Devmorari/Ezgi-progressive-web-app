@@ -54,7 +54,7 @@ const MainPage = () => {
   const [highlights, setHighlights] = useState([]);
   const [ads, setads] = useState([]);
   const [arrayMerge, setArrayMerge] = useState("Select");
-  const [membershipDate, setMembershipDate] = useState("");
+  // const [membershipDate, setMembershipDate] = useState("");
   const [commentator, setCommentator] = useState([]);
   const publicCount = 3;
   const SubscriptionCount = 3;
@@ -67,7 +67,7 @@ const MainPage = () => {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data);
-    setMembershipDate(res.data.membership_date);
+    // setMembershipDate(res.data.membership_date);
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
   }
@@ -80,10 +80,12 @@ const MainPage = () => {
   const [leftCornerAds, setLeftCornerAds] = useState([]);
   const [rightCornerAds, setRightCornerAds] = useState([]);
   const [category, setCategory] = useState("Futbol");
+
   function homeApiData(user_id) {
+    console.log(category,"=================>>category")
     axios
-      .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
-      // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)
+      // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
+      .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
         setPublicComments(
@@ -123,7 +125,7 @@ const MainPage = () => {
       })
       .catch((error) => {
         console.error("Error fetching data.", error);
-      }, []);
+      });
   }
 
   const mergeArrays = () => {
@@ -345,7 +347,7 @@ const MainPage = () => {
       setCurrentTheme("light");
     }
     homeApiData(user_id);
-  }, [themeMode]);
+  }, [themeMode, category]);
 
   const [mergedEditorResult, setMergedEditorResult] = useState([]);
 
@@ -539,7 +541,7 @@ const MainPage = () => {
                     setMergedEditorResult={setMergedEditorResult}
                     mergedEditorResult={mergedEditorResult}
                     handleOnlyPublicData={handleOnlyPublicData}
-                    membershipDate={membershipDate}
+                    // membershipDate={membershipDate}
                   />
                 )}
               </>
@@ -610,6 +612,9 @@ const MainPage = () => {
                     // }
                   />
                   <EditorBanner
+                    homeApiData={homeApiData}
+                    category={category}
+                    setCategory={setCategory}
                     setSelectContent={setSelectContent}
                     setContentData={setContentData}
                     setCommentsReactionsSports={setCommentsReactionsSports}

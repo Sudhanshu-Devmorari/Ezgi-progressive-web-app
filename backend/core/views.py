@@ -1451,7 +1451,6 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
-        print('==get')
         user = User.objects.get(id=id)
         if user.is_delete == True:
             return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -4658,12 +4657,16 @@ class BecomeEditorView(APIView):
                 data["commentator_status"] = "active"
 
                 # update or add membership date
-                membership_start_date = request.data.get('promotion_duration', None)
-                start_date = datetime.now()
-                days = int(membership_start_date) * 30
-                membership_end_date = start_date + timedelta(days=days)
-                data["membership_date"] = start_date.date()
-                data["membership_end_date"] = membership_end_date.date()
+                # is_membership_exists = MembershipSetting.objects.filter(commentator_level='apprentice').exists()
+                # if is_membership_exists:
+                #     membership_plan_obj = MembershipSetting.objects.get(commentator_level='apprentice')
+                #     membership_start_date = membership_plan_obj.promotion_duration
+                #     start_date = datetime.now()
+                #     days = int(membership_start_date) * 30
+                #     membership_end_date = start_date + timedelta(days=days)
+                #     data["membership_date"] = start_date.date()
+                #     data["membership_end_date"] = membership_end_date.date()
+                #     data["membership_plan_price"] = membership_plan_obj.plan_price
                 
                 # Update
                 serializer = UserSerializer(user, data=data, partial=True)
@@ -4786,13 +4789,13 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
-    def get_public_comments(self, id):
+    def get_public_comments(self, id, category):
         """ Return public comments data """
         public_comments = []
 
         try:
-            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False).order_by('-created').only('id')
-            # all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created').only('id')
+            # all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False).order_by('-created').only('id')
+            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created').only('id')
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -4805,11 +4808,12 @@ class RetrievePageData():
                 comment_data['commentator_user'] ['win'] = win_count
                 comment_data['commentator_user'] ['lose'] = lose_count
 
-                logged_in_user = User.objects.get(id=id)
+                if id != 'null':
+                    logged_in_user = User.objects.get(id=id)
                 
-                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
-                comment_data['is_subscribe'] = is_subscribe
-
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
+                    comment_data['is_subscribe'] = is_subscribe
+                
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
                 total_reactions = comment_reactions.aggregate(
@@ -4817,7 +4821,7 @@ class RetrievePageData():
                     total_favorite=Sum('favorite'),
                     total_clap=Sum('clap')
                 )
-                
+
                 # Update comment_data
                 comment_data['date'] = date_obj.strftime("%d.%m.%Y") 
                 comment_data['total_reactions'] = {
@@ -4833,7 +4837,7 @@ class RetrievePageData():
 
         return public_comments
     
-    def get_subscription_comments(self, id):
+    def get_subscription_comments(self, id, category):
         """ Return subscription comments data """
         subscription_comments = []
 
@@ -4849,8 +4853,10 @@ class RetrievePageData():
             
             subscription_obj = Subscription.objects.filter(standard_user_id=id, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
             for obj in subscription_obj:
-                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
-                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False, commentator_user__is_delete=False, is_resolve=False).order_by('-created')
+                if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False, category=[category]).exists():
+                # if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
+                    subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False, commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created')
+                    print('subscription_comment: ', subscription_comment)
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
@@ -4884,7 +4890,7 @@ class RetrievePageData():
         
         return subscription_comments
     
-    def get_highlights(self, id):
+    def get_highlights(self, id, category):
         """ Return highlights data """
         highlights = []
         standard_user_id = id if id != 'null' else None
@@ -4892,10 +4898,10 @@ class RetrievePageData():
         try:
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
-            logged_in_user = User.objects.get(id=standard_user_id)
+            
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False).order_by('?').only('id')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=['Futbol']).order_by('-created')
             
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
@@ -4907,8 +4913,10 @@ class RetrievePageData():
                 highlighted_data['user'] ['win'] = win_count
                 highlighted_data['user'] ['lose'] = lose_count
 
-                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
-                highlighted_data['is_subscribe'] = is_subscribe
+                if standard_user_id is not None:
+                    logged_in_user = User.objects.get(id=standard_user_id)
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
+                    highlighted_data['is_subscribe'] = is_subscribe
 
                 count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
                 highlighted_data['subscriber_count'] = count
@@ -5028,17 +5036,18 @@ class RetrieveHomeView(APIView):
         
         # Instantiate RetrievePageData object
 
-        # category = request.query_params.get('category', None)
+        category = request.query_params.get('category', None)
+     
         retrieve_data = RetrievePageData()
 
         # Get public comments data
-        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None))
+        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None), category)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None))
+        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None), category)
       
         # Get highlights data
-        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None))
+        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None), category)
         
         # Get advertisment data
         data_list['ads'] = retrieve_data.get_ads()

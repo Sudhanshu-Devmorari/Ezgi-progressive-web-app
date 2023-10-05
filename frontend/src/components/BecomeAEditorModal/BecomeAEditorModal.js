@@ -115,8 +115,9 @@ const BecomeAEditorModal = (props) => {
     } else if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
-      props.onHide();
-      setShowPaymentModal(true);
+      handleMambership();
+      // props.onHide();
+      // setShowPaymentModal(true);
       // if (preveiwProfilePic) {
       //   setIsLoading(true);
       //   const splitdata = selectedKategori.split(", ");
@@ -203,17 +204,15 @@ const BecomeAEditorModal = (props) => {
     userId && getUserdata();
   }, [userId]);
 
-  const handleMambership = async (promotion, plan_price) => {
-    console.log(promotion, 'promotion')
-    console.log(plan_price, 'plan_price')
+  const handleMambership = async () => {
     if (preveiwProfilePic) {
       setIsLoading(true);
       const splitdata = selectedKategori.split(", ");
       formData.append("category", splitdata);
       formData.append("experience", selectedDeneyim);
       file && formData.append("profile_pic", file);
-      formData.append("promotion_duration", promotion);
-      formData.append("plan_price", plan_price);
+      // formData.append("promotion_duration", promotion);
+      // formData.append("plan_price", plan_price);
       axios
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then(async (res) => {

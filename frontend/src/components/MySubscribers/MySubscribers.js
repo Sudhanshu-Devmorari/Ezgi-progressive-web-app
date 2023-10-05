@@ -5,7 +5,7 @@ import crown from "../../assets/crown.png";
 import "./MySubscribers.css";
 import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { truncateString, userId } from "../GetUser";
 import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 
@@ -52,8 +52,6 @@ const MySubscribers = (props) => {
     getSubscriptions();
   }, []);
 
-  console.log(props?.profileData,"=======>>profileData")
-
   return (
     <>
       <div
@@ -63,7 +61,7 @@ const MySubscribers = (props) => {
       >
         {props.user === "commentator" && (
           <>
-            {props?.subscribersOrSubscriptions === "My subscribers" && props?.profileData?.commentator_level != "apprentice" && (
+            {props?.subscribersOrSubscriptions === "My subscribers" && (
               <>
                 {isLoading ? (
                   <div className="text-center mt-3">Loading...</div>
@@ -75,7 +73,7 @@ const MySubscribers = (props) => {
                       </div>
                     ) : (
                       <>
-                        {mySubscribers?.map((sub, index) => (
+                        {mySubscribers?.map((res, index) => (
                           <div
                             className="p-1 d-flex justify-content-between align-items-center mb-2"
                             style={{
@@ -85,34 +83,44 @@ const MySubscribers = (props) => {
                           >
                             <div className="">
                               <img
+                                style={{
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
                                 onContextMenu={(e) => e.preventDefault()}
-                                src={profile}
+                                src={
+                                  res?.standard_user?.profile_pic
+                                    ? `${config.apiUrl}${res?.standard_user?.profile_pic}`
+                                    : profile
+                                }
                                 alt=""
                                 height={35}
                                 width={35}
                               />
-                              <span className="ps-1">{sub.name}</span>
+                              <span className="ps-1">
+                                {res.standard_user.username}
+                              </span>
                             </div>
                             <div className="">
-                              <span>3 Ay</span>
-                              <span className="px-2">22.04.2023 - 16:41</span>
+                              <span>{res?.duration}</span>
+                              <span className="px-2">{res?.start_date}</span>
                               <button
-                                className="px-2 me-2"
+                                className="px-2 me-2 text-capitalize"
                                 style={{
                                   color:
                                     currentTheme === "dark"
-                                      ? sub.status === "Active"
+                                      ? res.status === "active"
                                         ? "#37FF80"
-                                        : sub.status === "Pending"
+                                        : res.status === "pending"
                                         ? "#4DD5FF"
-                                        : sub.status === "Ended"
+                                        : res.status === "deactive"
                                         ? "#FF5757"
                                         : "#007BFC"
-                                      : sub.status === "Active"
+                                      : res.status === "active"
                                       ? "#00DE51"
-                                      : sub.status === "Pending"
+                                      : res.status === "pending"
                                       ? "#007BFC"
-                                      : sub.status === "Ended"
+                                      : res.status === "deactive"
                                       ? "#FF5757"
                                       : "#007BFC",
                                   backgroundColor:
@@ -127,7 +135,9 @@ const MySubscribers = (props) => {
                                   width: "4.4rem",
                                 }}
                               >
-                                {sub.status}
+                                {res?.status == "deactive"
+                                  ? "Ended"
+                                  : res?.status}
                               </button>
                             </div>
                           </div>
@@ -213,12 +223,12 @@ const MySubscribers = (props) => {
                                         ? "#FFCC00"
                                         : res?.status === "active"
                                         ? "#37FF80"
-                                        : res?.status === "renew"
+                                        : res?.status === "deactive"
                                         ? "#4DD5FF"
                                         : ""
                                       : res?.status === "pending"
                                       ? "#FFCC00"
-                                      : res?.status === "renew"
+                                      : res?.status === "deactive"
                                       ? "#00659D"
                                       : res?.status === "active"
                                       ? "#00DE51"
@@ -234,7 +244,9 @@ const MySubscribers = (props) => {
                                   borderRadius: "3px",
                                 }}
                               >
-                                {res?.status}
+                                {res?.status == "deactive"
+                                  ? "Ended"
+                                  : res?.status}
                               </button>
                             </div>
                           </div>
