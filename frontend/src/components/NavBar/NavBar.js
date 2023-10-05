@@ -90,7 +90,7 @@ const NavBar = (props) => {
               }}
             />
           </span>
-          {props?.profileData?.user_role ? (
+          {userId !== null ? (
             <>
               <span
                 onClick={() => {
@@ -121,8 +121,8 @@ const NavBar = (props) => {
               <span className="ps-2">
                 {props?.isLoading ? (
                   <Spinner
-                    size={2}
                     color={currentTheme == "dark" ? "#fff" : "#F6F6F6"}
+                    style={{width: '40px', height:"40px"}}
                   />
                 ) : (
                   <img

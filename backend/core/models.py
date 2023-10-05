@@ -300,7 +300,7 @@ SUBSCRIPTION_ROLE_CHOISE = (
     )
 class SubscriptionSetting(models.Model):
     commentator_level = models.CharField(max_length = 20, choices = SUBSCRIPTION_ROLE_CHOISE, null=True, blank=True)
-    duration = models.CharField(max_length=50,null=True, blank=True)
+    duration = ArrayField(models.CharField(max_length=50,null=True, blank=True),  default=list)
     month_1 = models.FloatField()
     month_3 = models.FloatField()
     month_6 = models.FloatField()

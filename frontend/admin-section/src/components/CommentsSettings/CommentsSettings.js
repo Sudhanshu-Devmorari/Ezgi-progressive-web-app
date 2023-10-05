@@ -262,14 +262,12 @@ const CommentsSettings = () => {
   };
 
   const handleEditorSelection = async (editor) => {
-    console.log("editor:::::::::::::", editor);
     setSelectedEditor(editor);
     setDropdownError({
       ...dropdownError,
       editor: "",
     });
     const filterData = alluserData.filter((res) => res.username == editor);
-    console.log("    filterData::::::::::    ", filterData);
     if (filterData.length !== 0) {
       filterData.map((res) => {
         setUserCategory(res.category);
