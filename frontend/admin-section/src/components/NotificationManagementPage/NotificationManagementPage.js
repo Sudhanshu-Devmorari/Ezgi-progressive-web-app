@@ -16,8 +16,11 @@ import axios from "axios";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import moment from "moment";
+import { useCookies } from "react-cookie";
 
 const NotificationManagementPage = () => {
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const [notifications, setNotifications] = useState([]);
   const [notificationsCount, setNotificationsCount] = useState({
     notificatios: 0,
@@ -79,6 +82,11 @@ const NotificationManagementPage = () => {
         const res = await axios.get(
           `${config?.apiUrl}/notification-management/?admin_id=${user_id}`
         );
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setNotifications(data.notification);

@@ -22,17 +22,20 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
+import { useCookies } from "react-cookie";
 import Swal from "sweetalert2";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const Home = (props) => {
   const [isLoadingActions, setIsLoadingActions] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
+  const admin_id = localStorage.getItem("admin-user-id")
   const handleDeactive = async (id, action) => {
     try {
       setIsLoadingActions(true);
       const res = await axios.delete(
-        `${config?.apiUrl}/user-management/${id}/?action=${action}`
+        `${config?.apiUrl}/user-management/${id}/?action=${action}&admin=${admin_id}`
       );
       if (res.status === 200) {
         const modalElement = document.getElementById("exampleModal");
@@ -57,6 +60,11 @@ const Home = (props) => {
         if (confirmation.value === true) {
           window.location.reload();
         }
+      }
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -236,7 +244,7 @@ const Home = (props) => {
       setValidUsername(null);
     }
     if (
-      addUser.phone.match(/^5\d*$/) == null ||
+      addUser.phone?.match(/^5\d*$/) == null ||
       addUser.phone == "" ||
       addUser.phone == undefined
     ) {
@@ -285,7 +293,7 @@ const Home = (props) => {
       formData.append("level", addUser.level);
       try {
         const response = await axios.post(
-          `${config?.apiUrl}/user-management/`,
+          `${config?.apiUrl}/user-management/?admin=${admin_id}`,
           formData
         );
         // e.target.setAttribute("data-bs-dismiss","modal")
@@ -297,6 +305,11 @@ const Home = (props) => {
           if (closeButton) {
             closeButton.click();
           }
+        }
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
         }
         window.location.reload();
         clearError();
@@ -388,7 +401,7 @@ const Home = (props) => {
       formData.append("user_id", user_id);
       try {
         const response = await axios.patch(
-          `${config?.apiUrl}/user-management/${id}/`,
+          `${config?.apiUrl}/user-management/${id}/?admin=${admin_id}`,
           formData
         );
         // console.log("API Response:", response);
@@ -424,6 +437,11 @@ const Home = (props) => {
           if (confirm.value === true) {
             window.location.reload();
           }
+        }
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
         }
       } catch (error) {
         if (error?.response?.data?.error) {
@@ -746,7 +764,7 @@ const Home = (props) => {
           </div>
         ) : (
           <>
-            {allFilterData.length == 0 ? (
+            {allFilterData?.length == 0 ? (
               <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                 No Record Found!
               </div>

@@ -6,10 +6,13 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
 import UserTagList from "../UserTagList/UserTagList";
+import { useCookies } from "react-cookie";
 
 const NotificationModel = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [userList, setUserList] = useState([]);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
 
   const handleClearData = () => {
     setUserList([]);
@@ -95,6 +98,11 @@ const NotificationModel = () => {
           `${config?.apiUrl}/notification-management/?sender=${adminUserId}`,
           values
         );
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log(res,"========================MMMM");
         // console.log(res.status);
         if (res.status === 200) {

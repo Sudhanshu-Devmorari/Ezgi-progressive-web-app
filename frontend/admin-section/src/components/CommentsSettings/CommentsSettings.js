@@ -7,6 +7,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const CommentsSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +59,8 @@ const CommentsSettings = () => {
   const [alluserData, setAlluserData] = useState([]);
   const [userCategory, setUserCategory] = useState([]);
 
+  const admin_id = localStorage.getItem("admin-user-id")
+  const [cookies, setCookie, removeCookie] = useCookies();
   useEffect(() => {
     try {
       axios
@@ -415,9 +418,14 @@ const CommentsSettings = () => {
           date: selectedDate,
         };
         const res = await axios.post(
-          `${config?.apiUrl}/comment-setting/`,
+          `${config?.apiUrl}/comment-setting/?admin=${admin_id}`,
           data
         );
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (res.status === 201) {
           setIsLoading(false);
           Swal.fire({

@@ -4,9 +4,12 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useCookies } from "react-cookie";
 
 const SalesMembershipSettings = (props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const admin_id = localStorage.getItem("admin-user-id")
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const validationSchema = Yup.object().shape({
     plan_price: Yup.number()
@@ -36,11 +39,16 @@ const SalesMembershipSettings = (props) => {
         const res = await axios.get(
           `${
             config?.apiUrl
-          }/membership-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`
+          }/membership-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}&admin=${admin_id}`
         );
         const data = res.data[0];
         // console.log(data,"===================>>>>data")
         setIsLoading(false);
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (res.status === 200) {
           formik.setValues({
             plan_price: data?.plan_price,
@@ -75,9 +83,14 @@ const SalesMembershipSettings = (props) => {
         const res = await axios.post(
           `${
             config?.apiUrl
-          }/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+          }/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}&admin=${admin_id}`,
           data
         );
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log(res,"=res")
         if (res.status === 201) {
           setIsLoading(false);

@@ -27,6 +27,7 @@ import moment from "moment";
 import axios from "axios";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
+import { useCookies } from "react-cookie";
 
 const CommentsManagement = (props) => {
   const [fData, setFdata] = useState({});
@@ -34,7 +35,7 @@ const CommentsManagement = (props) => {
   const [secondStatus, setSecondStatus] = useState("");
   const [thirdStatus, setThirdStatus] = useState("");
   const [fourthStatus, setFourthStatus] = useState("");
-
+  const [cookies, setCookie, removeCookie] = useCookies();
   const [currentData, setCurrentData] = useState([]);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
@@ -82,6 +83,11 @@ const CommentsManagement = (props) => {
       })
       .then((res) => {
         // console.log(res.data,"=====>>filter");
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         setFdata(res.data);
         setDisplayUser(res.data);
         handleFilterState();
@@ -127,6 +133,11 @@ const CommentsManagement = (props) => {
         `${config?.apiUrl}/comments-management/${id}/?admin_id=${user_id}`,
         { status: `${status}` }
       );
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
+      }
       window.location.reload();
     } catch (error) {
       console.error("Error fetching data:", error);

@@ -18,11 +18,14 @@ import axios from "axios";
 import Export from "../Export/Export";
 import config from "../../config";
 import moment from "moment";
+import { useCookies } from "react-cookie";
 
 const SalesManagementPage = () => {
   const [salesData, setSalesData] = useState({});
   const [records, setRecords] = useState([]);
   const [recordsDisplay, setRecordsDisplay] = useState(records);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const salesArray = [
     { icon: PlanIcon, name: "Plan Sales", count: 12.86, per: 22 },
     {
@@ -286,7 +289,13 @@ const SalesManagementPage = () => {
   // Sales management API
   async function getSalesData() {
     try {
-      const res = await axios.get(`${config?.apiUrl}/sales-management`);
+      const adminId = localStorage.getItem('admin-user-id')
+      const res = await axios.get(`${config?.apiUrl}/sales-management?admin=${adminId}`);
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
+      }
       updateRecordsDisplay(res?.data);
       setSalesData(res?.data);
     } catch (error) {

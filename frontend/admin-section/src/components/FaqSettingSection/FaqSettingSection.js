@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MdDelete, MdDragIndicator } from "react-icons/md";
 import { BiPlus } from "react-icons/bi";
 import { Container, Draggable } from "react-smooth-dnd";
-
+import { useCookies } from "react-cookie";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
@@ -10,6 +10,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const Item = ({ id, color: backgroundColor, removeInputFields, formik }) => {
+  const admin_id = localStorage.getItem("admin-user-id")
+
   return (
     <div className="item">
       <div className="d-flex align-items-center">
@@ -83,12 +85,15 @@ const DraggableItem = ({ index, item, removeInputFields, formik }) => {
 };
 
 const FaqSettingSection = () => {
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const [isLoading, setIsLoading] = useState(true);
 
   const validationSchema = Yup.object().shape({
     question: Yup.mixed().required("Question is required"),
     answer: Yup.string().required("Answer is required"),
   });
+  const admin_id = localStorage.getItem("admin-user-id")
 
   const ArrayOfCarsSchema = Yup.array().of(validationSchema);
 
@@ -104,11 +109,16 @@ const FaqSettingSection = () => {
         // console.log(values)
       try {
         const response = await axios.post(
-          `${config.apiUrl}/become-editor-faq/`,
+          `${config.apiUrl}/become-editor-faq/?admin=${admin_id}`,
           {
             faq_data: values,
           }
         );
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (response.status == 200) {
           const confirm = await Swal.fire({
             title: "Success",
@@ -150,7 +160,7 @@ const FaqSettingSection = () => {
   const removeInputFields = async (index, deleteId) => {
     try {
       const response = await axios.delete(
-        `${config.apiUrl}/become-editor-faq/${deleteId}`
+        `${config.apiUrl}/become-editor-faq/${deleteId}?admin=${admin_id}`
       );
       if (response.status == 200) {
         const confirm = await Swal.fire({
@@ -163,6 +173,11 @@ const FaqSettingSection = () => {
         // if (confirm.value === true) {
         //   window.location.reload();
         // }
+      }
+      if (response.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
       }
       const rows = [...formik.values];
       rows.splice(index, 1);
@@ -196,7 +211,12 @@ const FaqSettingSection = () => {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/become-editor-faq/`);
+        const response = await axios.get(`${config.apiUrl}/become-editor-faq/?admin=${admin_id}`);
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         formik.setValues(response.data);
         setIsLoading(false);
       } catch (error) {

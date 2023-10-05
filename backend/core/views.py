@@ -1632,7 +1632,12 @@ class AdminMainPage(APIView):
         previous_24_hours = timezone.now() - timedelta(hours=24)
         previous_day = datetime.now() - timedelta(days=1)
 
+        user_id = request.query_params.get('id')
+        user = User.objects.get(id=user_id)
+
         try:
+            if user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             try:
                 """user percentage"""
                 deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
@@ -1711,6 +1716,11 @@ class UserManagement(APIView):
 
 
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             try:
                 """user percentage"""
                 deleted_users_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True).count()
@@ -1775,6 +1785,10 @@ class UserManagement(APIView):
         Create new User.
         """
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             username = request.data['username']
             if User.objects.filter(username=username).exists():
                 return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1861,6 +1875,11 @@ class UserManagement(APIView):
         Update User details.
         """
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -1910,6 +1929,11 @@ class UserManagement(APIView):
         Deactivate or delete user.
         """
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             user = User.objects.get(pk=pk)
             action = request.query_params.get('action')
             if action == 'delete':
@@ -2044,6 +2068,11 @@ class CommentsManagement(APIView):
         previous_24_hours = now - timedelta(hours=24)
         
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+
             """Comments percentage"""
             status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(status='reject', date_updated__gte=previous_24_hours).count()
             new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(status='pending', date_created__gte=previous_24_hours).count()
@@ -2110,6 +2139,11 @@ class CommentsManagement(APIView):
 
     def patch(self, request, pk, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin_id')
+            adminuser = User.objects.get(id=adminuser_id)
+            if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             comment = Comments.objects.get(pk=pk)
         except Comments.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -2476,6 +2510,12 @@ class EditorManagement(APIView):
 
         try:
             try:
+                adminuser_id = request.query_params.get('id')
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                
                 """editor percentage"""
                 deleted_editor_count = User.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, is_delete=True, user_role='commentator').count()
                 editor_previous_24_hours = User.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, is_delete=False, user_role='commentator').count()
@@ -2638,6 +2678,12 @@ class EditorManagement(APIView):
         """
         # print("+++++", request.data)
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+        
             username = request.data['username']
             if User.objects.filter(username=username).exists():
                 return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2702,6 +2748,12 @@ class EditorManagement(APIView):
     def patch(self, request, pk, format=None, *args, **kwargs):
         data = {}
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -2742,6 +2794,12 @@ class EditorManagement(APIView):
         Deactivate or delete user.
         """
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             user = User.objects.get(pk=pk)
             action = request.query_params.get('action')
             if not action:
@@ -2838,6 +2896,11 @@ class UpdateStatusForVerifyRequest(APIView):
         
     def post(self, request, id, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             # Validations
             verify_status = request.data.get('status')
             if verify_status is None:
@@ -3012,6 +3075,11 @@ class SalesManagement(APIView):
         previous_24_hours = now - timedelta(hours=24)
         previous_day = datetime.now() - timedelta(days=1)
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             try:
                 """Subscribers percentage"""
                 status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
@@ -3109,6 +3177,11 @@ class SalesManagement(APIView):
         data_list = []
         filters = {}
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             # print("---------", request.data)
             if request.data:
                 details = {}
@@ -3221,6 +3294,11 @@ class SupportManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             try:
                 """Ticket percentage"""
                 status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
@@ -3279,6 +3357,9 @@ class SupportManagement(APIView):
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
+        
+            if user.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             ticket_id = request.data.get('ticket_id')
 
             message = request.data.get('message')
@@ -3355,6 +3436,9 @@ class TicketRedirectView(APIView):
         """
         try:
             admin_user = User.objects.get(id=id)
+            if admin_user.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            
             ticket = TicketSupport.objects.get(id=ticket_id)
             note = request.data.get('note')
             print('note: ', note)
@@ -3465,6 +3549,11 @@ class RedirectAnswerView(APIView):
 class NotificationManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin_id')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             data = {}
 
             # Count the number of notifications with status=False
@@ -3579,6 +3668,11 @@ class SubUserManagement(APIView):
         data_list = {}
 
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             subuser_count = User.objects.filter(user_role='sub_user',is_delete=False, is_active=True).order_by("-created")
             data_list['subuser_count'] = subuser_count.count()
             serializer = UserSerializer(subuser_count, many=True)
@@ -3611,6 +3705,11 @@ class SubUserManagement(APIView):
 
     def post(self, request, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if request.data:
                 role = 'sub_user'
 
@@ -3670,6 +3769,11 @@ class SubUserManagement(APIView):
         
     def patch(self, request, pk, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -3710,6 +3814,11 @@ class SubUserManagement(APIView):
         
     def delete(self, request, pk, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             user = User.objects.get(pk=pk)
             action = request.query_params.get('action')
             if not action:
@@ -3875,6 +3984,11 @@ class AdvertisementManagement(APIView):
 class LevelRule(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             level = request.query_params.get('commentator_level')
             
             if not level:
@@ -3900,6 +4014,11 @@ class LevelRule(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
+        adminuser_id = request.query_params.get('admin')
+        adminuser = User.objects.get(id=adminuser_id)
+        
+        if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         commentator_level = request.query_params.get('commentator_level')
 
         data = request.data.copy()
@@ -3927,6 +4046,11 @@ class LevelRule(APIView):
 class MembershipSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             level = request.query_params.get('commentator_level')
             
             if not level:
@@ -3951,6 +4075,11 @@ class MembershipSettingView(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def post(self, request, format=None, *args, **kwargs):
+        adminuser_id = request.query_params.get('admin')
+        adminuser = User.objects.get(id=adminuser_id)
+        
+        if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         commentator_level = request.query_params.get('commentator_level')
         data = request.data.copy()
         if commentator_level.lower() == 'expert':
@@ -4093,6 +4222,11 @@ class CommentSetting(APIView):
     try:
         
         def post(self, request, format=None, *args, **kwargs):
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             print('=========================post calledd')
             data = request.data.copy() 
 
@@ -5084,6 +5218,11 @@ class RetrieveEditorView(APIView):
 class BecomeEditorFAQView(APIView):
 
     def get(self, request, id=None):
+        adminuser_id = request.query_params.get('admin')
+        adminuser = User.objects.get(id=adminuser_id)
+        
+        if adminuser.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         if request.query_params.get("id"):
             user = User.objects.get(id=request.query_params.get('id'))
             if user.is_delete == True:
@@ -5104,6 +5243,11 @@ class BecomeEditorFAQView(APIView):
 
     def post(self, request):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             data_list = []
             faq_data = request.data['faq_data'] if request.data['faq_data'] else []
             for index, data in enumerate(faq_data):
@@ -5131,6 +5275,11 @@ class BecomeEditorFAQView(APIView):
         
     def delete(self, request, id):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             data_delete = BecomeEditor.objects.get(id=id)
             data_delete.delete()
             return Response({"msg": "deleted"}, status=status.HTTP_200_OK)
@@ -5163,6 +5312,11 @@ def create_reminder_notification():
 class BankDetailsView(APIView):
     def get(self, request, id=None, *args, **kwargs):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
                 if user.user_role == 'commentator':
@@ -5234,6 +5388,9 @@ class BankDetailsView(APIView):
     def post(self, request, id):
         try:
             user = User.objects.get(id=id)
+            
+            if user.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
 
             if 'bank_iban' not in request.data:
                 return Response({'error' : 'bank_iban not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -5338,6 +5495,11 @@ class GetUserdata(APIView):
 class EditorBannerView(APIView):
     def get(self, request):
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             banner =  EditorBanner.objects.all()    
             data = EditorBannerSerializer(banner, many=True).data
             return Response({'data' : data}, status=status.HTTP_200_OK)
@@ -5346,6 +5508,11 @@ class EditorBannerView(APIView):
 
     def patch(self, request): 
         try:
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             print('request.data: ', request.data)
             if 'editor_banner' not in request.data:
                 return Response({'data' : 'Editor banner is required.'}, status=status.HTTP_404_NOT_FOUND)

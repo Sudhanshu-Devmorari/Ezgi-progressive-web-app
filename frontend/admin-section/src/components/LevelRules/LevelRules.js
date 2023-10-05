@@ -6,10 +6,13 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useCookies } from "react-cookie";
 
 const LevelRules = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewIcon, setPreviewIcon] = useState(null);
+  const admin_id = localStorage.getItem("admin-user-id")
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   useEffect(() => {
     async function getData() {
@@ -18,9 +21,14 @@ const LevelRules = (props) => {
         const res = await axios.get(
           `${
             config?.apiUrl
-          }/level-rule/?commentator_level=${props?.selectLevel?.toLowerCase()}`
+          }/level-rule/?commentator_level=${props?.selectLevel?.toLowerCase()}&admin=${admin_id}`
         );
         setIsLoading(false);
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (res.status === 200) {
           const data = res.data[0];
           // console.log(data);
@@ -87,10 +95,15 @@ const LevelRules = (props) => {
         const res = await axios.post(
           `${
             config?.apiUrl
-          }/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}`,
+          }/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}&admin=${admin_id}`,
           formData
         );
         setIsLoading(false);
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (res.status === 201) {
           const confirm = await Swal.fire({
             title: "Success",

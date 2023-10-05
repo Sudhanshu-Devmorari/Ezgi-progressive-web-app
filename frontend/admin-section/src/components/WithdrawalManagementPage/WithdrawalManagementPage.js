@@ -23,6 +23,7 @@ import "./WithdrawalManagementPage.css";
 import axios from "axios";
 import config from "../../config";
 import { useEffect } from "react";
+import { useCookies } from "react-cookie";
 import moment from "moment";
 
 const WithdrawalManagementPage = () => {
@@ -123,7 +124,8 @@ const WithdrawalManagementPage = () => {
       status: "10 min ago",
     },
   ];
-
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const admin_id = localStorage.getItem("admin-user-id")
   const [countsRequest, setCountsRequest] = useState({
     bank_request: 0,
     pending: 0,
@@ -135,7 +137,7 @@ const WithdrawalManagementPage = () => {
   async function getWithdrawData() {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${config.apiUrl}/bank-details/`);
+      const res = await axios.get(`${config.apiUrl}/bank-details/?admin=${admin_id}`);
       if (res?.status === 200) {
         const data = res?.data?.data;
         setUpdateRequest(data?.bank_details);
@@ -147,6 +149,11 @@ const WithdrawalManagementPage = () => {
           new: data?.new,
         });
         setIsLoading(false);
+      }
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);

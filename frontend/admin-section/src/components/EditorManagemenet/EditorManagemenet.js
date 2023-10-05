@@ -26,6 +26,7 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import { CustomDropdownEditor } from "../CustomDropdownEditor";
+import { useCookies } from "react-cookie";
 
 const EditorManagemenet = (props) => {
   const [addUser, setAddUser] = useState({});
@@ -67,14 +68,15 @@ const EditorManagemenet = (props) => {
     setSelectedDeneyim("Select");
     setSelectedGender("Select");
   };
-
+  const [cookies, setCookie, removeCookie] = useCookies();
   // const [isLoadingDeactive, setIsLoadingDeactive] = useState(false);
+  const admin_id = localStorage.getItem("admin-user-id")
 
   const handleDeactive = async (id, action) => {
     try {
       // setIsLoadingDeactive(true);
       const res = await axios.delete(
-        `${config?.apiUrl}/editor-management/${id}/?action=${action}`
+        `${config?.apiUrl}/editor-management/${id}/?action=${action}&admin=${admin_id}`
       );
       if (res.status === 200) {
         props?.editorManagementApiData();
@@ -97,6 +99,11 @@ const EditorManagemenet = (props) => {
         if (confirm.value === true) {
           window.location.reload();
         }
+      }
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -343,9 +350,14 @@ const EditorManagemenet = (props) => {
       const id = 1; // temp
       try {
         const response = await axios.post(
-          `${config?.apiUrl}/editor-management/`,
+          `${config?.apiUrl}/editor-management/?admin=${admin_id}`,
           formData
         );
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         const modalElement = document.getElementById("exampleModal");
         if (modalElement) {
           const closeButton = modalElement.querySelector(
@@ -479,9 +491,14 @@ const EditorManagemenet = (props) => {
       formData.append("membership_date", addUser.membership_date);
       try {
         const response = await axios.patch(
-          `${config?.apiUrl}/editor-management/${id}/`,
+          `${config?.apiUrl}/editor-management/${id}/?admin=${admin_id}`,
           formData
         );
+        if (response.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         if (response.status === 200) {
           clearError();
           props.setupdateProfile(1);

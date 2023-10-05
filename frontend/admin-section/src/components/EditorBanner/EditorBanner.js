@@ -6,18 +6,26 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const EditorBanner = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const [bannerId, setbannerId] = useState(null);
 
   const formData = new FormData();
+  const admin_id = localStorage.getItem("admin-user-id")
 
   useEffect(() => {
     async function getBannerImg() {
       try {
-        const res = await axios.get(`${config.apiUrl}/editor-banner/`);
+        const res = await axios.get(`${config.apiUrl}/editor-banner/?admin=${admin_id}`);
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         const img = res?.data?.data[0]?.editor_banner;
         const id = res?.data?.data[0]?.id;
         setbannerId(id);
@@ -49,9 +57,14 @@ const EditorBanner = () => {
       }
       try {
         const res = await axios.patch(
-          `${config.apiUrl}/editor-banner/`,
+          `${config.apiUrl}/editor-banner/?admin=${admin_id}`,
           formData
         );
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log(res);
         if (res?.status === 200) {
           Swal.fire({

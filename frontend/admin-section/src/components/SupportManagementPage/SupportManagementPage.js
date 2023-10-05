@@ -18,9 +18,12 @@ import axios from "axios";
 import Export from "../Export/Export";
 import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const SupportManagementPage = () => {
   // Support management API
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const [NewRequest, setNewRequest] = useState("");
   const [PendingRequest, setPendingRequest] = useState("");
   const [ResolvedRequest, setResolvedRequest] = useState("");
@@ -50,7 +53,14 @@ const SupportManagementPage = () => {
 
   async function getSupportData() {
     try {
-      const res = await axios.get(`${config?.apiUrl}/support-management`);
+      const adminId = localStorage.getItem('admin-user-id')
+
+      const res = await axios.get(`${config?.apiUrl}/support-management?admin=${adminId}`);
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
+      }
       const formattedPercentage = Math.round(
         res?.data?.new_tickets_percentage
       );

@@ -20,6 +20,7 @@ import "./CreateSubUser.css";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useCookies } from "react-cookie";
 
 const CreateSubUser = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +37,7 @@ const CreateSubUser = (props) => {
     "Ads Manager",
     "Director Manager",
   ];
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   // const [authTypeDropDown, setAuthTypeDropDown] = useState(false);
   const [departmentDropDown, setDepartmentDropDown] = useState(false);
@@ -97,6 +99,7 @@ const CreateSubUser = (props) => {
     } catch (error) {}
   }
 
+  const adminId = localStorage.getItem('admin-user-id')
 
   // // Edit Sub User Profile
   const [userProfile, setuserProfile] = useState(null);
@@ -208,7 +211,7 @@ const CreateSubUser = (props) => {
         try {
           setIsLoading(true);
           const res = await axios.patch(
-            `${config?.apiUrl}/subuser-management/${props.editUser?.id}/`,
+            `${config?.apiUrl}/subuser-management/${props.editUser?.id}/?admin=${adminId}`,
             formData
           );
           if (res.data.status === 200) {
@@ -225,6 +228,11 @@ const CreateSubUser = (props) => {
                 window.location.reload();
               }
             });
+          }
+          if (res.status == 204) {
+            localStorage.clear();
+            removeCookie("admin-user-id");
+            window.location.reload();
           }
         } catch (error) {
           console.log(error);
@@ -243,7 +251,7 @@ const CreateSubUser = (props) => {
         setIsLoading(true);
         try {
           const res = await axios.post(
-            `${config?.apiUrl}/subuser-management/`,
+            `${config?.apiUrl}/subuser-management/?admin=${adminId}`,
             formData
           );
           // console.log(res);
@@ -261,6 +269,11 @@ const CreateSubUser = (props) => {
                 window.location.reload();
               }
             });
+          }
+          if (res.status == 204) {
+            localStorage.clear();
+            removeCookie("admin-user-id");
+            window.location.reload();
           }
         } catch (error) {
           console.log(error);

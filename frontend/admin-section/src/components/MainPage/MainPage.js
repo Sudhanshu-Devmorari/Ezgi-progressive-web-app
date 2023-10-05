@@ -16,17 +16,25 @@ import DailySalesArray from "../DailySalesArray/DailySalesArray";
 import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 import axios from "axios";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const MainPage = () => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const adminHomeApiData = async (user_id) => {
+    const id = localStorage.getItem("admin-user-id")
     const res = await axios
-      .get(`${config?.apiUrl}/home/`)
+      .get(`${config?.apiUrl}/home/?id=${id}`)
       .then((res) => {
-        // console.log(res, "=====>>>>res.data");
+        // console.log(res.status, "=====>>>>res.data");
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         setData(res?.data);
         setUsers(res?.data?.users_list);
         setIsLoading(false);

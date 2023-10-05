@@ -6,9 +6,11 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const tickeview = props?.tickeview;
 
@@ -88,6 +90,11 @@ const TicketReplyModal = (props) => {
                 window.location.reload();
               }
             }
+            if (res.status == 204) {
+              localStorage.clear();
+              removeCookie("admin-user-id");
+              window.location.reload();
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -120,8 +127,9 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else {
+        const adminId = localStorage.getItem('admin-user-id')
         axios
-          .post(`${config?.apiUrl}/redirect-ticket/${38}/${tickeview?.id}`, {
+          .post(`${config?.apiUrl}/redirect-ticket/${adminId}/${tickeview?.id}`, {
             note: ticketRepltOrRedirect.redirect,
             id: tickeview?.id, // sub user id
           })
@@ -135,6 +143,11 @@ const TicketReplyModal = (props) => {
                 backdrop: false,
                 customClass: "dark-mode-alert",
               });
+            }
+            if (res.status == 204) {
+              localStorage.clear();
+              removeCookie("admin-user-id");
+              window.location.reload();
             }
           });
       }

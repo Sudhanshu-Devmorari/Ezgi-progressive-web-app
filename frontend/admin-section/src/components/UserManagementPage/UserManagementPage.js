@@ -12,6 +12,7 @@ import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 import config from "../../config";
 
 const UserManagementPage = () => {
@@ -19,12 +20,19 @@ const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
   const [userTimeLine, setUserTimeLine] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const admin_id = localStorage.getItem("admin-user-id")
 
   async function userManagementApiData() {
     // console.log("test");
     const res = await axios
-      .get(`${config?.apiUrl}/user-management/`)
+      .get(`${config?.apiUrl}/user-management/?admin=${admin_id}`)
       .then((res) => {
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log(res.data);
         setData(res?.data);
         setUsers(res?.data?.users_list);

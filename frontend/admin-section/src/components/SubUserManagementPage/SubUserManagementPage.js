@@ -18,6 +18,7 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const SubUserManagementPage = () => {
   const users = [
@@ -34,13 +35,19 @@ const SubUserManagementPage = () => {
   const [subuserList, setSubuserList] = useState([]);
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
-
+  const adminId = localStorage.getItem('admin-user-id')
   const [isLoading, setIsLoading] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   async function getSubUsers() {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${config?.apiUrl}/subuser-management/`);
+      const res = await axios.get(`${config?.apiUrl}/subuser-management/?admin=${adminId}`);
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
+      }
       // console.log(res.data, "==========>>>res sub users");
       const data = res?.data;
       setNotificationCount(data?.notification_count);
@@ -79,7 +86,7 @@ const SubUserManagementPage = () => {
     event.preventDefault();
     try {
       const res = await axios.delete(
-        `${config?.apiUrl}/subuser-management/${e}/?action=${action}`
+        `${config?.apiUrl}/subuser-management/${e}/?action=${action}&admin=${adminId}`
       );
       if (res.status === 200) {
         getSubUsers();
@@ -93,6 +100,11 @@ const SubUserManagementPage = () => {
         if (confirm.value === true) {
           window.location.reload();
         }
+      }
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
       }
     } catch (error) {
       console.log(error);

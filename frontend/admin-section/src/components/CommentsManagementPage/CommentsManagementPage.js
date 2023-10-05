@@ -9,6 +9,7 @@ import winner from "../../assets/Group 73.svg";
 import lose from "../../assets/Group 74.svg";
 import axios from "axios";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const CommentsManagementPage = () => {
   const [data, setData] = useState({});
@@ -16,13 +17,20 @@ const CommentsManagementPage = () => {
   const [commentData, setCommentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState("All");
+  const [cookies, setCookie, removeCookie] = useCookies();
+  const admin_id = localStorage.getItem("admin-user-id")
 
   const commentManagementApiData = async () => {
     // console.log(data)
     await axios
-      .get(`${config?.apiUrl}/comments-management/`)
+      .get(`${config?.apiUrl}/comments-management/?admin=${admin_id}`)
       .then((res) => {
         // console.log("=-=-=-=-=-=-=> ", res.data);
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         setData(res.data);
         setMostLike(res?.data?.most_like);
         setCommentData(res.data.all_comment);

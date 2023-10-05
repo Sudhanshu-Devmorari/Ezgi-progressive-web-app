@@ -6,6 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
+import { useCookies } from "react-cookie";
 
 const SalesManagementFilter = (props) => {
   const DateOptions = ["option 1", "option 2"];
@@ -31,6 +32,7 @@ const SalesManagementFilter = (props) => {
   const [statusDropDown, setStatusDropDown] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("Select");
   const [durationDropDown, setDurationDropDown] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const handleTypeSelection = (selectedType) => {
     setSelectedType(selectedType);
@@ -82,10 +84,16 @@ const SalesManagementFilter = (props) => {
       ...(selectedDuration !== "Select" && { duration: selectedDuration }),
     };
     try {
+      const adminId = localStorage.getItem('admin-user-id')
       const res = await axios.post(
-        `${config?.apiUrl}/sales-management/`,
+        `${config?.apiUrl}/sales-management/?admin=${adminId}`,
         payload
       );
+      if (res.status == 204) {
+        localStorage.clear();
+        removeCookie("admin-user-id");
+        window.location.reload();
+      }
       // console.log("@@@@@@@@@@@@: ", res.data);
       props.updateRecordsDisplay(res.data[0])
       const modalElement = document.getElementById("filterModal");

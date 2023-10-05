@@ -11,6 +11,7 @@ import Top10 from "../Top10/Top10";
 import EditorAccountStatus from "../EditorAccountStatus/EditorAccountStatus";
 import LevelCount from "../LevelCount/LevelCount";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 import config from "../../config";
 
 const EditorManagementPage = () => {
@@ -19,13 +20,20 @@ const EditorManagementPage = () => {
   const [verifyUser, setverifyUsererifyUser] = useState([]);
   const [deactivateUser, setDeactivateUser] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [cookies, setCookie, removeCookie] = useCookies();
 
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [deactivationonRequests, setDeactivationonRequests] = useState([]);
   function editorManagementApiData() {
+    const id = localStorage.getItem("admin-user-id")
     axios
-      .get(`${config?.apiUrl}/editor-management/`)
+      .get(`${config?.apiUrl}/editor-management/?id=${id}`)
       .then((res) => {
+        if (res.status == 204) {
+          localStorage.clear();
+          removeCookie("admin-user-id");
+          window.location.reload();
+        }
         // console.log("%%%%%%%%%", res.data);
         setData(res.data);
         setDeactivateUser(res.data.deactivat_user);
