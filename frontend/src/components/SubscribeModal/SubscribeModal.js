@@ -20,8 +20,14 @@ import Swal from "sweetalert2";
 import moment from "moment";
 
 const SubscribeModal = (props) => {
-  const { commentatorUser, handleMambership, isRenewLoading, isRenewTerms, preveiwProfilePic } =
-    props;
+  const {
+    commentatorUser,
+    handleMambership,
+    isRenewLoading,
+    isRenewTerms,
+    preveiwProfilePic,
+    setMembershipData,
+  } = props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   useEffect(() => {
     isRenewTerms && setSelectCheckBox(isRenewTerms);
@@ -136,6 +142,7 @@ const SubscribeModal = (props) => {
           const data = res?.data[0];
           setRenewPlan(data);
           setIsSubscriptionLoading(false);
+          setMembershipData && setMembershipData(data);
         }
       } catch (error) {
         console.log(error);
@@ -357,7 +364,10 @@ const SubscribeModal = (props) => {
                         <div className="text-center my-2">
                           <div>Total Amount</div>
                           <div style={{ fontSize: "19px" }}>
-                            {renewPlan?.plan_price}₺
+                            {renewPlan?.plan_price -
+                              renewPlan?.plan_price *
+                                (renewPlan?.promotion_rate / 100)}
+                            ₺
                           </div>
                         </div>
                       )}
@@ -370,11 +380,11 @@ const SubscribeModal = (props) => {
                           <div style={{ fontSize: "19px" }}>
                             {(selectedPlan === "1 Year" &&
                               subscriptionPlan?.year_1) ||
-                              (selectedPlan === "1 Month" &&
+                              (selectedPlan === "1 Months" &&
                                 subscriptionPlan?.month_1) ||
-                              (selectedPlan === "3 Month" &&
+                              (selectedPlan === "3 Months" &&
                                 subscriptionPlan?.month_3) ||
-                              (selectedPlan === "6 Month" &&
+                              (selectedPlan === "6 Months" &&
                                 subscriptionPlan?.month_6)}
                             ₺
                           </div>
@@ -430,7 +440,10 @@ const SubscribeModal = (props) => {
                       <button
                         onClick={() =>
                           props.text == "renew"
-                            ? handleMambership(renewPlan?.promotion_duration, renewPlan?.plan_price)
+                            ? handleMambership(
+                                renewPlan?.promotion_duration,
+                                renewPlan?.plan_price
+                              )
                             : handleSubscription()
                         }
                         style={{ fontSize: "14px" }}
@@ -451,10 +464,13 @@ const SubscribeModal = (props) => {
                     </div>
                     <div className="text-center" style={{ fontSize: "12px" }}>
                       <div className="">
-                        Subscription plans do not renew automatically.
+                        {props.text == "renew" ? "Membership" : "Subscription"}{" "}
+                        plans do not renew automatically.
                       </div>
                       <div className="">
-                        You can cancel the subscription at any time.
+                        You can cancel the{" "}
+                        {props.text == "renew" ? "membership" : "subscription"}{" "}
+                        at any time.
                       </div>
                     </div>
                   </div>

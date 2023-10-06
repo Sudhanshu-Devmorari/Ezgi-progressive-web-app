@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from core.utils import create_response, sms_send, get_league_data, on_match_time_update_comment_status
+from core.utils import create_response, sms_send, get_league_data
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -710,11 +710,11 @@ class SubscriptionView(APIView):
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
-                if duration == "1 Month":
+                if duration == "1 Months":
                     end_date = start_date + timedelta(days=30)
-                if duration == "3 Month":
+                if duration == "3 Months":
                     end_date = start_date + timedelta(days=90)
-                if duration == "6 Month":
+                if duration == "6 Months":
                     end_date = start_date + timedelta(days=180)
                 if duration == "1 Year":
                     end_date = start_date + timedelta(days=365)
@@ -5191,7 +5191,6 @@ class RetrieveHomeView(APIView):
     """
     for Home page:
     """
-    @on_match_time_update_comment_status
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
             "Public_Comments": [],

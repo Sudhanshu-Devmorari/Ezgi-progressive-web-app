@@ -17,12 +17,14 @@ import VerificationModal from "../VerificationModal/VerificationModal";
 import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { Range, getTrackBackground } from "react-range";
+import moment from "moment";
 
 const AccountStatus = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [verifyShow, setVerifyShow] = React.useState(false);
   const [subLoading, setSubLoading] = React.useState(false);
+  const [membershipData, setMembershipData] = React.useState({});
   const [commentatorSubscriptionData, setCommentatorSubscriptionData] =
     React.useState({});
   const errorSwal = () => {
@@ -108,7 +110,6 @@ const AccountStatus = (props) => {
         const res = await axios.get(
           `${config?.apiUrl}/subscription-setting/?commentator_level=master`
         );
-        console.log(res);
         setExpertData(res?.data[0]);
         setExpertLoading(false);
       } catch (error) {
@@ -158,18 +159,51 @@ const AccountStatus = (props) => {
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
-      // console.log(res,"=>>>>renew res")
-      setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
+        setCommentatorUser(res?.data?.data);
         setRenewLoading(false);
       }
     } catch (error) {
       console.log(error);
+      setRenewLoading(false);
     }
   };
   useEffect(() => {
-    getUserdata();
-  }, []);
+    userId && getUserdata();
+  }, [userId]);
+
+  const targetDate = moment(props?.membershipDate); // Set your target date
+  const [daysLeft, setDaysLeft] = useState(0);
+
+  useEffect(() => {
+    const calculateDaysLeft = () => {
+      const countNumber = membershipData?.promotion_duration?.split(" ");
+
+      if (!countNumber || countNumber.length !== 2) {
+        return 0; // Handle invalid input gracefully
+      }
+
+      const interval = countNumber[1].toLowerCase(); // e.g., "months"
+      const duration = parseInt(countNumber[0], 10);
+
+      if (isNaN(duration) || !interval) {
+        return 0; // Handle invalid input gracefully
+      }
+
+      const currentDate = moment();
+      const nextIntervalDate = moment(targetDate).add(duration, interval);
+
+      if (currentDate.isAfter(nextIntervalDate)) {
+        console.log("Interval is already over");
+        return 0; // Interval is already over
+      }
+
+      const daysRemaining = nextIntervalDate.diff(currentDate, "days");
+      return daysRemaining;
+    };
+
+    membershipData && commentatorUser && setDaysLeft(calculateDaysLeft());
+  }, [membershipData, commentatorUser]);
 
   return (
     <>
@@ -188,6 +222,7 @@ const AccountStatus = (props) => {
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                height: "100%",
               }}
             >
               <div className="ms-3" style={{ width: 75, height: 75 }}>
@@ -284,7 +319,7 @@ const AccountStatus = (props) => {
                 </span>
               </div>
               <div
-                className={`row g-0 justify-content-center ${
+                className={`row g-0 justify-content-center align-items-center ${
                   subLoading ? "pt-4" : "pt-0"
                 }`}
               >
@@ -292,21 +327,37 @@ const AccountStatus = (props) => {
                   "Loading...."
                 ) : (
                   <>
-                    <div className="col text-center">
-                      <div className="mb-1 d-flex flex-column">
-                        <span className="font-res">1 Month Subscription</span>
-                        <span className="number-font">
-                          {commentatorSubscriptionData?.month_1}₺
-                        </span>
-                      </div>
-                      <div className="d-flex flex-column">
-                        <span className="font-res">3 Month Subscription</span>
-                        <span className="number-font">
-                          {commentatorSubscriptionData?.month_3}₺
-                        </span>
-                      </div>
-                    </div>
-                    <div className="col text-center">
+                    {commentatorSubscriptionData?.duration?.map(
+                      (res, index) => {
+                        return (
+                          <div className="col-6 text-center" key={index}>
+                            <div className="mb-1 d-flex flex-column">
+                              <span className="font-res">
+                                {res} Subscription
+                              </span>
+                              <span classNa me="number-font">
+                                {res == "1 Months"
+                                  ? `${commentatorSubscriptionData?.month_1}₺`
+                                  : res == "3 Months"
+                                  ? `${commentatorSubscriptionData?.month_3}₺`
+                                  : res == "6 Months"
+                                  ? `${commentatorSubscriptionData?.month_6}₺`
+                                  : `${commentatorSubscriptionData?.year_1}₺`}
+                              </span>
+                            </div>
+                            {/* <div className="d-flex flex-column">
+                              <span className="font-res">
+                                {res} Subscription
+                              </span>
+                              <span className="number-font">
+                                {commentatorSubscriptionData?.month_3}₺
+                              </span>
+                            </div> */}
+                          </div>
+                        );
+                      }
+                    )}
+                    {/* <div className="col text-center">
                       <div className="mb-1 d-flex flex-column">
                         <span className="font-res">6 Month Subscription</span>
                         <span className="number-font">
@@ -319,7 +370,7 @@ const AccountStatus = (props) => {
                           {commentatorSubscriptionData?.year_1}₺
                         </span>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="d-flex justify-content-between">
                       <span className="font-res">
                         Commmision Rate{" "}
@@ -330,7 +381,7 @@ const AccountStatus = (props) => {
                               currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
                           }}
                         >
-                          {commentatorSubscriptionData?.commission_rate}
+                          {commentatorSubscriptionData?.commission_rate} %
                         </span>
                       </span>
                       <span className="font-res">
@@ -361,26 +412,43 @@ const AccountStatus = (props) => {
               <span>Subscription</span>
               <span>Earnings</span>
             </div>
-            <div className={`col-8 p-2 ${expertLoading ? "pt-4" : "pt-0"}`}>
+            <div className={`col-8 px-2 ${expertLoading ? "pt-4" : "pt-0"}`}>
               {expertLoading ? (
                 "Loading..."
               ) : (
-                <div className="row g-0">
-                  <div className="col text-center">
-                    <div className="mb-1 d-flex flex-column">
-                      <span className="font-res">1 Month Subscription</span>
-                      <span className="number-font" style={{ color: "FFA200" }}>
-                        {expertData?.month_1}₺
-                      </span>
-                    </div>
-                    <div className="d-flex flex-column">
-                      <span className="font-res">3 Month Subscription</span>
-                      <span className="number-font" style={{ color: "FFA200" }}>
-                        {expertData?.month_3}₺
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col text-center">
+                <div className="row g-0 h-100 align-items-center">
+                  {expertData?.duration?.map((res, index) => {
+                    return (
+                      <div className="col text-center" key={index}>
+                        <div className="mb-1 d-flex flex-column">
+                          <span className="font-res">{res} Subscription</span>
+                          <span
+                            className="number-font"
+                            style={{ color: "FFA200" }}
+                          >
+                            {res == "1 Months"
+                              ? `${expertData?.month_1}₺`
+                              : res == "3 Months"
+                              ? `${expertData?.month_3}₺`
+                              : res == "6 Months"
+                              ? `${expertData?.month_6}₺`
+                              : `${expertData?.year_1}₺`}
+                            {/* {expertData?.month_1}₺ */}
+                          </span>
+                        </div>
+                        {/* <div className="d-flex flex-column">
+                          <span className="font-res">3 Month Subscription</span>
+                          <span
+                            className="number-font"
+                            style={{ color: "FFA200" }}
+                          >
+                            {expertData?.month_3}₺
+                          </span>
+                        </div> */}
+                      </div>
+                    );
+                  })}
+                  {/* <div className="col text-center">
                     <div className="mb-1 d-flex flex-column">
                       <span className="font-res">6 Month Subscription</span>
                       <span className="number-font" style={{ color: "FFA200" }}>
@@ -393,7 +461,7 @@ const AccountStatus = (props) => {
                         {expertData?.year_1}₺
                       </span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               )}
             </div>
@@ -590,17 +658,30 @@ const AccountStatus = (props) => {
                 }}
               >
                 {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
-                  <>
-                    <div className="my-2 ms-2 d-flex flex-column">
-                      Membership Date {props?.membershipDate}
-                      <span>
-                        {" "}
-                        Active Plan{" "}
-                        <span className="text-capitalize" style={{ color: "#007BF6" }}>{props?.commentator_level}</span>
+                <>
+                  <div className="my-2 ms-2 d-flex flex-column">
+                    Membership Date : {props?.membershipDate}
+                    <span>
+                      {" "}
+                      Active Plan :{" "}
+                      <span
+                        className="text-uppercase"
+                        style={{
+                          color:
+                            currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
+                        }}
+                      >
+                        {props?.commentator_level}
                       </span>
-                      <span>Membership Price 249.90₺</span>
-                    </div>
-                    <div className="d-flex justify-content-end m-2">
+                    </span>
+                    {membershipData?.plan_price && (
+                      <span>
+                        Membership Price : {membershipData?.plan_price}₺
+                      </span>
+                    )}
+                  </div>
+                  <div className="d-flex justify-content-end m-2">
+                    {daysLeft == 0 ? (
                       <button
                         onClick={() => {
                           if (
@@ -624,10 +705,24 @@ const AccountStatus = (props) => {
                           backgroundColor: "transparent",
                         }}
                       >
-                        {renewLoading ? "Loading" : "Renew"}
+                        Renew
                       </button>
-                    </div>
-                  </>
+                    ) : (
+                      <span className="text-end">
+                        {" "}
+                        <span
+                          style={{
+                            color:
+                              currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
+                          }}
+                        >
+                          {daysLeft} days are left{" "}
+                        </span>{" "}
+                        for the next plan payment date
+                      </span>
+                    )}
+                  </div>
+                </>
                 {/* ) : (
                   <span className="d-flex align-items-center justify-content-center h-100">
                     No Membership found!
@@ -643,6 +738,7 @@ const AccountStatus = (props) => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         text="renew"
+        setMembershipData={setMembershipData}
       />
       <VerificationModal
         show={verifyShow}

@@ -15,7 +15,7 @@ function PlanSelection(props) {
   };
 
   const isPlanSelected = (plan) => {
-    return props?.text === "renew" ? `${props?.selectedPlan} Month` === plan : `${props?.selectedPlan}` === plan
+    return `${props?.selectedPlan}` === plan;
   };
 
   const renderPlan = (plan, price, discountText, backgroundColor) => (
@@ -46,7 +46,7 @@ function PlanSelection(props) {
         <span style={{ fontSize: "1rem" }}>
           {discountText && (
             <span className="pe-2" style={{ color: "#47FF8A" }}>
-              {discountText}
+              {discountText} off
             </span>
           )}
           {price}
@@ -62,92 +62,35 @@ function PlanSelection(props) {
       </div>
       {props?.isSubscriptionLoading ? (
         <div className="text-center py-3">Loading...</div>
-      ) : (
+      ) : props?.text === "renew" ? (
         <>
-          {props?.text === "renew" ? (
-            <>
-              {renderPlan(
-                `${renewPlan?.promotion_duration} Month`,
-                `${renewPlan?.plan_price}₺`,
-                null,
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-            </>
-          ) : (
-            <>
-              {renderPlan(
-                "1 Month",
-                `${subscriptionPlan?.month_1}₺`,
-                null,
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "3 Month",
-                `${subscriptionPlan?.month_3}₺`,
-                "%20 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "6 Month",
-                `${subscriptionPlan?.month_6}₺`,
-                "%30 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "1 Year",
-                `${subscriptionPlan?.year_1}₺`,
-                "%40 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-
-              {/* <>
-            {commentatorUser.commentator_level == 'journeyman' ? 
-            <>
-            {renderPlan(
-                "1 Month",
-                `${subscriptionPlan?.month_1}₺`,
-                null,
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "3 Month",
-                `${subscriptionPlan?.month_3}₺`,
-                "%20 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              </>
-              :
-              <>
-              {renderPlan(
-                "1 Month",
-                `${subscriptionPlan?.month_1}₺`,
-                null,
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "3 Month",
-                `${subscriptionPlan?.month_3}₺`,
-                "%20 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "6 Month",
-                `${subscriptionPlan?.month_6}₺`,
-                "%30 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              {renderPlan(
-                "1 Year",
-                `${subscriptionPlan?.year_1}₺`,
-                "%40 Save!",
-                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
-              )}
-              </>
-              }
-            </> */}
-            </>
+          {renderPlan(
+            `${renewPlan?.promotion_duration}`,
+            `${renewPlan?.plan_price}₺`,
+            renewPlan?.promotion_rate != 0 && `${renewPlan?.promotion_rate}%`,
+            currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
           )}
         </>
+      ) : (
+        subscriptionPlan &&
+        subscriptionPlan?.duration?.map((res) => {
+          return (
+            <>
+              {renderPlan(
+                res,
+                res == "1 Months"
+                  ? `${subscriptionPlan?.month_1}₺`
+                  : res == "3 Months"
+                  ? `${subscriptionPlan?.month_3}₺`
+                  : res == "6 Months"
+                  ? `${subscriptionPlan?.month_6}₺`
+                  : `${subscriptionPlan?.year_1}₺`,
+                null,
+                currentTheme === "dark" ? "#0B2447" : "#F6F6F6"
+              )}
+            </>
+          );
+        })
       )}
     </div>
   );

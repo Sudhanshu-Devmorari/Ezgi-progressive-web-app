@@ -42,8 +42,8 @@ const CommentatorIcons = (props) => {
     }
   }
   useEffect(() => {
-    getBankIban();
-  }, []);
+    userId && getBankIban();
+  }, [userId]);
 
   const currentpage = localStorage.getItem('currentpage');
 

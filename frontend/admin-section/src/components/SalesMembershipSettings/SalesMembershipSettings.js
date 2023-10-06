@@ -5,11 +5,16 @@ import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCookies } from "react-cookie";
+import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForCommentsCreatetion";
 
 const SalesMembershipSettings = (props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const admin_id = localStorage.getItem("admin-user-id")
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const admin_id = localStorage.getItem("admin-user-id");
   const [cookies, setCookie, removeCookie] = useCookies();
+  const durationOptions = ["1 Months", "3 Months", "6 Months"];
+  const [editorDropDown, setEditorDropDown] = useState(false);
+  const [selectedEditors, setSelectedEditors] = useState(durationOptions[0]);
 
   const validationSchema = Yup.object().shape({
     plan_price: Yup.number()
@@ -21,47 +26,44 @@ const SalesMembershipSettings = (props) => {
     promotion_rate: Yup.string()
       .required("Promotion Rate is required")
       .matches(/^\d+$/, "Promotion Rate must be a valid number"),
-    promotion_duration: Yup.string()
-      .required("Promotion Duration is required")
-      .matches(/^\d+$/, "Promotion Rate must be a valid number"),
   });
   const initialValues = {
     plan_price: "",
     commission_rate: "",
     promotion_rate: "",
-    promotion_duration: "",
   };
 
   useEffect(() => {
     async function getData() {
       try {
-        // setIsLoading(true);
         const res = await axios.get(
           `${
             config?.apiUrl
           }/membership-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}&admin=${admin_id}`
         );
         const data = res.data[0];
-        // console.log(data,"===================>>>>data")
-        setIsLoading(false);
+        
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
           window.location.reload();
+          setIsDataLoading(false);
         }
         if (res.status === 200) {
+          setSelectedEditors(data?.promotion_duration);
           formik.setValues({
             plan_price: data?.plan_price,
             commission_rate: data?.commission_rate,
             promotion_rate: data?.promotion_rate,
-            promotion_duration: data?.promotion_duration,
           });
+          setIsDataLoading(false);
         }
       } catch (error) {
         console.log(error);
         if (error.response.status === 404) {
           formik.resetForm();
         }
+        setIsDataLoading(false);
       }
     }
     getData();
@@ -76,7 +78,7 @@ const SalesMembershipSettings = (props) => {
           plan_price: values?.plan_price,
           commission_rate: values?.commission_rate,
           promotion_rate: values?.promotion_rate,
-          promotion_duration: values?.promotion_duration,
+          promotion_duration: selectedEditors,
         };
         // console.log(data,"====================data")
         setIsLoading(true);
@@ -108,9 +110,17 @@ const SalesMembershipSettings = (props) => {
     },
   });
 
+  const handleEditorSelection = (editor) => {
+    setSelectedEditors(editor);
+  };
+
+  const toggleEditorDropdown = () => {
+    setEditorDropDown(!editorDropDown);
+  };
+
   return (
     <>
-      {isLoading ? (
+      {isDataLoading ? (
         <div className="d-flex gap-1 h-100 my-2 pb-2 align-items-center justify-content-center">
           Loading...
         </div>
@@ -134,7 +144,9 @@ const SalesMembershipSettings = (props) => {
             </div>
             <div className="col-2">
               <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Commision Rate <small>(%)</small></span>
+                <span className="p-1 ps-0">
+                  Commision Rate <small>(%)</small>
+                </span>
                 <input
                   onChange={formik.handleChange}
                   type="text"
@@ -151,7 +163,9 @@ const SalesMembershipSettings = (props) => {
             </div>
             <div className="col-2">
               <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">Promotion Rate <small>(%)</small></span>
+                <span className="p-1 ps-0">
+                  Promotion Rate <small>(%)</small>
+                </span>
                 <input
                   onChange={formik.handleChange}
                   type="text"
@@ -167,8 +181,16 @@ const SalesMembershipSettings = (props) => {
               </div>
             </div>
             <div className="col-2">
-              <div className="col d-flex flex-column">
-                <span className="p-1 ps-0">
+              <div className="d-flex flex-column w-auto">
+                <CustomDropDownForCommentsCreatetion
+                  label="Promotion Duration"
+                  options={durationOptions}
+                  selectedOption={selectedEditors}
+                  onSelectOption={handleEditorSelection}
+                  isOpen={editorDropDown}
+                  toggleDropdown={toggleEditorDropdown}
+                />
+                {/* <span className="p-1 ps-0">
                   Promotion Duration <small>(Months)</small>
                 </span>
                 <input
@@ -182,7 +204,7 @@ const SalesMembershipSettings = (props) => {
                   <div className="text-danger">
                     {formik.errors.promotion_duration}
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>
