@@ -30,7 +30,7 @@ const Home = (props) => {
   const [isLoadingActions, setIsLoadingActions] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies();
 
-  const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = localStorage.getItem("admin-user-id");
   const handleDeactive = async (id, action) => {
     try {
       setIsLoadingActions(true);
@@ -212,6 +212,25 @@ const Home = (props) => {
       console.error("Error making POST request:", error);
     }
   };
+  const [subscriberIncome, setSubscriberIncome] = useState([]);
+
+  const handleTransectionHistory = async (id) => {
+    // console.log("IDDD: ", id);
+    try {
+      // setIsLoadingDeactive(true);
+      const res = await axios.get(
+        `${config?.apiUrl}/user-transaction-history/${id}/`
+      );
+      if (res.status === 200) {
+        // console.log("-->: ", res.data);
+        const data = res.data;
+        data.sort((a, b) => moment(b.date).unix() - moment(a.date).unix());
+        setSubscriberIncome(data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const [modelClose, setModelClose] = useState(false);
   const [preveiwProfile, setPreveiwProfile] = useState(null);
@@ -249,6 +268,11 @@ const Home = (props) => {
       addUser.phone == undefined
     ) {
       setValidPhone("Please enter valid phone.");
+    } else {
+      setValidPhone(null);
+    }
+    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone.length != 10) {
+      setValidPhone("Phone must start with '5' and must be 10 digits.");
     } else {
       setValidPhone(null);
     }
@@ -355,6 +379,11 @@ const Home = (props) => {
       addUser.phone == undefined
     ) {
       setValidPhone("Please enter valid phone.");
+    } else {
+      setValidPhone(null);
+    }
+    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone.length != 10) {
+      setValidPhone("Phone must start with '5' and must be 10 digits.");
     } else {
       setValidPhone(null);
     }
@@ -770,33 +799,41 @@ const Home = (props) => {
               </div>
             ) : (
               allFilterData?.map((res, index) => (
-                  <React.Fragment key={index}>
-                    <MainDiv>
-                      <div className="col">
-                        {/* <span className="pe-1">{`# ${res?.id
+                <React.Fragment key={index}>
+                  <MainDiv>
+                    <div className="col">
+                      {/* <span className="pe-1">{`# ${res?.id
                           .toString()
                           .padStart(4, "0")}`}</span> */}
-                        <span className="pe-1">{`# ${(index + 1)
-                          .toString()
-                          .padStart(4, "0")}`}</span>
-                        <img
-                          src={`${
-                            res?.profile_pic
-                              ? server_url + res?.profile_pic
-                              : initialProfile
-                          }`}
-                          className="rounded-circle"
-                          alt=""
-                          height={42}
-                          width={42}
-                        />
-                        <span className="ps-1">{res?.name}</span>
+                      <span className="pe-1">{`# ${(index + 1)
+                        .toString()
+                        .padStart(4, "0")}`}</span>
+                      <img
+                        src={`${
+                          res?.profile_pic
+                            ? server_url + res?.profile_pic
+                            : initialProfile
+                        }`}
+                        className="rounded-circle"
+                        alt=""
+                        height={42}
+                        width={42}
+                      />
+                      <span className="ps-1">{res?.name}</span>
+                    </div>
+                    <div className="d-flex justify-content-between gap-2 align-items-center col ">
+                      <div style={{ width: "33%" }}>
+                        {res?.username?.trim()}
                       </div>
-                      <div className="d-flex justify-content-between gap-2 align-items-center col ">
-                        <div style={{width:"33%"}}>{res?.username?.trim()}</div>
-                        <div className="d-flex" style={{width:"33%"}}>
-                        <span style={{display:"block", minWidth:"fit-content", textWrap:"nowrap"}}>
-                        {res.gender == "Male" && (
+                      <div className="d-flex" style={{ width: "33%" }}>
+                        <span
+                          style={{
+                            display: "block",
+                            minWidth: "fit-content",
+                            textWrap: "nowrap",
+                          }}
+                        >
+                          {res.gender == "Male" && (
                             <img
                               src={gender_male}
                               alt=""
@@ -813,90 +850,92 @@ const Home = (props) => {
                             />
                           )}
                           {res.age}
-                          </span>
-                        </div>
-                        <div className="" style={{width:"33%"}}>{res.country?.trim()}</div>
-                      </div>
-                      {usersPart === "users" && (
-                        <div
-                          className="d-flex  align-items-center block-width col justify-content-center"
-                          style={{ minWidth: "7.5rem" }}
-                        >
-                          {res.commentator_level &&
-                          res.commentator_level !== "undefined" ? (
-                            <button
-                              className="btn-user"
-                              style={{
-                                textAlign: "center",
-                                paddingTop: "0.1rem",
-                                width: "7.5rem",
-                                color:
-                                  (res.commentator_level === "journeyman" &&
-                                    "#4DD5FF") ||
-                                  (res.commentator_level === "master" &&
-                                    "#03fc77") ||
-                                  (res.commentator_level === "grandmaster" &&
-                                    "#FF9100") ||
-                                  (res.commentator_level === "apprentice" &&
-                                    "#FFEE7D"),
-                                border:
-                                  (res.commentator_level === "journeyman" &&
-                                    "1px solid #4DD5FF") ||
-                                  (res.commentator_level === "master" &&
-                                    "1px solid #03fc77") ||
-                                  (res.commentator_level === "grandmaster" &&
-                                    "1px solid #FF9100") ||
-                                  (res.commentator_level === "apprentice" &&
-                                    "1px solid #FFEE7D"),
-                                borderRadius: "2px",
-                                backgroundColor: "transparent",
-                              }}
-                            >
-                              {res.commentator_level.charAt(0).toUpperCase() +
-                                res.commentator_level.slice(1).toLowerCase()}
-                            </button>
-                          ) : (
-                            <span></span>
-                          )}
-                        </div>
-                      )}
-                      <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
-                        <span>
-                          {moment(res.created).format("DD-MM.YYYY - HH:mm")}
                         </span>
-                        <img
-                          data-bs-toggle="modal"
-                          data-bs-target="#exampleModal"
-                          onClick={() => {
-                            setprofile(true);
-                            setUserData(res);
-                            setAddUser(res);
-                            setPreveiwProfilePic(true);
-                          }}
-                          className="cursor"
-                          src={userEdit}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
-                        <img
-                          onClick={
-                            () => {
-                              // if (userData?.is_delete) {
-                              handleDeactive(res.id, "delete");
-                            }
-                            // }
-                          }
-                          className="cursor"
-                          src={trash}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
                       </div>
-                    </MainDiv>
-                  </React.Fragment>
-                ))
+                      <div className="" style={{ width: "33%" }}>
+                        {res.country?.trim()}
+                      </div>
+                    </div>
+                    {usersPart === "users" && (
+                      <div
+                        className="d-flex  align-items-center block-width col justify-content-center"
+                        style={{ minWidth: "7.5rem" }}
+                      >
+                        {res.commentator_level &&
+                        res.commentator_level !== "undefined" ? (
+                          <button
+                            className="btn-user"
+                            style={{
+                              textAlign: "center",
+                              paddingTop: "0.1rem",
+                              width: "7.5rem",
+                              color:
+                                (res.commentator_level === "journeyman" &&
+                                  "#4DD5FF") ||
+                                (res.commentator_level === "master" &&
+                                  "#03fc77") ||
+                                (res.commentator_level === "grandmaster" &&
+                                  "#FF9100") ||
+                                (res.commentator_level === "apprentice" &&
+                                  "#FFEE7D"),
+                              border:
+                                (res.commentator_level === "journeyman" &&
+                                  "1px solid #4DD5FF") ||
+                                (res.commentator_level === "master" &&
+                                  "1px solid #03fc77") ||
+                                (res.commentator_level === "grandmaster" &&
+                                  "1px solid #FF9100") ||
+                                (res.commentator_level === "apprentice" &&
+                                  "1px solid #FFEE7D"),
+                              borderRadius: "2px",
+                              backgroundColor: "transparent",
+                            }}
+                          >
+                            {res.commentator_level.charAt(0).toUpperCase() +
+                              res.commentator_level.slice(1).toLowerCase()}
+                          </button>
+                        ) : (
+                          <span></span>
+                        )}
+                      </div>
+                    )}
+                    <div className="d-flex align-items-center justify-content-end gap-2 edit-icon-gap col">
+                      <span>
+                        {moment(res.created).format("DD-MM.YYYY - HH:mm")}
+                      </span>
+                      <img
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal"
+                        onClick={() => {
+                          setprofile(true);
+                          setUserData(res);
+                          setAddUser(res);
+                          setPreveiwProfilePic(true);
+                        }}
+                        className="cursor"
+                        src={userEdit}
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
+                      <img
+                        onClick={
+                          () => {
+                            // if (userData?.is_delete) {
+                            handleDeactive(res.id, "delete");
+                          }
+                          // }
+                        }
+                        className="cursor"
+                        src={trash}
+                        alt=""
+                        height={25}
+                        width={25}
+                      />
+                    </div>
+                  </MainDiv>
+                </React.Fragment>
+              ))
             )}
           </>
         )}
@@ -1009,7 +1048,10 @@ const Home = (props) => {
                         12-02-2023
                       </span>
                       <span
-                        onClick={() => setshowTransactionHistory(2)}
+                        onClick={() => {
+                          setshowTransactionHistory(2);
+                          handleTransectionHistory(addUser.id);
+                        }}
                         className="p-1"
                       >
                         Transaction History
@@ -1442,47 +1484,67 @@ const Home = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="" style={{ overflowY: "scroll" }}>
-                {transactionHistoryArray.map((res, key) => (
-                  <div className="row g-0 my-2" key={res.id}>
-                    <div
-                      className="px-2 d-flex justify-content-between align-items-center"
-                      style={{ backgroundColor: "#0B2447" }}
-                    >
-                      <div className="position-relative">
-                        <img src={user1} alt="" height={56} width={56} />
-                        <div
-                          className="position-absolute d-flex justify-content-center align-items-center"
-                          style={{
-                            height: "19px",
-                            width: "19px",
-                            border: "2px solid #FFEE7D",
-                            borderRadius: "50%",
-                            backgroundColor: "#0B2447",
-                            top: "5px",
-                            left: "40px",
-                          }}
-                        >
-                          <BiSolidCrown
-                            fontSize={"0.65rem"}
-                            style={{ color: "#FFEE7D" }}
+              <div className="" style={{ overflowY: "scroll", height: "18rem" }}>
+                {subscriberIncome?.length == 0 ? (
+                  <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                    No Record Found!
+                  </div>
+                ) : (
+                  subscriberIncome?.map((res, key) => (
+                    <div className="row g-0 my-2" key={res.id}>
+                      <div
+                        className="px-2 d-flex justify-content-between align-items-center"
+                        style={{ backgroundColor: "#0B2447" }}
+                      >
+                        <div className="position-relative">
+                          <img
+                            src={
+                              res?.user?.profile_pic
+                                ? `${config.apiUrl}${res?.user?.profile_pic}`
+                                : res?.commentator_user?.profile_pic
+                                ? `${config.apiUrl}${res?.commentator_user?.profile_pic}`
+                                : initialProfile
+                            }
+                            className="rounded-circle"
+                            alt=""
+                            height={56}
+                            width={56}
                           />
+                          <div
+                            className="position-absolute d-flex justify-content-center align-items-center"
+                            style={{
+                              height: "19px",
+                              width: "19px",
+                              border: "2px solid #FFEE7D",
+                              borderRadius: "50%",
+                              backgroundColor: "#0B2447",
+                              top: "5px",
+                              left: "40px",
+                            }}
+                          >
+                            <BiSolidCrown
+                              fontSize={"0.65rem"}
+                              style={{ color: "#FFEE7D" }}
+                            />
+                          </div>
+                          <span className="ps-2">{res?.user ? res?.user.name : res?.commentator_user.name}</span>
                         </div>
-                        <span className="ps-2">johndoe</span>
-                      </div>
-                      <div className="">
-                        <span>1 Month </span>
-                        <span className="px-2">15-06-2023 - 16:37</span>
-                        <span>69.90</span>
+                        <div className="">
+                          <span>{res.duration} </span>
+                          <span className="px-2">{moment(res.created).format(
+                                    "DD-MM.YYYY - HH:mm"
+                                  )}</span>
+                          <span>{res.money}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
               <img
-                onClick={()=>{
+                onClick={() => {
                   // setNumberDropDown(false)
-                  setshowTransactionHistory(1)
+                  setshowTransactionHistory(1);
                 }}
                 data-bs-dismiss="modal"
                 src={cross}

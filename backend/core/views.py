@@ -3080,6 +3080,18 @@ class SalesManagement(APIView):
             
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+
+            try:
+                """Sales percentage"""
+                status_changed_to_pending = BecomeCommentator.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                data_list['new_sales_percentage'] = subscriptions_percentage
+            except:
+                data_list['new_sales_percentage'] = 0
+
             try:
                 """Subscribers percentage"""
                 status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
@@ -3101,6 +3113,22 @@ class SalesManagement(APIView):
                 data_list['new_highlights_percentage'] = highlights_percentage
             except:
                 data_list['new_highlights_percentage'] = 0
+
+            try:
+                # plan sale objects handling
+                plan_sale_obj = BecomeCommentator.objects.filter(commentator=True)
+                print("*******", plan_sale_obj)
+                plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
+                plan_sale_cal_ = 0
+                for obj in plan_sale_obj_cal:
+                    plan_sale_cal_ += obj.money
+
+                serializer1 = BecomeCommentatorSerializer(plan_sale_obj, many=True)
+                data_list['plan_sale_count'] = plan_sale_cal_
+                data_list['plan_sale'] = serializer1.data
+
+            except Exception as e:
+                return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # Subscription objects handling 
 
@@ -3134,7 +3162,7 @@ class SalesManagement(APIView):
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        data_list['daily_total'] = subscription_cal + highlights_cal_
+        data_list['daily_total'] = plan_sale_cal_ + subscription_cal + highlights_cal_
 
         try:
             subscription_obj = Subscription.objects.filter(subscription=True)
@@ -3146,7 +3174,7 @@ class SalesManagement(APIView):
             for obj in highlights_obj:
                 highlights_cal += obj.money
 
-            print("-----", subscription_cal + highlights_cal)
+            # print("-----", subscription_cal + highlights_cal)
             data_list['all_time_total'] = subscription_cal + highlights_cal
 
         except Exception as e:
@@ -4046,11 +4074,12 @@ class LevelRule(APIView):
 class MembershipSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
-            
-            if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            if request.query_params.get('admin'):
+                adminuser_id = request.query_params.get('admin')
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             level = request.query_params.get('commentator_level')
             
             if not level:
@@ -4783,7 +4812,7 @@ class BecomeEditorView(APIView):
                 if not data["profile_pic"]:
                     return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
-                # Update data to pass in serializer 
+                # Update data to pass in serializer
                 data["user_role"] = "commentator"
                 data["commentator_level"] = "apprentice"
                 data['category'] = category_data  
@@ -4807,6 +4836,11 @@ class BecomeEditorView(APIView):
                 if serializer.is_valid():
                     try:
                         serializer.save()
+
+                        editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
+                        
+                        obj = BecomeCommentator.objects.create(user=user, money=editor_obj.answer, commentator=True, status='active')
+                        obj.save()
                     except Exception as e:
                         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     return Response(serializer.data)
@@ -5218,11 +5252,12 @@ class RetrieveEditorView(APIView):
 class BecomeEditorFAQView(APIView):
 
     def get(self, request, id=None):
-        adminuser_id = request.query_params.get('admin')
-        adminuser = User.objects.get(id=adminuser_id)
-        
-        if adminuser.is_delete == True:
-                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+        if request.query_params.get('admin'):
+            adminuser_id = request.query_params.get('admin')
+            adminuser = User.objects.get(id=adminuser_id)
+            
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
         if request.query_params.get("id"):
             user = User.objects.get(id=request.query_params.get('id'))
             if user.is_delete == True:
@@ -5312,11 +5347,12 @@ def create_reminder_notification():
 class BankDetailsView(APIView):
     def get(self, request, id=None, *args, **kwargs):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
-            
-            if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            if request.query_params.get('admin') != None:
+                adminuser_id = request.query_params.get('admin')
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
                 if user.user_role == 'commentator':
@@ -5495,10 +5531,11 @@ class GetUserdata(APIView):
 class EditorBannerView(APIView):
     def get(self, request):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
-            
-            if adminuser.is_delete == True:
+            if request.query_params.get('admin'):
+                adminuser_id = request.query_params.get('admin')
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             banner =  EditorBanner.objects.all()    
             data = EditorBannerSerializer(banner, many=True).data
@@ -5585,5 +5622,60 @@ class GetPendingBalance(APIView):
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+class TransactionHistory(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            if id is not None:
+                details = {}
+                editor_user = get_object_or_404(User, id=id)
+                data = PendingBalanceHistory.objects.filter(editor=editor_user)
+                subscriber_income = PendingBalanceHistorySerializer(data, many=True).data
+                details['subscriber_income'] = subscriber_income
 
+                """withdrawal remaning"""
+                withdrawal = []
+                details['withdrawal'] = withdrawal
 
+                payment = []
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=editor_user)
+                for obj in subscription_obj:
+                    subscription_payment = SubscriptionSerializer(obj).data
+                    payment.append(subscription_payment)
+                highlight_obj = Highlight.objects.filter(highlight=True, user=editor_user)
+                for obj in highlight_obj:
+                    highlight_payment = HighlightSerializer(obj).data
+                    payment.append(highlight_payment)
+
+                details['payment'] = payment
+
+                return Response(data=details, status=status.HTTP_200_OK)
+            else:
+                return Response(data={"message": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UserTransactionHistory(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+            if user.user_role == 'standard':
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=user)
+                subscription_payment = SubscriptionSerializer(subscription_obj, many=True).data
+                return Response(data=subscription_payment, status=status.HTTP_200_OK)
+            if user.user_role == 'commentator':
+                payment = []
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=user)
+                for obj in subscription_obj:
+                    subscription_payment = SubscriptionSerializer(obj).data
+                    payment.append(subscription_payment)
+                highlight_obj = Highlight.objects.filter(highlight=True, user=user)
+                for obj in highlight_obj:
+                    highlight_payment = HighlightSerializer(obj).data
+                    payment.append(highlight_payment)
+                return Response(data=payment, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
