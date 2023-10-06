@@ -113,7 +113,7 @@ class SignupView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
         otp = totp.now()
-        print("--------", otp)
+        # print("--------", otp)
         res = sms_send(phone, otp)  
         if res == 'Success':
             return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -209,10 +209,10 @@ class LoginView(APIView):
 class GoogleLoginview(APIView):
     def post(self, request, format=None):
         email = request.data.get('email')
-        print('email: ', email)
+        # print('email: ', email)
         try: 
             user = User.objects.get(Q(email=email) & Q(logged_in_using='google'))
-            print("Email already exists")
+            # print("Email already exists")
         except User.DoesNotExist:
             user = User.objects.create(
                 email=email,
@@ -1051,7 +1051,7 @@ class FavEditorsCreateView(APIView):
         try:
             user = get_object_or_404(User, id=id)
             editor = request.query_params.get('commentator')
-            print('editor: ', editor)
+            # print('editor: ', editor)
 
             commentator = get_object_or_404(User, id=editor)
             faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
@@ -2517,7 +2517,7 @@ class FilterComments(APIView):
                 # serializer = CommentsSerializer(filtered_comments, many=True)
                 # data = serializer.data
                 # data_list.append(data)
-            print("data", request.data)
+            # print("data", request.data)
             return Response(data=data_list, status=status.HTTP_200_OK)
     
         except Exception as e:
@@ -2688,7 +2688,7 @@ class EditorManagement(APIView):
             return Response(data=data_list, status=status.HTTP_200_OK)
         
         except Exception as e:
-            print(e,"===================>>>>>e")
+            # print(e,"===================>>>>>e")
             # Handle the exception here (e.g., log the error, return a specific error response, etc.)
             return Response(data={'error': f'An error occurred while processing the request.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -2804,11 +2804,11 @@ class EditorManagement(APIView):
             try:
                 serializer.save()
             except Exception as e:
-                print("error: ", e)
+                # print("error: ", e)
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             return Response(serializer.data)
         else:
-            print("ERROR: ", serializer.errors)
+            # print("ERROR: ", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     def delete(self, request, pk, format=None, *args, **kwargs):
@@ -3063,7 +3063,7 @@ class DeactivateCommentator(APIView):
                 obj.commentator_status = 'deactive'
                 obj.save(update_fields=['deactivate_commentator','commentator_status', 'is_active', 'updated'])
             elif deactivation_status == 'reject':
-                print('deactivation_status: ', deactivation_status)
+                # print('deactivation_status: ', deactivation_status)
                 obj.deactivate_commentator = ''
                 obj.save(update_fields=['deactivate_commentator','updated'])
 
@@ -3102,6 +3102,18 @@ class SalesManagement(APIView):
             
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+
+            try:
+                """Sales percentage"""
+                status_changed_to_pending = BecomeCommentator.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                data_list['new_sales_percentage'] = subscriptions_percentage
+            except:
+                data_list['new_sales_percentage'] = 0
+
             try:
                 """Subscribers percentage"""
                 status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
@@ -3123,6 +3135,22 @@ class SalesManagement(APIView):
                 data_list['new_highlights_percentage'] = highlights_percentage
             except:
                 data_list['new_highlights_percentage'] = 0
+
+            try:
+                # plan sale objects handling
+                plan_sale_obj = BecomeCommentator.objects.filter(commentator=True)
+                # print("*******", plan_sale_obj)
+                plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
+                plan_sale_cal_ = 0
+                for obj in plan_sale_obj_cal:
+                    plan_sale_cal_ += obj.money
+
+                serializer1 = BecomeCommentatorSerializer(plan_sale_obj, many=True)
+                data_list['plan_sale_count'] = plan_sale_cal_
+                data_list['plan_sale'] = serializer1.data
+
+            except Exception as e:
+                return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # Subscription objects handling 
 
@@ -3156,7 +3184,7 @@ class SalesManagement(APIView):
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        data_list['daily_total'] = subscription_cal + highlights_cal_
+        data_list['daily_total'] = plan_sale_cal_ + subscription_cal + highlights_cal_
 
         try:
             subscription_obj = Subscription.objects.filter(subscription=True)
@@ -3168,7 +3196,7 @@ class SalesManagement(APIView):
             for obj in highlights_obj:
                 highlights_cal += obj.money
 
-            print("-----", subscription_cal + highlights_cal)
+            # print("-----", subscription_cal + highlights_cal)
             data_list['all_time_total'] = subscription_cal + highlights_cal
 
         except Exception as e:
@@ -3397,7 +3425,7 @@ class SupportManagement(APIView):
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
-            print('res_obj: ', res_obj)
+            # print('res_obj: ', res_obj)
             if res_obj != None:
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
                                                             response_ticket=res_obj, message=message)
@@ -3437,12 +3465,12 @@ class RetrieveSubUserView(APIView):
     def post(self, request, format=None, *args, **kwargs):
         try:
             department = request.data.get('department')
-            print('department: ', department)
+            # print('department: ', department)
             if not department:
                 return Response({'error': 'Department not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
             sub_users = User.objects.filter(department=department, user_role='sub_user')
-            print('sub_users: ', sub_users)
+            # print('sub_users: ', sub_users)
             serializer = UserSerializer(sub_users, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -3463,9 +3491,9 @@ class TicketRedirectView(APIView):
             
             ticket = TicketSupport.objects.get(id=ticket_id)
             note = request.data.get('note')
-            print('note: ', note)
+            # print('note: ', note)
             user_id = request.data.get('id')  # sub user id
-            print('user_id: ', user_id)
+            # print('user_id: ', user_id)
             
             if user_id is None:
                 return Response({'error': 'User-Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -3879,7 +3907,7 @@ class FilterSubUserManagement(APIView):
                 
                 if 'users' in request.data and request.data.get('users') != None and request.data.get('users') != "Select":
                     users = request.data.get('users')
-                    print('users: ', users)
+                    # print('users: ', users)
                     if users == 'Deactivated Users':
                         filters.update({'is_active': False})
                     if users == 'Deleted Users':
@@ -4250,7 +4278,7 @@ class CommentSetting(APIView):
             
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
-            print('=========================post calledd')
+            # print('=========================post calledd')
             data = request.data.copy() 
 
             comment_serializer = CommentsSerializer(data=data)
@@ -4261,7 +4289,7 @@ class CommentSetting(APIView):
             user = User.objects.get(username=editor)
             
             category = request.data.get('category')
-            print('category: ', category)
+            # print('category: ', category)
             country = request.data.get('country')
             league = request.data.get('league')
             date = request.data.get('date')
@@ -4276,9 +4304,9 @@ class CommentSetting(APIView):
 
             match_data = get_league_data(category, league, date)
             match_time = match_data[0].get('Time', None) if match_data else None
-            print('match_time: ', match_time)
+            # print('match_time: ', match_time)
             match_time_obj =  datetime.strptime(match_time, '%H:%M:%S').time() if match_time else None
-            print('match_time_obj: ', match_time_obj)
+            # print('match_time_obj: ', match_time_obj)
 
             comment = Comments.objects.create(
                     comment=comment_1,
@@ -4797,7 +4825,7 @@ class BecomeEditorView(APIView):
 
             if user.user_role == "standard":
                 # Get data
-                print('request.data: ', request.data)
+                # print('request.data: ', request.data)
                 data = dict(request.data)
                 category_data = request.data.get('category', '').split(',')
 
@@ -4806,7 +4834,7 @@ class BecomeEditorView(APIView):
                 if not data["profile_pic"]:
                     return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
-                # Update data to pass in serializer 
+                # Update data to pass in serializer
                 data["user_role"] = "commentator"
                 data["commentator_level"] = "apprentice"
                 data['category'] = category_data  
@@ -4830,6 +4858,11 @@ class BecomeEditorView(APIView):
                 if serializer.is_valid():
                     try:
                         serializer.save()
+
+                        editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
+                        
+                        obj = BecomeCommentator.objects.create(user=user, money=editor_obj.answer, commentator=True, status='active')
+                        obj.save()
                     except Exception as e:
                         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     return Response(serializer.data)
@@ -5550,7 +5583,7 @@ class EditorBannerView(APIView):
             
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
-            print('request.data: ', request.data)
+            # print('request.data: ', request.data)
             if 'editor_banner' not in request.data:
                 return Response({'data' : 'Editor banner is required.'}, status=status.HTTP_404_NOT_FOUND)
             
@@ -5621,3 +5654,61 @@ class GetPendingBalance(APIView):
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+class TransactionHistory(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            if id is not None:
+                details = {}
+                editor_user = get_object_or_404(User, id=id)
+                data = PendingBalanceHistory.objects.filter(editor=editor_user)
+                subscriber_income = PendingBalanceHistorySerializer(data, many=True).data
+                details['subscriber_income'] = subscriber_income
+
+                """withdrawal remaning"""
+                withdrawal = []
+                details['withdrawal'] = withdrawal
+
+                payment = []
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=editor_user)
+                for obj in subscription_obj:
+                    subscription_payment = SubscriptionSerializer(obj).data
+                    payment.append(subscription_payment)
+                highlight_obj = Highlight.objects.filter(highlight=True, user=editor_user)
+                for obj in highlight_obj:
+                    highlight_payment = HighlightSerializer(obj).data
+                    payment.append(highlight_payment)
+
+                details['payment'] = payment
+
+                return Response(data=details, status=status.HTTP_200_OK)
+            else:
+                return Response(data={"message": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UserTransactionHistory(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+            if user.user_role == 'standard':
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=user)
+                subscription_payment = SubscriptionSerializer(subscription_obj, many=True).data
+                return Response(data=subscription_payment, status=status.HTTP_200_OK)
+            if user.user_role == 'commentator':
+                payment = []
+                subscription_obj = Subscription.objects.filter(subscription=True, standard_user=user)
+                for obj in subscription_obj:
+                    subscription_payment = SubscriptionSerializer(obj).data
+                    payment.append(subscription_payment)
+                highlight_obj = Highlight.objects.filter(highlight=True, user=user)
+                for obj in highlight_obj:
+                    highlight_payment = HighlightSerializer(obj).data
+                    payment.append(highlight_payment)
+                return Response(data=payment, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

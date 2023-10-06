@@ -70,7 +70,7 @@ const EditorManagemenet = (props) => {
   };
   const [cookies, setCookie, removeCookie] = useCookies();
   // const [isLoadingDeactive, setIsLoadingDeactive] = useState(false);
-  const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = localStorage.getItem("admin-user-id");
 
   const handleDeactive = async (id, action) => {
     try {
@@ -259,7 +259,6 @@ const EditorManagemenet = (props) => {
     }
     setDeneyimDropdown(!deneyimDropdown);
   };
-
 
   function handleAddProfile(e) {
     const imageFile = e.target.files[0];
@@ -483,7 +482,11 @@ const EditorManagemenet = (props) => {
       formData.append("city", addUser.city);
       formData.append(
         "category",
-        `${Array.isArray(addUser?.category)?addUser?.category?.join(","):addUser?.category?.split(", ")?.join(",")}`
+        `${
+          Array.isArray(addUser?.category)
+            ? addUser?.category?.join(",")
+            : addUser?.category?.split(", ")?.join(",")
+        }`
       );
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
@@ -744,6 +747,31 @@ const EditorManagemenet = (props) => {
   const categoryOptions = ["Futbol", "Basketbol", "Futbol, Basketbol"];
 
   const [selectedHisory, setselectedHisory] = useState("subscriber");
+  const [subscriberIncome, setSubscriberIncome] = useState([]);
+  const [withdrawal, setWithdrawal] = useState([]);
+  const [payment, setPayment] = useState([]);
+
+  const handleTransectionHistory = async (id) => {
+    // console.log("IDDD: ", id)
+    try {
+      // setIsLoadingDeactive(true);
+      const res = await axios.get(
+        `${config?.apiUrl}/transaction-history/${id}/`
+      );
+      if (res.status === 200) {
+        // console.log("-->: ", res);
+        const data = res.data.subscriber_income;
+        data.sort((a, b) => moment(b.date).unix() - moment(a.date).unix());
+        setSubscriberIncome(data);
+        setWithdrawal(res.data.withdrawal);
+        const data2 = res.data.payment
+        data2.sort((a, b) => moment(b.created).unix() - moment(a.created).unix());
+        setPayment(data2);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const subscriberArray = [
     { id: "#0001", profile: user1, name: "johndoe", month: "3 Months" },
@@ -1014,7 +1042,7 @@ const EditorManagemenet = (props) => {
               editorsArray?.map((res, index) => (
                 <div
                   key={index}
-                  onClick={() => { 
+                  onClick={() => {
                     props.setupdateProfile(2);
                     setPartialData(res);
                     setAddUser(res.editor_data);
@@ -1295,7 +1323,10 @@ const EditorManagemenet = (props) => {
                       Total Balance 12.500
                     </div>
                     <div
-                      onClick={() => setshowHistory(true)}
+                      onClick={() => {
+                        setshowHistory(true);
+                        handleTransectionHistory(partialData?.editor_data?.id);
+                      }}
                       className="text-end"
                       style={{ fontSize: ".9rem", cursor: "pointer" }}
                     >
@@ -1326,7 +1357,13 @@ const EditorManagemenet = (props) => {
                 <div className="p-2">
                   <div className="d-flex justify-content-between">
                     <div className="p-1 gap-3 d-flex ">
-                      <img src={leftArrow} alt="" height={20} width={20} onClick={() => setshowHistory(false)}/>
+                      <img
+                        src={leftArrow}
+                        alt=""
+                        height={20}
+                        width={20}
+                        onClick={() => setshowHistory(false)}
+                      />
                       <div
                         onClick={() => setselectedHisory("subscriber")}
                         className=""
@@ -1374,60 +1411,96 @@ const EditorManagemenet = (props) => {
                       </button>
                     </div>
                   </div>
-                  <div className="my-2" style={{ overflowY: "scroll" }}>
+                  <div
+                    className="my-2"
+                    style={{ overflowY: "scroll", height: "18rem" }}
+                  >
                     {selectedHisory === "subscriber" && (
                       <>
-                        {subscriberArray.map((res, index) => (
-                          <div
-                            className="row g-0 my-2 dark-mode px-3"
-                            style={{ backgroundColor: "#0B2447" }}
-                          >
-                            <div className="col d-flex align-items-center">
-                              <span className="pe-2">{res.id}</span>
-                              <img src={user1} alt="" height={50} width={50} />
-                              <span className="ps-2">{res.name}</span>
-                            </div>
-                            <div className="col d-flex align-items-center gap-3 justify-content-center">
-                              <div>{res.month}</div>
-                              <div>1/3</div>
-                              <div>229.90</div>
-                            </div>
-                            <div className="col d-flex align-items-center justify-content-end">
-                              <div>15-06-2023 - 16:37</div>
-                            </div>
+                        {subscriberIncome?.length == 0 ? (
+                          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                            No Record Found!
                           </div>
-                        ))}
+                        ) : (
+                          subscriberIncome?.map((res, index) => (
+                            <div
+                              className="row g-0 my-2 dark-mode px-3"
+                              style={{ backgroundColor: "#0B2447" }}
+                            >
+                              <div className="col d-flex align-items-center">
+                                <span className="pe-2">{`# ${(index + 1)
+                                  .toString()
+                                  .padStart(4, "0")}`}</span>
+                                <img
+                                  src={
+                                    res?.user?.profile_pic
+                                      ? `${config.apiUrl}${res?.user?.profile_pic}`
+                                      : initialProfile
+                                  }
+                                  className="rounded-circle"
+                                  alt=""
+                                  height={50}
+                                  width={50}
+                                />
+                                <span className="ps-2">{res.user.name}</span>
+                              </div>
+                              <div className="col d-flex align-items-center gap-3 justify-content-center">
+                                <div>{res.duration.split("-")[1]} Month</div>
+                                <div>{res.duration}</div>
+                                <div>{res.amount.toFixed(2)}</div>
+                              </div>
+                              <div className="col d-flex align-items-center justify-content-end">
+                                <div>
+                                  {moment(res.date).format(
+                                    "DD-MM.YYYY - HH:mm"
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </>
                     )}
                     {selectedHisory === "withdrawal" && (
                       <>
-                        {withdrawalArray.map((res, index) => (
-                          <div
-                            className="my-2 dark-mode px-3 py-2 pe-0 d-flex gap-5"
-                            style={{
-                              backgroundColor: "#0B2447",
-                              fontSize: "0.9rem",
-                            }}
-                          >
-                            <div className="">{res.id}</div>
-                            <div className="">{res.account}</div>
-                            <div className="">15-06-2023 - 16:37</div>
-                            <div className="">3.500</div>
-                            <div className="gap-0">
-                              <img
-                                src={circle_check}
-                                alt=""
-                                height={25}
-                                width={25}
-                              />
-                            </div>
+                        {withdrawal?.length == 0 ? (
+                          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                            No Record Found!
                           </div>
-                        ))}
+                        ) : (
+                          withdrawal?.map((res, index) => (
+                            <div
+                              className="my-2 dark-mode px-3 py-2 pe-0 d-flex gap-5"
+                              style={{
+                                backgroundColor: "#0B2447",
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              <div className="">{res.id}</div>
+                              <div className="">{res.account}</div>
+                              <div className="">15-06-2023 - 16:37</div>
+                              <div className="">3.500</div>
+                              <div className="gap-0">
+                                <img
+                                  src={circle_check}
+                                  alt=""
+                                  height={25}
+                                  width={25}
+                                />
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </>
                     )}
                     {selectedHisory === "payment" && (
                       <>
-                        {paymentArray.map((res, index) => (
+                        {payment?.length == 0 ? (
+                          <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                            No Record Found!
+                          </div>
+                        ) : (
+                          payment?.map((res, index) => (
                           <div
                             className="row g-0 my-2 dark-mode px-3 py-2"
                             style={{
@@ -1436,15 +1509,20 @@ const EditorManagemenet = (props) => {
                             }}
                           >
                             <div className="col gap-5 d-flex">
-                              <div>{res.id}</div>
-                              <div>{res.plan}</div>
+                              <div>{`# ${(index + 1)
+                                  .toString()
+                                  .padStart(4, "0")}`}</div>
+                              {res.subscription ? <div>{res.commentator_user.commentator_level.charAt(0).toUpperCase() + res.commentator_user.commentator_level.slice(1)} Subscription Plan</div> : null}
+                              {res.highlight ? <div>Highlight Plan {res.duration}</div> : null}
                             </div>
                             <div className="col gap-5 d-flex justify-content-end">
-                              <div>15-06-2023 - 16:37</div>
-                              <div>369.90</div>
+                              <div>{moment(res.created).format(
+                                    "DD-MM.YYYY - HH:mm"
+                                  )}</div>
+                              <div>{res.money}</div>
                             </div>
                           </div>
-                        ))}
+                        )))}
                       </>
                     )}
                   </div>
@@ -1578,7 +1656,11 @@ const EditorManagemenet = (props) => {
                         value={addUser.selectedDeneyim}
                         onChange={submitEditorData}
                         options={deneyimOptions}
-                        selectedOption={addUser.experience ? addUser.experience : selectedDeneyim}
+                        selectedOption={
+                          addUser.experience
+                            ? addUser.experience
+                            : selectedDeneyim
+                        }
                         onSelectOption={handleDeneyimSelection}
                         isOpen={deneyimDropdown}
                         toggleDropdown={toggleDeneyimDropdown}
@@ -1615,7 +1697,11 @@ const EditorManagemenet = (props) => {
                         label="Category"
                         options={categoryOptions}
                         selectedOption={
-                          addUser.category ? Array.isArray(addUser.category)?addUser.category.join(", "):addUser.category : selectedCategory
+                          addUser.category
+                            ? Array.isArray(addUser.category)
+                              ? addUser.category.join(", ")
+                              : addUser.category
+                            : selectedCategory
                         }
                         onSelectOption={handleCategorySelection}
                         isOpen={categoryDropdown}

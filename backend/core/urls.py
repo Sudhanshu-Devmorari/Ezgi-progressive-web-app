@@ -3,7 +3,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
-                         GetPendingBalance,
+                         GetPendingBalance, TransactionHistory, UserTransactionHistory,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -54,6 +54,8 @@ urlpatterns = [
     path('sports-statistics/<int:id>/', SportsStatisticsView.as_view(), name='Sports-State'), 
     path('football-basketball-content/', FootbalAndBasketballContentView.as_view(), name='Football-Basketball-Content'), 
     path('pending-balance/<int:id>/', GetPendingBalance.as_view(), name='Pending-Balance'), 
+    path('transaction-history/<int:id>/', TransactionHistory.as_view(), name='Transaction-History'), 
+    path('user-transaction-history/<int:id>/', UserTransactionHistory.as_view(), name='User-TransactionHistory'), 
 
 
     # Admin Panel's api

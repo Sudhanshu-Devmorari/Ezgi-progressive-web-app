@@ -333,13 +333,13 @@ COMMENTATOR_STATUS = (
         ('deactive','Deactive'),
     )
 class BecomeCommentator(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    duration = models.CharField(max_length=20)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+    duration = models.CharField(max_length=20,null=True, blank=True)
     money = models.FloatField(null=True, blank=True)
-    commentator = models.BooleanField()
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
-    status = models.CharField(max_length = 20, choices = COMMENTATOR_STATUS)
+    commentator = models.BooleanField(null=True, blank=True)
+    start_date = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = COMMENTATOR_STATUS,null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
