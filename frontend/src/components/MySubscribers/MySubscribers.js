@@ -55,6 +55,7 @@ const MySubscribers = (props) => {
   return (
     <>
       <div
+        style={{ height: "250px", overflowY: "auto" }}
         className={`${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } my-2 p-2 pb-5 fonts-subscribers`}
@@ -81,7 +82,39 @@ const MySubscribers = (props) => {
                                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                             }}
                           >
-                            <div className="">
+                            <div
+                              className=""
+                              onClick={() => {
+                                const currentPage =
+                                  localStorage.getItem("currentpage");
+                                const currentuser =
+                                  localStorage.getItem("user-role");
+                                localStorage.setItem("dashboardShow", true);
+                                (currentPage !== "show-all-comments" ||
+                                  currentPage !== "notifications") &&
+                                  localStorage.setItem(
+                                    "priviouspage",
+                                    currentPage
+                                  );
+                                localStorage.setItem(
+                                  "currentpage",
+                                  "show-all-comments"
+                                );
+                                localStorage.setItem(
+                                  "subcurrentpage",
+                                  "subscribers"
+                                );
+                                localStorage.setItem(
+                                  "activeCommentId",
+                                  res?.standard_user?.id
+                                );
+                                props?.setActiveCommentsshow(
+                                  res?.standard_user?.id
+                                );
+                                props?.setDashboardSUser(false);
+                                props?.setSelectContent("show-all-comments");
+                              }}
+                            >
                               <img
                                 style={{
                                   borderRadius: "50%",
@@ -168,7 +201,39 @@ const MySubscribers = (props) => {
                                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                             }}
                           >
-                            <div className="">
+                            <div
+                              className=""
+                              onClick={() => {
+                                const currentPage =
+                                  localStorage.getItem("currentpage");
+                                const currentuser =
+                                  localStorage.getItem("user-role");
+                                localStorage.setItem("dashboardShow", true);
+                                (currentPage !== "show-all-comments" ||
+                                  currentPage !== "notifications") &&
+                                  localStorage.setItem(
+                                    "priviouspage",
+                                    currentPage
+                                  );
+                                localStorage.setItem(
+                                  "currentpage",
+                                  "show-all-comments"
+                                );
+                                localStorage.setItem(
+                                  "subcurrentpage",
+                                  "subscribers"
+                                );
+                                localStorage.setItem(
+                                  "activeCommentId",
+                                  res?.commentator_user?.id
+                                );
+                                props?.setActiveCommentsshow(
+                                  res?.commentator_user?.id
+                                );
+                                props?.setDashboardSUser(false);
+                                props?.setSelectContent("show-all-comments");
+                              }}
+                            >
                               <div className="position-relative">
                                 <img
                                   onContextMenu={(e) => e.preventDefault()}
@@ -199,8 +264,8 @@ const MySubscribers = (props) => {
                                     : profile
                                 }
                                 alt=""
-                                height={38}
-                                width={38}
+                                height={35}
+                                width={35}
                               />
                               <span className="ps-1">
                                 {res?.commentator_user?.username}

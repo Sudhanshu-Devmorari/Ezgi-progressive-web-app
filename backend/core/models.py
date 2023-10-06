@@ -139,6 +139,7 @@ class Subscription(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     status = models.CharField(max_length = 20, choices = SUBSCRIPTION_STATUS)
+    is_cancelled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

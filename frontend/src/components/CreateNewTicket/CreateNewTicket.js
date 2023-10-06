@@ -38,12 +38,13 @@ const CreateNewTicket = (props) => {
     } else if (message === "") {
       setMessageError("Message is required.");
     } else {
-      const mapDepartmentData = ticketsData?.map((res) => res.department);
-      const mapStatusData = ticketsData?.map((res) => res.status);
+      const filterData  =  ticketsData?.filter(res => res.department == selectedMatchDetails)
+      const mapDepartmentData = filterData?.map((res) => res.department);
+      const mapStatusData = filterData?.map((res) => res.status);
 
       if (
         mapDepartmentData?.includes(selectedMatchDetails) &&
-        mapStatusData?.includes("pending")
+       ( mapStatusData?.includes("pending") ||  mapStatusData?.includes("progress"))
       ) {
         await Swal.fire({
           title: "Error",

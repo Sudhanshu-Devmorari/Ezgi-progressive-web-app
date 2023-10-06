@@ -38,7 +38,7 @@ const Support = () => {
   useEffect(() => {
     async function getTicketsData() {
       const res = await axios.get(`${config?.apiUrl}/support/${userId}`);
-      // console.log("res----------", res.data);
+      console.log("res----------", res.data);
       setTicketsData(res.data);
     }
     getTicketsData();
@@ -57,7 +57,6 @@ const Support = () => {
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
-          // console.log(res.data, "=================>>>>res");
           setTicketData(res.data);
         })
         .catch((error) => {
@@ -65,6 +64,14 @@ const Support = () => {
         });
     } catch (e) {}
   }
+
+  const [responseTicketID, setResponseTicketID] = useState(null);
+  useEffect(() => {
+    if (ticketData[0]?.response_ticket) {
+      const admin_id = ticketData[0]?.response_ticket?.user?.id;
+      setResponseTicketID(admin_id);
+    }
+  }, [ticketData]);
 
   return (
     <>
@@ -165,6 +172,7 @@ const Support = () => {
             setShowModal={setShowModal}
             ticketId={ticketId}
             ticketData={ticketData}
+            responseTicketID={responseTicketID}
           />
         )}
 
@@ -172,6 +180,7 @@ const Support = () => {
           <TicketReplyModal
             setShowModal={setShowModal}
             ticketData={ticketData}
+            responseTicketID={responseTicketID}
           />
         )}
       </div>

@@ -1,16 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import Swal from "sweetalert2";
 import moment from "moment";
 import config from "../../config";
+import { userId } from "../GetUser";
 
 const TicketReplyModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const ticketData = props?.ticketData || [];
-  // console.log(ticketData,"=============>>>>ticketData");
 
   const [replyMessage, setReplyMessage] = useState("");
 
@@ -21,15 +21,17 @@ const TicketReplyModal = (props) => {
         text: "Please add a reply",
         icon: "error",
         backdrop: false,
-        customClass: "dark-mode-alert",
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
     } else if (replyMessage !== "") {
       axios
         .post(
-          `${config?.apiUrl}/reply-ticket/${ticketData?.user?.id}/${ticketData?.id}/`,
+          `${config?.apiUrl}/reply-ticket/${userId}/${ticketData[0]?.ticket_support?.id}/`,
           {
             message: replyMessage,
-            admin_id: ticketData?.admin_response?.user?.id,
+            admin_id: props?.responseTicketID,
+            // admin_id: ticketData?.admin_response?.user?.id,
           }
         )
         .then((res) => {
@@ -41,7 +43,10 @@ const TicketReplyModal = (props) => {
               text: "Reply sent successfully",
               icon: "success",
               backdrop: false,
-              customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
             });
           }
         })
@@ -55,15 +60,22 @@ const TicketReplyModal = (props) => {
       <div className="p-2">
         <div className="d-flex">
           <span className="pe-2">Department</span>
-          <span style={{ color: "#D2DB08" }}>{ticketData?.department}</span>
+          <span style={{ color: "#D2DB08" }}>
+            {ticketData[0]?.ticket_support?.department}
+          </span>
           <span className="ms-auto">
-            Ticket {`#${ticketData?.id?.toString()?.padStart(4, "0")}`}
+            Ticket{" "}
+            {`#${ticketData[0]?.ticket_support?.id
+              ?.toString()
+              ?.padStart(4, "0")}`}
           </span>
         </div>
-        <div className="my-2">Subject {ticketData?.subject}</div>
+        <div className="my-2">
+          Subject: {ticketData[0]?.ticket_support?.subject}
+        </div>
         <div className="my-2">Message</div>
 
-        <div className="d-flex justify-content-between">
+        {/* <div className="d-flex justify-content-between">
           <span>
             Support -{" "}
             <span style={{ color: "#D2DB08" }}>
@@ -88,7 +100,7 @@ const TicketReplyModal = (props) => {
           }`}
           defaultValue={ticketData?.admin_response?.response}
           disabled
-        />
+        /> */}
         <div className="">
           <label htmlFor="Reply">Reply</label>
           <br />

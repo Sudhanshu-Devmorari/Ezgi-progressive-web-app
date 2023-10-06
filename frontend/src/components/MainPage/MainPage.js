@@ -82,7 +82,6 @@ const MainPage = () => {
   const [category, setCategory] = useState("Futbol");
 
   function homeApiData(user_id) {
-    console.log(category,"=================>>category")
     axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)

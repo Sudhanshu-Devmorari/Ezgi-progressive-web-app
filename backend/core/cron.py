@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytz
 import requests
 from core.utils import sms_send
-from core.models import User, Comments
+from core.models import User, Comments, Highlight
 import logging
 # from django_cron import CronJobBase, Schedule
 
@@ -11,10 +11,6 @@ logger = logging.getLogger('django_cron')
 
 def subscription_reminder_cron():
     try:
-        # u = User.objects.get(id=68)
-        # u.name = 'mansiiiiiiiii00000-------------------'
-        # u.save()
-        # print("\n\n =======>>>>>> Entering subscription")
         notification_list = []
         today_date = timezone.now().date() 
         cutoff_date = timezone.now() + timedelta(days=3)
@@ -43,6 +39,28 @@ def subscription_reminder_cron():
         
         # Deactivate subscription after 3 days of expiration if subscription not activated
         pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
+
+
+        # Send notification expiration highlight purchase
+        highlight_list = []
+        expiration_highlight = Highlight.objects.filter(end_date__date__lt=today_date, status='active')
+        for highlight in expiration_highlight:
+            is_highlight_notification = Notification.objects.filter(receiver=highlight.user, subject='Highlight Plan Expires', date=today_date).exists()
+
+            if not is_highlight_notification:
+                notification = Notification(
+                    receiver=highlight.user, 
+                    subject='Highlight Plan Expires',
+                    date=today_date, 
+                    status=False,
+                    context=f'Your Highlights period has ended! Boost your interactions by featuring again!'
+                )
+                highlight_list.append(notification)
+        Notification.objects.bulk_create(highlight_list)
+        
+        if Highlight.objects.filter(end_date__date__lt=today_date, status='active').exists():
+            Highlight.objects.filter(end_date__date__lt=today_date, status='active').update(status='deactive')
+
         return True
     
     except:

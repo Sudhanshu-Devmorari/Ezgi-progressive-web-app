@@ -692,8 +692,9 @@ class SubscriptionView(APIView):
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
                 subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
-                subscription_obj.status = 'deactive'
-                subscription_obj.save(update_fields=['status', 'updated'])
+                # subscription_obj.status = 'deactive'
+                subscription_obj.is_cancelled = True
+                subscription_obj.save(update_fields=['is_cancelled', 'updated'])
 
                 Notification.objects.create(
                         sender=user,receiver=commentator, 
@@ -985,7 +986,8 @@ class ProfileView(APIView):
                     data['is_subscribe'] = is_subscribe
                     if is_subscribe:
                         subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
-                        data['subscription_end_date'] = subscription.end_date
+                        if subscription.is_cancelled:
+                            data['subscription_end_date'] = subscription.end_date
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -1220,7 +1222,13 @@ class SupportView(APIView):
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 if support_obj != None:
-                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                    # ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                    ticket_obj = TicketHistory.objects.create(
+                        user=user,
+                        ticket_support=support_obj,
+                        status='create',
+                        message=request.data.get('message')
+                    )
                 if support_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1262,7 +1270,13 @@ class ShowTicketData(APIView):
             serializer = TicketSupportSerializer(support_obj).data
         # serializer['admin_response'] = TicketHistorySerializer(ticket_history).data if ticket_history else None
         serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
-        return Response(data=serializer, status=status.HTTP_200_OK)
+
+        
+        history = TicketHistory.objects.filter(ticket_support=support_obj).order_by('-created')
+        history_serializer = TicketHistorySerializer(history, many=True).data
+
+        return Response(data=history_serializer, status=status.HTTP_200_OK)
+        # return Response(data=serializer, status=status.HTTP_200_OK)
 
 
 class ReplyTicketView(APIView):
@@ -1532,6 +1546,14 @@ class HighlightPurchaseView(APIView):
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
                 if highlight_obj != None:
+                    
+                    notification_obj = Notification.objects.create(
+                            receiver=user, 
+                            subject='Highlight Purchase', 
+                            date=datetime.today().date(), 
+                            status=False, context=f'Congratulations! Your profile and comments are now listed at the top.', 
+                        )
+                    
                     if DataCount.objects.filter(id=user.id).exists():
                         obj = DataCount.objects.get(id=user.id)
                         obj.highlight += 1
@@ -3378,7 +3400,7 @@ class SupportManagement(APIView):
             print('res_obj: ', res_obj)
             if res_obj != None:
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
-                                                            response_ticket=res_obj)
+                                                            response_ticket=res_obj, message=message)
                 ticket_support.status = 'progress'
                 ticket_support.save()
 
@@ -4046,11 +4068,12 @@ class LevelRule(APIView):
 class MembershipSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
+                adminuser = User.objects.get(id=adminuser_id)
             
-            if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             level = request.query_params.get('commentator_level')
             
             if not level:
@@ -4990,7 +5013,6 @@ class RetrievePageData():
                 if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False, category=[category]).exists():
                 # if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
                     subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False, commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created')
-                    print('subscription_comment: ', subscription_comment)
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
@@ -5033,32 +5055,45 @@ class RetrievePageData():
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
             
+            top_users = User.objects.annotate(comment_count=Count('comments')).filter(
+                    comment_count__gt=0,                 
+                    highlight__isnull=False,               
+                    is_delete=False,
+                    highlight__status='active',
+                    comments__status='approve', 
+                    category__contains=[category],
+                )[:5]
+
+            for user in top_users:
+                most_recent_highlight = user.highlight_set.filter(status='active')
+                print('most_recent_highlight: ', most_recent_highlight)
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=['Futbol']).order_by('-created')
+            # all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('-created')
             
-            for obj in all_highlights:
-                highlighted_data = HighlightSerializer(obj).data
-                user_data = highlighted_data['user'] 
+            # for obj in all_highlights:
+                for obj in most_recent_highlight:
+                    highlighted_data = HighlightSerializer(obj).data
+                    user_data = highlighted_data['user'] 
 
-                data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
-                win_count = data.filter(is_prediction=True).count()
-                lose_count = data.filter(is_prediction=False).count()
-                highlighted_data['user'] ['win'] = win_count
-                highlighted_data['user'] ['lose'] = lose_count
+                    data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
+                    win_count = data.filter(is_prediction=True).count()
+                    lose_count = data.filter(is_prediction=False).count()
+                    highlighted_data['user'] ['win'] = win_count
+                    highlighted_data['user'] ['lose'] = lose_count
 
-                if standard_user_id is not None:
-                    logged_in_user = User.objects.get(id=standard_user_id)
-                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
-                    highlighted_data['is_subscribe'] = is_subscribe
+                    if standard_user_id is not None:
+                        logged_in_user = User.objects.get(id=standard_user_id)
+                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
+                        highlighted_data['is_subscribe'] = is_subscribe
 
-                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
-                highlighted_data['subscriber_count'] = count
+                    count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
+                    highlighted_data['subscriber_count'] = count
 
-                if standard_user_id:
-                    highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
-                else:
-                    highlighted_data['is_fav_editor'] = False
+                    if standard_user_id:
+                        highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
+                    else:
+                        highlighted_data['is_fav_editor'] = False
 
                 highlights.append(highlighted_data)
         except:
@@ -5218,12 +5253,13 @@ class RetrieveEditorView(APIView):
 class BecomeEditorFAQView(APIView):
 
     def get(self, request, id=None):
-        adminuser_id = request.query_params.get('admin')
-        adminuser = User.objects.get(id=adminuser_id)
+        adminuser_id = request.query_params.get('admin', None)
+        if adminuser_id is not None:
+            adminuser = User.objects.get(id=adminuser_id)
         
-        if adminuser.is_delete == True:
-                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
-        if request.query_params.get("id"):
+            if adminuser.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+        if request.query_params.get("id", None) is not None:
             user = User.objects.get(id=request.query_params.get('id'))
             if user.is_delete == True:
                 return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -5312,11 +5348,12 @@ def create_reminder_notification():
 class BankDetailsView(APIView):
     def get(self, request, id=None, *args, **kwargs):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
-            
-            if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
                 if user.user_role == 'commentator':
@@ -5495,11 +5532,12 @@ class GetUserdata(APIView):
 class EditorBannerView(APIView):
     def get(self, request):
         try:
-            adminuser_id = request.query_params.get('admin')
-            adminuser = User.objects.get(id=adminuser_id)
-            
-            if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
+                adminuser = User.objects.get(id=adminuser_id)
+                
+                if adminuser.is_delete == True:
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             banner =  EditorBanner.objects.all()    
             data = EditorBannerSerializer(banner, many=True).data
             return Response({'data' : data}, status=status.HTTP_200_OK)
@@ -5584,6 +5622,3 @@ class GetPendingBalance(APIView):
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
-
-

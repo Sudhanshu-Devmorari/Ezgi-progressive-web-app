@@ -119,20 +119,24 @@ const FavEditor = (props) => {
                 }`}
               >
                 <div className="text-end mt-1">
-                  <span
-                    className="pe-2 shared-font"
-                    style={{ fontSize: "13px" }}
-                  >
+                  {res?.data?.commentator_user?.commentator_level !=
+                    "apprentice" && (
                     <span
-                      className="pe-2"
-                      style={{
-                        color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                      }}
+                      className="pe-2 shared-font"
+                      style={{ fontSize: "13px" }}
                     >
-                      {res?.subscriber_count}
+                      <span
+                        className="pe-2"
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                        }}
+                      >
+                        {res?.subscriber_count}
+                      </span>
+                      Kişi abone oldu
                     </span>
-                    Kişi abone oldu
-                  </span>
+                  )}
                   <img
                     onContextMenu={(e) => e.preventDefault()}
                     className=""
@@ -141,7 +145,6 @@ const FavEditor = (props) => {
                     height={22}
                     width={22}
                     onClick={() => {
-                      // console.log("star click in fav editor:::::::::::::");
                       if (userId) {
                         onFavEditorSelect(res?.data?.commentator_user?.id);
                       }

@@ -45,6 +45,8 @@ const CommentatorIcons = (props) => {
     getBankIban();
   }, []);
 
+  const currentpage = localStorage.getItem('currentpage');
+
   return (
     <>
       <div className={`row my-2 g-0 gap-1 ${user !== "commentator" && "mx-4"}`}>
@@ -54,6 +56,7 @@ const CommentatorIcons = (props) => {
               onClick={() => {
                 props.setContent("home");
                 localStorage.setItem("subcurrentpage", "home");
+                currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
               }}
               className={`${
                 currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -79,6 +82,7 @@ const CommentatorIcons = (props) => {
           onClick={() => {
             props.setContent("subscribers");
             localStorage.setItem("subcurrentpage", "subscribers");
+            currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
           }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -103,6 +107,7 @@ const CommentatorIcons = (props) => {
             getBankIban()
             props.setContent("wallet");
             localStorage.setItem("subcurrentpage", "wallet");
+            currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
           }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -126,6 +131,7 @@ const CommentatorIcons = (props) => {
           onClick={() => {
             props.setContent("fav");
             localStorage.setItem("subcurrentpage", "fav");
+            currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
           }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -149,6 +155,7 @@ const CommentatorIcons = (props) => {
           onClick={() => {
             props.setContent("notifications");
             localStorage.setItem("subcurrentpage", "notifications");
+            currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
           }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
@@ -172,6 +179,7 @@ const CommentatorIcons = (props) => {
           onClick={() => {
             props.setContent("support");
             localStorage.setItem("subcurrentpage", "support");
+            currentpage == 'fav' &&  localStorage.setItem("currentpage", "show-all-comments");
           }}
           className={`${
             currentTheme === "dark" ? "dark-mode" : "light-mode"
