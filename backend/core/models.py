@@ -183,6 +183,8 @@ SUPPORT_STATUS = (
         ('progress','Progress'),
         ('resolved','Resolved'),
         ('pending','Pending'),
+        ('user responded','User Responded'),
+        ('responded','Responded'),
     )
 class TicketSupport(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

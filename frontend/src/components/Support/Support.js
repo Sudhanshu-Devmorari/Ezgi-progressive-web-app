@@ -38,7 +38,6 @@ const Support = () => {
   useEffect(() => {
     async function getTicketsData() {
       const res = await axios.get(`${config?.apiUrl}/support/${userId}`);
-      console.log("res----------", res.data);
       setTicketsData(res.data);
     }
     getTicketsData();
@@ -138,7 +137,9 @@ const Support = () => {
                         backgroundColor:
                           (res.status.toLowerCase() === "pending" &&
                             "#F8FF61") ||
-                          (res.status.toLowerCase() === "progress" &&
+                          ((res.status.toLowerCase() === "progress" ||
+                            res.status.toLowerCase() === "user responded" ||
+                            res.status.toLowerCase() === "responded") &&
                             "#4DD5FF") ||
                           (res.status.toLowerCase() === "resolved" &&
                             "#37FF80"),
@@ -148,8 +149,8 @@ const Support = () => {
                       {res.department}
                     </span>
                   </div>
-                  <div className="col-6 text-center">{res.created}</div>
-                  <div className="text-capitalize col-2 text-end">
+                  <div className="col-5 text-center">{res.created}</div>
+                  <div className="text-capitalize col-3 text-end">
                     {res.status}
                   </div>
                 </div>

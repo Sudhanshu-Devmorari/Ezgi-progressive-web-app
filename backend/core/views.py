@@ -1039,7 +1039,7 @@ class ProfileView(APIView):
                 user.description = description
             if 'description' not in request.data:
                 return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
-        # user.save(update_fields=['profile_pic', 'description', 'updated'])
+        user.save(update_fields=['profile_pic', 'description', 'updated'])
 
         serializer = UserSerializer(user)
         return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
@@ -1301,7 +1301,7 @@ class ReplyTicketView(APIView):
                 request_to=admin_obj
             )
             if ticket_history != None:
-                ticket_obj.status = 'pending'
+                ticket_obj.status = 'user responded'
                 ticket_obj.save()
 
             serializer = TicketHistorySerializer(ticket_history)
@@ -1372,7 +1372,15 @@ class ResolvedTicket(APIView):
                     return Response({'error': 'This ticket does not belong to the you.'}, status=status.HTTP_403_FORBIDDEN)
 
                 ticket_obj.status = 'resolved'
-                ticket_obj.save()
+                ticket_obj.save(update_fields=['status', 'updated'])
+
+                notification_obj = Notification.objects.create(
+                        receiver=ticket_obj.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Your ticket with the subject "{ticket_obj.subject}" has been successfully resolved.',
+                    )
 
                 serializer = TicketSupportSerializer(ticket_obj)
                 data = serializer.data
@@ -3424,14 +3432,36 @@ class SupportManagement(APIView):
             except TicketSupport.DoesNotExist:
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+            is_res_obj = ResponseTicket.objects.filter(user=user,ticket=ticket_support)
+
+            if is_res_obj:
+                ticket_support.status = 'responded'
+            else:
+                ticket_support.status = 'progress'
+            ticket_support.save(update_fields=['status', 'updated'])
+
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
-            # print('res_obj: ', res_obj)
-            if res_obj != None:
+
+            if res_obj != None:             
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
                                                             response_ticket=res_obj, message=message)
-                ticket_support.status = 'progress'
-                ticket_support.save()
-
+                if is_res_obj:
+                    notification_obj = Notification.objects.create(
+                        receiver=ticket_support.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Motiwy has responded to your ticket with the subject: {ticket_support.subject}.',
+                    )
+                else:
+                    notification_obj = Notification.objects.create(
+                        receiver=ticket_support.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Motiwy has replied to your ticket with the subject: {ticket_support.subject}.',
+                    )
+                
             serializer = ResponseTicketSerializer(res_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -5473,9 +5503,9 @@ class BankDetailsView(APIView):
                     bank_details.save(update_fields=['bank_iban', 'updated'])
                     return Response({'data': 'Bank Iban has been updated successfully'}, status=status.HTTP_200_OK)
                 else:
-                    bank_details.total_balance = 12.650
-                    bank_details.pending_balance = 12.650
-                    bank_details.withdrawable_balance = 8.000
+                    bank_details.total_balance = 0.0
+                    bank_details.pending_balance = 0.0
+                    bank_details.withdrawable_balance = 0.000
                     bank_details.save(update_fields=['total_balance', 'pending_balance', 'withdrawable_balance', 'updated'])
                     return Response({'data': 'Bank Iban has been created successfully'}, status=status.HTTP_201_CREATED)
 
@@ -5712,3 +5742,9 @@ class UserTransactionHistory(APIView):
             return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+from core.cron import Userst
+class TestCronView(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        Userst()
+        return Response(data={"message": "Cron run successfully"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

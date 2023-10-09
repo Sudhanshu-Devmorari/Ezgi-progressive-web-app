@@ -288,14 +288,16 @@ const SupportManagementPage = () => {
                             style={{
                               backgroundColor:
                                 (res.status === "pending" && "#FFDD00") ||
-                                (res.status === "answered" && "#4DD5FF") ||
+                                (res.status === "user responded" && "#4DD5FF") ||
+                                (res.status === "responded" && "#4DD5FF") ||
                                 (res.status === "resolved" && "#58DEAA") ||
                                 (res.status === "progress" && "#FF9100"),
                               borderRadius: "4px",
                               border:
                                 (res.status === "pending" &&
                                   "1px solid #FFDD00") ||
-                                (res.status === "answered" && "#4DD5FF") ||
+                                (res.status === "user responded" && "#4DD5FF") ||
+                                (res.status === "responded" && "#4DD5FF") ||
                                 (res.status === "resolved" && "#58DEAA") ||
                                 (res.status === "progress" && "#FF9100"),
                               // (res.status === "redirected" && "#FF9100"),
