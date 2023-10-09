@@ -56,7 +56,7 @@ const MainPage = () => {
   const [arrayMerge, setArrayMerge] = useState("Select");
   // const [membershipDate, setMembershipDate] = useState("");
   const [commentator, setCommentator] = useState([]);
-  const publicCount = 3;
+  const publicCount = 5;
   const SubscriptionCount = 3;
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(null);
@@ -82,7 +82,6 @@ const MainPage = () => {
   const [category, setCategory] = useState("Futbol");
 
   function homeApiData(user_id) {
-    console.log(category,"=================>>category")
     axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)

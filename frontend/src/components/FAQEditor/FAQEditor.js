@@ -21,147 +21,7 @@ const FAQEditor = () => {
     abonelik sayısına göre hesaplayabilirsin.`,
   };
 
-  const FAQArray = [
-    {
-      question: "Motiwy nedir?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Editör Üye nedir?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Ne kadar kazanırım?",
-      ans: `Motiwy'de her abonelikten belirli bir kazanç elde edersin. 
-      Kazancını doğru ve güvenilir tahminler paylaşarak artırabilirsin.
-      Örnek kazanç tablosu ile tahmini aylık kazancını seviye seçerek 
-      abonelik sayısına göre hesaplayabilirsin.`,
-    },
-    {
-      question: "Seviye nedir?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Seviyemi nasıl yükseltirim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Kazancımı nasıl çekebilirim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Tahminlerimi düzenleyebilir miyim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Başarı oranı nasıl hesaplanır?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Skor puanı nedir?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Seviyemi görüntüleyebilir miyim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Bekleyen bakiye nedir?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Nasıl destek alabilirim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Üyeliğimi iptal edebilir miyim?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-    {
-      question: "Profilim deaktif oldu, ne yapmalıyım?",
-      ans: ` Editör üyeler, deneyimli oldukları spor dallarında gerçekleşecek
-        müsabakalara dair yorumlarını ve analizlerini diğer spor severler
-        ile paylaşırlar. Editör üyelerin amacı, yaptıkları analizler ile
-        daha derinlemesine içerikler ve değerli bilgiler sunmaktır.
-        Yapılan analizler, spor severlerin sporla ilgili bilgilerini
-        zenginleştirirken, platformda sağlanan içeriklerin güvenilirliğini
-        ve kalitesini artırır.`,
-    },
-  ];
-
-  const [selectSub, setSelectSub] = useState("");
+  const [selectSub, setSelectSub] = useState("KALFA");
 
   const [values, setValues] = useState([0]);
 
@@ -181,19 +41,21 @@ const FAQEditor = () => {
 
   // Editor earning API
   const [earnings, setEarnings] = useState(0);
-  function getEarnings() {
+  function getEarnings(newValues) {
+    console.log(newValues, ":::::::::::newValues:::::::")
     const type =
       (selectSub === "KALFA" && "journeyman") ||
       (selectSub === "USTA" && "master") ||
       (selectSub === "büyük usta" && "grandmaster");
-    if (type) {
+    // if (type) {
       axios
         .get(
-          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${type}`
+          `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${type}`
         )
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
+            console.log("res.data.total_earning::::::::::::", res.data.total_earning)
             setEarnings(res.data.total_earning);
           }
         })
@@ -212,16 +74,18 @@ const FAQEditor = () => {
             });
           }
         });
-    }
+    // }
   }
 
   const fetchFaqs = async () => {
     try {
       const userId = localStorage.getItem("user-id");
-      const response = await axios.get(`${config.apiUrl}/become-editor-faq/?id=${userId}`);
+      const response = await axios.get(
+        `${config.apiUrl}/become-editor-faq/?id=${userId}`
+      );
       if (response.status == 204) {
         localStorage.clear();
-      window.location.reload();
+        window.location.reload();
       }
       if (response.data.length > 2) {
         response.data.splice(2, 0, staticFaq);
@@ -237,7 +101,7 @@ const FAQEditor = () => {
 
   useEffect(() => {
     fetchFaqs();
-    getEarnings();
+    // values && getEarnings();
   }, [selectSub]);
 
   return (
@@ -407,7 +271,7 @@ const FAQEditor = () => {
                           // onChange={(newValues) => getEarnings()}
                           onChange={(newValues) => {
                             setValues(newValues);
-                            getEarnings();
+                            getEarnings(newValues);
                           }}
                           renderTrack={({ props, children }) => {
                             return (

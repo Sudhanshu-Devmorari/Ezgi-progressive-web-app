@@ -7,6 +7,7 @@ import CreateNewTicket from "../CreateNewTicket/CreateNewTicket";
 import AnsweredTicketView from "../AnsweredTicketView/AnsweredTicketView";
 import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal";
 import config from "../../config";
+import Swal from "sweetalert2";
 
 const Support = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -38,7 +39,6 @@ const Support = () => {
   useEffect(() => {
     async function getTicketsData() {
       const res = await axios.get(`${config?.apiUrl}/support/${userId}`);
-      // console.log("res----------", res.data);
       setTicketsData(res.data);
     }
     getTicketsData();
@@ -46,10 +46,34 @@ const Support = () => {
 
   // Ticket View
   const [ticketId, setticketId] = useState("");
+  const [ticketResponse, setTicketResponse] = useState("");
   function handleTicketView(e) {
     setticketId(e);
     setShowModal(3);
   }
+
+  const handleCheckTicketAction = async(ticket_id) => {
+    console.log("ticket_id", ticket_id)
+    try {
+      const res = await axios.get(`${config?.apiUrl}/check-ticket-action/${ticket_id}/`);
+      // console.log("res: ", res)
+    }
+    catch (error) {
+      if(error.response.status == 404){
+        Swal.fire({
+          title: "Error",
+          text: `${error.response.data.message}`,
+          icon: "error",
+          backdrop: false,
+          customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+        });
+      }
+      // console.log("Error : ", error);
+    
+  }}
 
   const [ticketData, setTicketData] = useState([]);
   function getData(e) {
@@ -57,7 +81,6 @@ const Support = () => {
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
-          // console.log(res.data, "=================>>>>res");
           setTicketData(res.data);
         })
         .catch((error) => {
@@ -65,6 +88,14 @@ const Support = () => {
         });
     } catch (e) {}
   }
+
+  const [responseTicketID, setResponseTicketID] = useState(null);
+  useEffect(() => {
+    if (ticketData[0]?.response_ticket) {
+      const admin_id = ticketData[0]?.response_ticket?.user?.id;
+      setResponseTicketID(admin_id);
+    }
+  }, [ticketData]);
 
   return (
     <>
@@ -113,8 +144,13 @@ const Support = () => {
               <>
                 <div
                   onClick={() => {
+                    if(res.user_label.toLowerCase() === "responded"){
+                      // API call to check admin adswered but user can not take action so ticket is resolved.
+                      handleCheckTicketAction(res.id)
+                    }
                     handleTicketView(res.id);
                     getData(res.id);
+                    setTicketResponse(res.status)
                   }}
                   key={index}
                   className="my-2 row g-0 p-2 ps-0"
@@ -129,11 +165,16 @@ const Support = () => {
                         width: "7px",
                         height: "18px",
                         backgroundColor:
-                          (res.status.toLowerCase() === "pending" &&
+                          (res.user_label.toLowerCase() === "pending" &&
                             "#F8FF61") ||
-                          (res.status.toLowerCase() === "progress" &&
+                          // ((res.status.toLowerCase() === "progress" ||
+                          //   res.status.toLowerCase() === "user responded" ||
+                          //   res.status.toLowerCase() === "responded") &&
+                          (res.user_label.toLowerCase() === "progress" &&
                             "#4DD5FF") ||
-                          (res.status.toLowerCase() === "resolved" &&
+                            (res.user_label.toLowerCase() === "responded" &&
+                            "#4DD5FF") ||
+                          (res.user_label.toLowerCase() === "resolved" &&
                             "#37FF80"),
                       }}
                     ></div>
@@ -141,9 +182,12 @@ const Support = () => {
                       {res.department}
                     </span>
                   </div>
+                  {/* <div className="col-5 text-center">{res.created}</div>
+                  <div className="text-capitalize col-3 text-end">
+                    {res.status} */}
                   <div className="col-6 text-center">{res.created}</div>
                   <div className="text-capitalize col-2 text-end">
-                    {res.status}
+                    {res.user_label}
                   </div>
                 </div>
               </>
@@ -165,6 +209,8 @@ const Support = () => {
             setShowModal={setShowModal}
             ticketId={ticketId}
             ticketData={ticketData}
+            responseTicketID={responseTicketID}
+            ticketResponse={ticketResponse}
           />
         )}
 
@@ -172,6 +218,7 @@ const Support = () => {
           <TicketReplyModal
             setShowModal={setShowModal}
             ticketData={ticketData}
+            responseTicketID={responseTicketID}
           />
         )}
       </div>

@@ -41,7 +41,7 @@ class FavEditorsAdmin(admin.ModelAdmin):
 
 @admin.register(TicketSupport)
 class SupportTicketAdmin(admin.ModelAdmin):
-    list_display = ('id','user','department','subject','message','status','created','updated')
+    list_display = ('id','user','department','subject','message', 'watched', 'status','admin_label','user_label','created','updated')
 
 
 @admin.register(ResponseTicket)

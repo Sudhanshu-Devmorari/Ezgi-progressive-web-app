@@ -139,6 +139,7 @@ class Subscription(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
     status = models.CharField(max_length = 20, choices = SUBSCRIPTION_STATUS)
+    is_cancelled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -182,13 +183,26 @@ SUPPORT_STATUS = (
         ('progress','Progress'),
         ('resolved','Resolved'),
         ('pending','Pending'),
+        ('user responded','User Responded'),
+        ('responded','Responded'),
+    )
+
+LABEL_STATUS = (
+        ('pending','Pending'),
+        ('responded','Responded'),
+        ('progress','Progress'),
+        ('user responded','User Responded'),
+        ('resolved','Resolved'),
     )
 class TicketSupport(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     department = models.CharField(max_length = 100)
     subject = models.CharField(max_length = 100)
     message = models.TextField()
+    watched = models.BooleanField(default=False)
     status = models.CharField(max_length = 20, choices = SUPPORT_STATUS, default='pending')
+    admin_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='pending')
+    user_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='pending')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

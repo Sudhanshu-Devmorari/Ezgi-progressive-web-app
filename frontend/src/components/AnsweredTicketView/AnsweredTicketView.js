@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
@@ -9,16 +9,16 @@ import Swal from "sweetalert2";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const { ticketResponse } = props;
 
   const ticketData = props?.ticketData || {};
 
   const handleResolvedTicket = () => {
     axios
       .post(`${config.apiUrl}/resolved-ticket/${userId}`, {
-        ticket_id: ticketData?.id,
+        ticket_id: ticketData[0]?.ticket_support?.id,
       })
       .then((res) => {
-        // console.log(res);
         if (res.status === 200) {
           props.setShowModal(1);
         }
@@ -33,12 +33,19 @@ const AnsweredTicketView = (props) => {
       <div className="p-2">
         <div className="d-flex">
           <span className="pe-2">Department</span>
-          <span style={{ color: "#D2DB08" }}>{ticketData?.department}</span>
+          <span style={{ color: "#D2DB08" }}>
+            {ticketData[0]?.ticket_support?.department}
+          </span>
           <span className="ms-auto">
-            Ticket {`#${ticketData?.id?.toString()?.padStart(4, "0")}`}
+            Ticket{" "}
+            {`#${ticketData[0]?.ticket_support?.id
+              ?.toString()
+              ?.padStart(4, "0")}`}
           </span>
         </div>
-        <div className="my-2">Subject {ticketData?.subject}</div>
+        <div className="my-2">
+          Subject {ticketData[0]?.ticket_support?.subject}
+        </div>
         <div className="my-2">Message</div>
         <div className="d-flex justify-content-between">
           <span
@@ -51,7 +58,7 @@ const AnsweredTicketView = (props) => {
           </span>
           <span className="">{ticketData?.created}</span>
         </div>
-        <div
+        {/* <div
           className="p-1 mb-2 mt-1"
           style={{
             backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
@@ -60,18 +67,18 @@ const AnsweredTicketView = (props) => {
           }}
         >
           {ticketData?.message}
-        </div>
-        {ticketData?.admin_response && (
+        </div> */}
+        {ticketData?.map((res, index) => (
           <>
             <div className="d-flex justify-content-between">
               <span>
-                Support -{" "}
+                {res?.user?.id != userId && 'Support - '} 
                 <span style={{ color: "#D2DB08" }}>
-                  {ticketData?.admin_response?.user?.username}
+                  {res?.user?.username}
                 </span>
               </span>
               <span className="">
-                {moment(ticketData?.admin_response?.created).format(
+                {moment(res?.created).format(
                   "DD-MM.YYYY - HH:mm"
                 )}
               </span>
@@ -87,62 +94,101 @@ const AnsweredTicketView = (props) => {
                   ? "textArea-dark-mode"
                   : "textArea-light-mode"
               } mb-2 mt-1`}
-              defaultValue={ticketData?.admin_response?.response}
+              defaultValue={res?.message}
             />
           </>
-        )}
-        <div className="my-3 d-flex justify-content-center gap-2">
-          <button
-            onClick={() => {
-              if (!ticketData?.admin_response) {
-                Swal.fire({
-                  // title: "Success",
-                  text: "You cannot reply to your own ticket as admin has not responded yet.",
-                  // icon: "success",
-                  backdrop: false,
-                  customClass: `${
-                    currentTheme === "dark"
-                      ? "dark-mode-alert"
-                      : "light-mode-alert"
-                  }`,
-                });
-              } else {
-                props.setShowModal(4);
-              }
-            }}
-            className="px-3"
-            style={{
-              color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
-              backgroundColor: "transparent",
-              border:
+        ))}
+        {/* {ticketData?.admin_response && (
+          <>
+            <div className="d-flex justify-content-between">
+              <span>
+                {res?.user?.id != userId && "Support - "}
+                <span style={{ color: "#D2DB08" }}>{res?.user?.username}</span>
+              </span>
+              <span className="">
+                {moment(res?.created).format("DD-MM.YYYY - HH:mm")}
+              </span>
+            </div>
+            <Form.Control
+              disabled
+              style={{ fontSize: "14px", height: "100px" }}
+              id="Reply"
+              as="textarea"
+              maxLength={250}
+              className={`${
                 currentTheme === "dark"
-                  ? "1px solid #37FF80"
-                  : "1px solid #00DE51",
-              borderRadius: "3px",
-            }}
-          >
-            Reply
-          </button>
-          {ticketData?.admin_response && (
+                  ? "textArea-dark-mode"
+                  : "textArea-light-mode"
+              } mb-2 mt-1`}
+              defaultValue={res?.message}
+            />
+          </>
+        ))}
+
+        {ticketResponse && ticketResponse != "resolved" && (
+          <div className="my-3 d-flex justify-content-center gap-2">
             <button
               onClick={() => {
-                handleResolvedTicket();
+                if (
+                  ticketData?.length == 1 ||
+                  props?.responseTicketID == userId ||
+                  props?.responseTicketID == null
+                ) {
+        )} */}
+        
+        {ticketData[0]?.ticket_support.user_label != "resolved" && (
+          <div className="my-3 d-flex justify-content-center gap-2">
+            <button
+              onClick={() => {
+                if (ticketData?.length == 1 || props?.responseTicketID == userId || props?.responseTicketID == null) {
+                  Swal.fire({
+                    text: "You cannot reply to your own ticket as admin has not responded yet.",
+                    backdrop: false,
+                    customClass: `${
+                      currentTheme === "dark"
+                        ? "dark-mode-alert"
+                        : "light-mode-alert"
+                    }`,
+                  });
+                } else {
+                  props.setShowModal(4);
+                }
+                // props.setShowModal(4);
               }}
               className="px-3"
               style={{
-                color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
                 backgroundColor: "transparent",
                 border:
                   currentTheme === "dark"
-                    ? "1px solid #D2DB0B"
-                    : "1px solid #00659D",
+                    ? "1px solid #37FF80"
+                    : "1px solid #00DE51",
                 borderRadius: "3px",
               }}
             >
-              Resolved
+              Reply
             </button>
-          )}
-        </div>
+            {ticketData?.length != 1 && (
+              <button
+                onClick={() => {
+                  handleResolvedTicket();
+                }}
+                className="px-3"
+                style={{
+                  color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                  backgroundColor: "transparent",
+                  border:
+                    currentTheme === "dark"
+                      ? "1px solid #D2DB0B"
+                      : "1px solid #00659D",
+                  borderRadius: "3px",
+                }}
+              >
+                Resolved
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

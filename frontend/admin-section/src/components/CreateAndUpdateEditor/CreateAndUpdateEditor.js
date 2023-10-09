@@ -616,7 +616,7 @@ const CreateAndUpdateEditor = (props) => {
                           alt=""
                           style={{ cursor: "pointer" }}
                         />
-                        <span className="px-2">Jouneyman</span>
+                        <span className="px-2">Journeyman</span>
                       </div>
                       <div className="">
                         <img
@@ -640,7 +640,7 @@ const CreateAndUpdateEditor = (props) => {
                           alt=""
                           style={{ cursor: "pointer" }}
                         />
-                        <span className="px-2">Jouneyman</span>
+                        <span className="px-2">Journeyman</span>
                       </div>
                     </div>
 

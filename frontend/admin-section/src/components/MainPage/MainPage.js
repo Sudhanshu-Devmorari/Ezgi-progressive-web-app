@@ -44,7 +44,6 @@ const MainPage = () => {
         setIsLoading(false);
       }, []);
   };
-  // console.log(data, "===========>>>data");
   useEffect(() => {
     adminHomeApiData();
   }, []);

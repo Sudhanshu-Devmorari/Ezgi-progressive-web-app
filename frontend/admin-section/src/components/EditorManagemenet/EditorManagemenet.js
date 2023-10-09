@@ -1773,23 +1773,23 @@ const EditorManagemenet = (props) => {
                         <div className="">
                           <img
                             name="level"
-                            value="jouneyman"
+                            value="journeyman"
                             height={30}
                             width={30}
                             onClick={(e) => {
                               setIsJourneymanSelected(!isJourneymanSelected);
-                              submitEditorData(e, "jouneyman");
-                              setLevelRadio("jouneyman");
+                              submitEditorData(e, "journeyman");
+                              setLevelRadio("journeyman");
                             }}
                             src={
-                              addUser.level == "jouneyman"
+                              addUser.level == "journeyman"
                                 ? selectedRadio
                                 : Radio
                             }
                             alt=""
                             style={{ cursor: "pointer" }}
                           />
-                          <span className="px-2">Jouneyman</span>
+                          <span className="px-2">Journeyman</span>
                         </div>
                         <div className="">
                           <img

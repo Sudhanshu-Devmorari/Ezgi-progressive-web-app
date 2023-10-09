@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 import pytz
 import requests
 from core.utils import sms_send
-from core.models import User, Comments
+from core.models import User, Comments, Highlight
 import logging
 # from django_cron import CronJobBase, Schedule
 
@@ -11,10 +11,6 @@ logger = logging.getLogger('django_cron')
 
 def subscription_reminder_cron():
     try:
-        # u = User.objects.get(id=68)
-        # u.name = 'mansiiiiiiiii00000-------------------'
-        # u.save()
-        # print("\n\n =======>>>>>> Entering subscription")
         notification_list = []
         today_date = timezone.now().date() 
         cutoff_date = timezone.now() + timedelta(days=3)
@@ -43,6 +39,28 @@ def subscription_reminder_cron():
         
         # Deactivate subscription after 3 days of expiration if subscription not activated
         pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
+
+
+        # Send notification expiration highlight purchase
+        highlight_list = []
+        expiration_highlight = Highlight.objects.filter(end_date__date__lt=today_date, status='active')
+        for highlight in expiration_highlight:
+            is_highlight_notification = Notification.objects.filter(receiver=highlight.user, subject='Highlight Plan Expires', date=today_date).exists()
+
+            if not is_highlight_notification:
+                notification = Notification(
+                    receiver=highlight.user, 
+                    subject='Highlight Plan Expires',
+                    date=today_date, 
+                    status=False,
+                    context=f'Your Highlights period has ended! Boost your interactions by featuring again!'
+                )
+                highlight_list.append(notification)
+        Notification.objects.bulk_create(highlight_list)
+        
+        if Highlight.objects.filter(end_date__date__lt=today_date, status='active').exists():
+            Highlight.objects.filter(end_date__date__lt=today_date, status='active').update(status='deactive')
+
         return True
     
     except:
@@ -178,19 +196,20 @@ def Userst():
                             get_match_score = requests.get(match_score_url, headers=headers)
                             matchScore_data = get_match_score.json()
                             matchScore_data_list = matchScore_data["data"]
-
                             team_1 = 0
                             team_2 = 0
-                            for value in matchScore_data_list[0]['matchResult']:
-                                if value['metaName'] == 'msHomeScore':                                    
-                                    team_1 = value['value']
-                                elif value['metaName'] == 'msAwayScore':                                    
-                                    team_2 = value['value']
+                            if matchScore_data_list:
+                                i.is_resolve = True if matchScore_data_list[0]['matchResult'] and not i.is_resolve else i.is_resolve
+                                for value in matchScore_data_list[0]['matchResult']:
+                                    if value['metaName'] == 'msHomeScore':                                    
+                                        team_1 = value['value']
+                                    elif value['metaName'] == 'msAwayScore':                                    
+                                        team_2 = value['value']
 
                             i.match_score = f'{team_1} - {team_2}'
                             logger.info("match_score: %s" % i.match_score)
 
-                            i.save(update_fields=['match_score', 'updated'])
+                            i.save(update_fields=['match_score', 'is_resolve', 'updated'])
                             
                             matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
 
@@ -263,10 +282,59 @@ def Userst():
                 user.commentator_level = "master"
             if 70 < Success_rate < 100:
                 user.commentator_level = "grandmaster"
+
+            # Update is_resolve status for pending comment
+            pending_comments = Comments.objects.filter(status='pending', is_resolve=False, commentator_user= user)
+            resolve_pending_comments(pending_comments)
+            
             user.save()
     except Exception as e:
         logger.error('\n Error occurred in comment prediction check cron: %s', str(e))
 
+
+def resolve_pending_comments(comments_data):
+    try:
+        for i in comments_data:
+            pending_category = 1 if (i.category[0].lower()) == 'futbol' else 2
+            url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type={pending_category}&league={i.league}&date={i.date}"
+            
+            headers = {
+                "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+            }
+            response = requests.get(url, headers=headers)
+            json_data = response.json()
+            pending_match_data_list = json_data["data"]
+
+            for match in pending_match_data_list:
+                if match['LiveStatus'] != 0:
+                    teams = match.get("Teams")
+
+                    if teams == i.match_detail:
+                        matchID = match.get("MatchID")
+
+                        # Save match score 
+                        match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
+
+                        get_match_score = requests.get(match_score_url, headers=headers)
+                        matchScore_data = get_match_score.json()
+                        matchScore_data_list = matchScore_data["data"]
+                        team_1 = 0
+                        team_2 = 0
+                        if matchScore_data_list:
+                            i.is_resolve = True if matchScore_data_list[0]['matchResult'] and not i.is_resolve else i.is_resolve
+                            for value in matchScore_data_list[0]['matchResult']:
+                                if value['metaName'] == 'msHomeScore':                                    
+                                    team_1 = value['value']
+                                elif value['metaName'] == 'msAwayScore':                                    
+                                    team_2 = value['value']
+
+                        i.match_score = f'{team_1} - {team_2}'
+                        i.save(update_fields=['match_score', 'is_resolve', 'updated'])
+
+        return True
+    except Exception as e:
+        logger.error('\n Error occurred in pending comment prediction check cron: %s', str(e))
+        return True
 
 def weekly_comment_count_check(): 
     # try:

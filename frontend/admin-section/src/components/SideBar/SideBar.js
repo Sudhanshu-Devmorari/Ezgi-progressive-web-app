@@ -27,15 +27,31 @@ import logout from "../../assets/logout.svg";
 import "./SideBar.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import axios from "axios";
+import config from "../../config";
 
 const SideBar = (props) => {
+  console.log("props?.supportIcon", props?.supportIcon)
   const navigate = useNavigate();
   const [showDetails, setshowDetails] = useState("home");
   const [cookies, setCookie, removeCookie] = useCookies();
 
+  const [supportIcon, setSupportIcon] = useState(false);
+  const handleSupportIcon = async () => {
+    const res = await axios.get(`${config?.apiUrl}/check-new-support-ticket/`);
+    setSupportIcon(res.data)
+  }
+  // console.log(supportIcon, "===========>>>data");
+
+  const handleChangeSupportIcon = async () => {
+    const res = await axios.get(`${config?.apiUrl}/check-change-support-ticket/`);
+    setSupportIcon(false)
+  }
+
   const location = useLocation();
   const path = location.pathname;
   useEffect(() => {
+    handleSupportIcon()
     setshowDetails(path);
   }, [path]);
 
@@ -116,6 +132,10 @@ const SideBar = (props) => {
               navigate("/sales/");
             }}
           />
+          <div>
+          {supportIcon &&
+            <span className="badgeIcon translate-middle border border-light rounded-circle" />
+          }
           <img
             className="cursor icons-responsive-size"
             src={showDetails === "/support/" ? Selectedsupport : support}
@@ -123,12 +143,14 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              handleChangeSupportIcon()
               props.setSelectedOption && props.setSelectedOption("All")
               props.refreshComments && props.refreshComments()
               setshowDetails("/support/");
               navigate("/support/");
             }}
           />
+          </div>
           <img
             className="cursor icons-responsive-size"
             src={showDetails === "/subuser/" ? sub_user_selected : sub_user}
@@ -136,6 +158,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              console.log("icon: ", props?.supportIcon)
               props.refreshComments && props.refreshComments()
               setshowDetails("/subuser/");
               navigate("/subuser/");

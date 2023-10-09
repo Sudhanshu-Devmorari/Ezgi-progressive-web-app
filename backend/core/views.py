@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from core.utils import create_response, sms_send, get_league_data, on_match_time_update_comment_status
+from core.utils import create_response, sms_send, get_league_data
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -692,8 +692,9 @@ class SubscriptionView(APIView):
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
                 subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
-                subscription_obj.status = 'deactive'
-                subscription_obj.save(update_fields=['status', 'updated'])
+                # subscription_obj.status = 'deactive'
+                subscription_obj.is_cancelled = True
+                subscription_obj.save(update_fields=['is_cancelled', 'updated'])
 
                 Notification.objects.create(
                         sender=user,receiver=commentator, 
@@ -709,11 +710,11 @@ class SubscriptionView(APIView):
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
-                if duration == "1 Month":
+                if duration == "1 Months":
                     end_date = start_date + timedelta(days=30)
-                if duration == "3 Month":
+                if duration == "3 Months":
                     end_date = start_date + timedelta(days=90)
-                if duration == "6 Month":
+                if duration == "6 Months":
                     end_date = start_date + timedelta(days=180)
                 if duration == "1 Year":
                     end_date = start_date + timedelta(days=365)
@@ -985,7 +986,8 @@ class ProfileView(APIView):
                     data['is_subscribe'] = is_subscribe
                     if is_subscribe:
                         subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
-                        data['subscription_end_date'] = subscription.end_date
+                        if subscription.is_cancelled:
+                            data['subscription_end_date'] = subscription.end_date
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -1037,7 +1039,7 @@ class ProfileView(APIView):
                 user.description = description
             if 'description' not in request.data:
                 return Response({'error': 'No description found', 'status' : status.HTTP_400_BAD_REQUEST})
-        # user.save(update_fields=['profile_pic', 'description', 'updated'])
+        user.save(update_fields=['profile_pic', 'description', 'updated'])
 
         serializer = UserSerializer(user)
         return Response({ 'data' : serializer.data, 'status' : status.HTTP_200_OK})
@@ -1220,7 +1222,13 @@ class SupportView(APIView):
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 if support_obj != None:
-                    ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                    # ticket_obj = TicketHistory.objects.create(user=user, ticket_support=support_obj, status='create')
+                    ticket_obj = TicketHistory.objects.create(
+                        user=user,
+                        ticket_support=support_obj,
+                        status='create',
+                        message=request.data.get('message')
+                    )
                 if support_obj != None:
                     if DataCount.objects.filter(id=1).exists():
                         obj = DataCount.objects.get(id=1)
@@ -1262,7 +1270,13 @@ class ShowTicketData(APIView):
             serializer = TicketSupportSerializer(support_obj).data
         # serializer['admin_response'] = TicketHistorySerializer(ticket_history).data if ticket_history else None
         serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
-        return Response(data=serializer, status=status.HTTP_200_OK)
+
+        
+        history = TicketHistory.objects.filter(ticket_support=support_obj).order_by('-created')
+        history_serializer = TicketHistorySerializer(history, many=True).data
+
+        return Response(data=history_serializer, status=status.HTTP_200_OK)
+        # return Response(data=serializer, status=status.HTTP_200_OK)
 
 
 class ReplyTicketView(APIView):
@@ -1287,7 +1301,10 @@ class ReplyTicketView(APIView):
                 request_to=admin_obj
             )
             if ticket_history != None:
+                # ticket_obj.status = 'user responded'
                 ticket_obj.status = 'pending'
+                ticket_obj.user_label = 'progress'
+                ticket_obj.admin_label = 'user responded'
                 ticket_obj.save()
 
             serializer = TicketHistorySerializer(ticket_history)
@@ -1358,7 +1375,18 @@ class ResolvedTicket(APIView):
                     return Response({'error': 'This ticket does not belong to the you.'}, status=status.HTTP_403_FORBIDDEN)
 
                 ticket_obj.status = 'resolved'
+                ticket_obj.user_label = 'resolved'
+                ticket_obj.admin_label = 'resolved'
                 ticket_obj.save()
+                # ticket_obj.save(update_fields=['status', 'updated'])
+
+                notification_obj = Notification.objects.create(
+                        receiver=ticket_obj.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Your ticket with the subject "{ticket_obj.subject}" has been successfully resolved.',
+                    )
 
                 serializer = TicketSupportSerializer(ticket_obj)
                 data = serializer.data
@@ -1532,6 +1560,14 @@ class HighlightPurchaseView(APIView):
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
                 if highlight_obj != None:
+                    
+                    notification_obj = Notification.objects.create(
+                            receiver=user, 
+                            subject='Highlight Purchase', 
+                            date=datetime.today().date(), 
+                            status=False, context=f'Congratulations! Your profile and comments are now listed at the top.', 
+                        )
+                    
                     if DataCount.objects.filter(id=user.id).exists():
                         obj = DataCount.objects.get(id=user.id)
                         obj.highlight += 1
@@ -3402,14 +3438,45 @@ class SupportManagement(APIView):
             except TicketSupport.DoesNotExist:
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+            # is_res_obj = ResponseTicket.objects.filter(user=user,ticket=ticket_support)
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
             # print('res_obj: ', res_obj)
             if res_obj != None:
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
-                                                            response_ticket=res_obj)
+                                                            response_ticket=res_obj, message=message)
                 ticket_support.status = 'progress'
+                ticket_support.admin_label = 'responded'
+                ticket_support.user_label = 'responded'
                 ticket_support.save()
 
+            # if is_res_obj:
+            #     ticket_support.status = 'responded'
+            # else:
+            #     ticket_support.status = 'progress'
+            # ticket_support.save(update_fields=['status', 'updated'])
+
+            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+
+            if res_obj != None:             
+                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                                                            response_ticket=res_obj, message=message)
+                if is_res_obj:
+                    notification_obj = Notification.objects.create(
+                        receiver=ticket_support.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Motiwy has responded to your ticket with the subject: {ticket_support.subject}.',
+                    )
+                else:
+                    notification_obj = Notification.objects.create(
+                        receiver=ticket_support.user, 
+                        subject='Support ticket',
+                        date=datetime.now().date(), 
+                        status=False,
+                        context=f'Motiwy has replied to your ticket with the subject: {ticket_support.subject}.',
+                    )
+                
             serializer = ResponseTicketSerializer(res_obj)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -4074,10 +4141,10 @@ class LevelRule(APIView):
 class MembershipSettingView(APIView):
     def get(self, request, format=None, *args, **kwargs):
         try:
-            if request.query_params.get('admin'):
-                adminuser_id = request.query_params.get('admin')
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
                 adminuser = User.objects.get(id=adminuser_id)
-                
+            
                 if adminuser.is_delete == True:
                         return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             level = request.query_params.get('commentator_level')
@@ -4957,13 +5024,40 @@ class GetALLUsers(APIView):
 
 class RetrievePageData():
 
+    def is_highlight_user(self, user_id, compare_date=None):
+        try:
+            if not compare_date: compare_date = datetime.now()
+            is_highlight_user = Highlight.objects.filter(user_id=user_id, start_date__lte=compare_date, end_date__gte=compare_date, status="active").exists()
+            return is_highlight_user
+        except:
+            return False
+        
+    def get_highlight_user(self, compare_date=None):
+        try:
+            if not compare_date: compare_date = datetime.now()
+            highligth_user_list = list(Highlight.objects.filter(start_date__lte=compare_date, end_date__gte=compare_date, status="active").values_list('user_id', flat=True))
+            return highligth_user_list
+        except:
+            return []
+    
     def get_public_comments(self, id, category):
         """ Return public comments data """
         public_comments = []
 
         try:
-            # all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False).order_by('-created').only('id')
-            all_comments = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created').only('id')
+            current_datetime = datetime.now()
+            logged_in_user = User.objects.filter(id=id).first() if id != 'null' else None
+            is_highlight_user = self.is_highlight_user(id, current_datetime) if logged_in_user else False
+
+            highlight_comments = []
+            if is_highlight_user:
+                highligt_user_list = self.get_highlight_user()
+                highlight_comments = Comments.objects.filter(commentator_user_id__in=highligt_user_list, status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('?').only('id')[:5]
+
+            highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
+            comments_data = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).exclude(id__in=highlight_comments_ids).order_by('-created').only('id')
+            
+            all_comments = highlight_comments.union(comments_data) if highlight_comments else comments_data
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -4976,11 +5070,8 @@ class RetrievePageData():
                 comment_data['commentator_user'] ['win'] = win_count
                 comment_data['commentator_user'] ['lose'] = lose_count
 
-                if id != 'null':
-                    logged_in_user = User.objects.get(id=id)
-                
-                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
-                    comment_data['is_subscribe'] = is_subscribe
+                is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
+                comment_data['is_subscribe'] = is_subscribe
                 
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
@@ -5024,7 +5115,6 @@ class RetrievePageData():
                 if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False, category=[category]).exists():
                 # if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
                     subscription_comment = Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', public_content=False, commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('-created')
-                    # print('subscription_comment: ', subscription_comment)
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
@@ -5066,33 +5156,49 @@ class RetrievePageData():
         try:
             # Validation
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
-            
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=['Futbol']).order_by('-created')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('-created')
             
-            for obj in all_highlights:
-                highlighted_data = HighlightSerializer(obj).data
-                user_data = highlighted_data['user'] 
+            top_users = User.objects.annotate(comment_count=Count('comments')).filter(
+                    comment_count__gt=0,                 
+                    highlight__isnull=False,               
+                    is_delete=False,
+                    highlight__status='active',
+                    comments__status='approve', 
+                    category__contains=[category],
+                )[:5]
 
-                data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
-                win_count = data.filter(is_prediction=True).count()
-                lose_count = data.filter(is_prediction=False).count()
-                highlighted_data['user'] ['win'] = win_count
-                highlighted_data['user'] ['lose'] = lose_count
+            for user in top_users:
+                most_recent_highlight = user.highlight_set.filter(status='active')
+                # print('most_recent_highlight: ', most_recent_highlight)
 
-                if standard_user_id is not None:
-                    logged_in_user = User.objects.get(id=standard_user_id)
-                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
-                    highlighted_data['is_subscribe'] = is_subscribe
+            # Get data
+            # all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('-created')
+            
+            # for obj in all_highlights:
+                for obj in most_recent_highlight:
+                    highlighted_data = HighlightSerializer(obj).data
+                    user_data = highlighted_data['user'] 
 
-                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
-                highlighted_data['subscriber_count'] = count
+                    data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
+                    win_count = data.filter(is_prediction=True).count()
+                    lose_count = data.filter(is_prediction=False).count()
+                    highlighted_data['user'] ['win'] = win_count
+                    highlighted_data['user'] ['lose'] = lose_count
 
-                if standard_user_id:
-                    highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
-                else:
-                    highlighted_data['is_fav_editor'] = False
+                    if standard_user_id is not None:
+                        logged_in_user = User.objects.get(id=standard_user_id)
+                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
+                        highlighted_data['is_subscribe'] = is_subscribe
+
+                    count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
+                    highlighted_data['subscriber_count'] = count
+
+                    if standard_user_id:
+                        highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
+                    else:
+                        highlighted_data['is_fav_editor'] = False
 
                 highlights.append(highlighted_data)
         except:
@@ -5190,7 +5296,6 @@ class RetrieveHomeView(APIView):
     """
     for Home page:
     """
-    @on_match_time_update_comment_status
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
             "Public_Comments": [],
@@ -5252,13 +5357,13 @@ class RetrieveEditorView(APIView):
 class BecomeEditorFAQView(APIView):
 
     def get(self, request, id=None):
-        if request.query_params.get('admin'):
-            adminuser_id = request.query_params.get('admin')
+        adminuser_id = request.query_params.get('admin', None)
+        if adminuser_id is not None:
             adminuser = User.objects.get(id=adminuser_id)
-            
+        
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
-        if request.query_params.get("id"):
+        if request.query_params.get("id", None) is not None:
             user = User.objects.get(id=request.query_params.get('id'))
             if user.is_delete == True:
                 return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -5347,8 +5452,8 @@ def create_reminder_notification():
 class BankDetailsView(APIView):
     def get(self, request, id=None, *args, **kwargs):
         try:
-            if request.query_params.get('admin') != None:
-                adminuser_id = request.query_params.get('admin')
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
                 adminuser = User.objects.get(id=adminuser_id)
                 
                 if adminuser.is_delete == True:
@@ -5440,9 +5545,9 @@ class BankDetailsView(APIView):
                     bank_details.save(update_fields=['bank_iban', 'updated'])
                     return Response({'data': 'Bank Iban has been updated successfully'}, status=status.HTTP_200_OK)
                 else:
-                    bank_details.total_balance = 12.650
-                    bank_details.pending_balance = 12.650
-                    bank_details.withdrawable_balance = 8.000
+                    bank_details.total_balance = 0.0
+                    bank_details.pending_balance = 0.0
+                    bank_details.withdrawable_balance = 0.000
                     bank_details.save(update_fields=['total_balance', 'pending_balance', 'withdrawable_balance', 'updated'])
                     return Response({'data': 'Bank Iban has been created successfully'}, status=status.HTTP_201_CREATED)
 
@@ -5531,12 +5636,12 @@ class GetUserdata(APIView):
 class EditorBannerView(APIView):
     def get(self, request):
         try:
-            if request.query_params.get('admin'):
-                adminuser_id = request.query_params.get('admin')
+            adminuser_id = request.query_params.get('admin', None)
+            if adminuser_id is not None:
                 adminuser = User.objects.get(id=adminuser_id)
                 
                 if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             banner =  EditorBanner.objects.all()    
             data = EditorBannerSerializer(banner, many=True).data
             return Response({'data' : data}, status=status.HTTP_200_OK)
@@ -5679,3 +5784,55 @@ class UserTransactionHistory(APIView):
             return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+from core.cron import Userst
+class TestCronView(APIView):
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        Userst()
+        return Response(data={"message": "Cron run successfully"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CheckTicketActionView(APIView):
+    def get(self, request, ticket_id=None, format=None, *args, **kwargs):
+        try:
+            current_time = datetime.now(timezone.utc)
+
+            ticket_obj = TicketSupport.objects.get(id=ticket_id)
+            if ticket_obj.admin_label == 'responded':
+                response_obj = ResponseTicket.objects.filter(ticket=ticket_obj).order_by('-created').first()
+                if response_obj:
+                    time_difference = current_time - response_obj.created
+                    hours_old = time_difference.total_seconds() / 3600
+                    if hours_old >= 24:
+                        ticket_obj.status = 'resolved'
+                        ticket_obj.admin_label = 'resolved'
+                        ticket_obj.user_label = 'resolved'
+                        ticket_obj.save()
+                        return Response(data={"message": "Since you did not take any action in the last 24 hours, so this ticket has been closed."}, status=status.HTTP_404_NOT_FOUND)
+                    else:
+                        serializer = TicketSupportSerializer(ticket_obj).data
+                        return Response(data=serializer, status=status.HTTP_200_OK)
+                else:
+                    return Response(data={"message": "No response found for the ticket."}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                serializer = TicketSupportSerializer(ticket_obj).data
+                return Response(data=serializer, status=status.HTTP_200_OK)
+        except TicketSupport.DoesNotExist:
+            return Response(data={"message": "Ticket with the specified ID does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CheckNewSupportTicketView(APIView):
+    def get(self, request, ticket_id=None, format=None, *args, **kwargs):
+        if TicketSupport.objects.filter(watched=False).exists():
+            return Response(data=True, status=status.HTTP_200_OK)
+        else:
+            return Response(data=False, status=status.HTTP_200_OK)
+
+class CheckChangeSupportTicket(APIView):
+    def get(self, request, ticket_id=None, format=None, *args, **kwargs):
+        if TicketSupport.objects.filter(watched=False).exists():
+            Ticket_obj = updated_count = TicketSupport.objects.filter(watched=False).update(watched=True)
+            return Response(data=True, status=status.HTTP_200_OK)
+        else:
+            return Response(data=False, status=status.HTTP_200_OK)

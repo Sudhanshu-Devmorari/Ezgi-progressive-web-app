@@ -169,17 +169,19 @@ const SharedProfile = (props) => {
         }`}
       >
         <div className="text-end mt-1">
-          <span className="pe-2 shared-font" style={{ fontSize: "13px" }}>
-            <span
-              className="pe-2"
-              style={{
-                color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-              }}
-            >
-              {data?.value?.subscriber_count}
+          {data?.value?.user?.commentator_level != "apprentice" && (
+            <span className="pe-2 shared-font" style={{ fontSize: "13px" }}>
+              <span
+                className="pe-2"
+                style={{
+                  color: currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                }}
+              >
+                {data?.value?.subscriber_count}
+              </span>
+              Kişi abone oldu
             </span>
-            Kişi abone oldu
-          </span>
+          )}
           {data?.value?.is_fav_editor ? (
             <img
               onContextMenu={(e) => e.preventDefault()}

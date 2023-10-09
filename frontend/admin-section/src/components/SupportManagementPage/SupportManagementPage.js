@@ -43,13 +43,39 @@ const SupportManagementPage = () => {
     axios
       .get(`${config.apiUrl}/show-ticket-data/${e}/`)
       .then((res) => {
-        // console.log(res.data);
+        // console.log("-------",res.data);
         setTickeview(res.data);
       })
       .catch((error) => {
         console.log(error);
       });
   }
+
+  const [ticketData, setTicketData] = useState([]);
+  function getData(userId,e) {
+    try {
+      axios
+        .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
+        .then((res) => {
+          console.log("RESSS: ", res)
+          setTicketData(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (e) {}
+  }
+  // useEffect(() => {
+  //   getData(2,16)
+  // }, []);
+
+  const [responseTicketID, setResponseTicketID] = useState(null);
+  useEffect(() => {
+    if (ticketData[0]?.response_ticket) {
+      const admin_id = ticketData[0]?.response_ticket?.user?.id;
+      setResponseTicketID(admin_id);
+    }
+  }, [ticketData]);
 
   async function getSupportData() {
     try {
@@ -287,23 +313,32 @@ const SupportManagementPage = () => {
                             className="px-2 text-center text-capitalize"
                             style={{
                               backgroundColor:
-                                (res.status === "pending" && "#FFDD00") ||
-                                (res.status === "answered" && "#4DD5FF") ||
-                                (res.status === "resolved" && "#58DEAA") ||
-                                (res.status === "progress" && "#FF9100"),
+                                //(res.status === "pending" && "#FFDD00") ||
+                                //(res.status === "user responded" && "#4DD5FF") ||
+                                //(res.status === "responded" && "#4DD5FF") ||
+                                //(res.status === "resolved" && "#58DEAA") ||
+                                //(res.status === "progress" && "#FF9100"),
+                                (res.admin_label === "pending" && "#FFDD00") ||
+                                (res.admin_label === "responded" && "#4DD5FF") ||
+                                (res.admin_label === "resolved" && "#58DEAA") ||
+                                (res.user_label === "progress" && "#FF9100"),
                               borderRadius: "4px",
                               border:
-                                (res.status === "pending" &&
+                                (res.admin_label === "pending" &&
                                   "1px solid #FFDD00") ||
-                                (res.status === "answered" && "#4DD5FF") ||
-                                (res.status === "resolved" && "#58DEAA") ||
-                                (res.status === "progress" && "#FF9100"),
+                                //(res.status === "user responded" && "#4DD5FF") ||
+                                //(res.status === "responded" && "#4DD5FF") ||
+                                //(res.status === "resolved" && "#58DEAA") ||
+                                //(res.status === "progress" && "#FF9100"),
+                                (res.admin_label === "responded" && "#4DD5FF") ||
+                                (res.admin_label === "resolved" && "#58DEAA") ||
+                                (res.user_label === "progress" && "#FF9100"),
                               // (res.status === "redirected" && "#FF9100"),
                               color: "#0D2A53",
                               width: "5.4rem",
                             }}
                           >
-                            {res?.status}
+                            {res?.admin_label}
                           </button>
                         </div>
                         <div
@@ -314,7 +349,9 @@ const SupportManagementPage = () => {
                         >
                           <div className="">{res?.created}</div>
                           {/* <div className="">15-06-2023 - 16:37</div> */}
-                          <img src={eye} alt="" height={24} width={24} />
+                          <img 
+                          onClick={() => getData(res?.user?.id, res?.id)}
+                          src={eye} alt="" height={24} width={24} />
                         </div>
                       </>
                     </MainDiv>
@@ -366,7 +403,7 @@ const SupportManagementPage = () => {
         </div>
       </div>
 
-      <TicketReplyModal tickeview={tickeview} />
+      <TicketReplyModal ticketData={ticketData} tickeview={tickeview} />
 
       <Export exportList={displayTickets} exportData={"Support"} />
     </>

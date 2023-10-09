@@ -7,12 +7,14 @@ import Swal from "sweetalert2";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import moment from "moment";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
   const [cookies, setCookie, removeCookie] = useCookies();
-
+  const userId = localStorage.getItem("admin-user-id");
   const tickeview = props?.tickeview;
+  const ticketData = props?.ticketData;
 
   const [subUsersOptions, setSubUsersOptions] = useState([]);
 
@@ -49,7 +51,7 @@ const TicketReplyModal = (props) => {
     reply: "",
     note: "",
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTicketRepltOrRedirect((prevDateSelected) => ({
@@ -57,8 +59,13 @@ const TicketReplyModal = (props) => {
       [name]: value,
     }));
   };
-
-  const adminUserId = localStorage.getItem('admin-user-id')
+  const handleSetSelectedSubUserdata = (selectedOption) => {
+    setSelectedSubUser({
+      ...selectedSubUser,
+      name: selectedOption,
+    });
+  };
+  const adminUserId = localStorage.getItem("admin-user-id");
 
   const handleTicket = async (e) => {
     if (selecteReply === "reply") {
@@ -76,7 +83,7 @@ const TicketReplyModal = (props) => {
             message: ticketRepltOrRedirect.reply,
             ticket_id: tickeview?.id,
           })
-          .then(async(res) => {
+          .then(async (res) => {
             // console.log(res);
             if (res.status === 200) {
               const confirm = await Swal.fire({
@@ -98,7 +105,7 @@ const TicketReplyModal = (props) => {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response.status === 500){
+            if (error.response.status === 500) {
               Swal.fire({
                 title: "Error",
                 text: error?.response?.data?.error,
@@ -127,12 +134,15 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else {
-        const adminId = localStorage.getItem('admin-user-id')
+        const adminId = localStorage.getItem("admin-user-id");
         axios
-          .post(`${config?.apiUrl}/redirect-ticket/${adminId}/${tickeview?.id}`, {
-            note: ticketRepltOrRedirect.redirect,
-            id: tickeview?.id, // sub user id
-          })
+          .post(
+            `${config?.apiUrl}/redirect-ticket/${adminId}/${tickeview?.id}`,
+            {
+              note: ticketRepltOrRedirect.redirect,
+              id: tickeview?.id, // sub user id
+            }
+          )
           .then((res) => {
             // console.log(res);
             if (res.status === 200) {
@@ -234,7 +244,7 @@ const TicketReplyModal = (props) => {
                   disabled
                 />
               </div>
-              <div className="my-2">
+              {/* <div className="my-2">
                 <span>Message</span>
                 <div className="">
                   <textarea
@@ -243,7 +253,7 @@ const TicketReplyModal = (props) => {
                     defaultValue={tickeview?.message}
                   ></textarea>
                 </div>
-              </div>
+              </div> */}
               {/* For Redirected msg */}
               {/* <div
                 className="my-2 py-2"
@@ -254,7 +264,7 @@ const TicketReplyModal = (props) => {
                 interdum consectetur.
               </div> */}
               {/* End For Redirected msg */}
-              {tickeview?.updated_ticket_message && (
+              {/* {tickeview?.updated_ticket_message && (
                 <>
                   <div className="d-flex gap-2">
                     <div className="">Reply</div>
@@ -269,46 +279,81 @@ const TicketReplyModal = (props) => {
                     defaultValue={tickeview?.updated_ticket_message}
                   ></textarea>
                 </>
-              )}
-              <div className="my-3">
-                <span
-                  className="cursor"
-                  onClick={() => setSelecteReply("reply")}
-                  style={{ color: selecteReply === "reply" && "#D2DB08" }}
-                >
-                  Reply
-                </span>
-                <span
-                  onClick={() => setSelecteReply("redirect")}
-                  style={{ color: selecteReply === "redirect" && "#D2DB08" }}
-                  className="ps-2 cursor"
-                >
-                  Redirect
-                </span>
-                <div className="my-2">
-                  {selecteReply === "reply" && (
+              )} */}
+              <div>
+                {ticketData.reverse().map((res, index) => (
+                  <>
+                    <span>
+                      {res?.user?.id == userId ? (
+                        <div className="d-flex gap-2">
+                          <div className="">Reply</div>
+                          <div className="" style={{ color: "#DD7DFF" }}>
+                            {res?.user?.name}
+                          </div>
+                          <div className="ms-auto">
+                            {moment(res?.created).format("DD-MM.YYYY - HH:mm")}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="d-flex gap-2">
+                            Message
+                            <div className="ms-auto">
+                              {moment(res?.created).format(
+                                "DD-MM.YYYY - HH:mm"
+                              )}
+                            </div>
+                          </span>
+                        </>
+                      )}
+                    </span>
                     <textarea
                       style={{ height: "100px", fontSize: ".8rem" }}
-                      className="darkMode-input form-control"
-                      value={ticketRepltOrRedirect.reply}
-                      name="reply"
-                      onChange={handleChange}
+                      className="darkMode-input form-control my-2 p-2"
+                      defaultValue={res?.message}
                     ></textarea>
-                  )}
-                  {selecteReply === "redirect" && (
-                    <>
-                      <div className="cursor" style={{ width: "99.59px" }}>
-                        <CustomDropdown
-                          label=" "
-                          name={""}
-                          value={selectedSubUser.name}
-                          options={subUsersOptions.map((user) => user.name)}
-                          selectedOption={selectedSubUser?.name}
-                          onSelectOption={handleSetSelectedSubUser}
-                          isOpen={subUserDropDown}
-                          toggleDropdown={toggleSubUserDropDown}
-                        />
-                        {/* <CustomDropdown
+                  </>
+                ))}
+
+                <div className="my-3">
+                  <span
+                    className="cursor"
+                    onClick={() => setSelecteReply("reply")}
+                    style={{ color: selecteReply === "reply" && "#D2DB08" }}
+                  >
+                    Reply
+                  </span>
+                  <span
+                    onClick={() => setSelecteReply("redirect")}
+                    style={{ color: selecteReply === "redirect" && "#D2DB08" }}
+                    className="ps-2 cursor"
+                  >
+                    Redirect
+                  </span>
+                  <div className="my-2">
+                    {selecteReply === "reply" && (
+                      <textarea
+                        style={{ height: "100px", fontSize: ".8rem" }}
+                        className="darkMode-input form-control"
+                        value={ticketRepltOrRedirect.reply}
+                        name="reply"
+                        onChange={handleChange}
+                      ></textarea>
+                    )}
+                    {selecteReply === "redirect" && (
+                      <>
+                        <div className="cursor" style={{ width: "99.59px" }}>
+                          <CustomDropdown
+                            label=" "
+                            name={""}
+                            value={selectedSubUser.name}
+                            options={subUsersOptions.map((user) => user.name)}
+                            selectedOption={selectedSubUser?.name}
+                            onSelectOption={handleSetSelectedSubUserdata} // Pass the function here
+                            isOpen={subUserDropDown}
+                            toggleDropdown={toggleSubUserDropDown}
+                          />
+                          {/* <CustomDropdown
                           label=" "
                           name=" "
                           value={selectedSubUser ? selectedSubUser.name : "Select"}
@@ -318,35 +363,36 @@ const TicketReplyModal = (props) => {
                           isOpen={subUserDropDown}
                           toggleDropdown={toggleSubUserDropDown}
                         /> */}
-                      </div>
-                      <div className="my-2">
-                        <span>Note</span>
-                        <input
-                          onChange={handleChange}
-                          value={ticketRepltOrRedirect?.note}
-                          type="text"
-                          name="note"
-                          id=""
-                          className="form-control darkMode-input "
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div className="my-3 d-flex justify-content-center">
-                  <button
-                    data-bs-dismiss="modal"
-                    onClick={() => handleTicket(tickeview?.id)}
-                    className="px-3 py-1"
-                    style={{
-                      backgroundColor: "transparent",
-                      borderRadius: "4px",
-                      border: "1px solid #D2DB08",
-                      color: "#D2DB08",
-                    }}
-                  >
-                    Done
-                  </button>
+                        </div>
+                        <div className="my-2">
+                          <span>Note</span>
+                          <input
+                            onChange={handleChange}
+                            value={ticketRepltOrRedirect?.note}
+                            type="text"
+                            name="note"
+                            id=""
+                            className="form-control darkMode-input "
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="my-3 d-flex justify-content-center">
+                    <button
+                      data-bs-dismiss="modal"
+                      onClick={() => handleTicket(tickeview?.id)}
+                      className="px-3 py-1"
+                      style={{
+                        backgroundColor: "transparent",
+                        borderRadius: "4px",
+                        border: "1px solid #D2DB08",
+                        color: "#D2DB08",
+                      }}
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -13,22 +13,6 @@ const MySubscribers = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [RenewModalShow, setRenewModalShow] = useState(false);
 
-  const subscribers = [
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Ended" },
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Ended" },
-  ];
-  const subscriptions = [
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Renew" },
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Renew" },
-    { name: "melih1905", status: "Active" },
-  ];
-
   // Subscription API
   const [mySubscribers, setMySubscribers] = useState([]);
   const [mySubscriptions, setMySubscriptions] = useState([]);
@@ -55,6 +39,7 @@ const MySubscribers = (props) => {
   return (
     <>
       <div
+        style={{ height: "250px", overflowY: "auto" }}
         className={`${
           currentTheme === "dark" ? "dark-mode" : "light-mode"
         } my-2 p-2 pb-5 fonts-subscribers`}
@@ -75,13 +60,46 @@ const MySubscribers = (props) => {
                       <>
                         {mySubscribers?.map((res, index) => (
                           <div
+                            key={index}
                             className="p-1 d-flex justify-content-between align-items-center mb-2"
                             style={{
                               backgroundColor:
                                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                             }}
                           >
-                            <div className="">
+                            <div
+                              className=""
+                              onClick={() => {
+                                const currentPage =
+                                  localStorage.getItem("currentpage");
+                                const currentuser =
+                                  localStorage.getItem("user-role");
+                                localStorage.setItem("dashboardShow", true);
+                                (currentPage !== "show-all-comments" ||
+                                  currentPage !== "notifications") &&
+                                  localStorage.setItem(
+                                    "priviouspage",
+                                    currentPage
+                                  );
+                                localStorage.setItem(
+                                  "currentpage",
+                                  "show-all-comments"
+                                );
+                                localStorage.setItem(
+                                  "subcurrentpage",
+                                  "subscribers"
+                                );
+                                localStorage.setItem(
+                                  "activeCommentId",
+                                  res?.standard_user?.id
+                                );
+                                props?.setActiveCommentsshow(
+                                  res?.standard_user?.id
+                                );
+                                props?.setDashboardSUser(false);
+                                props?.setSelectContent("show-all-comments");
+                              }}
+                            >
                               <img
                                 style={{
                                   borderRadius: "50%",
@@ -168,7 +186,39 @@ const MySubscribers = (props) => {
                                 currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                             }}
                           >
-                            <div className="">
+                            <div
+                              className=""
+                              onClick={() => {
+                                const currentPage =
+                                  localStorage.getItem("currentpage");
+                                const currentuser =
+                                  localStorage.getItem("user-role");
+                                localStorage.setItem("dashboardShow", true);
+                                (currentPage !== "show-all-comments" ||
+                                  currentPage !== "notifications") &&
+                                  localStorage.setItem(
+                                    "priviouspage",
+                                    currentPage
+                                  );
+                                localStorage.setItem(
+                                  "currentpage",
+                                  "show-all-comments"
+                                );
+                                localStorage.setItem(
+                                  "subcurrentpage",
+                                  "subscribers"
+                                );
+                                localStorage.setItem(
+                                  "activeCommentId",
+                                  res?.commentator_user?.id
+                                );
+                                props?.setActiveCommentsshow(
+                                  res?.commentator_user?.id
+                                );
+                                props?.setDashboardSUser(false);
+                                props?.setSelectContent("show-all-comments");
+                              }}
+                            >
                               <div className="position-relative">
                                 <img
                                   onContextMenu={(e) => e.preventDefault()}
@@ -199,8 +249,8 @@ const MySubscribers = (props) => {
                                     : profile
                                 }
                                 alt=""
-                                height={38}
-                                width={38}
+                                height={35}
+                                width={35}
                               />
                               <span className="ps-1">
                                 {res?.commentator_user?.username}
@@ -208,7 +258,6 @@ const MySubscribers = (props) => {
                             </div>
                             <div className="">
                               <span>{res?.duration}</span>
-                              {/* <span>3 Ay</span> */}
                               <span className="px-2">{res?.start_date}</span>
                               <button
                                 // onClick={() => {

@@ -121,7 +121,6 @@ const CommentatorsCommentsPage = (props) => {
       setCommentLoading(false);
     }
   };
-  console.log(profileData, "============>>profileData");
 
   return (
     <>
@@ -211,6 +210,9 @@ const CommentatorsCommentsPage = (props) => {
                 commentator_level={profileData?.commentator_level}
               />
               <MySubscribers
+                setSelectContent={props?.setSelectContent}
+                setDashboardSUser={props?.setDashboardSUser}
+                setActiveCommentsshow={props?.setActiveCommentsshow}
                 subscribersOrSubscriptions={subscribersOrSubscriptions}
                 user={"commentator"}
               />

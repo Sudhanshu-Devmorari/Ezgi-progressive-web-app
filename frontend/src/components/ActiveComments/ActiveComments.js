@@ -420,7 +420,7 @@ const ActiveComments = (props) => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
+            confirmButtonText: "Yes, Cancel Subscription!",
           }).then((result) => {
             if (result.isConfirmed) {
               cancelSubcription();
@@ -496,6 +496,7 @@ const ActiveComments = (props) => {
             onClick={() => {
               const currentPage =
                 localStorage.getItem("priviouspage") || "home";
+              const priviusPage = localStorage.getItem("priviouspage")
               const deshboardShow =
                 localStorage.getItem("dashboardShow") || false;
               localStorage.setItem(
@@ -512,9 +513,9 @@ const ActiveComments = (props) => {
                   : currentPage || "home"
               );
               props.setDashboardSUser(
-                deshboardShow == "true" ? false : true || false
+                deshboardShow == "true" ? false : priviusPage == 'fav' ? false : true
               );
-              localStorage.setItem("dashboardShow", false);
+              localStorage.setItem("dashboardShow", priviusPage == 'fav' ? false : true);
               localStorage.removeItem("activeCommentId");
               setActiveCommentsshow && setActiveCommentsshow(null);
             }}
@@ -981,8 +982,8 @@ const ActiveComments = (props) => {
                 props.content === ("home" || "wallet") && "mb-5"
               }`}
             >
-              {Number(userId) !== profileData?.id &&
-              !profileData?.is_subscribe ? (
+              {/* {Number(userId) !== profileData?.id && */}
+              {!profileData?.subscription_end_date ? (
                 <button
                   onClick={() => {
                     if (userId) {
@@ -1004,7 +1005,7 @@ const ActiveComments = (props) => {
                     borderRadius: "3px",
                   }}
                 >
-                  Subscribe
+                  {profileData?.is_subscribe ? "Cancel Subscription" : "Subscribe" }
                 </button>
               ) : (
                 <span>
@@ -1015,7 +1016,7 @@ const ActiveComments = (props) => {
                     ).toLocaleDateString()}{" "}
                   </span>
                   date.
-                </span>
+                </span> 
               )}
             </div>
           )}
