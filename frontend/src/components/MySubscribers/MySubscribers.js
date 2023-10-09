@@ -13,22 +13,6 @@ const MySubscribers = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [RenewModalShow, setRenewModalShow] = useState(false);
 
-  const subscribers = [
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Ended" },
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Ended" },
-  ];
-  const subscriptions = [
-    { name: "melih1905", status: "Pending" },
-    { name: "melih1905", status: "Renew" },
-    { name: "melih1905", status: "Active" },
-    { name: "melih1905", status: "Renew" },
-    { name: "melih1905", status: "Active" },
-  ];
-
   // Subscription API
   const [mySubscribers, setMySubscribers] = useState([]);
   const [mySubscriptions, setMySubscriptions] = useState([]);
@@ -76,6 +60,7 @@ const MySubscribers = (props) => {
                       <>
                         {mySubscribers?.map((res, index) => (
                           <div
+                            key={index}
                             className="p-1 d-flex justify-content-between align-items-center mb-2"
                             style={{
                               backgroundColor:
@@ -273,7 +258,6 @@ const MySubscribers = (props) => {
                             </div>
                             <div className="">
                               <span>{res?.duration}</span>
-                              {/* <span>3 Ay</span> */}
                               <span className="px-2">{res?.start_date}</span>
                               <button
                                 // onClick={() => {

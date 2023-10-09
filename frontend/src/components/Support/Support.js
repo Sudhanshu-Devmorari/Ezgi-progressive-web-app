@@ -45,6 +45,7 @@ const Support = () => {
 
   // Ticket View
   const [ticketId, setticketId] = useState("");
+  const [ticketResponse, setTicketResponse] = useState("");
   function handleTicketView(e) {
     setticketId(e);
     setShowModal(3);
@@ -121,6 +122,7 @@ const Support = () => {
                   onClick={() => {
                     handleTicketView(res.id);
                     getData(res.id);
+                    setTicketResponse(res.status)
                   }}
                   key={index}
                   className="my-2 row g-0 p-2 ps-0"
@@ -174,6 +176,7 @@ const Support = () => {
             ticketId={ticketId}
             ticketData={ticketData}
             responseTicketID={responseTicketID}
+            ticketResponse={ticketResponse}
           />
         )}
 

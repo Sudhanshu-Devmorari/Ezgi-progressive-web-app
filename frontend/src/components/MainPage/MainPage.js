@@ -56,7 +56,7 @@ const MainPage = () => {
   const [arrayMerge, setArrayMerge] = useState("Select");
   // const [membershipDate, setMembershipDate] = useState("");
   const [commentator, setCommentator] = useState([]);
-  const publicCount = 3;
+  const publicCount = 5;
   const SubscriptionCount = 3;
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(null);

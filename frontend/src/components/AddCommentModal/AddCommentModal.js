@@ -168,8 +168,25 @@ const AddCommentModal = (props) => {
         console.log("======data=======", res.data);
 
         const MatchList = res.data;
-        setMatchList(MatchList);
-        setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
+
+        const filterdata = MatchList.filter((resp) => new Date(resp.TarihSaat).getTime() >= new Date().getTime())
+
+        console.log("filterdata:::::::::::", filterdata)
+
+        // MatchList.map((resp) => {
+        //   const matchTime = resp.TarihSaat;
+        //   const metchStartTime = new Date(matchTime).getTime();
+        //   const currentTime = new Date().getTime();
+        //   if (metchStartTime >= currentTime) {
+        //     console.log("currentTime:::::::::::::", currentTime);
+        //     console.log("metchStartTime:::::::::::::", metchStartTime);
+        //     console.log("resp:::::::::::", resp);
+        //     console.log("matchTime::::::::::::", matchTime);
+        //   }
+        // });
+
+        setMatchList(filterdata);
+        setMatchDetailsOptions(filterdata.map((item) => item.takimlar));
         // setMatchId(MatchList.map((item) => item.MatchID));
       })
       .catch((err) => {});

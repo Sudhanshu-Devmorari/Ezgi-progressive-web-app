@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const { ticketResponse } = props;
 
   const ticketData = props?.ticketData || {};
 
@@ -18,7 +19,6 @@ const AnsweredTicketView = (props) => {
         ticket_id: ticketData[0]?.ticket_support?.id,
       })
       .then((res) => {
-        // console.log(res);
         if (res.status === 200) {
           props.setShowModal(1);
         }
@@ -58,29 +58,16 @@ const AnsweredTicketView = (props) => {
           </span>
           <span className="">{ticketData?.created}</span>
         </div>
-        {/* <div
-          className="p-1 mb-2 mt-1"
-          style={{
-            backgroundColor: currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-            fontSize: "14px",
-            height: "100px",
-          }}
-        >
-          {ticketData?.message}
-        </div> */}
+
         {ticketData?.map((res, index) => (
           <>
             <div className="d-flex justify-content-between">
               <span>
-                {res?.user?.id != userId && 'Support - '} 
-                <span style={{ color: "#D2DB08" }}>
-                  {res?.user?.username}
-                </span>
+                {res?.user?.id != userId && "Support - "}
+                <span style={{ color: "#D2DB08" }}>{res?.user?.username}</span>
               </span>
               <span className="">
-                {moment(res?.created).format(
-                  "DD-MM.YYYY - HH:mm"
-                )}
+                {moment(res?.created).format("DD-MM.YYYY - HH:mm")}
               </span>
             </div>
             <Form.Control
@@ -98,41 +85,16 @@ const AnsweredTicketView = (props) => {
             />
           </>
         ))}
-        {/* {ticketData?.admin_response && (
-          <>
-            <div className="d-flex justify-content-between">
-              <span>
-                Support -{" "}
-                <span style={{ color: "#D2DB08" }}>
-                  {ticketData?.admin_response?.user?.username}
-                </span>
-              </span>
-              <span className="">
-                {moment(ticketData?.admin_response?.created).format(
-                  "DD-MM.YYYY - HH:mm"
-                )}
-              </span>
-            </div>
-            <Form.Control
-              disabled
-              style={{ fontSize: "14px", height: "100px" }}
-              id="Reply"
-              as="textarea"
-              maxLength={250}
-              className={`${
-                currentTheme === "dark"
-                  ? "textArea-dark-mode"
-                  : "textArea-light-mode"
-              } mb-2 mt-1`}
-              defaultValue={ticketData?.admin_response?.response}
-            />
-          </>
-        )} */}
-        {ticketData[0]?.status != "resolved" && (
+
+        {ticketResponse && ticketResponse != "resolved" && (
           <div className="my-3 d-flex justify-content-center gap-2">
             <button
               onClick={() => {
-                if (ticketData?.length == 1 || props?.responseTicketID == userId || props?.responseTicketID == null) {
+                if (
+                  ticketData?.length == 1 ||
+                  props?.responseTicketID == userId ||
+                  props?.responseTicketID == null
+                ) {
                   Swal.fire({
                     text: "You cannot reply to your own ticket as admin has not responded yet.",
                     backdrop: false,
