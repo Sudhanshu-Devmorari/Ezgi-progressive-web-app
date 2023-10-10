@@ -253,7 +253,12 @@ def Userst():
             Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
 
             total_predictions = len(correct_prediction) + len(incorrect_prediction)
-            Success_rate = round((len(correct_prediction)/total_predictions)*100, 2)
+
+            if total_predictions > 0:
+                Success_rate = round((len(correct_prediction) / total_predictions) * 100, 2)
+            else:
+                Success_rate = 0
+
             user.success_rate = Success_rate
             user.score_points = Score_point
 
@@ -282,6 +287,8 @@ def Userst():
                 user.commentator_level = "master"
             if 70 < Success_rate < 100:
                 user.commentator_level = "grandmaster"
+
+            logger.info("last debug: ======================%s")
 
             # Update is_resolve status for pending comment
             pending_comments = Comments.objects.filter(status='pending', is_resolve=False, commentator_user= user)

@@ -4893,18 +4893,21 @@ class SportsStatisticsView(APIView):
 
 
 class BecomeEditorEarnDetailsview(APIView):
-    def get(self, request, subscriber, format=None, *args, **kwargs):
+    def get(self, request, subscriber, format=None, *args, **kwargs): 
         try:
-            type = request.query_params.get('type')
-            value = SubscriptionSetting.objects.get(commentator_level=type)
+            commentator_level = request.query_params.get('type')
+            value = SubscriptionSetting.objects.get(commentator_level=commentator_level)
+            commission_rate = MembershipSetting.objects.get(commentator_level=commentator_level).commission_rate
             try:
-                data = BecomeEditorEarnDetails.objects.get(subscription_type=type)
-                total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
+                data = BecomeEditorEarnDetails.objects.get(subscription_type=commentator_level)
+                value_with_commision_calc = int(value.month_1) - (int(value.month_1) * (int(commission_rate)/100))
+                # total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
+                total_earning = (float(value_with_commision_calc) * int(subscriber)) / int(data.threshold_subscriber)
                 return Response({"total_earning": round(total_earning, 2)})
             except ObjectDoesNotExist:
                 data = BecomeEditorEarnDetails.objects.create(subscription_type=type, threshold_subscriber=1, earn_amount=value.month_1)
                 total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
-                return Response({"total_earning": round(total_earning, 2)})
+            return Response({"total_earning": round(total_earning, 2)})
         except SubscriptionSetting.DoesNotExist:
             return Response({"error": "SubscriptionSetting not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
