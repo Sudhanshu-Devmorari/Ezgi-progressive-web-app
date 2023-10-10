@@ -188,6 +188,7 @@ SUPPORT_STATUS = (
     )
 
 LABEL_STATUS = (
+        ('new','New'),
         ('pending','Pending'),
         ('responded','Responded'),
         ('progress','Progress'),
@@ -201,7 +202,7 @@ class TicketSupport(models.Model):
     message = models.TextField()
     watched = models.BooleanField(default=False)
     status = models.CharField(max_length = 20, choices = SUPPORT_STATUS, default='pending')
-    admin_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='pending')
+    admin_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='new')
     user_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='pending')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -413,6 +414,25 @@ class BankDetails(models.Model):
     withdrawable_balance = models.FloatField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+
+class Withdrawable(models.Model):
+    bankdetails = models.ForeignKey(BankDetails, on_delete=models.CASCADE)
+    amount = models.FloatField(null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE,default="pending", null=True, blank=True)
+    withdrawable = models.BooleanField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+class BankUpdate(models.Model):
+    bankdetails = models.ForeignKey(BankDetails, on_delete=models.CASCADE)
+    new_iban = models.CharField(null=True, blank=True)
+    bankupdate = models.BooleanField(null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE,default="pending", null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
 
 class EditorBanner(models.Model):
     editor_banner = models.ImageField(upload_to='Editor_banner', null=True, blank=True)

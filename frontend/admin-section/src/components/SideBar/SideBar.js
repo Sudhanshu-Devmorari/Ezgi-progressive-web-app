@@ -31,7 +31,7 @@ import axios from "axios";
 import config from "../../config";
 
 const SideBar = (props) => {
-  console.log("props?.supportIcon", props?.supportIcon)
+  // console.log("props?.supportIcon", props?.supportIcon)
   const navigate = useNavigate();
   const [showDetails, setshowDetails] = useState("home");
   const [cookies, setCookie, removeCookie] = useCookies();
@@ -89,6 +89,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.setCommentData && props.setCommentData(false)
               props.setSelectedOption && props.setSelectedOption("All")
               props.refreshComments && props.refreshComments()
               setshowDetails("/comments/");
@@ -116,6 +117,9 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              props.setWithdrawableData && props.setWithdrawableData(false)
+              props.refreshComments && props.refreshComments()
+              props.refresh && props.refresh()
               setshowDetails("/withdrawal/");
               navigate("/withdrawal/");
             }}

@@ -20,7 +20,7 @@ import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 
-const SupportManagementPage = () => {
+const SupportManagementPage = (props) => {
   // Support management API
   const [cookies, setCookie, removeCookie] = useCookies();
 
@@ -176,7 +176,7 @@ const SupportManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setSelectedOption={setSelectedOption} refreshComments={getSupportData}/>
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} setSelectedOption={setSelectedOption} refreshComments={getSupportData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -319,6 +319,7 @@ const SupportManagementPage = () => {
                                 //(res.status === "resolved" && "#58DEAA") ||
                                 //(res.status === "progress" && "#FF9100"),
                                 (res.admin_label === "pending" && "#FFDD00") ||
+                                (res.admin_label === "new" && "#FFDD00") ||
                                 (res.admin_label === "responded" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
                                 (res.user_label === "progress" && "#FF9100"),
@@ -330,6 +331,7 @@ const SupportManagementPage = () => {
                                 //(res.status === "responded" && "#4DD5FF") ||
                                 //(res.status === "resolved" && "#58DEAA") ||
                                 //(res.status === "progress" && "#FF9100"),
+                                (res.admin_label === "new" && "#FFDD00") ||
                                 (res.admin_label === "responded" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
                                 (res.user_label === "progress" && "#FF9100"),

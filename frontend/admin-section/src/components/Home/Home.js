@@ -24,6 +24,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCookies } from "react-cookie";
 import Swal from "sweetalert2";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 
 const Home = (props) => {
@@ -729,6 +730,8 @@ const Home = (props) => {
     setAgeFilterDropDown(false);
     setUserFilterDropDown(!userFilterDropDown);
   };
+  const location = useLocation();
+  const path = location.pathname;
   return (
     <>
       <div
@@ -918,6 +921,7 @@ const Home = (props) => {
                         height={25}
                         width={25}
                       />
+                      {path != "/" && 
                       <img
                         onClick={
                           () => {
@@ -932,6 +936,7 @@ const Home = (props) => {
                         height={25}
                         width={25}
                       />
+                      }
                     </div>
                   </MainDiv>
                 </React.Fragment>

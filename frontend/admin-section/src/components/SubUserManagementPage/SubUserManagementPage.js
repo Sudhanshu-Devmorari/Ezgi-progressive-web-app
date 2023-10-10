@@ -20,7 +20,7 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 
-const SubUserManagementPage = () => {
+const SubUserManagementPage = (props) => {
   const users = [
     { profile: user1, btn: "Support Supervisor" },
     { profile: user2, btn: "Financial Supervisor" },
@@ -127,7 +127,7 @@ const SubUserManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar refreshComments={getSubUsers}/>
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refreshComments={getSubUsers}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

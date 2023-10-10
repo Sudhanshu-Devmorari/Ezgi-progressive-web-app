@@ -2,7 +2,7 @@ import React from "react";
 import withdrawal from "../../assets/cash-banknote.svg";
 import './NewWithdrawalRqst.css'
 
-const NewWithdrawalRqst = () => {
+const NewWithdrawalRqst = (props) => {
   return (
     <>
       <div
@@ -11,7 +11,7 @@ const NewWithdrawalRqst = () => {
       >
         <img className="icon" src={withdrawal} alt="" />
         <span className="heading">New Withdrawal Request</span>
-        <span className="number">127</span>
+        <span className="number">{props.withdrawable}</span>
       </div>
     </>
   );

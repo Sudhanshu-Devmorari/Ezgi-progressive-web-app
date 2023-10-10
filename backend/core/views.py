@@ -32,7 +32,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail,
-                          PendingBalanceHistory, CommissionEarning)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
@@ -40,7 +40,7 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
                              TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer,
-                             EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer)
+                             EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer, WithdrawableSerializer, BankUpdateSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -1307,6 +1307,10 @@ class ReplyTicketView(APIView):
                 ticket_obj.admin_label = 'user responded'
                 ticket_obj.save()
 
+            if ticket_obj != None:
+                ticket_obj.watched = False
+                ticket_obj.save()
+
             serializer = TicketHistorySerializer(ticket_history)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -1718,6 +1722,39 @@ class AdminMainPage(APIView):
             except:
                 data_list['comments_percentage'] = 0
 
+            try:
+                """Sales percentage"""
+                status_changed_to_pending = BecomeCommentator.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = BecomeCommentator.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                sales_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                # data_list['new_sales_percentage'] = sales_percentage
+            except:
+                sales_percentage = 0
+
+            try:
+                """Subscribers percentage"""
+                status_changed_to_pending = Subscription.objects.annotate(date_updated=TruncDate('updated')).filter(date_updated__gte=previous_24_hours, status='pending').count()
+                new_subscriptions = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__gte=previous_24_hours, status='active').count()
+                subscriptions_before_24_hours = Subscription.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                count = (subscriptions_before_24_hours - status_changed_to_pending) + new_subscriptions
+                subscriptions_percentage = ((count-subscriptions_before_24_hours)/subscriptions_before_24_hours) * 100
+                # data_list['new_subscriptions_percentage'] = subscriptions_percentage
+            except:
+                subscriptions_percentage = 0
+
+            try:
+                """Highlights percentage"""
+                highlights_status_changed_to_pending = Highlight.objects.annotate(date_updated=TruncDate('updated')).filter(status='pending', date_updated__gte=previous_24_hours).count()
+                highlights_purchased = Highlight.objects.annotate(date_created=TruncDate('created')).filter(status='active', highlight=True, date_created__gte=previous_24_hours).count()
+                highlights_before_24_hours = Highlight.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+                highlights_count = (highlights_before_24_hours - highlights_status_changed_to_pending) + highlights_purchased
+                highlights_percentage = ((highlights_count-highlights_before_24_hours)/highlights_before_24_hours) * 100
+                # data_list['new_highlights_percentage'] = highlights_percentage
+            except:
+                highlights_percentage = 0
+
 
             new_user = User.objects.filter(created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_user'] = new_user
@@ -1729,13 +1766,29 @@ class AdminMainPage(APIView):
             data_list['new_subscriber'] = new_subscriber
 
             # new_comment = Comments.objects.filter(status='approve').count()
-            new_comment = Comments.objects.filter(created__gte=previous_day, created__lt=datetime.now()).count()
+            new_comment = Comments.objects.filter(status='pending',created__gte=previous_day, created__lt=datetime.now()).count()
             data_list['new_comment'] = new_comment
+
+            cal_ = 0
+            plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
+            for obj in plan_sale_obj_cal:
+                cal_ += obj.money
+            subscription_obj_cal = Subscription.objects.filter(subscription=True, created__gte=previous_day, created__lt=datetime.now())
+            for obj in subscription_obj_cal:
+                cal_ += obj.money
+            highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
+            for obj in highlights_obj_cal:
+                cal_ += obj.money
+            data_list['daily'] = cal_
+            data_list['daily_percentage'] = (sales_percentage + subscriptions_percentage + highlights_percentage) / 3
 
             all_user = User.objects.filter(is_delete=False,is_admin=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
             serializer = UserSerializer(all_user, many=True)
             data = serializer.data
             data_list['users_list'] = data
+
+            withdrawable = Withdrawable.objects.filter(status="pending").count()
+            data_list['withdrawable'] = withdrawable
 
             return Response(data=data_list, status=status.HTTP_200_OK)
 
@@ -2163,6 +2216,10 @@ class CommentsManagement(APIView):
                     commentator.append(details)
             else:
                 return Response({"error": "No comments with likes found."}, status=status.HTTP_404_NOT_FOUND)
+                
+        previous_day = datetime.now() - timedelta(days=1)
+        new_comment = Comments.objects.filter(status='pending',created__gte=previous_day, created__lt=datetime.now())
+        management['new_comment'] = CommentsSerializer(new_comment, many=True).data
 
         management['comments_count'] = comments_count
         management['all_comment'] = serializer1.data
@@ -3438,7 +3495,7 @@ class SupportManagement(APIView):
             except TicketSupport.DoesNotExist:
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-            # is_res_obj = ResponseTicket.objects.filter(user=user,ticket=ticket_support)
+            is_res_obj = ResponseTicket.objects.filter(user=user,ticket=ticket_support)
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
             # print('res_obj: ', res_obj)
             if res_obj != None:
@@ -3458,8 +3515,8 @@ class SupportManagement(APIView):
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
 
             if res_obj != None:             
-                ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
-                                                            response_ticket=res_obj, message=message)
+                # ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
+                #                                             response_ticket=res_obj, message=message)
                 if is_res_obj:
                     notification_obj = Notification.objects.create(
                         receiver=ticket_support.user, 
@@ -4722,7 +4779,7 @@ class SportsStatisticsView(APIView):
                 football_Leagues.append(data)
             fb_frozen_dicts = [frozenset(d.items()) for d in football_Leagues]
             fb_counter = Counter(fb_frozen_dicts)
-            fb_most_common_duplicates = fb_counter.most_common(8)
+            fb_most_common_duplicates = fb_counter.most_common(5)
             fb_result = [dict(frozenset_pair) for frozenset_pair, count in fb_most_common_duplicates]
             # football_counter = Counter(football_Leagues)
             # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
@@ -5584,6 +5641,8 @@ class BankDetailsView(APIView):
                         query.save(update_fields=['status','updated'])
                         return Response({'data': 'Your withdrawal request has been successfully submitted!'}, status=status.HTTP_200_OK)
                     else:
+                        query.is_withdrawable_request = True
+                        query.save()
                         return Response({'data': 'Your withdrawal request is currently in progress. Please await the first response before generating another request.'}, status=status.HTTP_200_OK)
                 else:
                     return Response({'error' : 'Failed to process withdrawal request. Please try again later.'}, status=status.HTTP_404_NOT_FOUND) 
@@ -5836,3 +5895,82 @@ class CheckChangeSupportTicket(APIView):
             return Response(data=True, status=status.HTTP_200_OK)
         else:
             return Response(data=False, status=status.HTTP_200_OK)
+
+
+class CreateWithdrawableRequest(APIView):
+    def post(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+
+            if user.is_delete:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            if not user.is_active:
+                return Response("Your account has been deactivated. Contact support for assistance.", status=status.HTTP_400_BAD_REQUEST)
+
+            bankiban = request.data.get("bank_iban")
+            amount = request.data.get("amount")
+
+            try:
+                bankdetails = BankDetails.objects.get(user=user, bank_iban=bankiban)
+                if not Withdrawable.objects.filter(bankdetails=bankdetails, status='pending').exists():
+                    obj = Withdrawable.objects.create(bankdetails=bankdetails, amount=amount, withdrawable=True)
+                    obj.save()
+                    serializer = WithdrawableSerializer(obj).data
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                else:
+                    return Response(data={"message": "Your withdrawal request is currently in progress. Please await the first response before generating another request."}, status=status.HTTP_404_NOT_FOUND)
+            except BankDetails.DoesNotExist:
+                return Response(data={"message": "There are no bank details found for the specific Bank Iban."}, status=status.HTTP_404_NOT_FOUND)
+
+        except User.DoesNotExist:
+            return Response(data={"message": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CreateBankUpdateRequest(APIView):
+    def post(self, request, id=None, format=None, *args, **kwargs):
+        try:
+            user = get_object_or_404(User, id=id)
+
+            if user.is_delete:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            if not user.is_active:
+                return Response("Your account has been deactivated. Contact support for assistance.", status=status.HTTP_400_BAD_REQUEST)
+
+            new_bank_iban = request.data.get("bank_iban")
+
+            if BankDetails.objects.filter(user=user).exists():
+                bankdetails = BankDetails.objects.get(user=user)
+                obj = BankUpdate.objects.create(bankdetails=bankdetails, new_iban=new_bank_iban, bankupdate=True)
+                obj.save()
+                serializer = BankUpdateSerializer(obj).data
+                return Response(data=serializer, status=status.HTTP_200_OK)
+
+            return Response("Bank details not found for this user.", status=status.HTTP_404_NOT_FOUND)
+
+        except User.DoesNotExist:
+            return Response("User not found.", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class ShowWithdrawableData(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        data_list = {}
+        
+        try:
+            all_request = Withdrawable.objects.all()
+            serializer = WithdrawableSerializer(all_request, many=True).data
+            data_list['all_request'] = serializer
+        except Exception as e:
+            return Response(data={'error': 'An error occurred while fetching all requests.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        try:
+            new_request = Withdrawable.objects.filter(status='pending')
+            serializer1 = WithdrawableSerializer(new_request, many=True).data
+            data_list['new_request'] = serializer1
+        except Exception as e:
+            return Response(data={'error': 'An error occurred while fetching new requests.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(data=data_list, status=status.HTTP_200_OK)

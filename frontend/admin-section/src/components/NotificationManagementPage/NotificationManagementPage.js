@@ -18,7 +18,7 @@ import initialProfile from "../../assets/profile.png";
 import moment from "moment";
 import { useCookies } from "react-cookie";
 
-const NotificationManagementPage = () => {
+const NotificationManagementPage = (props) => {
   const [cookies, setCookie, removeCookie] = useCookies();
 
   const [notifications, setNotifications] = useState([]);
@@ -126,7 +126,7 @@ const NotificationManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>

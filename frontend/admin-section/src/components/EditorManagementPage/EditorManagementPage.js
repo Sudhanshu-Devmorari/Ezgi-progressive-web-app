@@ -14,7 +14,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import config from "../../config";
 
-const EditorManagementPage = () => {
+const EditorManagementPage = (props) => {
   const [data, setData] = useState({});
   const [users, setUsers] = useState([]);
   const [verifyUser, setverifyUsererifyUser] = useState([]);
@@ -85,7 +85,7 @@ const EditorManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar refresh={()=>{setDeactiveRqst(false);setverifyRqst(false)}} refreshComments={editorManagementApiData}/>
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refresh={()=>{setDeactiveRqst(false);setverifyRqst(false)}} refreshComments={editorManagementApiData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

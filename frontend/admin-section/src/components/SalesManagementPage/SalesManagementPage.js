@@ -20,7 +20,7 @@ import config from "../../config";
 import moment from "moment";
 import { useCookies } from "react-cookie";
 
-const SalesManagementPage = () => {
+const SalesManagementPage = (props) => {
   const [salesData, setSalesData] = useState({});
   const [records, setRecords] = useState([]);
   const [recordsDisplay, setRecordsDisplay] = useState(records);
@@ -417,7 +417,7 @@ const SalesManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar refreshComments={getSalesData} />
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refreshComments={getSalesData} />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

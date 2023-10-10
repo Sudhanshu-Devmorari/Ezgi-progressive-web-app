@@ -12,6 +12,7 @@ import circle_check from "../../assets/circle-check-1.png";
 import circle_x from "../../assets/circle-x.png";
 import circle_b from "../../assets/Group 311.png";
 import circle_y from "../../assets/clock-exclamation.png";
+import circel_check from "../../assets/circle-check-1.png"
 import WithdrawalRqstFilter from "../WithdrawalRqstFilter/WithdrawalRqstFilter";
 import VerificationRequestsBtns from "../VerificationRequestsBtns/VerificationRequestsBtns";
 import user2 from "../../assets/user2.png";
@@ -26,7 +27,7 @@ import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import moment from "moment";
 
-const WithdrawalManagementPage = () => {
+const WithdrawalManagementPage = (props) => {
   const users = [
     {
       sr: "#0001",
@@ -140,7 +141,7 @@ const WithdrawalManagementPage = () => {
       const res = await axios.get(`${config.apiUrl}/bank-details/?admin=${admin_id}`);
       if (res?.status === 200) {
         const data = res?.data?.data;
-        setUpdateRequest(data?.bank_details);
+        // setUpdateRequest(data?.bank_details);
         setCountsRequest({
           ...countsRequest,
           bank_request: data?.bank_details?.length,
@@ -160,9 +161,30 @@ const WithdrawalManagementPage = () => {
     }
   }
 
+  async function WithdrawDataRetrieve() {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(`${config.apiUrl}/show-withdrawable-data/`);
+      if (res?.status === 200) {
+        // console.log("resData: ", res)
+        if(props.withdrawableData === true){
+          setUpdateRequest(res.data.new_request);
+        }
+        else{
+          setUpdateRequest(res.data.all_request);
+
+        }
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  console.log("props.withdrawableData: ", props.withdrawableData)
   useEffect(() => {
-    getWithdrawData();
-  }, []);
+    getWithdrawData()
+    WithdrawDataRetrieve();
+  }, [props.withdrawableData]);
 
   const rqstArray = [
     { name: "New", count: countsRequest?.new },
@@ -176,7 +198,7 @@ const WithdrawalManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refreshComments={WithdrawDataRetrieve}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -282,28 +304,30 @@ const WithdrawalManagementPage = () => {
                           <MainDiv>
                             <>
                               <div className="col-3 d-flex align-items-center">
-                                <span className="pe-2">{res.sr}</span>
+                                <span className="pe-2">{`# ${(index + 1)
+                                  .toString()
+                                  .padStart(4, "0")}`}</span>
                                 <img
                                   style={{
                                     borderRadius: "50%",
                                     objectFit: "cover",
                                   }}
                                   src={
-                                    res?.user?.profile_pic
-                                      ? `${config.apiUrl}${res?.user?.profile_pic}`
+                                    res?.bankdetails.user?.profile_pic
+                                      ? `${config.apiUrl}${res?.bankdetails.user?.profile_pic}`
                                       : user1
                                   }
                                   alt=""
                                   height={45}
                                   width={45}
                                 />
-                                <span className="ps-2">{res.name}</span>
+                                <span className="ps-2">{res?.bankdetails.user?.name}</span>
                               </div>
                               <div className="col-4 d-flex align-items-center justify-content-center">
-                                <div>TR {res?.bank_iban}</div>
+                                <div>TR {res?.bankdetails?.bank_iban}</div>
                               </div>
                               <div className="col-1 d-flex align-items-center justify-content-center">
-                                <div>{res?.withdrawable_balance}</div>
+                                <div>{res?.amount}</div>
                               </div>
                               <div className="col-4 d-flex align-items-center justify-content-end gap-1 pe-2">
                                 <div>
@@ -314,7 +338,7 @@ const WithdrawalManagementPage = () => {
                                 <img
                                   src={
                                     (res?.status === "pending" && circle_y) ||
-                                    (res?.status === "approve" && circle_y) ||
+                                    (res?.status === "approve" && circel_check) ||
                                     (res?.status === "reject" && circle_x)
                                   }
                                   alt=""

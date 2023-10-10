@@ -4,7 +4,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
                           SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner,
-                          PendingBalanceHistory, CommissionEarning)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -259,4 +259,18 @@ class CommissionEarningSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = CommissionEarning
+        fields = '__all__'
+
+
+class WithdrawableSerializer(serializers.ModelSerializer):
+    bankdetails = BankDetailsSerializer()
+    class Meta:
+        model = Withdrawable
+        fields = '__all__'
+
+
+class BankUpdateSerializer(serializers.ModelSerializer):
+    bankdetails = BankDetailsSerializer()
+    class Meta:
+        model = BankUpdate
         fields = '__all__'

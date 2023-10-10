@@ -3,7 +3,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
                          CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
                          BecomeCommentator, BlueTick, DataCount, TicketHistory, ResponseTicket, BecomeEditor,
-                         BecomeEditorEarnDetails, PendingBalanceHistory, CommissionEarning, BankDetails)
+                         BecomeEditorEarnDetails, PendingBalanceHistory, CommissionEarning, BankDetails, Withdrawable, BankUpdate)
 
 # Register your models here.
 @admin.register(User)
@@ -120,3 +120,13 @@ class CommissionEarningAdmin(admin.ModelAdmin):
 @admin.register(BankDetails)
 class BankDetailsAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'bank_iban', 'status', 'total_balance', 'pending_balance', 'withdrawable_balance', 'created', 'updated')
+
+
+@admin.register(Withdrawable)
+class WithdrawableAdmin(admin.ModelAdmin):
+    list_display = ('id', 'bankdetails', 'amount','status','withdrawable', 'created', 'updated')
+
+
+@admin.register(BankUpdate)
+class BankUpdateAdmin(admin.ModelAdmin):
+    list_display = ('id', 'bankdetails', 'new_iban','bankupdate','status', 'created', 'updated')

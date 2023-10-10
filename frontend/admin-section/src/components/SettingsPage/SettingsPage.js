@@ -7,7 +7,7 @@ import SubIcon from "../../assets/wallet (1).svg";
 import commentsIcon from "../../assets/target-arrow-1.svg";
 import './SettingsPage.css'
 
-const SettingsPage = () => {
+const SettingsPage = (props) => {
   const [selecteSetting, setSelecteSetting] = useState("Editor Statistics");
   const array = [
     { img: editorIcon, name: "Editor Statistics" },
@@ -21,7 +21,7 @@ const SettingsPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0 gap-2" style={{ height: "12vh" }}>

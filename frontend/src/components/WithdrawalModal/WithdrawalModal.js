@@ -15,19 +15,59 @@ const WithdrawalModal = (props) => {
 
   const [withdrawalLoading, setWithdrawalLoading] = useState(false);
   const handleWithdraw = async () => {
+    // try {
+    //   setWithdrawalLoading(true);
+    //   const res = await axios.patch(`${config.apiUrl}/bank-details/${userId}`, {
+    //     bank_iban: bankDetails?.bank_iban,
+    //     withdrawable_amount: bankDetails?.withdrawable_balance,
+    //   });
+    //   // console.log(res);
+    //   if (res?.status === 200) {
+    //     setWithdrawalLoading(false);
+    //     Swal.fire({
+    //       title: "Success",
+    //       text: res?.data?.data,
+    //       icon: "error",
+    //       backdrop: false,
+    //       customClass:
+    //         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    //     }).then((res) => {
+    //       if (res?.isConfirmed) {
+    //         window.location.reload();
+    //       }
+    //     });
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    //   if (error?.response?.status === 404) {
+    //     setWithdrawalLoading(false);
+    //     Swal.fire({
+    //       title: "Error",
+    //       text: error?.response?.data?.error,
+    //       icon: "error",
+    //       backdrop: false,
+    //       customClass:
+    //         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    //     });
+    //   }
+    // }
+  };
+
+  const handleWithdrawRequest = async () => {
     try {
       setWithdrawalLoading(true);
-      const res = await axios.patch(`${config.apiUrl}/bank-details/${userId}`, {
+      const res = await axios.post(`${config.apiUrl}/create-withdrawable-request/${userId}/`, {
         bank_iban: bankDetails?.bank_iban,
-        withdrawable_amount: bankDetails?.withdrawable_balance,
+        amount: bankDetails?.withdrawable_balance,
       });
       // console.log(res);
       if (res?.status === 200) {
         setWithdrawalLoading(false);
         Swal.fire({
           title: "Success",
-          text: res?.data?.data,
-          icon: "error",
+          // text: res?.data?.data,
+          text: "Withdrawal request sucessfully sent.",
+          icon: "success",
           backdrop: false,
           customClass:
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
@@ -43,7 +83,7 @@ const WithdrawalModal = (props) => {
         setWithdrawalLoading(false);
         Swal.fire({
           title: "Error",
-          text: error?.response?.data?.error,
+          text: error?.response?.data?.message,
           icon: "error",
           backdrop: false,
           customClass:
@@ -52,6 +92,7 @@ const WithdrawalModal = (props) => {
       }
     }
   };
+
 
   return (
     <>
@@ -128,7 +169,7 @@ const WithdrawalModal = (props) => {
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button
-                  onClick={handleWithdraw}
+                  onClick={() => {handleWithdraw(); handleWithdrawRequest()}}
                   className={`${
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}

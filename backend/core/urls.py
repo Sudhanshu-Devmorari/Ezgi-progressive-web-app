@@ -3,7 +3,10 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
                          TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
-                         GetPendingBalance, TransactionHistory, UserTransactionHistory,
+
+                        #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
+                         GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
+                         CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -56,6 +59,12 @@ urlpatterns = [
     path('pending-balance/<int:id>/', GetPendingBalance.as_view(), name='Pending-Balance'), 
     path('transaction-history/<int:id>/', TransactionHistory.as_view(), name='Transaction-History'), 
     path('user-transaction-history/<int:id>/', UserTransactionHistory.as_view(), name='User-TransactionHistory'), 
+    path('check-ticket-action/<int:ticket_id>/', CheckTicketActionView.as_view(), name='Check-Ticket-Action'), 
+    path('check-new-support-ticket/', CheckNewSupportTicketView.as_view(), name='Check-New-Support-Ticket'), 
+    path('check-change-support-ticket/', CheckChangeSupportTicket.as_view(), name='Check-Change-Support-Ticket'), 
+    path('create-withdrawable-request/<int:id>/', CreateWithdrawableRequest.as_view(), name='Create-Withdrawable-Request'), 
+    path('create-bank-update-request/<int:id>/', CreateBankUpdateRequest.as_view(), name='Create-Bank-Update-Request'), 
+    path('show-withdrawable-data/', ShowWithdrawableData.as_view(), name='Show-Withdrawable-Data'), 
 
 
     # Admin Panel's api
@@ -110,4 +119,6 @@ urlpatterns = [
     path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
     path('editor-banner/', EditorBannerView.as_view(), name='Editor-banner'),
     path('futbol-basketbol-count/', GetFutbolAndBasketbolCountView.as_view(), name='futbol-basketbol-count'),
+
+    path('test-cron/', TestCronView.as_view(), name='test-cron'),
 ]

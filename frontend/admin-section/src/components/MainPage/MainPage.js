@@ -17,19 +17,23 @@ import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 import axios from "axios";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import { Link } from "react-router-dom";
 
-const MainPage = () => {
+const MainPage = (props) => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
+  const [daily, setDaily] = useState();
+  const [dailyPersentage, setDailyPersentage] = useState();
+  const [withdrawable, setWithdrawable] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [cookies, setCookie, removeCookie] = useCookies();
 
   const adminHomeApiData = async (user_id) => {
-    const id = localStorage.getItem("admin-user-id")
+    const id = localStorage.getItem("admin-user-id");
     const res = await axios
       .get(`${config?.apiUrl}/home/?id=${id}`)
       .then((res) => {
-        // console.log(res.status, "=====>>>>res.data");
+        // console.log(res, "=====>>>>res.data");
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
@@ -37,6 +41,9 @@ const MainPage = () => {
         }
         setData(res?.data);
         setUsers(res?.data?.users_list);
+        setDaily(res?.data?.daily);
+        setDailyPersentage(res?.data?.daily_percentage);
+        setWithdrawable(res?.data?.withdrawable);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -95,7 +102,7 @@ const MainPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setCommentData={props.setCommentData} />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -116,8 +123,15 @@ const MainPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-4">
-                <NewUsers array={newCommentsArray} isLoading={isLoading} />
+              <div
+                className="col-4"
+                onClick={() => {
+                  props.setCommentData(true);
+                }}
+              >
+                <Link to="comments/" style={{ textDecoration: "none" }}>
+                  <NewUsers array={newCommentsArray} isLoading={isLoading} />
+                </Link>
               </div>
             </div>
             <div className="row g-0">
@@ -129,8 +143,19 @@ const MainPage = () => {
                 />
               </div>
               <div className="col-4">
-                <DailySalesArray />
-                <NewWithdrawalRqst />
+                <DailySalesArray
+                  daily={daily}
+                  dailyPersentage={dailyPersentage}
+                />
+                <div
+                  onClick={() => {
+                    props.setWithdrawableData(true);
+                  }}
+                >
+                  <Link to="withdrawal/" style={{ textDecoration: "none" }}>
+                    <NewWithdrawalRqst withdrawable={withdrawable} />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

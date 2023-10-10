@@ -8,7 +8,7 @@ import EditorWithdrawalSettings from "../EditorWithdrawalSettings/EditorWithdraw
 import EditorCommentsSettings from "../EditorCommentsSettings/EditorCommentsSettings";
 import './EditorSettingsPage.css'
 
-const EditorSettingsPage = () => {
+const EditorSettingsPage = (props) => {
   const [selectEditorSetting, setSelectEditorSetting] =
     useState("Editors Settings");
   return (
@@ -17,7 +17,7 @@ const EditorSettingsPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar />
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0 gap-2" style={{ height: "12vh" }}>

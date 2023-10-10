@@ -11,7 +11,7 @@ import axios from "axios";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 
-const CommentsManagementPage = () => {
+const CommentsManagementPage = (props) => {
   const [data, setData] = useState({});
   const [mostLike, setMostLike] = useState([]);
   const [commentData, setCommentData] = useState([]);
@@ -33,7 +33,12 @@ const CommentsManagementPage = () => {
         }
         setData(res.data);
         setMostLike(res?.data?.most_like);
-        setCommentData(res.data.all_comment);
+        if(props.commentData === true){
+          setCommentData(res.data.new_comment);
+        }
+        else{
+          setCommentData(res.data.all_comment);
+        }
         setIsLoading(false);
       })
       .catch((error) => {
@@ -44,7 +49,7 @@ const CommentsManagementPage = () => {
 
   useEffect(() => {
     commentManagementApiData();
-  }, []);
+  }, [props.commentData]);
 
   const newCommentsArray = [
     {
@@ -95,7 +100,7 @@ const CommentsManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setSelectedOption={setSelectedOption} refreshComments={commentManagementApiData}/>
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} setSelectedOption={setSelectedOption} refreshComments={commentManagementApiData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

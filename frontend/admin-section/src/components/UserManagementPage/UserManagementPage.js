@@ -15,7 +15,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import config from "../../config";
 
-const UserManagementPage = () => {
+const UserManagementPage = (props) => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [userTimeLine, setUserTimeLine] = useState([]);
@@ -130,7 +130,7 @@ const UserManagementPage = () => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar refreshComments={userManagementApiData}/>
+            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refreshComments={userManagementApiData}/>
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">

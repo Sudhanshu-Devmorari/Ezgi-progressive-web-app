@@ -16,6 +16,9 @@ import LoginModal from "./components/LoginModal/LoginModal";
 import { useCookies } from "react-cookie";
 
 function App() {
+  const [commentData, setCommentData] = useState(false);
+  const [withdrawableData, setWithdrawableData] = useState(false);
+
   const [cookies, setCookie, removeCookie] = useCookies();
   const isAuthenticated = cookies["admin-user-id"]
   const navigate = useNavigate()
@@ -35,18 +38,18 @@ function App() {
           <Route path="/" element={<LoginModal />} />
         ) : (
           <>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/users" element={<UserManagementPage />} />
-            <Route path="comments" element={<CommentsManagementPage />} />
-            <Route path="editors" element={<EditorManagementPage />} />
-            <Route path="withdrawal" element={<WithdrawalManagementPage />} />
-            <Route path="sales" element={<SalesManagementPage />} />
-            <Route path="support" element={<SupportManagementPage />} />
-            <Route path="subuser" element={<SubUserManagementPage />} />
-            <Route path="notification" element={<NotificationManagementPage />} />
-            <Route path="ads" element={<AdsManagementPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="editorSettings" element={<EditorSettingsPage />} />
+            <Route path="/" element={<MainPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="/users" element={<UserManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="comments" element={<CommentsManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData} commentData={commentData}/>} />
+            <Route path="editors" element={<EditorManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="withdrawal" element={<WithdrawalManagementPage setWithdrawableData={setWithdrawableData} withdrawableData={withdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="sales" element={<SalesManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="support" element={<SupportManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="subuser" element={<SubUserManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="notification" element={<NotificationManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="ads" element={<AdsManagementPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="settings" element={<SettingsPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
+            <Route path="editorSettings" element={<EditorSettingsPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
           </>
         )}
       </Routes>
