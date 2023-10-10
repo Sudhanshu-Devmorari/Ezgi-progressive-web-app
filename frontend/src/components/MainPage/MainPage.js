@@ -57,7 +57,7 @@ const MainPage = () => {
   // const [membershipDate, setMembershipDate] = useState("");
   const [commentator, setCommentator] = useState([]);
   const publicCount = 5;
-  const SubscriptionCount = 3;
+  const SubscriptionCount = 5;
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,21 +84,25 @@ const MainPage = () => {
   function homeApiData(user_id) {
     axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
-      .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`)
+      .get(
+        `${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`
+      )
       // .get(`${config?.apiUrl}/retrieve-commentator/?id=${user_id}`)
       .then((res) => {
-        setPublicComments(
-          res?.data?.Public_Comments.sort(
-            (a, b) => moment(b.created).unix() - moment(a.created).unix()
-          )
-        );
+        // setPublicComments(
+        //   res?.data?.Public_Comments.sort(
+        //     (a, b) => moment(b.created).unix() - moment(a.created).unix()
+        //   )
+        // );
+        setPublicComments(res?.data?.Public_Comments);
 
         setHighlights(res?.data?.highlights);
-        setsubscriptionComments(
-          res?.data?.Subscription_Comments.sort(
-            (a, b) => moment(b.created).unix() - moment(a.created).unix()
-          )
-        );
+        // setsubscriptionComments(
+        //   res?.data?.Subscription_Comments.sort(
+        //     (a, b) => moment(b.created).unix() - moment(a.created).unix()
+        //   )
+        // );
+        setsubscriptionComments(res?.data?.Subscription_Comments);
         setads(res?.data?.ads);
         const ads = res?.data?.ads;
         const leftCornerAdsFilter = ads.filter(

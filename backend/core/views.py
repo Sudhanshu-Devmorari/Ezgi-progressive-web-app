@@ -3480,7 +3480,7 @@ class SupportManagement(APIView):
             user = User.objects.get(id=id)
         
             if user.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             ticket_id = request.data.get('ticket_id')
 
             message = request.data.get('message')
@@ -5100,18 +5100,18 @@ class RetrievePageData():
         except:
             return []
     
-    def get_public_comments(self, id, category):
+    def get_public_comments(self, id, category, highligt_user_list):
         """ Return public comments data """
         public_comments = []
 
         try:
             current_datetime = datetime.now()
             logged_in_user = User.objects.filter(id=id).first() if id != 'null' else None
-            is_highlight_user = self.is_highlight_user(id, current_datetime) if logged_in_user else False
+            # is_highlight_user = self.is_highlight_user(id, current_datetime) if logged_in_user else False
+            is_highlight_user = True
 
             highlight_comments = []
             if is_highlight_user:
-                highligt_user_list = self.get_highlight_user()
                 highlight_comments = Comments.objects.filter(commentator_user_id__in=highligt_user_list, status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('?').only('id')[:5]
 
             highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
@@ -5156,11 +5156,13 @@ class RetrievePageData():
 
         return public_comments
     
-    def get_subscription_comments(self, id, category):
+    def get_subscription_comments(self, id, category, highligt_user_list):
         """ Return subscription comments data """
         subscription_comments = []
 
         try:
+            current_datetime = datetime.now()
+
             # Id validation
             if id == 'null':
                 return subscription_comments
@@ -5169,8 +5171,21 @@ class RetrievePageData():
             is_user_exist = User.objects.filter(id=id).exists()
             if not is_user_exist:
                 return subscription_comments
-            
-            subscription_obj = Subscription.objects.filter(standard_user_id=id, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').order_by('-created').only('id','commentator_user')
+
+            # Is login user is highlight user ?
+            # is_highlight_user = self.is_highlight_user(id, current_datetime)
+            is_highlight_user = True
+
+            # Is login user is highlight user than get random 5 subscription comments of all highlighted users
+            highlight_comments = []
+            if is_highlight_user:
+                highlight_comments = Subscription.objects.filter(standard_user_id=id, commentator_user_id__in=highligt_user_list, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').order_by('?').only('id','commentator_user')[:5]
+
+            highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
+            subscription_data = Subscription.objects.filter(standard_user_id=id, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').exclude(id__in=highlight_comments_ids).order_by('-created').only('id','commentator_user')
+
+            subscription_obj = highlight_comments.union(subscription_data) if highlight_comments else subscription_data
+
             for obj in subscription_obj:
                 if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False, category=[category]).exists():
                 # if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False).exists():
@@ -5218,47 +5233,30 @@ class RetrievePageData():
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('-created')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('?')
             
-            top_users = User.objects.annotate(comment_count=Count('comments')).filter(
-                    comment_count__gt=0,                 
-                    highlight__isnull=False,               
-                    is_delete=False,
-                    highlight__status='active',
-                    comments__status='approve', 
-                    category__contains=[category],
-                )[:5]
+            for obj in all_highlights:
+                highlighted_data = HighlightSerializer(obj).data
+                user_data = highlighted_data['user'] 
 
-            for user in top_users:
-                most_recent_highlight = user.highlight_set.filter(status='active')
-                # print('most_recent_highlight: ', most_recent_highlight)
+                data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
+                win_count = data.filter(is_prediction=True).count()
+                lose_count = data.filter(is_prediction=False).count()
+                highlighted_data['user'] ['win'] = win_count
+                highlighted_data['user'] ['lose'] = lose_count
 
-            # Get data
-            # all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('-created')
-            
-            # for obj in all_highlights:
-                for obj in most_recent_highlight:
-                    highlighted_data = HighlightSerializer(obj).data
-                    user_data = highlighted_data['user'] 
+                if standard_user_id is not None:
+                    logged_in_user = User.objects.get(id=standard_user_id)
+                    is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
+                    highlighted_data['is_subscribe'] = is_subscribe
 
-                    data = Comments.objects.filter(commentator_user=obj.user, commentator_user__is_delete=False).only('id','is_prediction')
-                    win_count = data.filter(is_prediction=True).count()
-                    lose_count = data.filter(is_prediction=False).count()
-                    highlighted_data['user'] ['win'] = win_count
-                    highlighted_data['user'] ['lose'] = lose_count
+                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
+                highlighted_data['subscriber_count'] = count
 
-                    if standard_user_id is not None:
-                        logged_in_user = User.objects.get(id=standard_user_id)
-                        is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
-                        highlighted_data['is_subscribe'] = is_subscribe
-
-                    count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
-                    highlighted_data['subscriber_count'] = count
-
-                    if standard_user_id:
-                        highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
-                    else:
-                        highlighted_data['is_fav_editor'] = False
+                if standard_user_id:
+                    highlighted_data['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=standard_user_id).exists()
+                else:
+                    highlighted_data['is_fav_editor'] = False
 
                 highlights.append(highlighted_data)
         except:
@@ -5323,13 +5321,22 @@ class RetrievePageData():
         user_detail = []
         user_id = id if id != 'null' else None
         try:
+            current_datetime = datetime.now()
+
             # Validation
             user_id = user_id if User.objects.filter(id=user_id).exists() else None
             
             user = User.objects.get(id=user_id) if id is not None else None        
+            
+            # Get all highlight user
+            highligt_user_list = self.get_highlight_user()
+            highlight_users = User.objects.filter(~Q(id=user_id), id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
+            highlight_users_ids = highlight_users.values_list('id', flat=True)
 
             # Get data
-            all_commentator = User.objects.filter(~Q(id=user_id), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
+            all_commentator_data = User.objects.filter(Q(~Q(id=user_id) & ~Q(id__in=highlight_users_ids)), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
+            all_commentator = list(highlight_users) + list(all_commentator_data)
+
             for obj in all_commentator:
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
@@ -5372,12 +5379,13 @@ class RetrieveHomeView(APIView):
         category = request.query_params.get('category', None)
      
         retrieve_data = RetrievePageData()
+        highligt_user_list = retrieve_data.get_highlight_user()
 
         # Get public comments data
-        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None), category)
+        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None), category, highligt_user_list)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None), category)
+        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None), category, highligt_user_list)
       
         # Get highlights data
         data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None), category)

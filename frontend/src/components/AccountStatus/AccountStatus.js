@@ -80,7 +80,7 @@ const AccountStatus = (props) => {
   const STEP = 1;
   const MIN = 0;
   const MAX = 1000;
-  function getEarnings() {
+  function getEarnings(newValues) {
     const type =
       selectSub === "journeyman" ||
       selectSub === "master" ||
@@ -88,7 +88,7 @@ const AccountStatus = (props) => {
     if (type) {
       axios
         .get(
-          `${config.apiUrl}/become-editor-earn-details/${values}/?type=${selectSub}`
+          `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${selectSub}`
         )
         .then((res) => {
           if (res.status === 200) {
@@ -149,9 +149,9 @@ const AccountStatus = (props) => {
     selectSub && fetchSubscriptionData();
   }, [selectSub]);
 
-  useEffect(() => {
-    getEarnings();
-  }, [selectSubRangeData]);
+  // useEffect(() => {
+  //   getEarnings();
+  // }, [selectSubRangeData]);
 
   const [renewLoading, setRenewLoading] = useState(false);
   const [commentatorUser, setCommentatorUser] = useState([]);
@@ -173,33 +173,50 @@ const AccountStatus = (props) => {
   }, [userId]);
 
   const targetDate = moment(props?.membershipDate); // Set your target date
-  const [daysLeft, setDaysLeft] = useState(0);
+  const [daysLeft, setDaysLeft] = useState({});
+  const [membershipEndDate, setMembershipEndDate] = useState("");
+  const [totalDaysRemaining, setTotalDaysRemaining] = useState("");
 
   useEffect(() => {
     const calculateDaysLeft = () => {
       const countNumber = membershipData?.promotion_duration?.split(" ");
 
       if (!countNumber || countNumber.length !== 2) {
-        return 0; // Handle invalid input gracefully
+        return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
       }
 
       const interval = countNumber[1].toLowerCase(); // e.g., "months"
       const duration = parseInt(countNumber[0], 10);
 
       if (isNaN(duration) || !interval) {
-        return 0; // Handle invalid input gracefully
+        return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
       }
 
       const currentDate = moment();
       const nextIntervalDate = moment(targetDate).add(duration, interval);
+      const finaldaysRemaining = nextIntervalDate.diff(currentDate, "days");
+      console.log("finaldaysRemaining", finaldaysRemaining);
+      finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
 
-      if (currentDate.isAfter(nextIntervalDate)) {
+      if (currentDate.isAfter(nextIntervalDate) && finaldaysRemaining == 0) {
         console.log("Interval is already over");
-        return 0; // Interval is already over
+        return { daysRemaining: 0, showRenewButton: true }; // Interval is already over, show renew button
       }
 
-      const daysRemaining = nextIntervalDate.diff(currentDate, "days");
-      return daysRemaining;
+      const finalEndDate = nextIntervalDate.format("YYYY-MM-DD");
+      setMembershipEndDate(finalEndDate);
+
+      // Calculate the end of the current month
+      const endOfMonth = currentDate.clone().endOf("month");
+
+      // Calculate remaining days within the current month
+      const daysRemaining = endOfMonth.diff(currentDate, "days") + 1;
+      console.log("daysRemaining::", daysRemaining);
+
+      return {
+        daysRemaining,
+        showRenewButton: daysRemaining == 0 ? true : false,
+      };
     };
 
     membershipData && commentatorUser && setDaysLeft(calculateDaysLeft());
@@ -345,32 +362,10 @@ const AccountStatus = (props) => {
                                   : `${commentatorSubscriptionData?.year_1}₺`}
                               </span>
                             </div>
-                            {/* <div className="d-flex flex-column">
-                              <span className="font-res">
-                                {res} Subscription
-                              </span>
-                              <span className="number-font">
-                                {commentatorSubscriptionData?.month_3}₺
-                              </span>
-                            </div> */}
                           </div>
                         );
                       }
                     )}
-                    {/* <div className="col text-center">
-                      <div className="mb-1 d-flex flex-column">
-                        <span className="font-res">6 Month Subscription</span>
-                        <span className="number-font">
-                          {commentatorSubscriptionData?.month_6}₺
-                        </span>
-                      </div>
-                      <div className="d-flex flex-column">
-                        <span className="font-res">12 Month Subscription</span>
-                        <span className="number-font">
-                          {commentatorSubscriptionData?.year_1}₺
-                        </span>
-                      </div>
-                    </div> */}
                     <div className="d-flex justify-content-between">
                       <span className="font-res">
                         Commmision Rate{" "}
@@ -433,35 +428,11 @@ const AccountStatus = (props) => {
                               : res == "6 Months"
                               ? `${expertData?.month_6}₺`
                               : `${expertData?.year_1}₺`}
-                            {/* {expertData?.month_1}₺ */}
                           </span>
                         </div>
-                        {/* <div className="d-flex flex-column">
-                          <span className="font-res">3 Month Subscription</span>
-                          <span
-                            className="number-font"
-                            style={{ color: "FFA200" }}
-                          >
-                            {expertData?.month_3}₺
-                          </span>
-                        </div> */}
                       </div>
                     );
                   })}
-                  {/* <div className="col text-center">
-                    <div className="mb-1 d-flex flex-column">
-                      <span className="font-res">6 Month Subscription</span>
-                      <span className="number-font" style={{ color: "FFA200" }}>
-                        {expertData?.month_6}₺
-                      </span>
-                    </div>
-                    <div className="d-flex flex-column">
-                      <span className="font-res">12 Month Subscription</span>
-                      <span className="number-font" style={{ color: "FFA200" }}>
-                        {expertData?.year_1}₺
-                      </span>
-                    </div>
-                  </div> */}
                 </div>
               )}
             </div>
@@ -533,7 +504,7 @@ const AccountStatus = (props) => {
               // onChange={(newValues) => getEarnings()}
               onChange={(newValues) => {
                 setValues(newValues);
-                getEarnings();
+                getEarnings(newValues);
               }}
               renderTrack={({ props, children }) => {
                 return (
@@ -615,7 +586,7 @@ const AccountStatus = (props) => {
           <div className="my-2 row g-0">
             <div className="col-5 font-respo">
               <div
-                className="d-flex me-2 p-2 gap-2 flex-column justify-content-center align-items-center"
+                className="d-flex me-2 p-2 gap-2 flex-column justify-content-center align-items-center h-100"
                 style={{
                   backgroundColor:
                     currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
@@ -679,9 +650,12 @@ const AccountStatus = (props) => {
                         Membership Price : {membershipData?.plan_price}₺
                       </span>
                     )}
+                    {membershipEndDate && (
+                      <>Membership expiry : {membershipEndDate}</>
+                    )}
                   </div>
                   <div className="d-flex justify-content-end m-2">
-                    {daysLeft == 0 ? (
+                    {daysLeft?.showRenewButton == true ? (
                       <button
                         onClick={() => {
                           if (
@@ -716,7 +690,7 @@ const AccountStatus = (props) => {
                               currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
                           }}
                         >
-                          {daysLeft} days are left{" "}
+                          {daysLeft?.daysRemaining} days are left{" "}
                         </span>{" "}
                         for the next plan payment date
                       </span>

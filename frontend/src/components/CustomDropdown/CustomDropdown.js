@@ -28,7 +28,7 @@ export const CustomDropdown = ({
           currentTheme === "dark"
             ? "customDropdown-content-dark-mode"
             : "customDropdown-content-light-mode"
-        } pt-2 flex-column d-flex text-center ${isOpen ? "d-block" : "d-none"}`}
+        } pt-2 flex-column d-flex text-center ${isOpen ? "d-flex" : "d-none"}`}
         // style={{ width: ((label === "Category" || label === "Level" || label === "Score Point" || label === "Success Rate") && "41%") && (label === "Match Details" ||label === "Country" ||label === "City" || label === "Age" || label === "Gender") ? "100%" : "46%" }}
         style={{
           width:

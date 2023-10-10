@@ -119,10 +119,16 @@ const AddCommentModal = (props) => {
   const handleCountrySelection = (country) => {
     if (selectedCountry !== country) {
       setSelectedLeague("Select");
+      setLeagueOptions([]);
       setSelectedDate("Select");
+      setDateOptions([]);
       setSelectedMatchDetails("Select");
+      setMatchList([]);
+      setMatchDetailsOptions([]);
       setSelectedPrediction("Select");
+      setPredictionData([]);
       setSelectedPredictionType("Select");
+      setPredictionType([]);
     }
     setSelectedCountry(country);
     setCountryError("");
@@ -169,9 +175,11 @@ const AddCommentModal = (props) => {
 
         const MatchList = res.data;
 
-        const filterdata = MatchList.filter((resp) => new Date(resp.TarihSaat).getTime() >= new Date().getTime())
+        const filterdata = MatchList.filter(
+          (resp) => new Date(resp.TarihSaat).getTime() >= new Date().getTime()
+        );
 
-        console.log("filterdata:::::::::::", filterdata)
+        console.log("filterdata:::::::::::", filterdata);
 
         // MatchList.map((resp) => {
         //   const matchTime = resp.TarihSaat;
@@ -184,6 +192,7 @@ const AddCommentModal = (props) => {
         //     console.log("matchTime::::::::::::", matchTime);
         //   }
         // });
+        filterdata.length == 0 && setSelectedMatchDetails("No Matchs Found!");
 
         setMatchList(filterdata);
         setMatchDetailsOptions(filterdata.map((item) => item.takimlar));
@@ -195,6 +204,7 @@ const AddCommentModal = (props) => {
   const handleMatchDetailsSelection = (matchDetails) => {
     if (selectedCountry !== matchDetails) {
       setSelectedPrediction("Select");
+      setPredictionData([]);
       setSelectedPredictionType("Select");
     }
     setMatchId(
@@ -213,6 +223,7 @@ const AddCommentModal = (props) => {
     //     setMatchDetailsOptions(MatchList.map((item) => item.takimlar));
     //   })
     //   .catch((err) => {});
+
     setPredictionTypeDropdown(false);
     setPredictionDropdown(false);
     setCountryDropDown(false);
@@ -487,7 +498,10 @@ const AddCommentModal = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       let type;
-      if (selectedMatchDetails !== "Select") {
+      if (
+        selectedMatchDetails !== "Select" ||
+        selectedMatchDetails !== "No Matchs Found!"
+      ) {
         if (selectedCategory === "Futbol") {
           type = 1;
         } else if (selectedCategory === "Basketbol") {
@@ -521,7 +535,9 @@ const AddCommentModal = (props) => {
       }
     };
 
-    fetchData();
+    selectedMatchDetails !== "No Matchs Found!" &&
+      selectedMatchDetails !== "Select" &&
+      fetchData();
   }, [selectedMatchDetails]);
 
   return (

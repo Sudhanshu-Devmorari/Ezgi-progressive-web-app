@@ -25,7 +25,7 @@ const DashboardSU = (props) => {
   const [favSelection, setFavSelection] = useState("fav editor");
 
   useEffect(() => {
-  // console.log("props.activeCommentsshow:::::::::::::", props.activeCommentsshow)
+    // console.log("props.activeCommentsshow:::::::::::::", props.activeCommentsshow)
 
     if (props.selectContent === "notifications") {
       setContent("notifications");
@@ -41,7 +41,6 @@ const DashboardSU = (props) => {
 
   const [transactionHistory, setTransactionHistory] = useState([]);
 
-
   // Fav Editor & Comments API
   const [favEditorData, setFavEditorData] = useState([]);
   const [favCommentData, setFavCommentData] = useState([]);
@@ -52,7 +51,11 @@ const DashboardSU = (props) => {
       );
       // console.log("=>>>", res.data);
       setFavEditorData(res.data.favEditors);
-      setFavCommentData(res.data.favComments.sort((a, b) => moment(b.created).unix() - moment(a.created).unix()));
+      setFavCommentData(
+        res.data.favComments.sort(
+          (a, b) => moment(b.created).unix() - moment(a.created).unix()
+        )
+      );
     } catch (error) {
       console.log(error);
     }
@@ -81,7 +84,12 @@ const DashboardSU = (props) => {
       {content === "subscribers" && (
         <>
           <SubscribersSelection user={"standard user"} />
-          <MySubscribers user={"standard user"} />
+          <MySubscribers
+            user={"standard user"}
+            setSelectContent={props?.setSelectContent}
+            setDashboardSUser={props?.setDashboardSUser}
+            setActiveCommentsshow={props?.setActiveCommentsshow}
+          />
         </>
       )}
       {content === "wallet" && (
@@ -92,7 +100,10 @@ const DashboardSU = (props) => {
               currentTheme === "dark" ? "dark-mode" : "light-mode"
             } my-2 p-2`}
           >
-            <TransactionArray user={"standard user"} transactionHistory={transactionHistory}/>
+            <TransactionArray
+              user={"standard user"}
+              transactionHistory={transactionHistory}
+            />
           </div>
         </>
       )}

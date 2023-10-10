@@ -123,7 +123,7 @@ const MySubscribers = (props) => {
                               <span>{res?.duration}</span>
                               <span className="px-2">{res?.start_date}</span>
                               <button
-                                className="px-2 me-2 text-capitalize"
+                                className="px-2 me-2 text-uppercase"
                                 style={{
                                   color:
                                     currentTheme === "dark"
@@ -264,7 +264,7 @@ const MySubscribers = (props) => {
                                 //   res.status === "Renew" &&
                                 //     setRenewModalShow(true);
                                 // }}
-                                className="px-3 me-2 button-status text-capitalize"
+                                className="px-2 me-2 button-status text-uppercase"
                                 style={{
                                   color:
                                     currentTheme === "dark"
@@ -291,6 +291,7 @@ const MySubscribers = (props) => {
                                       ? "1px solid #0D2A53"
                                       : "1px solid #FFFFFF",
                                   borderRadius: "3px",
+                                  width: "4.4rem",
                                 }}
                               >
                                 {res?.status == "deactive"
@@ -310,84 +311,137 @@ const MySubscribers = (props) => {
         )}
         {props.user === "standard user" && (
           <>
-            {mySubscribers?.map((sub, index) => (
-              <div
-                key={index}
-                className="p-1 d-flex justify-content-between align-items-center my-2"
-                style={{
-                  backgroundColor:
-                    currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                }}
-              >
-                <div className="">
-                  <div className="position-relative">
-                    <img
-                      onContextMenu={(e) => e.preventDefault()}
-                      style={{
-                        position: "absolute",
-                        background:
-                          currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                        borderRadius: "50%",
-                        left: "1.5rem",
-                      }}
-                      src={crown}
-                      alt=""
-                      height={13}
-                      width={13}
-                    />
+            {isLoading ? (
+              <div className="text-center mt-3">Loading...</div>
+            ) : (
+              <>
+                {mySubscriptions?.length == 0 ? (
+                  <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                    No Record Found!
                   </div>
-                  <img
-                    onContextMenu={(e) => e.preventDefault()}
-                    src={`${config?.apiUrl}${sub?.commentator_user.profile_pic}`}
-                    alt=""
-                    height={38}
-                    width={38}
-                    style={{ borderRadius: "50%", objectFit: "cover" }}
-                  />
-                  <span className="ps-1">{sub?.commentator_user.username}</span>
-                </div>
-                <div className="">
-                  <span>{sub.duration}</span>
-                  {/* <span>3 Ay</span> */}
-                  <span className="px-2">22.04.2023 - 16:41</span>
-                  <button
-                    className="me-2 button-status text-capitalize"
-                    style={{
-                      color:
-                        currentTheme === "dark"
-                          ? sub.commentator_user.commentator_status ===
-                            "pending"
-                            ? "#FFCC00"
-                            : sub.commentator_user.commentator_status ===
-                              "active"
-                            ? "#37FF80"
-                            : sub.commentator_user.commentator_status ===
-                              "renew"
-                            ? "#4DD5FF"
-                            : ""
-                          : sub.commentator_user.commentator_status ===
-                            "pending"
-                          ? "#FFCC00"
-                          : sub.commentator_user.commentator_status === "renew"
-                          ? "#00659D"
-                          : sub.commentator_user.commentator_status === "active"
-                          ? "#00DE51"
-                          : "",
-                      backgroundColor:
-                        currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
-                      border:
-                        currentTheme === "dark"
-                          ? "1px solid #0D2A53"
-                          : "1px solid #FFFFFF",
-                      borderRadius: "3px",
-                      width: "4.6rem",
-                    }}
-                  >
-                    {sub?.commentator_user.commentator_status}
-                  </button>
-                </div>
-              </div>
-            ))}
+                ) : (
+                  <>
+                    {mySubscriptions?.map((res, index) => (
+                      <div
+                        key={index}
+                        className="p-1 d-flex justify-content-between align-items-center mb-2"
+                        style={{
+                          backgroundColor:
+                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
+                        }}
+                      >
+                        <div
+                          className=""
+                          onClick={() => {
+                            const currentPage =
+                              localStorage.getItem("currentpage");
+                            const currentuser =
+                              localStorage.getItem("user-role");
+                            localStorage.setItem("dashboardShow", true);
+                            (currentPage !== "show-all-comments" ||
+                              currentPage !== "notifications") &&
+                              localStorage.setItem("priviouspage", currentPage);
+                            localStorage.setItem(
+                              "currentpage",
+                              "show-all-comments"
+                            );
+                            localStorage.setItem(
+                              "subcurrentpage",
+                              "subscribers"
+                            );
+                            localStorage.setItem(
+                              "activeCommentId",
+                              res?.commentator_user?.id
+                            );
+                            props?.setActiveCommentsshow(
+                              res?.commentator_user?.id
+                            );
+                            props?.setDashboardSUser(false);
+                            props?.setSelectContent("show-all-comments");
+                          }}
+                        >
+                          <div className="position-relative">
+                            <img
+                              onContextMenu={(e) => e.preventDefault()}
+                              style={{
+                                position: "absolute",
+                                background:
+                                  currentTheme === "dark"
+                                    ? "#0D2A53"
+                                    : "#FFFFFF",
+                                borderRadius: "50%",
+                                left: "1.5rem",
+                              }}
+                              src={crown}
+                              alt=""
+                              height={13}
+                              width={13}
+                            />
+                          </div>
+                          <img
+                            style={{
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                            }}
+                            onContextMenu={(e) => e.preventDefault()}
+                            src={
+                              res?.commentator_user?.profile_pic
+                                ? `${config.apiUrl}${res?.commentator_user?.profile_pic}`
+                                : profile
+                            }
+                            alt=""
+                            height={35}
+                            width={35}
+                          />
+                          <span className="ps-1">
+                            {res?.commentator_user?.username}
+                          </span>
+                        </div>
+                        <div className="">
+                          <span>{res?.duration}</span>
+                          <span className="px-2">{res?.start_date}</span>
+                          <button
+                            // onClick={() => {
+                            //   res.status === "Renew" &&
+                            //     setRenewModalShow(true);
+                            // }}
+                            className="px-2 me-2 button-status text-uppercase"
+                            style={{
+                              color:
+                                currentTheme === "dark"
+                                  ? res?.status === "pending"
+                                    ? "#FFCC00"
+                                    : res?.status === "active"
+                                    ? "#37FF80"
+                                    : res?.status === "deactive"
+                                    ? "#4DD5FF"
+                                    : ""
+                                  : res?.status === "pending"
+                                  ? "#FFCC00"
+                                  : res?.status === "deactive"
+                                  ? "#00659D"
+                                  : res?.status === "active"
+                                  ? "#00DE51"
+                                  : "",
+                              backgroundColor:
+                                currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
+                              border:
+                                currentTheme === "dark"
+                                  ? "1px solid #0D2A53"
+                                  : "1px solid #FFFFFF",
+                              borderRadius: "3px",
+                              width: "4.4rem",
+                            }}
+                          >
+                            {res?.status == "deactive" ? "Ended" : res?.status}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </>
+            )}
           </>
         )}
       </div>
