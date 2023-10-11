@@ -41,13 +41,13 @@ const FAQEditor = () => {
 
   // Editor earning API
   const [earnings, setEarnings] = useState(0);
-  function getEarnings(newValues) {
-    console.log(newValues, ":::::::::::newValues:::::::")
+  function getEarnings(newValues, typeData) {
+    console.log(newValues, ":::::::::::newValues:::::::");
     const type =
-      (selectSub === "KALFA" && "journeyman") ||
-      (selectSub === "USTA" && "master") ||
-      (selectSub === "büyük usta" && "grandmaster");
-    // if (type) {
+      (typeData === "KALFA" && "journeyman") ||
+      (typeData === "USTA" && "master") ||
+      (typeData === "büyük usta" && "grandmaster");
+    if (type && newValues) {
       axios
         .get(
           `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${type}`
@@ -55,7 +55,10 @@ const FAQEditor = () => {
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            console.log("res.data.total_earning::::::::::::", res.data.total_earning)
+            console.log(
+              "res.data.total_earning::::::::::::",
+              res.data.total_earning
+            );
             setEarnings(res.data.total_earning);
           }
         })
@@ -74,7 +77,7 @@ const FAQEditor = () => {
             });
           }
         });
-    // }
+    }
   }
 
   const fetchFaqs = async () => {
@@ -172,7 +175,11 @@ const FAQEditor = () => {
                       <div className="d-flex justify-content-center gap-3 fw-bold my-2">
                         <span
                           className="cursor text-center"
-                          onClick={() => setSelectSub("KALFA")}
+                          onClick={() => {
+                            setSelectSub("KALFA");
+                            selectSub !== "KALFA" &&
+                              getEarnings(values, "KALFA");
+                          }}
                           style={{
                             backgroundColor:
                               currentTheme === "dark" && selectSub === "KALFA"
@@ -199,7 +206,10 @@ const FAQEditor = () => {
                         </span>
                         <span
                           className="cursor text-center"
-                          onClick={() => setSelectSub("USTA")}
+                          onClick={() => {
+                            setSelectSub("USTA");
+                            selectSub !== "USTA" && getEarnings(values, "USTA");
+                          }}
                           style={{
                             backgroundColor:
                               currentTheme === "dark" && selectSub === "USTA"
@@ -226,7 +236,11 @@ const FAQEditor = () => {
                         </span>
                         <span
                           className="cursor text-center"
-                          onClick={() => setSelectSub("büyük usta")}
+                          onClick={() => {
+                            setSelectSub("büyük usta");
+                            selectSub !== "büyük usta" &&
+                              getEarnings(values, "büyük usta");
+                          }}
                           // onClick={() => setSelectSub("ÜSTAD")}
                           style={{
                             backgroundColor:
@@ -268,10 +282,13 @@ const FAQEditor = () => {
                           step={STEP}
                           min={MIN}
                           max={MAX}
-                          // onChange={(newValues) => getEarnings()}
                           onChange={(newValues) => {
                             setValues(newValues);
                             getEarnings(newValues);
+                          }}
+                          onFinalChange={(newValues) => {
+                            console.log("final function called");
+                            getEarnings(newValues, selectSub);
                           }}
                           renderTrack={({ props, children }) => {
                             return (
@@ -338,7 +355,9 @@ const FAQEditor = () => {
                           </div>
                           <div className="col d-flex flex-column text-center">
                             <span>Tahmini Kazanç</span>
-                            <span className="fw-bold">{earnings} ₺</span>
+                            <span className="fw-bold">
+                              {earnings?.toFixed(0)} ₺
+                            </span>
                           </div>
                         </div>
                       </div>

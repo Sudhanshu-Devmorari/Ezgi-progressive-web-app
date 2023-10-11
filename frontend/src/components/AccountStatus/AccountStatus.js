@@ -80,18 +80,24 @@ const AccountStatus = (props) => {
   const STEP = 1;
   const MIN = 0;
   const MAX = 1000;
-  function getEarnings(newValues) {
-    const type =
-      selectSub === "journeyman" ||
-      selectSub === "master" ||
-      selectSub === "grandmaster";
-    if (type) {
+  function getEarnings(newValues, typeData) {
+    console.log("new Values:::::::::::::", newValues);
+    // console.log("selectSubRangeData:::::::::::::", selectSubRangeData);
+    console.log("typeData:::::::::::::", typeData);
+    // const type =
+    //   selectSubRangeData === "journeyman" ||
+    //   selectSubRangeData === "master" ||
+    //   selectSubRangeData === "grandmaster";
+
+    // console.log("selectSubRangeData:::::::::::", type);
+    if (typeData && newValues) {
       axios
         .get(
-          `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${selectSub}`
+          `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${typeData}`
         )
         .then((res) => {
           if (res.status === 200) {
+            console.log("total earning::::::", res.data.total_earning);
             setEarnings(res.data.total_earning);
           }
         })
@@ -195,7 +201,7 @@ const AccountStatus = (props) => {
       const currentDate = moment();
       const nextIntervalDate = moment(targetDate).add(duration, interval);
       const finaldaysRemaining = nextIntervalDate.diff(currentDate, "days");
-      console.log("finaldaysRemaining", finaldaysRemaining);
+      // console.log("finaldaysRemaining", finaldaysRemaining);
       finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
 
       if (currentDate.isAfter(nextIntervalDate) && finaldaysRemaining == 0) {
@@ -211,7 +217,7 @@ const AccountStatus = (props) => {
 
       // Calculate remaining days within the current month
       const daysRemaining = endOfMonth.diff(currentDate, "days") + 1;
-      console.log("daysRemaining::", daysRemaining);
+      // console.log("daysRemaining::", daysRemaining);
 
       return {
         daysRemaining,
@@ -448,7 +454,11 @@ const AccountStatus = (props) => {
               <div className="">Estimated Monthly Earnings</div>
               <span
                 className="cursor text-center"
-                onClick={() => setSelectSubRangeData("journeyman")}
+                onClick={() => {
+                  setSelectSubRangeData("journeyman");
+                  selectSubRangeData !== "journeyman" &&
+                    getEarnings(values, "journeyman");
+                }}
                 style={{
                   color:
                     currentTheme !== "dark"
@@ -464,7 +474,11 @@ const AccountStatus = (props) => {
               </span>
               <span
                 className="cursor text-center"
-                onClick={() => setSelectSubRangeData("master")}
+                onClick={() => {
+                  setSelectSubRangeData("master");
+                  selectSubRangeData !== "master" &&
+                    getEarnings(values, "master");
+                }}
                 style={{
                   color:
                     currentTheme !== "dark"
@@ -480,7 +494,11 @@ const AccountStatus = (props) => {
               </span>
               <span
                 className="cursor text-center"
-                onClick={() => setSelectSubRangeData("grandmaster")}
+                onClick={() => {
+                  setSelectSubRangeData("grandmaster");
+                  selectSubRangeData !== "grandmaster" &&
+                    getEarnings(values, "grandmaster");
+                }}
                 style={{
                   color:
                     currentTheme !== "dark"
@@ -501,10 +519,13 @@ const AccountStatus = (props) => {
               step={STEP}
               min={MIN}
               max={MAX}
-              // onChange={(newValues) => getEarnings()}
               onChange={(newValues) => {
                 setValues(newValues);
-                getEarnings(newValues);
+                // getEarnings(newValues, selectSub);
+              }}
+              onFinalChange={(newValues) => {
+                console.log("final function called");
+                getEarnings(newValues, selectSub);
               }}
               renderTrack={({ props, children }) => {
                 return (
@@ -578,7 +599,7 @@ const AccountStatus = (props) => {
                   }}
                 >
                   {" "}
-                  {earnings}₺
+                  {earnings?.toFixed(0)}₺
                 </span>
               </div>
             </div>

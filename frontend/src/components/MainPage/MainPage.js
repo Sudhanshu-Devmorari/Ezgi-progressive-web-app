@@ -75,6 +75,8 @@ const MainPage = () => {
     if (userId || selectContent == "show-all-comments") {
       getProfileData();
     }
+    console.log("current time:::::::::", new Date())
+    console.log("current time:::::::::", moment().toDate())
   }, [userId, selectContent == "show-all-comments"]);
 
   const [leftCornerAds, setLeftCornerAds] = useState([]);

@@ -44,6 +44,7 @@ const CommentsManagement = (props) => {
   const [predictionTypeDropdown, setPredictionTypeDropdown] = useState(false);
   const [selectedPrediction, setSelectedPrediction] = useState("Select");
   const [predictionDropdown, setPredictionDropdown] = useState(false);
+  const [dataloading, setDataloading] = useState(true);
   // Get League / Date / Match details
   const [LeagueValue, setLeagueValue] = useState([]);
   const [DateValue, setDateValue] = useState([]);
@@ -51,7 +52,10 @@ const CommentsManagement = (props) => {
 
   const [displayUser, setDisplayUser] = useState(props?.commentData);
   useEffect(() => {
-    setDisplayUser(props?.commentData);
+    setTimeout(() => {
+      setDataloading(false);
+      setDisplayUser(props?.commentData);
+    }, 500);
   }, [props?.commentData]);
 
   const handleFilterState = () => {
@@ -136,13 +140,30 @@ const CommentsManagement = (props) => {
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
-        window.location.reload();
+        // window.location.reload();
       }
-      window.location.reload();
+      // window.location.reload();
+      // props.setCommentData(props?.commentData)
+      // setDisplayUser(displayUser)
+      filterData(props.selectedOption);
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
+  };
+
+  const filterData = (e) => {
+    setDataloading(true);
+    const val = e == "Published" ? "Approve" : e;
+    // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
+    const filteredArray = displayUser?.filter(
+      (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
+    );
+    console.log("filtered::::::", filteredArray);
+    setTimeout(() => {
+      setDisplayUser(val == "All" ? props?.commentData : filteredArray);
+      setDataloading(false);
+    }, 500);
   };
 
   const [cities, setCities] = useState([]);
@@ -423,87 +444,95 @@ const CommentsManagement = (props) => {
           commentData={props?.commentData}
           setDisplayUser={setDisplayUser}
           selectedOption={props.selectedOption}
-          setSelectedOption = {props.setSelectedOption}
+          setSelectedOption={props.setSelectedOption}
+          setDataloading={setDataloading}
+          filterData={filterData}
         />
-        {props?.isLoading ? (
+        {props?.isLoading || dataloading ? (
           <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
             Loading...
           </div>
         ) : (
           <>
-            {displayUser?.map((res, index) => (
-              <MainDiv>
-                <div className="col-3 d-flex align-items-center cursor">
-                  <span className="pe-1">{`# ${(index + 1)
-                    .toString()
-                    .padStart(4, "0")}`}</span>
-                  <div className="position-relative">
-                    <img
-                      className="rounded-circle profile-icon"
-                      src={`${
-                        res.commentator_user?.profile_pic
-                          ? server_url + res.commentator_user?.profile_pic
-                          : initialProfile
-                      }`}
-                      alt=""
-                      height={45}
-                      width={45}
-                    />
-                    <div
-                      className="position-absolute d-flex justify-content-center align-items-center"
-                      style={{
-                        height: "16px",
-                        width: "16px",
-                        border: "2px solid #FF9100",
-                        borderRadius: "50%",
-                        backgroundColor: "#0B2447",
-                        top: "0px",
-                        left: "25px",
-                      }}
-                    >
-                      <BiSolidCrown
-                        fontSize={"0.62rem"}
-                        style={{ color: "#FF9100" }}
+            {displayUser.length == 0 ? (
+              <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
+                No Record Found!
+              </div>
+            ) : (
+              displayUser?.map((res, index) => (
+                <MainDiv key={index}>
+                  <div className="col-3 d-flex align-items-center cursor">
+                    <span className="pe-1">{`# ${(index + 1)
+                      .toString()
+                      .padStart(4, "0")}`}</span>
+                    <div className="position-relative">
+                      <img
+                        className="rounded-circle profile-icon"
+                        src={`${
+                          res.commentator_user?.profile_pic
+                            ? server_url + res.commentator_user?.profile_pic
+                            : initialProfile
+                        }`}
+                        alt=""
+                        height={45}
+                        width={45}
                       />
+                      <div
+                        className="position-absolute d-flex justify-content-center align-items-center"
+                        style={{
+                          height: "16px",
+                          width: "16px",
+                          border: "2px solid #FF9100",
+                          borderRadius: "50%",
+                          backgroundColor: "#0B2447",
+                          top: "0px",
+                          left: "25px",
+                        }}
+                      >
+                        <BiSolidCrown
+                          fontSize={"0.62rem"}
+                          style={{ color: "#FF9100" }}
+                        />
+                      </div>
                     </div>
+                    <span className="ps-2">{res.commentator_user?.name}</span>
                   </div>
-                  <span className="ps-2">{res.commentator_user?.name}</span>
-                </div>
-                <div className="col-3">
-                  <img
-                    className="flag-icon"
-                    src={flag}
-                    alt=""
-                    height={26}
-                    width={26}
-                  />
-                  <span className="ps-1">{res.league}</span>
-                </div>
-                <div className="col-4 ps-2">{res.match_detail}</div>
-                <div className="col-2 justify-content-end d-flex">
-                  <span className="pe-1">
-                    {moment(res.date).format("DD-MM.YYYY - HH:mm")}
-                  </span>
-                  <img
-                    className="eye-icon"
-                    src={circle_check}
-                    alt=""
-                    height={23}
-                    width={23}
-                  />
-                  <img
-                    onClick={() => setCurrentData(res)}
-                    data-bs-toggle="modal"
-                    data-bs-target="#filter"
-                    className="eye-icon cursor"
-                    src={eye}
-                    alt=""
-                    height={23}
-                    width={23}
-                  />
-                </div>
-              </MainDiv>
-            ))}
+                  <div className="col-3">
+                    <img
+                      className="flag-icon"
+                      src={flag}
+                      alt=""
+                      height={26}
+                      width={26}
+                    />
+                    <span className="ps-1">{res.league}</span>
+                  </div>
+                  <div className="col-4 ps-2">{res.match_detail}</div>
+                  <div className="col-2 justify-content-end d-flex">
+                    <span className="pe-1">
+                      {moment(res.date).format("DD-MM.YYYY - HH:mm")}
+                    </span>
+                    <img
+                      className="eye-icon"
+                      src={circle_check}
+                      alt=""
+                      height={23}
+                      width={23}
+                    />
+                    <img
+                      onClick={() => setCurrentData(res)}
+                      data-bs-toggle="modal"
+                      data-bs-target="#filter"
+                      className="eye-icon cursor"
+                      src={eye}
+                      alt=""
+                      height={23}
+                      width={23}
+                    />
+                  </div>
+                </MainDiv>
+              ))
+            )}
           </>
         )}
       </div>
@@ -893,38 +922,40 @@ const CommentsManagement = (props) => {
                   className="darkMode-input form-control"
                 ></textarea>
               </div>
-              {currentData.status == 'pending' && <div className="my-3 d-flex justify-content-center gap-3">
-                <div className="">
-                  <button
-                    data-bs-dismiss="modal"
-                    onClick={() => handleStatus(currentData.id, "approve")}
-                    className="px-3"
-                    style={{
-                      color: "#D2DB08",
-                      backgroundColor: "transparent",
-                      border: "1px solid #D2DB08",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Publish
-                  </button>
+              {currentData.status == "pending" && (
+                <div className="my-3 d-flex justify-content-center gap-3">
+                  <div className="">
+                    <button
+                      data-bs-dismiss="modal"
+                      onClick={() => handleStatus(currentData.id, "approve")}
+                      className="px-3"
+                      style={{
+                        color: "#D2DB08",
+                        backgroundColor: "transparent",
+                        border: "1px solid #D2DB08",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Publish
+                    </button>
+                  </div>
+                  <div className="">
+                    <button
+                      data-bs-dismiss="modal"
+                      onClick={() => handleStatus(currentData.id, "reject")}
+                      className="px-3"
+                      style={{
+                        color: "#FF5757",
+                        backgroundColor: "transparent",
+                        border: "1px solid #FF5757",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
-                <div className="">
-                  <button
-                    data-bs-dismiss="modal"
-                    onClick={() => handleStatus(currentData.id, "reject")}
-                    className="px-3"
-                    style={{
-                      color: "#FF5757",
-                      backgroundColor: "transparent",
-                      border: "1px solid #FF5757",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>}
+              )}
             </div>
             <img
               data-bs-dismiss="modal"

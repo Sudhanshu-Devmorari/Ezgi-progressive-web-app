@@ -18,7 +18,7 @@ const CommentsManagementPage = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState("All");
   const [cookies, setCookie, removeCookie] = useCookies();
-  const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = localStorage.getItem("admin-user-id");
 
   const commentManagementApiData = async () => {
     // console.log(data)
@@ -33,10 +33,9 @@ const CommentsManagementPage = (props) => {
         }
         setData(res.data);
         setMostLike(res?.data?.most_like);
-        if(props.commentData === true){
+        if (props.commentData === true) {
           setCommentData(res.data.new_comment);
-        }
-        else{
+        } else {
           setCommentData(res.data.all_comment);
         }
         setIsLoading(false);
@@ -100,7 +99,12 @@ const CommentsManagementPage = (props) => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} setSelectedOption={setSelectedOption} refreshComments={commentManagementApiData}/>
+            <SideBar
+              setWithdrawableData={props.setWithdrawableData}
+              setCommentData={props.setCommentData}
+              setSelectedOption={setSelectedOption}
+              refreshComments={commentManagementApiData}
+            />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -131,7 +135,8 @@ const CommentsManagementPage = (props) => {
                   commentData={commentData}
                   isLoading={isLoading}
                   selectedOption={selectedOption}
-                  setSelectedOption = {setSelectedOption}
+                  setSelectedOption={setSelectedOption}
+                  setCommentData={setCommentData}
                 />
               </div>
               <div className="col-4">

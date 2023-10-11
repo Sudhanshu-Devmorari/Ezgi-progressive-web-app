@@ -3,9 +3,8 @@ import { GoSearch } from "react-icons/go";
 
 const CommentsManagementFilter = (props) => {
   // console.log("***:::::***", props?.commentData)
-  
 
-  const options = ["All", "Published", "Pending", "Stopped"];
+  const options = ["All", "Published", "Pending", "Reject", "Paused-Postponed"];
 
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -18,20 +17,24 @@ const CommentsManagementFilter = (props) => {
     const filteredArray = props?.commentData.filter(
       (obj) =>
         obj?.commentator_user?.name?.toLowerCase().startsWith(val) ||
-        obj?.commentator_user?.name?.toLowerCase().includes(val) 
+        obj?.commentator_user?.name?.toLowerCase().includes(val)
     );
-    props.setDisplayUser(val == "" ? props?.commentData :filteredArray);
+    props.setDisplayUser(val == "" ? props?.commentData : filteredArray);
   };
 
-  const filterData = (e) => {
-    const val = e == "Published"?"Approve":e=="Stopped"?"Reject":e;
-    const filteredArray = props?.commentData.filter(
-      (obj) =>
-        obj?.status?.toLowerCase() == val?.toLowerCase()
-    );
-    // console.log("filtered:", filteredArray)
-    props.setDisplayUser(val == "All" ? props?.commentData :filteredArray);
-  };
+  // const filterData = (e) => {
+  //   props?.setDataloading(true);
+  //   const val = e == "Published" ? "Approve" : e;
+  //   // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
+  //   const filteredArray = props?.commentData.filter(
+  //     (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
+  //   );
+  //   console.log("filtered::::::", filteredArray);
+  //   setTimeout(() => {
+  //     props.setDisplayUser(val == "All" ? props?.commentData : filteredArray);
+  //     props?.setDataloading(false);
+  //   }, 500);
+  // };
 
   return (
     <>
@@ -41,7 +44,11 @@ const CommentsManagementFilter = (props) => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input onChange={filterCommentData} type="text" className="input-field-dark" />
+            <input
+              onChange={filterCommentData}
+              type="text"
+              className="input-field-dark"
+            />
           </div>
         </div>
         <div className="p-2 position-relative">
@@ -88,8 +95,10 @@ const CommentsManagementFilter = (props) => {
                   value={option}
                   className="m-1 px-2 py-1 text-center cursor"
                   style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
-                  onClick={(e) => {handleOptionClick(option);
-                    filterData(option)}}
+                  onClick={(e) => {
+                    handleOptionClick(option);
+                    props.filterData(option);
+                  }}
                 >
                   {option}
                 </span>

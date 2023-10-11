@@ -151,6 +151,7 @@ const MySubscribers = (props) => {
                                       : "1px solid #FFFFFF",
                                   borderRadius: "3px",
                                   width: "4.4rem",
+                                  fontSize: "12px",
                                 }}
                               >
                                 {res?.status == "deactive"
@@ -264,7 +265,7 @@ const MySubscribers = (props) => {
                                 //   res.status === "Renew" &&
                                 //     setRenewModalShow(true);
                                 // }}
-                                className="px-2 me-2 button-status text-uppercase"
+                                className="px-2 me-2 text-uppercase"
                                 style={{
                                   color:
                                     currentTheme === "dark"
@@ -292,6 +293,7 @@ const MySubscribers = (props) => {
                                       : "1px solid #FFFFFF",
                                   borderRadius: "3px",
                                   width: "4.4rem",
+                                  fontSize: "12px",
                                 }}
                               >
                                 {res?.status == "deactive"
@@ -405,7 +407,7 @@ const MySubscribers = (props) => {
                             //   res.status === "Renew" &&
                             //     setRenewModalShow(true);
                             // }}
-                            className="px-2 me-2 button-status text-uppercase"
+                            className="px-2 me-2 text-uppercase"
                             style={{
                               color:
                                 currentTheme === "dark"
@@ -431,6 +433,7 @@ const MySubscribers = (props) => {
                                   : "1px solid #FFFFFF",
                               borderRadius: "3px",
                               width: "4.4rem",
+                              fontSize: "12px",
                             }}
                           >
                             {res?.status == "deactive" ? "Ended" : res?.status}
