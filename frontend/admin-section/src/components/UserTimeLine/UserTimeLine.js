@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import initialProfile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import user2 from "../../assets/user2.png";
@@ -11,6 +11,30 @@ import config from "../../config";
 
 const UserTimeLine = (props) => {
   const server_url = `${config?.apiUrl}`;
+
+  const [displayTimelineData, setDisplayTimelineData] = useState(props?.notification);
+  useEffect(() => {
+    setDisplayTimelineData(props?.notification)
+  }, [props?.notification]);
+
+  const options = ["See All", "Purchase Transactions", "Interactions"];
+  const [selectedOption, setSelectedOption] = useState("See All");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    setShowDropdown(false);
+  };
+
+  const filterData = (e) => {
+
+      const filteredArray = props?.notification.filter(
+          (obj) =>
+            obj?.subject?.toLowerCase() == e?.toLowerCase()
+        );
+        console.log(filteredArray)
+        setDisplayTimelineData(e == "See All" ? props?.notification : filteredArray)
+  };
 
   // const notification = [
   //   {
@@ -90,14 +114,70 @@ const UserTimeLine = (props) => {
       </>
     );
   };
-
+  
   return (
     <>
       <div className="dark-mode p-2 sidebar-height" style={{ height: "90vh" }}>
-        <div className="" style={{ fontSize: "1.2rem" }}>
+      <div className="d-flex" style={{alignItems:"center", justifyContent:"space-between"}}>
+        <div style={{ fontSize: "1.2rem", alignItems: "center" }}>
           {props?.transactionHistory === "history"
             ? "Transaction History"
             : "User Timeline"}
+        </div>
+        
+        {props?.transactionHistory !== "history" &&
+        <div className="p-2 position-relative" style={{ justifyContent: "flex-end"}}>
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            style={{
+              backgroundColor: "transparent",
+              borderRadius: "3px",
+              border: "1px solid #E6E6E6",
+              color: "#E6E6E6",
+              width: "7.5rem",
+              borderBottom: showDropdown
+                ? "1px solid #0D2A53"
+                : "1px solid #E6E6E6",
+              borderLeft: showDropdown
+                ? "1px solid #E6E6E6"
+                : "1px solid #E6E6E6",
+              borderRight: showDropdown
+                ? "1px solid #E6E6E6"
+                : "1px solid #E6E6E6",
+              borderTop: showDropdown
+                ? "1px solid #E6E6E6"
+                : "1px solid #E6E6E6",
+            }}
+          >
+            {selectedOption}
+          </button>
+          <div
+            className={`position-absolute d-flex flex-column ${
+              showDropdown ? "d-block" : "d-none"
+            }`}
+            style={{
+              backgroundColor: "#0B2447",
+              border: "1px solid #E6E6E6",
+              borderRadius: "3px",
+              borderTop: "none",
+            }}
+          >
+            {options
+              .filter((option) => option !== selectedOption)
+              .map((option) => (
+                <span
+                  key={option}
+                  value={option}
+                  className="m-1 px-2 py-1 text-center cursor"
+                  style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
+                  onClick={(e) => {handleOptionClick(option);
+                    filterData(option)}}
+                >
+                  {option}
+                </span>
+              ))}
+          </div>
+        </div>}
         </div>
         {props.isLoading ? (
           <div className="d-flex gap-1 my-2 pb-2 h-100 align-items-center justify-content-center">
@@ -105,7 +185,7 @@ const UserTimeLine = (props) => {
           </div>
         ) : (
           <>
-            {props?.notification.map((res, index) => (
+            {displayTimelineData?.map((res, index) => (
               <div
                 key={index}
                 className="d-flex gap-1 my-2 pb-2"
@@ -116,7 +196,7 @@ const UserTimeLine = (props) => {
                     src={`${
                       res?.sender?.profile_pic
                         ? server_url + res?.sender?.profile_pic
-                        : initialProfile
+                        : res?.receiver?.profile_pic ? server_url + res?.receiver?.profile_pic : initialProfile
                     }`}
                     className="rounded-circle"
                     alt=""
@@ -127,7 +207,7 @@ const UserTimeLine = (props) => {
                 </div>
                 <div className=" flex-grow-1 d-flex flex-column">
                   <div className="d-flex justify-content-between">
-                    <span className="username">{res?.sender?.name}</span>
+                    <span className="username">{res?.sender?.name ? res?.sender?.name : res?.receiver?.name}</span>
                     <span
                       className="support-history-fonts"
                       style={{ fontSize: "0.8rem" }}

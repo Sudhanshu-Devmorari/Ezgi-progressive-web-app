@@ -53,7 +53,7 @@ const Support = () => {
   }
 
   const handleCheckTicketAction = async(ticket_id) => {
-    console.log("ticket_id", ticket_id)
+    // console.log("ticket_id", ticket_id)
     try {
       const res = await axios.get(`${config?.apiUrl}/check-ticket-action/${ticket_id}/`);
       // console.log("res: ", res)
@@ -144,7 +144,7 @@ const Support = () => {
               <>
                 <div
                   onClick={() => {
-                    if(res.user_label.toLowerCase() === "responded"){
+                    if(res.user_label.toLowerCase() === "answered"){
                       // API call to check admin adswered but user can not take action so ticket is resolved.
                       handleCheckTicketAction(res.id)
                     }
@@ -165,15 +165,17 @@ const Support = () => {
                         width: "7px",
                         height: "18px",
                         backgroundColor:
-                          (res.user_label.toLowerCase() === "pending" &&
+                          (res.user_label.toLowerCase() === "waiting" &&
                             "#F8FF61") ||
                           // ((res.status.toLowerCase() === "progress" ||
                           //   res.status.toLowerCase() === "user responded" ||
                           //   res.status.toLowerCase() === "responded") &&
-                          (res.user_label.toLowerCase() === "progress" &&
+                          (res.user_label.toLowerCase() === "in progress" &&
                             "#4DD5FF") ||
-                            (res.user_label.toLowerCase() === "responded" &&
+                            (res.user_label.toLowerCase() === "answered" &&
                             "#4DD5FF") ||
+                            (res.user_label.toLowerCase() === "you responded" &&
+                            "#F8FF61") ||
                           (res.user_label.toLowerCase() === "resolved" &&
                             "#37FF80"),
                       }}
@@ -186,7 +188,7 @@ const Support = () => {
                   <div className="text-capitalize col-3 text-end">
                     {res.status} */}
                   <div className="col-6 text-center">{res.created}</div>
-                  <div className="text-capitalize col-2 text-end">
+                  <div className="text-capitalize col-2 text-end" style={{textWrap:"nowrap"}}>
                     {res.user_label}
                   </div>
                 </div>

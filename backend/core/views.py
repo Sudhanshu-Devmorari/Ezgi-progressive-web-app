@@ -32,7 +32,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail,
-                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
@@ -40,7 +40,8 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              TicketSupportSerializer, ResponseTicketSerializer, HighlightSerializer, AdvertisementSerializer,HighlightSettingSerializer,MembershipSettingSerializer,
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
                              TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer,
-                             EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer, WithdrawableSerializer, BankUpdateSerializer)
+                             EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer, WithdrawableSerializer, BankUpdateSerializer,
+                             GiftSubscription)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -733,7 +734,7 @@ class SubscriptionView(APIView):
                 notification_obj = Notification.objects.create(sender=user, receiver=commentator,date=datetime.today().date(), status=False, context=f'{user.username} started following you.', admin_context=f'{user.username} started following user {commentator.username}.')
         
             # send Subscription notification:
-            notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Subscription Purchase', date=datetime.today().date(), status=False, context=f'{user.username} Subscribe you.', admin_context=f'{user.username} subscribed to user {commentator.username} for {duration}.')
+            notification_obj = Notification.objects.create(sender=user,receiver=commentator, subject='Purchase Transactions', date=datetime.today().date(), status=False, context=f'{user.username} Subscribe you.', admin_context=f'{user.username} subscribed to user {commentator.username} for {duration}.')
             if Subscription_obj != None:
                 if DataCount.objects.filter(id=1).exists():
                     obj = DataCount.objects.get(id=1)
@@ -884,7 +885,7 @@ class CommentReactionView(APIView):
                     total_favorite=Sum('favorite'),
                     total_clap=Sum('clap')
                 )
-                notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
+                notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, subject='Interactions', date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
                 data = {'comment_id': comment_id,
                         'total_likes': total_reactions['total_likes'] or 0,
@@ -904,7 +905,7 @@ class CommentReactionView(APIView):
             # User clicked the same button again, remove the reaction
             setattr(comment_reaction, reaction_type, None)
             comment_reaction.save(update_fields=[reaction_type,'updated'])
-            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} removed the {reaction_type} for comment {comment_obj_.match_detail}.', admin_context=f'{user.username} removed the {reaction_type} for comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
+            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, subject='Interactions', date=datetime.today().date(), status=False, context=f'{user.username} removed the {reaction_type} for comment {comment_obj_.match_detail}.', admin_context=f'{user.username} removed the {reaction_type} for comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
             if comment_reaction.like is None and comment_reaction.favorite is None and comment_reaction.clap is None:
                 comment_reaction.delete()
@@ -932,7 +933,7 @@ class CommentReactionView(APIView):
             # User clicked a different button, update the reaction
             setattr(comment_reaction, reaction_type, 1)
             comment_reaction.save(update_fields=[reaction_type,'updated'])
-            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
+            notification_obj = Notification.objects.create(sender=user, receiver=comment_obj_.commentator_user, subject='Interactions', date=datetime.today().date(), status=False, context=f'{user.username} {reaction_type} the comment {comment_obj_.match_detail}.', admin_context=f'{user.username} {reaction_type} the comment of user {comment_obj_.commentator_user.username} on the {comment_obj_.match_detail} match.')
 
             comment_reactions = CommentReaction.objects.filter(comment_id=comment_id).values('like', 'favorite', 'clap')
             total_reactions = comment_reactions.aggregate(
@@ -1272,7 +1273,7 @@ class ShowTicketData(APIView):
         serializer['admin_response'] = ResponseTicketSerializer(ticket_history.response_ticket).data if ticket_history else None
 
         
-        history = TicketHistory.objects.filter(ticket_support=support_obj).order_by('-created')
+        history = TicketHistory.objects.filter(ticket_support=support_obj).order_by('-created')[:2]
         history_serializer = TicketHistorySerializer(history, many=True).data
 
         return Response(data=history_serializer, status=status.HTTP_200_OK)
@@ -1303,7 +1304,7 @@ class ReplyTicketView(APIView):
             if ticket_history != None:
                 # ticket_obj.status = 'user responded'
                 ticket_obj.status = 'pending'
-                ticket_obj.user_label = 'progress'
+                ticket_obj.user_label = 'you responded'
                 ticket_obj.admin_label = 'user responded'
                 ticket_obj.save()
 
@@ -1567,9 +1568,10 @@ class HighlightPurchaseView(APIView):
                     
                     notification_obj = Notification.objects.create(
                             receiver=user, 
-                            subject='Highlight Purchase', 
+                            subject='Purchase Transactions', 
                             date=datetime.today().date(), 
                             status=False, context=f'Congratulations! Your profile and comments are now listed at the top.', 
+                            admin_context=f'{user.username} purchase the highlights for {duration}.'
                         )
                     
                     if DataCount.objects.filter(id=user.id).exists():
@@ -1893,26 +1895,40 @@ class UserManagement(APIView):
 
             subscription = request.data.get('subscription')
             if subscription == 'True':
+
+                if request.data.get('duration').lower() == 'undefined':
+                    return Response({'error': 'Duration is not defined for free subscription.'}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data.get('number').lower() == 'undefined':
+                    return Response({'error': "Number of editor's is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data.get('level').lower() == 'undefined':
+                    return Response({'error': "Editor's level is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+
                 duration = request.data.get('duration')
-                role = 'commentator'
-                if request.data.get('level').lower() == 'expert':
-                    level = 'master'
+                number = request.data.get('number')
+                editor_level = request.data.get('level')
+
+                if editor_level.lower() == 'expert':
+                    editor_level = 'master'
                 else:
-                    level = request.data.get('level').lower()
+                    editor_level = request.data.get('level').lower()
 
                 user_obj = User.objects.create(profile_pic=profile,
                     name=name, username=username, phone=phone,
-                    password=password, gender=gender, age=age,
-                    user_role=role, commentator_level=level
-                    )
-                user_obj.save()
-            else:
-                user_obj = User.objects.create(profile_pic=profile,
-                    name=name, username=username, phone=phone,
                     password=password, gender=gender, age=age
-                )
+                        )
                 # user_obj.set_password(password)
                 user_obj.save()
+
+                gift_obj = GiftSubscription.objects.create(user=user_obj, duration=duration, editor_count=number, editor_level=editor_level)
+                gift_obj.save()
+                
+
+            user_obj = User.objects.create(profile_pic=profile,
+                name=name, username=username, phone=phone,
+                password=password, gender=gender, age=age
+            )
+            # user_obj.set_password(password)
+            user_obj.save()
 
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -1924,26 +1940,26 @@ class UserManagement(APIView):
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
-            if subscription == 'True' and user_obj != None:
-                start_date = datetime.now()
-                if duration == "1 Month":
-                    end_date = start_date + timedelta(days=30)
-                if duration == "3 Month":
-                    end_date = start_date + timedelta(days=90)
-                if duration == "6 Month":
-                    end_date = start_date + timedelta(days=180)
+            # if subscription == 'True' and user_obj != None:
+            #     start_date = datetime.now()
+            #     if duration == "1 Month":
+            #         end_date = start_date + timedelta(days=30)
+            #     if duration == "3 Month":
+            #         end_date = start_date + timedelta(days=90)
+            #     if duration == "6 Month":
+            #         end_date = start_date + timedelta(days=180)
                 
-                editor_obj = BecomeCommentator.objects.create(user=user_obj, duration=duration, status='active', commentator=True, end_date=end_date)
-                editor_obj.save()
-                if DataCount.objects.filter(id=1).exists():
-                    obj = DataCount.objects.get(id=1)
-                    obj.editor += 1
-                    obj.save()
-                else:
-                    obj = DataCount.objects.create(editor=1)
-                serializer = BecomeCommentatorSerializer(editor_obj)
-                data = serializer.data
-                return Response(data=data, status=status.HTTP_200_OK)
+            #     editor_obj = BecomeCommentator.objects.create(user=user_obj, duration=duration, status='active', commentator=True, end_date=end_date)
+            #     editor_obj.save()
+            #     if DataCount.objects.filter(id=1).exists():
+            #         obj = DataCount.objects.get(id=1)
+            #         obj.editor += 1
+            #         obj.save()
+            #     else:
+            #         obj = DataCount.objects.create(editor=1)
+            #     serializer = BecomeCommentatorSerializer(editor_obj)
+            #     data = serializer.data
+            #     return Response(data=data, status=status.HTTP_200_OK)
 
             return Response(data=data, status=status.HTTP_200_OK)
 
@@ -3496,15 +3512,23 @@ class SupportManagement(APIView):
                 return Response({'error': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
 
             is_res_obj = ResponseTicket.objects.filter(user=user,ticket=ticket_support)
+            if not ResponseTicket.objects.filter(ticket=ticket_support).exists():
+                ticket_support.status = 'progress'
+                ticket_support.admin_label = 'answered'
+                ticket_support.user_label = 'in progress'
+                ticket_support.save()
+            else:
+                ticket_support.status = 'progress'
+                ticket_support.admin_label = 'answered'
+                ticket_support.user_label = 'answered'
+                ticket_support.save()
+
             res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
             # print('res_obj: ', res_obj)
             if res_obj != None:
                 ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
                                                             response_ticket=res_obj, message=message)
-                ticket_support.status = 'progress'
-                ticket_support.admin_label = 'responded'
-                ticket_support.user_label = 'responded'
-                ticket_support.save()
+                
 
             # if is_res_obj:
             #     ticket_support.status = 'responded'
@@ -3512,7 +3536,7 @@ class SupportManagement(APIView):
             #     ticket_support.status = 'progress'
             # ticket_support.save(update_fields=['status', 'updated'])
 
-            res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
+            # res_obj = ResponseTicket.objects.create(user=user,ticket=ticket_support, response=message)
 
             if res_obj != None:             
                 # ticket_obj = TicketHistory.objects.create(user=user, ticket_support=ticket_support, status='comment_by_user',
@@ -4968,6 +4992,15 @@ class BecomeEditorView(APIView):
                         
                         obj = BecomeCommentator.objects.create(user=user, money=editor_obj.answer, commentator=True, status='active')
                         obj.save()
+
+                        notification_obj = Notification.objects.create(
+                            receiver=user, 
+                            subject='Purchase Transactions', 
+                            date=datetime.today().date(), 
+                            status=False, context=f'Congratulations! You are now editor.', 
+                            admin_context=f'{user.username} purchased the plan for becoming an editor.'
+                        )
+                        
                     except Exception as e:
                         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     return Response(serializer.data)
@@ -5985,3 +6018,23 @@ class ShowWithdrawableData(APIView):
             return Response(data={'error': 'An error occurred while fetching new requests.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(data=data_list, status=status.HTTP_200_OK)
+
+
+class ViewAllTicketHistory(APIView):
+    def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response(data={"error": "User not found for the given ID"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            support_obj = TicketSupport.objects.get(id=ticket_id)
+        except TicketSupport.DoesNotExist:
+            return Response(data={"error": "TicketSupport not found for the given ID"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            history = TicketHistory.objects.filter(ticket_support=support_obj).order_by('-created')
+            history_serializer = TicketHistorySerializer(history, many=True).data
+            return Response(data=history_serializer, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(data={"error": f"An error occurred while retrieving the ticket history: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

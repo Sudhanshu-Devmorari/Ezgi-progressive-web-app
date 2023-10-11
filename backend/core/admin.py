@@ -3,7 +3,8 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                          CommentReaction, FavEditors, TicketSupport, Highlight, Advertisement,
                          CommentatorLevelRule, MembershipSetting, SubscriptionSetting, HighlightSetting ,
                          BecomeCommentator, BlueTick, DataCount, TicketHistory, ResponseTicket, BecomeEditor,
-                         BecomeEditorEarnDetails, PendingBalanceHistory, CommissionEarning, BankDetails, Withdrawable, BankUpdate)
+                         BecomeEditorEarnDetails, PendingBalanceHistory, CommissionEarning, BankDetails, 
+                         Withdrawable, BankUpdate, GiftSubscription)
 
 # Register your models here.
 @admin.register(User)
@@ -130,3 +131,8 @@ class WithdrawableAdmin(admin.ModelAdmin):
 @admin.register(BankUpdate)
 class BankUpdateAdmin(admin.ModelAdmin):
     list_display = ('id', 'bankdetails', 'new_iban','bankupdate','status', 'created', 'updated')
+
+
+@admin.register(GiftSubscription)
+class GiftSubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'duration','editor_count','editor_level', 'created', 'updated')

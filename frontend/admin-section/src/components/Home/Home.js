@@ -272,7 +272,7 @@ const Home = (props) => {
     } else {
       setValidPhone(null);
     }
-    if (addUser.phone.match(/^5\d*$/) == null || addUser.phone.length != 10) {
+    if (addUser?.phone?.match(/^5\d*$/) == null || addUser.phone.length != 10) {
       setValidPhone("Phone must start with '5' and must be 10 digits.");
     } else {
       setValidPhone(null);
@@ -314,7 +314,7 @@ const Home = (props) => {
       formData.append("age", addUser.age);
       formData.append("subscription", addUser.subscription);
       formData.append("duration", addUser.duration);
-      // formData.append("month", addUser.month);
+      formData.append("number", addUser.month);
       formData.append("level", addUser.level);
       try {
         const response = await axios.post(
@@ -921,7 +921,7 @@ const Home = (props) => {
                         height={25}
                         width={25}
                       />
-                      {path != "/" && 
+                      {/* {path != "/" && 
                       <img
                         onClick={
                           () => {
@@ -936,7 +936,7 @@ const Home = (props) => {
                         height={25}
                         width={25}
                       />
-                      }
+                      } */}
                     </div>
                   </MainDiv>
                 </React.Fragment>
@@ -1285,7 +1285,7 @@ const Home = (props) => {
                         onChange={submitUserData}
                         name="month"
                         value={
-                          userData ? userData?.duration : addUser.selectedNumber
+                          userData ? addUser.selectedNumber : selectedNumber
                         }
                         label=" "
                         options={numberOptions}

@@ -51,7 +51,7 @@ const UserManagementPage = (props) => {
 
   const newUsersArray = [
     {
-      label: "New Users",
+      label: "Total Users",
       icon: newUser,
       count: `${data?.new_user}`,
       per: isLoading ? 0 : Math.round(data?.new_user_percentage),
@@ -61,7 +61,7 @@ const UserManagementPage = (props) => {
   ];
   const newEditorsArray = [
     {
-      label: "New Editors",
+      label: "Total Editors",
       icon: editorIcon,
       count: `${data?.new_editor}`,
       per: isLoading ? 0 : Math.round(data?.new_editor_percentage),
@@ -71,7 +71,7 @@ const UserManagementPage = (props) => {
   ];
   const newSubscribersArray = [
     {
-      label: "New Subscribers",
+      label: "Total Subscribers",
       icon: subscriberIcon,
       count: `${data?.new_subscriber}`,
       per: isLoading ? 0 : Math.round(data?.new_subscriptions_percentage),

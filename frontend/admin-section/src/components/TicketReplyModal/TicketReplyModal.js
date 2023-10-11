@@ -281,7 +281,7 @@ const TicketReplyModal = (props) => {
                 </>
               )} */}
               <div>
-                {ticketData.reverse().map((res, index) => (
+                {ticketData.map((res, index) => (
                   <>
                     <span>
                       {res?.user?.id == userId ? (

@@ -19,6 +19,7 @@ import Export from "../Export/Export";
 import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import moment from "moment";
 
 const SupportManagementPage = (props) => {
   // Support management API
@@ -57,8 +58,10 @@ const SupportManagementPage = (props) => {
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
-          console.log("RESSS: ", res)
-          setTicketData(res.data);
+          // console.log("RESSS: ", res)
+          const data = res.data
+          data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+          setTicketData(data);
         })
         .catch((error) => {
           console.log(error);
@@ -320,9 +323,9 @@ const SupportManagementPage = (props) => {
                                 //(res.status === "progress" && "#FF9100"),
                                 (res.admin_label === "pending" && "#FFDD00") ||
                                 (res.admin_label === "new" && "#FFDD00") ||
-                                (res.admin_label === "responded" && "#4DD5FF") ||
+                                (res.admin_label === "answered" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
-                                (res.user_label === "progress" && "#FF9100"),
+                                (res.admin_label === "user responded" && "#FF9100"),
                               borderRadius: "4px",
                               border:
                                 (res.admin_label === "pending" &&
@@ -332,9 +335,9 @@ const SupportManagementPage = (props) => {
                                 //(res.status === "resolved" && "#58DEAA") ||
                                 //(res.status === "progress" && "#FF9100"),
                                 (res.admin_label === "new" && "#FFDD00") ||
-                                (res.admin_label === "responded" && "#4DD5FF") ||
+                                (res.admin_label === "answered" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
-                                (res.user_label === "progress" && "#FF9100"),
+                                (res.admin_label === "user responded" && "#FF9100"),
                               // (res.status === "redirected" && "#FF9100"),
                               color: "#0D2A53",
                               width: "5.4rem",

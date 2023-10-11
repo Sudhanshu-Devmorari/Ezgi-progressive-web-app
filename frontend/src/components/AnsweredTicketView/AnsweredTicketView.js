@@ -13,6 +13,12 @@ const AnsweredTicketView = (props) => {
 
   const ticketData = props?.ticketData || {};
 
+  const [displayAllticketsData, setDisplayAllTicketsData] = useState(props?.ticketData);
+  
+  useEffect(() => {
+    setDisplayAllTicketsData(props?.ticketData)
+  }, [props?.ticketData]);
+
   const handleResolvedTicket = () => {
     axios
       .post(`${config.apiUrl}/resolved-ticket/${userId}`, {
@@ -27,6 +33,17 @@ const AnsweredTicketView = (props) => {
         console.log(error);
       });
   };
+  const userId = localStorage.getItem("user-id");
+  const showAllTicketHistory = async(ticket_id) => {
+    try {
+      const res = await axios.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`);
+      // console.log("All res: ", res)
+      setDisplayAllTicketsData(res.data)
+    }
+    catch (error) {
+
+    }
+  }
 
   return (
     <>
@@ -68,19 +85,15 @@ const AnsweredTicketView = (props) => {
         >
           {ticketData?.message}
         </div> */}
-        {ticketData?.map((res, index) => (
+        {displayAllticketsData?.map((res, index) => (
           <>
             <div className="d-flex justify-content-between">
               <span>
-                {res?.user?.id != userId && 'Support - '} 
-                <span style={{ color: "#D2DB08" }}>
-                  {res?.user?.username}
-                </span>
+                {res?.user?.id != userId && "Support - "}
+                <span style={{ color: "#D2DB08" }}>{res?.user?.username}</span>
               </span>
               <span className="">
-                {moment(res?.created).format(
-                  "DD-MM.YYYY - HH:mm"
-                )}
+                {moment(res?.created).format("DD-MM.YYYY - HH:mm")}
               </span>
             </div>
             <Form.Control
@@ -135,60 +148,84 @@ const AnsweredTicketView = (props) => {
                   props?.responseTicketID == null
                 ) {
         )} */}
-        
-        {ticketData[0]?.ticket_support.user_label != "resolved" && (
-          <div className="my-3 d-flex justify-content-center gap-2">
-            <button
-              onClick={() => {
-                if (ticketData?.length == 1 || props?.responseTicketID == userId || props?.responseTicketID == null) {
-                  Swal.fire({
-                    text: "You cannot reply to your own ticket as admin has not responded yet.",
-                    backdrop: false,
-                    customClass: `${
-                      currentTheme === "dark"
-                        ? "dark-mode-alert"
-                        : "light-mode-alert"
-                    }`,
-                  });
-                } else {
-                  props.setShowModal(4);
-                }
-                // props.setShowModal(4);
-              }}
-              className="px-3"
-              style={{
-                color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
-                backgroundColor: "transparent",
-                border:
-                  currentTheme === "dark"
-                    ? "1px solid #37FF80"
-                    : "1px solid #00DE51",
-                borderRadius: "3px",
-              }}
-            >
-              Reply
-            </button>
-            {ticketData?.length != 1 && (
+
+        <div className="my-3 d-flex justify-content-center gap-2">
+          {ticketData[0]?.ticket_support.user_label != "resolved" && (
+            <>
               <button
                 onClick={() => {
-                  handleResolvedTicket();
+                  if (
+                    ticketData?.length == 1 ||
+                    props?.responseTicketID == userId ||
+                    props?.responseTicketID == null
+                  ) {
+                    Swal.fire({
+                      text: "You cannot reply to your own ticket as admin has not responded yet.",
+                      backdrop: false,
+                      customClass: `${
+                        currentTheme === "dark"
+                          ? "dark-mode-alert"
+                          : "light-mode-alert"
+                      }`,
+                    });
+                  } else {
+                    props.setShowModal(4);
+                  }
+                  // props.setShowModal(4);
                 }}
                 className="px-3"
                 style={{
-                  color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                  color: currentTheme === "dark" ? "#37FF80" : "#00DE51",
                   backgroundColor: "transparent",
                   border:
                     currentTheme === "dark"
-                      ? "1px solid #D2DB0B"
-                      : "1px solid #00659D",
+                      ? "1px solid #37FF80"
+                      : "1px solid #00DE51",
                   borderRadius: "3px",
                 }}
               >
-                Resolved
+                Reply
               </button>
-            )}
-          </div>
-        )}
+              {ticketData?.length != 1 && (
+                <button
+                  onClick={() => {
+                    handleResolvedTicket();
+                  }}
+                  className="px-3"
+                  style={{
+                    color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                    backgroundColor: "transparent",
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #D2DB0B"
+                        : "1px solid #00659D",
+                    borderRadius: "3px",
+                  }}
+                >
+                  Resolved
+                </button>
+              )}
+            </>
+          )}
+
+          <button
+            onClick={() => {
+              showAllTicketHistory(ticketData[0]?.ticket_support?.id);
+            }}
+            className="px-3"
+            style={{
+              color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+              backgroundColor: "transparent",
+              border:
+                currentTheme === "dark"
+                  ? "1px solid #D2DB0B"
+                  : "1px solid #00659D",
+              borderRadius: "3px",
+            }}
+          >
+            View All
+          </button>
+        </div>
       </div>
     </>
   );

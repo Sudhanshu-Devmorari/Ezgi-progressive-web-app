@@ -144,6 +144,15 @@ class Subscription(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
+class GiftSubscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    duration = models.CharField(max_length=20, null=True, blank=True)
+    editor_count = models.IntegerField(null=True, blank=True)
+    editor_level =  models.CharField(max_length = 20, choices = COMMENTATOR_ROLE_CHOISE, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+
 class Notification(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender', null=True, blank=True)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver', null=True, blank=True)
@@ -189,9 +198,10 @@ SUPPORT_STATUS = (
 
 LABEL_STATUS = (
         ('new','New'),
-        ('pending','Pending'),
-        ('responded','Responded'),
-        ('progress','Progress'),
+        ('waiting','Waiting'),
+        ('answered','Answered'),
+        ('in progress','In Progress'),
+        ('you responded','You Responded'),
         ('user responded','User Responded'),
         ('resolved','Resolved'),
     )
@@ -203,7 +213,7 @@ class TicketSupport(models.Model):
     watched = models.BooleanField(default=False)
     status = models.CharField(max_length = 20, choices = SUPPORT_STATUS, default='pending')
     admin_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='new')
-    user_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='pending')
+    user_label = models.CharField(max_length = 30, choices = LABEL_STATUS, default='waiting')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

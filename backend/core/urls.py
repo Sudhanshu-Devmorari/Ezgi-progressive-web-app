@@ -7,6 +7,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                         #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
+                         ViewAllTicketHistory,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -65,6 +66,7 @@ urlpatterns = [
     path('create-withdrawable-request/<int:id>/', CreateWithdrawableRequest.as_view(), name='Create-Withdrawable-Request'), 
     path('create-bank-update-request/<int:id>/', CreateBankUpdateRequest.as_view(), name='Create-Bank-Update-Request'), 
     path('show-withdrawable-data/', ShowWithdrawableData.as_view(), name='Show-Withdrawable-Data'), 
+    path('view-all-ticket-history/<int:id>/<int:ticket_id>/', ViewAllTicketHistory.as_view(), name='View-All-Ticket-History'), 
 
 
     # Admin Panel's api
