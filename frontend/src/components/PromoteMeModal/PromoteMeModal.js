@@ -19,6 +19,7 @@ import config from "../../config";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import { ref } from "../GetRefNo";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
@@ -71,22 +72,18 @@ const PromoteMeModal = (props) => {
         (selectedPlan === "2 Week" && highlightPlan?.week_2);
       try {
         setIsLoading(true);
-        const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
+
+        const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+          payment: "highlight",
           duration: selectedPlan,
           amount: money,
           id: userId,
         });
-        if (res?.status === 200) {
-          setIsLoading(false);
-          props.onHide();
-          Swal.fire({
-            title: "Success",
-            text: `You've successfully purchase highlight.`,
-            icon: "sucess",
-            backdrop: false,
-            customClass:
-              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-          });
+        console.log(payment_res, "==========payment_res");
+
+        if (payment_res.status === 200) {
+          const url = payment_res?.data?.URL_3DS;
+          window.location.replace(url);
         }
       } catch (error) {
         console.log(error);
@@ -119,6 +116,56 @@ const PromoteMeModal = (props) => {
       setValidationError("Please select a Plan or Checkbox");
     }
   };
+
+  const promoteMeEntry = async () => {
+    const money =
+      (selectedPlan === "1 Month" && highlightPlan?.month_1) ||
+      (selectedPlan === "1 Week" && highlightPlan?.week_1) ||
+      (selectedPlan === "2 Week" && highlightPlan?.week_2);
+    try {
+      const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
+        duration: selectedPlan,
+        amount: money,
+        id: userId,
+      });
+      if (res?.status === 200) {
+        // setIsLoading(false);
+        // props.onHide();
+        Swal.fire({
+          title: "Success",
+          text: `You've successfully purchase highlight.`,
+          icon: "sucess",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const ref_no = ref();
+  useEffect(() => {
+    async function testPurchase() {
+      console.log(ref_no,"================>>>ref_no")
+      try {
+        const purchase_res = await axios.post(
+          `${config.paymentURL}/api/services/ProcessQuery`, {
+            "MERCHANT": "TEST1234" , 
+            "MERCHANT_KEY": "4oK26hK8MOXrIV1bzTRVPA==" ,
+            "ORDER_REF_NUMBER" : ref_no 
+          }
+        );
+        console.log(purchase_res, "==============>>>>>purchase_res*********************");
+      } catch (error) {
+        console.log(error, '=====purchase error');
+      }
+    }
+    if (ref_no) {
+      testPurchase();
+    }
+  }, [ref_no]);
 
   return (
     <>

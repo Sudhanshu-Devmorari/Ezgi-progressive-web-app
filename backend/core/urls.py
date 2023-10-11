@@ -2,7 +2,7 @@ from django.urls import path, include
 from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentView, NotificationView, SubscriptionView,
                          CommentReactionView, ProfileView, FavEditorsCreateView, RetrieveFavEditorsAndFavComment,
                          SupportView, UpdateTicketMessageView, ResolvedTicket, ActiveResolvedCommentRetrieveView, ReplyTicketView,
-                         TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView,
+                         TicketRedirectView, RetrieveSubUserView, SubUserSupportTicket,RedirectAnswerView,ShowTicketData, SportsStatisticsView, PaymentView,
 
                         #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
@@ -121,6 +121,7 @@ urlpatterns = [
     path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
     path('editor-banner/', EditorBannerView.as_view(), name='Editor-banner'),
     path('futbol-basketbol-count/', GetFutbolAndBasketbolCountView.as_view(), name='futbol-basketbol-count'),
+    path('payment/', PaymentView.as_view(), name='payment'),
 
     path('test-cron/', TestCronView.as_view(), name='test-cron'),
 ]

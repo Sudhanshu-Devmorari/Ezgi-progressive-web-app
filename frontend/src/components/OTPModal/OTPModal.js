@@ -52,7 +52,7 @@ const OTPModal = (props) => {
         otp: otp,
         phone: phone,
         name: props?.signUpData?.name,
-        username: props?.signUpData?.username,
+        username: (props?.signUpData?.username).toLowerCase(),
         password: props?.signUpData?.password,
         city: props?.signUpData?.city,
         gender: props?.signUpData?.gender,

@@ -295,7 +295,7 @@ const EditorProfileStatisticsSection = (props) => {
                   <span className="my-2">Comments Journey</span>
                   <div className="my-2 text-end">
                     <span style={{ fontSize: "12px" }}>
-                      Son 30 Tahmine Göre{" "}
+                      Son 20 Tahmine Göre{" "}
                       <span style={{ fontSize: "16px", color: "#37FF80" }}>
                         {" "}
                         {SelectSport === "football" &&
@@ -305,55 +305,93 @@ const EditorProfileStatisticsSection = (props) => {
                       </span>
                     </span>
                     <div className="d-flex">
-                      {SelectSport === "football" &&
-                        footballStats?.Comments_Journey_football?.map(
-                          (isGreen, index) => (
-                            <div
-                              className={isGreen ? "green-block" : "red-block"}
-                              key={index}
-                            ></div>
-                          )
-                        )}
-                      {SelectSport === "basketball" &&
-                        basketballStats?.Comments_Journey_basketball?.map(
-                          (isGreen, index) => (
-                            <div
-                              className={isGreen ? "green-block" : "red-block"}
-                              key={index}
-                            ></div>
-                          )
-                        )}
+                      {SelectSport === "football" && (
+                        <>
+                          {footballStats?.Comments_Journey_football?.length ==
+                          [] ? (
+                            <small>No Record Found!</small>
+                          ) : (
+                            <>
+                              {footballStats?.Comments_Journey_football?.map(
+                                (isGreen, index) => (
+                                  <div
+                                    className={
+                                      isGreen ? "green-block" : "red-block"
+                                    }
+                                    key={index}
+                                  ></div>
+                                )
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
+                      {SelectSport === "basketball" && (
+                        <>
+                          {basketballStats?.Comments_Journey_basketball
+                            ?.length == [] ? (
+                            <small>No Record Found!</small>
+                          ) : (
+                            <>
+                              {basketballStats?.Comments_Journey_basketball?.map(
+                                (isGreen, index) => (
+                                  <div
+                                    className={
+                                      isGreen ? "green-block" : "red-block"
+                                    }
+                                    key={index}
+                                  ></div>
+                                )
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="mb-2 mt-3">
                   <div className="my-2 pb-1">Countries - Leagues</div>
                   <div className="d-flex flex-wrap gap-2">
-                    {displayLeague?.map((res, index) => (
-                      <div
-                        key={index}
-                        className="p-3"
-                        style={{
-                          fontSize: "14px",
-                          backgroundColor:
-                            currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
-                          borderRadius: "13px",
-                        }}
-                      >
-                        <img
-                          onContextMenu={(e) => e.preventDefault()}
-                          style={{ borderRadius: "50%", objectFit: "cover" }}
-                          className="flag-responsive"
-                          src={res?.flagUrl}
-                          alt=""
-                          height={25}
-                          width={25}
-                        />
-                        <span className="p-2 ps-2 Flag-content-font">
-                          {res?.league}
-                        </span>
-                      </div>
-                    ))}
+                    {console.log(displayLeague,"============>>displayLeague")}
+                    <>
+                      {displayLeague?.length == 0 ? (
+                        <small>No Record Found!</small>
+                      ) : (
+                        <>
+                          {displayLeague?.map((res, index) => (
+                            <div
+                              key={index}
+                              className="p-3"
+                              style={{
+                                fontSize: "14px",
+                                backgroundColor:
+                                  currentTheme === "dark"
+                                    ? "#0B2447"
+                                    : "#F6F6F6",
+                                borderRadius: "13px",
+                              }}
+                            >
+                              <img
+                                onContextMenu={(e) => e.preventDefault()}
+                                style={{
+                                  borderRadius: "50%",
+                                  objectFit: "cover",
+                                }}
+                                className="flag-responsive"
+                                src={res?.flagUrl}
+                                alt=""
+                                height={25}
+                                width={25}
+                              />
+                              <span className="p-2 ps-2 Flag-content-font">
+                                {res?.league}
+                              </span>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </>
                   </div>
                 </div>
               </>

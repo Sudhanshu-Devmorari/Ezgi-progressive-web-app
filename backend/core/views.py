@@ -48,6 +48,8 @@ from django.contrib.auth import authenticate
 from translate import Translator
 from core.models import BLUETICK_CHOISE
 from core.models import DEACTIVATE_STATUS
+import os
+import string
 
 class SignupUserExistsView(APIView):
     def post(self, request, format=None):
@@ -4675,17 +4677,18 @@ class SportsStatisticsView(APIView):
             user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
             total_user_cmt = user_all_cmt.count()
             
-            p_type_lst = [obj.prediction_type for obj in user_all_cmt]
+            # p_type_lst = [obj.prediction_type for obj in user_all_cmt]
 
-            prediction_type_counts = Counter(p_type_lst)
+            # prediction_type_counts = Counter(p_type_lst)
 
-            top_3_prediction_types = prediction_type_counts.most_common(3)
+            # top_3_prediction_types = prediction_type_counts.most_common(3)
 
-            top_3_prediction_types = [prediction[0] for prediction in top_3_prediction_types]
+            # top_3_prediction_types = [prediction[0] for prediction in top_3_prediction_types]
+            top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             prediction_types_data = []
             for i in top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Basketbol', status='approve').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Basketbol', status='approve', is_resolve=True).count()
 
                 cal = (predict_type / total_user_cmt)* 100
                 data ={
@@ -4707,18 +4710,35 @@ class SportsStatisticsView(APIView):
                 }
                 prediction_types_data.append(other_data)
                 
-            recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve').order_by('-created')[:20]
+            recent_30_comments = Comments.objects.filter(
+                                Q(commentator_user__id=id) &
+                                Q(category__icontains='Basketbol') &
+                                Q(status='approve') &
+                                Q(is_resolve=True) &
+                                (Q(is_prediction=True) | Q(is_prediction=False))
+                            ).order_by('-created')[:20]
             for obj in recent_30_comments:
                 Comments_Journey_basketball.append(obj.is_prediction)
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            correct_prediction_basketball = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Basketbol', status='approve').order_by('-created')[:20]
+            correct_prediction_basketball = Comments.objects.filter(
+                                            commentator_user__id=id,  
+                                            is_prediction=True, 
+                                            category__icontains='Basketbol', 
+                                            status='approve'
+                                        ).order_by('-created')[:20]
 
-            basketball_calculation = (len(correct_prediction_basketball)/30)*100
+            basketball_calculation = (len(correct_prediction_basketball)/20)*100
             details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
-            Countries_Leagues_basketball = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
+            Countries_Leagues_basketball = Comments.objects.filter(
+                                            Q(commentator_user__id=id) &
+                                            Q(category__icontains='Basketbol') &
+                                            Q(status='approve') &
+                                            Q(is_resolve=True) &
+                                            (Q(is_prediction=True) | Q(is_prediction=False))
+                                        )
             for obj in Countries_Leagues_basketball:
                 translator= Translator(from_lang="turkish",to_lang="english")
                 translation_coutry = translator.translate(obj.country)
@@ -4727,7 +4747,6 @@ class SportsStatisticsView(APIView):
                     "league":obj.league,
                 }
                 basketball_Leagues.append(data)
-                # basketball_Leagues.append(obj.league)
             frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
             counter = Counter(frozen_dicts)
             most_common_duplicates = counter.most_common(5)
@@ -4749,17 +4768,18 @@ class SportsStatisticsView(APIView):
             fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             fb_total_user_cmt = fb_user_all_cmt.count()
             
-            fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
+            # fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
 
-            fb_prediction_type_counts = Counter(fb_p_type_lst)
+            # fb_prediction_type_counts = Counter(fb_p_type_lst)
 
-            fb_top_3_prediction_types = fb_prediction_type_counts.most_common(3)
+            # fb_top_3_prediction_types = fb_prediction_type_counts.most_common(3)
 
-            fb_top_3_prediction_types = [prediction[0] for prediction in fb_top_3_prediction_types]
+            # fb_top_3_prediction_types = [prediction[0] for prediction in fb_top_3_prediction_types]
+            fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             fb_prediction_types_data = []
             for i in fb_top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type=i, category__icontains='Futbol', status='approve').count()
+                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Futbol', status='approve').count()
 
                 cal = (predict_type / fb_total_user_cmt)* 100
                 data ={
@@ -4780,18 +4800,35 @@ class SportsStatisticsView(APIView):
                 }
                 fb_prediction_types_data.append(fb_other_data)
 
-            fb_recent_30_comments = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve').order_by('-created')[:20]
+            fb_recent_30_comments = Comments.objects.filter(
+                                    Q(commentator_user__id=id) &
+                                    Q(category__icontains='Futbol') &
+                                    Q(status='approve') &
+                                    Q(is_resolve=True) &
+                                    (Q(is_prediction=True) | Q(is_prediction=False))
+                                ).order_by('-created')[:20]
+            
             for obj in fb_recent_30_comments:
                 Comments_Journey_football.append(obj.is_prediction)
             Fb_details['Comments_Journey_football'] = Comments_Journey_football
 
-            correct_prediction_football = Comments.objects.filter(commentator_user__id=id, is_prediction=True, category__icontains='Futbol', status='approve').order_by('-created')[:20]
+            correct_prediction_football = Comments.objects.filter(
+                                        commentator_user__id=id, 
+                                        is_prediction=True, 
+                                        category__icontains='Futbol', 
+                                        status='approve'
+                                    ).order_by('-created')[:20]
 
-            football_calculation = (len(correct_prediction_football)/30)*100
+            football_calculation = (len(correct_prediction_football)/20)*100
             Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
-            Countries_Leagues_football = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
+            Countries_Leagues_football = Comments.objects.filter(
+                                                commentator_user__id=id,  
+                                                is_prediction=True, 
+                                                category__icontains='Futbol', 
+                                                status='approve'
+                                            )
             for obj in Countries_Leagues_football:
                 # football_Leagues.append(obj.league)
                 translator= Translator(from_lang="turkish",to_lang="english")
@@ -6019,6 +6056,75 @@ class ShowWithdrawableData(APIView):
 
         return Response(data=data_list, status=status.HTTP_200_OK)
 
+def random_num():
+    uppercase_letters = ''.join(random.choice(string.ascii_uppercase) for _ in range(2))    
+    lowercase_letters = ''.join(random.choice(string.ascii_lowercase) for _ in range(2))    
+    digits = ''.join(random.choice(string.digits) for _ in range(2))    
+    random_string = uppercase_letters + lowercase_letters + digits    
+    return random_string
+class PaymentView(APIView):
+    def post(self, request):
+
+        ref_no = random_num()
+        print()
+        print()
+        print()
+        print('ref_no: ', ref_no)
+
+        if 'highlight' in request.data['payment']:
+
+            if 'id' not in request.data:
+                raise KeyError('Commentator Id not found.')
+            if 'duration' not in request.data:
+                raise KeyError('Duration not found.')
+            if 'amount' not in request.data:
+                raise KeyError('Amount not found.')
+            
+            id = request.data.get('id', None)
+            duration = request.data.get('duration')
+            money = request.data.get('amount')
+
+            if duration not in ["1 Week", "2 Week", "1 Month"]:
+                raise ValueError('Invalid duration.')
+
+        data = {
+            "Config": {
+                "MERCHANT": os.environ.get('MERCHANT'),
+                "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                "ORDER_REF_NUMBER": ref_no,
+                "ORDER_AMOUNT": "1",
+                "PRICES_CURRENCY": "TRY",
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+            },
+            "Customer": {
+                "FIRST_NAME": "Firstname",
+                "LAST_NAME": "Lastname",
+                "MAIL": "destek@esnekpos.com",
+                "PHONE": "05435434343",
+                "CITY": "İstanbul",
+                "STATE": "Kağıthane",
+                "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+            },
+            "Product": [
+                {
+                    "PRODUCT_ID": id,
+                    "PRODUCT_NAME": duration,
+                    "PRODUCT_CATEGORY": "highlight",
+                    "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
+                    "PRODUCT_AMOUNT": money
+                }
+            ]
+        }
+        
+        url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+        response = requests.post(url, json=data)
+        json_data = response.json()
+       
+        if json_data['RETURN_CODE'] == '0':
+            return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+        
+        else:
+            return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
 
 class ViewAllTicketHistory(APIView):
     def get(self, request, id, ticket_id, format=None, *args, **kwargs):

@@ -1165,6 +1165,11 @@ export const country_code = [
     code: "GB",
   },
   {
+    name: "England",
+    dial_code: "+44",
+    code: "GB",
+  },
+  {
     name: "USA",
     dial_code: "+1",
     code: "US",

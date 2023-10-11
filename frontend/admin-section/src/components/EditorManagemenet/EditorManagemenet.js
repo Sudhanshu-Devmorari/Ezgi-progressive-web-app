@@ -332,7 +332,7 @@ const EditorManagemenet = (props) => {
       const formData = new FormData();
       formData.append("file", selectedImage);
       formData.append("name", addUser.name);
-      formData.append("username", addUser.username);
+      formData.append("username", (addUser.username).toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("about", addUser.about);
@@ -474,7 +474,7 @@ const EditorManagemenet = (props) => {
       const formData = new FormData();
       selectedImage != false && formData.append("profile_pic", selectedImage);
       formData.append("name", addUser.name);
-      formData.append("username", addUser.username);
+      formData.append("username", (addUser.username).toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("about", addUser.about);

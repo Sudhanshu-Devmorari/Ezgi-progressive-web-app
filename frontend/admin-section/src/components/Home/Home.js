@@ -307,7 +307,7 @@ const Home = (props) => {
       selectedImage != false && formData.append("file", selectedImage);
       // formData.append("date", addUser.date);
       formData.append("name", addUser.name);
-      formData.append("username", addUser.username);
+      formData.append("username", (addUser.username).toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("gender", addUser.gender);
@@ -419,7 +419,7 @@ const Home = (props) => {
       selectedImage != false && formData.append("profile_pic", selectedImage);
       // formData.append("date", addUser.date);
       formData.append("name", addUser.name);
-      formData.append("username", addUser.username);
+      formData.append("username", (addUser.username).toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("gender", addUser.gender);
