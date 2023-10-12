@@ -18,6 +18,7 @@ import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import moment from "moment";
+import { ref, transcationQueryAPI } from "../GetRefNo";
 
 const SubscribeModal = (props) => {
   const {
@@ -41,6 +42,7 @@ const SubscribeModal = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Save the subscription entry to DB when successful payment is received
   const subcriptionEntry = async (amount, duration, commentator_user_id) => {
     try {
       const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
@@ -76,6 +78,18 @@ const SubscribeModal = (props) => {
         (selectedPlan === "6 Month" && subscriptionPlan?.month_6);
       try {
         setIsLoading(true);
+        const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+          payment: "subscription",
+          duration: selectedPlan,
+          amount: money,
+          id: commentatorUser?.id,
+        });
+        console.log(payment_res, "==========payment_res");
+
+        if (payment_res.status === 200) {
+          const url = payment_res?.data?.URL_3DS;
+          window.location.replace(url);
+        }
         // const res = await axios.post(
         //   `${config.apiUrl}/subscription/${userId}/`,
         //   {
@@ -128,6 +142,31 @@ const SubscribeModal = (props) => {
       setValidationError("Please select a Plan or Checkbox");
     }
   };
+
+  // check the successful payment request
+  const ref_no = ref();
+  useEffect(() => {
+    async function testPurchase() {
+      try {
+        const result = await transcationQueryAPI(ref_no);
+        if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+          console.log("payment succesffull");
+          const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+          if (category === "highlight") {
+            const commentator_user_id = result?.PRODUCTS[0]?.PRODUCT_ID;
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
+            const amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
+            subcriptionEntry(amount, duration, commentator_user_id);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (ref_no) {
+      testPurchase();
+    }
+  }, [ref_no]);
 
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState([]);

@@ -1533,6 +1533,17 @@ class DeactivateProfile(APIView):
 
 
 class HighlightPurchaseView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        
+        print("request.query_param.get('id', None): ", request.query_params.get('id', None))
+        if request.query_params.get('id', None) != None:
+            user = User.objects.get(id=request.query_params.get('id'))
+            if Highlight.objects.filter(user=user,status='active').exists():
+                return Response({'data':'Your highlight plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'data' : 'Highlight purchase request'}, status=status.HTTP_200_OK)
+        return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
+    
     def post(self, request, format=None, *args, **kwargs):
         """
         if highlight purchase sucessfull then below code work
@@ -6082,7 +6093,7 @@ class PaymentView(APIView):
                 "MERCHANT": os.environ.get('MERCHANT'),
                 "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
                 "ORDER_REF_NUMBER": ref_no,
-                "ORDER_AMOUNT": "1",
+                "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
                 "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
             },

@@ -73,17 +73,23 @@ const PromoteMeModal = (props) => {
       try {
         setIsLoading(true);
 
-        const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
-          payment: "highlight",
-          duration: selectedPlan,
-          amount: money,
-          id: userId,
-        });
-        console.log(payment_res, "==========payment_res");
+        const checkHighlightPlan = await axios.get(
+          `${config.apiUrl}/highlight-purchase/?id=${userId}`
+        );
 
-        if (payment_res.status === 200) {
-          const url = payment_res?.data?.URL_3DS;
-          window.location.replace(url);
+        if (checkHighlightPlan?.status === 200) {
+          const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+            payment: "highlight",
+            duration: selectedPlan,
+            amount: money,
+            id: userId,
+          });
+          console.log(payment_res, "==========payment_res");
+
+          if (payment_res.status === 200) {
+            const url = payment_res?.data?.URL_3DS;
+            window.location.replace(url);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -132,6 +138,10 @@ const PromoteMeModal = (props) => {
           backdrop: false,
           customClass:
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        }).then((res) => {
+          if (res.isConfirmed) {
+            window.location.replace("/");
+          }
         });
       }
     } catch (error) {
