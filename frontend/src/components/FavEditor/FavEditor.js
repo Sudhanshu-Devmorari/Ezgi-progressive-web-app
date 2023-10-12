@@ -75,6 +75,7 @@ const FavEditor = (props) => {
 
   // check activation
   const checkDeactivation = async (value, is_subscribe) => {
+    console.log(value,"===>>value")
     try {
       const res = await axios.get(
         `${config.apiUrl}/check-deactivated-account/${userId}`
@@ -290,7 +291,7 @@ const FavEditor = (props) => {
                         <button
                           onClick={() => {
                             checkDeactivation(
-                              res?.commentator_user,
+                              res?.data?.commentator_user,
                               res?.is_subscribe
                             );
                           }}

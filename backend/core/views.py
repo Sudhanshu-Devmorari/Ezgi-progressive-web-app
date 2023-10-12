@@ -681,17 +681,11 @@ class CommentView(APIView):
 
 
 class SubscriptionView(APIView):
-    """
-    Standard user purchase the NEW Subscription to view commentator post:
-    """
-    def post(self, request, id, format=None, *args, **kwargs):
-        """
-        Subscription purchase logic here, if purchase is successful, below code runs.
-        """
+
+    def patch(self, request, id):
         try:
             user = User.objects.get(id=id)
-            commentator = User.objects.get(id=request.data.get('commentator_id')) 
-            
+            commentator = User.objects.get(id=request.query_params.get('commentator_id')) 
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
                 subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
@@ -706,6 +700,27 @@ class SubscriptionView(APIView):
                         status=False, context=f'{user.username}, subscription has been terminated due to non-renewal.', 
                     )
                 return Response({'data':'Your subscription plan has been canceled.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'data':'Your subscription plan is not active'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'data': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+
+    """
+    Standard user purchase the NEW Subscription to view commentator post:
+    """
+    def post(self, request, id, format=None, *args, **kwargs):
+        """
+        Subscription purchase logic here, if purchase is successful, below code runs.
+        """
+        try:
+            user = User.objects.get(id=id)
+            commentator = User.objects.get(id=request.data.get('commentator_id')) 
+
+            is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
+            if is_subscription:
+                return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_200_OK)
             
             # if not BankDetails.objects.filter(user=commentator).exists():
             #     return Response({'data':f'You can not purchase the subscription for {commentator.username} because editor does not provide bank detail.'}, status=status.HTTP_200_OK)
@@ -6125,15 +6140,7 @@ class PaymentView(APIView):
         id = request.data.get('id', None)
         duration = request.data.get('duration', None)
         money = request.data.get('amount', None)
-
-        print("********", request.data.get('category', None))
-        category = request.data.get('category', None)
-        experience = request.data.get('experience', None)
-        profile_pic = request.data.get('profile_pic', None)
-        profile_file = request.data.get('profile_file', None)
-        print("********", request.data.get('experience', None))
-        print("********", request.data.get('profile_pic', None))
-        print("********", request.data.get('profile_file', None))
+        commentator_username = request.data.get('commentator_username', None)
 
         if 'highlight' in request.data['payment']:
 
@@ -6152,117 +6159,66 @@ class PaymentView(APIView):
 
         if 'withdrawal' in request.data['payment']:
             pass
+
+        data = {
+            "Config": {
+                "MERCHANT": os.environ.get('MERCHANT'),
+                "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                "ORDER_REF_NUMBER": ref_no,
+                "ORDER_AMOUNT": money,
+                "PRICES_CURRENCY": "TRY",
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+            },
+            "Customer": {
+                "FIRST_NAME": "Firstname",
+                "LAST_NAME": "Lastname",
+                "MAIL": "destek@esnekpos.com",
+                "PHONE": "05435434343",
+                "CITY": "İstanbul",
+                "STATE": "Kağıthane",
+                "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+            },
+            "Product": [
+                {
+                    "PRODUCT_ID": id,
+                    "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                    "PRODUCT_CATEGORY": request.data['payment'],
+                    "PRODUCT_DESCRIPTION": commentator_username if commentator_username != None  else "Ürün Açıklaması",
+                    "PRODUCT_AMOUNT": money
+                }
+            ]
+        }
         
-        if 'membership' in request.data['payment']:
-
-            if 'id' not in request.data:
-                raise KeyError('Commentator Id not found.')
-            if 'duration' not in request.data:
-                raise KeyError('Duration not found.')
-            if 'amount' not in request.data:
-                raise KeyError('Amount not found.')           
-
-            # if duration not in ["1 Week", "2 Week", "1 Month"]:
-            #     raise ValueError('Invalid duration.')
-        if 'membership' in request.data['payment']:
-            data = {
-                "Config": {
-                    "MERCHANT": os.environ.get('MERCHANT'),
-                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
-                    "ORDER_REF_NUMBER": ref_no,
-                    "ORDER_AMOUNT": money,
-                    "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                },
-                "Customer": {
-                    "FIRST_NAME": "Firstname",
-                    "LAST_NAME": "Lastname",
-                    "MAIL": "destek@esnekpos.com",
-                    "PHONE": "05435434343",
-                    "CITY": "İstanbul",
-                    "STATE": "Kağıthane",
-                    "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
-                },
-                "Product": [
-                    {
-                        "PRODUCT_ID": id,
-                        "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
-                        "PRODUCT_CATEGORY": request.data['payment'],
-                        "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
-                        "PRODUCT_AMOUNT": money,
-                    },
-                    {
-                        "PRODUCT_ID" : "1",
-                        "PRODUCT_NAME" : experience,
-                        "PRODUCT_CATEGORY" : category,
-                        "PRODUCT_DESCRIPTION" : profile_pic,
-                        "PRODUCT_AMOUNT" : profile_file,
-                    }
-                ]
-            }
-
-            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
-            response = requests.post(url, json=data)
-            json_data = response.json()
-            if json_data['RETURN_CODE'] == '0':
-                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
-        
-            else:
-                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+        url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+        response = requests.post(url, json=data)
+        json_data = response.json()
+        print()
+        print()
+        print('json_data: ', json_data)
+        print()
+        print()
+       
+        if json_data['RETURN_CODE'] == '0':
+            return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
         
         else:
-            data = {
-                "Config": {
-                    "MERCHANT": os.environ.get('MERCHANT'),
-                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
-                    "ORDER_REF_NUMBER": ref_no,
-                    "ORDER_AMOUNT": money,
-                    "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                },
-                "Customer": {
-                    "FIRST_NAME": "Firstname",
-                    "LAST_NAME": "Lastname",
-                    "MAIL": "destek@esnekpos.com",
-                    "PHONE": "05435434343",
-                    "CITY": "İstanbul",
-                    "STATE": "Kağıthane",
-                    "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
-                },
-                "Product": [
-                    {
-                        "PRODUCT_ID": id,
-                        "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
-                        "PRODUCT_CATEGORY": request.data['payment'],
-                        "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
-                        "PRODUCT_AMOUNT": money,
-                    },
-                ]
-            }
-
-            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
-            response = requests.post(url, json=data)
-            json_data = response.json()
-            if json_data['RETURN_CODE'] == '0':
-                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
-            
-            else:
-                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
 
 class CheckTransactionEnquiry(APIView):
     def post(self, request):
+        print()
+        print()
         ref_no = request.data.get('ref_no', None)
+        print('ref_no: ', ref_no)
         if ref_no != None:
             url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
             data = {
-                    "MERCHANT": "TEST1234" , 
-                    "MERCHANT_KEY": "4oK26hK8MOXrIV1bzTRVPA==" ,
-                    "ORDER_REF_NUMBER" : f"{ref_no}" 
+                    "MERCHANT": os.environ.get('MERCHANT'),
+                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                    "ORDER_REF_NUMBER" : ref_no
                     }
             response = requests.post(url, json=data)
             json_data = response.json()
-            print()
-            print()
             print('json_data: ', json_data)
             print()
             print()

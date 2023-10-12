@@ -123,6 +123,7 @@ const PromoteMeModal = (props) => {
     }
   };
 
+  // Save the highlight entry to DB when successful payment is received
   const promoteMeEntry = async (amount, duration) => {
     try {
       const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
@@ -148,7 +149,7 @@ const PromoteMeModal = (props) => {
       console.log(error);
     }
   };
-
+  // check the successful payment request
   const ref_no = ref();
   useEffect(() => {
     async function testPurchase() {
