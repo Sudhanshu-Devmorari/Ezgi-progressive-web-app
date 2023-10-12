@@ -15,6 +15,7 @@ const CommentsManagementPage = (props) => {
   const [data, setData] = useState({});
   const [mostLike, setMostLike] = useState([]);
   const [commentData, setCommentData] = useState([]);
+  const [commentFilterData, setCommentFilterData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState("All");
   const [cookies, setCookie, removeCookie] = useCookies();
@@ -35,8 +36,10 @@ const CommentsManagementPage = (props) => {
         setMostLike(res?.data?.most_like);
         if (props.commentData === true) {
           setCommentData(res.data.new_comment);
+          setCommentFilterData(res.data.new_comment);
         } else {
           setCommentData(res.data.all_comment);
+          setCommentFilterData(res.data.all_comment);
         }
         setIsLoading(false);
       })
@@ -137,6 +140,9 @@ const CommentsManagementPage = (props) => {
                   selectedOption={selectedOption}
                   setSelectedOption={setSelectedOption}
                   setCommentData={setCommentData}
+                  setCommentFilterData={setCommentFilterData}
+                  commentFilterData={commentFilterData}
+                  commentManagementApiData={commentManagementApiData}
                 />
               </div>
               <div className="col-4">

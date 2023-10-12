@@ -30,6 +30,8 @@ import initialProfile from "../../assets/profile.png";
 import { useCookies } from "react-cookie";
 
 const CommentsManagement = (props) => {
+  const { commentFilterData, setCommentFilterData, commentManagementApiData } =
+    props;
   const [fData, setFdata] = useState({});
   const [status, setStatus] = useState("");
   const [secondStatus, setSecondStatus] = useState("");
@@ -50,7 +52,7 @@ const CommentsManagement = (props) => {
   const [DateValue, setDateValue] = useState([]);
   const [MatchdetailsValue, setMatchdetailsValue] = useState([]);
 
-  const [displayUser, setDisplayUser] = useState(props?.commentData);
+  const [displayUser, setDisplayUser] = useState([]);
   useEffect(() => {
     setTimeout(() => {
       setDataloading(false);
@@ -142,29 +144,39 @@ const CommentsManagement = (props) => {
         removeCookie("admin-user-id");
         // window.location.reload();
       }
-      // window.location.reload();
+      window.location.reload();
       // props.setCommentData(props?.commentData)
       // setDisplayUser(displayUser)
-      filterData(props.selectedOption);
+      // filterData(props.selectedOption);
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
     }
   };
 
-  const filterData = (e) => {
-    setDataloading(true);
-    const val = e == "Published" ? "Approve" : e;
-    // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
-    const filteredArray = displayUser?.filter(
-      (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
-    );
-    console.log("filtered::::::", filteredArray);
-    setTimeout(() => {
-      setDisplayUser(val == "All" ? props?.commentData : filteredArray);
-      setDataloading(false);
-    }, 500);
-  };
+  // const filterData = (e) => {
+  //   setDataloading(true);
+  //   const val = e == "Published" ? "Approve" : e;
+  //   console.log("value:::::::::::", val);
+  //   // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
+  //   const filteredArray =
+  //     commentFilterData &&
+  //     commentFilterData?.filter(
+  //       (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
+  //     );
+
+  //   console.log(
+  //     "filterdata:::::::::::::",
+  //     commentFilterData?.filter(
+  //       (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
+  //     )
+  //   );
+  //   console.log("filtered::::::", filteredArray);
+  //   setTimeout(() => {
+  //     setCommentFilterData(val == "All" ? props?.commentData : filteredArray);
+  //     setDataloading(false);
+  //   }, 500);
+  // };
 
   const [cities, setCities] = useState([]);
 
@@ -446,7 +458,7 @@ const CommentsManagement = (props) => {
           selectedOption={props.selectedOption}
           setSelectedOption={props.setSelectedOption}
           setDataloading={setDataloading}
-          filterData={filterData}
+          // filterData={filterData}
         />
         {props?.isLoading || dataloading ? (
           <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
@@ -454,7 +466,7 @@ const CommentsManagement = (props) => {
           </div>
         ) : (
           <>
-            {displayUser.length == 0 ? (
+            {displayUser && displayUser.length == 0 ? (
               <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                 No Record Found!
               </div>
@@ -775,7 +787,7 @@ const CommentsManagement = (props) => {
                 </div>
                 <div className="d-flex justify-content-center my-2">
                   <button
-                    onClick={updateCommentApiData}
+                    onClick={() => updateCommentApiData()}
                     data-bs-dismiss="modal"
                     className="px-3 py-1"
                     style={{

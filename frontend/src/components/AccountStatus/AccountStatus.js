@@ -76,20 +76,14 @@ const AccountStatus = (props) => {
   const [selectSub, setSelectSub] = useState("journeyman");
   const [selectSubRangeData, setSelectSubRangeData] = useState("journeyman");
   const [values, setValues] = useState([0]);
+  const [rangeBarLoading, setRangeBarLoading] = useState(false);
 
   const STEP = 1;
   const MIN = 0;
   const MAX = 1000;
   function getEarnings(newValues, typeData) {
-    console.log("new Values:::::::::::::", newValues);
-    // console.log("selectSubRangeData:::::::::::::", selectSubRangeData);
-    console.log("typeData:::::::::::::", typeData);
-    // const type =
-    //   selectSubRangeData === "journeyman" ||
-    //   selectSubRangeData === "master" ||
-    //   selectSubRangeData === "grandmaster";
+    setRangeBarLoading(true);
 
-    // console.log("selectSubRangeData:::::::::::", type);
     if (typeData && newValues) {
       axios
         .get(
@@ -100,9 +94,11 @@ const AccountStatus = (props) => {
             console.log("total earning::::::", res.data.total_earning);
             setEarnings(res.data.total_earning);
           }
+          setRangeBarLoading(false);
         })
         .catch((error) => {
           console.log(error);
+          setRangeBarLoading(false);
         });
     }
   }
@@ -525,7 +521,7 @@ const AccountStatus = (props) => {
               }}
               onFinalChange={(newValues) => {
                 console.log("final function called");
-                getEarnings(newValues, selectSub);
+                getEarnings(newValues, selectSubRangeData);
               }}
               renderTrack={({ props, children }) => {
                 return (
@@ -599,7 +595,8 @@ const AccountStatus = (props) => {
                   }}
                 >
                   {" "}
-                  {earnings?.toFixed(0)}₺
+                  {rangeBarLoading ? "Loading..." : `${earnings?.toFixed(0)}₺`}
+                  {/* {earnings?.toFixed(0)}₺ */}
                 </span>
               </div>
             </div>
@@ -649,80 +646,70 @@ const AccountStatus = (props) => {
                     currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 }}
               >
-                {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
-                <>
-                  <div className="my-2 ms-2 d-flex flex-column">
-                    Membership Date : {props?.membershipDate}
+                <div className="my-2 ms-2 d-flex flex-column">
+                  Membership Date : {props?.membershipDate}
+                  <span>
+                    {" "}
+                    Active Plan :{" "}
+                    <span
+                      className="text-uppercase"
+                      style={{
+                        color: currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
+                      }}
+                    >
+                      {props?.commentator_level}
+                    </span>
+                  </span>
+                  {membershipData?.plan_price && (
                     <span>
+                      Membership Price : {membershipData?.plan_price}₺
+                    </span>
+                  )}
+                  {membershipEndDate && (
+                    <>Membership expiry : {membershipEndDate}</>
+                  )}
+                </div>
+                <div className="d-flex justify-content-end m-2">
+                  {daysLeft?.showRenewButton == true ? (
+                    <button
+                      onClick={() => {
+                        if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                        setModalShow(true);
+                      }}
+                      className="px-3"
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid  #D2DB08"
+                            : "1px solid #00659D",
+                        borderRadius: "3px",
+                        backgroundColor: "transparent",
+                      }}
+                    >
+                      Renew
+                    </button>
+                  ) : (
+                    <span className="text-end">
                       {" "}
-                      Active Plan :{" "}
                       <span
-                        className="text-uppercase"
                         style={{
                           color:
                             currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
                         }}
                       >
-                        {props?.commentator_level}
-                      </span>
+                        {daysLeft?.daysRemaining} days are left{" "}
+                      </span>{" "}
+                      for the next plan payment date
                     </span>
-                    {membershipData?.plan_price && (
-                      <span>
-                        Membership Price : {membershipData?.plan_price}₺
-                      </span>
-                    )}
-                    {membershipEndDate && (
-                      <>Membership expiry : {membershipEndDate}</>
-                    )}
-                  </div>
-                  <div className="d-flex justify-content-end m-2">
-                    {daysLeft?.showRenewButton == true ? (
-                      <button
-                        onClick={() => {
-                          if (
-                            JSON.parse(localStorage.getItem("user-active")) ==
-                            false
-                          ) {
-                            errorSwal();
-                            return;
-                          }
-                          setModalShow(true);
-                        }}
-                        className="px-3"
-                        style={{
-                          color:
-                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid  #D2DB08"
-                              : "1px solid #00659D",
-                          borderRadius: "3px",
-                          backgroundColor: "transparent",
-                        }}
-                      >
-                        Renew
-                      </button>
-                    ) : (
-                      <span className="text-end">
-                        {" "}
-                        <span
-                          style={{
-                            color:
-                              currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
-                          }}
-                        >
-                          {daysLeft?.daysRemaining} days are left{" "}
-                        </span>{" "}
-                        for the next plan payment date
-                      </span>
-                    )}
-                  </div>
-                </>
-                {/* ) : (
-                  <span className="d-flex align-items-center justify-content-center h-100">
-                    No Membership found!
-                  </span>
-                )} */}
+                  )}
+                </div>
               </div>
             </div>
           </div>

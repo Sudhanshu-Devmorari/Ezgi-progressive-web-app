@@ -22,19 +22,19 @@ const CommentsManagementFilter = (props) => {
     props.setDisplayUser(val == "" ? props?.commentData : filteredArray);
   };
 
-  // const filterData = (e) => {
-  //   props?.setDataloading(true);
-  //   const val = e == "Published" ? "Approve" : e;
-  //   // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
-  //   const filteredArray = props?.commentData.filter(
-  //     (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
-  //   );
-  //   console.log("filtered::::::", filteredArray);
-  //   setTimeout(() => {
-  //     props.setDisplayUser(val == "All" ? props?.commentData : filteredArray);
-  //     props?.setDataloading(false);
-  //   }, 500);
-  // };
+  const filterData = (e) => {
+    props?.setDataloading(true);
+    const val = e == "Published" ? "Approve" : e;
+    // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
+    const filteredArray = props?.commentData.filter(
+      (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
+    );
+    console.log("filtered::::::", filteredArray);
+    setTimeout(() => {
+      props.setDisplayUser(val == "All" ? props?.commentData : filteredArray);
+      props?.setDataloading(false);
+    }, 500);
+  };
 
   return (
     <>
@@ -45,7 +45,7 @@ const CommentsManagementFilter = (props) => {
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
             <input
-              onChange={filterCommentData}
+              onChange={(e) => filterCommentData(e)}
               type="text"
               className="input-field-dark"
             />
@@ -97,7 +97,8 @@ const CommentsManagementFilter = (props) => {
                   style={{ backgroundColor: "#0D2A53", width: "6.9rem" }}
                   onClick={(e) => {
                     handleOptionClick(option);
-                    props.filterData(option);
+                    // props.filterData(option);
+                    filterData(option);
                   }}
                 >
                   {option}
