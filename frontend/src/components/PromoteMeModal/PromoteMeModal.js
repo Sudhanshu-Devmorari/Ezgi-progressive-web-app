@@ -19,7 +19,7 @@ import config from "../../config";
 import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
-import { ref } from "../GetRefNo";
+import { ref, transcationQueryAPI } from "../GetRefNo";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
@@ -117,20 +117,14 @@ const PromoteMeModal = (props) => {
     }
   };
 
-  const promoteMeEntry = async () => {
-    const money =
-      (selectedPlan === "1 Month" && highlightPlan?.month_1) ||
-      (selectedPlan === "1 Week" && highlightPlan?.week_1) ||
-      (selectedPlan === "2 Week" && highlightPlan?.week_2);
+  const promoteMeEntry = async (amount, duration) => {
     try {
       const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
-        duration: selectedPlan,
-        amount: money,
+        duration: duration,
+        amount: amount,
         id: userId,
       });
       if (res?.status === 200) {
-        // setIsLoading(false);
-        // props.onHide();
         Swal.fire({
           title: "Success",
           text: `You've successfully purchase highlight.`,
@@ -148,18 +142,19 @@ const PromoteMeModal = (props) => {
   const ref_no = ref();
   useEffect(() => {
     async function testPurchase() {
-      console.log(ref_no,"================>>>ref_no")
       try {
-        const purchase_res = await axios.post(
-          `${config.paymentURL}/api/services/ProcessQuery`, {
-            "MERCHANT": "TEST1234" , 
-            "MERCHANT_KEY": "4oK26hK8MOXrIV1bzTRVPA==" ,
-            "ORDER_REF_NUMBER" : ref_no 
+        const result = await transcationQueryAPI(ref_no);
+        if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+          console.log("payment succesffull");
+          const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+          if (category === "highlight") {
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
+            const amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
+            promoteMeEntry(amount, duration);
           }
-        );
-        console.log(purchase_res, "==============>>>>>purchase_res*********************");
+        }
       } catch (error) {
-        console.log(error, '=====purchase error');
+        console.log(error);
       }
     }
     if (ref_no) {

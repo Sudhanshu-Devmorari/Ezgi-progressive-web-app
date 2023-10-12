@@ -41,6 +41,31 @@ const SubscribeModal = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const subcriptionEntry = async (amount, duration, commentator_user_id) => {
+    try {
+      const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
+        duration: duration,
+        money: amount,
+        commentator_id: commentator_user_id,
+      });
+      if (res?.status === 200) {
+        setIsLoading(false);
+        await Swal.fire({
+          title: "Success",
+          text: `You've subscribe to ${commentatorUser?.username}`,
+          icon: "sucess",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          timer: 2000,
+        });
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSubscription = async () => {
     if (selectCheckBox && selectedPlan) {
       setValidationError("");
@@ -51,28 +76,27 @@ const SubscribeModal = (props) => {
         (selectedPlan === "6 Month" && subscriptionPlan?.month_6);
       try {
         setIsLoading(true);
-        const res = await axios.post(
-          `${config.apiUrl}/subscription/${userId}/`,
-          {
-            duration: selectedPlan,
-            money: money,
-            commentator_id: commentatorUser?.id,
-          }
-        );
-        if (res?.status === 200) {
-          setIsLoading(false);
-          // props.onHide();
-          await Swal.fire({
-            title: "Success",
-            text: `You've subscribe to ${commentatorUser?.username}`,
-            icon: "sucess",
-            backdrop: false,
-            customClass:
-              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-            timer: 2000,
-          });
-          window.location.reload();
-        }
+        // const res = await axios.post(
+        //   `${config.apiUrl}/subscription/${userId}/`,
+        //   {
+        //     duration: selectedPlan,
+        //     money: money,
+        //     commentator_id: commentatorUser?.id,
+        //   }
+        // );
+        // if (res?.status === 200) {
+        //   setIsLoading(false);
+        //   await Swal.fire({
+        //     title: "Success",
+        //     text: `You've subscribe to ${commentatorUser?.username}`,
+        //     icon: "sucess",
+        //     backdrop: false,
+        //     customClass:
+        //       currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        //     timer: 2000,
+        //   });
+        //   window.location.reload();
+        // }
       } catch (error) {
         console.log(error);
         if (error?.response?.status === 500) {

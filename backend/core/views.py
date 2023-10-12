@@ -4677,24 +4677,23 @@ class SportsStatisticsView(APIView):
             user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
             total_user_cmt = user_all_cmt.count()
             
-            # p_type_lst = [obj.prediction_type for obj in user_all_cmt]
-
-            # prediction_type_counts = Counter(p_type_lst)
-
-            # top_3_prediction_types = prediction_type_counts.most_common(3)
-
-            # top_3_prediction_types = [prediction[0] for prediction in top_3_prediction_types]
             top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             prediction_types_data = []
             for i in top_3_prediction_types:
                 predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Basketbol', status='approve', is_resolve=True).count()
 
-                cal = (predict_type / total_user_cmt)* 100
-                data ={
-                    "prediction_type":i,
-                    "calculation":round(cal, 2)
-                }
+                if total_user_cmt > 0:
+                    cal = (predict_type / total_user_cmt)* 100 
+                    data ={
+                        "prediction_type":i,
+                        "calculation":round(cal, 2)
+                    }
+                else:
+                    data ={
+                        "prediction_type":i,
+                        "calculation": 0
+                    }
                 prediction_types_data.append(data)
 
             if total_user_cmt == 0:
@@ -4717,18 +4716,16 @@ class SportsStatisticsView(APIView):
                                 Q(is_resolve=True) &
                                 (Q(is_prediction=True) | Q(is_prediction=False))
                             ).order_by('-created')[:20]
+            
+            correct_prediction_basketball = 0
+
             for obj in recent_30_comments:
                 Comments_Journey_basketball.append(obj.is_prediction)
+                if obj.is_prediction:
+                    correct_prediction_basketball += 1
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            correct_prediction_basketball = Comments.objects.filter(
-                                            commentator_user__id=id,  
-                                            is_prediction=True, 
-                                            category__icontains='Basketbol', 
-                                            status='approve'
-                                        ).order_by('-created')[:20]
-
-            basketball_calculation = (len(correct_prediction_basketball)/20)*100
+            basketball_calculation = (correct_prediction_basketball/20)*100
             details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
@@ -4753,8 +4750,6 @@ class SportsStatisticsView(APIView):
             result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
 
 
-            # basketball_counter = Counter(basketball_Leagues)
-            # basketball_most_common_duplicates = [item for item, count in basketball_counter.most_common() if count >= 1][:8]
             details['basketball_Leagues'] = result
             details['basketball_comment_types'] = prediction_types_data
             datalist.append(details)
@@ -4767,14 +4762,7 @@ class SportsStatisticsView(APIView):
             Comments_Journey_football = []
             fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             fb_total_user_cmt = fb_user_all_cmt.count()
-            
-            # fb_p_type_lst = [obj.prediction_type for obj in fb_user_all_cmt]
 
-            # fb_prediction_type_counts = Counter(fb_p_type_lst)
-
-            # fb_top_3_prediction_types = fb_prediction_type_counts.most_common(3)
-
-            # fb_top_3_prediction_types = [prediction[0] for prediction in fb_top_3_prediction_types]
             fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             fb_prediction_types_data = []
@@ -4807,19 +4795,15 @@ class SportsStatisticsView(APIView):
                                     Q(is_resolve=True) &
                                     (Q(is_prediction=True) | Q(is_prediction=False))
                                 ).order_by('-created')[:20]
-            
+
+            correct_prediction_football = 0
             for obj in fb_recent_30_comments:
                 Comments_Journey_football.append(obj.is_prediction)
+                if obj.is_prediction:
+                    correct_prediction_football += 1
             Fb_details['Comments_Journey_football'] = Comments_Journey_football
 
-            correct_prediction_football = Comments.objects.filter(
-                                        commentator_user__id=id, 
-                                        is_prediction=True, 
-                                        category__icontains='Futbol', 
-                                        status='approve'
-                                    ).order_by('-created')[:20]
-
-            football_calculation = (len(correct_prediction_football)/20)*100
+            football_calculation = (correct_prediction_football/20)*100
             Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
@@ -5595,7 +5579,7 @@ class BankDetailsView(APIView):
                 adminuser = User.objects.get(id=adminuser_id)
                 
                 if adminuser.is_delete == True:
-                        return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
                 if user.user_role == 'commentator':
@@ -6071,6 +6055,10 @@ class PaymentView(APIView):
         print()
         print('ref_no: ', ref_no)
 
+        id = request.data.get('id', None)
+        duration = request.data.get('duration', None)
+        money = request.data.get('amount', None)
+
         if 'highlight' in request.data['payment']:
 
             if 'id' not in request.data:
@@ -6078,14 +6066,16 @@ class PaymentView(APIView):
             if 'duration' not in request.data:
                 raise KeyError('Duration not found.')
             if 'amount' not in request.data:
-                raise KeyError('Amount not found.')
-            
-            id = request.data.get('id', None)
-            duration = request.data.get('duration')
-            money = request.data.get('amount')
+                raise KeyError('Amount not found.')           
 
             if duration not in ["1 Week", "2 Week", "1 Month"]:
                 raise ValueError('Invalid duration.')
+        
+        if 'subscription' in request.data['payment']:
+            pass
+
+        if 'withdrawal' in request.data['payment']:
+            pass
 
         data = {
             "Config": {
@@ -6108,8 +6098,8 @@ class PaymentView(APIView):
             "Product": [
                 {
                     "PRODUCT_ID": id,
-                    "PRODUCT_NAME": duration,
-                    "PRODUCT_CATEGORY": "highlight",
+                    "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                    "PRODUCT_CATEGORY": request.data['payment'],
                     "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
                     "PRODUCT_AMOUNT": money
                 }
@@ -6125,6 +6115,28 @@ class PaymentView(APIView):
         
         else:
             return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+
+class CheckTransactionEnquiry(APIView):
+    def post(self, request):
+        ref_no = request.data.get('ref_no', None)
+        if ref_no != None:
+            url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
+            data = {
+                    "MERCHANT": "TEST1234" , 
+                    "MERCHANT_KEY": "4oK26hK8MOXrIV1bzTRVPA==" ,
+                    "ORDER_REF_NUMBER" : "MQrt75" 
+                    }
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            print()
+            print()
+            print('json_data: ', json_data)
+            print()
+            print()
+            print()
+            return Response({'data' : json_data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'data' : 'Ref number not found!'}, status=status.HTTP_404_NOT_FOUND)
 
 class ViewAllTicketHistory(APIView):
     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
