@@ -462,7 +462,7 @@ const CommentsManagement = (props) => {
               displayUser?.map((res, index) => (
                 <MainDiv key={index}>
                   <div className="col-3 d-flex align-items-center cursor">
-                    <span className="pe-1">{`# ${(index + 1)
+                    <span className="pe-1">{`# ${(displayUser.length - index)
                       .toString()
                       .padStart(4, "0")}`}</span>
                     <div className="position-relative">

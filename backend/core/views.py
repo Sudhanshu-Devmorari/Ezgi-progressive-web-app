@@ -2283,13 +2283,28 @@ class CommentsManagement(APIView):
             else:
                 return Response({"error": "No comments with likes found."}, status=status.HTTP_404_NOT_FOUND)
                 
-        previous_day = datetime.now() - timedelta(days=1)
-        new_comment = Comments.objects.filter(status='pending',created__gte=previous_day, created__lt=datetime.now())
-        # today = date.today()
-        # new_comment = Comments.objects.filter(status='pending',created__date=today)
+        # previous_day = datetime.now() - timedelta(days=1)
+        # new_comment = Comments.objects.filter(status='pending',created__gte=previous_day, created__lt=datetime.now())
+        today = date.today()
+        new_comment = Comments.objects.filter(status='pending',created__date=today)
+        daily_win_count = Comments.objects.filter(created__date=today, is_prediction=True).count()
+        daily_lose_count = Comments.objects.filter(created__date=today, is_prediction=False).count()
+
+        total_all_comment = Comments.objects.all().count()
+        management['total_all_comment'] = total_all_comment
+
+        total_all_win_comment = Comments.objects.filter(is_prediction=True).count()
+        management['total_all_win_comment'] = total_all_win_comment
+
+        total_all_lose_comment = Comments.objects.filter(is_prediction=False).count()
+        management['total_all_lose_comment'] = total_all_lose_comment
+
+
         management['new_comment'] = CommentsSerializer(new_comment, many=True).data
 
-        management['comments_count'] = comments_count
+        management['comments_count'] = new_comment.count()
+        management['comments_win'] = daily_win_count
+        management['comments_lose'] = daily_lose_count
         management['all_comment'] = serializer1.data
         management['most_like'] = commentator
         return Response(data=management, status=status.HTTP_200_OK)

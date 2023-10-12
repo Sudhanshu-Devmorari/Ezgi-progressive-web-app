@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { HiArrowSmDown, HiArrowSmUp } from "react-icons/hi";
 import "./NewUsers.css";
 
 const NewUsers = (props) => {
   // console.log("props:::::::::::::", props);
+  const [totalWin,setTotalWin] = useState();
+  const [totalLose,setTotalLose] = useState();
   const newArray = props.array;
   const totalArray = props?.totalArray;
+  // const totalLose = props?.totalLose
+    // const totalWin = props?.totalWin
+  useEffect(() => {
+    setTotalWin(props?.totalWin)
+    setTotalLose(props?.totalLose)
+  }, [props?.totalLose,props?.totalWin]);
 
   return (
     <>
@@ -79,7 +87,7 @@ const NewUsers = (props) => {
               >
                 <div className="">
                   <span className="rate-font">
-                    9.845{" "}
+                    {totalWin? totalWin : totalArray.rateWin}{" "}
                     <span className="rate-font" style={{ color: "#58DEAA" }}>
                       %22
                       <HiArrowSmUp
@@ -91,7 +99,7 @@ const NewUsers = (props) => {
                 </div>
                 <div className="">
                   <span className="rate-font">
-                    9.845{" "}
+                    {totalLose ? totalLose : totalArray.rateLose}{" "}
                     <span className="rate-font" style={{ color: "#FF5757" }}>
                       %22
                       <HiArrowSmDown

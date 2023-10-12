@@ -14,6 +14,8 @@ import { useCookies } from "react-cookie";
 const CommentsManagementPage = (props) => {
   const [data, setData] = useState({});
   const [mostLike, setMostLike] = useState([]);
+  const [totalWin, setTotalWin] = useState([]);
+  const [totalLose, setTotalLose] = useState([]);
   const [commentData, setCommentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState("All");
@@ -38,6 +40,8 @@ const CommentsManagementPage = (props) => {
         } else {
           setCommentData(res.data.all_comment);
         }
+        setTotalWin(data.total_all_win_comment)
+        setTotalLose(data.total_all_lose_comment)
         setIsLoading(false);
       })
       .catch((error) => {
@@ -65,7 +69,7 @@ const CommentsManagementPage = (props) => {
     {
       label: "Winner",
       icon: winner,
-      count: "127",
+      count: `${data.comments_win}`,
       per: "22",
       color: "#58DEAA",
       rate_icon: "arrowUp",
@@ -75,7 +79,7 @@ const CommentsManagementPage = (props) => {
     {
       label: "Lose",
       icon: lose,
-      count: "127",
+      count: `${data.comments_lose}`,
       per: "22",
       color: "#FF5757",
       rate_icon: "arrowDown",
@@ -84,9 +88,9 @@ const CommentsManagementPage = (props) => {
   const totalArray = [
     {
       label: "Total",
-      count: "12.700",
-      rateWin: "9.845",
-      rateLose: "9.845",
+      count: `${data.total_all_comment}`,
+      rateWin: `${data.total_all_win_comment}`,
+      rateLose: `${data.total_all_lose_comment}`,
       perWin: "%22",
       perLose: "%22",
       color: "#FF5757",
@@ -126,7 +130,7 @@ const CommentsManagementPage = (props) => {
                 </div>
               </div>
               <div className="col-4">
-                <NewUsers totalArray={totalArray} isLoading={isLoading} />
+                <NewUsers totalWin={totalWin} totalLose={totalLose} totalArray={totalArray} isLoading={isLoading} />
               </div>
             </div>
             <div className="row g-0">
