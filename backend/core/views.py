@@ -1785,15 +1785,22 @@ class AdminMainPage(APIView):
             data_list['new_comment'] = new_comment
 
             cal_ = 0
+
             plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
             for obj in plan_sale_obj_cal:
-                cal_ += obj.money
+                if obj.money is not None:
+                    cal_ += obj.money
+
             subscription_obj_cal = Subscription.objects.filter(subscription=True, created__gte=previous_day, created__lt=datetime.now())
             for obj in subscription_obj_cal:
-                cal_ += obj.money
+                if obj.money is not None:
+                    cal_ += obj.money
+
             highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
             for obj in highlights_obj_cal:
-                cal_ += obj.money
+                if obj.money is not None:
+                    cal_ += obj.money
+
             data_list['daily'] = cal_
             data_list['daily_percentage'] = (sales_percentage + subscriptions_percentage + highlights_percentage) / 3
 
@@ -1869,10 +1876,23 @@ class UserManagement(APIView):
             data_list['new_subscriber'] = new_subscriber
 
             # all_user = User.objects.filter(is_delete=False).order_by('-created')
+            user_data = []
             all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
-            serializer = UserSerializer(all_user, many=True)
-            data = serializer.data
-            data_list['users_list'] = data
+            for obj in all_user:
+                serializer = UserSerializer(obj).data
+                if GiftSubscription.objects.filter(user__username=obj.username).exists():
+                    gift_obj = GiftSubscription.objects.filter(user=obj).order_by('-created').first()
+                    serializer['subscription'] = True
+                    serializer['duration'] = gift_obj.duration
+                    serializer['number'] = gift_obj.editor_count
+                    serializer['level'] = gift_obj.editor_level
+                    
+                user_data.append(serializer)
+
+                    
+            # serializer = UserSerializer(all_user, many=True)
+            # data = serializer.data
+            data_list['users_list'] = user_data
 
             all_notification = Notification.objects.all().exclude(admin_context = None).order_by('-created')
             serializer1 = NotificationSerializer(all_notification, many=True)
@@ -1935,13 +1955,13 @@ class UserManagement(APIView):
                 gift_obj = GiftSubscription.objects.create(user=user_obj, duration=duration, editor_count=number, editor_level=editor_level)
                 gift_obj.save()
                 
-
-            user_obj = User.objects.create(profile_pic=profile,
-                name=name, username=username, phone=phone,
-                password=password, gender=gender, age=age
-            )
-            # user_obj.set_password(password)
-            user_obj.save()
+            else:
+                user_obj = User.objects.create(profile_pic=profile,
+                    name=name, username=username, phone=phone,
+                    password=password, gender=gender, age=age
+                )
+                # user_obj.set_password(password)
+                user_obj.save()
 
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -2019,27 +2039,44 @@ class UserManagement(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
+
+            if request.data.get('duration').lower() == 'undefined':
+                return Response({'error': 'Duration is not defined for free subscription.'}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data.get('number').lower() == 'undefined':
+                return Response({'error': "Number of editor's is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+            if request.data.get('level').lower() == 'undefined':
+                return Response({'error': "Editor's level is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+
             duration = request.data.get('duration')
-            start_date = datetime.now()
-            if duration == "1 Month":
-                end_date = start_date + timedelta(days=30)
-            if duration == "3 Month":
-                end_date = start_date + timedelta(days=90)
-            if duration == "6 Month":
-                end_date = start_date + timedelta(days=180)
+            number = request.data.get('number')
+            editor_level = request.data.get('level')
+
+            if editor_level.lower() == 'expert':
+                editor_level = 'master'
+            else:
+                editor_level = request.data.get('level').lower()
+                
+            # duration = request.data.get('duration')
+            # start_date = datetime.now()
+            # if duration == "1 Month":
+            #     end_date = start_date + timedelta(days=30)
+            # if duration == "3 Month":
+            #     end_date = start_date + timedelta(days=90)
+            # if duration == "6 Month":
+            #     end_date = start_date + timedelta(days=180)
             
-            editor_obj = BecomeCommentator.objects.create(user=user, duration=duration, status='active', commentator=True, end_date=end_date)
-            editor_obj.save()
-            if editor_obj != None:
-                if DataCount.objects.filter(id=1).exists():
-                    obj = DataCount.objects.get(id=1)
-                    obj.editor += 1
-                    obj.save()
-                else:
-                    obj = DataCount.objects.create(editor=1)
-            serializer = BecomeCommentatorSerializer(editor_obj)
-            data = serializer.data
-            return Response(data=data, status=status.HTTP_200_OK)
+            # editor_obj = BecomeCommentator.objects.create(user=user, duration=duration, status='active', commentator=True, end_date=end_date)
+            # editor_obj.save()
+            # if editor_obj != None:
+            #     if DataCount.objects.filter(id=1).exists():
+            #         obj = DataCount.objects.get(id=1)
+            #         obj.editor += 1
+            #         obj.save()
+            #     else:
+            #         obj = DataCount.objects.create(editor=1)
+            # serializer = BecomeCommentatorSerializer(editor_obj)
+            # data = serializer.data
+            # return Response(data=data, status=status.HTTP_200_OK)
 
             
     def delete(self, request, pk, format=None, *args, **kwargs):
@@ -2248,6 +2285,8 @@ class CommentsManagement(APIView):
                 
         previous_day = datetime.now() - timedelta(days=1)
         new_comment = Comments.objects.filter(status='pending',created__gte=previous_day, created__lt=datetime.now())
+        # today = date.today()
+        # new_comment = Comments.objects.filter(status='pending',created__date=today)
         management['new_comment'] = CommentsSerializer(new_comment, many=True).data
 
         management['comments_count'] = comments_count
@@ -4970,6 +5009,23 @@ class BecomeEditorEarnDetailsview(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class BecomeEditorView(APIView):
+    def get(self, request, *args, **kwargs):
+        if request.query_params.get('id', None) != None:
+            user = User.objects.get(id=request.query_params.get('id'))
+            if BecomeCommentator.objects.filter(user=user,status='active').exists():
+                return Response({'data':'Your Membership plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if MembershipSetting.objects.filter(commentator_level = 'apprentice').exists():
+                    obj = MembershipSetting.objects.get(commentator_level = 'apprentice')
+                    serializer = MembershipSettingSerializer(obj).data
+                    month = obj.promotion_duration.split(" ")[0]
+                    monthly_amount = float(int(obj.plan_price)/int(month))
+                    serializer['monthly_amount'] = monthly_amount
+                    return Response(data=serializer, status=status.HTTP_200_OK)
+                else:
+                    return Response({'data':'Membership setting not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
+    
     def patch(self, request, id, format=None, *args, **kwargs):
         """
         Payment gateway code here.
@@ -6070,6 +6126,15 @@ class PaymentView(APIView):
         duration = request.data.get('duration', None)
         money = request.data.get('amount', None)
 
+        print("********", request.data.get('category', None))
+        category = request.data.get('category', None)
+        experience = request.data.get('experience', None)
+        profile_pic = request.data.get('profile_pic', None)
+        profile_file = request.data.get('profile_file', None)
+        print("********", request.data.get('experience', None))
+        print("********", request.data.get('profile_pic', None))
+        print("********", request.data.get('profile_file', None))
+
         if 'highlight' in request.data['payment']:
 
             if 'id' not in request.data:
@@ -6087,45 +6152,102 @@ class PaymentView(APIView):
 
         if 'withdrawal' in request.data['payment']:
             pass
-
-        data = {
-            "Config": {
-                "MERCHANT": os.environ.get('MERCHANT'),
-                "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
-                "ORDER_REF_NUMBER": ref_no,
-                "ORDER_AMOUNT": money,
-                "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-            },
-            "Customer": {
-                "FIRST_NAME": "Firstname",
-                "LAST_NAME": "Lastname",
-                "MAIL": "destek@esnekpos.com",
-                "PHONE": "05435434343",
-                "CITY": "İstanbul",
-                "STATE": "Kağıthane",
-                "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
-            },
-            "Product": [
-                {
-                    "PRODUCT_ID": id,
-                    "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
-                    "PRODUCT_CATEGORY": request.data['payment'],
-                    "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
-                    "PRODUCT_AMOUNT": money
-                }
-            ]
-        }
         
-        url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
-        response = requests.post(url, json=data)
-        json_data = response.json()
-       
-        if json_data['RETURN_CODE'] == '0':
-            return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+        if 'membership' in request.data['payment']:
+
+            if 'id' not in request.data:
+                raise KeyError('Commentator Id not found.')
+            if 'duration' not in request.data:
+                raise KeyError('Duration not found.')
+            if 'amount' not in request.data:
+                raise KeyError('Amount not found.')           
+
+            # if duration not in ["1 Week", "2 Week", "1 Month"]:
+            #     raise ValueError('Invalid duration.')
+        if 'membership' in request.data['payment']:
+            data = {
+                "Config": {
+                    "MERCHANT": os.environ.get('MERCHANT'),
+                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                    "ORDER_REF_NUMBER": ref_no,
+                    "ORDER_AMOUNT": money,
+                    "PRICES_CURRENCY": "TRY",
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                },
+                "Customer": {
+                    "FIRST_NAME": "Firstname",
+                    "LAST_NAME": "Lastname",
+                    "MAIL": "destek@esnekpos.com",
+                    "PHONE": "05435434343",
+                    "CITY": "İstanbul",
+                    "STATE": "Kağıthane",
+                    "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+                },
+                "Product": [
+                    {
+                        "PRODUCT_ID": id,
+                        "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                        "PRODUCT_CATEGORY": request.data['payment'],
+                        "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
+                        "PRODUCT_AMOUNT": money,
+                    },
+                    {
+                        "PRODUCT_ID" : "1",
+                        "PRODUCT_NAME" : experience,
+                        "PRODUCT_CATEGORY" : category,
+                        "PRODUCT_DESCRIPTION" : profile_pic,
+                        "PRODUCT_AMOUNT" : profile_file,
+                    }
+                ]
+            }
+
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            if json_data['RETURN_CODE'] == '0':
+                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+        
+            else:
+                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
         
         else:
-            return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                "Config": {
+                    "MERCHANT": os.environ.get('MERCHANT'),
+                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                    "ORDER_REF_NUMBER": ref_no,
+                    "ORDER_AMOUNT": money,
+                    "PRICES_CURRENCY": "TRY",
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                },
+                "Customer": {
+                    "FIRST_NAME": "Firstname",
+                    "LAST_NAME": "Lastname",
+                    "MAIL": "destek@esnekpos.com",
+                    "PHONE": "05435434343",
+                    "CITY": "İstanbul",
+                    "STATE": "Kağıthane",
+                    "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+                },
+                "Product": [
+                    {
+                        "PRODUCT_ID": id,
+                        "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                        "PRODUCT_CATEGORY": request.data['payment'],
+                        "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
+                        "PRODUCT_AMOUNT": money,
+                    },
+                ]
+            }
+
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            if json_data['RETURN_CODE'] == '0':
+                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+            
+            else:
+                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
 
 class CheckTransactionEnquiry(APIView):
     def post(self, request):
@@ -6135,7 +6257,7 @@ class CheckTransactionEnquiry(APIView):
             data = {
                     "MERCHANT": "TEST1234" , 
                     "MERCHANT_KEY": "4oK26hK8MOXrIV1bzTRVPA==" ,
-                    "ORDER_REF_NUMBER" : "MQrt75" 
+                    "ORDER_REF_NUMBER" : f"{ref_no}" 
                     }
             response = requests.post(url, json=data)
             json_data = response.json()

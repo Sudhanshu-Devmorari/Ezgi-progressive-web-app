@@ -15,8 +15,10 @@ import { userId } from "../GetUser";
 import axios from "axios";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { useEffect } from "react";
+import { ref, transcationQueryAPI } from "../GetRefNo";
 
 const BecomeAEditorModal = (props) => {
+  const userId = localStorage.getItem("user-id");
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -115,7 +117,67 @@ const BecomeAEditorModal = (props) => {
     } else if (!selectCheckBox) {
       setCheckboxError("Please select a checkbox");
     } else {
-      handleMambership();
+
+      try {
+        setIsLoading(true);
+
+        const checkMembership = await axios.get(
+          `${config.apiUrl}/become-editor/?id=${userId}`
+        );
+        console.log("splitdata", selectedKategori)
+        console.log("selectedDeneyim", selectedDeneyim)
+        console.log("preveiwProfilePic", preveiwProfilePic)
+        if (checkMembership?.status === 200) {
+          const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+            payment: "membership",
+            duration: checkMembership.data.promotion_duration,
+            amount: checkMembership.data.monthly_amount,
+            id: userId,
+            category:selectedKategori,
+            experience:selectedDeneyim,
+            profile_pic:preveiwProfilePic,
+            profile_file:file,
+          });
+          console.log(payment_res, "==========payment_res");
+
+          if (payment_res.status === 200) {
+            const url = payment_res?.data?.URL_3DS;
+            console.log("URL: ", url)
+            window.location.replace(url);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 500) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: "something went wrong",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+        if (error?.response?.status === 400) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.data,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+      }
+
+      // handleMambership();
+
+
+
       // props.onHide();
       // setShowPaymentModal(true);
       // if (preveiwProfilePic) {
@@ -185,6 +247,32 @@ const BecomeAEditorModal = (props) => {
       // }
     }
   }
+  const ref_no = ref();
+
+  useEffect(() => {
+    const ref_no = ref();
+    async function testPurchase() {
+      try {
+        const result = await transcationQueryAPI(ref_no);
+        if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+          console.log("payment succesffull");
+          const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+          if (category === "membership") {
+            console.log("membership--In")
+            console.log("11splitdata", selectedKategori)
+            console.log("11selectedDeneyim", selectedDeneyim)
+            console.log("11preveiwProfilePic", preveiwProfilePic)
+            handleMambership();
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (ref_no) {
+      testPurchase();
+    }
+  }, [ref_no]);
 
   const [renewLoading, setRenewLoading] = useState(false);
   const [commentatorUser, setCommentatorUser] = useState([]);
@@ -205,6 +293,9 @@ const BecomeAEditorModal = (props) => {
   }, [userId]);
 
   const handleMambership = async () => {
+    console.log("splitdata", selectedKategori)
+    console.log("selectedDeneyim", selectedDeneyim)
+    console.log("preveiwProfilePic", preveiwProfilePic)
     if (preveiwProfilePic) {
       setIsLoading(true);
       const splitdata = selectedKategori.split(", ");
@@ -213,10 +304,12 @@ const BecomeAEditorModal = (props) => {
       file && formData.append("profile_pic", file);
       // formData.append("promotion_duration", promotion);
       // formData.append("plan_price", plan_price);
-      axios
+      await axios
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then(async (res) => {
           if (res.status === 200) {
+            console.log("res----> ", res)
+
             // setShowPaymentModal(true);
             localStorage.setItem("user-role", res.data.user_role);
             props.onHide();

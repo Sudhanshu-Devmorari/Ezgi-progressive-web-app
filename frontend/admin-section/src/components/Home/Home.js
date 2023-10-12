@@ -307,7 +307,7 @@ const Home = (props) => {
       selectedImage != false && formData.append("file", selectedImage);
       // formData.append("date", addUser.date);
       formData.append("name", addUser.name);
-      formData.append("username", (addUser.username).toLowerCase());
+      formData.append("username", addUser.username.toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("gender", addUser.gender);
@@ -419,14 +419,14 @@ const Home = (props) => {
       selectedImage != false && formData.append("profile_pic", selectedImage);
       // formData.append("date", addUser.date);
       formData.append("name", addUser.name);
-      formData.append("username", (addUser.username).toLowerCase());
+      formData.append("username", addUser.username.toLowerCase());
       formData.append("phone", addUser.phone);
       formData.append("password", addUser.password);
       formData.append("gender", addUser.gender);
       formData.append("age", addUser.age);
       formData.append("subscription", addUser.subscription);
       formData.append("duration", addUser.duration);
-      // formData.append("month", addUser.month);
+      formData.append("number", addUser.month);
       formData.append("level", addUser.level);
       formData.append("user_id", user_id);
       try {
@@ -445,6 +445,7 @@ const Home = (props) => {
               closeButton.click();
             }
           }
+          console.log(addUser);
           clearError();
           setAddUser({
             name: "",
@@ -453,6 +454,9 @@ const Home = (props) => {
             password: "",
             gender: "",
             age: "",
+            duration: "",
+            number: "",
+            level: "",
           });
           setprofile(false);
           setPreveiwProfilePic(null);
@@ -1247,14 +1251,17 @@ const Home = (props) => {
                 <div className="col-4">
                   <img
                     alt=""
-                    src={!selectCheckBox ? checkbox : Selectedcheckbox}
+                    // src={!selectCheckBox ? checkbox : Selectedcheckbox}
+                    src={addUser.subscription === "True" ? Selectedcheckbox : checkbox}
                     style={{ cursor: "pointer" }}
                     height={58}
                     width={55}
                     name="subscription"
                     value={addUser.selectCheckBox}
+                    // value={addUser.subscription ? addUser.subscription : addUser.selectCheckBox}
                     onClick={() => {
                       setSelectCheckBox(!selectCheckBox);
+                      // setSelectCheckBox(addUser.subscription ? Selectedcheckbox : checkbox);
                       setAddUser({
                         ...addUser,
                         subscription:
@@ -1272,9 +1279,12 @@ const Home = (props) => {
                         value={
                           userData ? userData?.duration : addUser.selectedMonth
                         }
+                        // value={
+                        //   addUser?.duration ? addUser?.duration : addUser.selectedMonth
+                        // }
                         label=" "
                         options={monthOptions}
-                        selectedOption={selectedMonth}
+                        selectedOption={addUser?.duration ? addUser?.duration : selectedMonth}
                         onSelectOption={handleduration}
                         isOpen={monthDropDown}
                         toggleDropdown={toggleMonthDropdown}
@@ -1287,9 +1297,12 @@ const Home = (props) => {
                         value={
                           userData ? addUser.selectedNumber : selectedNumber
                         }
+                        // value={
+                        //   addUser?.number ? addUser?.number : addUser.selectedNumber
+                        // }
                         label=" "
                         options={numberOptions}
-                        selectedOption={selectedNumber}
+                        selectedOption={addUser?.number ? addUser?.number : selectedNumber}
                         onSelectOption={handleNumber}
                         isOpen={numberDropDown}
                         toggleDropdown={toggleNumberDropdown}
@@ -1304,9 +1317,12 @@ const Home = (props) => {
                             ? userData?.commentator_level
                             : addUser.selectedLevel
                         }
+                        // value={
+                        //   addUser?.level ? addUser?.level : addUser.selectedLevel
+                        // }
                         label=" "
                         options={levelOptions}
-                        selectedOption={selectedLevel}
+                        selectedOption={addUser?.level ? addUser?.level : selectedLevel}
                         onSelectOption={handleLevel}
                         isOpen={levelDropDown}
                         toggleDropdown={toggleLevelDropdown}
@@ -1329,6 +1345,9 @@ const Home = (props) => {
                               password: "",
                               gender: "",
                               age: "",
+                              duration: "",
+                              number: "",
+                              level: "",
                             });
                             setprofile(false);
                             setPreveiwProfilePic(null);
@@ -1378,6 +1397,9 @@ const Home = (props) => {
                               password: "",
                               gender: "",
                               age: "",
+                              duration: "",
+                              number: "",
+                              level: "",
                             });
                             setprofile(false);
                             setPreveiwProfilePic(null);
@@ -1433,6 +1455,9 @@ const Home = (props) => {
                     password: "",
                     gender: "",
                     age: "",
+                    duration: "",
+                    number: "",
+                    level: "",
                   });
                   setprofile(false);
                   setPreveiwProfilePic(null);
@@ -1489,7 +1514,10 @@ const Home = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="" style={{ overflowY: "scroll", height: "18rem" }}>
+              <div
+                className=""
+                style={{ overflowY: "scroll", height: "18rem" }}
+              >
                 {subscriberIncome?.length == 0 ? (
                   <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                     No Record Found!
@@ -1532,13 +1560,17 @@ const Home = (props) => {
                               style={{ color: "#FFEE7D" }}
                             />
                           </div>
-                          <span className="ps-2">{res?.user ? res?.user.name : res?.commentator_user.name}</span>
+                          <span className="ps-2">
+                            {res?.user
+                              ? res?.user.name
+                              : res?.commentator_user.name}
+                          </span>
                         </div>
                         <div className="">
                           <span>{res.duration} </span>
-                          <span className="px-2">{moment(res.created).format(
-                                    "DD-MM.YYYY - HH:mm"
-                                  )}</span>
+                          <span className="px-2">
+                            {moment(res.created).format("DD-MM.YYYY - HH:mm")}
+                          </span>
                           <span>{res.money}</span>
                         </div>
                       </div>

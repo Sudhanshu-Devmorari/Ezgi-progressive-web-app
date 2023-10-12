@@ -103,6 +103,7 @@ urlpatterns = [
     path('verify-user/<int:id>/', UpdateStatusForVerifyRequest.as_view(), name='Update-Status-For-Verify-Request'),
     path('show-ticket-data/<int:ticket_id>/', SubUserShowTicketData.as_view(), name='Show-Ticket-Data'),
     # path('become-editor/', BecomeEditorView.as_view(), name='become-editor'),
+    path('become-editor/', BecomeEditorView.as_view(), name='Become-Editor'),
     path('become-editor/<int:id>/', BecomeEditorView.as_view(), name='Become-Editor'),
     path('become-editor-earn-details/<int:subscriber>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
 

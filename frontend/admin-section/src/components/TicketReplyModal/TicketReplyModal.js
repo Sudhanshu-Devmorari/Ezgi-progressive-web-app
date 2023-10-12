@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { BiSolidCrown } from "react-icons/bi";
 import user3 from "../../assets/user1.png";
 import cross from "../../assets/Group 81.svg";
@@ -51,6 +51,22 @@ const TicketReplyModal = (props) => {
     reply: "",
     note: "",
   });
+  const currentTheme = "dark";
+
+  const [displayAllticketsData, setDisplayAllTicketsData] = useState([]);
+  useEffect(() => {
+    props?.ticketData && setDisplayAllTicketsData(props?.ticketData);
+  }, [props?.ticketData]);
+
+  const showAllTicketHistory = async (ticket_id) => {
+    try {
+      const res = await axios.get(
+        `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
+      );
+      // console.log("All res: ", res)
+      setDisplayAllTicketsData(res.data);
+    } catch (error) {}
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -281,7 +297,7 @@ const TicketReplyModal = (props) => {
                 </>
               )} */}
               <div>
-                {ticketData.map((res, index) => (
+                {displayAllticketsData?.map((res, index) => (
                   <>
                     <span>
                       {res?.user?.id == userId ? (
@@ -310,7 +326,7 @@ const TicketReplyModal = (props) => {
                     <textarea
                       style={{ height: "100px", fontSize: ".8rem" }}
                       className="darkMode-input form-control my-2 p-2"
-                      defaultValue={res?.message}
+                      value={res?.message}
                     ></textarea>
                   </>
                 ))}
@@ -378,7 +394,7 @@ const TicketReplyModal = (props) => {
                       </>
                     )}
                   </div>
-                  <div className="my-3 d-flex justify-content-center">
+                  <div className="my-3 d-flex justify-content-evenly">
                     <button
                       data-bs-dismiss="modal"
                       onClick={() => handleTicket(tickeview?.id)}
@@ -391,6 +407,23 @@ const TicketReplyModal = (props) => {
                       }}
                     >
                       Done
+                    </button>
+                    <button
+                      onClick={() => {
+                        showAllTicketHistory(tickeview?.id);
+                      }}
+                      className="px-3 ml-3"
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB0B" : "#00659D",
+                        backgroundColor: "transparent",
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid #D2DB0B"
+                            : "1px solid #00659D",
+                        borderRadius: "3px",
+                      }}
+                    >
+                      View All
                     </button>
                   </div>
                 </div>

@@ -60,6 +60,7 @@ class User(AbstractBaseUser):
     experience = models.CharField(max_length=20, choices=Experience, null=True, blank=True)
     membership_date = models.DateField(default=date.today)
     membership_end_date = models.DateField(null=True, blank=True)
+    remaining_monthly_count = models.IntegerField(null=True, blank=True)
     # membership_plan_price = models.FloatField(null=True, blank=True)
     success_rate = models.FloatField(null=True, blank=True)
     score_points = models.IntegerField(null=True, blank=True)
