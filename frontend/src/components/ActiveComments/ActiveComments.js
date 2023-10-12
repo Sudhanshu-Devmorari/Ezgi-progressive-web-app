@@ -445,9 +445,10 @@ const ActiveComments = (props) => {
   // Cancel Subcription
   const cancelSubcription = async () => {
     try {
-      const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
-        commentator_id: profileData?.id,
-      });
+      // const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
+      //   commentator_id: profileData?.id,
+      // });
+      const res = await axios.patch(`${config.apiUrl}/subscription/${userId}/?commentator_id=${profileData?.id}`, )
       if (res?.status === 200) {
         window.location.reload();
         // Swal.fire({

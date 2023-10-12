@@ -24,6 +24,8 @@ import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
 import CategoryFilter from "../CategoryFilter/CategoryFilter";
+import { ref, transcationQueryAPI } from "../GetRefNo";
+import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -62,6 +64,42 @@ const MainPage = () => {
   const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const user_id = localStorage.getItem("user-id");
+
+  // check the successful payment request
+  const ref_no = ref();
+  useEffect(() => {
+    async function testPurchase() {
+      console.log(ref_no, "=>>ref_no");
+      try {
+        const result = await transcationQueryAPI(ref_no);
+
+        if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+          console.log("payment succesffull", result);
+          const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+
+          if (category === "subscription") {
+            const commentator_user_id = result?.PRODUCTS[0]?.PRODUCT_ID;
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
+            const amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
+            const commentator_username =
+              result?.PRODUCTS[0]?.PRODUCT_DESCRIPTION;
+
+            subcriptionEntry(
+              amount,
+              duration,
+              commentator_user_id,
+              commentator_username
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (ref_no) {
+      testPurchase();
+    }
+  }, [ref_no]);
 
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
