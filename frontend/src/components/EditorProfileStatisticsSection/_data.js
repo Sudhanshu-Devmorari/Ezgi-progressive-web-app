@@ -400,6 +400,11 @@ export const country_code = [
     code: "DE",
   },
   {
+    name: "Germany Amateur",
+    dial_code: "+49",
+    code: "DE",
+  },
+  {
     name: "Ghana",
     dial_code: "+233",
     code: "GH",

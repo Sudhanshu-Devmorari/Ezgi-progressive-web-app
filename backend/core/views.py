@@ -773,10 +773,15 @@ class SubscriptionView(APIView):
                     "1 Month": 1,
                     "3 Month": 3,
                     "6 Month": 6,
-                    "1 Year": 12
+                    "1 Year": 12,
+                    "1 Months": 1,
+                    "3 Months": 3,
+                    "6 Months": 6,
+                    "1 Years": 12,
                 }
 
                 duration_months = durations.get(duration)
+                print('duration_months: ', duration_months)
                 
                 if duration_months:
                     monthly_cal = money_cal / duration_months
@@ -789,6 +794,30 @@ class SubscriptionView(APIView):
                         duration_label = f'{i + 1}-{duration_months}'
                         pending_history = PendingBalanceHistory.objects.create(date=end_date, user=user, editor=commentator, duration=duration_label, amount=monthly_cal)
                         pending_history.save()
+                        print('pending_history: ', pending_history)
+
+                duration_mapping = {
+                    '1 month': 1,
+                    '1 months': 1,
+                    '3 month': 3,
+                    '3 months': 3,
+                    '6 month': 6,
+                    '6 months': 6,
+                    '1 year': 12,
+                    '1 years': 12,
+                }
+
+
+                subscriptions = Subscription.objects.filter(commentator_user=commentator)
+                print('subscriptions: ', subscriptions)
+
+                total_months = 0
+
+                for obj in subscriptions:
+                    lower_duration = obj.duration.lower()
+                    if lower_duration in duration_mapping:
+                        total_months += duration_mapping[lower_duration]
+                print('total_months: before-----------------------------------', total_months) 
 
                 if BankDetails.objects.filter(user=commentator).exists():
                     level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
@@ -797,14 +826,33 @@ class SubscriptionView(APIView):
                     balance_obj = BankDetails.objects.get(user=commentator)
                     balance_obj.total_balance += final_cal
                     balance_obj.pending_balance += final_cal
-                    balance_obj.save()
+                    balance_obj.save(update_fields=['total_balance', 'pending_balance', 'updated'])
+
+                    
+
+                    if total_months > 0:
+                        withdrawable_amount = balance_obj.pending_balance / total_months
+                        print('iffffffffffff')
+                        print('total_months: ', total_months)
+                        print('withdrawable_amount: ', withdrawable_amount)
+                        balance_obj.withdrawable_balance = round(withdrawable_amount, 2)
+                        balance_obj.save(update_fields=['withdrawable_balance', 'updated'])
 
                 else:
                     level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
                     calculation = (float(level_obj.commission_rate) * float(money)) / 100
                     final_cal = money - calculation
                     balance_obj = BankDetails.objects.create(user=commentator, total_balance=final_cal, pending_balance=final_cal)
-                    balance_obj.save()
+
+                    if total_months > 0:
+                        withdrawable_amount = balance_obj.pending_balance / total_months
+                        print('elseeeeeeeeeeeeee')
+                        print('total_months: ', total_months)
+                        print('withdrawable_amount: ', withdrawable_amount)
+                        balance_obj.withdrawable_balance = round(withdrawable_amount, 2)
+                        balance_obj.save(update_fields=['withdrawable_balance', 'updated'])
+
+                    # balance_obj.save()
 
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
@@ -1507,15 +1555,15 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
         data_list = {}
         try:
             if user.user_role == 'commentator':
-                my_subscribers = Subscription.objects.filter(commentator_user=user)
+                my_subscribers = Subscription.objects.filter(commentator_user=user).order_by('-created')
                 serializer = SubscriptionSerializer(my_subscribers, many=True)
                 data_list['subscribers'] = serializer.data 
 
-                my_subscription = Subscription.objects.filter(standard_user=user)
+                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
                 serializer1 = SubscriptionSerializer(my_subscription, many=True)
                 data_list['subscription'] = serializer1.data
             else:
-                my_subscription = Subscription.objects.filter(standard_user=user)
+                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
                 serializer = SubscriptionSerializer(my_subscription, many=True)
                 data_list['subscription'] = serializer.data
                     
@@ -4757,24 +4805,31 @@ class SportsStatisticsView(APIView):
             user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
             total_user_cmt = user_all_cmt.count()
             
+            other_comments_basketball = 0
+            
             top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             prediction_types_data = []
             for i in top_3_prediction_types:
                 predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Basketbol', status='approve', is_resolve=True).count()
 
-                if total_user_cmt > 0:
-                    cal = (predict_type / total_user_cmt)* 100 
-                    data ={
-                        "prediction_type":i,
-                        "calculation":round(cal, 2)
-                    }
-                else:
-                    data ={
-                        "prediction_type":i,
-                        "calculation": 0
-                    }
+                # if total_user_cmt > 0:
+                #     cal = (predict_type / total_user_cmt)* 100 
+                #     data ={
+                #         "prediction_type":i,
+                #         "calculation":round(cal, 2)
+                #     }
+                # else:
+                #     data ={
+                #         "prediction_type":i,
+                #         "calculation": 0
+                #     }
+                data ={
+                    "prediction_type":i,
+                    "calculation": predict_type
+                }
                 prediction_types_data.append(data)
+                other_comments_basketball += predict_type
 
             if total_user_cmt == 0:
                 prediction_types_data = []
@@ -4783,9 +4838,13 @@ class SportsStatisticsView(APIView):
                 for i in prediction_types_data:
                     b_avg += i['calculation']
 
+                # other_data = {
+                #     "prediction_type":'Other',
+                #     "calculation":round(100-b_avg, 2)
+                # }
                 other_data = {
                     "prediction_type":'Other',
-                    "calculation":round(100-b_avg, 2)
+                    "calculation": total_user_cmt - other_comments_basketball
                 }
                 prediction_types_data.append(other_data)
                 
@@ -4805,7 +4864,10 @@ class SportsStatisticsView(APIView):
                     correct_prediction_basketball += 1
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            basketball_calculation = (correct_prediction_basketball/20)*100
+            print('recent_30_comments.count(): ', recent_30_comments.count())
+            total_comments_recents = recent_30_comments.count() if recent_30_comments.count() != 0 else 1
+
+            basketball_calculation = (correct_prediction_basketball/total_comments_recents)*100
             details['basketball_calculation'] = round(basketball_calculation, 2)
 
             basketball_Leagues = []
@@ -4842,6 +4904,9 @@ class SportsStatisticsView(APIView):
             Comments_Journey_football = []
             fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             fb_total_user_cmt = fb_user_all_cmt.count()
+            print('fb_total_user_cmt: ', fb_total_user_cmt)
+
+            other_comments_fb = 0
 
             fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
@@ -4849,22 +4914,33 @@ class SportsStatisticsView(APIView):
             for i in fb_top_3_prediction_types:
                 predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Futbol', status='approve').count()
 
-                cal = (predict_type / fb_total_user_cmt)* 100
+                # cal = (predict_type / fb_total_user_cmt)* 100
+                # data ={
+                #     "prediction_type":i,
+                #     "calculation":round(cal, 2)
+                # }
                 data ={
                     "prediction_type":i,
-                    "calculation":round(cal, 2)
+                    "calculation":predict_type
                 }
+                print('predict_type: ', predict_type)
+                other_comments_fb += predict_type
                 fb_prediction_types_data.append(data)
 
+            print('other_comments_fb: ', other_comments_fb)
             if fb_total_user_cmt == 0:
                 fb_prediction_types_data = []
             else:
                 fb_avg = 0
                 for i in fb_prediction_types_data:
                     fb_avg += i['calculation']
+                # fb_other_data = {
+                #     "prediction_type":'Other',
+                #     "calculation":round(100-fb_avg, 2)
+                # }
                 fb_other_data = {
                     "prediction_type":'Other',
-                    "calculation":round(100-fb_avg, 2)
+                    "calculation": fb_total_user_cmt - other_comments_fb
                 }
                 fb_prediction_types_data.append(fb_other_data)
 
@@ -4883,7 +4959,9 @@ class SportsStatisticsView(APIView):
                     correct_prediction_football += 1
             Fb_details['Comments_Journey_football'] = Comments_Journey_football
 
-            football_calculation = (correct_prediction_football/20)*100
+            total_comments_recents_fb = fb_recent_30_comments.count() if fb_recent_30_comments.count() != 0 else 1
+
+            football_calculation = (correct_prediction_football/total_comments_recents_fb)*100
             Fb_details['football_calculation'] = round(football_calculation, 2)
 
             football_Leagues = []
@@ -5911,7 +5989,10 @@ class GetPendingBalance(APIView):
             if id is not None:
                 data_list = []
                 editor_user = get_object_or_404(User, id=id)
+                print('editor_user: ', editor_user)
+                print('editor_user_id: ', editor_user.id)
                 data = PendingBalanceHistory.objects.filter(editor=editor_user)
+                print('data: ', data)
 
                 monthwise_data = defaultdict(list)
                 monthwise_amount_sum = defaultdict(float)
@@ -6182,8 +6263,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",

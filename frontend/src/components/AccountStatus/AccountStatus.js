@@ -294,7 +294,7 @@ const AccountStatus = (props) => {
               <div className="d-flex justify-content-center  gap-2 fw-medium my-2">
                 <span
                   className="cursor text-center"
-                  onClick={() => setSelectSub("journeyman")}
+                  onClick={() => {setSelectSub("journeyman"); setValues(0)}}
                   style={{
                     color:
                       currentTheme !== "dark"

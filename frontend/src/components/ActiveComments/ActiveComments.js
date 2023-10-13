@@ -365,8 +365,13 @@ const ActiveComments = (props) => {
     try {
       const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
       if (res?.status === 200) {
-        setBankDetails(res?.data?.data);
-        setWithdrawalModal(true);
+        const bank_iban = res?.data?.data?.bank_iban;
+        if (bank_iban) {
+          setBankDetails(res?.data?.data);
+          setWithdrawalModal(true);
+        } else {
+          setShowBankUpdate(true);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -448,7 +453,9 @@ const ActiveComments = (props) => {
       // const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
       //   commentator_id: profileData?.id,
       // });
-      const res = await axios.patch(`${config.apiUrl}/subscription/${userId}/?commentator_id=${profileData?.id}`, )
+      const res = await axios.patch(
+        `${config.apiUrl}/subscription/${userId}/?commentator_id=${profileData?.id}`
+      );
       if (res?.status === 200) {
         window.location.reload();
         // Swal.fire({
@@ -497,7 +504,7 @@ const ActiveComments = (props) => {
             onClick={() => {
               const currentPage =
                 localStorage.getItem("priviouspage") || "home";
-              const priviusPage = localStorage.getItem("priviouspage")
+              const priviusPage = localStorage.getItem("priviouspage");
               const deshboardShow =
                 localStorage.getItem("dashboardShow") || false;
               localStorage.setItem(
@@ -514,9 +521,16 @@ const ActiveComments = (props) => {
                   : currentPage || "home"
               );
               props.setDashboardSUser(
-                deshboardShow == "true" ? false : priviusPage == 'fav' ? false : true
+                deshboardShow == "true"
+                  ? false
+                  : priviusPage == "fav"
+                  ? false
+                  : true
               );
-              localStorage.setItem("dashboardShow", priviusPage == 'fav' ? false : true);
+              localStorage.setItem(
+                "dashboardShow",
+                priviusPage == "fav" ? false : true
+              );
               localStorage.removeItem("activeCommentId");
               setActiveCommentsshow && setActiveCommentsshow(null);
             }}
@@ -1006,7 +1020,9 @@ const ActiveComments = (props) => {
                     borderRadius: "3px",
                   }}
                 >
-                  {profileData?.is_subscribe ? "Cancel Subscription" : "Subscribe" }
+                  {profileData?.is_subscribe
+                    ? "Cancel Subscription"
+                    : "Subscribe"}
                 </button>
               ) : (
                 <span>
@@ -1017,7 +1033,7 @@ const ActiveComments = (props) => {
                     ).toLocaleDateString()}{" "}
                   </span>
                   date.
-                </span> 
+                </span>
               )}
             </div>
           )}

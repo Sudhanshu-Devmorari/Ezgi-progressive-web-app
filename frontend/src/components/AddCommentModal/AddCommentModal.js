@@ -22,6 +22,7 @@ import { DateAPI } from "../GetDateAPI";
 import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
 import Swal from "sweetalert2";
 import config from "../../config";
+import moment from "moment";
 
 const AddCommentModal = (props) => {
   const { activeResolved, profileData } = props;
@@ -153,7 +154,6 @@ const AddCommentModal = (props) => {
 
     DateAPI(categoryType, league)
       .then((res) => {
-        // console.log(res.data, "========================res date");
         const DateList = res.data;
         setDateOptions(DateList.map((item) => item.date));
       })
@@ -176,27 +176,15 @@ const AddCommentModal = (props) => {
         const MatchList = res.data;
 
         const filterdata = MatchList.filter(
-          (resp) => new Date(resp.TarihSaat).getTime() >= new Date().getTime()
+          // (resp) => new Date(resp.TarihSaat).getTime() >= new Date().getTime()
+          (resp) => moment(resp.TarihSaat).valueOf() >= moment().valueOf()
         );
 
         console.log("filterdata:::::::::::", filterdata);
-
-        // MatchList.map((resp) => {
-        //   const matchTime = resp.TarihSaat;
-        //   const metchStartTime = new Date(matchTime).getTime();
-        //   const currentTime = new Date().getTime();
-        //   if (metchStartTime >= currentTime) {
-        //     console.log("currentTime:::::::::::::", currentTime);
-        //     console.log("metchStartTime:::::::::::::", metchStartTime);
-        //     console.log("resp:::::::::::", resp);
-        //     console.log("matchTime::::::::::::", matchTime);
-        //   }
-        // });
         filterdata.length == 0 && setSelectedMatchDetails("No Matchs Found!");
 
         setMatchList(filterdata);
         setMatchDetailsOptions(filterdata.map((item) => item.takimlar));
-        // setMatchId(MatchList.map((item) => item.MatchID));
       })
       .catch((err) => {});
   };

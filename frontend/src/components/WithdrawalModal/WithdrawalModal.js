@@ -54,45 +54,60 @@ const WithdrawalModal = (props) => {
   };
 
   const handleWithdrawRequest = async () => {
-    try {
-      setWithdrawalLoading(true);
-      const res = await axios.post(`${config.apiUrl}/create-withdrawable-request/${userId}/`, {
-        bank_iban: bankDetails?.bank_iban,
-        amount: bankDetails?.withdrawable_balance,
+    if (bankDetails?.withdrawable_balance == 0) {
+      props?.onHide();
+      Swal.fire({
+        title: "Error",
+        text: "There is no withdrawable balance, please check 'Pending Balance' transactions.",
+        icon: "error",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
-      // console.log(res);
-      if (res?.status === 200) {
-        setWithdrawalLoading(false);
-        Swal.fire({
-          title: "Success",
-          // text: res?.data?.data,
-          text: "Withdrawal request sucessfully sent.",
-          icon: "success",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        }).then((res) => {
-          if (res?.isConfirmed) {
-            window.location.reload();
+    } else {
+      try {
+        setWithdrawalLoading(true);
+        const res = await axios.post(
+          `${config.apiUrl}/create-withdrawable-request/${userId}/`,
+          {
+            bank_iban: bankDetails?.bank_iban,
+            amount: bankDetails?.withdrawable_balance,
           }
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      if (error?.response?.status === 404) {
-        setWithdrawalLoading(false);
-        Swal.fire({
-          title: "Error",
-          text: error?.response?.data?.message,
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
+        );
+        // console.log(res);
+        if (res?.status === 200) {
+          setWithdrawalLoading(false);
+          Swal.fire({
+            title: "Success",
+            // text: res?.data?.data,
+            text: "Withdrawal request sucessfully sent.",
+            icon: "success",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          }).then((res) => {
+            if (res?.isConfirmed) {
+              window.location.reload();
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 404) {
+          props?.onHide();
+          setWithdrawalLoading(false);
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.message,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
     }
   };
-
 
   return (
     <>
@@ -169,7 +184,10 @@ const WithdrawalModal = (props) => {
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button
-                  onClick={() => {handleWithdraw(); handleWithdrawRequest()}}
+                  onClick={() => {
+                    handleWithdraw();
+                    handleWithdrawRequest();
+                  }}
                   className={`${
                     currentTheme === "dark" ? "darkMode-btn" : "lightMode-btn"
                   } px-3 py-1`}
