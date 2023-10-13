@@ -124,25 +124,26 @@ const BecomeAEditorModal = (props) => {
         const checkMembership = await axios.get(
           `${config.apiUrl}/become-editor/?id=${userId}`
         );
-        console.log("splitdata", selectedKategori)
-        console.log("selectedDeneyim", selectedDeneyim)
-        console.log("preveiwProfilePic", preveiwProfilePic)
+
+        const formData = new FormData();
+
         if (checkMembership?.status === 200) {
-          const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
-            payment: "membership",
-            duration: checkMembership.data.promotion_duration,
-            amount: checkMembership.data.monthly_amount,
-            id: userId,
-            category:selectedKategori,
-            experience:selectedDeneyim,
-            profile_pic:preveiwProfilePic,
-            profile_file:file,
-          });
-          console.log(payment_res, "==========payment_res");
+          formData.append("payment", "membership");
+          formData.append("duration", checkMembership.data.promotion_duration);
+          formData.append("amount", checkMembership.data.monthly_amount);
+          formData.append("id", userId);
+          formData.append("category", selectedKategori);
+          formData.append("experience", selectedDeneyim);
+          formData.append("profile_pic", preveiwProfilePic);
+          file && formData.append("profile_file", file);
+
+          const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+          formData);
+          // console.log(payment_res, "==========payment_res");
 
           if (payment_res.status === 200) {
             const url = payment_res?.data?.URL_3DS;
-            console.log("URL: ", url)
+            // console.log("URL: ", url)
             window.location.replace(url);
           }
         }
@@ -255,14 +256,15 @@ const BecomeAEditorModal = (props) => {
       try {
         const result = await transcationQueryAPI(ref_no);
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
-          console.log("payment succesffull");
+          // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
           if (category === "membership") {
-            console.log("membership--In")
-            console.log("11splitdata", selectedKategori)
-            console.log("11selectedDeneyim", selectedDeneyim)
-            console.log("11preveiwProfilePic", preveiwProfilePic)
-            handleMambership();
+            const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
+            const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
+            const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME
+            const startdate = result?.PAYMENT_DATE
+            handleMambership(category, experience, monthly_amount, duration, startdate);
           }
         }
       } catch (error) {
@@ -292,29 +294,30 @@ const BecomeAEditorModal = (props) => {
     userId && getUserdata();
   }, [userId]);
 
-  const handleMambership = async () => {
-    console.log("splitdata", selectedKategori)
-    console.log("selectedDeneyim", selectedDeneyim)
-    console.log("preveiwProfilePic", preveiwProfilePic)
-    if (preveiwProfilePic) {
+  const handleMambership = async (category, experience, monthly_amount, duration, startdate) => {
+   
+    // if (preveiwProfilePic) {
       setIsLoading(true);
-      const splitdata = selectedKategori.split(", ");
+      const splitdata = category.split(", ");
       formData.append("category", splitdata);
-      formData.append("experience", selectedDeneyim);
-      file && formData.append("profile_pic", file);
+      formData.append("experience", experience);
+      formData.append("monthly_amount", monthly_amount);
+      formData.append("duration", duration);
+      formData.append("startdate", startdate);
+      // file && formData.append("profile_pic", file);
       // formData.append("promotion_duration", promotion);
       // formData.append("plan_price", plan_price);
+
       await axios
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then(async (res) => {
           if (res.status === 200) {
-            console.log("res----> ", res)
 
             // setShowPaymentModal(true);
             localStorage.setItem("user-role", res.data.user_role);
             props.onHide();
             setShowPaymentModal(false);
-            await Swal.fire({
+            const confirm = await Swal.fire({
               title: "Success",
               text: "User has successfully become a commentator",
               icon: "success",
@@ -336,6 +339,9 @@ const BecomeAEditorModal = (props) => {
             props?.setSelectContent("show-all-comments");
             props?.setActiveCommentsshow(null);
             props?.setDashboardSUser(true);
+            if (confirm.value === true) {
+              window.location.replace(window.location.origin+'/')
+            }
           }
         })
         .catch((error) => {
@@ -365,7 +371,7 @@ const BecomeAEditorModal = (props) => {
             });
           }
         });
-    }
+    // }
   };
 
   return (

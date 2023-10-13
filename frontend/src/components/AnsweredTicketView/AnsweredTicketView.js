@@ -12,6 +12,7 @@ const AnsweredTicketView = (props) => {
   const { ticketResponse } = props;
 
   const ticketData = props?.ticketData || {};
+  const ticketAllData = props?.ticketAllData
 
   const [displayAllticketsData, setDisplayAllTicketsData] = useState(props?.ticketData);
   
@@ -43,6 +44,9 @@ const AnsweredTicketView = (props) => {
     catch (error) {
 
     }
+  }
+  const displayAllData = () => {
+    setDisplayAllTicketsData(ticketAllData)
   }
 
   return (
@@ -208,9 +212,12 @@ const AnsweredTicketView = (props) => {
             </>
           )}
 
-          <button
+          {ticketAllData.length > 2 && 
+            <button id="viewAllId"
             onClick={() => {
-              showAllTicketHistory(ticketData[0]?.ticket_support?.id);
+              // showAllTicketHistory(ticketData[0]?.ticket_support?.id);
+              displayAllData()
+              document.getElementById("viewAllId").style.display="none"
             }}
             className="px-3"
             style={{
@@ -225,6 +232,7 @@ const AnsweredTicketView = (props) => {
           >
             View All
           </button>
+          }
         </div>
       </div>
     </>

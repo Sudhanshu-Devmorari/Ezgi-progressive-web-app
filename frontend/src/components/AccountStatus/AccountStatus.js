@@ -228,6 +228,60 @@ const AccountStatus = (props) => {
     membershipData && commentatorUser && setDaysLeft(calculateDaysLeft());
   }, [membershipData, commentatorUser]);
 
+  const handleRenew = async () => {
+    try {
+      const checkMembership = await axios.get(
+        `${config.apiUrl}/become-editor/?id=${userId}`
+      );
+
+      const formData = new FormData();
+
+      if (checkMembership?.status === 200) {
+        formData.append("payment", "membership renew");
+        formData.append("duration", checkMembership.data.promotion_duration);
+        formData.append("amount", checkMembership.data.monthly_amount);
+        formData.append("id", userId);
+
+        const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+        formData);
+        // console.log(payment_res, "==========payment_res");
+
+        if (payment_res.status === 200) {
+          const url = payment_res?.data?.URL_3DS;
+          // console.log("URL: ", url)
+          window.location.replace(url);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      if (error?.response?.status === 500) {
+        // setIsLoading(false);
+        props.onHide();
+        Swal.fire({
+          title: "Error",
+          text: "something went wrong",
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+      if (error?.response?.status === 400) {
+        // setIsLoading(false);
+        props.onHide();
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+
+  } 
+
   return (
     <>
       <div
@@ -676,7 +730,8 @@ const AccountStatus = (props) => {
                     )}
                   </div>
                   <div className="d-flex justify-content-end m-2">
-                    {daysLeft?.showRenewButton == true ? (
+                  {/* {console.log("daysLeft", daysLeft)} */}
+                    {/* {daysLeft?.showRenewButt on == true ? ( */}
                       <button
                         onClick={() => {
                           if (
@@ -687,6 +742,7 @@ const AccountStatus = (props) => {
                             return;
                           }
                           setModalShow(true);
+                          // handleRenew()
                         }}
                         className="px-3"
                         style={{
@@ -702,7 +758,7 @@ const AccountStatus = (props) => {
                       >
                         Renew
                       </button>
-                    ) : (
+                    {/* ) : (
                       <span className="text-end">
                         {" "}
                         <span
@@ -715,7 +771,7 @@ const AccountStatus = (props) => {
                         </span>{" "}
                         for the next plan payment date
                       </span>
-                    )}
+                    )} */}
                   </div>
                 </>
                 {/* ) : (

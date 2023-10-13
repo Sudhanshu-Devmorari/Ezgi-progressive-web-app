@@ -5154,10 +5154,10 @@ class BecomeEditorView(APIView):
                 data = dict(request.data)
                 category_data = request.data.get('category', '').split(',')
 
-                # Profile pic validation
-                data["profile_pic"] = request.data.get('profile_pic', user.profile_pic)
-                if not data["profile_pic"]:
-                    return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
+                # # Profile pic validation
+                # data["profile_pic"] = request.data.get('profile_pic', user.profile_pic)
+                # if not data["profile_pic"]:
+                #     return Response({'error': 'Profile-Pic not found.'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Update data to pass in serializer
                 data["user_role"] = "commentator"
@@ -5183,10 +5183,14 @@ class BecomeEditorView(APIView):
                 if serializer.is_valid():
                     try:
                         serializer.save()
-
-                        editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
-                        
-                        obj = BecomeCommentator.objects.create(user=user, money=editor_obj.answer, commentator=True, status='active')
+                        # editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
+                        startdate_str = request.data.get('startdate')
+                        formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
+                        enddate = formatted_startdate + timedelta(days=30)
+                        # enddate = ''
+                        obj = BecomeCommentator.objects.create(user=user, money=request.data.get('monthly_amount'), membership_status='new', 
+                                                               commentator=True, status='active', duration=request.data.get('duration'), 
+                                                               start_date=formatted_startdate, end_date=enddate)
                         obj.save()
 
                         notification_obj = Notification.objects.create(
@@ -6238,6 +6242,11 @@ class PaymentView(APIView):
         money = request.data.get('amount', None)
         commentator_username = request.data.get('commentator_username', None)
 
+        category = request.data.get('category', None)
+        experience = request.data.get('experience', None)
+        profile_pic = request.data.get('profile_pic', None)
+        profile_file = request.data.get('profile_file', None)
+
         if 'highlight' in request.data['payment']:
 
             if 'id' not in request.data:
@@ -6256,15 +6265,112 @@ class PaymentView(APIView):
         if 'withdrawal' in request.data['payment']:
             pass
 
-        data = {
+        # data = {
+        #     "Config": {
+        #         "MERCHANT": os.environ.get('MERCHANT'),
+        #         "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+        #         "ORDER_REF_NUMBER": ref_no,
+        #         "ORDER_AMOUNT": money,
+        #         "PRICES_CURRENCY": "TRY",
+        #         "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+        #         # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+        #     },
+        #     "Customer": {
+        #         "FIRST_NAME": "Firstname",
+        #         "LAST_NAME": "Lastname",
+        #         "MAIL": "destek@esnekpos.com",
+        #         "PHONE": "05435434343",
+        #         "CITY": "İstanbul",
+        #         "STATE": "Kağıthane",
+        #         "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+        #     },
+        #     "Product": [
+        #         {
+        #             "PRODUCT_ID": id,
+        #             "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+        #             "PRODUCT_CATEGORY": request.data['payment'],
+        #             "PRODUCT_DESCRIPTION": commentator_username if commentator_username != None  else "Ürün Açıklaması",
+        #             "PRODUCT_AMOUNT": money
+        #         }
+        #     ]
+        # }
+        
+        if 'membership' in request.data['payment']:
+
+            if 'id' not in request.data:
+                raise KeyError('Commentator Id not found.')
+            if 'duration' not in request.data:
+                raise KeyError('Duration not found.')
+            if 'amount' not in request.data:
+                raise KeyError('Amount not found.')           
+
+            # if duration not in ["1 Week", "2 Week", "1 Month"]:
+            #     raise ValueError('Invalid duration.')
+        if 'membership' in request.data['payment']:
+            data = {
+                "Config": {
+                    "MERCHANT": os.environ.get('MERCHANT'),
+                    "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                    "ORDER_REF_NUMBER": ref_no,
+                    "ORDER_AMOUNT": money,
+                    "PRICES_CURRENCY": "TRY",
+                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                },
+                "Customer": {
+                    "FIRST_NAME": "Firstname",
+                    "LAST_NAME": "Lastname",
+                    "MAIL": "destek@esnekpos.com",
+                    "PHONE": "05435434343",
+                    "CITY": "İstanbul",
+                    "STATE": "Kağıthane",
+                    "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+                },
+                "Product": [
+                    {
+                        "PRODUCT_ID": id,
+                        "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                        "PRODUCT_CATEGORY": request.data['payment'],
+                        "PRODUCT_DESCRIPTION": "Ürün Açıklaması",
+                        "PRODUCT_AMOUNT": money,
+                    },
+                    {
+                        "PRODUCT_ID" : "1",
+                        "PRODUCT_NAME" : experience,
+                        "PRODUCT_CATEGORY" : category,
+                        "PRODUCT_DESCRIPTION" : "Ürün Açıklaması",
+                        "PRODUCT_AMOUNT" : money,
+                    }
+                ]
+            }
+
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            if json_data['RETURN_CODE'] == '0':
+                detail ={"profile_pic":request.FILES.get('profile_file', None)}
+                user = User.objects.get(id=request.data.get('id'))
+                serializer = UserSerializer(user, data=detail, partial=True)
+                if serializer.is_valid():
+                    try:
+                        serializer.save()
+                        return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+                    except Exception as e:
+                        return Response({"data": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+            else:
+                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+        
+        else:
+            data = {
             "Config": {
                 "MERCHANT": os.environ.get('MERCHANT'),
                 "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6285,21 +6391,14 @@ class PaymentView(APIView):
                 }
             ]
         }
-        
-        url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
-        response = requests.post(url, json=data)
-        json_data = response.json()
-        print()
-        print()
-        print('json_data: ', json_data)
-        print()
-        print()
-       
-        if json_data['RETURN_CODE'] == '0':
-            return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
-        
-        else:
-            return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            if json_data['RETURN_CODE'] == '0':
+                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+            else:
+                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
 
 class CheckTransactionEnquiry(APIView):
     def post(self, request):
@@ -6342,3 +6441,38 @@ class ViewAllTicketHistory(APIView):
             return Response(data=history_serializer, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(data={"error": f"An error occurred while retrieving the ticket history: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SubscriptionReNew(APIView):
+    def get():
+        pass
+    def patch(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.filter(id=id).first()
+            if not user:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            if user.user_role == "commentator":
+                data = request.data
+                if BecomeCommentator.objects.filter(user=user).exists():
+                    obj = BecomeCommentator.objects.get(user=user)
+
+                    serializer = BecomeCommentatorSerializer(obj, data=data, partial=True)
+                    if serializer.is_valid():
+                        try:
+                            serializer.save()
+                        except Exception as e:
+                            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                        notification_obj = Notification.objects.create(
+                            receiver=user, 
+                            subject='Purchase Transactions', 
+                            date=datetime.today().date(), 
+                            status=False, context=f'Congratulations! You sucessfully renew the membership.', 
+                            admin_context=f'{user.username} renew the plan for becoming an editor.'
+                            )
+                        return Response(serializer.data)
+            else:
+                return Response({'error':"You are not Commentator user."},status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

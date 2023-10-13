@@ -76,7 +76,13 @@ const Support = () => {
   }}
 
   const [ticketData, setTicketData] = useState([]);
-  function getData(e) {
+  const [ticketAllData, setTicketAllData] = useState([]);
+  async function getData(e) {
+    try {
+      const res = await axios.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${e}/`);
+      // console.log("All res: ", res)
+      setTicketAllData(res.data)
+    }catch (e) {}
     try {
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
@@ -211,6 +217,7 @@ const Support = () => {
             setShowModal={setShowModal}
             ticketId={ticketId}
             ticketData={ticketData}
+            ticketAllData={ticketAllData}
             responseTicketID={responseTicketID}
             ticketResponse={ticketResponse}
           />

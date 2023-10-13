@@ -118,11 +118,14 @@ def Userst():
             user = User.objects.get(id=individual.id)
             logger.info("cron starttttttttt: %s", 'cron starttttt')
             logger.info("Processing user: %s", user.username)
+            print("user", user.username)
 
             if not Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user).exists():
                 continue
             data = Comments.objects.filter(status='approve', is_prediction=None, commentator_user= user)
             logger.info("Processing Comment data: %s", data)
+            print("startttt")
+            print("comment_count", data.count())
 
             # correct_prediction = data.filter(is_prediction=True)
             # incorrect_prediction = data.filter(is_prediction=False)
@@ -181,14 +184,15 @@ def Userst():
                     continue
                 
                 for match in match_data_list:
-                    logger.info("LiveStatus : %s", match['LiveStatus'])
-                    if match['LiveStatus'] != 0:
+                        logger.info("LiveStatus : %s", match['LiveStatus'])
+                        # if match['LiveStatus'] != 0:
                         teams = match.get("Teams")
 
                         if teams == i.match_detail:
 
                             matchID = match.get("MatchID")
                             logger.info("matchID : %s", matchID)
+                            print("matchID", matchID)
 
                             # Save match score 
                             match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
@@ -213,8 +217,8 @@ def Userst():
                             
                             matchid_url = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
 
-                            data = requests.get(matchid_url, headers=headers)
-                            matchID_data = data.json()
+                            data1 = requests.get(matchid_url, headers=headers)
+                            matchID_data = data1.json()
                             matchID_data_list = matchID_data["data"]
                             logger.info("matchID_data_list : %s", matchID_data_list)
 
@@ -247,7 +251,7 @@ def Userst():
                                 if match['LiveStatus'] != 0:
                                     i.is_resolve = True
                                     i.save()
-
+            print("FOR LOOP END")
             correct_prediction = data.filter(is_prediction=True)
             incorrect_prediction = data.filter(is_prediction=False)
             Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
@@ -261,8 +265,11 @@ def Userst():
 
             user.success_rate = Success_rate
             user.score_points = Score_point
+            print('score_points: ', Score_point)
+            print('success_rate: ', Success_rate)
 
             level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            print('level: ', level)
             
             if level.winning_limit < correct_prediction.count():
                 if int(level.sucess_rate) < Success_rate :
@@ -289,7 +296,7 @@ def Userst():
                 user.commentator_level = "grandmaster"
 
             logger.info("last debug: ======================%s")
-
+            print("last debug")
             # Update is_resolve status for pending comment
             pending_comments = Comments.objects.filter(status='pending', is_resolve=False, commentator_user= user)
             resolve_pending_comments(pending_comments)
