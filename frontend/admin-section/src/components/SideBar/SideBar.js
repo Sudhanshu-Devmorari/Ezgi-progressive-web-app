@@ -48,6 +48,10 @@ const SideBar = (props) => {
     setSupportIcon(false)
   }
 
+  const handleCheckTicketAction = async () => {
+    const res = await axios.get(`${config?.apiUrl}/check-all-ticket-action/`);
+  }
+
   const location = useLocation();
   const path = location.pathname;
   useEffect(() => {
@@ -147,6 +151,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
+              handleCheckTicketAction()
               handleChangeSupportIcon()
               props.setSelectedOption && props.setSelectedOption("All")
               props.refreshComments && props.refreshComments()

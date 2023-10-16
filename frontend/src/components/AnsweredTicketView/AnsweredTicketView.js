@@ -89,7 +89,7 @@ const AnsweredTicketView = (props) => {
         >
           {ticketData?.message}
         </div> */}
-        {displayAllticketsData?.map((res, index) => (
+        {displayAllticketsData?.reverse().map((res, index) => (
           <>
             <div className="d-flex justify-content-between">
               <span>

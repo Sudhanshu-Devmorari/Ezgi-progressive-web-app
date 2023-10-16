@@ -51,10 +51,26 @@ const SupportManagementPage = (props) => {
         console.log(error);
       });
   }
+  const [displayAllticketHistory, setDisplayAllTicketHistory] = useState([]);
+// console.log("displayAllticketHistory", displayAllticketHistory)
+  const showAllTicketHistory = async (userId, ticket_id) => {
+    try {
+      const res = await axios.get(
+        `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
+      );
+      // console.log("All res: ", res)
+      const data = res.data
+      data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+      setDisplayAllTicketHistory(data)
+
+      // setDisplayAllTicketsData(res.data);
+    } catch (error) {}
+  };
 
   const [ticketData, setTicketData] = useState([]);
   function getData(userId,e) {
     try {
+      showAllTicketHistory(userId, e)
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
@@ -68,9 +84,12 @@ const SupportManagementPage = (props) => {
         });
     } catch (e) {}
   }
-  // useEffect(() => {
-  //   getData(2,16)
-  // }, []);
+  const handleCheckTicketAction = async () => {
+    const res = await axios.get(`${config?.apiUrl}/check-all-ticket-action/`);
+  }
+  useEffect(() => {
+    handleCheckTicketAction()
+  }, []);
 
   const [responseTicketID, setResponseTicketID] = useState(null);
   useEffect(() => {
@@ -408,7 +427,7 @@ const SupportManagementPage = (props) => {
         </div>
       </div>
 
-      <TicketReplyModal ticketData={ticketData} tickeview={tickeview} />
+      <TicketReplyModal displayAllticketHistory={displayAllticketHistory} ticketData={ticketData} tickeview={tickeview} />
 
       <Export exportList={displayTickets} exportData={"Support"} />
     </>

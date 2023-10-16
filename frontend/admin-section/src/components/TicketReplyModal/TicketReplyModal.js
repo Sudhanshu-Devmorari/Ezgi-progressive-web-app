@@ -52,20 +52,28 @@ const TicketReplyModal = (props) => {
     note: "",
   });
   const currentTheme = "dark";
+  const displayAllticketHistory = props?.displayAllticketHistory
 
   const [displayAllticketsData, setDisplayAllTicketsData] = useState([]);
+  // const [displayAllticketHistory, setDisplayAllTicketHistory] = useState([]);
   useEffect(() => {
     props?.ticketData && setDisplayAllTicketsData(props?.ticketData);
   }, [props?.ticketData]);
 
   const showAllTicketHistory = async (ticket_id) => {
-    try {
-      const res = await axios.get(
-        `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
-      );
-      // console.log("All res: ", res)
-      setDisplayAllTicketsData(res.data);
-    } catch (error) {}
+    // try {
+    //   const res = await axios.get(
+    //     `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
+    //   );
+    //   // console.log("All res: ", res)
+    //   const data = res.data
+    //   data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+    //   setDisplayAllTicketHistory(data)
+
+    //   // setDisplayAllTicketsData(res.data);
+    // } catch (error) {}
+    
+    setDisplayAllTicketsData(props?.displayAllticketHistory)
   };
 
   const handleChange = (e) => {
@@ -408,6 +416,7 @@ const TicketReplyModal = (props) => {
                     >
                       Done
                     </button>
+                    {displayAllticketHistory.length > 2 && 
                     <button
                       onClick={() => {
                         showAllTicketHistory(tickeview?.id);
@@ -425,6 +434,7 @@ const TicketReplyModal = (props) => {
                     >
                       View All
                     </button>
+                    }
                   </div>
                 </div>
               </div>

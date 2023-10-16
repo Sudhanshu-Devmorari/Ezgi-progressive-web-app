@@ -55,7 +55,7 @@ def sms_send(number, msg):
         return "Code element not found in the response."
     
 
-def get_league_data(match_type, league, date):
+def get_league_data(match_type, league, date, match_detail):
     try:
         match_data = None    
         access_token = "lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
@@ -76,9 +76,16 @@ def get_league_data(match_type, league, date):
 
         if response.status_code == 200:
             response_data = response.json() 
-            match_data = response_data.get('data', None)
+            match_data = []
+            if response_data.get('data', None) != None:
+                data = response_data.get('data')
+                for obj in data:
+
+                    if obj['Teams'] == match_detail:
+                        match_data.append(obj)
+                        return match_data
     
-        return match_data
+        # return match_data
     except:
         return None
 

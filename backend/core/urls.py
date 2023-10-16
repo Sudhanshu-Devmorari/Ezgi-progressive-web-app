@@ -7,7 +7,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                         #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
-                         ViewAllTicketHistory, SubscriptionReNew,
+                         ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -61,6 +61,7 @@ urlpatterns = [
     path('transaction-history/<int:id>/', TransactionHistory.as_view(), name='Transaction-History'), 
     path('user-transaction-history/<int:id>/', UserTransactionHistory.as_view(), name='User-TransactionHistory'), 
     path('check-ticket-action/<int:ticket_id>/', CheckTicketActionView.as_view(), name='Check-Ticket-Action'), 
+    path('check-all-ticket-action/', CheckAllTicketActionView.as_view(), name='Check-All-Ticket-Action'), 
     path('check-new-support-ticket/', CheckNewSupportTicketView.as_view(), name='Check-New-Support-Ticket'), 
     path('check-change-support-ticket/', CheckChangeSupportTicket.as_view(), name='Check-Change-Support-Ticket'), 
     path('create-withdrawable-request/<int:id>/', CreateWithdrawableRequest.as_view(), name='Create-Withdrawable-Request'), 

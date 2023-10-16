@@ -18,8 +18,10 @@ import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { Range, getTrackBackground } from "react-range";
 import moment from "moment";
+import { ref, transcationQueryAPI } from "../GetRefNo";
 
 const AccountStatus = (props) => {
+  const userId = localStorage.getItem("user-id");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [verifyShow, setVerifyShow] = React.useState(false);
@@ -228,59 +230,87 @@ const AccountStatus = (props) => {
     membershipData && commentatorUser && setDaysLeft(calculateDaysLeft());
   }, [membershipData, commentatorUser]);
 
-  const handleRenew = async () => {
-    try {
-      const checkMembership = await axios.get(
-        `${config.apiUrl}/become-editor/?id=${userId}`
-      );
+  // const handleRenew = async () => {
+  //   try {
+  //     const checkMembership = await axios.get(
+  //       `${config.apiUrl}/subscription-reNew/${userId}/`
+  //     );
 
-      const formData = new FormData();
+  //     const formData = new FormData();
 
-      if (checkMembership?.status === 200) {
-        formData.append("payment", "membership renew");
-        formData.append("duration", checkMembership.data.promotion_duration);
-        formData.append("amount", checkMembership.data.monthly_amount);
-        formData.append("id", userId);
+  //     if (checkMembership?.status === 200) {
+  //       formData.append("payment", "membership renew");
+  //       formData.append("duration", checkMembership.data.duration);
+  //       formData.append("amount", checkMembership.data.money);
+  //       formData.append("id", userId);
 
-        const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
-        formData);
-        // console.log(payment_res, "==========payment_res");
+  //       const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+  //       formData);
+  //       // console.log(payment_res, "==========payment_res");
 
-        if (payment_res.status === 200) {
-          const url = payment_res?.data?.URL_3DS;
-          // console.log("URL: ", url)
-          window.location.replace(url);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      if (error?.response?.status === 500) {
-        // setIsLoading(false);
-        props.onHide();
-        Swal.fire({
-          title: "Error",
-          text: "something went wrong",
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
-      }
-      if (error?.response?.status === 400) {
-        // setIsLoading(false);
-        props.onHide();
-        Swal.fire({
-          title: "Error",
-          text: error?.response?.data?.data,
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
-      }
-    }
+  //       if (payment_res.status === 200) {
+  //         const url = payment_res?.data?.URL_3DS;
+  //         // console.log("URL: ", url)
+  //         window.location.replace(url);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     if (error?.response?.status === 500) {
+  //       // setIsLoading(false);
+  //       props?.onHide();
+  //       Swal.fire({
+  //         title: "Error",
+  //         text: "something went wrong",
+  //         icon: "error",
+  //         backdrop: false,
+  //         customClass:
+  //           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+  //       });
+  //     }
+  //     if (error?.response?.status === 400) {
+  //       // setIsLoading(false);
+  //       props?.onHide();
+  //       Swal.fire({
+  //         title: "Error",
+  //         text: error?.response?.data?.data,
+  //         icon: "error",
+  //         backdrop: false,
+  //         customClass:
+  //           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+  //       });
+  //     }
+  //   }
 
-  } 
+  // } 
+
+  // const ref_no = ref();
+
+  // useEffect(() => {
+  //   const ref_no = ref();
+  //   async function testPurchase() {
+  //     try {
+  //       const result = await transcationQueryAPI(ref_no);
+  //       if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+  //         // console.log("payment succesffull");
+  //         const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+  //         if (category === "membership renew") {
+  //           const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
+  //           const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
+  //           const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
+  //           const duration = result?.PRODUCTS[0]?.PRODUCT_NAME
+  //           const startdate = result?.PAYMENT_DATE
+  //           // handleMambership(category, experience, monthly_amount, duration, startdate);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   if (ref_no) {
+  //     testPurchase();
+  //   }
+  // }, [ref_no]);
 
   return (
     <>

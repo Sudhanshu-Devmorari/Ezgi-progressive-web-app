@@ -601,7 +601,7 @@ class CommentView(APIView):
                 if not comment:
                     raise NotFound("Comment not found.")
                 
-                match_data = get_league_data(category, league, date)
+                match_data = get_league_data(category, league, date, match_detail)
                 match_time = match_data[0].get('Time', None) if match_data else None
                 match_time_obj =  datetime.strptime(match_time, '%H:%M:%S').time() if match_time else None
                 
@@ -5173,6 +5173,7 @@ class BecomeEditorView(APIView):
                 data['category'] = category_data  
                 data['experience'] = request.data.get('experience', None)
                 data["commentator_status"] = "active"
+                data["remaining_monthly_count"] = (int(request.data.get('duration').split(" ")[0])-1)
 
                 # update or add membership date
                 # is_membership_exists = MembershipSetting.objects.filter(commentator_level='apprentice').exists()
@@ -6303,6 +6304,15 @@ class PaymentView(APIView):
         #     ]
         # }
         
+        if 'membership renew' in request.data['payment']:
+
+            if 'id' not in request.data:
+                raise KeyError('Commentator Id not found.')
+            if 'duration' not in request.data:
+                raise KeyError('Duration not found.')
+            if 'amount' not in request.data:
+                raise KeyError('Amount not found.')  
+            
         if 'membership' in request.data['payment']:
 
             if 'id' not in request.data:
@@ -6314,7 +6324,7 @@ class PaymentView(APIView):
 
             # if duration not in ["1 Week", "2 Week", "1 Month"]:
             #     raise ValueError('Invalid duration.')
-        if 'membership' in request.data['payment']:
+        if request.data.get('payment') == 'membership':
             data = {
                 "Config": {
                     "MERCHANT": os.environ.get('MERCHANT'),
@@ -6322,8 +6332,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6452,8 +6462,20 @@ class ViewAllTicketHistory(APIView):
 
 
 class SubscriptionReNew(APIView):
-    def get():
-        pass
+    def get(self, request, id, *args, **kwargs):
+        user = User.objects.get(id=id)
+        if BecomeCommentator.objects.filter(user=user,status='active').exists():
+            return Response({'data':'Your Membership plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if user.remaining_monthly_count != 0:
+                obj = BecomeCommentator.objects.get(user=user)
+                serializer = BecomeCommentatorSerializer(obj).data
+                # serializer['monthly_duration'] = ''
+                return Response(data=serializer, status=status.HTTP_200_OK)
+            else:
+                return Response({'data':'You have to purchase new membership plan.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
     def patch(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.filter(id=id).first()
@@ -6484,3 +6506,27 @@ class SubscriptionReNew(APIView):
                 return Response({'error':"You are not Commentator user."},status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class CheckAllTicketActionView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            current_time = datetime.now(timezone.utc)
+
+            ticket_obj = TicketSupport.objects.all()
+            for ticket in ticket_obj:
+
+                if ticket.admin_label == 'responded':
+                    response_obj = ResponseTicket.objects.filter(ticket=ticket).order_by('-created').first()
+                    if response_obj:
+                        time_difference = current_time - response_obj.created
+                        hours_old = time_difference.total_seconds() / 3600
+                        if hours_old >= 24:
+                            ticket_obj.status = 'resolved'
+                            ticket_obj.admin_label = 'resolved'
+                            ticket_obj.user_label = 'resolved'
+                            ticket_obj.save()
+                            return Response(data={"message": "Since user did not take any action in the last 24 hours, so this ticket has been closed."}, status=status.HTTP_200_OK)
+            return Response(data={"message": "Since user did not take any action in the last 24 hours, so this ticket has been closed."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

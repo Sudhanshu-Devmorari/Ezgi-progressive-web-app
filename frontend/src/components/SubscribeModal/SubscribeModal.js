@@ -153,6 +153,88 @@ const SubscribeModal = (props) => {
     setSelectedPlan(renewPlan?.promotion_duration);
   }, [props?.text, renewPlan?.promotion_duration]);
 
+  const handleRenew = async () => {
+    try {
+      const checkMembership = await axios.get(
+        `${config.apiUrl}/subscription-reNew/${userId}/`
+      );
+
+      const formData = new FormData();
+
+      if (checkMembership?.status === 200) {
+        formData.append("payment", "membership renew");
+        formData.append("duration", checkMembership.data.duration);
+        formData.append("amount", checkMembership.data.money);
+        formData.append("id", userId);
+
+        const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+        formData);
+        // console.log(payment_res, "==========payment_res");
+
+        if (payment_res.status === 200) {
+          const url = payment_res?.data?.URL_3DS;
+          // console.log("URL: ", url)
+          window.location.replace(url);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      if (error?.response?.status === 500) {
+        // setIsLoading(false);
+        props?.onHide();
+        Swal.fire({
+          title: "Error",
+          text: "something went wrong",
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+      if (error?.response?.status === 400) {
+        // setIsLoading(false);
+        props?.onHide();
+        Swal.fire({
+          title: "Error",
+          text: error?.response?.data?.data,
+          icon: "error",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+        });
+      }
+    }
+
+  } 
+
+  const ref_no = ref();
+
+  useEffect(() => {
+    const ref_no = ref();
+    async function testPurchase() {
+      try {
+        const result = await transcationQueryAPI(ref_no);
+        if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
+          // console.log("payment succesffull");
+          const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+          if (category === "membership renew") {
+            const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
+            const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
+            const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME
+            const startdate = result?.PAYMENT_DATE
+            // handleMambership(category, experience, monthly_amount, duration, startdate);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (ref_no) {
+      testPurchase();
+    }
+  }, [ref_no]);
+
   return (
     <>
       <Modal
@@ -432,12 +514,16 @@ const SubscribeModal = (props) => {
                     <div className="d-flex justify-content-center my-3">
                       <button
                         onClick={() =>
+                          {
+                            // props.text == 'renew'&& handleRenew()
                           props.text == "renew"
                             ? handleMambership(
                                 renewPlan?.promotion_duration,
                                 renewPlan?.plan_price
                               )
                             : handleSubscription()
+                            }
+                            
                         }
                         style={{ fontSize: "14px" }}
                         className={`${

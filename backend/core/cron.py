@@ -5,6 +5,7 @@ import requests
 from core.utils import sms_send
 from core.models import User, Comments, Highlight
 import logging
+from datetime import date
 # from django_cron import CronJobBase, Schedule
 
 logger = logging.getLogger('django_cron')
@@ -410,6 +411,10 @@ def comment_result_check():
                 continue
             
             all_comment = Comments.objects.filter(status='approve', is_resolve=False, commentator_user= user, is_prediction=None)
+            # if not Comments.objects.filter(status='approve', is_resolve=False, commentator_user= user).exists():
+            #     continue
+            
+            # all_comment = Comments.objects.filter(status='approve', is_resolve=False, commentator_user= user)
 
             for obj in all_comment:
 
@@ -429,12 +434,17 @@ def comment_result_check():
                 logger.info("match_data_list : %s", match_data_list)
                 
                 if len(match_data_list) <= 0:
+                    # current_date = date.today()
+                    # if obj.date < current_date:
+                    #     obj.is_resolve = True
+                    #     obj.save()
                     continue
 
                 for match in match_data_list:
                     check_match = match.get('Result')
                     check_result = match.get('GameResult')
 
+                    # if check_match != 'Pending' and check_result != 'Pending':
                     if check_match != 'Pending':
                         teams = match.get("Teams")
                         if teams == obj.match_detail:

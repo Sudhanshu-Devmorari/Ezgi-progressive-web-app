@@ -8,6 +8,7 @@ import AnsweredTicketView from "../AnsweredTicketView/AnsweredTicketView";
 import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal";
 import config from "../../config";
 import Swal from "sweetalert2";
+import moment from "moment";
 
 const Support = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -81,12 +82,19 @@ const Support = () => {
     try {
       const res = await axios.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${e}/`);
       // console.log("All res: ", res)
+      // const data = res.data
+      // data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+      // setTicketAllData(data)
+        
       setTicketAllData(res.data)
     }catch (e) {}
     try {
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
+          // const data = res.data
+          // data.sort((a, b) => moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+          // setTicketData(data);
           setTicketData(res.data);
         })
         .catch((error) => {
@@ -150,7 +158,7 @@ const Support = () => {
               <>
                 <div
                   onClick={() => {
-                    if(res.user_label.toLowerCase() === "answered"){
+                    if(res.admin_label.toLowerCase() === "answered"){
                       // API call to check admin adswered but user can not take action so ticket is resolved.
                       handleCheckTicketAction(res.id)
                     }
