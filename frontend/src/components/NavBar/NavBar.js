@@ -170,6 +170,7 @@ const NavBar = (props) => {
         ShowModal={ShowModal}
       />
       <AddCommentModal
+        
         show={addCommentShow}
         onHide={() => {
           setAddCommentShow(false);

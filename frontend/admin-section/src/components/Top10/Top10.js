@@ -31,7 +31,7 @@ const Top10 = (props) => {
                 alt=""
               />
               <span className="text-top10" style={{ fontSize: "0.7rem" }}>
-                {data.length > 0 ? data[0].Subscriber_Count : null}
+                {data.length > 0 ? data[0]?.Subscriber_Count : null}
               </span>
             </div>
             <div className="d-flex flex-column">
@@ -44,7 +44,7 @@ const Top10 = (props) => {
                 alt=""
               />
               <span className="text-top10" style={{ fontSize: "0.8rem" }}>
-                {data.length > 0 ? data[2].Subscriber_Count : null}
+                {data.length > 0 ? data[2]?.Subscriber_Count : null}
               </span>
             </div>
             <div className="d-flex flex-column">
@@ -57,7 +57,7 @@ const Top10 = (props) => {
                 alt=""
               />
               <span className="text-top10" style={{ fontSize: "0.7rem" }}>
-                {data.length > 0 ? data[1].Subscriber_Count : null}
+                {data?.length > 0 ? data[1]?.Subscriber_Count : null}
               </span>
             </div>
           </div>
@@ -86,7 +86,7 @@ const Top10 = (props) => {
                     className="all-user-text"
                     style={{ fontSize: "0.7rem" }}
                   >
-                    {res.Subscriber_Count}
+                    {res?.Subscriber_Count}
                   </span>
                 </div>
               ))}

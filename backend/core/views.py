@@ -3565,7 +3565,7 @@ class SupportManagement(APIView):
             adminuser = User.objects.get(id=adminuser_id)
             
             if adminuser.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             try:
                 """Ticket percentage"""
                 status_changed_to_resolved = TicketSupport.objects.annotate(date_updated=TruncDate('updated')).filter(status='resolved', date_updated__gte=previous_24_hours).count()
@@ -3673,6 +3673,7 @@ class SupportManagement(APIView):
                 #                                             response_ticket=res_obj, message=message)
                 if is_res_obj:
                     notification_obj = Notification.objects.create(
+                        sender=user,
                         receiver=ticket_support.user, 
                         subject='Support ticket',
                         date=datetime.now().date(), 
@@ -3681,6 +3682,7 @@ class SupportManagement(APIView):
                     )
                 else:
                     notification_obj = Notification.objects.create(
+                        sender=user,
                         receiver=ticket_support.user, 
                         subject='Support ticket',
                         date=datetime.now().date(), 
@@ -4811,7 +4813,12 @@ class SportsStatisticsView(APIView):
 
             prediction_types_data = []
             for i in top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Basketbol', status='approve', is_resolve=True).count()
+                predict_type = Comments.objects.filter(
+                        commentator_user__id=id,
+                        prediction_type__icontains=i, 
+                        category__icontains='Basketbol', 
+                        status='approve', 
+                    ).count()
 
                 # if total_user_cmt > 0:
                 #     cal = (predict_type / total_user_cmt)* 100 
@@ -4864,7 +4871,6 @@ class SportsStatisticsView(APIView):
                     correct_prediction_basketball += 1
             details['Comments_Journey_basketball'] = Comments_Journey_basketball
 
-            print('recent_30_comments.count(): ', recent_30_comments.count())
             total_comments_recents = recent_30_comments.count() if recent_30_comments.count() != 0 else 1
 
             basketball_calculation = (correct_prediction_basketball/total_comments_recents)*100
@@ -4904,7 +4910,6 @@ class SportsStatisticsView(APIView):
             Comments_Journey_football = []
             fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
             fb_total_user_cmt = fb_user_all_cmt.count()
-            print('fb_total_user_cmt: ', fb_total_user_cmt)
 
             other_comments_fb = 0
 
@@ -4912,7 +4917,12 @@ class SportsStatisticsView(APIView):
 
             fb_prediction_types_data = []
             for i in fb_top_3_prediction_types:
-                predict_type = Comments.objects.filter(commentator_user__id=id,prediction_type__icontains=i, category__icontains='Futbol', status='approve').count()
+                predict_type = Comments.objects.filter(
+                            commentator_user__id=id,
+                            prediction_type__icontains=i, 
+                            category__icontains='Futbol', 
+                            status='approve'
+                        ).count()
 
                 # cal = (predict_type / fb_total_user_cmt)* 100
                 # data ={
@@ -4923,11 +4933,9 @@ class SportsStatisticsView(APIView):
                     "prediction_type":i,
                     "calculation":predict_type
                 }
-                print('predict_type: ', predict_type)
                 other_comments_fb += predict_type
                 fb_prediction_types_data.append(data)
 
-            print('other_comments_fb: ', other_comments_fb)
             if fb_total_user_cmt == 0:
                 fb_prediction_types_data = []
             else:

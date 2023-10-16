@@ -74,7 +74,7 @@ const Notifications = () => {
               style={{ borderRadius: "50%" }}
             />
             <div className="d-flex flex-column ps-1" style={{ width: "66%" }}>
-              <span>{res?.sender?.username}</span>
+              <span>{ res?.subject === 'Support ticket' ? 'Support' : res?.sender?.username}</span>
               <span style={{ fontSize: "10px" }}>{res?.context}</span>
             </div>
             <div className="ms-auto mt-2 text-end">

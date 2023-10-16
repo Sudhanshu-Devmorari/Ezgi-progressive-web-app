@@ -248,9 +248,9 @@ def Userst():
                                 i.average_odds =round(avg, 2)
                                 i.save()
 
-                                if match['LiveStatus'] != 0:
-                                    i.is_resolve = True
-                                    i.save()
+                                # if match['LiveStatus'] != 0:
+                                #     i.is_resolve = True
+                                #     i.save()
             print("FOR LOOP END")
             correct_prediction = data.filter(is_prediction=True)
             incorrect_prediction = data.filter(is_prediction=False)
@@ -320,7 +320,10 @@ def resolve_pending_comments(comments_data):
             pending_match_data_list = json_data["data"]
 
             for match in pending_match_data_list:
-                if match['LiveStatus'] != 0:
+                # if match['LiveStatus'] != 0:
+                check_match = match.get('Result')
+
+                if check_match != 'Pending':
                     teams = match.get("Teams")
 
                     if teams == i.match_detail:
@@ -394,3 +397,150 @@ def withdrawable_balance_update():
         bank_obj.withdrawable_balance += obj.amount
 
         bank_obj.save()
+
+
+def comment_result_check():
+    try:
+        all_user = User.objects.filter(user_role='commentator')
+        for individual in all_user:
+            user = User.objects.get(id=individual.id)
+            logger.info("Processing user: %s", user.username)
+
+            if not Comments.objects.filter(status='approve', is_resolve=False, commentator_user= user, is_prediction=None).exists():
+                continue
+            
+            all_comment = Comments.objects.filter(status='approve', is_resolve=False, commentator_user= user, is_prediction=None)
+
+            for obj in all_comment:
+
+                if (obj.category[0].lower()) == 'futbol':
+                    url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=1&league={obj.league}&date={obj.date}"
+                    logger.info("url : %s", url)
+                else:
+                    url = f"https://www.nosyapi.com/apiv2/service/bettable-matches?type=2&league={obj.league}&date={obj.date}"
+                    logger.info("url : %s", url)
+
+                headers = {
+                            "Authorization": "Bearer lnIttTJHmoftk74gnHNLgRpTjrPzOAkh5nK5yu23SgxU9P3wARDQB2hqv3np"
+                        }
+                response = requests.get(url, headers=headers)
+                json_data = response.json()
+                match_data_list = json_data["data"]
+                logger.info("match_data_list : %s", match_data_list)
+                
+                if len(match_data_list) <= 0:
+                    continue
+
+                for match in match_data_list:
+                    check_match = match.get('Result')
+                    check_result = match.get('GameResult')
+
+                    if check_match != 'Pending':
+                        teams = match.get("Teams")
+                        if teams == obj.match_detail:
+                            matchID = match.get("MatchID")
+                            logger.info("matchID : %s", matchID)
+
+                            # Save match score 
+                            match_score_url = f'https://www.nosyapi.com/apiv2/service/matches-result/details?matchID={matchID}'
+
+                            get_match_score = requests.get(match_score_url, headers=headers)
+                            matchScore_data = get_match_score.json()
+                            matchScore_data_list = matchScore_data["data"]
+                            team_1 = 0
+                            team_2 = 0
+                            if matchScore_data_list:
+                                obj.is_resolve = True if matchScore_data_list[0]['matchResult'] and not obj.is_resolve else obj.is_resolve
+                                for value in matchScore_data_list[0]['matchResult']:
+                                    if value['metaName'] == 'msHomeScore':                                    
+                                        team_1 = value['value']
+                                    elif value['metaName'] == 'msAwayScore':                                    
+                                        team_2 = value['value']
+
+                            obj.match_score = f'{team_1} - {team_2}'
+                            logger.info("match_score: %s" % obj.match_score)
+
+                            obj.save(update_fields=['match_score', 'is_resolve', 'updated'])
+
+                            game_result = f"https://www.nosyapi.com/apiv2/service/bettable-result?matchID={matchID}"
+
+                            details = requests.get(game_result, headers=headers)
+                            matchID_data = details.json()
+                            matchID_data_list = matchID_data["data"]
+                            logger.info("matchID_data_list : %s", matchID_data_list)
+
+                            for predict_result in matchID_data_list:
+                                bettableResult = predict_result.get("bettableResult")
+                                for result in bettableResult:
+                                    if result['gameName'] == obj.prediction_type:
+                                        for obj_data in result['game_result']:
+                                            if obj_data['value'] == obj.prediction:
+                                                obj.is_prediction = True
+                                                obj.is_resolve = True
+                                                obj.save()
+                                                break
+                                            else:
+                                                obj.is_prediction = False
+                                                obj.is_resolve = True
+                                                obj.save()
+
+                                HomeWin = float(predict_result['HomeWin']) if predict_result['HomeWin'] is not None else 0.0
+                                Draw = float(predict_result['Draw'])  if predict_result['Draw'] is not None else 0.0
+                                AwayWin = float(predict_result['AwayWin']) if predict_result['AwayWin'] is not None else 0.0
+                                GoalUnder = float(predict_result['Under25']) if predict_result['Under25'] is not None else 0.0
+                                GoalOver = float(predict_result['Over25']) if predict_result['Over25'] is not None else 0.0
+                                avg = (GoalOver+GoalUnder+AwayWin+HomeWin+Draw)/5
+                                
+                                obj.average_odds =round(avg, 2)
+                                obj.save()
+
+            correct_prediction = all_comment.filter(is_prediction=True)
+            incorrect_prediction = all_comment.filter(is_prediction=False)
+            Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+
+            total_predictions = len(correct_prediction) + len(incorrect_prediction)
+
+            if total_predictions > 0:
+                Success_rate = round((len(correct_prediction) / total_predictions) * 100, 2)
+            else:
+                Success_rate = 0
+
+            user.success_rate = Success_rate
+            user.score_points = Score_point
+
+            level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            
+            if level.winning_limit < correct_prediction.count():
+                if int(level.sucess_rate) < Success_rate :
+
+                    if user.commentator_level == 'apprentice':
+                        user.commentator_level = "journeyman"
+                        user.save()
+
+                    elif user.commentator_level == 'journeyman':
+                        user.commentator_level = "master"
+                        user.save()
+
+                    elif user.commentator_level == 'master':
+                        user.commentator_level = "grandmaster"
+                        user.save()
+
+            if 0 < Success_rate < 60:
+                user.commentator_level = "apprentice"
+            if 60 < Success_rate< 65:
+                user.commentator_level = "journeyman"
+            if 65 < Success_rate < 70:
+                user.commentator_level = "master"
+            if 70 < Success_rate < 100:
+                user.commentator_level = "grandmaster"
+
+            logger.info("last debug: ======================%s")
+            
+            # Update is_resolve status for pending comment
+            pending_comments = Comments.objects.filter(status='pending', is_resolve=False, commentator_user= user)
+            resolve_pending_comments(pending_comments)
+            
+            user.save()
+
+    except Exception as e:
+        logger.error('\n Error occurred in comment prediction check cron: %s', str(e))
