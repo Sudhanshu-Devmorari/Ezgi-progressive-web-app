@@ -471,7 +471,6 @@ const ContentSection = ({
               </div>
             </div>
             {(userPhone === null || !data?.value?.public_content) &&
-            // selectContent !== "subscription" &&
             !data?.value?.is_subscribe &&
             userId != data?.value?.commentator_user?.id ? (
               <>

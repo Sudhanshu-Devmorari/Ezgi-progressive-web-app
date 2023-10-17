@@ -287,7 +287,7 @@ const CommentsContentSection = (props) => {
                                   11
                                 )}
                               </span>
-                              {props.verifyid?.includes(
+                              {props?.verifyid?.includes(
                                 val?.commentator_user?.id
                               ) && (
                                 <img
@@ -693,13 +693,17 @@ const CommentsContentSection = (props) => {
                               <span className="p-1 autorname-responsive">
                                 {val?.commentator_user?.username}
                               </span>
-                              <img
-                                onContextMenu={(e) => e.preventDefault()}
-                                src={blueTick}
-                                alt=""
-                                width={16}
-                                height={16}
-                              />
+                              {props?.verifyid?.includes(
+                                val?.commentator_user?.id
+                              ) && (
+                                <img
+                                  onContextMenu={(e) => e.preventDefault()}
+                                  src={blueTick}
+                                  alt=""
+                                  width={14}
+                                  height={14}
+                                />
+                              )}
                             </div>
                           </div>
                           <div className="col p-0">
@@ -1199,22 +1203,22 @@ const CommentsContentSection = (props) => {
                               />
                             )}
                           </>
-                          {(res.is_prediction != true &&
-                            res.is_prediction != null) && (
-                            <img
-                              onContextMenu={(e) => e.preventDefault()}
-                              src={
-                                res.is_prediction == false
-                                  ? circle_x
-                                  : // : res.is_prediction == null
-                                    // ? clock_pause
-                                    ""
-                              }
-                              alt=""
-                              height={31}
-                              width={31}
-                            />
-                          )}
+                          {res.is_prediction != true &&
+                            res.is_prediction != null && (
+                              <img
+                                onContextMenu={(e) => e.preventDefault()}
+                                src={
+                                  res.is_prediction == false
+                                    ? circle_x
+                                    : // : res.is_prediction == null
+                                      // ? clock_pause
+                                      ""
+                                }
+                                alt=""
+                                height={31}
+                                width={31}
+                              />
+                            )}
                         </div>
                       )}
 
@@ -1247,6 +1251,7 @@ const CommentsContentSection = (props) => {
                     </div>
                     {user_id == res?.commentator_user?.id ||
                     res.public_content ||
+                    res?.is_resolve ||
                     res.is_subscribe ? (
                       <div
                         className="p-1 my-2 content-font"
@@ -1382,13 +1387,16 @@ const CommentsContentSection = (props) => {
                                 : "#00659D",
                             color:
                               props.SelectComment === "resolvedComments"
-                                ? res.is_prediction == null ? "#fff" : "#0D2A53"
+                                ? res.is_prediction == null
+                                  ? "#fff"
+                                  : "#0D2A53"
                                 : "#FFFFFF",
                             fontSize: "12px",
                           }}
                         >
                           {user_id == res?.commentator_user?.id ||
                           res.public_content ||
+                          res?.is_resolve ||
                           res?.is_subscribe ? (
                             <>{`${res?.prediction_type} & ${res?.prediction}`}</>
                           ) : (

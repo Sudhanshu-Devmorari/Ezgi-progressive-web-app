@@ -16,6 +16,9 @@ def subscription_reminder_cron():
         today_date = timezone.now().date() 
         cutoff_date = timezone.now() + timedelta(days=3)
 
+        # deactive highlight plan
+        active_highlights = Highlight.objects.filter(status='active', end_date__date__lt=today_date).update(status='deactive')
+
         # Send notification and sms before 3 days of subscription expiration
         reminder_notification_sub_data = Subscription.objects.filter(end_date__date=cutoff_date.date(), status='active')
         for sub in reminder_notification_sub_data:

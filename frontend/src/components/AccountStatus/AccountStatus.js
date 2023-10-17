@@ -244,7 +244,7 @@ const AccountStatus = (props) => {
   //       formData.append("amount", checkMembership.data.money);
   //       formData.append("id", userId);
 
-  //       const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+  //       const payment_res = await axios.post(`${config.apiUrl}/payment/`,
   //       formData);
   //       // console.log(payment_res, "==========payment_res");
 
@@ -282,7 +282,7 @@ const AccountStatus = (props) => {
   //     }
   //   }
 
-  // } 
+  // }
 
   // const ref_no = ref();
 
@@ -378,7 +378,10 @@ const AccountStatus = (props) => {
               <div className="d-flex justify-content-center  gap-2 fw-medium my-2">
                 <span
                   className="cursor text-center"
-                  onClick={() => {setSelectSub("journeyman"); setValues(0)}}
+                  onClick={() => {
+                    setSelectSub("journeyman");
+                    setValues(0);
+                  }}
                   style={{
                     color:
                       currentTheme !== "dark"
@@ -539,9 +542,13 @@ const AccountStatus = (props) => {
               <span
                 className="cursor text-center"
                 onClick={() => {
+                  setValues([0]);
+                  const ear_var = 0;
+                  setEarnings(ear_var);
                   setSelectSubRangeData("journeyman");
                   selectSubRangeData !== "journeyman" &&
-                    getEarnings(values, "journeyman");
+                    getEarnings(0, "journeyman");
+                  // getEarnings(values, "journeyman");
                 }}
                 style={{
                   color:
@@ -559,9 +566,13 @@ const AccountStatus = (props) => {
               <span
                 className="cursor text-center"
                 onClick={() => {
+                  setValues([0]);
+                  const ear_var = 0;
+                  setEarnings(ear_var);
                   setSelectSubRangeData("master");
                   selectSubRangeData !== "master" &&
-                    getEarnings(values, "master");
+                    getEarnings(0, "master");
+                    // getEarnings(values, "master");
                 }}
                 style={{
                   color:
@@ -579,9 +590,13 @@ const AccountStatus = (props) => {
               <span
                 className="cursor text-center"
                 onClick={() => {
+                  setValues([0]);
+                  const ear_var = 0;
+                  setEarnings(ear_var);
                   setSelectSubRangeData("grandmaster");
                   selectSubRangeData !== "grandmaster" &&
-                    getEarnings(values, "grandmaster");
+                    getEarnings(0, "grandmaster");
+                    // getEarnings(values, "grandmaster");
                 }}
                 style={{
                   color:
@@ -760,34 +775,33 @@ const AccountStatus = (props) => {
                     )}
                   </div>
                   <div className="d-flex justify-content-end m-2">
-                  {/* {console.log("daysLeft", daysLeft)} */}
+                    {/* {console.log("daysLeft", daysLeft)} */}
                     {/* {daysLeft?.showRenewButt on == true ? ( */}
-                      <button
-                        onClick={() => {
-                          if (
-                            JSON.parse(localStorage.getItem("user-active")) ==
-                            false
-                          ) {
-                            errorSwal();
-                            return;
-                          }
-                          setModalShow(true);
-                          // handleRenew()
-                        }}
-                        className="px-3"
-                        style={{
-                          color:
-                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid  #D2DB08"
-                              : "1px solid #00659D",
-                          borderRadius: "3px",
-                          backgroundColor: "transparent",
-                        }}
-                      >
-                        Renew
-                      </button>
+                    <button
+                      onClick={() => {
+                        if (
+                          JSON.parse(localStorage.getItem("user-active")) ==
+                          false
+                        ) {
+                          errorSwal();
+                          return;
+                        }
+                        setModalShow(true);
+                        // handleRenew()
+                      }}
+                      className="px-3"
+                      style={{
+                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                        border:
+                          currentTheme === "dark"
+                            ? "1px solid  #D2DB08"
+                            : "1px solid #00659D",
+                        borderRadius: "3px",
+                        backgroundColor: "transparent",
+                      }}
+                    >
+                      Renew
+                    </button>
                     {/* ) : (
                       <span className="text-end">
                         {" "}

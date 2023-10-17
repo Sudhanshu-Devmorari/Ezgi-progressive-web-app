@@ -69,7 +69,6 @@ const MainPage = () => {
   const ref_no = ref();
   useEffect(() => {
     async function testPurchase() {
-      console.log(ref_no, "=>>ref_no");
       try {
         const result = await transcationQueryAPI(ref_no);
 

@@ -397,7 +397,7 @@ const FavComments = (props) => {
                   </div>
                 ) : (
                   <>
-                    {res.public_content === true ? (
+                    {res?.public_content === true || res?.is_resolve ? (
                       <>
                         <div
                           className="p-1 my-2 content-font"
@@ -581,7 +581,7 @@ const FavComments = (props) => {
                         fontSize: "12px",
                       }}
                     >
-                      {res.public_content || res.is_subscribe
+                      {res.public_content || res.is_subscribe || res?.is_resolve
                         ? `${res?.prediction_type} & ${res?.prediction}`
                         : "Subscribers Only"}
                     </span>

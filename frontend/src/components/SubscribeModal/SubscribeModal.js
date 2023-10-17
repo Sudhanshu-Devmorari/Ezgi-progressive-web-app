@@ -595,6 +595,12 @@ export default SubscribeModal;
         }).then((res) => {
           if (res.isConfirmed) {
             window.location.replace("/");
+            // After successful payment 
+            // window.history.replaceState(null, null, "/");
+            // window.history.pushState(null, null, "/");
+            // window.location.reload()
+
+
           }
         });
       }

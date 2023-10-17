@@ -4809,7 +4809,8 @@ class SportsStatisticsView(APIView):
             
             other_comments_basketball = 0
             
-            top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
+            top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+            # top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             prediction_types_data = []
             for i in top_3_prediction_types:
@@ -4818,25 +4819,17 @@ class SportsStatisticsView(APIView):
                         prediction_type__icontains=i, 
                         category__icontains='Basketbol', 
                         status='approve', 
-                    ).count()
+                    )
 
-                # if total_user_cmt > 0:
-                #     cal = (predict_type / total_user_cmt)* 100 
-                #     data ={
-                #         "prediction_type":i,
-                #         "calculation":round(cal, 2)
-                #     }
-                # else:
-                #     data ={
-                #         "prediction_type":i,
-                #         "calculation": 0
-                #     }
+                if i == 'Alt/Üst':
+                    predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+
                 data ={
                     "prediction_type":i,
-                    "calculation": predict_type
+                    "calculation": predict_type.count()
                 }
                 prediction_types_data.append(data)
-                other_comments_basketball += predict_type
+                other_comments_basketball += predict_type.count()
 
             if total_user_cmt == 0:
                 prediction_types_data = []
@@ -4850,7 +4843,7 @@ class SportsStatisticsView(APIView):
                 #     "calculation":round(100-b_avg, 2)
                 # }
                 other_data = {
-                    "prediction_type":'Other',
+                    "prediction_type":'Diger',
                     "calculation": total_user_cmt - other_comments_basketball
                 }
                 prediction_types_data.append(other_data)
@@ -4913,7 +4906,8 @@ class SportsStatisticsView(APIView):
 
             other_comments_fb = 0
 
-            fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
+            fb_top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+            # fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
 
             fb_prediction_types_data = []
             for i in fb_top_3_prediction_types:
@@ -4922,18 +4916,16 @@ class SportsStatisticsView(APIView):
                             prediction_type__icontains=i, 
                             category__icontains='Futbol', 
                             status='approve'
-                        ).count()
+                        )
 
-                # cal = (predict_type / fb_total_user_cmt)* 100
-                # data ={
-                #     "prediction_type":i,
-                #     "calculation":round(cal, 2)
-                # }
+                if i == 'Alt/Üst':
+                    predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+                    
                 data ={
                     "prediction_type":i,
-                    "calculation":predict_type
+                    "calculation":predict_type.count()
                 }
-                other_comments_fb += predict_type
+                other_comments_fb += predict_type.count()
                 fb_prediction_types_data.append(data)
 
             if fb_total_user_cmt == 0:
@@ -4947,7 +4939,7 @@ class SportsStatisticsView(APIView):
                 #     "calculation":round(100-fb_avg, 2)
                 # }
                 fb_other_data = {
-                    "prediction_type":'Other',
+                    "prediction_type":'Diger',
                     "calculation": fb_total_user_cmt - other_comments_fb
                 }
                 fb_prediction_types_data.append(fb_other_data)
@@ -5323,6 +5315,25 @@ class GetALLUsers(APIView):
         except Exception as e:
             return Response({'error': f'Error while fetching users. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def success_rate_score_points(user_id):
+    user = User.objects.get(id=user_id) if user_id != None else None
+    if user != None:
+        data = Comments.objects.filter(commentator_user=user, is_resolve=True)
+        win_count = data.filter(is_prediction=True).count()
+        lose_count = data.filter(is_prediction=False).count()
+
+        if len(data) != 0:
+            Success_rate = round((win_count/len(data))*100, 2)
+        else:
+            Success_rate = 0
+
+        Score_point = ((10*win_count)- (10*lose_count))
+        user.score_points = Score_point
+        user.success_rate = Success_rate
+        user.save(update_fields=['success_rate', 'score_points', 'updated'])
+        return True
+    return False
+    
 
 class RetrievePageData():
 
@@ -5359,7 +5370,8 @@ class RetrievePageData():
             highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
             comments_data = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).exclude(id__in=highlight_comments_ids).order_by('-created').only('id')
             
-            all_comments = highlight_comments.union(comments_data) if highlight_comments else comments_data
+            # all_comments = highlight_comments.union(comments_data) if highlight_comments else comments_data
+            all_comments = list(highlight_comments) + list(comments_data) if highlight_comments else comments_data
 
             for comment in all_comments:
                 comment_data = CommentsSerializer(comment).data
@@ -5374,6 +5386,8 @@ class RetrievePageData():
 
                 is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
                 comment_data['is_subscribe'] = is_subscribe
+
+                success_rate_score_points(comment.commentator_user.id)
                 
                 # Fetch comment reactions and calculate the total count of reactions
                 comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
@@ -5426,7 +5440,8 @@ class RetrievePageData():
             highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
             subscription_data = Subscription.objects.filter(standard_user_id=id, commentator_user__is_delete=False, end_date__gte=datetime.now(), status='active').exclude(id__in=highlight_comments_ids).order_by('-created').only('id','commentator_user')
 
-            subscription_obj = highlight_comments.union(subscription_data) if highlight_comments else subscription_data
+            # subscription_obj = highlight_comments.union(subscription_data) if highlight_comments else subscription_data
+            subscription_obj = list(highlight_comments) + list(subscription_data) if highlight_comments else subscription_data
 
             for obj in subscription_obj:
                 if Comments.objects.filter(commentator_user=obj.commentator_user, status='approve', commentator_user__is_delete=False, category=[category]).exists():
@@ -5446,6 +5461,8 @@ class RetrievePageData():
                         comment_data['is_subscribe'] = True
 
                         comment_data['commentator_user']['is_subscribed'] = True
+
+                        success_rate_score_points(obj.commentator_user.id)
 
                         # is_subscribe = Subscription.objects.filter(standard_user=id, commentator_user=comment.commentator_user, status='active').exists()
                         # comment_data['is_subscribe'] = is_subscribe
@@ -5486,6 +5503,8 @@ class RetrievePageData():
                 lose_count = data.filter(is_prediction=False).count()
                 highlighted_data['user'] ['win'] = win_count
                 highlighted_data['user'] ['lose'] = lose_count
+
+                success_rate_score_points(obj.user.id)
 
                 if standard_user_id is not None:
                     logged_in_user = User.objects.get(id=standard_user_id)
@@ -5583,6 +5602,8 @@ class RetrievePageData():
                 detail = {}
                 count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
                 user_data = UserSerializer(obj).data
+                
+                success_rate_score_points(obj.id)
 
                 if user is not None:
                     is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.id, status='active').exists()
@@ -6387,8 +6408,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
