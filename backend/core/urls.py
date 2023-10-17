@@ -7,7 +7,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                         #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
-                         ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView,
+                         ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -107,7 +107,10 @@ urlpatterns = [
     path('become-editor/', BecomeEditorView.as_view(), name='Become-Editor'),
     path('become-editor/<int:id>/', BecomeEditorView.as_view(), name='Become-Editor'),
     path('become-editor-earn-details/<int:subscriber>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
-    path('subscription-reNew/<int:id>/', SubscriptionReNew.as_view(), name='Subscription-ReNew'),# path('become-editor-earn-details/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
+    path('subscription-reNew/<int:id>/', SubscriptionReNew.as_view(), name='Subscription-ReNew'),
+    path('renew-model-data/<int:id>/', RenewModelData.as_view(), name='Renew-Model-Data'),
+    path('retrieve-become-commentator-data/<int:id>/', RetrieveBecomeCommentatorData.as_view(), name='Retrieve-BecomeCommentator-Data'),
+    # path('become-editor-earn-details/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
     # path('become-editor-earn-details/<int:id>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
     # path('become-editor-earn-details/<int:id>/<int:subscriber>/', BecomeEditorEarnDetailsview.as_view(), name='become-editor-earn-details'),
 

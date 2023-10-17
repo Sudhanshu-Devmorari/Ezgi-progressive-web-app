@@ -29,6 +29,7 @@ const SubscribeModal = (props) => {
     isRenewTerms,
     preveiwProfilePic,
     setMembershipData,
+    renewModelData,
   } = props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   useEffect(() => {
@@ -135,7 +136,16 @@ const SubscribeModal = (props) => {
           const data = res?.data[0];
           setRenewPlan(data);
           setIsSubscriptionLoading(false);
-          setMembershipData && setMembershipData(data);
+          try {
+            const ress = await axios.get(
+              `${config?.apiUrl}/retrieve-become-commentator-data/${userId}/`
+            );
+          } catch (error) {
+            console.log(error);
+          }
+          if (res.status === 200) {
+            setMembershipData && setMembershipData(res?.data);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -153,30 +163,38 @@ const SubscribeModal = (props) => {
     setSelectedPlan(renewPlan?.promotion_duration);
   }, [props?.text, renewPlan?.promotion_duration]);
 
+  // const totalValue = (renewModelData?.plan_price - renewModelData?.plan_price * (renewModelData?.plan_promotion_rate / 100))
+  // console.log("toatlValue", totalValue)
   const handleRenew = async () => {
     try {
-      const checkMembership = await axios.get(
-        `${config.apiUrl}/subscription-reNew/${userId}/`
-      );
+      // const checkMembership = await axios.get(
+      //   `${config.apiUrl}/subscription-reNew/${userId}/`
+      // );
+      const totalValue =
+        renewModelData?.plan_price -
+        renewModelData?.plan_price *
+          (renewModelData?.plan_promotion_rate / 100);
 
       const formData = new FormData();
 
-      if (checkMembership?.status === 200) {
-        formData.append("payment", "membership renew");
-        formData.append("duration", checkMembership.data.duration);
-        formData.append("amount", checkMembership.data.money);
-        formData.append("id", userId);
+      // if (checkMembership?.status === 200) {
+      formData.append("payment", "membership renew");
+      formData.append("duration", selectedPlan);
+      formData.append("amount", totalValue);
+      formData.append("id", userId);
 
-        const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
-        formData);
-        // console.log(payment_res, "==========payment_res");
+      const payment_res = await axios.post(
+        `${config.apiUrl}/payment/`,
+        formData
+      );
+      // console.log(payment_res, "==========payment_res");
 
-        if (payment_res.status === 200) {
-          const url = payment_res?.data?.URL_3DS;
-          // console.log("URL: ", url)
-          window.location.replace(url);
-        }
+      if (payment_res.status === 200) {
+        const url = payment_res?.data?.URL_3DS;
+        // console.log("URL: ", url)
+        window.location.replace(url);
       }
+      // }
     } catch (error) {
       console.log(error);
       if (error?.response?.status === 500) {
@@ -204,8 +222,7 @@ const SubscribeModal = (props) => {
         });
       }
     }
-
-  } 
+  };
 
   const ref_no = ref();
 
@@ -218,12 +235,10 @@ const SubscribeModal = (props) => {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
           if (category === "membership renew") {
-            const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
-            const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
-            const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
-            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME
-            const startdate = result?.PAYMENT_DATE
-            // handleMambership(category, experience, monthly_amount, duration, startdate);
+            console.log("IN: ");
+            const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
+            const startdate = result?.PAYMENT_DATE;
+            handleRenewMambership(monthly_amount, startdate);
           }
         }
       } catch (error) {
@@ -234,6 +249,20 @@ const SubscribeModal = (props) => {
       testPurchase();
     }
   }, [ref_no]);
+
+  const handleRenewMambership = async (monthly_amount, startdate) => {
+    try {
+      const checkMembership = await axios.patch(
+        `${config.apiUrl}/subscription-reNew/${userId}/`,
+        {
+          money: monthly_amount,
+          start_date: startdate,
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -424,7 +453,8 @@ const SubscribeModal = (props) => {
                 </div>
 
                 <PlanSelection
-                  renewPlan={renewPlan}
+                  // renewModelData={renewModelData}
+                  renewPlan={renewModelData}
                   isSubscriptionLoading={isSubscriptionLoading}
                   text={props?.text}
                   subscriptionPlan={subscriptionPlan}
@@ -435,13 +465,13 @@ const SubscribeModal = (props) => {
                 <div className="">
                   {props?.text === "renew" ? (
                     <>
-                      {selectedPlan && (
+                      {selectedPlan == "1 Months" && (
                         <div className="text-center my-2">
                           <div>Total Amount</div>
                           <div style={{ fontSize: "19px" }}>
-                            {renewPlan?.plan_price -
-                              renewPlan?.plan_price *
-                                (renewPlan?.promotion_rate / 100)}
+                            {renewModelData?.plan_price -
+                              renewModelData?.plan_price *
+                                (renewModelData?.plan_promotion_rate / 100)}
                             ₺
                           </div>
                         </div>
@@ -513,18 +543,16 @@ const SubscribeModal = (props) => {
                     <small className="text-danger">{validationError}</small>
                     <div className="d-flex justify-content-center my-3">
                       <button
-                        onClick={() =>
-                          {
-                            // props.text == 'renew'&& handleRenew()
+                        onClick={() => {
+                          // props.text == 'renew'&& handleRenew()
                           props.text == "renew"
-                            ? handleMambership(
-                                renewPlan?.promotion_duration,
-                                renewPlan?.plan_price
-                              )
-                            : handleSubscription()
-                            }
-                            
-                        }
+                            ? // ? handleMambership(
+                              //     renewPlan?.promotion_duration,
+                              //     renewPlan?.plan_price
+                              //   )
+                              handleRenew()
+                            : handleSubscription();
+                        }}
                         style={{ fontSize: "14px" }}
                         className={`${
                           currentTheme === "dark"
@@ -571,18 +599,31 @@ const SubscribeModal = (props) => {
 
 export default SubscribeModal;
 
-  // Save the subscription entry to DB when successful payment is received
-  export const subcriptionEntry = async (
-    amount,
-    duration,
-    commentator_user_id,
-    commentator_username
-  ) => {
-    try {
-      const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
-        duration: duration,
-        money: amount,
-        commentator_id: commentator_user_id,
+// Save the subscription entry to DB when successful payment is received
+export const subcriptionEntry = async (
+  amount,
+  duration,
+  commentator_user_id,
+  commentator_username
+) => {
+  try {
+    const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
+      duration: duration,
+      money: amount,
+      commentator_id: commentator_user_id,
+    });
+    if (res?.status === 200) {
+      await Swal.fire({
+        title: "Success",
+        text: `You've subscribe to ${commentator_username}`,
+        icon: "sucess",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      }).then((res) => {
+        if (res.isConfirmed) {
+          window.location.replace("/");
+        }
       });
       if (res?.status === 200) {
         await Swal.fire({
@@ -604,7 +645,11 @@ export default SubscribeModal;
           }
         });
       }
-    } catch (error) {
-      console.log(error);
     }
-  };
+    //  catch (error) {
+    //   console.log(error);
+    // }
+  } catch (error) {
+    console.log(error);
+  }
+};

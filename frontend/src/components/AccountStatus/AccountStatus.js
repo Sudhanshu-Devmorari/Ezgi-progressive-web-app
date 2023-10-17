@@ -181,13 +181,17 @@ const AccountStatus = (props) => {
   }, [userId]);
 
   const targetDate = moment(props?.membershipDate); // Set your target date
+  console.log(targetDate)
   const [daysLeft, setDaysLeft] = useState({});
   const [membershipEndDate, setMembershipEndDate] = useState("");
   const [totalDaysRemaining, setTotalDaysRemaining] = useState("");
-
+  
   useEffect(() => {
     const calculateDaysLeft = () => {
-      const countNumber = membershipData?.promotion_duration?.split(" ");
+      // const targetDates = moment(membershipData?.start_date?.format('YYYY-MM-DD')); 
+      // console.log("--->>: ",targetDates)
+
+      const countNumber = membershipData?.duration?.split(" ");
 
       if (!countNumber || countNumber.length !== 2) {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
@@ -230,88 +234,18 @@ const AccountStatus = (props) => {
     membershipData && commentatorUser && setDaysLeft(calculateDaysLeft());
   }, [membershipData, commentatorUser]);
 
-  // const handleRenew = async () => {
-  //   try {
-  //     const checkMembership = await axios.get(
-  //       `${config.apiUrl}/subscription-reNew/${userId}/`
-  //     );
-
-  //     const formData = new FormData();
-
-  //     if (checkMembership?.status === 200) {
-  //       formData.append("payment", "membership renew");
-  //       formData.append("duration", checkMembership.data.duration);
-  //       formData.append("amount", checkMembership.data.money);
-  //       formData.append("id", userId);
-
-  //       const payment_res = await axios.post(`${config.apiUrl}/payment/`,
-  //       formData);
-  //       // console.log(payment_res, "==========payment_res");
-
-  //       if (payment_res.status === 200) {
-  //         const url = payment_res?.data?.URL_3DS;
-  //         // console.log("URL: ", url)
-  //         window.location.replace(url);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error?.response?.status === 500) {
-  //       // setIsLoading(false);
-  //       props?.onHide();
-  //       Swal.fire({
-  //         title: "Error",
-  //         text: "something went wrong",
-  //         icon: "error",
-  //         backdrop: false,
-  //         customClass:
-  //           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-  //       });
-  //     }
-  //     if (error?.response?.status === 400) {
-  //       // setIsLoading(false);
-  //       props?.onHide();
-  //       Swal.fire({
-  //         title: "Error",
-  //         text: error?.response?.data?.data,
-  //         icon: "error",
-  //         backdrop: false,
-  //         customClass:
-  //           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-  //       });
-  //     }
-  //   }
-
-  // }
-
-  // const ref_no = ref();
-
-  // useEffect(() => {
-  //   const ref_no = ref();
-  //   async function testPurchase() {
-  //     try {
-  //       const result = await transcationQueryAPI(ref_no);
-  //       if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
-  //         // console.log("payment succesffull");
-  //         const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
-  //         if (category === "membership renew") {
-  //           const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
-  //           const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
-  //           const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
-  //           const duration = result?.PRODUCTS[0]?.PRODUCT_NAME
-  //           const startdate = result?.PAYMENT_DATE
-  //           // handleMambership(category, experience, monthly_amount, duration, startdate);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   if (ref_no) {
-  //     testPurchase();
-  //   }
-  // }, [ref_no]);
-
+  const [renewModelData, setRenewModelData] = useState({});
+  const handleRenew = async () => {
+    try {
+      const res = await axios.get(`${config.apiUrl}/renew-model-data/${userId}/`);
+      if (res.status === 200) {
+        setRenewModelData(res.data)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+console.log("renewModelData: ", renewModelData)
   return (
     <>
       <div
@@ -775,33 +709,34 @@ const AccountStatus = (props) => {
                     )}
                   </div>
                   <div className="d-flex justify-content-end m-2">
-                    {/* {console.log("daysLeft", daysLeft)} */}
-                    {/* {daysLeft?.showRenewButt on == true ? ( */}
-                    <button
-                      onClick={() => {
-                        if (
-                          JSON.parse(localStorage.getItem("user-active")) ==
-                          false
-                        ) {
-                          errorSwal();
-                          return;
-                        }
-                        setModalShow(true);
-                        // handleRenew()
-                      }}
-                      className="px-3"
-                      style={{
-                        color: currentTheme === "dark" ? "#D2DB08" : "#00659D",
-                        border:
-                          currentTheme === "dark"
-                            ? "1px solid  #D2DB08"
-                            : "1px solid #00659D",
-                        borderRadius: "3px",
-                        backgroundColor: "transparent",
-                      }}
-                    >
-                      Renew
-                    </button>
+                  {/* {console.log("daysLeft", daysLeft)} */}
+                    {/* {daysLeft?.showRenewButton == true ? ( */}
+                      <button
+                        onClick={() => {
+                          if (
+                            JSON.parse(localStorage.getItem("user-active")) ==
+                            false
+                          ) {
+                            errorSwal();
+                            return;
+                          }
+                          setModalShow(true);
+                          handleRenew()
+                        }}
+                        className="px-3"
+                        style={{
+                          color:
+                            currentTheme === "dark" ? "#D2DB08" : "#00659D",
+                          border:
+                            currentTheme === "dark"
+                              ? "1px solid  #D2DB08"
+                              : "1px solid #00659D",
+                          borderRadius: "3px",
+                          backgroundColor: "transparent",
+                        }}
+                      >
+                        Renew
+                      </button>
                     {/* ) : (
                       <span className="text-end">
                         {" "}
@@ -829,6 +764,7 @@ const AccountStatus = (props) => {
         </div>
       </div>
       <SubscribeModal
+        renewModelData={renewModelData}
         commentatorUser={commentatorUser}
         show={modalShow}
         onHide={() => setModalShow(false)}

@@ -232,6 +232,7 @@ const CommentatorsCommentsPage = (props) => {
               )}
               {walletSelection === "account status" && (
                 <AccountStatus
+                setWalletSelection={setWalletSelection}
                   membershipDate={profileData?.membership_date}
                   commentator_level={profileData?.commentator_level}
                 />

@@ -111,7 +111,7 @@ const AnsweredTicketView = (props) => {
                   ? "textArea-dark-mode"
                   : "textArea-light-mode"
               } mb-2 mt-1`}
-              defaultValue={res?.message}
+              value={res?.message}
             />
           </>
         ))}

@@ -41,7 +41,7 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
                              TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer,
                              EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer, WithdrawableSerializer, BankUpdateSerializer,
-                             GiftSubscription)
+                             GiftSubscriptionSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -2090,7 +2090,7 @@ class UserManagement(APIView):
             if user_obj.phone != request.data['phone']:
                 if User.objects.filter(phone=request.data['phone']).exists():
                     return Response({'error': 'User already present with this number.'}, status=status.HTTP_400_BAD_REQUEST)
-                
+       
         if request.data.get('subscription') == 'undefined':
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
@@ -2102,23 +2102,41 @@ class UserManagement(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
+            if request.data.get('subscription') == 'True':
+                if request.data.get('duration').lower() == 'undefined':
+                    return Response({'error': 'Duration is not defined for free subscription.'}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data.get('number').lower() == 'undefined':
+                    return Response({'error': "Number of editor's is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data.get('level').lower() == 'undefined':
+                    return Response({'error': "Editor's level is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
 
-            if request.data.get('duration').lower() == 'undefined':
-                return Response({'error': 'Duration is not defined for free subscription.'}, status=status.HTTP_400_BAD_REQUEST)
-            if request.data.get('number').lower() == 'undefined':
-                return Response({'error': "Number of editor's is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
-            if request.data.get('level').lower() == 'undefined':
-                return Response({'error': "Editor's level is not defined for free subscription."}, status=status.HTTP_400_BAD_REQUEST)
+                duration = request.data.get('duration')
+                number = request.data.get('number')
+                editor_level = request.data.get('level')
 
-            duration = request.data.get('duration')
-            number = request.data.get('number')
-            editor_level = request.data.get('level')
+                if editor_level.lower() == 'expert':
+                    editor_level = 'master'
+                else:
+                    editor_level = request.data.get('level').lower()
 
-            if editor_level.lower() == 'expert':
-                editor_level = 'master'
-            else:
-                editor_level = request.data.get('level').lower()
-                
+                if not GiftSubscription.objects.filter(user=user, duration=duration, editor_count=number, editor_level=editor_level).exists():
+                    obj = GiftSubscription.objects.create(user=user, duration=duration, editor_count=number, editor_level=editor_level)
+                    obj.save()
+                    serializer1 = GiftSubscriptionSerializer(obj)
+
+                    serializer = UserSerializer(user, data=request.data, partial=True)
+                    if serializer.is_valid():
+                        try:
+                            serializer.save()
+                        except Exception as e:
+                            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        return Response(serializer.data)
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+                else:
+                    pass
+            
             # duration = request.data.get('duration')
             # start_date = datetime.now()
             # if duration == "1 Month":
@@ -4560,7 +4578,7 @@ class CommentSetting(APIView):
                 public_content = request.data.get('public_content')
             comment_1 = request.data.get('comment')
 
-            match_data = get_league_data(category, league, date)
+            match_data = get_league_data(category, league, date, match_detail)
             match_time = match_data[0].get('Time', None) if match_data else None
             # print('match_time: ', match_time)
             match_time_obj =  datetime.strptime(match_time, '%H:%M:%S').time() if match_time else None
@@ -5129,6 +5147,7 @@ class BecomeEditorView(APIView):
                     month = obj.promotion_duration.split(" ")[0]
                     monthly_amount = float(int(obj.plan_price)/int(month))
                     serializer['monthly_amount'] = monthly_amount
+                    serializer['promotion_duration'] = "1 Months"
                     return Response(data=serializer, status=status.HTTP_200_OK)
                 else:
                     return Response({'data':'Membership setting not found.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -5165,7 +5184,8 @@ class BecomeEditorView(APIView):
                 data['category'] = category_data  
                 data['experience'] = request.data.get('experience', None)
                 data["commentator_status"] = "active"
-                data["remaining_monthly_count"] = (int(request.data.get('duration').split(" ")[0])-1)
+                # data["remaining_monthly_count"] = (int(request.data.get('duration').split(" ")[0])-1)
+                data["remaining_monthly_count"] = request.data.get('duration').split(" ")[0]
 
                 # update or add membership date
                 # is_membership_exists = MembershipSetting.objects.filter(commentator_level='apprentice').exists()
@@ -6353,8 +6373,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6408,8 +6428,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6481,6 +6501,31 @@ class ViewAllTicketHistory(APIView):
         except Exception as e:
             return Response(data={"error": f"An error occurred while retrieving the ticket history: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class RenewModelData(APIView):
+    def get(self, request, id, *args, **kwargs):
+        data = {}
+        try:
+            user = User.objects.get(id=id)
+            if user.remaining_monthly_count != 0:
+                data['plan_duration'] = "1 Months"
+                obj = BecomeCommentator.objects.get(user=user)
+                data['plan_price'] = obj.money
+                # data['plan_monthly_price'] = obj.money
+                membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
+                data['plan_promotion_rate'] = membership_obj.promotion_rate
+            else:
+                membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
+                data['plan_duration'] = "1 Months"
+                # data['plan_price'] = membership_obj.plan_price
+                data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+                data['plan_promotion_rate'] = membership_obj.promotion_rate
+        except ObjectDoesNotExist as e:
+            return Response(data={'error': f'{e}'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={'error': f'An error occurred.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
 
 class SubscriptionReNew(APIView):
     def get(self, request, id, *args, **kwargs):
@@ -6504,7 +6549,20 @@ class SubscriptionReNew(APIView):
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
             if user.user_role == "commentator":
-                data = request.data
+                data = {}
+
+                data['money'] = request.data.get('money')
+
+                startdate_str = request.data.get('start_date')
+                formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
+                data['start_date'] = formatted_startdate
+
+                enddate = formatted_startdate + timedelta(days=30)
+                data['end_date'] = enddate
+
+                data['status'] = 'active'
+                data['membership_status'] = 'renew'
+
                 if BecomeCommentator.objects.filter(user=user).exists():
                     obj = BecomeCommentator.objects.get(user=user)
 
@@ -6512,6 +6570,9 @@ class SubscriptionReNew(APIView):
                     if serializer.is_valid():
                         try:
                             serializer.save()
+                            if obj.membership_status.lower() == 'new':
+                                user.remaining_monthly_count = user.remaining_monthly_count - 1
+                                user.save()
                         except Exception as e:
                             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -6523,6 +6584,8 @@ class SubscriptionReNew(APIView):
                             admin_context=f'{user.username} renew the plan for becoming an editor.'
                             )
                         return Response(serializer.data)
+                else:
+                    return Response({'error':"You don't have any membership plan."},status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'error':"You are not Commentator user."},status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
@@ -6551,3 +6614,16 @@ class CheckAllTicketActionView(APIView):
             return Response(data={"message": "Since user did not take any action in the last 24 hours, so this ticket has been closed."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RetrieveBecomeCommentatorData(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            obj = BecomeCommentator.objects.get(user__id=id)
+        except BecomeCommentator.DoesNotExist:
+            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        serializer = BecomeCommentatorSerializer(obj).data
+        return Response(data=serializer, status=status.HTTP_200_OK)

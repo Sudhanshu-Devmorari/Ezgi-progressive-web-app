@@ -918,6 +918,7 @@ const Home = (props) => {
                           setUserData(res);
                           setAddUser(res);
                           setPreveiwProfilePic(true);
+                          res?.subscription ? setSelectCheckBox(true) : setSelectCheckBox(false)
                         }}
                         className="cursor"
                         src={userEdit}
@@ -1251,8 +1252,8 @@ const Home = (props) => {
                 <div className="col-4">
                   <img
                     alt=""
-                    // src={!selectCheckBox ? checkbox : Selectedcheckbox}
-                    src={addUser.subscription === "True" ? Selectedcheckbox : checkbox}
+                    src={!selectCheckBox ? checkbox : Selectedcheckbox}
+                    // src={addUser.subscription === "True" ? Selectedcheckbox : checkbox}
                     style={{ cursor: "pointer" }}
                     height={58}
                     width={55}
