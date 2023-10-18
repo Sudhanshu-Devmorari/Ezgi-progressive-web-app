@@ -180,54 +180,65 @@ const AccountStatus = (props) => {
     userId && getUserdata();
   }, [userId]);
 
-  const targetDate = moment(props?.membershipDate); // Set your target date
-  console.log(targetDate)
+  // const targetDate = moment(props?.membershipDate); // Set your target date
+  // console.log(targetDate)
   const [daysLeft, setDaysLeft] = useState({});
   const [membershipEndDate, setMembershipEndDate] = useState("");
   const [totalDaysRemaining, setTotalDaysRemaining] = useState("");
   
   useEffect(() => {
     const calculateDaysLeft = () => {
-      // const targetDates = moment(membershipData?.start_date?.format('YYYY-MM-DD')); 
-      // console.log("--->>: ",targetDates)
+
+      const tDate = moment(membershipData?.start_date, 'YYYY-MM-DDTHH:mm:ssZ');
+      const targetDate = tDate.format('YYYY-MM-DD')
 
       const countNumber = membershipData?.duration?.split(" ");
+
 
       if (!countNumber || countNumber.length !== 2) {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
       }
 
       const interval = countNumber[1].toLowerCase(); // e.g., "months"
+
       const duration = parseInt(countNumber[0], 10);
+
 
       if (isNaN(duration) || !interval) {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
       }
 
       const currentDate = moment();
+
       const nextIntervalDate = moment(targetDate).add(duration, interval);
+
       const finaldaysRemaining = nextIntervalDate.diff(currentDate, "days");
+
       // console.log("finaldaysRemaining", finaldaysRemaining);
       finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
 
+      // const finalEndDate = nextIntervalDate.format("YYYY-MM-DD");
+      const finalEndDate = moment(membershipData?.end_date, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD');
+      setMembershipEndDate(finalEndDate);
+      
       if (currentDate.isAfter(nextIntervalDate) && finaldaysRemaining == 0) {
         console.log("Interval is already over");
         return { daysRemaining: 0, showRenewButton: true }; // Interval is already over, show renew button
       }
-
-      const finalEndDate = nextIntervalDate.format("YYYY-MM-DD");
-      setMembershipEndDate(finalEndDate);
+      
 
       // Calculate the end of the current month
       const endOfMonth = currentDate.clone().endOf("month");
 
       // Calculate remaining days within the current month
-      const daysRemaining = endOfMonth.diff(currentDate, "days") + 1;
+      // const daysRemaining = endOfMonth.diff(currentDate, "days") + 1;
+      const daysRemaining = finaldaysRemaining;
       // console.log("daysRemaining::", daysRemaining);
 
       return {
         daysRemaining,
-        showRenewButton: daysRemaining == 0 ? true : false,
+        showRenewButton: daysRemaining <= 0 ? true : false,
+        // showRenewButton: daysRemaining == 0 ? true : false,
       };
     };
 
@@ -245,7 +256,7 @@ const AccountStatus = (props) => {
       console.log(error);
     }
   }
-console.log("renewModelData: ", renewModelData)
+
   return (
     <>
       <div
@@ -685,7 +696,7 @@ console.log("renewModelData: ", renewModelData)
                 {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
                 <>
                   <div className="my-2 ms-2 d-flex flex-column">
-                    Membership Date : {props?.membershipDate}
+                    Membership Date : {moment(membershipData?.start_date, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD')}
                     <span>
                       {" "}
                       Active Plan :{" "}
@@ -696,12 +707,12 @@ console.log("renewModelData: ", renewModelData)
                             currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
                         }}
                       >
-                        {props?.commentator_level}
+                        {membershipData?.commentator_level}
                       </span>
                     </span>
-                    {membershipData?.plan_price && (
+                    {membershipData?.money && (
                       <span>
-                        Membership Price : {membershipData?.plan_price}₺
+                        Membership Price : {membershipData?.money}₺
                       </span>
                     )}
                     {membershipEndDate && (
@@ -710,7 +721,7 @@ console.log("renewModelData: ", renewModelData)
                   </div>
                   <div className="d-flex justify-content-end m-2">
                   {/* {console.log("daysLeft", daysLeft)} */}
-                    {/* {daysLeft?.showRenewButton == true ? ( */}
+                    {daysLeft?.showRenewButton == true ? (
                       <button
                         onClick={() => {
                           if (
@@ -737,7 +748,7 @@ console.log("renewModelData: ", renewModelData)
                       >
                         Renew
                       </button>
-                    {/* ) : (
+                    ) : (
                       <span className="text-end">
                         {" "}
                         <span
@@ -750,7 +761,7 @@ console.log("renewModelData: ", renewModelData)
                         </span>{" "}
                         for the next plan payment date
                       </span>
-                    )} */}
+                    )}
                   </div>
                 </>
                 {/* ) : (

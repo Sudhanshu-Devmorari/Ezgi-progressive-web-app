@@ -1053,9 +1053,9 @@ const EditorManagemenet = (props) => {
                   <div className="row g-0 d-flex justify-content-between align-items-center">
                     <div className="col-3">
                       <div className="d-flex align-items-center">
-                        <span className="pe-1">{`# ${(index + 1)
-                          .toString()
-                          .padStart(4, "0")}`}</span>
+                        <span className="pe-1">{`# ${(editorsArray.length - index)
+                      .toString()
+                      .padStart(4, "0")}`}</span>
                         <div className="position-relative">
                           <img
                             className="rounded-circle profile-icon"

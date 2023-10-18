@@ -28,6 +28,7 @@ import { ref, transcationQueryAPI } from "../GetRefNo";
 import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
 
 const MainPage = () => {
+  
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // Select Content
@@ -494,6 +495,22 @@ const MainPage = () => {
       handlesportData();
     }
   }, [onlyPubliccategory]);
+
+  // useEffect(() => {
+  //   // Prevent user from going back
+  //   window.history.pushState(null, null, window.location.pathname);
+  //   window.addEventListener('popstate', () => {
+  //     window.history.pushState(null, null, window.location.pathname);
+  //   });
+
+
+  //   return () => {
+  //     // Remove event listener when component unmounts
+  //     window.removeEventListener('popstate', () => {
+  //       window.history.pushState(null, null, window.location.pathname);
+  //     });
+  //   };
+  // }, []);
 
   return (
     <>

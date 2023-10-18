@@ -64,14 +64,13 @@ function PlanSelection(props) {
         <div className="text-center py-3">Loading...</div>
       ) : props?.text === "renew" ? (
         <>
-          {console.log("REnEW: ", renewPlan)}
           {renderPlan(
             `${
               renewPlan?.promotion_duration
                 ? renewPlan?.promotion_duration
                 : renewPlan?.plan_duration
             }`,
-            `${renewPlan?.plan_price}₺`,
+            `${Math.round(renewPlan?.plan_price)}₺`,
             renewPlan?.promotion_rate
               ? renewPlan?.promotion_rate != 0 &&
                   `${renewPlan?.promotion_rate}%`

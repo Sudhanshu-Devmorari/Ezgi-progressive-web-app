@@ -812,9 +812,9 @@ const Home = (props) => {
                       {/* <span className="pe-1">{`# ${res?.id
                           .toString()
                           .padStart(4, "0")}`}</span> */}
-                      <span className="pe-1">{`# ${(index + 1)
-                        .toString()
-                        .padStart(4, "0")}`}</span>
+                      <span className="pe-1">{`# ${(allFilterData.length - index)
+                      .toString()
+                      .padStart(4, "0")}`}</span>
                       <img
                         src={`${
                           res?.profile_pic

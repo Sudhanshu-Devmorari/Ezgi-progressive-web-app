@@ -35,14 +35,16 @@ const SubUserManagementPage = (props) => {
   const [subuserList, setSubuserList] = useState([]);
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
-  const adminId = localStorage.getItem('admin-user-id')
+  const adminId = localStorage.getItem("admin-user-id");
   const [isLoading, setIsLoading] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies();
 
   async function getSubUsers() {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${config?.apiUrl}/subuser-management/?admin=${adminId}`);
+      const res = await axios.get(
+        `${config?.apiUrl}/subuser-management/?admin=${adminId}`
+      );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
@@ -127,7 +129,11 @@ const SubUserManagementPage = (props) => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} refreshComments={getSubUsers}/>
+            <SideBar
+              setWithdrawableData={props.setWithdrawableData}
+              setCommentData={props.setCommentData}
+              refreshComments={getSubUsers}
+            />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -208,7 +214,9 @@ const SubUserManagementPage = (props) => {
                               <>
                                 <div className="col d-flex align-items-center">
                                   {/* <span>#0001</span> */}
-                                  <span className="pe-1">{`# ${(index + 1)
+                                  <span className="pe-1">{`# ${(
+                                    displaySubuserList.length - index
+                                  )
                                     .toString()
                                     .padStart(4, "0")}`}</span>
                                   <span className="px-2">

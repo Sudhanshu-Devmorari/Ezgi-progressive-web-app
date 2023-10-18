@@ -5208,7 +5208,7 @@ class BecomeEditorView(APIView):
                         enddate = formatted_startdate + timedelta(days=30)
                         # enddate = ''
                         obj = BecomeCommentator.objects.create(user=user, money=request.data.get('monthly_amount'), membership_status='new', 
-                                                               commentator=True, status='active', duration=request.data.get('duration'), 
+                                                               commentator=True, commentator_level='apprentice', status='active', duration=request.data.get('duration'), 
                                                                start_date=formatted_startdate, end_date=enddate)
                         obj.save()
 
@@ -6543,10 +6543,11 @@ class RenewModelData(APIView):
             user = User.objects.get(id=id)
             if user.remaining_monthly_count != 0:
                 data['plan_duration'] = "1 Months"
-                obj = BecomeCommentator.objects.get(user=user)
-                data['plan_price'] = obj.money
+                # obj = BecomeCommentator.objects.get(user=user)
+                # data['plan_price'] = obj.money
                 # data['plan_monthly_price'] = obj.money
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
+                data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
                 data['plan_promotion_rate'] = membership_obj.promotion_rate
             else:
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
@@ -6597,6 +6598,7 @@ class SubscriptionReNew(APIView):
 
                 data['status'] = 'active'
                 data['membership_status'] = 'renew'
+                data['commentator_level'] = user.commentator_level
 
                 if BecomeCommentator.objects.filter(user=user).exists():
                     obj = BecomeCommentator.objects.get(user=user)

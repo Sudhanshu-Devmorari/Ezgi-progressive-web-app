@@ -475,10 +475,10 @@ const SalesManagementPage = (props) => {
                     updateRecordsDisplay={updateRecordsDisplay}
                   />
 
-                  {recordsDisplay.map((x, i) => (
-                    <x.Comp i={i + 1} />
+                  {recordsDisplay.map((x, index) => (
+                    <x.Comp i={recordsDisplay.length - index} />
                   ))}
-
+                  
                   {/* {records.map((res, index) => (
                     <MainDiv>
                       <>

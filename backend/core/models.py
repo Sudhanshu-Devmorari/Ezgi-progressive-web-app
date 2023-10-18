@@ -366,6 +366,7 @@ class BecomeCommentator(models.Model):
     duration = models.CharField(max_length=20,null=True, blank=True)
     money = models.FloatField(null=True, blank=True)
     commentator = models.BooleanField(null=True, blank=True)
+    commentator_level = models.CharField(max_length=20, choices = COMMENTATOR_ROLE_CHOISE, null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length = 20, choices = COMMENTATOR_STATUS,null=True, blank=True)

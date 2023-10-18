@@ -77,7 +77,7 @@ const NotificationManagementPage = (props) => {
   // Get Notification API
   useEffect(() => {
     async function getNotificationsData() {
-      const user_id = localStorage.getItem("admin-user-id")
+      const user_id = localStorage.getItem("admin-user-id");
       try {
         const res = await axios.get(
           `${config?.apiUrl}/notification-management/?admin_id=${user_id}`
@@ -126,7 +126,10 @@ const NotificationManagementPage = (props) => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} />
+            <SideBar
+              setWithdrawableData={props.setWithdrawableData}
+              setCommentData={props.setCommentData}
+            />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0" style={{ height: "25vh" }}>
@@ -160,12 +163,14 @@ const NotificationManagementPage = (props) => {
                 <MainDiv>
                   <>
                     <div className="col-2 d-flex align-items-center">
-                      <span className="pe-1">{`# ${(index + 1)
+                      <span className="pe-1">{`# ${(
+                        notifications.length - index
+                      )
                         .toString()
                         .padStart(4, "0")}`}</span>
                       <span className="px-2">
                         <img
-                        style={{objectFit: 'cover', borderRadius: '50%'}}
+                          style={{ objectFit: "cover", borderRadius: "50%" }}
                           src={
                             res?.receiver?.profile_pic
                               ? `${config.apiUrl}${res?.receiver?.profile_pic}`
@@ -250,7 +255,9 @@ const NotificationManagementPage = (props) => {
                       </div>
                     </div>
                     <div className="col-2 d-flex align-items-center justify-content-end gap-2">
-                      <div className="">{moment(res.created).format("DD-MM.YYYY - HH:mm")}</div>
+                      <div className="">
+                        {moment(res.created).format("DD-MM.YYYY - HH:mm")}
+                      </div>
                       <img
                         src={res?.status ? green_tick : yellow_tick}
                         alt=""

@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import { currentTheme } from "../GetCurrentTheme";
+import { useNavigate } from "react-router-dom";
 
 const SubscribeModal = (props) => {
   const {
@@ -31,6 +32,9 @@ const SubscribeModal = (props) => {
     setMembershipData,
     renewModelData,
   } = props;
+
+  // const history = useHistory()
+
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   useEffect(() => {
     isRenewTerms && setSelectCheckBox(isRenewTerms);
@@ -43,6 +47,7 @@ const SubscribeModal = (props) => {
   const [validationError, setValidationError] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const handleSubscription = async () => {
     if (selectCheckBox && selectedPlan) {
@@ -140,11 +145,11 @@ const SubscribeModal = (props) => {
             const ress = await axios.get(
               `${config?.apiUrl}/retrieve-become-commentator-data/${userId}/`
             );
+            if (ress.status === 200) {
+              setMembershipData && setMembershipData(ress?.data);
+            }
           } catch (error) {
             console.log(error);
-          }
-          if (res.status === 200) {
-            setMembershipData && setMembershipData(res?.data);
           }
         }
       } catch (error) {
@@ -163,64 +168,80 @@ const SubscribeModal = (props) => {
     setSelectedPlan(renewPlan?.promotion_duration);
   }, [props?.text, renewPlan?.promotion_duration]);
 
+  // useEffect(() => {
+  //   window.addEventListener('popstate', (event) => {
+  //     // if (paymentCompleted) {
+  //       const mainPageUrl = '/'; // Replace with the URL of your main page
+  //       window.history.replaceState(null, null, mainPageUrl);
+  //     // }
+  //   });
+  // }, []);
+
   // const totalValue = (renewModelData?.plan_price - renewModelData?.plan_price * (renewModelData?.plan_promotion_rate / 100))
   // console.log("toatlValue", totalValue)
   const handleRenew = async () => {
-    try {
-      // const checkMembership = await axios.get(
-      //   `${config.apiUrl}/subscription-reNew/${userId}/`
-      // );
-      const totalValue =
-        renewModelData?.plan_price -
-        renewModelData?.plan_price *
-          (renewModelData?.plan_promotion_rate / 100);
+    if (selectCheckBox && selectedPlan) {
+      try {
+        // const checkMembership = await axios.get(
+        //   `${config.apiUrl}/subscription-reNew/${userId}/`
+        // );
+        const totalValue = Math.round(
+          renewModelData?.plan_price -
+            renewModelData?.plan_price *
+              (renewModelData?.plan_promotion_rate / 100)
+        );
 
-      const formData = new FormData();
+        console.log("totalValue", totalValue);
 
-      // if (checkMembership?.status === 200) {
-      formData.append("payment", "membership renew");
-      formData.append("duration", selectedPlan);
-      formData.append("amount", totalValue);
-      formData.append("id", userId);
+        const formData = new FormData();
 
-      const payment_res = await axios.post(
-        `${config.apiUrl}/payment/`,
-        formData
-      );
-      // console.log(payment_res, "==========payment_res");
+        // if (checkMembership?.status === 200) {
+        formData.append("payment", "membership renew");
+        formData.append("duration", selectedPlan);
+        formData.append("amount", totalValue);
+        formData.append("id", userId);
 
-      if (payment_res.status === 200) {
-        const url = payment_res?.data?.URL_3DS;
-        // console.log("URL: ", url)
-        window.location.replace(url);
+        const payment_res = await axios.post(
+          `${config.apiUrl}/payment/`,
+          formData
+        );
+        // console.log(payment_res, "==========payment_res");
+
+        if (payment_res.status === 200) {
+          const url = payment_res?.data?.URL_3DS;
+          // console.log("URL: ", url)
+          window.location.replace(url);
+        }
+        // }
+      } catch (error) {
+        console.log(error);
+        if (error?.response?.status === 500) {
+          // setIsLoading(false);
+          props?.onHide();
+          Swal.fire({
+            title: "Error",
+            text: "something went wrong",
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
+        if (error?.response?.status === 400) {
+          // setIsLoading(false);
+          props?.onHide();
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.data,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
-      // }
-    } catch (error) {
-      console.log(error);
-      if (error?.response?.status === 500) {
-        // setIsLoading(false);
-        props?.onHide();
-        Swal.fire({
-          title: "Error",
-          text: "something went wrong",
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
-      }
-      if (error?.response?.status === 400) {
-        // setIsLoading(false);
-        props?.onHide();
-        Swal.fire({
-          title: "Error",
-          text: error?.response?.data?.data,
-          icon: "error",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        });
-      }
+    } else {
+      setValidationError("Please select a Plan or Checkbox");
     }
   };
 
@@ -235,7 +256,7 @@ const SubscribeModal = (props) => {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
           if (category === "membership renew") {
-            console.log("IN: ");
+            console.log("IN membership re new: ");
             const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
             const startdate = result?.PAYMENT_DATE;
             handleRenewMambership(monthly_amount, startdate);
@@ -252,13 +273,31 @@ const SubscribeModal = (props) => {
 
   const handleRenewMambership = async (monthly_amount, startdate) => {
     try {
-      const checkMembership = await axios.patch(
+      const RenewMembership = await axios.patch(
         `${config.apiUrl}/subscription-reNew/${userId}/`,
         {
           money: monthly_amount,
           start_date: startdate,
         }
       );
+      console.log("RenewMembership", RenewMembership);
+      if (RenewMembership.status == 200) {
+        window.location.replace(window.location.origin + "/");
+        console.log("window.history.length", window.history.length);
+        console.log("\n\nwindow.history\n", window.history);
+        if (window.history && window.history.length > 1) {
+          // window.history.go(window.history.length - 3);
+          window.history.go(1)
+          // window.history.pushState({}, '', window.location.href);
+        }
+        // if (history.action === 'POP'){
+        //   console.log("POP inside")
+        // }
+        // window.history.pushState(null, null, document.URL);
+        // window.addEventListener("popstate", function (event) {
+        //   window.location.replace("http://localhost:3000/");
+        // });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -469,9 +508,11 @@ const SubscribeModal = (props) => {
                         <div className="text-center my-2">
                           <div>Total Amount</div>
                           <div style={{ fontSize: "19px" }}>
-                            {renewModelData?.plan_price -
-                              renewModelData?.plan_price *
-                                (renewModelData?.plan_promotion_rate / 100)}
+                            {Math.round(
+                              renewModelData?.plan_price -
+                                renewModelData?.plan_price *
+                                  (renewModelData?.plan_promotion_rate / 100)
+                            )}
                             ₺
                           </div>
                         </div>

@@ -52,31 +52,39 @@ const SupportManagementPage = (props) => {
       });
   }
   const [displayAllticketHistory, setDisplayAllTicketHistory] = useState([]);
-// console.log("displayAllticketHistory", displayAllticketHistory)
+  // console.log("displayAllticketHistory", displayAllticketHistory)
   const showAllTicketHistory = async (userId, ticket_id) => {
     try {
       const res = await axios.get(
         `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
       );
       // console.log("All res: ", res)
-      const data = res.data
-      data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
-      setDisplayAllTicketHistory(data)
+      const data = res.data;
+      data.sort(
+        (a, b) =>
+          moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix() -
+          moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix()
+      );
+      setDisplayAllTicketHistory(data);
 
       // setDisplayAllTicketsData(res.data);
     } catch (error) {}
   };
 
   const [ticketData, setTicketData] = useState([]);
-  function getData(userId,e) {
+  function getData(userId, e) {
     try {
-      showAllTicketHistory(userId, e)
+      showAllTicketHistory(userId, e);
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
           // console.log("RESSS: ", res)
-          const data = res.data
-          data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
+          const data = res.data;
+          data.sort(
+            (a, b) =>
+              moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix() -
+              moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix()
+          );
           setTicketData(data);
         })
         .catch((error) => {
@@ -86,9 +94,9 @@ const SupportManagementPage = (props) => {
   }
   const handleCheckTicketAction = async () => {
     const res = await axios.get(`${config?.apiUrl}/check-all-ticket-action/`);
-  }
+  };
   useEffect(() => {
-    handleCheckTicketAction()
+    handleCheckTicketAction();
   }, []);
 
   const [responseTicketID, setResponseTicketID] = useState(null);
@@ -101,17 +109,17 @@ const SupportManagementPage = (props) => {
 
   async function getSupportData() {
     try {
-      const adminId = localStorage.getItem('admin-user-id')
+      const adminId = localStorage.getItem("admin-user-id");
 
-      const res = await axios.get(`${config?.apiUrl}/support-management?admin=${adminId}`);
+      const res = await axios.get(
+        `${config?.apiUrl}/support-management?admin=${adminId}`
+      );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
         window.location.reload();
       }
-      const formattedPercentage = Math.round(
-        res?.data?.new_tickets_percentage
-      );
+      const formattedPercentage = Math.round(res?.data?.new_tickets_percentage);
       // console.log("=?????", res.data);
       setPerNewRequest(formattedPercentage);
       setTotalRequest(Math.round(res?.data?.total_ticket_percentage));
@@ -198,7 +206,12 @@ const SupportManagementPage = (props) => {
         <NavBar />
         <div className="row g-0 mt-2">
           <div className="col-1" style={{ width: "5%" }}>
-            <SideBar setWithdrawableData={props.setWithdrawableData} setCommentData={props.setCommentData} setSelectedOption={setSelectedOption} refreshComments={getSupportData}/>
+            <SideBar
+              setWithdrawableData={props.setWithdrawableData}
+              setCommentData={props.setCommentData}
+              setSelectedOption={setSelectedOption}
+              refreshComments={getSupportData}
+            />
           </div>
           <div className="col-11" style={{ width: "95%" }}>
             <div className="row g-0">
@@ -274,9 +287,11 @@ const SupportManagementPage = (props) => {
                           data-bs-target="#exampleModal"
                           onClick={() => getTicketsLatestData(res.id)}
                         >
-                          <span className="pe-1">{`# ${(index + 1)
-                          .toString()
-                          .padStart(4, "0")}`}</span>
+                          <span className="pe-1">{`# ${(
+                            filteredTickets.length - index
+                          )
+                            .toString()
+                            .padStart(4, "0")}`}</span>
                           <span className="px-2">
                             <img
                               style={{
@@ -344,7 +359,8 @@ const SupportManagementPage = (props) => {
                                 (res.admin_label === "new" && "#FFDD00") ||
                                 (res.admin_label === "answered" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
-                                (res.admin_label === "user responded" && "#FF9100"),
+                                (res.admin_label === "user responded" &&
+                                  "#FF9100"),
                               borderRadius: "4px",
                               border:
                                 (res.admin_label === "pending" &&
@@ -356,7 +372,8 @@ const SupportManagementPage = (props) => {
                                 (res.admin_label === "new" && "#FFDD00") ||
                                 (res.admin_label === "answered" && "#4DD5FF") ||
                                 (res.admin_label === "resolved" && "#58DEAA") ||
-                                (res.admin_label === "user responded" && "#FF9100"),
+                                (res.admin_label === "user responded" &&
+                                  "#FF9100"),
                               // (res.status === "redirected" && "#FF9100"),
                               color: "#0D2A53",
                               width: "5.4rem",
@@ -373,9 +390,13 @@ const SupportManagementPage = (props) => {
                         >
                           <div className="">{res?.created}</div>
                           {/* <div className="">15-06-2023 - 16:37</div> */}
-                          <img 
-                          onClick={() => getData(res?.user?.id, res?.id)}
-                          src={eye} alt="" height={24} width={24} />
+                          <img
+                            onClick={() => getData(res?.user?.id, res?.id)}
+                            src={eye}
+                            alt=""
+                            height={24}
+                            width={24}
+                          />
                         </div>
                       </>
                     </MainDiv>
@@ -427,7 +448,11 @@ const SupportManagementPage = (props) => {
         </div>
       </div>
 
-      <TicketReplyModal displayAllticketHistory={displayAllticketHistory} ticketData={ticketData} tickeview={tickeview} />
+      <TicketReplyModal
+        displayAllticketHistory={displayAllticketHistory}
+        ticketData={ticketData}
+        tickeview={tickeview}
+      />
 
       <Export exportList={displayTickets} exportData={"Support"} />
     </>
