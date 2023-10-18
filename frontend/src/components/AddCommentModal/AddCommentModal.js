@@ -83,7 +83,7 @@ const AddCommentModal = (props) => {
 
   const handleCategorySelection = async (category) => {
     if (selectedCategory !== category) {
-      setSelectedCountry("select");
+      setSelectedCountry("Select");
       setSelectedLeague("Select");
       setSelectedDate("Select");
       setSelectedMatchDetails("Select");
@@ -366,6 +366,12 @@ const AddCommentModal = (props) => {
     setToggleInput(false);
     setcommentText("");
     setSelectCheckBox(false);
+    setCountryOptions([]);
+    setLeagueOptions([]);
+    setDateOptions([]);
+    setMatchDetailsOptions([]);
+    setPredictionType([]);
+    setPredictionData([]);
   };
 
   // Add Comment pr Post comment API

@@ -809,7 +809,6 @@ class SubscriptionView(APIView):
 
 
                 subscriptions = Subscription.objects.filter(commentator_user=commentator)
-                print('subscriptions: ', subscriptions)
 
                 total_months = 0
 
@@ -817,7 +816,6 @@ class SubscriptionView(APIView):
                     lower_duration = obj.duration.lower()
                     if lower_duration in duration_mapping:
                         total_months += duration_mapping[lower_duration]
-                print('total_months: before-----------------------------------', total_months) 
 
                 if BankDetails.objects.filter(user=commentator).exists():
                     level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
@@ -826,31 +824,13 @@ class SubscriptionView(APIView):
                     balance_obj = BankDetails.objects.get(user=commentator)
                     balance_obj.total_balance += final_cal
                     balance_obj.pending_balance += final_cal
-                    balance_obj.save(update_fields=['total_balance', 'pending_balance', 'updated'])
-
-                    
-
-                    if total_months > 0:
-                        withdrawable_amount = balance_obj.pending_balance / total_months
-                        print('iffffffffffff')
-                        print('total_months: ', total_months)
-                        print('withdrawable_amount: ', withdrawable_amount)
-                        balance_obj.withdrawable_balance = round(withdrawable_amount, 2)
-                        balance_obj.save(update_fields=['withdrawable_balance', 'updated'])
+                    balance_obj.save(update_fields=['total_balance', 'pending_balance', 'updated'])                    
 
                 else:
                     level_obj = MembershipSetting.objects.get(commentator_level=commentator.commentator_level)
                     calculation = (float(level_obj.commission_rate) * float(money)) / 100
                     final_cal = money - calculation
                     balance_obj = BankDetails.objects.create(user=commentator, total_balance=final_cal, pending_balance=final_cal)
-
-                    if total_months > 0:
-                        withdrawable_amount = balance_obj.pending_balance / total_months
-                        print('elseeeeeeeeeeeeee')
-                        print('total_months: ', total_months)
-                        print('withdrawable_amount: ', withdrawable_amount)
-                        balance_obj.withdrawable_balance = round(withdrawable_amount, 2)
-                        balance_obj.save(update_fields=['withdrawable_balance', 'updated'])
 
                     # balance_obj.save()
 
@@ -4667,7 +4647,25 @@ def Statistics(user_obj=None, user_id=None):
         else:
             Success_rate = 0
 
-        Score_point = ((10*win_count)- (10*lose_count))
+        # Score_point = ((10*win_count)- (10*lose_count))
+
+        comments = data.exclude(status='reject').order_by('created')
+
+        is_prediction_list = [item.is_prediction for item in comments if item.is_prediction is not None]
+
+        Score_point = 0
+        current_chain_true = 0
+        current_chain_false = 0
+
+        for is_prediction in is_prediction_list:
+            if is_prediction:
+                current_chain_false = 0
+                current_chain_true += 1
+                Score_point += current_chain_true * 10
+            else:
+                current_chain_true = 0
+                current_chain_false += 1
+                Score_point += current_chain_false * -10
 
 
         # if win_count >= 60:
@@ -5347,7 +5345,26 @@ def success_rate_score_points(user_id):
         else:
             Success_rate = 0
 
-        Score_point = ((10*win_count)- (10*lose_count))
+        # Score_point = ((10*win_count)- (10*lose_count))
+
+        comments = data.exclude(status='reject').order_by('created')
+
+        is_prediction_list = [item.is_prediction for item in comments if item.is_prediction is not None]
+
+        Score_point = 0
+        current_chain_true = 0
+        current_chain_false = 0
+
+        for is_prediction in is_prediction_list:
+            if is_prediction:
+                current_chain_false = 0
+                current_chain_true += 1
+                Score_point += current_chain_true * 10
+            else:
+                current_chain_true = 0
+                current_chain_false += 1
+                Score_point += current_chain_false * -10
+
         user.score_points = Score_point
         user.success_rate = Success_rate
         user.save(update_fields=['success_rate', 'score_points', 'updated'])
@@ -5818,12 +5835,30 @@ class BankDetailsView(APIView):
                     transactions = []
                     subscription_obj = Subscription.objects.filter(commentator_user=user)
                     for obj in subscription_obj:
+
+                        level_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
+                        calculation = (float(level_obj.commission_rate) * float(obj.money)) / 100
+                        final_cal = obj.money - calculation
+
                         formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
                         details = {
                             "type":"New Subscriber",
                             "duration":obj.duration,
                             "date":formatted_date,
-                            "amount":obj.money
+                            "amount": final_cal
+                        }
+                        transactions.append(details)
+
+                    my_subcriptions = Subscription.objects.filter(standard_user=user)
+                    for obj in my_subcriptions:
+                        print('obj: ', obj.duration, obj.money)
+
+                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"New Subcription",
+                            "duration":obj.duration,
+                            "date":formatted_date,
+                            "amount": obj.money
                         }
                         transactions.append(details)
 
@@ -6627,3 +6662,87 @@ class RetrieveBecomeCommentatorData(APIView):
 
         serializer = BecomeCommentatorSerializer(obj).data
         return Response(data=serializer, status=status.HTTP_200_OK)
+
+print()
+print()
+print()
+
+import time 
+
+# true_pre = []
+# false_pre = []
+
+# comments = Comments.objects.filter(commentator_user__id=95, is_resolve=True).exclude(status='reject')
+
+# for i, comment in enumerate(comments):
+#     if comment.is_prediction:
+#         true_pre.append(True)
+#     else:
+#         false_pre.append(False)
+
+# correct = sum((i + 1) * 10 for i in range(len(true_pre)))
+
+# incorrect = -10 if i==0 else -sum((i + 1) * 10 for i in range(len(false_pre)))
+# final = correct + incorrect
+
+
+
+
+# print('correct: ', correct)
+# print('incorrect: ', incorrect)
+# print('final: ', final)
+
+
+# lst = [True, True, False, False, True, False]
+# score = 0
+# current_chain_true = 0
+# current_chain_false = 0
+
+# comments = Comments.objects.filter(commentator_user__id=68, is_resolve=True).exclude(status='reject')
+
+# for i,item in enumerate(comments):
+#     print('item.is_prediction: ', i, item.is_prediction)
+#     if item.is_prediction:
+#         current_chain_false = 0
+#         current_chain_true += 1
+#         score += current_chain_true * 10
+#     elif item.is_prediction == False:
+#         current_chain_true = 0
+#         current_chain_false += 1
+#         score += current_chain_false * -10
+# print()
+# print(score)
+
+# comments = Comments.objects.filter(commentator_user__id=68, is_resolve=True).exclude(status='reject')
+
+# # Extract a list of boolean values indicating if each comment is a prediction
+# is_prediction_list = [item.is_prediction for item in comments if item.is_prediction is not None]
+
+# print('is_prediction_list: ', is_prediction_list)
+
+# score = 0
+# current_chain_true = 0
+# current_chain_false = 0
+
+# for is_prediction in is_prediction_list:
+#     if is_prediction:
+#         current_chain_false = 0
+#         current_chain_true += 1
+#         score += current_chain_true * 10
+#     else:
+#         current_chain_true = 0
+#         current_chain_false += 1
+#         score += current_chain_false * -10
+
+# # Print the final score
+# print("Final Score:", score)
+
+
+
+
+# # print('true_pre: ', correct_streak)
+# # print('false_pre: ', incorrect_streak)
+# # print('final: ', final_score)
+
+# print()
+# print()

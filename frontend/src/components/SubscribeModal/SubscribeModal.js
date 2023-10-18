@@ -612,19 +612,19 @@ export const subcriptionEntry = async (
       money: amount,
       commentator_id: commentator_user_id,
     });
-    if (res?.status === 200) {
-      await Swal.fire({
-        title: "Success",
-        text: `You've subscribe to ${commentator_username}`,
-        icon: "sucess",
-        backdrop: false,
-        customClass:
-          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-      }).then((res) => {
-        if (res.isConfirmed) {
-          window.location.replace("/");
-        }
-      });
+    // if (res?.status === 200) {
+    //   await Swal.fire({
+    //     title: "Success",
+    //     text: `You've subscribe to ${commentator_username}`,
+    //     icon: "sucess",
+    //     backdrop: false,
+    //     customClass:
+    //       currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+    //   }).then((res) => {
+    //     if (res.isConfirmed) {
+    //       window.location.replace("/");
+    //     }
+    //   });
       if (res?.status === 200) {
         await Swal.fire({
           title: "Success",
@@ -635,7 +635,8 @@ export const subcriptionEntry = async (
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         }).then((res) => {
           if (res.isConfirmed) {
-            window.location.replace("/");
+            window.location.replace(window.location.origin+'/')
+            // window.location.replace("/");
             // After successful payment 
             // window.history.replaceState(null, null, "/");
             // window.history.pushState(null, null, "/");
@@ -645,7 +646,7 @@ export const subcriptionEntry = async (
           }
         });
       }
-    }
+    // }
     //  catch (error) {
     //   console.log(error);
     // }

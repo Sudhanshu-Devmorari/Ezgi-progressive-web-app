@@ -258,7 +258,7 @@ def Userst():
             print("FOR LOOP END")
             correct_prediction = data.filter(is_prediction=True)
             incorrect_prediction = data.filter(is_prediction=False)
-            Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
+            # Score_point = (10*len(correct_prediction)- 10*(len(incorrect_prediction)))
 
             total_predictions = len(correct_prediction) + len(incorrect_prediction)
 
@@ -266,6 +266,24 @@ def Userst():
                 Success_rate = round((len(correct_prediction) / total_predictions) * 100, 2)
             else:
                 Success_rate = 0
+
+            comments = Comments.objects.filter(is_resolve=True, commentator_user=user).exclude(status='reject').order_by('created')
+
+            is_prediction_list = [item.is_prediction for item in comments if item.is_prediction is not None]
+
+            Score_point = 0
+            current_chain_true = 0
+            current_chain_false = 0
+
+            for is_prediction in is_prediction_list:
+                if is_prediction:
+                    current_chain_false = 0
+                    current_chain_true += 1
+                    Score_point += current_chain_true * 10
+                else:
+                    current_chain_true = 0
+                    current_chain_false += 1
+                    Score_point += current_chain_false * -10
 
             user.success_rate = Success_rate
             user.score_points = Score_point
