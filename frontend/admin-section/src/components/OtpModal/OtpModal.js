@@ -29,11 +29,29 @@ const OtpModal = (props) => {
     };
   }, [timer, isTimerVisible]);
 
+  const handleResendOtp = async () => {
+    try {
+      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
+        phone: props?.phone,
+        is_admin: true,
+      });
+      if (res.data.status === 500) {
+        setErrorMessage(res.data.error);
+      }
+    } catch (error) {
+      console.log("error:::::::::::::", error);
+    }
+  };
   const handleResendClick = () => {
     setTimer(30);
     setIsTimerVisible(true);
     handleResendOtp()
   };
+  // const handleResendClick = () => {
+  //   setTimer(30);
+  //   setIsTimerVisible(true);
+  //   handleOtpVerify()
+  // };
   const [errorMessage, setErrorMessage] = useState("");
   function handleOtpVerify() {
     axios
@@ -57,20 +75,6 @@ const OtpModal = (props) => {
         console.log(error);
       });
   }
-
-  const handleResendOtp = async () => {
-    try {
-      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
-        phone: props?.phone,
-        is_admin: true,
-      });
-      if (res.data.status === 500) {
-        setErrorMessage(res.data.error);
-      }
-    } catch (error) {
-      console.log("error:::::::::::::", error);
-    }
-  };
 
   return (
     <>

@@ -1,4 +1,4 @@
-from core.models import Subscription, Notification, CommentatorLevelRule, PendingBalanceHistory, BankDetails
+from core.models import Subscription, Notification, CommentatorLevelRule, PendingBalanceHistory, BankDetails, BecomeCommentator
 from datetime import datetime, timedelta, timezone
 import pytz
 import requests
@@ -81,6 +81,18 @@ def send_notification_sms(notification_data):
     
     except:
         return False
+    
+
+def membership_plan_check():
+    all_obj = BecomeCommentator.objects.all()
+    current_date = datetime.now().date()
+
+    for obj in all_obj:
+        if obj.duration == '1 Months':
+            new_end_date = obj.end_date + timedelta(days=3)
+            if current_date == new_end_date.date():
+                obj.user.is_active = False
+                obj.user.save()
 
 # def subscriptionstatus():
 #     today_date = datetime.now(timezone.utc)

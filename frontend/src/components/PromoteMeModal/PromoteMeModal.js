@@ -141,7 +141,17 @@ const PromoteMeModal = (props) => {
             currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         }).then((res) => {
           if (res.isConfirmed) {
-            window.location.replace("/");
+            // window.location.replace("/");
+            window.history.pushState(null, null, window.location.origin + "/");
+              window.addEventListener("popstate", () => {
+                window.history.pushState(null, null, window.location.origin + "/");
+              });
+              // return () => {
+                // Remove event listener when component unmounts
+                window.removeEventListener("popstate", () => {
+                  window.history.pushState(null, null, window.location.origin + "/");
+                  // window.location.replace(window.location.origin + "/");
+                });
           }
         });
       }

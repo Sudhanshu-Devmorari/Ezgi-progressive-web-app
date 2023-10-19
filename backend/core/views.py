@@ -111,6 +111,8 @@ class SignupUserExistsView(APIView):
 #             # else:
 #             #     obj = DataCount.objects.create(user=1)
 #             # return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
+# def generate_otp():
+#     return random.randrange(100000,999999)
 
 def generate_otp():
     return random.randrange(100000,999999)
@@ -127,7 +129,7 @@ def send_otp(phone):
     else:
         otp_obj = Otp.objects.create(otp=otp,phone=phone)
         return otp
-
+    
 class SignupView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
@@ -141,6 +143,8 @@ class SignupView(APIView):
             return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
         else:
             return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})  
+        return Response(data={'error': 'Something went wrong', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+
 
 class OtpVerify(APIView):
     def post(self, request):
@@ -204,7 +208,6 @@ class OtpReSend(APIView):
                 })
 
             otp = send_otp(phone)
-
             res = sms_send(phone, otp)  
             if res == 'Success':
                 return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -6638,8 +6641,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6694,8 +6697,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6838,6 +6841,10 @@ class SubscriptionReNew(APIView):
                     if serializer.is_valid():
                         try:
                             serializer.save()
+                            
+                            user.is_active = True
+                            user.save()
+
                             if obj.membership_status.lower() == 'new':
                                 user.remaining_monthly_count = user.remaining_monthly_count - 1
                                 user.save()

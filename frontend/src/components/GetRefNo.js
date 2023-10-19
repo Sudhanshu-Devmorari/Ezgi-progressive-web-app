@@ -15,6 +15,7 @@ export const transcationQueryAPI = async (ref_no) => {
       ref_no: ref_no,
     });
     const data = res?.data?.data;
+    // sessionStorage.setItem("reloadCount", String(1))
     return data;
   } catch (error) {
     console.log(error);

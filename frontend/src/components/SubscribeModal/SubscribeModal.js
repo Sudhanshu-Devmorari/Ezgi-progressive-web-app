@@ -282,14 +282,53 @@ const SubscribeModal = (props) => {
       );
       console.log("RenewMembership", RenewMembership);
       if (RenewMembership.status == 200) {
-        window.location.replace(window.location.origin + "/");
-        console.log("window.history.length", window.history.length);
-        console.log("\n\nwindow.history\n", window.history);
-        if (window.history && window.history.length > 1) {
-          // window.history.go(window.history.length - 3);
-          window.history.go(1)
-          // window.history.pushState({}, '', window.location.href);
-        }
+        window.history.pushState(null, null, window.location.origin + "/");
+        window.addEventListener("popstate", () => {
+          window.history.pushState(null, null, window.location.origin + "/");
+        });
+        // return () => {
+          // Remove event listener when component unmounts
+          window.removeEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+            // window.location.replace(window.location.origin + "/");
+          });
+        // };
+        // console.log("window.history.length", window.history.length);
+        // console.log("\n\nwindow.history\n", window.history);
+
+        // const disableBackButton = (e) => {
+        //   e.preventDefault();
+        // };
+
+        // // Add the event listener to disable the back button
+        // window.history.pushState(null, '', window.location.href);
+        // window.addEventListener('popstate', disableBackButton);
+
+        // // Redirect the user
+        // window.location.replace(window.location.origin + "/");
+
+        // // Ensure that the event listener is removed when the component unmounts
+        // return () => {
+        //   window.removeEventListener('popstate', disableBackButton);
+        // };
+
+        // const onPopState = () => {
+        //   window.location.href = window.location.origin + "/";
+        // };
+        // window.addEventListener('popstate', onPopState);
+        // return () => {
+        //   window.removeEventListener('popstate', onPopState);
+        // };
+
+        // if (window.history && window.history.length > 1) {
+        //   // window.history.go(window.history.length - 3);
+        //   // window.history.go(0)
+        //   window.history.go(window.history.length);
+        //   // window.history.forward();
+        //   // window.history.pushState({}, '', window.location.href);
+        // }
+
+
         // if (history.action === 'POP'){
         //   console.log("POP inside")
         // }
@@ -666,27 +705,35 @@ export const subcriptionEntry = async (
     //       window.location.replace("/");
     //     }
     //   });
-      if (res?.status === 200) {
-        await Swal.fire({
-          title: "Success",
-          text: `You've subscribe to ${commentator_username}`,
-          icon: "sucess",
-          backdrop: false,
-          customClass:
-            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-        }).then((res) => {
-          if (res.isConfirmed) {
-            window.location.replace(window.location.origin+'/')
-            // window.location.replace("/");
-            // After successful payment 
-            // window.history.replaceState(null, null, "/");
-            // window.history.pushState(null, null, "/");
-            // window.location.reload()
-
-
-          }
+    if (res?.status === 200) {
+      await Swal.fire({
+        title: "Success",
+        text: `You've subscribe to ${commentator_username}`,
+        icon: "sucess",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      }).then((res) => {
+        if (res.isConfirmed) {
+          // window.location.replace(window.location.origin + "/");
+          window.history.pushState(null, null, window.location.origin + "/");
+        window.addEventListener("popstate", () => {
+          window.history.pushState(null, null, window.location.origin + "/");
         });
-      }
+        // return () => {
+          // Remove event listener when component unmounts
+          window.removeEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+            // window.location.replace(window.location.origin + "/");
+          });
+          // window.location.replace("/");
+          // After successful payment
+          // window.history.replaceState(null, null, "/");
+          // window.history.pushState(null, null, "/");
+          // window.location.reload()
+        }
+      });
+    }
     // }
     //  catch (error) {
     //   console.log(error);

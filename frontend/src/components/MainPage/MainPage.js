@@ -28,7 +28,6 @@ import { ref, transcationQueryAPI } from "../GetRefNo";
 import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
 
 const MainPage = () => {
-  
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // Select Content
@@ -77,6 +76,14 @@ const MainPage = () => {
           console.log("payment succesffull", result);
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
 
+          // window.location.reload()
+          // const reloadCount = sessionStorage.getItem("reloadCount");
+          // if (reloadCount < 2) {
+          //   sessionStorage.setItem("reloadCount", String(reloadCount + 1));
+          //   window.location.reload();
+          // } else {
+          //   sessionStorage.removeItem("reloadCount");
+          // }
           if (category === "subscription") {
             const commentator_user_id = result?.PRODUCTS[0]?.PRODUCT_ID;
             const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
@@ -496,21 +503,19 @@ const MainPage = () => {
     }
   }, [onlyPubliccategory]);
 
-  // useEffect(() => {
-  //   // Prevent user from going back
-  //   window.history.pushState(null, null, window.location.pathname);
-  //   window.addEventListener('popstate', () => {
-  //     window.history.pushState(null, null, window.location.pathname);
-  //   });
-
-
-  //   return () => {
-  //     // Remove event listener when component unmounts
-  //     window.removeEventListener('popstate', () => {
-  //       window.history.pushState(null, null, window.location.pathname);
-  //     });
-  //   };
-  // }, []);
+  useEffect(() => {
+    // Prevent user from going back
+    // window.history.pushState(null, null, window.location.origin + "/");
+    // window.addEventListener('popstate', () => {
+    //   window.history.pushState(null, null, window.location.origin + "/");
+    // });
+    // return () => {
+    //   // Remove event listener when component unmounts
+    //   window.removeEventListener('popstate', () => {
+    //     window.history.pushState(null, null, window.location.origin + "/");
+    //   });
+    // };
+  }, []);
 
   return (
     <>
