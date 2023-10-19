@@ -159,7 +159,7 @@ const CommentsManagement = (props) => {
     const filteredArray = displayUser?.filter(
       (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
     );
-    console.log("filtered::::::", filteredArray);
+    // console.log("filtered::::::", filteredArray);
     setTimeout(() => {
       setDisplayUser(val == "All" ? props?.commentData : filteredArray);
       setDataloading(false);

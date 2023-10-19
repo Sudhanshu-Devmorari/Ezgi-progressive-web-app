@@ -66,7 +66,7 @@ const SubscribeModal = (props) => {
           id: commentatorUser?.id,
           commentator_username: commentatorUser?.username,
         });
-        console.log(payment_res, "==========payment_res");
+        // console.log(payment_res, "==========payment_res");
 
         if (payment_res.status === 200) {
           const url = payment_res?.data?.URL_3DS;
@@ -191,7 +191,7 @@ const SubscribeModal = (props) => {
               (renewModelData?.plan_promotion_rate / 100)
         );
 
-        console.log("totalValue", totalValue);
+        // console.log("totalValue", totalValue);
 
         const formData = new FormData();
 
@@ -256,7 +256,7 @@ const SubscribeModal = (props) => {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
           if (category === "membership renew") {
-            console.log("IN membership re new: ");
+            // console.log("IN membership re new: ");
             const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
             const startdate = result?.PAYMENT_DATE;
             handleRenewMambership(monthly_amount, startdate);

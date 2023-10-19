@@ -445,7 +445,7 @@ const Home = (props) => {
               closeButton.click();
             }
           }
-          console.log(addUser);
+          // console.log(addUser);
           clearError();
           setAddUser({
             name: "",

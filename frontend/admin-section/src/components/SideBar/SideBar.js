@@ -167,7 +167,7 @@ const SideBar = (props) => {
             height={32}
             width={32}
             onClick={() => {
-              console.log("icon: ", props?.supportIcon)
+              // console.log("icon: ", props?.supportIcon)
               props.refreshComments && props.refreshComments()
               setshowDetails("/subuser/");
               navigate("/subuser/");

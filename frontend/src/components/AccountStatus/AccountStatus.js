@@ -83,9 +83,9 @@ const AccountStatus = (props) => {
   const MIN = 0;
   const MAX = 1000;
   function getEarnings(newValues, typeData) {
-    console.log("new Values:::::::::::::", newValues);
+    // console.log("new Values:::::::::::::", newValues);
     // console.log("selectSubRangeData:::::::::::::", selectSubRangeData);
-    console.log("typeData:::::::::::::", typeData);
+    // console.log("typeData:::::::::::::", typeData);
     // const type =
     //   selectSubRangeData === "journeyman" ||
     //   selectSubRangeData === "master" ||
@@ -99,7 +99,7 @@ const AccountStatus = (props) => {
         )
         .then((res) => {
           if (res.status === 200) {
-            console.log("total earning::::::", res.data.total_earning);
+            // console.log("total earning::::::", res.data.total_earning);
             setEarnings(res.data.total_earning);
           }
         })
@@ -222,7 +222,7 @@ const AccountStatus = (props) => {
       setMembershipEndDate(finalEndDate);
       
       if (currentDate.isAfter(nextIntervalDate) && finaldaysRemaining == 0) {
-        console.log("Interval is already over");
+        // console.log("Interval is already over");
         return { daysRemaining: 0, showRenewButton: true }; // Interval is already over, show renew button
       }
       
@@ -568,7 +568,7 @@ const AccountStatus = (props) => {
                 // getEarnings(newValues, selectSub);
               }}
               onFinalChange={(newValues) => {
-                console.log("final function called");
+                // console.log("final function called");
                 getEarnings(newValues, selectSub);
               }}
               renderTrack={({ props, children }) => {

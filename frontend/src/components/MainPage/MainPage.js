@@ -73,7 +73,7 @@ const MainPage = () => {
         const result = await transcationQueryAPI(ref_no);
 
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
-          console.log("payment succesffull", result);
+          // console.log("payment succesffull", result);
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
 
           // window.location.reload()

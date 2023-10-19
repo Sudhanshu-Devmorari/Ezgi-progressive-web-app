@@ -39,7 +39,7 @@ const OtpModal = (props) => {
         setErrorMessage(res.data.error);
       }
     } catch (error) {
-      console.log("error:::::::::::::", error);
+      console.log("error", error);
     }
   };
   const handleResendClick = () => {

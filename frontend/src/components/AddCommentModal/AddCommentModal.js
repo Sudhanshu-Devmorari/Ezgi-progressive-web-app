@@ -171,7 +171,7 @@ const AddCommentModal = (props) => {
 
     MatchDetailsAPI(categoryType, selectedLeague, date)
       .then((res) => {
-        console.log("======data=======", res.data);
+        // console.log("======data=======", res.data);
 
         const MatchList = res.data;
 
@@ -180,7 +180,7 @@ const AddCommentModal = (props) => {
           (resp) => moment(resp.TarihSaat).valueOf() >= moment().valueOf()
         );
 
-        console.log("filterdata:::::::::::", filterdata);
+        // console.log("filterdata:::::::::::", filterdata);
         filterdata.length == 0 && setSelectedMatchDetails("No Matchs Found!");
 
         setMatchList(filterdata);
@@ -474,7 +474,7 @@ const AddCommentModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         } else if (error.response.status === 400) {
-          console.log("error.response.data:::::::::::", error);
+          // console.log("error.response.data:::::::::::", error);
           // Swal.fire({
           //   title: "Error",
           //   text: `${error.response.data.data}`,

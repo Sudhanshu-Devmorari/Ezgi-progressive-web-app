@@ -180,7 +180,7 @@ const WithdrawalManagementPage = (props) => {
       console.log(error);
     }
   }
-  console.log("props.withdrawableData: ", props.withdrawableData);
+  // console.log("props.withdrawableData: ", props.withdrawableData);
   useEffect(() => {
     getWithdrawData();
     WithdrawDataRetrieve();

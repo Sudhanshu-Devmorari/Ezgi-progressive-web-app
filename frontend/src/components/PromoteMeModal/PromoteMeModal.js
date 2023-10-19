@@ -84,7 +84,7 @@ const PromoteMeModal = (props) => {
             amount: money,
             id: userId,
           });
-          console.log(payment_res, "==========payment_res");
+          // console.log(payment_res, "==========payment_res");
 
           if (payment_res.status === 200) {
             const url = payment_res?.data?.URL_3DS;
@@ -166,7 +166,7 @@ const PromoteMeModal = (props) => {
       try {
         const result = await transcationQueryAPI(ref_no);
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
-          console.log("payment succesffull");
+          // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
           if (category === "highlight") {
             const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;

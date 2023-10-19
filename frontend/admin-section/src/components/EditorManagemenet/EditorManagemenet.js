@@ -1293,12 +1293,12 @@ const EditorManagemenet = (props) => {
                     <input
                       type="date"
                       onChange={(e) => {
-                        console.log(
-                          "date:",
-                          moment(e.target.value).format(
-                            "YYYY-MM-DD HH:mm:SS.SSSSSSZ"
-                          )
-                        );
+                        // console.log(
+                        //   "date:",
+                        //   moment(e.target.value).format(
+                        //     "YYYY-MM-DD HH:mm:SS.SSSSSSZ"
+                        //   )
+                        // );
                         setAddUser({
                           ...addUser,
                           membership_date: moment(e.target.value).format(

@@ -485,9 +485,9 @@ const ActiveComments = (props) => {
 
     if (currentTime >= subExpDate) {
       cancelSubcription();
-      console.log("Subscription expired - cancelling");
+      // console.log("Subscription expired - cancelling");
     } else {
-      console.log("Subscription is active");
+      // console.log("Subscription is active");
     }
   }, [profileData]);
 

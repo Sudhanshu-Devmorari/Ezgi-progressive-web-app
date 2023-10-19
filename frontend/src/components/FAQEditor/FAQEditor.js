@@ -42,7 +42,7 @@ const FAQEditor = () => {
   // Editor earning API
   const [earnings, setEarnings] = useState(0);
   function getEarnings(newValues, typeData) {
-    console.log(newValues, ":::::::::::newValues:::::::");
+    // console.log(newValues, ":::::::::::newValues:::::::");
     const type =
       (typeData === "KALFA" && "journeyman") ||
       (typeData === "USTA" && "master") ||
@@ -287,7 +287,7 @@ const FAQEditor = () => {
                             getEarnings(newValues);
                           }}
                           onFinalChange={(newValues) => {
-                            console.log("final function called");
+                            // console.log("final function called");
                             getEarnings(newValues, selectSub);
                           }}
                           renderTrack={({ props, children }) => {

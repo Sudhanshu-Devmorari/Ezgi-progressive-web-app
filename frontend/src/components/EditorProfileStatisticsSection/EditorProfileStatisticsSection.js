@@ -45,7 +45,7 @@ const EditorProfileStatisticsSection = (props) => {
   useEffect(() => {
     profileData &&
       profileData?.category.map((res) => {
-        console.log("res::::::::::", res);
+        // console.log("res::::::::::", res);
         setSelectSport(
           res == "Futbol" || res == "Football" ? "Futbol" : "Basketbol"
         );
@@ -53,11 +53,11 @@ const EditorProfileStatisticsSection = (props) => {
   }, [profileData]);
 
   useEffect(() => {
-    console.log(
-      "props?.activeCommentsshow::::::::::::::",
-      props?.activeCommentsshow
-    );
-    console.log("props?.from::::::::::::::", props?.from);
+    // console.log(
+    //   "props?.activeCommentsshow::::::::::::::",
+    //   props?.activeCommentsshow
+    // );
+    // console.log("props?.from::::::::::::::", props?.from);
     if (props?.from === "editor" && props?.activeCommentsshow) {
       setUserUid(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
@@ -69,7 +69,7 @@ const EditorProfileStatisticsSection = (props) => {
   }, [props?.from, props?.activeCommentsshow, userId]);
 
   const sportsAPI = (user, categoty) => {
-    console.log("SelectSport:::::::::::::", categoty);
+    // console.log("SelectSport:::::::::::::", categoty);
     if (user && categoty) {
       setIsLoading(true);
       try {
@@ -78,7 +78,7 @@ const EditorProfileStatisticsSection = (props) => {
             `${config.apiUrl}/sports-statistics/${user}/?category=${categoty}`
           )
           .then((res) => {
-            console.log("=====>>ressssssssssssssss", res.data);
+            // console.log("=====>>ressssssssssssssss", res.data);
             if (res.status === 200) {
               // if (SelectSport == "football") {
               setFootballStats(res.data[0]);
@@ -241,7 +241,7 @@ const EditorProfileStatisticsSection = (props) => {
     //   .catch((error) => {
     //     console.log(error);
     //   });
-    console.log("user:::::::::::::::::", userUid);
+    // console.log("user:::::::::::::::::", userUid);
     SelectSport && userUid && sportsAPI(userUid, SelectSport);
   }, [userUid, SelectSport]);
 
@@ -271,7 +271,7 @@ const EditorProfileStatisticsSection = (props) => {
         <div className="text-end d-flex justify-content-end gap-3">
           {profileData &&
             profileData?.category.map((res) => {
-              console.log("res::::::::::", res);
+              {/* console.log("res::::::::::", res); */}
               return (
                 <span
                   style={{
