@@ -6324,7 +6324,7 @@ class PaymentView(APIView):
 
         id = request.data.get('id', None)
         duration = request.data.get('duration', None)
-        money = request.data.get('amount', None)
+        money = str(int(round(float(request.data.get('amount', None)))))
         commentator_username = request.data.get('commentator_username', None)
 
         category = request.data.get('category', None)
@@ -6439,6 +6439,7 @@ class PaymentView(APIView):
             }
 
             url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            print("data:", data)
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':
