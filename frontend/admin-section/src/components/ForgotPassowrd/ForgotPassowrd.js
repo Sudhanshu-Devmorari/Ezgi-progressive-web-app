@@ -115,7 +115,7 @@ const ForgotPassowrd = () => {
                   </div>
                 </form>
               )}
-              {showModal === 2 && <OtpModal setShowModal={setShowModal} />}
+              {showModal === 2 && <OtpModal setShowModal={setShowModal} phone={phone}/>}
               {showModal === 3 && <NewPassword phone={phone}/>}
             </div>
             <img

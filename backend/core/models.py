@@ -89,6 +89,13 @@ class User(AbstractBaseUser):
         indexes = [
             models.Index(fields=['created']),
         ]
+
+class Otp(models.Model):
+    phone = models.CharField(max_length=15,null=True, blank=True) 
+    otp = models.CharField(max_length=20, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
 class FollowCommentator(models.Model):
     commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentator_user')
     standard_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='standard_user')

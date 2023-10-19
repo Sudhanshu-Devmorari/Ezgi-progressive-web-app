@@ -32,12 +32,12 @@ const OtpModal = (props) => {
   const handleResendClick = () => {
     setTimer(30);
     setIsTimerVisible(true);
-    handleOtpVerify()
+    handleResendOtp()
   };
   const [errorMessage, setErrorMessage] = useState("");
   function handleOtpVerify() {
     axios
-      .post(`${config?.apiUrl}/otp-verify/`, { otp: otp })
+      .post(`${config?.apiUrl}/otp-verify/`, { otp: otp, phone: props?.phone })
       .then((res) => {
         // console.log(res);
         if (res.data.status === 200) {
@@ -57,6 +57,20 @@ const OtpModal = (props) => {
         console.log(error);
       });
   }
+
+  const handleResendOtp = async () => {
+    try {
+      const res = await axios.post(`${config.apiUrl}/otp-resend/`, {
+        phone: props?.phone,
+        is_admin: true,
+      });
+      if (res.data.status === 500) {
+        setErrorMessage(res.data.error);
+      }
+    } catch (error) {
+      console.log("error:::::::::::::", error);
+    }
+  };
 
   return (
     <>

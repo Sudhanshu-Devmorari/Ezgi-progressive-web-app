@@ -32,7 +32,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail,
-                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription, Otp)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
@@ -112,41 +112,72 @@ class SignupUserExistsView(APIView):
 #             #     obj = DataCount.objects.create(user=1)
 #             # return Response(data={'success': 'Registration done', 'status' : status.HTTP_200_OK})
 
+def generate_otp():
+    return random.randrange(100000,999999)
+
+def send_otp(phone):
+    otp = generate_otp()
+    is_otp_obj = Otp.objects.filter(phone=phone).exists()
+    
+    if is_otp_obj:
+        otp_obj = Otp.objects.get(phone=phone)
+        otp_obj.otp = otp
+        otp_obj.save(update_fields=['otp','updated'])
+        return otp
+    else:
+        otp_obj = Otp.objects.create(otp=otp,phone=phone)
+        return otp
+
 class SignupView(APIView):
     def post(self, request, format=None):
         phone = request.data['phone']
-        otp = totp.now()
+        # otp = totp.now()
         # print("--------", otp)
+
+        otp = send_otp(phone)
+
         res = sms_send(phone, otp)  
         if res == 'Success':
             return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
         else:
-            return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
-
+            return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})  
 
 class OtpVerify(APIView):
-    def post(self, request, format=None, *args, **kwargs):
+    def post(self, request):
         try:
             otp = request.data.get('otp')
-            if 'phone' and 'signup' in request.data:
-                verification_result = totp.verify(otp)
-                if verification_result:
-                    serializer = UserSerializer(data=request.data)
-                    if serializer.is_valid():
-                        data = serializer.save()
-                        return Response({'success': 'Otp successfully verified.', 'user' : serializer.data ,'status': status.HTTP_200_OK} )
-                    else:
-                        return Response({'error': 'Error', 'data' : serializer.errors ,'status': status.HTTP_200_OK} )           
+            phone = request.data.get('phone')
+            signup = request.data.get('signup')
+
+            print('======>>>>>', request.data)
+            
+            otp_obj = Otp.objects.get(phone=phone)
+            expired_OTP_time = otp_obj.updated + timezone.timedelta(seconds=30)
+            
+            if otp_obj.otp != otp:
+                return Response({'error': 'Invalid OTP.', 'status': status.HTTP_400_BAD_REQUEST})
+            
+            if timezone.now() > expired_OTP_time:
+                otp_obj.otp = ''
+                otp_obj.save(update_fields=['otp', 'updated'])
+                return Response({'error': 'OTP has been expired!', 'status': status.HTTP_400_BAD_REQUEST})
+            
+            if signup:
+                serializer = UserSerializer(data=request.data)
+                if serializer.is_valid():
+                    data = serializer.save()
+                    otp_obj.delete()
+                    return Response({'success': 'OTP successfully verified.', 'user': serializer.data, 'status': status.HTTP_200_OK})
                 else:
-                    return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
-                    
-            verification_result = totp.verify(otp)
-            if verification_result:
-                return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
-            else:
-                return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
+                    return Response({'error': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST})
+
+            otp_obj.delete()
+            return Response({'success': 'OTP successfully verified.', 'status': status.HTTP_200_OK})
+
+        except Otp.DoesNotExist:
+            return Response({'error': 'No OTP found for the given phone.', 'status': status.HTTP_404_NOT_FOUND})
         except Exception as e:
-            return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
 
 class OtpReSend(APIView):
     def post(self, request, format=None, *args, **kwargs):
@@ -155,7 +186,9 @@ class OtpReSend(APIView):
             if 'is_admin' in request.data:
                 user = User.objects.filter(phone=phone, is_admin=True, is_delete=False).first()
             elif 'signup' in request.data:
-                otp = totp.now()
+
+                otp = send_otp(phone)
+
                 res = sms_send(phone, otp)  
                 if res == 'Success':
                     return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -170,7 +203,8 @@ class OtpReSend(APIView):
                     'status' : status.HTTP_404_NOT_FOUND
                 })
 
-            otp = totp.now()
+            otp = send_otp(phone)
+
             res = sms_send(phone, otp)  
             if res == 'Success':
                 return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
@@ -181,6 +215,64 @@ class OtpReSend(APIView):
                 'data':"Something went wrong!",
                 'status' : status.HTTP_404_NOT_FOUND
             })
+        
+# class OtpVerify(APIView):
+#     def post(self, request, format=None, *args, **kwargs):
+#         try:
+#             otp = request.data.get('otp')
+#             if 'phone' and 'signup' in request.data:
+#                 verification_result = totp.verify(otp)
+#                 if verification_result:
+#                     serializer = UserSerializer(data=request.data)
+#                     if serializer.is_valid():
+#                         data = serializer.save()
+#                         return Response({'success': 'Otp successfully verified.', 'user' : serializer.data ,'status': status.HTTP_200_OK} )
+#                     else:
+#                         return Response({'error': 'Error', 'data' : serializer.errors ,'status': status.HTTP_200_OK} )           
+#                 else:
+#                     return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
+                    
+#             verification_result = totp.verify(otp)
+#             if verification_result:
+#                 return Response({'success': 'Otp successfully verified.', 'status': status.HTTP_200_OK} )
+#             else:
+#                 return Response({'error': "The OTP verification failed.",'status': status.HTTP_400_BAD_REQUEST})
+#         except Exception as e:
+#             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class OtpReSend(APIView):
+#     def post(self, request, format=None, *args, **kwargs):
+#         phone = request.data['phone']
+#         try:
+#             if 'is_admin' in request.data:
+#                 user = User.objects.filter(phone=phone, is_admin=True, is_delete=False).first()
+#             elif 'signup' in request.data:
+#                 otp = totp.now()
+#                 res = sms_send(phone, otp)  
+#                 if res == 'Success':
+#                     return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+#                 else:
+#                     return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+#             else:
+#                 user = User.objects.filter(phone=phone, is_admin=False, is_delete=False).first()
+
+#             if not user:
+#                 return Response({
+#                     'data':"User Doesn't exists.",
+#                     'status' : status.HTTP_404_NOT_FOUND
+#                 })
+
+#             otp = totp.now()
+#             res = sms_send(phone, otp)  
+#             if res == 'Success':
+#                 return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+#             else:
+#                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
+#         except:
+#             return Response({
+#                 'data':"Something went wrong!",
+#                 'status' : status.HTTP_404_NOT_FOUND
+#             })
 
 class LoginView(APIView):
 
@@ -4812,204 +4904,342 @@ class UserStatistics(APIView):
 #         return Response({"data": commentator_user.values(), 'monthly_subscription_chart': months_dict.__str__()})
 
 
+# class SportsStatisticsView(APIView):
+#     def get(self, request, id, format=None, *args, **kwargs):
+#         datalist = []
+
+#         try:
+#             p_type_lst = []
+#             details = {}
+#             Comments_Journey_basketball = []
+#             user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
+#             total_user_cmt = user_all_cmt.count()
+            
+#             other_comments_basketball = 0
+            
+#             top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+#             # top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
+
+#             prediction_types_data = []
+#             for i in top_3_prediction_types:
+#                 predict_type = Comments.objects.filter(
+#                         commentator_user__id=id,
+#                         prediction_type__icontains=i, 
+#                         category__icontains='Basketbol', 
+#                         status='approve', 
+#                     )
+
+#                 if i == 'Alt/Üst':
+#                     predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+
+#                 data ={
+#                     "prediction_type":i,
+#                     "calculation": predict_type.count()
+#                 }
+#                 prediction_types_data.append(data)
+#                 other_comments_basketball += predict_type.count()
+
+#             if total_user_cmt == 0:
+#                 prediction_types_data = []
+#             else:
+#                 b_avg = 0
+#                 for i in prediction_types_data:
+#                     b_avg += i['calculation']
+
+#                 # other_data = {
+#                 #     "prediction_type":'Other',
+#                 #     "calculation":round(100-b_avg, 2)
+#                 # }
+#                 other_data = {
+#                     "prediction_type":'Diger',
+#                     "calculation": total_user_cmt - other_comments_basketball
+#                 }
+#                 prediction_types_data.append(other_data)
+                
+#             recent_30_comments = Comments.objects.filter(
+#                                 Q(commentator_user__id=id) &
+#                                 Q(category__icontains='Basketbol') &
+#                                 Q(status='approve') &
+#                                 Q(is_resolve=True) &
+#                                 (Q(is_prediction=True) | Q(is_prediction=False))
+#                             ).order_by('-created')[:20]
+            
+#             correct_prediction_basketball = 0
+
+#             for obj in recent_30_comments:
+#                 Comments_Journey_basketball.append(obj.is_prediction)
+#                 if obj.is_prediction:
+#                     correct_prediction_basketball += 1
+#             details['Comments_Journey_basketball'] = Comments_Journey_basketball
+
+#             total_comments_recents = recent_30_comments.count() if recent_30_comments.count() != 0 else 1
+
+#             basketball_calculation = (correct_prediction_basketball/total_comments_recents)*100
+#             details['basketball_calculation'] = round(basketball_calculation, 2)
+
+#             basketball_Leagues = []
+#             Countries_Leagues_basketball = Comments.objects.filter(
+#                                             Q(commentator_user__id=id) &
+#                                             Q(category__icontains='Basketbol') &
+#                                             Q(status='approve') &
+#                                             Q(is_resolve=True) &
+#                                             (Q(is_prediction=True) | Q(is_prediction=False))
+#                                         )
+#             for obj in Countries_Leagues_basketball:
+#                 translator= Translator(from_lang="turkish",to_lang="english")
+#                 translation_coutry = translator.translate(obj.country)
+#                 data = {
+#                     "country":translation_coutry,
+#                     "league":obj.league,
+#                 }
+#                 basketball_Leagues.append(data)
+#             frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
+#             counter = Counter(frozen_dicts)
+#             most_common_duplicates = counter.most_common(5)
+#             result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
+
+
+#             details['basketball_Leagues'] = result
+#             details['basketball_comment_types'] = prediction_types_data
+#             datalist.append(details)
+#         except Comments.DoesNotExist:
+#             datalist.append({})  # Append an empty dictionary
+
+#         try:
+#             fb_p_type_lst = []
+#             Fb_details = {}
+#             Comments_Journey_football = []
+#             fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
+#             fb_total_user_cmt = fb_user_all_cmt.count()
+
+#             other_comments_fb = 0
+
+#             fb_top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+#             # fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
+
+#             fb_prediction_types_data = []
+#             for i in fb_top_3_prediction_types:
+#                 predict_type = Comments.objects.filter(
+#                             commentator_user__id=id,
+#                             prediction_type__icontains=i, 
+#                             category__icontains='Futbol', 
+#                             status='approve'
+#                         )
+
+#                 if i == 'Alt/Üst':
+#                     predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+                    
+#                 data ={
+#                     "prediction_type":i,
+#                     "calculation":predict_type.count()
+#                 }
+#                 other_comments_fb += predict_type.count()
+#                 fb_prediction_types_data.append(data)
+
+#             if fb_total_user_cmt == 0:
+#                 fb_prediction_types_data = []
+#             else:
+#                 fb_avg = 0
+#                 for i in fb_prediction_types_data:
+#                     fb_avg += i['calculation']
+#                 # fb_other_data = {
+#                 #     "prediction_type":'Other',
+#                 #     "calculation":round(100-fb_avg, 2)
+#                 # }
+#                 fb_other_data = {
+#                     "prediction_type":'Diger',
+#                     "calculation": fb_total_user_cmt - other_comments_fb
+#                 }
+#                 fb_prediction_types_data.append(fb_other_data)
+
+#             fb_recent_30_comments = Comments.objects.filter(
+#                                     Q(commentator_user__id=id) &
+#                                     Q(category__icontains='Futbol') &
+#                                     Q(status='approve') &
+#                                     Q(is_resolve=True) &
+#                                     (Q(is_prediction=True) | Q(is_prediction=False))
+#                                 ).order_by('-created')[:20]
+
+#             correct_prediction_football = 0
+#             for obj in fb_recent_30_comments:
+#                 Comments_Journey_football.append(obj.is_prediction)
+#                 if obj.is_prediction:
+#                     correct_prediction_football += 1
+#             Fb_details['Comments_Journey_football'] = Comments_Journey_football
+
+#             total_comments_recents_fb = fb_recent_30_comments.count() if fb_recent_30_comments.count() != 0 else 1
+
+#             football_calculation = (correct_prediction_football/total_comments_recents_fb)*100
+#             Fb_details['football_calculation'] = round(football_calculation, 2)
+
+#             football_Leagues = []
+#             Countries_Leagues_football = Comments.objects.filter(
+#                                                 commentator_user__id=id,  
+#                                                 is_prediction=True, 
+#                                                 category__icontains='Futbol', 
+#                                                 status='approve'
+#                                             )
+#             for obj in Countries_Leagues_football:
+#                 # football_Leagues.append(obj.league)
+#                 translator= Translator(from_lang="turkish",to_lang="english")
+#                 translation_coutry = translator.translate(obj.country)
+#                 data = {
+#                     "country":translation_coutry,
+#                     "league":obj.league,
+#                 }
+#                 football_Leagues.append(data)
+#             fb_frozen_dicts = [frozenset(d.items()) for d in football_Leagues]
+#             fb_counter = Counter(fb_frozen_dicts)
+#             fb_most_common_duplicates = fb_counter.most_common(5)
+#             fb_result = [dict(frozenset_pair) for frozenset_pair, count in fb_most_common_duplicates]
+#             # football_counter = Counter(football_Leagues)
+#             # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
+#             Fb_details['football_Leagues'] = fb_result
+#             Fb_details['football_comment_types'] = fb_prediction_types_data
+#             datalist.append(Fb_details)
+#         except Comments.DoesNotExist:
+#             datalist.append({})  # Append an empty dictionary
+
+#         return Response(data=datalist, status=status.HTTP_200_OK)
+
+def get_recent_comments(user_id, category, top_n=20):
+    recent_comments = Comments.objects.filter(
+        Q(commentator_user__id=user_id) &
+        Q(category__icontains=category) &
+        Q(status='approve') &
+        Q(is_resolve=True) &
+        (Q(is_prediction=True) | Q(is_prediction=False))
+    ).order_by('-created')[:top_n]
+
+    correct_predictions = 0
+    comments_journey = []
+    for obj in recent_comments:
+        comments_journey.append(obj.is_prediction)
+        if obj.is_prediction:
+            correct_predictions += 1
+
+    total_comments_recent = recent_comments.count() if recent_comments.count() != 0 else 1
+    calculation = (correct_predictions / total_comments_recent) * 100
+
+    return comments_journey, round(calculation, 2)
+
+def get_translation_data(user_id, category):
+    data = []
+    comments = Comments.objects.filter(
+        Q(commentator_user__id=user_id) &
+        Q(category__icontains=category) &
+        Q(status='approve') &
+        Q(is_resolve=True) &
+        (Q(is_prediction=True) | Q(is_prediction=False))
+    )
+    for obj in comments:
+        translator = Translator(from_lang="turkish", to_lang="english")
+        translation_country = translator.translate(obj.country)
+        data.append({
+            "country": translation_country,
+            "league": obj.league,
+        })
+
+    frozen_dicts = [frozenset(d.items()) for d in data]
+    counter = Counter(frozen_dicts)
+    most_common_duplicates = counter.most_common(5)
+    result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
+
+    return result
+
+def get_comment_types(user_id, category, top_prediction_types):
+    prediction_data = []
+    other_comments = 0
+
+    user_all_cmt = Comments.objects.filter(commentator_user__id=user_id, category__icontains=category, status='approve').count()
+
+
+    for prediction_type in top_prediction_types:
+        predict_type = Comments.objects.filter(
+            commentator_user__id=user_id,
+            prediction_type__icontains=prediction_type,
+            category__icontains=category,
+            status='approve'
+        )
+
+        if prediction_type == 'Alt/Üst':
+            predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+
+        data = {
+            "prediction_type": prediction_type,
+            "calculation": predict_type.count()
+        }
+        prediction_data.append(data)
+        other_comments += predict_type.count()
+
+    if user_all_cmt == 0:
+        prediction_data = []
+    else:
+        other_data = {
+                "prediction_type":'Diger',
+                "calculation": user_all_cmt - other_comments
+            }
+        prediction_data.append(other_data)
+
+    return prediction_data
 class SportsStatisticsView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         datalist = []
 
-        try:
-            p_type_lst = []
-            details = {}
-            Comments_Journey_basketball = []
-            user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Basketbol', status='approve')
-            total_user_cmt = user_all_cmt.count()
-            
-            other_comments_basketball = 0
-            
-            top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
-            # top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
+        category = request.query_params.get('category', None)
+        print('category: ', category)
 
-            prediction_types_data = []
-            for i in top_3_prediction_types:
-                predict_type = Comments.objects.filter(
-                        commentator_user__id=id,
-                        prediction_type__icontains=i, 
-                        category__icontains='Basketbol', 
-                        status='approve', 
-                    )
+        if category is not None:
+            if category.lower() == 'basketball' or category.lower() == 'basketbol':
 
-                if i == 'Alt/Üst':
-                    predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
+                try:
+                    top_3_prediction_types_basketball = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+                    basketball_comment_types = get_comment_types(id, 'Basketbol', top_3_prediction_types_basketball)
+                    basketball_comments_journey, basketball_calculation = get_recent_comments(id, 'Basketbol', top_n=20)
+                    basketball_leagues = get_translation_data(id, 'Basketbol')
 
-                data ={
-                    "prediction_type":i,
-                    "calculation": predict_type.count()
-                }
-                prediction_types_data.append(data)
-                other_comments_basketball += predict_type.count()
+                    details = {
+                        'comment_types': basketball_comment_types,
+                        'comments_Journey': basketball_comments_journey,
+                        'calculation': basketball_calculation,
+                        'leagues': basketball_leagues
+                    }
+                    # details = {
+                    #     'basketball_comment_types': basketball_comment_types,
+                    #     'Comments_Journey_basketball': basketball_comments_journey,
+                    #     'basketball_calculation': basketball_calculation,
+                    #     'basketball_Leagues': basketball_leagues
+                    # }
+                    datalist.append(details)
+                except Comments.DoesNotExist:
+                    datalist.append({})
 
-            if total_user_cmt == 0:
-                prediction_types_data = []
-            else:
-                b_avg = 0
-                for i in prediction_types_data:
-                    b_avg += i['calculation']
+            if category.lower() == 'football' or category.lower() == 'futbol':
 
-                # other_data = {
-                #     "prediction_type":'Other',
-                #     "calculation":round(100-b_avg, 2)
-                # }
-                other_data = {
-                    "prediction_type":'Diger',
-                    "calculation": total_user_cmt - other_comments_basketball
-                }
-                prediction_types_data.append(other_data)
-                
-            recent_30_comments = Comments.objects.filter(
-                                Q(commentator_user__id=id) &
-                                Q(category__icontains='Basketbol') &
-                                Q(status='approve') &
-                                Q(is_resolve=True) &
-                                (Q(is_prediction=True) | Q(is_prediction=False))
-                            ).order_by('-created')[:20]
-            
-            correct_prediction_basketball = 0
+                try:
+                    top_3_prediction_types_football = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+                    football_comment_types = get_comment_types(id, 'Futbol', top_3_prediction_types_football)
+                    football_comments_journey, football_calculation = get_recent_comments(id, 'Futbol', top_n=20)
+                    football_leagues = get_translation_data(id, 'Futbol')
 
-            for obj in recent_30_comments:
-                Comments_Journey_basketball.append(obj.is_prediction)
-                if obj.is_prediction:
-                    correct_prediction_basketball += 1
-            details['Comments_Journey_basketball'] = Comments_Journey_basketball
+                    Fb_details = {
+                        'comment_types': football_comment_types,
+                        'comments_Journey': football_comments_journey,
+                        'calculation': football_calculation,
+                        'leagues': football_leagues
+                    }
+                    # Fb_details = {
+                    #     'football_comment_types': football_comment_types,
+                    #     'Comments_Journey_football': football_comments_journey,
+                    #     'football_calculation': football_calculation,
+                    #     'football_Leagues': football_leagues
+                    # }
+                    datalist.append(Fb_details)
+                    # datalist.insert(1, Fb_details)
+                except Comments.DoesNotExist:
+                    datalist.append({})
 
-            total_comments_recents = recent_30_comments.count() if recent_30_comments.count() != 0 else 1
-
-            basketball_calculation = (correct_prediction_basketball/total_comments_recents)*100
-            details['basketball_calculation'] = round(basketball_calculation, 2)
-
-            basketball_Leagues = []
-            Countries_Leagues_basketball = Comments.objects.filter(
-                                            Q(commentator_user__id=id) &
-                                            Q(category__icontains='Basketbol') &
-                                            Q(status='approve') &
-                                            Q(is_resolve=True) &
-                                            (Q(is_prediction=True) | Q(is_prediction=False))
-                                        )
-            for obj in Countries_Leagues_basketball:
-                translator= Translator(from_lang="turkish",to_lang="english")
-                translation_coutry = translator.translate(obj.country)
-                data = {
-                    "country":translation_coutry,
-                    "league":obj.league,
-                }
-                basketball_Leagues.append(data)
-            frozen_dicts = [frozenset(d.items()) for d in basketball_Leagues]
-            counter = Counter(frozen_dicts)
-            most_common_duplicates = counter.most_common(5)
-            result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
-
-
-            details['basketball_Leagues'] = result
-            details['basketball_comment_types'] = prediction_types_data
-            datalist.append(details)
-        except Comments.DoesNotExist:
-            datalist.append({})  # Append an empty dictionary
-
-        try:
-            fb_p_type_lst = []
-            Fb_details = {}
-            Comments_Journey_football = []
-            fb_user_all_cmt = Comments.objects.filter(commentator_user__id=id, category__icontains='Futbol', status='approve')
-            fb_total_user_cmt = fb_user_all_cmt.count()
-
-            other_comments_fb = 0
-
-            fb_top_3_prediction_types = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
-            # fb_top_3_prediction_types = ['Maç Sonucu', 'Karşılıklı Gol', 'Alt/Üst']
-
-            fb_prediction_types_data = []
-            for i in fb_top_3_prediction_types:
-                predict_type = Comments.objects.filter(
-                            commentator_user__id=id,
-                            prediction_type__icontains=i, 
-                            category__icontains='Futbol', 
-                            status='approve'
-                        )
-
-                if i == 'Alt/Üst':
-                    predict_type = predict_type.exclude(prediction_type__icontains='İlk Yarı')
-                    
-                data ={
-                    "prediction_type":i,
-                    "calculation":predict_type.count()
-                }
-                other_comments_fb += predict_type.count()
-                fb_prediction_types_data.append(data)
-
-            if fb_total_user_cmt == 0:
-                fb_prediction_types_data = []
-            else:
-                fb_avg = 0
-                for i in fb_prediction_types_data:
-                    fb_avg += i['calculation']
-                # fb_other_data = {
-                #     "prediction_type":'Other',
-                #     "calculation":round(100-fb_avg, 2)
-                # }
-                fb_other_data = {
-                    "prediction_type":'Diger',
-                    "calculation": fb_total_user_cmt - other_comments_fb
-                }
-                fb_prediction_types_data.append(fb_other_data)
-
-            fb_recent_30_comments = Comments.objects.filter(
-                                    Q(commentator_user__id=id) &
-                                    Q(category__icontains='Futbol') &
-                                    Q(status='approve') &
-                                    Q(is_resolve=True) &
-                                    (Q(is_prediction=True) | Q(is_prediction=False))
-                                ).order_by('-created')[:20]
-
-            correct_prediction_football = 0
-            for obj in fb_recent_30_comments:
-                Comments_Journey_football.append(obj.is_prediction)
-                if obj.is_prediction:
-                    correct_prediction_football += 1
-            Fb_details['Comments_Journey_football'] = Comments_Journey_football
-
-            total_comments_recents_fb = fb_recent_30_comments.count() if fb_recent_30_comments.count() != 0 else 1
-
-            football_calculation = (correct_prediction_football/total_comments_recents_fb)*100
-            Fb_details['football_calculation'] = round(football_calculation, 2)
-
-            football_Leagues = []
-            Countries_Leagues_football = Comments.objects.filter(
-                                                commentator_user__id=id,  
-                                                is_prediction=True, 
-                                                category__icontains='Futbol', 
-                                                status='approve'
-                                            )
-            for obj in Countries_Leagues_football:
-                # football_Leagues.append(obj.league)
-                translator= Translator(from_lang="turkish",to_lang="english")
-                translation_coutry = translator.translate(obj.country)
-                data = {
-                    "country":translation_coutry,
-                    "league":obj.league,
-                }
-                football_Leagues.append(data)
-            fb_frozen_dicts = [frozenset(d.items()) for d in football_Leagues]
-            fb_counter = Counter(fb_frozen_dicts)
-            fb_most_common_duplicates = fb_counter.most_common(5)
-            fb_result = [dict(frozenset_pair) for frozenset_pair, count in fb_most_common_duplicates]
-            # football_counter = Counter(football_Leagues)
-            # football_most_common_duplicates = [item for item, count in football_counter.most_common() if count >= 1][:8]
-            Fb_details['football_Leagues'] = fb_result
-            Fb_details['football_comment_types'] = fb_prediction_types_data
-            datalist.append(Fb_details)
-        except Comments.DoesNotExist:
-            datalist.append({})  # Append an empty dictionary
-
-        return Response(data=datalist, status=status.HTTP_200_OK)
-
+            return Response(data=datalist, status=status.HTTP_200_OK)
 
 """class BecomeEditorView(APIView):
     
@@ -6665,87 +6895,3 @@ class RetrieveBecomeCommentatorData(APIView):
 
         serializer = BecomeCommentatorSerializer(obj).data
         return Response(data=serializer, status=status.HTTP_200_OK)
-
-print()
-print()
-print()
-
-import time 
-
-# true_pre = []
-# false_pre = []
-
-# comments = Comments.objects.filter(commentator_user__id=95, is_resolve=True).exclude(status='reject')
-
-# for i, comment in enumerate(comments):
-#     if comment.is_prediction:
-#         true_pre.append(True)
-#     else:
-#         false_pre.append(False)
-
-# correct = sum((i + 1) * 10 for i in range(len(true_pre)))
-
-# incorrect = -10 if i==0 else -sum((i + 1) * 10 for i in range(len(false_pre)))
-# final = correct + incorrect
-
-
-
-
-# print('correct: ', correct)
-# print('incorrect: ', incorrect)
-# print('final: ', final)
-
-
-# lst = [True, True, False, False, True, False]
-# score = 0
-# current_chain_true = 0
-# current_chain_false = 0
-
-# comments = Comments.objects.filter(commentator_user__id=68, is_resolve=True).exclude(status='reject')
-
-# for i,item in enumerate(comments):
-#     print('item.is_prediction: ', i, item.is_prediction)
-#     if item.is_prediction:
-#         current_chain_false = 0
-#         current_chain_true += 1
-#         score += current_chain_true * 10
-#     elif item.is_prediction == False:
-#         current_chain_true = 0
-#         current_chain_false += 1
-#         score += current_chain_false * -10
-# print()
-# print(score)
-
-# comments = Comments.objects.filter(commentator_user__id=68, is_resolve=True).exclude(status='reject')
-
-# # Extract a list of boolean values indicating if each comment is a prediction
-# is_prediction_list = [item.is_prediction for item in comments if item.is_prediction is not None]
-
-# print('is_prediction_list: ', is_prediction_list)
-
-# score = 0
-# current_chain_true = 0
-# current_chain_false = 0
-
-# for is_prediction in is_prediction_list:
-#     if is_prediction:
-#         current_chain_false = 0
-#         current_chain_true += 1
-#         score += current_chain_true * 10
-#     else:
-#         current_chain_true = 0
-#         current_chain_false += 1
-#         score += current_chain_false * -10
-
-# # Print the final score
-# print("Final Score:", score)
-
-
-
-
-# # print('true_pre: ', correct_streak)
-# # print('false_pre: ', incorrect_streak)
-# # print('final: ', final_score)
-
-# print()
-# print()

@@ -95,6 +95,7 @@ const OTPModal = (props) => {
       // console.log("inside else condition:::::::::::")
       const res = await axios.post(`${config.apiUrl}/otp-verify/`, {
         otp: otp,
+        phone: props?.forgotPsPhone,
       });
       // console.log("res:::::::::::::", res);
 
