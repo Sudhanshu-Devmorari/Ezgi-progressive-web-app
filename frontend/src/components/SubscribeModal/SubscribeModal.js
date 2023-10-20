@@ -287,11 +287,11 @@ const SubscribeModal = (props) => {
           window.history.pushState(null, null, window.location.origin + "/");
         });
         // return () => {
-          // Remove event listener when component unmounts
-          window.removeEventListener("popstate", () => {
-            window.history.pushState(null, null, window.location.origin + "/");
-            // window.location.replace(window.location.origin + "/");
-          });
+        // Remove event listener when component unmounts
+        window.removeEventListener("popstate", () => {
+          window.history.pushState(null, null, window.location.origin + "/");
+          // window.location.replace(window.location.origin + "/");
+        });
         // };
         // console.log("window.history.length", window.history.length);
         // console.log("\n\nwindow.history\n", window.history);
@@ -327,7 +327,6 @@ const SubscribeModal = (props) => {
         //   // window.history.forward();
         //   // window.history.pushState({}, '', window.location.href);
         // }
-
 
         // if (history.action === 'POP'){
         //   console.log("POP inside")
@@ -717,15 +716,16 @@ export const subcriptionEntry = async (
         if (res.isConfirmed) {
           // window.location.replace(window.location.origin + "/");
           window.history.pushState(null, null, window.location.origin + "/");
-        window.addEventListener("popstate", () => {
-          window.history.pushState(null, null, window.location.origin + "/");
-        });
-        // return () => {
+          window.addEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+          });
+          // return () => {
           // Remove event listener when component unmounts
           window.removeEventListener("popstate", () => {
             window.history.pushState(null, null, window.location.origin + "/");
             // window.location.replace(window.location.origin + "/");
           });
+          window.location.reload();
           // window.location.replace("/");
           // After successful payment
           // window.history.replaceState(null, null, "/");

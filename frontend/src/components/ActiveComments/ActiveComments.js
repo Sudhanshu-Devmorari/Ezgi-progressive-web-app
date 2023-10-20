@@ -1062,7 +1062,7 @@ const ActiveComments = (props) => {
                 Add Comment
               </button>
             )}
-            {props.content === "wallet" && (
+            {props.content === "wallet" && profileData?.commentator_level !== "apprentice" && (
               <button
                 onClick={() => {
                   checkDeactivation("bank update");

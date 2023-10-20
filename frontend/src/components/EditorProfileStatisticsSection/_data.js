@@ -1180,6 +1180,11 @@ export const country_code = [
     code: "US",
   },
   {
+    name: "ABD",
+    dial_code: "+1",
+    code: "US",
+  },
+  {
     name: "Uruguay",
     dial_code: "+598",
     code: "UY",

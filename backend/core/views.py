@@ -45,7 +45,8 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
 import pyotp
 from django.contrib.auth import authenticate
 
-from translate import Translator
+# from translate import Translator
+from googletrans import Translator
 from core.models import BLUETICK_CHOISE
 from core.models import DEACTIVATE_STATUS
 import os
@@ -4509,47 +4510,64 @@ class UserStatistics(APIView):
 
 
 def get_recent_comments(user_id, category, top_n=20):
+
     recent_comments = Comments.objects.filter(
-        Q(commentator_user__id=user_id) &
-        Q(category__icontains=category) &
-        Q(status='approve') &
-        Q(is_resolve=True) &
-        (Q(is_prediction=True) | Q(is_prediction=False))
-    ).order_by('-created')[:top_n]
+            commentator_user__id=user_id,
+            category__icontains=category,
+            status='approve',
+            is_resolve=True,
+            is_prediction__in=[True, False]
+        ).order_by('-created')[:top_n]
 
     correct_predictions = 0
-    comments_journey = []
+    comments_journey = [obj.is_prediction for obj in recent_comments]
+
     for obj in recent_comments:
-        comments_journey.append(obj.is_prediction)
         if obj.is_prediction:
             correct_predictions += 1
 
-    total_comments_recent = recent_comments.count() if recent_comments.count() != 0 else 1
+    total_comments_recent = len(recent_comments) if len(recent_comments) != 0 else 1
     calculation = (correct_predictions / total_comments_recent) * 100
 
     return comments_journey, round(calculation, 2)
 
 def get_translation_data(user_id, category):
-    data = []
-    comments = Comments.objects.filter(
-        Q(commentator_user__id=user_id) &
-        Q(category__icontains=category) &
-        Q(status='approve') &
-        Q(is_resolve=True) &
-        (Q(is_prediction=True) | Q(is_prediction=False))
-    )
-    for obj in comments:
-        translator = Translator(from_lang="turkish", to_lang="english")
-        translation_country = translator.translate(obj.country)
-        data.append({
-            "country": translation_country,
-            "league": obj.league,
-        })
 
-    frozen_dicts = [frozenset(d.items()) for d in data]
+    translation_cache = {}
+
+    comments = Comments.objects.filter(
+        commentator_user__id=user_id,
+        category__icontains=category,
+        status='approve',
+        is_resolve=True,
+        is_prediction__in=[True, False]
+    ).values('league','country')
+
+    frozen_dicts = [frozenset(d.items()) for d in comments]
+
     counter = Counter(frozen_dicts)
+
     most_common_duplicates = counter.most_common(5)
+
     result = [dict(frozenset_pair) for frozenset_pair, count in most_common_duplicates]
+
+    translator = Translator()
+
+    for i in result:
+        country_to_translate = i['country']
+        if country_to_translate in translation_cache:
+            i['country'] = translation_cache[country_to_translate]
+        else:
+            # using googletras
+            translated_country = translator.translate(country_to_translate)
+            translation_cache[country_to_translate] = translated_country.text
+            i['country'] = translated_country.text
+
+            # USING tanslator library
+            # translator= Translator(from_lang="turkish",to_lang="english")
+            # translated_country = translator.translate(country_to_translate)
+            # translation_cache[country_to_translate] = translated_country
+            # i['country'] = translated_country
 
     return result
 
@@ -4573,10 +4591,10 @@ def get_comment_types(user_id, category, top_prediction_types):
 
         data = {
             "prediction_type": prediction_type,
-            "calculation": predict_type.count()
+            "calculation": len(predict_type)
         }
         prediction_data.append(data)
-        other_comments += predict_type.count()
+        other_comments += len(predict_type)
 
     if user_all_cmt == 0:
         prediction_data = []
@@ -4588,6 +4606,7 @@ def get_comment_types(user_id, category, top_prediction_types):
         prediction_data.append(other_data)
 
     return prediction_data
+
 class SportsStatisticsView(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         datalist = []
@@ -5279,9 +5298,14 @@ class BankDetailsView(APIView):
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
+
                 if user.user_role == 'commentator':
-                    bank_details = get_object_or_404(BankDetails, user=user)
-                    bank_details_serializer = BankDetailsSerializer(bank_details).data
+                    is_bank_details = BankDetails.objects.filter(user=user).exists()
+                    if is_bank_details:
+                        bank_details = BankDetails.objects.get(user=user)
+                        bank_details_serializer = BankDetailsSerializer(bank_details).data
+                    else:
+                        bank_details_serializer = {}
 
                     transactions = []
                     subscription_obj = Subscription.objects.filter(commentator_user=user)
@@ -5306,7 +5330,7 @@ class BankDetailsView(APIView):
 
                         formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
                         details = {
-                            "type":"New Subcription",
+                            "type":"New Subscription",
                             "duration":obj.duration,
                             "date":formatted_date,
                             "amount": obj.money
@@ -5821,7 +5845,7 @@ class PaymentView(APIView):
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
                     # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -5877,7 +5901,7 @@ class PaymentView(APIView):
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
                 # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"http://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
