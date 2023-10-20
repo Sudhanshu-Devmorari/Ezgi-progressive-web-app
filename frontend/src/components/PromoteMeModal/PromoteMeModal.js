@@ -150,7 +150,7 @@ const PromoteMeModal = (props) => {
                 // Remove event listener when component unmounts
                 window.removeEventListener("popstate", () => {
                   window.history.pushState(null, null, window.location.origin + "/");
-                  // window.location.replace(window.location.origin + "/");
+                  window.location.replace(window.location.origin + "/");
                 });
           }
         });

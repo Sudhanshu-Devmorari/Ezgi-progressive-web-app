@@ -144,8 +144,8 @@ const BecomeAEditorModal = (props) => {
           if (payment_res.status === 200) {
             const url = payment_res?.data?.URL_3DS;
             // console.log("URL: ", url)
-            // window.location.replace(url);
-            window.location.href = url;
+            window.location.replace(url);
+            // window.location.href = url;
             // window.location.reload()
           }
         }
@@ -342,7 +342,7 @@ const BecomeAEditorModal = (props) => {
             props?.setActiveCommentsshow(null);
             props?.setDashboardSUser(true);
             if (confirm.value === true) {
-              window.location.replace(window.location.origin+'/')
+              // window.location.replace(window.location.origin+'/')
               window.history.pushState(null, null, window.location.origin + "/");
               window.addEventListener("popstate", () => {
                 window.history.pushState(null, null, window.location.origin + "/");
@@ -351,7 +351,7 @@ const BecomeAEditorModal = (props) => {
                 // Remove event listener when component unmounts
                 window.removeEventListener("popstate", () => {
                   window.history.pushState(null, null, window.location.origin + "/");
-                  // window.location.replace(window.location.origin + "/");
+                  window.location.replace(window.location.origin + "/");
                 });
             }
           }

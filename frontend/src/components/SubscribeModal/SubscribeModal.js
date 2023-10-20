@@ -287,11 +287,11 @@ const SubscribeModal = (props) => {
           window.history.pushState(null, null, window.location.origin + "/");
         });
         // return () => {
-        // Remove event listener when component unmounts
-        window.removeEventListener("popstate", () => {
-          window.history.pushState(null, null, window.location.origin + "/");
-          // window.location.replace(window.location.origin + "/");
-        });
+          // Remove event listener when component unmounts
+          window.removeEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+            window.location.replace(window.location.origin + "/");
+          });
         // };
         // console.log("window.history.length", window.history.length);
         // console.log("\n\nwindow.history\n", window.history);
@@ -723,7 +723,7 @@ export const subcriptionEntry = async (
           // Remove event listener when component unmounts
           window.removeEventListener("popstate", () => {
             window.history.pushState(null, null, window.location.origin + "/");
-            // window.location.replace(window.location.origin + "/");
+            window.location.replace(window.location.origin + "/");
           });
           window.location.reload();
           // window.location.replace("/");

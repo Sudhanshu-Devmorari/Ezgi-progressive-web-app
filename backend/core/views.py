@@ -4999,7 +4999,7 @@ class RetrievePageData():
             standard_user_id = id if User.objects.filter(id=standard_user_id).exists() else None
 
             # Get data
-            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('?')
+            all_highlights = Highlight.objects.filter(status='active', user__is_delete=False, user__is_admin=False, user__category__contains=[category]).order_by('?')[:5]
             
             for obj in all_highlights:
                 highlighted_data = HighlightSerializer(obj).data
@@ -5298,16 +5298,21 @@ class BankDetailsView(APIView):
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if id is not None:
                 user = get_object_or_404(User, id=id)
-
+                data = {}
                 if user.user_role == 'commentator':
-                    is_bank_details = BankDetails.objects.filter(user=user).exists()
-                    if is_bank_details:
+                    transactions = []
+
+                    # Check if the user has bank details, and if not, handle it
+                    try:
                         bank_details = BankDetails.objects.get(user=user)
+                    except BankDetails.DoesNotExist:
+                        bank_details = None
+
+                    if bank_details:
                         bank_details_serializer = BankDetailsSerializer(bank_details).data
                     else:
-                        bank_details_serializer = {}
+                        bank_details_serializer = {}  # Empty serializer if bank details not found
 
-                    transactions = []
                     subscription_obj = Subscription.objects.filter(commentator_user=user)
                     for obj in subscription_obj:
 
@@ -5348,8 +5353,20 @@ class BankDetailsView(APIView):
                         }
                         transactions.append(details)
 
+                    become_editor = BecomeCommentator.objects.filter(user=user)
+                    for obj in become_editor:
+                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"Become Editor",
+                            "duration":obj.duration,
+                            "date":formatted_date,
+                            "amount":obj.money
+                        }
+                        transactions.append(details)
+
                     bank_details_serializer['Transection_history'] = transactions
                     return Response({'data': bank_details_serializer}, status=status.HTTP_200_OK)
+
                 if user.user_role == 'standard':
                     transactions = []
                     subscription_obj = Subscription.objects.filter(standard_user=user)
@@ -5382,10 +5399,11 @@ class BankDetailsView(APIView):
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        except BankDetails.DoesNotExist:
-            return Response({'error': 'Bank details do not exist'}, status=status.HTTP_404_NOT_FOUND)
+        # except BankDetails.DoesNotExist:
+        #     return Response({'error': 'Bank details do not exist'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         
     def post(self, request, id):
         try:
@@ -6094,11 +6112,26 @@ class CheckAllTicketActionView(APIView):
 class RetrieveBecomeCommentatorData(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        try:
             obj = BecomeCommentator.objects.get(user__id=id)
         except BecomeCommentator.DoesNotExist:
             return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response(data={"message": "An error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
+        except MembershipSetting.DoesNotExist:
+            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         serializer = BecomeCommentatorSerializer(obj).data
+        serializer['money'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
         return Response(data=serializer, status=status.HTTP_200_OK)

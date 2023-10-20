@@ -126,6 +126,8 @@ const MainPage = () => {
   const [rightCornerAds, setRightCornerAds] = useState([]);
   const [category, setCategory] = useState("Futbol");
 
+  // const [highlightUserId, setHighlightUserId] = useState([]);
+
   function homeApiData(user_id) {
     axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
@@ -142,6 +144,15 @@ const MainPage = () => {
         setPublicComments(res?.data?.Public_Comments);
 
         setHighlights(res?.data?.highlights);
+        // console.log("res?.data?.highlights", res?.data?.highlights);
+        // const highlightsData = res?.data?.highlights;
+        // const highlightIds = highlightsData.map((highlight) => highlight?.user?.id);
+        // setHighlightUserId(highlightIds)
+        // console.log("highlightUserId", highlightUserId);
+
+        // console.log("res?.data?.Public_Comments", res?.data?.Public_Comments);
+        // console.log("res?.data?.Subscription_Comments", res?.data?.Subscription_Comments);
+
         // setsubscriptionComments(
         //   res?.data?.Subscription_Comments.sort(
         //     (a, b) => moment(b.created).unix() - moment(a.created).unix()
@@ -175,6 +186,8 @@ const MainPage = () => {
         console.error("Error fetching data.", error);
       });
   }
+  // console.log("highlightUserId", highlightUserId);
+
 
   const mergeArrays = () => {
     if (subscriptionComments.length > 0) {
@@ -214,6 +227,7 @@ const MainPage = () => {
         ];
       }
       setMergedResult(merged);
+      // sortMergeList()
     }
 
     if (subscriptionComments.length === 0) {
@@ -254,6 +268,7 @@ const MainPage = () => {
         ];
       }
       setMergedResult(merged);
+      // sortMergeList()
     }
   };
 
@@ -504,18 +519,40 @@ const MainPage = () => {
   }, [onlyPubliccategory]);
 
   useEffect(() => {
-    // Prevent user from going back
-    // window.history.pushState(null, null, window.location.origin + "/");
-    // window.addEventListener('popstate', () => {
-    //   window.history.pushState(null, null, window.location.origin + "/");
-    // });
-    // return () => {
-    //   // Remove event listener when component unmounts
-    //   window.removeEventListener('popstate', () => {
-    //     window.history.pushState(null, null, window.location.origin + "/");
-    //   });
-    // };
+    window.addEventListener("popstate", (e) => {
+      window.history.go(1);
+    });
   }, []);
+
+  // const sortMergeList = () => {
+  //   console.log("mergedResult", mergedResult)
+  //   const sortedList = mergedResult.slice(); 
+  //   console.log("sortedList", sortedList)
+
+
+  //   sortedList.sort((a, b) => {
+  //     const idA = a.value?.commentator_user?.id;
+  //     const idB = b.value?.commentator_user?.id;
+
+  //     const isAHighlighted = highlightUserId.includes(idA);
+  //     const isBHighlighted = highlightUserId.includes(idB);
+
+  //     if (isAHighlighted && !isBHighlighted) {
+  //       return -1; 
+  //     } else if (!isAHighlighted && isBHighlighted) {
+  //       return 1; 
+  //     } else {
+  //       return 0;
+  //     }
+  //   });
+
+  //   console.log("\n\nsortedList\n\n", sortedList)
+
+  //   // setMergedResult(sortedList);
+  // };
+  // useEffect(() => {
+  //   sortMergeList();
+  // }, [mergedResult]);
 
   return (
     <>

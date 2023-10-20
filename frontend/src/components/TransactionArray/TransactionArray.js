@@ -104,10 +104,14 @@ const TransactionArray = (props) => {
               style={{
                 color:
                   currentTheme === "dark"
-                    ? (tran.type === "Highlight" || tran.type === "New Subscription")
+                    // ? (tran.type === "Highlight" || tran.type === "New Subscription")
+                    //   ? "#FF5757"
+                    //   : "#37FF80"
+                    // : (tran.type === "Highlight" || tran.type === "New Subscription")
+                    ? (tran.type === "Highlight" || tran.type === "Become Editor"|| tran.type === "New Subscription")
                       ? "#FF5757"
                       : "#37FF80"
-                    : (tran.type === "Highlight" || tran.type === "New Subscription")
+                    : (tran.type === "Highlight" || tran.type === "Become Editor"|| tran.type === "New Subscription")
                     ? "#FF5757"
                     : "#00DE51",
               }}

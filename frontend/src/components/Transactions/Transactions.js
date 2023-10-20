@@ -39,6 +39,7 @@ const Transactions = () => {
   async function getBankIban() {
     try {
       const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      // console.log("Data: ", res.data)
       if (res?.status === 200) {
         setBankDetails(res?.data?.data);
 

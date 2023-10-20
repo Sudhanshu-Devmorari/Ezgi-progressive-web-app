@@ -83,9 +83,9 @@ const AccountStatus = (props) => {
   const MIN = 0;
   const MAX = 1000;
   function getEarnings(newValues, typeData) {
-    // console.log("new Values:::::::::::::", newValues);
+    console.log("new Values:::::::::::::", newValues);
     // console.log("selectSubRangeData:::::::::::::", selectSubRangeData);
-    // console.log("typeData:::::::::::::", typeData);
+    console.log("typeData:::::::::::::", typeData);
     // const type =
     //   selectSubRangeData === "journeyman" ||
     //   selectSubRangeData === "master" ||
@@ -569,7 +569,7 @@ const AccountStatus = (props) => {
               }}
               onFinalChange={(newValues) => {
                 // console.log("final function called");
-                getEarnings(newValues, selectSub);
+                getEarnings(newValues, selectSubRangeData);
               }}
               renderTrack={({ props, children }) => {
                 return (
@@ -712,7 +712,7 @@ const AccountStatus = (props) => {
                     </span>
                     {membershipData?.money && (
                       <span>
-                        Membership Price : {membershipData?.money}₺
+                        Membership Price : {Math.round(membershipData?.money)}₺
                       </span>
                     )}
                     {membershipEndDate && (
