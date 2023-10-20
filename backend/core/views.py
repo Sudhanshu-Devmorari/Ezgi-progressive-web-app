@@ -4637,7 +4637,7 @@ class SportsStatisticsView(APIView):
             if category.lower() == 'football' or category.lower() == 'futbol':
 
                 try:
-                    top_3_prediction_types_football = ['Maç Sonucu', 'İlk Yarı', 'Alt/Üst']
+                    top_3_prediction_types_football = ['Maç Sonucu', 'Karsilikli Gol', 'Alt/Üst']
                     football_comment_types = get_comment_types(id, 'Futbol', top_3_prediction_types_football)
                     football_comments_journey, football_calculation = get_recent_comments(id, 'Futbol', top_n=20)
                     football_leagues = get_translation_data(id, 'Futbol')
