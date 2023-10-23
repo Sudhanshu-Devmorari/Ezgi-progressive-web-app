@@ -5585,7 +5585,7 @@ class BankDetailsView(APIView):
                         query.save(update_fields=['status', 'updated'])
                         is_withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).exists()
                         if is_withdrawal_obj:
-                            withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).first()
+                            withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).order_by('-created').first()
                             withdrawal_obj.status = action
                             withdrawal_obj.save(update_fields=['status', 'updated'])
                             if action == 'reject':
