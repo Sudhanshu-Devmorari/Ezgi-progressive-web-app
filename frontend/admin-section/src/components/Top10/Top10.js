@@ -24,8 +24,13 @@ const Top10 = (props) => {
             <div className="d-flex flex-column">
               <img
                 // onClick={() => props.setupdateProfile(2)}
-                // data-bs-toggle="modal"
-                // data-bs-target="#exampleModal"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                onClick={()=>{
+                  props.setupdateProfile(2);
+                  props?.setPartialData(data[0]);
+                  props?.setAddUser(data[0]?.editor_data);
+                }}
                 className="top-2-img cursor"
                 src={data[0]?.editor_data?.profile_pic ? `${config.apiUrl}${data[0]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""

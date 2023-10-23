@@ -135,6 +135,7 @@ const WithdrawalManagementPage = (props) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [UpdateRequest, setUpdateRequest] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   async function getWithdrawData() {
     try {
       setIsLoading(true);
@@ -151,6 +152,7 @@ const WithdrawalManagementPage = (props) => {
           approved: data?.approved,
           new: data?.new,
         });
+        setNotifications(res?.data?.data?.notifications)
         setIsLoading(false);
       }
       if (res.status == 204) {
@@ -356,8 +358,13 @@ const WithdrawalManagementPage = (props) => {
                                 />
                                 <img
                                   onClick={() => {
-                                    setWithdrawalIndex(index);
-                                    setRequests(!Requests);
+                                    if (res?.status === "pending") {
+                                      if (withdrawalIndex === index) {
+                                        setRequests(!Requests);
+                                      } else {
+                                        setWithdrawalIndex(index);
+                                      }
+                                    }
                                   }}
                                   className="cursor"
                                   src={eye}
@@ -370,9 +377,11 @@ const WithdrawalManagementPage = (props) => {
                           </MainDiv>
                           {Requests && index === withdrawalIndex && (
                             <VerificationRequestsBtns
+                              setRequests={setRequests}
+                              WithdrawDataRetrieve={WithdrawDataRetrieve}
                               status={res?.status}
                               from={"withdrawal"}
-                              id={res?.id}
+                              id={res?.bankdetails?.id}
                               getWithdrawData={getWithdrawData}
                             />
                           )}
@@ -383,7 +392,7 @@ const WithdrawalManagementPage = (props) => {
                 </div>
               </div>
               <div className="col-4">
-                {/* <UserTimeLine transactionHistory={"history"} notification={notification}/> */}
+                <UserTimeLine transactionHistory={"history"} notification={notifications}/>
               </div>
             </div>
           </div>

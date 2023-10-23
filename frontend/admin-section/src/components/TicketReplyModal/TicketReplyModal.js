@@ -8,12 +8,14 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 import moment from "moment";
+import initialProfile from "../../assets/profile.png";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
   const [cookies, setCookie, removeCookie] = useCookies();
   const userId = localStorage.getItem("admin-user-id");
   const tickeview = props?.tickeview;
+  const setTickeview = props?.setTickeview;
   const ticketData = props?.ticketData;
 
   const [subUsersOptions, setSubUsersOptions] = useState([]);
@@ -215,7 +217,7 @@ const TicketReplyModal = (props) => {
                 <div className="col position-relative d-flex gap-2">
                   <img
                     style={{ borderRadius: "50%", objectFit: "cover" }}
-                    src={`${config?.apiUrl}${tickeview?.user?.profile_pic}`}
+                    src={tickeview?.user?.profile_pic ? `${config?.apiUrl}${tickeview?.user?.profile_pic}` : initialProfile}
                     alt=""
                     height={100}
                     width={100}
@@ -440,6 +442,7 @@ const TicketReplyModal = (props) => {
               </div>
             </div>
             <img
+            onClick={()=>setTickeview([])}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

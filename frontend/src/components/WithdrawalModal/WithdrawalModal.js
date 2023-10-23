@@ -54,11 +54,11 @@ const WithdrawalModal = (props) => {
   };
 
   const handleWithdrawRequest = async () => {
-    if (bankDetails?.withdrawable_balance == 0) {
+    if (bankDetails?.withdrawable_balance && bankDetails?.withdrawable_balance == 0) {
       props?.onHide();
       Swal.fire({
         title: "Error",
-        text: "There is no withdrawable balance, please check 'Pending Balance' transactions.",
+        text: "There is no withdrawable balance, Please check 'Pending Balance' transactions.",
         icon: "error",
         backdrop: false,
         customClass:
@@ -180,7 +180,7 @@ const WithdrawalModal = (props) => {
               </div>
               <div className="text-center">
                 <div className="h5">Withdrawable Balance</div>
-                <div className="h5">{bankDetails?.withdrawable_balance}₺</div>
+                <div className="h5">{bankDetails?.withdrawable_balance || 0}₺</div>
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button

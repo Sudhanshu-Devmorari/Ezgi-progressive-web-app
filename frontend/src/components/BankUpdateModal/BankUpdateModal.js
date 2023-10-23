@@ -49,6 +49,12 @@ const BankUpdateModal = (props) => {
             backdrop: false,
             customClass:
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if (!props?.getBankIban) {
+                window.location.reload();
+              }
+            }
           });
         }
         if (res?.status === 201) {

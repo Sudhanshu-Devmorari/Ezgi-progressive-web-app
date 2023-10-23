@@ -8,6 +8,7 @@ import user5 from "../../assets/user5.png";
 import user6 from "../../assets/user6.png";
 import "./UserTimeLine.css";
 import config from "../../config";
+import moment from "moment";
 
 const UserTimeLine = (props) => {
   const server_url = `${config?.apiUrl}`;
@@ -114,6 +115,22 @@ const UserTimeLine = (props) => {
       </>
     );
   };
+
+  const formatTimeDifference = (timestamp) => {
+    const now = moment();
+    const diff = moment(timestamp);
+  
+    if (now.diff(diff, "years") >= 1) {
+      return diff.fromNow();
+    } else if (now.diff(diff, "months") >= 1) {
+      return diff.fromNow();
+    } else if (now.diff(diff, "days") >= 1) {
+      return diff.fromNow();
+    } else {
+      return diff.fromNow();
+    }
+  };
+  
   
   return (
     <>
@@ -212,7 +229,7 @@ const UserTimeLine = (props) => {
                       className="support-history-fonts"
                       style={{ fontSize: "0.8rem" }}
                     >
-                      {res?.time_since_created}
+                      {formatTimeDifference(res?.created)}
                     </span>
                   </div>
                   <span

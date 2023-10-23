@@ -20,9 +20,9 @@ const VerificationRequestsBtns = (props) => {
           setIsLoading(true);
         }
         const adminId = localStorage.getItem('admin-user-id')
-        const res = await axios.post(`${config.apiUrl}/bank-details/${adminId}/`, {
-          id: id,
-          status: action,
+        const res = await axios.patch(`${config.apiUrl}/bank-details/${adminId}`, {
+          bank_id: id,
+          action: action,
         });
         // console.log(res,"=========>>res")
         if (res.status === 200) {
@@ -32,6 +32,8 @@ const VerificationRequestsBtns = (props) => {
             setIsLoading(false);
           }
           props?.getWithdrawData();
+          props?.WithdrawDataRetrieve();
+          props?.setRequests(false)
           Swal.fire({
             title: "Success",
             text:

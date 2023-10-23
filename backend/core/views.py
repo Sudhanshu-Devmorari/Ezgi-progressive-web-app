@@ -2586,7 +2586,7 @@ class EditorManagement(APIView):
 
             editor_list = []
             # all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
-            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True, is_admin=False).order_by('-created')
+            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True, is_admin=False, commentator_status='active').order_by('-created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2669,7 +2669,8 @@ class EditorManagement(APIView):
             data_list['top_ten'] = top_ten_commentators_list
 
 
-            active_editor = User.objects.filter(user_role='commentator', commentator_status='active').count()
+            # active_editor = User.objects.filter(user_role='commentator', commentator_status='active').count()
+            active_editor = len(commentator)
             data_list['active_editor'] = active_editor
 
             pending_editor = User.objects.filter(user_role='commentator', commentator_status='pending').count()
@@ -3107,6 +3108,7 @@ class DeactivateCommentator(APIView):
             if user.deactivate_commentator == 'pending':
                 return Response({'data' : 'You have already sent the request.'}, status=status.HTTP_400_BAD_REQUEST)
             user.deactivate_commentator = 'pending'
+            user.commentator_status = 'pending'
             user.save()
             return Response({'data' : 'Deactivation request sent successfully.'}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -4400,6 +4402,22 @@ class OtpSend(APIView):
                 return Response(data={'error': 'Wrong password. Try again.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+def update_commentator_level(user, win_count, success_rate):
+    level_rules = {
+        'apprentice': 'journeyman',
+        'journeyman': 'master',
+        'master': 'grandmaster'
+    }
+
+    current_level = user.commentator_level
+
+    if current_level in level_rules:
+        level_obj = CommentatorLevelRule.objects.filter(commentator_level=current_level).first()
+        if level_obj and win_count >= level_obj.winning_limit and success_rate >= int(level_obj.success_rate):
+            new_level = level_rules[current_level]
+            user.commentator_level = new_level
+            user.save(update_fields=['commentator_level', 'updated'])
 
 def Statistics(user_obj=None, user_id=None):
     try:
@@ -4445,31 +4463,44 @@ def Statistics(user_obj=None, user_id=None):
                 country_leagues[country].append(league)
             else:
                 country_leagues[country] = [league]
-        
-        level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
 
-        if level.winning_limit < win_count:
-            if int(level.sucess_rate) < Success_rate :
+        is_level_exists = CommentatorLevelRule.objects.filter(commentator_level=user.commentator_level).exists()
+        if is_level_exists:
+            level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            if win_count >= level_obj.winning_limit and Success_rate >= int(level_obj.sucess_rate):
 
                 if user.commentator_level == 'apprentice':
                     user.commentator_level = "journeyman"
-                    user.save()
 
                 elif user.commentator_level == 'journeyman':
                     user.commentator_level = "master"
-                    user.save()
 
                 elif user.commentator_level == 'master':
                     user.commentator_level = "grandmaster"
-                    user.save()
-                    
+                
+            user.save(update_fields=['commentator_level','updated'])
+
+        # if level.winning_limit < win_count:
+        #     if int(level.sucess_rate) < Success_rate :
+
+        #         if user.commentator_level == 'apprentice':
+        #             user.commentator_level = "journeyman"
+        #             user.save()
+
+        #         elif user.commentator_level == 'journeyman':
+        #             user.commentator_level = "master"
+        #             user.save()
+
+        #         elif user.commentator_level == 'master':
+        #             user.commentator_level = "grandmaster"
+        #             user.save()
 
         if len(data) != 0:
             avg_odd = round(avg_odd/len(data), 2)
         else:
             avg_odd = 0
 
-        user.save(update_fields=['commentator_level','updated'])
+        # user.save(update_fields=['commentator_level','updated'])
         return Success_rate, Score_point, win_count, lose_count, country_leagues, avg_odd, only_leagues
     except:
         raise HttpResponseServerError("Statistics Exception")
@@ -5388,13 +5419,17 @@ class BankDetailsView(APIView):
                 # Get counts for specific statuses
                 pending = BankDetails.objects.filter(status='pending').count()
                 approved = BankDetails.objects.filter(status='approve').count()
-                new = BankDetails.objects.filter(status='pending',created__date=datetime.today()).count()
+                new = len(BankDetails.objects.filter(status='pending'))
+
+                notifications = Notification.objects.filter(subject='Purchase Transactions').order_by('-created')
+                notifications_serializer = NotificationSerializer(notifications, many=True).data
 
                 data.update({
                     'bank_details': bank_details_serializer,
                     'pending': pending,
                     'approved': approved,
                     'new': new,
+                    'notifications': notifications_serializer,
                 })
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -5443,9 +5478,21 @@ class BankDetailsView(APIView):
                 bank_id = request.data['bank_id'] if 'bank_id' in request.data else None
                 if action is not None and bank_id is not None:
                     try:
-                        query = BankDetails.objects.get(id=bank_id,user=user) 
+                        query = BankDetails.objects.get(id=bank_id) 
                         query.status = action
                         query.save(update_fields=['status', 'updated'])
+                        withdrawal_obj = Withdrawable.objects.get(bankdetails=query) 
+                        withdrawal_obj.status = action
+                        withdrawal_obj.save(update_fields=['status', 'updated'])
+                        if action == 'reject':
+                            notification_obj = Notification.objects.create(
+                                            sender=user,
+                                            receiver=query.user, 
+                                            subject='Withdrawal Request',
+                                            date=datetime.now().date(), 
+                                            status=False,
+                                            context=f'Your withdrawal request has been declined by Motiwy.',
+                                        )
                         return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
                         return Response({'error' : 'Bank details doen not exist'}, status=status.HTTP_404_NOT_FOUND) 
@@ -5732,6 +5779,8 @@ class CreateWithdrawableRequest(APIView):
                 if not Withdrawable.objects.filter(bankdetails=bankdetails, status='pending').exists():
                     obj = Withdrawable.objects.create(bankdetails=bankdetails, amount=amount, withdrawable=True)
                     obj.save()
+                    bankdetails.status = 'pending'
+                    bankdetails.save(update_fields=['status','updated'])
                     serializer = WithdrawableSerializer(obj).data
                     return Response(data=serializer, status=status.HTTP_200_OK)
                 else:

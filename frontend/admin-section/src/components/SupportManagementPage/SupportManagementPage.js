@@ -11,6 +11,7 @@ import user1 from "../../assets/user3.png";
 import user2 from "../../assets/user2.png";
 import user3 from "../../assets/user1.png";
 import user4 from "../../assets/user6.png";
+import initialProfile from "../../assets/profile.png";
 import eye from "../../assets/eye.svg";
 import { MainDiv } from "../CommonBgRow";
 import SupportHistory from "../SupportHistory/SupportHistory";
@@ -285,7 +286,8 @@ const SupportManagementPage = (props) => {
                           className="col-3 d-flex align-items-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => getTicketsLatestData(res.id)}
+                          // onClick={() => getTicketsLatestData(res.id)}
+                          onClick={() => getData(res?.user?.id, res?.id)}
                         >
                           <span className="pe-1">{`# ${(
                             filteredTickets.length - index
@@ -298,7 +300,7 @@ const SupportManagementPage = (props) => {
                                 objectFit: "cover",
                                 borderRadius: "50%",
                               }}
-                              src={`${config?.apiUrl}${res?.user?.profile_pic}`}
+                              src={res?.user?.profile_pic ? `${config?.apiUrl}${res?.user?.profile_pic}` : initialProfile}
                               alt=""
                               height={45}
                               width={45}
@@ -310,7 +312,8 @@ const SupportManagementPage = (props) => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => getTicketsLatestData(res.id)}
+                          // onClick={() => getTicketsLatestData(res.id)}
+                          onClick={() => getData(res?.user?.id, res?.id)}
                         >
                           <button
                             className="px-2"
@@ -336,7 +339,8 @@ const SupportManagementPage = (props) => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => getTicketsLatestData(res.id)}
+                          // onClick={() => getTicketsLatestData(res.id)}
+                          onClick={() => getData(res?.user?.id, res?.id)}
                         >
                           <div>{res?.subject}</div>
                         </div>
@@ -344,7 +348,8 @@ const SupportManagementPage = (props) => {
                           className="col-2 d-flex align-items-center justify-content-center cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => getTicketsLatestData(res.id)}
+                          // onClick={() => getTicketsLatestData(res.id)}
+                          onClick={() => getData(res?.user?.id, res?.id)}
                         >
                           <button
                             className="px-2 text-center text-capitalize"
@@ -386,7 +391,8 @@ const SupportManagementPage = (props) => {
                           className="col-3 d-flex align-items-center justify-content-end gap-1 cursor"
                           data-bs-toggle="modal"
                           data-bs-target="#exampleModal"
-                          onClick={() => getTicketsLatestData(res.id)}
+                          // onClick={() => getTicketsLatestData(res.id)}
+                          onClick={() => getData(res?.user?.id, res?.id)}
                         >
                           <div className="">{res?.created}</div>
                           {/* <div className="">15-06-2023 - 16:37</div> */}
@@ -452,6 +458,7 @@ const SupportManagementPage = (props) => {
         displayAllticketHistory={displayAllticketHistory}
         ticketData={ticketData}
         tickeview={tickeview}
+        setTickeview={setTickeview}
       />
 
       <Export exportList={displayTickets} exportData={"Support"} />

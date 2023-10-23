@@ -92,6 +92,8 @@ def membership_plan_check():
             new_end_date = obj.end_date + timedelta(days=3)
             if current_date == new_end_date.date():
                 obj.user.is_active = False
+                obj.user.commentator_status = 'deactive'
+                obj.user.deactivate_commentator = 'deactive'
                 obj.user.save()
 
 # def subscriptionstatus():
@@ -551,31 +553,48 @@ def comment_result_check():
             user.success_rate = Success_rate
             user.score_points = Score_point
 
-            level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
-            
-            if level.winning_limit < correct_prediction.count():
-                if int(level.sucess_rate) < Success_rate :
+            is_level_exists = CommentatorLevelRule.objects.filter(commentator_level=user.commentator_level).exists()
+            if is_level_exists:
+                level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+                win_count = len(correct_prediction)
+                if win_count >= level_obj.winning_limit and Success_rate >= int(level_obj.sucess_rate):
 
                     if user.commentator_level == 'apprentice':
                         user.commentator_level = "journeyman"
-                        user.save()
 
                     elif user.commentator_level == 'journeyman':
                         user.commentator_level = "master"
-                        user.save()
 
                     elif user.commentator_level == 'master':
                         user.commentator_level = "grandmaster"
-                        user.save()
+                    
+                user.save(update_fields=['commentator_level','updated'])
 
-            if 0 < Success_rate < 60:
-                user.commentator_level = "apprentice"
-            if 60 < Success_rate< 65:
-                user.commentator_level = "journeyman"
-            if 65 < Success_rate < 70:
-                user.commentator_level = "master"
-            if 70 < Success_rate < 100:
-                user.commentator_level = "grandmaster"
+            # level = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            
+            # if level.winning_limit < correct_prediction.count():
+            #     if int(level.sucess_rate) < Success_rate :
+
+            #         if user.commentator_level == 'apprentice':
+            #             user.commentator_level = "journeyman"
+            #             user.save()
+
+            #         elif user.commentator_level == 'journeyman':
+            #             user.commentator_level = "master"
+            #             user.save()
+
+            #         elif user.commentator_level == 'master':
+            #             user.commentator_level = "grandmaster"
+            #             user.save()
+
+            # if 0 < Success_rate < 60:
+            #     user.commentator_level = "apprentice"
+            # if 60 < Success_rate< 65:
+            #     user.commentator_level = "journeyman"
+            # if 65 < Success_rate < 70:
+            #     user.commentator_level = "master"
+            # if 70 < Success_rate < 100:
+            #     user.commentator_level = "grandmaster"
 
             logger.info("last debug: ======================%s")
             
