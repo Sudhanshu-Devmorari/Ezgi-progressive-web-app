@@ -5583,18 +5583,20 @@ class BankDetailsView(APIView):
                         query = BankDetails.objects.get(id=bank_id) 
                         query.status = action
                         query.save(update_fields=['status', 'updated'])
-                        withdrawal_obj = Withdrawable.objects.get(bankdetails=query) 
-                        withdrawal_obj.status = action
-                        withdrawal_obj.save(update_fields=['status', 'updated'])
-                        if action == 'reject':
-                            notification_obj = Notification.objects.create(
-                                            sender=user,
-                                            receiver=query.user, 
-                                            subject='Withdrawal Request',
-                                            date=datetime.now().date(), 
-                                            status=False,
-                                            context=f'Your withdrawal request has been declined by Motiwy.',
-                                        )
+                        is_withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).exists()
+                        if is_withdrawal_obj:
+                            withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).first()
+                            withdrawal_obj.status = action
+                            withdrawal_obj.save(update_fields=['status', 'updated'])
+                            if action == 'reject':
+                                notification_obj = Notification.objects.create(
+                                                sender=user,
+                                                receiver=query.user, 
+                                                subject='Withdrawal Request',
+                                                date=datetime.now().date(), 
+                                                status=False,
+                                                context=f'Your withdrawal request has been declined by Motiwy.',
+                                            )
                         return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
                         return Response({'error' : 'Bank details doen not exist'}, status=status.HTTP_404_NOT_FOUND) 

@@ -54,7 +54,9 @@ const WithdrawalModal = (props) => {
   };
 
   const handleWithdrawRequest = async () => {
-    if (bankDetails?.withdrawable_balance && bankDetails?.withdrawable_balance == 0) {
+    console.log(bankDetails?.withdrawable_balance,"============>>bankDetails?.withdrawable_balance", typeof(bankDetails?.withdrawable_balance))
+    console.log(bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0,'LLLLL')
+    if (bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0) {
       props?.onHide();
       Swal.fire({
         title: "Error",
