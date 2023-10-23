@@ -96,7 +96,7 @@ const SalesManagementPage = (props) => {
     setRecordsDisplay(filteredArray);
   };
   const updateRecordsDisplay = (allData) => {
-    const planSaleJSX = allData?.plan_sale.map((data) => {
+    const planSaleJSX = allData?.plan_sale?.map((data) => {
       return {
         ...data,
         Comp: (props) => (
@@ -190,7 +190,7 @@ const SalesManagementPage = (props) => {
       };
     });
 
-    const subscriptionJSX = allData?.subscription.map((data) => {
+    const subscriptionJSX = allData?.subscription?.map((data) => {
       return {
         ...data,
         Comp: (props) => (
@@ -287,7 +287,7 @@ const SalesManagementPage = (props) => {
       };
     });
 
-    const highlightJSX = allData?.highlight.map((data) => {
+    const highlightJSX = allData?.highlight?.map((data) => {
       return {
         ...data,
         Comp: (props) => (
@@ -475,7 +475,7 @@ const SalesManagementPage = (props) => {
                     updateRecordsDisplay={updateRecordsDisplay}
                   />
 
-                  {recordsDisplay.map((x, index) => (
+                  {recordsDisplay?.map((x, index) => (
                     <x.Comp i={recordsDisplay.length - index} />
                   ))}
                   

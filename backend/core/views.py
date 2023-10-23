@@ -3364,6 +3364,7 @@ class SalesManagement(APIView):
                     # data_list.append(serializer.data)
                     details['subscription'] = serializer.data
                     details['highlight'] = []
+                    details['plan_sale'] = []
                     data_list.append(details)
 
                 elif type.lower() == 'highlight':
@@ -3371,7 +3372,17 @@ class SalesManagement(APIView):
                     serializer1 = HighlightSerializer(highlight_obj, many=True)
                     # data_list.append(serializer1.data)
                     details['subscription'] = []
+                    details['plan_sale'] = []
                     details['highlight'] = serializer1.data
+                    data_list.append(details)
+
+                elif type.lower() == 'plansales':
+                    plansale_obj = BecomeCommentator.objects.filter(query_filters)
+                    serializer1 = BecomeCommentatorSerializer(plansale_obj, many=True)
+                    # data_list.append(serializer1.data)
+                    details['subscription'] = []
+                    details['highlight'] = []
+                    details['plan_sale'] = serializer1.data
                     data_list.append(details)
                 else:
                     
@@ -3382,6 +3393,10 @@ class SalesManagement(APIView):
                     highlight_obj = Highlight.objects.filter(query_filters)
                     serializer1 = HighlightSerializer(highlight_obj, many=True)
                     details['highlight'] = serializer1.data
+
+                    plansale_obj = BecomeCommentator.objects.filter(query_filters)
+                    serializer2 = BecomeCommentatorSerializer(plansale_obj, many=True)
+                    details['plan_sale'] = serializer2.data
 
                     data_list.append(details)
 
