@@ -2154,6 +2154,28 @@ class CommentsManagement(APIView):
             management['comments_percentage'] = comments_percentage
         except:
             management['comments_percentage'] = 0
+
+        try:
+            """Comments win percentage"""
+            status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(is_prediction=False, date_updated__gte=previous_24_hours).count()
+            new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(is_prediction=True, date_created__gte=previous_24_hours).count()
+            comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+            comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+            management['comments_win_percentage'] = round(comments_percentage, 2)
+        except:
+            management['comments_win_percentage'] = 0
+
+        try:
+            """Comments lose percentage"""
+            status_changed_to_reject = Comments.objects.annotate(date_updated=TruncDate('updated')).filter(is_prediction=True, date_updated__gte=previous_24_hours).count()
+            new_pending_comments = Comments.objects.annotate(date_created=TruncDate('created')).filter(is_prediction=False, date_created__gte=previous_24_hours).count()
+            comments_before_24_hours = Comments.objects.annotate(date_created=TruncDate('created')).filter(date_created__lt=previous_24_hours).count()
+            count = (comments_before_24_hours - status_changed_to_reject) + new_pending_comments
+            comments_percentage = ((count-comments_before_24_hours)/comments_before_24_hours) * 100
+            management['comments_lose_percentage'] = round(comments_percentage, 2)
+        except:
+            management['comments_lose_percentage'] = 0
         
         comments = Comments.objects.filter().order_by('-created')
         comments_count = comments.count()
@@ -2202,8 +2224,11 @@ class CommentsManagement(APIView):
                 
         today = date.today()
         new_comment = Comments.objects.filter(status='pending',created__date=today)
-        daily_win_count = Comments.objects.filter(created__date=today, is_prediction=True).count()
-        daily_lose_count = Comments.objects.filter(created__date=today, is_prediction=False).count()
+        # daily_win_count = Comments.objects.filter(created__date=today, is_prediction=True).count()
+        # daily_lose_count = Comments.objects.filter(created__date=today, is_prediction=False).count()
+
+        daily_win_count = Comments.objects.filter(updated__date=today, is_prediction=True).count()
+        daily_lose_count = Comments.objects.filter(updated__date=today, is_prediction=False).count()
 
         total_all_comment = Comments.objects.all().count()
         management['total_all_comment'] = total_all_comment
@@ -2635,7 +2660,7 @@ class EditorManagement(APIView):
             }
 
             # Get the top ten users with user_role='commentator' based on their commentator_level's priority
-            top_ten_commentators = User.objects.filter(user_role='commentator').annotate(
+            top_ten_commentators = User.objects.filter(user_role='commentator', is_active=True, is_delete=False, is_admin=False).annotate(
                 priority=Case(
                     *[When(commentator_level=level, then=COMMENTATOR_PRIORITIES[level]) for level, _ in COMMENTATOR_ROLE_CHOISE],
                     default=0,
@@ -2727,7 +2752,6 @@ class EditorManagement(APIView):
             return Response(data={'error': f'An error occurred while processing the request.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
     def post(self, request, format=None, *args, **kwargs):
         """
         Create new commentator User.
@@ -2768,6 +2792,10 @@ class EditorManagement(APIView):
                     user_role=role, commentator_level=commentator_level, commentator_status='active',
                     experience=experience, city=city, category=category, membership_date=membership_date
                 )
+                user_obj.save()
+                if user_obj != None:
+                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, 
+                                                                  commentator=True, start_date=datetime.strptime(membership_date, '%Y-%m-%d'))
             else:
                 user_obj = User.objects.create(profile_pic=profile,
                     name=name, username=username, phone=phone,
@@ -2775,7 +2803,11 @@ class EditorManagement(APIView):
                     user_role=role, commentator_level=commentator_level, commentator_status='active',
                     experience=experience, city=city, category=category
                 )
-            user_obj.save()
+                user_obj.save()
+                if user_obj != None:
+                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, 
+                                                                  commentator=True)
+
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
                     obj = DataCount.objects.get(id=1)
@@ -3177,7 +3209,7 @@ class SalesManagement(APIView):
                 data_list['plan_sale'] = serializer1.data
 
             except Exception as e:
-                return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(data={'error': f'An error occurred while fetching highlight data.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # Subscription objects handling 
 
@@ -3193,7 +3225,7 @@ class SalesManagement(APIView):
             # data_list['subscription_count'] = subscription_obj.count()
 
         except Exception as e:
-            return Response(data={'error': 'An error occurred while fetching subscription data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'An error occurred while fetching subscription data.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             # Highlight objects handling
@@ -3209,22 +3241,56 @@ class SalesManagement(APIView):
             data_list['highlight'] = serializer1.data
 
         except Exception as e:
-            return Response(data={'error': 'An error occurred while fetching highlight data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'An error occurred while fetching highlight data.{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         data_list['daily_total'] = plan_sale_cal_ + subscription_cal + highlights_cal_
+        daily_total24 = plan_sale_cal_ + subscription_cal + highlights_cal_
 
         try:
+            two_day_ago = now - timedelta(hours=48)
+            plan_sale_obj_48cal = BecomeCommentator.objects.filter(commentator=True, created__gte=two_day_ago, created__lt=datetime.now())
+            plan_sale_48cal_ = 0
+            for obj in plan_sale_obj_48cal:
+                plan_sale_48cal_ += obj.money
+            plan48 = plan_sale_48cal_ - plan_sale_cal_
+
+            subscription_obj_48cal = Subscription.objects.filter(subscription=True, created__gte=two_day_ago, created__lt=datetime.now())
+            subscription_48cal = 0
+            for obj in subscription_obj_48cal:
+                subscription_48cal += obj.money
+            sub48 = subscription_48cal - subscription_cal
+
+            highlights_obj_48cal = Highlight.objects.filter(highlight=True, created__gte=two_day_ago, created__lt=datetime.now())
+            highlights_48cal_ = 0
+            for obj in highlights_obj_48cal:
+                highlights_48cal_ += obj.money
+            high48 = highlights_48cal_ - highlights_cal_
+
+            daily_total48 = plan48+sub48+high48
+
+            data_list['daily_total_persentage'] = round(((daily_total24 - daily_total48)/100) * 100, 2)
+
+        except:
+            data_list['daily_total_persentage'] = 0
+
+
+        try:
+            plan_sale_obj = BecomeCommentator.objects.filter(commentator=True)
+            plan_sale_obj_cal = 0
+            for obj in plan_sale_obj:
+                plan_sale_obj_cal += obj.money
+
             subscription_obj = Subscription.objects.filter(subscription=True)
             subscription_cal = 0
             for obj in subscription_obj:
                 subscription_cal += obj.money
+
             highlights_obj = Highlight.objects.filter(highlight=True)
             highlights_cal = 0
             for obj in highlights_obj:
                 highlights_cal += obj.money
 
-            # print("-----", subscription_cal + highlights_cal)
-            data_list['all_time_total'] = subscription_cal + highlights_cal
+            data_list['all_time_total'] = plan_sale_obj_cal + subscription_cal + highlights_cal
 
         except Exception as e:
             return Response(data={'error': f'{e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3243,7 +3309,22 @@ class SalesManagement(APIView):
         except Exception as e:
             return Response(data={'error': f'{e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        data_list['net_revenue'] = total_cal + highlights_cal_
+        data_list['net_revenue'] = plan_sale_cal_+ total_cal + highlights_cal_
+        net_revenue24 = plan_sale_cal_+ total_cal + highlights_cal_
+        try:
+            two_days_ago = date.today() - timedelta(days=2)
+            two_days_ago_created_subscriptions = Subscription.objects.filter(created__date=two_days_ago, subscription=True)
+            total_cal = 0.0
+            for obj in two_days_ago_created_subscriptions:
+                commission_rate = MembershipSetting.objects.get(commentator_level=obj.commentator_user.commentator_level)
+                total_cal += float(float(obj.money) * float(commission_rate.commission_rate)) / 100
+
+            net_revenue48 = plan_sale_48cal_ + total_cal + highlights_48cal_
+       
+            data_list['net_revenue_persentage'] = round(((net_revenue24 - net_revenue48)/100) * 100, 2)
+
+        except:
+            data_list['net_revenue_persentage'] = 0
 
         return Response(data=data_list, status=status.HTTP_200_OK)
     
@@ -5417,18 +5498,39 @@ class BankDetailsView(APIView):
                 bank_details_serializer = BankDetailsSerializer(queryset, many=True).data
 
                 # Get counts for specific statuses
-                pending = BankDetails.objects.filter(status='pending').count()
-                approved = BankDetails.objects.filter(status='approve').count()
-                new = len(BankDetails.objects.filter(status='pending'))
+                # pending = BankDetails.objects.filter(status='pending').count()
+                # approved = BankDetails.objects.filter(status='approve').count()
+                # new = BankDetails.objects.filter(status='pending',created__date=datetime.today()).count()
+
+                new_request = Withdrawable.objects.filter(status='pending')
+                approve_request = Withdrawable.objects.filter(status='approve')
+
+                # previous month data count:
+                today = datetime.today()
+                last_month_start = today.replace(day=1) - timedelta(days=1)
+                last_month_end = today.replace(day=1) - timedelta(days=today.day)
+                previous_month_count = Withdrawable.objects.filter(
+                    created__gte=last_month_start,
+                    created__lte=last_month_end
+                ).count()
+
+                # current month data count:
+                current_date = timezone.now()
+                first_day_of_month = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                last_day_of_month = first_day_of_month.replace(month=first_day_of_month.month + 1)
+                current_count = Withdrawable.objects.filter(created__gte=first_day_of_month, created__lt=last_day_of_month).count()
+
+                lastmonth = ((current_count - previous_month_count)/100)*100
 
                 notifications = Notification.objects.filter(subject='Purchase Transactions').order_by('-created')
                 notifications_serializer = NotificationSerializer(notifications, many=True).data
 
                 data.update({
                     'bank_details': bank_details_serializer,
-                    'pending': pending,
-                    'approved': approved,
-                    'new': new,
+                    'pending': new_request.count(),
+                    'approved': approve_request.count(),
+                    'new': new_request.count(),
+                    'lastmonth': round(lastmonth, 2),
                     'notifications': notifications_serializer,
                 })
                 return Response({'data': data}, status=status.HTTP_200_OK)
@@ -5836,6 +5938,11 @@ class ShowWithdrawableData(APIView):
             new_request = Withdrawable.objects.filter(status='pending')
             serializer1 = WithdrawableSerializer(new_request, many=True).data
             data_list['new_request'] = serializer1
+            data_list['new_request_count'] = new_request.count()
+
+            approve_request = Withdrawable.objects.filter(status='approve')
+            data_list['approve_request_count'] = approve_request.count()
+
         except Exception as e:
             return Response(data={'error': 'An error occurred while fetching new requests.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -5911,8 +6018,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -5967,8 +6074,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",

@@ -478,10 +478,3 @@ class CommissionEarning(models.Model):
     total_amount = models.FloatField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-
-class Otp(models.Model):
-    phone = models.CharField(max_length=15,null=True, blank=True) 
-    otp = models.CharField(max_length=20, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)

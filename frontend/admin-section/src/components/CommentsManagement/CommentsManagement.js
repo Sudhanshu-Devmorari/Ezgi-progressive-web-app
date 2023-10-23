@@ -9,6 +9,8 @@ import UKflag from "../../assets/Flag_of_the_United_Kingdom.png";
 import flag from "../../assets/Roundel_flag_of_Turkey.svg.png";
 import circle_check from "../../assets/circle-check-1.png";
 import circle_x from "../../assets/circle-x.png";
+import circle_exclamation from "../../assets/clock-exclamation.png";
+import circle_check_1 from "../../assets/circle-check-1.png";
 import selectedRadio from "../../assets/Group 312.svg";
 import Radio from "../../assets/Group 323.svg";
 import clock_exclamation from "../../assets/clock-exclamation.png";
@@ -154,8 +156,8 @@ const CommentsManagement = (props) => {
 
   const filterData = (e) => {
     setDataloading(true);
-    const val = e == "Published" ? "Approve" : e;
-    // const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e;
+    // const val = e == "Published" ? "Approve" : e;
+    const val = e == "Published" ? "Approve" : e == "Paused-Postponed" ? "Reject" : e == "Pending" ?  "Pending" : e;
     const filteredArray = displayUser?.filter(
       (obj) => obj?.status?.toLowerCase() == val?.toLowerCase()
     );
@@ -514,7 +516,7 @@ const CommentsManagement = (props) => {
                     </span>
                     <img
                       className="eye-icon"
-                      src={circle_check}
+                      src={res.status == 'pending' ? circle_exclamation : res.status == 'approve' ? circle_check_1 : res.status == 'reject' ? circle_x : null}
                       alt=""
                       height={23}
                       width={23}

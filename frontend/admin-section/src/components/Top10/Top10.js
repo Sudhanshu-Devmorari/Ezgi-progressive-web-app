@@ -23,14 +23,12 @@ const Top10 = (props) => {
           <div className="text-center d-flex gap-2 align-items-end">
             <div className="d-flex flex-column">
               <img
-                // onClick={() => props.setupdateProfile(2)}
+                onClick={() => {props.setupdateProfile(2)
+                  props.setAddUser(data[0]?.editor_data)
+                  props.setPartialData(data[0])
+                }}
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
-                onClick={()=>{
-                  props.setupdateProfile(2);
-                  props?.setPartialData(data[0]);
-                  props?.setAddUser(data[0]?.editor_data);
-                }}
                 className="top-2-img cursor"
                 src={data[0]?.editor_data?.profile_pic ? `${config.apiUrl}${data[0]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""
@@ -41,9 +39,12 @@ const Top10 = (props) => {
             </div>
             <div className="d-flex flex-column">
               <img
-                // onClick={() => props.setupdateProfile(2)}
-                // data-bs-toggle="modal"
-                // data-bs-target="#exampleModal"
+                onClick={() => {props.setupdateProfile(2)
+                  props.setAddUser(data[2]?.editor_data)
+                  props.setPartialData(data[2])
+                }}
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
                 className="top-1-img cursor"
                 src={data[2]?.editor_data?.profile_pic ? `${config.apiUrl}${data[2]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""
@@ -54,9 +55,12 @@ const Top10 = (props) => {
             </div>
             <div className="d-flex flex-column">
               <img
-                // onClick={() => props.setupdateProfile(2)}
-                // data-bs-toggle="modal"
-                // data-bs-target="#exampleModal"
+                onClick={() => {props.setupdateProfile(2)
+                  props.setAddUser(data[1]?.editor_data)
+                  props.setPartialData(data[1])
+                }}
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
                 className="top-2-img cursor"
                 src={data[1]?.editor_data?.profile_pic ? `${config.apiUrl}${data[1]?.editor_data?.profile_pic}` : initialProfile}
                 alt=""
@@ -80,9 +84,12 @@ const Top10 = (props) => {
                   key={index}
                 >
                   <img
-                    // onClick={() => props.setupdateProfile(2)}
-                    // data-bs-toggle="modal"
-                    // data-bs-target="#exampleModal"
+                    onClick={() => {props.setupdateProfile(2)
+                      props.setAddUser(res?.editor_data)
+                  props.setPartialData(res)
+                    }}
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
                     className="all-user-img cursor"
                     src={res?.editor_data?.profile_pic ? `${config.apiUrl}${res?.editor_data?.profile_pic}` : initialProfile}
                     alt=""

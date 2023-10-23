@@ -22,6 +22,9 @@ const EditorManagementPage = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [cookies, setCookie, removeCookie] = useCookies();
 
+  const [addUser, setAddUser] = useState({});
+  const [partialData, setPartialData] = useState([]);
+
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [deactivationonRequests, setDeactivationonRequests] = useState([]);
   function editorManagementApiData() {
@@ -118,6 +121,10 @@ const EditorManagementPage = (props) => {
                     deactiveRqst={deactiveRqst}
                     setDeactiveRqst={setDeactiveRqst}
                     isLoading={isLoading}
+                    setAddUser={setAddUser}
+                    addUser={addUser}
+                    setPartialData={setPartialData}
+                    partialData={partialData}
                   />
                 </div>
               </div>
@@ -128,6 +135,10 @@ const EditorManagementPage = (props) => {
                   setupdateProfile={setupdateProfile}
                   userData={data?.top_ten}
                   isLoading={isLoading}
+                  setAddUser={setAddUser}
+                  addUser={addUser}
+                  setPartialData={setPartialData}
+                  partialData={partialData}
                 />
                 <EditorAccountStatus
                   active_editor={data.active_editor}

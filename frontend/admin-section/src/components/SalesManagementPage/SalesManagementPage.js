@@ -25,7 +25,7 @@ const SalesManagementPage = (props) => {
   const [records, setRecords] = useState([]);
   const [recordsDisplay, setRecordsDisplay] = useState(records);
   const [cookies, setCookie, removeCookie] = useCookies();
-
+  // console.log("salesData", salesData)
   const salesArray = [
     {
       icon: PlanIcon,
@@ -125,12 +125,12 @@ const SalesManagementPage = (props) => {
                       border:
                         // (res.planD === "Subscription" && "1px solid #58DEAA") ||
                         // (res.planD === "Expert" && "1px solid #FF9100") ||
-                        (data?.user?.commentator_level === "apprentice" && "1px solid #4DD5FF"), 
+                        (data?.user?.commentator_level === "apprentice" ? "1px solid #4DD5FF" : "1px solid #FF9100"), 
                         // (res.planD === "Highlight" && "1px solid #D2DB08"),
                       color:
                         // (res.planD === "Subscription" && "#58DEAA") ||
                         // (res.planD === "Expert" && "#FF9100") ||
-                        (data?.user?.commentator_level === "apprentice" && "#4DD5FF") 
+                        (data?.user?.commentator_level === "apprentice" ? "#4DD5FF" : "#FF9100") 
                         // (res.planD === "Highlight" && "#D2DB08"),
                     }}
                   >
@@ -157,19 +157,19 @@ const SalesManagementPage = (props) => {
                       <button
                         className="px-2 text-center"
                         style={{
-                          backgroundColor:"#4DD5FF",
-                            // (res.plan === "Renew" && "#FF9100") ||
-                            // (res.plan === "New" && "#4DD5FF"),
+                          // backgroundColor:"#4DD5FF",
+                          backgroundColor : (data?.membership_status === "renew" && "#FF9100") ||
+                            (data?.membership_status === "new" && "#4DD5FF"),
                           borderRadius: "4px",
-                          border:"#4DD5FF",
-                            // (res.plan === "Renew" && "1px solid #FF9100") ||
-                            // (res.plan === "New" && "#4DD5FF"),
+                          // border:"#4DD5FF",
+                          border: (data?.membership_status === "renew" && "1px solid #FF9100") ||
+                            (data?.membership_status === "new" && "#4DD5FF"),
                           color: "#0D2A53",
                           width: "4.5rem",
                         }}
                       >
                         {/* {res.plan} */}
-                        New
+                        {data?.membership_status?.charAt(0).toUpperCase() + data?.membership_status?.slice(1)}
                       </button>
                     {/* )} */}
                   </>
@@ -588,7 +588,7 @@ const SalesManagementPage = (props) => {
                           className="rate-font"
                           style={{ color: "#58DEAA" }}
                         >
-                          %22
+                          %{salesData?.daily_total_persentage}
                           <HiArrowSmUp
                             className="arrow"
                             style={{ marginBottom: "0.1rem" }}
@@ -629,7 +629,7 @@ const SalesManagementPage = (props) => {
                   <div className="w-100 pt-5">
                     <span className="rate-font">
                       <span className="rate-font" style={{ color: "#58DEAA" }}>
-                        %22
+                        %{salesData?.net_revenue_persentage}
                         <HiArrowSmUp
                           className="arrow"
                           style={{ marginBottom: "0.1rem" }}

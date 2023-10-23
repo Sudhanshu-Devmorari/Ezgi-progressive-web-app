@@ -132,10 +132,12 @@ const WithdrawalManagementPage = (props) => {
     pending: 0,
     approved: 0,
     new: 0,
+    lastmonth: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [UpdateRequest, setUpdateRequest] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [requestCount, setRequestCount] = useState({});
   async function getWithdrawData() {
     try {
       setIsLoading(true);
@@ -151,6 +153,7 @@ const WithdrawalManagementPage = (props) => {
           pending: data?.pending,
           approved: data?.approved,
           new: data?.new,
+          lastmonth: data?.lastmonth,
         });
         setNotifications(res?.data?.data?.notifications)
         setIsLoading(false);
@@ -176,6 +179,11 @@ const WithdrawalManagementPage = (props) => {
         } else {
           setUpdateRequest(res.data.all_request);
         }
+        setRequestCount({
+          new:res.data.new_request_count,
+          pending:res.data.new_request_count,
+          approve:res.data.approve_request_count,
+        })
         setIsLoading(false);
       }
     } catch (error) {
@@ -266,7 +274,7 @@ const WithdrawalManagementPage = (props) => {
                             className="rate-font"
                             style={{ color: "#58DEAA" }}
                           >
-                            %22
+                            %{countsRequest?.lastmonth}
                             <HiArrowSmUp
                               className="arrow"
                               style={{ marginBottom: "0.1rem" }}

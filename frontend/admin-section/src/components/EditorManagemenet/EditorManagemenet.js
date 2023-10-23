@@ -29,9 +29,15 @@ import { CustomDropdownEditor } from "../CustomDropdownEditor";
 import { useCookies } from "react-cookie";
 
 const EditorManagemenet = (props) => {
-  const [addUser, setAddUser] = useState({});
+  // const [addUser, setAddUser] = useState({});
+  const addUser = props?.addUser && props?.addUser
+  const setAddUser = props?.setAddUser && props?.setAddUser
+  
   // console.log(addUser.country);
-  const [partialData, setPartialData] = useState([]);
+  // const [partialData, setPartialData] = useState([]);
+  const partialData = props?.partialData && props?.partialData
+  const setPartialData = props?.setPartialData && props?.setPartialData
+
   const [cities, setCities] = useState([]);
 
   const [validName, setValidName] = useState(null);
@@ -1113,7 +1119,7 @@ const EditorManagemenet = (props) => {
                         data-bs-target="#exampleModal"
                         style={{ color: "#D2DB0B", fontSize: "1rem" }}
                       >
-                        %62
+                        %{res?.editor_data?.success_rate}
                       </span>
                       {res?.editor_data?.gender == "Male" && (
                         <img src={gender_male} alt="" height={23} width={23} />
