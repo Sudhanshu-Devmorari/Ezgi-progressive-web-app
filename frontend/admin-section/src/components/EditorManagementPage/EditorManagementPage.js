@@ -83,12 +83,12 @@ const EditorManagementPage = (props) => {
   const [verifyRqst, setverifyRqst] = useState(false);
   const [deactiveRqst, setDeactiveRqst] = useState(false);
 
-  const [addUser, setAddUser] = useState({});
-  // console.log(addUser.country);
-  const [partialData, setPartialData] = useState([]);
+  // const [addUser, setAddUser] = useState({});
+  // // console.log(addUser.country);
+  // const [partialData, setPartialData] = useState([]);
 
-  console.log(addUser,'==========================adduser')
-  console.log(partialData,'==========================partialData')
+  // console.log(addUser,'==========================adduser')
+  // console.log(partialData,'==========================partialData')
   return (
     <>
       <div className="conatainer-fluid m-2">
@@ -130,8 +130,8 @@ const EditorManagementPage = (props) => {
               </div>
               <div className="col-4">
                 <Top10
-                  setPartialData={setPartialData}
-                  setAddUser={setAddUser}
+                  // setPartialData={setPartialData}
+                  // setAddUser={setAddUser}
                   setupdateProfile={setupdateProfile}
                   userData={data?.top_ten}
                   isLoading={isLoading}
