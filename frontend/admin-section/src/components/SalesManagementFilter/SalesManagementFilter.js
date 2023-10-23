@@ -10,7 +10,7 @@ import { useCookies } from "react-cookie";
 
 const SalesManagementFilter = (props) => {
   const DateOptions = ["option 1", "option 2"];
-  const TypeOptions = ["Subscription", "Highlight"];
+  const TypeOptions = ["Subscription", "Highlight", "PlanSales"];
   const StatusOptions = ["Active", "Pending", "Deactive"];
   const DurationOptions = ["1 Month", "3 Month", "6 Month", "1 Year"];
   const [selectedDateFilter, setSelectedDateFilter] = useState("Select");
