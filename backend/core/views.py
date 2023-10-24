@@ -6046,8 +6046,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6102,8 +6102,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
