@@ -133,6 +133,7 @@ const WithdrawalManagementPage = (props) => {
     approved: 0,
     new: 0,
     lastmonth: 0,
+    total_payment: 0.0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [UpdateRequest, setUpdateRequest] = useState([]);
@@ -156,6 +157,7 @@ const WithdrawalManagementPage = (props) => {
           approved: data?.approved,
           new: data?.new,
           lastmonth: data?.lastmonth,
+          total_payment: data?.total_payment,
         });
         setNotifications(res?.data?.data?.notifications);
         setIsLoading(false);
@@ -320,7 +322,7 @@ const WithdrawalManagementPage = (props) => {
                               Total Payment
                             </span>
                             <span className="number">
-                              12.645 <small>₺</small>
+                              {countsRequest?.total_payment} <small>₺</small>
                             </span>
                           </div>
                         </div>
