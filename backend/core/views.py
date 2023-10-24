@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from core.utils import create_response, sms_send, get_league_data
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -2794,8 +2794,9 @@ class EditorManagement(APIView):
                 )
                 user_obj.save()
                 if user_obj != None:
-                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, 
-                                                                  commentator=True, start_date=datetime.strptime(membership_date, '%Y-%m-%d'))
+                    end_date = datetime.strptime(membership_date, '%Y-%m-%d') + timedelta(days=30)
+                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, duration='1 Months', membership_status='new',money=0.0,
+                                                                  commentator=True, start_date=datetime.strptime(membership_date, '%Y-%m-%d'), end_date=end_date)
             else:
                 user_obj = User.objects.create(profile_pic=profile,
                     name=name, username=username, phone=phone,
@@ -2805,8 +2806,9 @@ class EditorManagement(APIView):
                 )
                 user_obj.save()
                 if user_obj != None:
-                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, 
-                                                                  commentator=True)
+                    end_date = datetime.now() + timedelta(days=30)
+                    editor_obj = BecomeCommentator.objects.create(user=user_obj, status='active', commentator_level=commentator_level, duration='1 Months', membership_status='new',money=0.0,
+                                                                  commentator=True, start_date=datetime.now(), end_date=end_date)
 
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -3155,6 +3157,12 @@ class SalesManagement(APIView):
         now = timezone.now()
         previous_24_hours = now - timedelta(hours=24)
         previous_day = datetime.now() - timedelta(days=1)
+
+        current_date = timezone.now().date()
+        start_time = time(0, 0, 0)
+        end_time = time(23, 59, 59)
+        start_datetime = datetime.combine(current_date, start_time)
+        end_datetime = datetime.combine(current_date, end_time)
         try:
             adminuser_id = request.query_params.get('admin')
             adminuser = User.objects.get(id=adminuser_id)
@@ -3199,7 +3207,8 @@ class SalesManagement(APIView):
                 # plan sale objects handling
                 plan_sale_obj = BecomeCommentator.objects.filter(commentator=True)
                 # print("*******", plan_sale_obj)
-                plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
+                # plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__gte=previous_day, created__lt=datetime.now())
+                plan_sale_obj_cal = BecomeCommentator.objects.filter(commentator=True, created__range=(start_datetime, end_datetime))
                 plan_sale_cal_ = 0
                 for obj in plan_sale_obj_cal:
                     plan_sale_cal_ += obj.money
@@ -3214,7 +3223,8 @@ class SalesManagement(APIView):
             # Subscription objects handling 
 
             subscription_obj = Subscription.objects.filter(subscription=True)
-            subscription_obj_cal = Subscription.objects.filter(subscription=True, created__gte=previous_day, created__lt=datetime.now())
+            # subscription_obj_cal = Subscription.objects.filter(subscription=True, created__gte=previous_day, created__lt=datetime.now())
+            subscription_obj_cal = Subscription.objects.filter(subscription=True, created__range=(start_datetime, end_datetime))
             subscription_cal = 0
             for obj in subscription_obj_cal:
                 subscription_cal += obj.money
@@ -3230,7 +3240,8 @@ class SalesManagement(APIView):
         try:
             # Highlight objects handling
             highlights_obj = Highlight.objects.filter(highlight=True)
-            highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
+            # highlights_obj_cal = Highlight.objects.filter(highlight=True, created__gte=previous_day, created__lt=datetime.now())
+            highlights_obj_cal = Highlight.objects.filter(highlight=True, created__range=(start_datetime, end_datetime))
             highlights_cal_ = 0
             for obj in highlights_obj_cal:
                 highlights_cal_ += obj.money
@@ -6035,8 +6046,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6091,8 +6102,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6172,13 +6183,15 @@ class RenewModelData(APIView):
             if user.remaining_monthly_count != 0:
                 data['plan_duration'] = "1 Months"
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
-                data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+                # data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+                data['plan_price'] = float(membership_obj.plan_price)
                 data['plan_promotion_rate'] = membership_obj.promotion_rate
             else:
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
                 data['plan_duration'] = "1 Months"
                 # data['plan_price'] = membership_obj.plan_price
-                data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+                # data['plan_price'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+                data['plan_price'] = float(membership_obj.plan_price)
                 data['plan_promotion_rate'] = membership_obj.promotion_rate
         except ObjectDoesNotExist as e:
             return Response(data={'error': f'{e}'}, status=status.HTTP_404_NOT_FOUND)
@@ -6306,5 +6319,6 @@ class RetrieveBecomeCommentatorData(APIView):
             return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         serializer = BecomeCommentatorSerializer(obj).data
-        serializer['money'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+        # serializer['money'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
+        serializer['money'] = float(membership_obj.plan_price)
         return Response(data=serializer, status=status.HTTP_200_OK)

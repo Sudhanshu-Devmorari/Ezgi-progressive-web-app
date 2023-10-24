@@ -144,10 +144,10 @@ const CommentsManagement = (props) => {
         removeCookie("admin-user-id");
         // window.location.reload();
       }
-      // window.location.reload();
       // props.setCommentData(props?.commentData)
       // setDisplayUser(displayUser)
       filterData(props.selectedOption);
+      window.location.reload();
     } catch (error) {
       console.error("Error fetching data:", error);
       return [];
