@@ -12,6 +12,8 @@ import { userId } from "../GetUser";
 import { useEffect } from "react";
 import initialProfile from "../../assets/profile.png";
 import Swal from "sweetalert2";
+import darkIcon from "../../assets/Dark.png"
+import lightIcon from "../../assets/Light.png"
 
 const FavEditor = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -207,7 +209,7 @@ const FavEditor = (props) => {
                       style={{ objectFit: "cover", borderRadius: "50%" }}
                     />
                     <div className="d-flex flex-column ps-1">
-                      <div>
+                      <div style={{gap:"0.8rem", display:"flex",alignItems:"center"}}>
                         <button
                           className="px-3"
                           style={{
@@ -220,6 +222,14 @@ const FavEditor = (props) => {
                         >
                           {res?.data?.commentator_user?.commentator_level}
                         </button>
+                        {console.log("res?.data", res)}
+                        {res?.is_highlight && (
+                    <img
+                      src={currentTheme === "dark" ? darkIcon : lightIcon}
+                      alt="darkIcon"
+                      style={{width:"20px", height:"20px"}}
+                    />
+                  )}
                       </div>
                       <div
                         className="blueTick-responsive align-items-center mt-1 responsive-username"

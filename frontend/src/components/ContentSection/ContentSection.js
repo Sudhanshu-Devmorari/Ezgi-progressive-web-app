@@ -41,7 +41,8 @@ import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import { formatTimeDifference } from "../FormatTime";
-
+import darkIcon from "../../assets/Dark.png"
+import lightIcon from "../../assets/Light.png"
 const ContentSection = ({
   data,
   setSelectContent,
@@ -400,6 +401,9 @@ const ContentSection = ({
                       style={{ height: "24.69px" }}
                     >
                       {userId != data?.value?.commentator_user?.id ? (
+                        <>
+                        <div style={{display:"flex", gap:"0.8rem"}}>
+                        {data?.value?.is_highlight && <img src={currentTheme === "dark" ? darkIcon : lightIcon} alt="darkIcon" />}
                         <button
                           onClick={() => {
                             followCommentator(
@@ -428,6 +432,8 @@ const ContentSection = ({
                             ? "Followed"
                             : "Follow"}
                         </button>
+                        </div>
+                        </>
                       ) : (
                         <button
                           style={{

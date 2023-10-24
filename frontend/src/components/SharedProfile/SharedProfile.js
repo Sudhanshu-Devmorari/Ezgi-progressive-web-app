@@ -16,6 +16,8 @@ import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { BsStar, BsStarFill } from "react-icons/bs";
+import darkIcon from "../../assets/Dark.png"
+import lightIcon from "../../assets/Light.png"
 
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
@@ -284,7 +286,7 @@ const SharedProfile = (props) => {
               alt=""
             />
             <div className="d-flex flex-column ps-1">
-              <div>
+              <div style={{gap:"0.8rem", display:"flex",alignItems:"center"}}>
                 <button
                   className="px-3"
                   style={{
@@ -300,6 +302,13 @@ const SharedProfile = (props) => {
                     ?.toUpperCase() +
                     data?.value?.user?.commentator_level?.substring(1)}
                 </button>
+                {data?.value?.is_highlight && (
+                    <img
+                      src={currentTheme === "dark" ? darkIcon : lightIcon}
+                      alt="darkIcon"
+                      style={{width:"20px", height:"20px"}}
+                    />
+                  )}
               </div>
               <div
                 className="blueTick-responsive align-items-center mt-1 responsive-username"

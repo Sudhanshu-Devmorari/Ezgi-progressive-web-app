@@ -40,6 +40,8 @@ import { formatTimeDifference } from "../FormatTime";
 import circle_check from "../../assets/circle-check.png";
 import clock_pause from "../../assets/clock-pause.svg";
 import circle_x from "../../assets/circle-x.png";
+import darkIcon from "../../assets/Dark.png"
+import lightIcon from "../../assets/Light.png"
 
 const FavComments = (props) => {
   const {
@@ -334,6 +336,9 @@ const FavComments = (props) => {
                 <div className="col p-0">
                   <div className="d-flex justify-content-end pe-2 mt-3">
                     {userId != res?.commentator_user?.id && (
+                      <>
+                      <div style={{display:"flex", gap:"0.8rem", alignItems:"center"}}>
+                        {res?.is_highlight && <img src={currentTheme === "dark" ? darkIcon : lightIcon} alt="darkIcon" style={{height:"20px", width:"20px"}}/>}
                       <button
                         onClick={() => {
                           followCommentator(
@@ -360,6 +365,8 @@ const FavComments = (props) => {
                           ? "Followed"
                           : "Follow"}
                       </button>
+                      </div>
+                      </>
                     )}
                   </div>
 

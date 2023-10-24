@@ -5,10 +5,11 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.db.models.functions import TruncDate
-from django.db.models import Count
+from django.db.models import Count, F, Value
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import Case, When, IntegerField
+from django.db.models.functions import Coalesce
 from core.models import COMMENTATOR_ROLE_CHOISE
 import math, random
 import pyotp
@@ -401,6 +402,17 @@ class RetrieveCommentatorView(APIView):
                     data_list['comment_reactions'] = cmt
         except:
             data_list['comment_reactions'] = []
+
+        # approved_comments = Comments.objects.filter(status='approve')
+        # comment_queryset = approved_comments.annotate(
+        #     has_purchased_highlight=Coalesce(
+        #         F('commentator_user__highlight__pk'), Value(0)
+        #     )
+        # )
+        # sorted_comments = comment_queryset.order_by('-has_purchased_highlight', '-commentator_user__success_rate')
+        # cmt_serializer = CommentsSerializer(sorted_comments, many=True).data
+        # data_list['cmt_serializer'] = cmt_serializer
+
         return Response(data=data_list, status=status.HTTP_200_OK)
     
 class FollowCommentatorView(APIView):
@@ -1083,6 +1095,8 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
                 is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.commentator_user, status='active').exists()
                 details['is_subscribe'] = is_subscribe
+                is_highlight = Highlight.objects.filter(user=obj.commentator_user, status='active').exists()
+                details['is_highlight'] = is_highlight
                 
                 # Subscribe count
                 count = Subscription.objects.filter(commentator_user=obj.commentator_user, standard_user__is_delete=False).count()
@@ -1108,6 +1122,8 @@ class RetrieveFavEditorsAndFavComment(APIView):
 
                 is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.comment.commentator_user, status='active').exists()
                 comment_data['is_subscribe'] = is_subscribe
+                is_highlight = Highlight.objects.filter(user=obj.comment.commentator_user, status='active').exists()
+                comment_data['is_highlight'] = is_highlight
 
                 comment_reactions = CommentReaction.objects.filter(comment=obj.comment)
                 total_reactions = comment_reactions.aggregate(
@@ -5024,6 +5040,9 @@ class RetrievePageData():
                 is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
                 comment_data['is_subscribe'] = is_subscribe
 
+                is_highlight = Highlight.objects.filter(user=comment.commentator_user, status='active').exists()
+                comment_data['is_highlight'] = is_highlight
+
                 success_rate_score_points(comment.commentator_user.id)
                 
                 # Fetch comment reactions and calculate the total count of reactions
@@ -5085,6 +5104,10 @@ class RetrievePageData():
 
                     for comment in subscription_comment:
                         comment_data = CommentsSerializer(comment).data
+
+                        is_highlight = Highlight.objects.filter(user=comment_data.commentator_user, status='active').exists()
+                        comment_data['is_highlight'] = is_highlight
+
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
                         comment_reactions = CommentReaction.objects.filter(comment=comment).values('like', 'favorite', 'clap')
                         total_reactions = comment_reactions.aggregate(
@@ -5141,6 +5164,8 @@ class RetrievePageData():
                     logged_in_user = User.objects.get(id=standard_user_id)
                     is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=obj.user, status='active').exists()
                     highlighted_data['is_subscribe'] = is_subscribe
+                    is_highlight = Highlight.objects.filter(user=obj.user, status='active').exists()
+                    highlighted_data['is_highlight'] = is_highlight
 
                 count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
                 highlighted_data['subscriber_count'] = count
@@ -5239,6 +5264,8 @@ class RetrievePageData():
                 if user is not None:
                     is_subscribe = Subscription.objects.filter(standard_user=user, commentator_user=obj.id, status='active').exists()
                     detail['is_subscribe'] = is_subscribe
+                    is_highlight = Highlight.objects.filter(user=obj.id, status='active').exists()
+                    detail['is_highlight'] = is_highlight
 
                 if user_id:
                     detail['is_fav_editor'] = FavEditors.objects.filter(commentator_user_id=user_data['id'], standard_user_id=user_id, commentator_user__is_delete=False).exists()
