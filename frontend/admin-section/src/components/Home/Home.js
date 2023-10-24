@@ -180,7 +180,8 @@ const Home = (props) => {
     const val = e.target.value.toLowerCase();
     const filteredArray = displayUser.filter(
       (obj) =>
-        obj?.name?.toLowerCase().startsWith(val) ||
+        // { console.log(obj?.username?.toLowerCase().includes(val),"*********")
+          obj?.name?.toLowerCase().startsWith(val) ||
         obj?.username?.toLowerCase().startsWith(val) ||
         obj?.username?.toLowerCase().includes(val) ||
         obj?.name?.toLowerCase().includes(val)

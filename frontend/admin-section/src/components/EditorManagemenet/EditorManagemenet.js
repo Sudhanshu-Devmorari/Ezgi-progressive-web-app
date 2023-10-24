@@ -1917,9 +1917,9 @@ const EditorManagemenet = (props) => {
                               borderRadius: "4px",
                             }}
                           >
-                            {partialData.editor_data?.is_active
-                              ? "Deactive"
-                              : "Active"}
+                            {partialData.editor_data?.commentator_status == 'active'
+                              ? "Active"
+                              : "Deactive"} 
                           </button>
                           <button
                             onClick={() => {

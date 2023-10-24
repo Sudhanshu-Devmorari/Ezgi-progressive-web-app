@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
-const WithdrawalRqstFilter = () => {
-  const [selectedOption, setSelectedOption] = useState("All");
-
-  const options = ["All", "Pendings", "Resolved", "Redirected"];
+const WithdrawalRqstFilter = (props) => {
+  const options = ["All", "Pendings", "Approved", "Rejected"];
 
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
+    props?.setSelectedOption(option);
+    // props?.filteredData(filterChar, (option === 'Pendings' && 'pending') || (option === 'Approved' && 'approve') || (option === 'Rejected' && 'reject') || '' );
     setShowDropdown(false);
   };
   return (
@@ -20,7 +19,16 @@ const WithdrawalRqstFilter = () => {
             <span class="input-group-text search-icon-dark" id="basic-addon1">
               <GoSearch style={{ color: "#FFFFFF" }} />
             </span>
-            <input type="text" className="input-field-dark" />
+            <input
+              onChange={(e) => {
+                const value = e.target.value
+                props?.filteredData(value);
+                // props?.filteredData(value , props?.selectedOption);
+                props?.setFilterChar(value);
+              }}
+              type="text"
+              className="input-field-dark"
+            />
           </div>
         </div>
         <div className="p-2 position-relative">
@@ -46,7 +54,7 @@ const WithdrawalRqstFilter = () => {
                 : "1px solid #E6E6E6",
             }}
           >
-            {selectedOption}
+            {props?.selectedOption}
           </button>
           <div
             className={`position-absolute d-flex flex-column ${
@@ -60,7 +68,7 @@ const WithdrawalRqstFilter = () => {
             }}
           >
             {options
-              .filter((option) => option !== selectedOption)
+              .filter((option) => option !== props?.selectedOption)
               .map((option) => (
                 <span
                   key={option}

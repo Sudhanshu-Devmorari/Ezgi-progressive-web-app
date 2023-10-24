@@ -136,6 +136,8 @@ const WithdrawalManagementPage = (props) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [UpdateRequest, setUpdateRequest] = useState([]);
+  const [filteredArray, setFilteredArray] = useState([]);
+
   const [notifications, setNotifications] = useState([]);
   const [requestCount, setRequestCount] = useState({});
   async function getWithdrawData() {
@@ -155,7 +157,7 @@ const WithdrawalManagementPage = (props) => {
           new: data?.new,
           lastmonth: data?.lastmonth,
         });
-        setNotifications(res?.data?.data?.notifications)
+        setNotifications(res?.data?.data?.notifications);
         setIsLoading(false);
       }
       if (res.status == 204) {
@@ -176,14 +178,16 @@ const WithdrawalManagementPage = (props) => {
         // console.log("resData: ", res)
         if (props.withdrawableData === true) {
           setUpdateRequest(res.data.new_request);
+          setFilteredArray(res.data.new_request);
         } else {
           setUpdateRequest(res.data.all_request);
+          setFilteredArray(res.data.all_request);
         }
         setRequestCount({
-          new:res.data.new_request_count,
-          pending:res.data.new_request_count,
-          approve:res.data.approve_request_count,
-        })
+          new: res.data.new_request_count,
+          pending: res.data.new_request_count,
+          approve: res.data.approve_request_count,
+        });
         setIsLoading(false);
       }
     } catch (error) {
@@ -201,6 +205,59 @@ const WithdrawalManagementPage = (props) => {
     { name: "Pending", count: countsRequest.pending },
     { name: "Approved", count: countsRequest.approved },
   ];
+
+  const [selectedOption, setSelectedOption] = useState("All");
+  const [filterChar, setFilterChar] = useState("");
+
+
+  const filteredData = (value) => {
+    // const filteredData = (value, status) => {
+    // console.log(value, status,"================>>>value, status")
+
+    const filteredArray1 = (
+      value == "" && selectedOption == "All" ? UpdateRequest : filteredArray
+    ).filter(
+      (obj) =>
+        obj?.bankdetails?.user?.name
+          ?.toLowerCase()
+          .startsWith(value.toLowerCase()) ||
+        obj?.bankdetails?.user?.name
+          ?.toLowerCase()
+          .includes(value.toLowerCase()) ||
+        obj?.bankdetails?.username?.name
+          ?.toLowerCase()
+          .startsWith(value.toLowerCase()) ||
+        obj?.bankdetails?.username?.name
+          ?.toLowerCase()
+          .includes(value.toLowerCase())
+      // obj?.status?.toLowerCase().includes(status.toLowerCase())
+    );
+    console.log(filteredArray1, "=>>filteredArray1");
+    setFilteredArray(filteredArray1);
+    selectedOption !== "All" && value == "" && handleDropFilter();
+  };
+
+  const handleDropFilter = () => {
+    const updatedFilteredData = UpdateRequest.filter((obj) => {
+      if (selectedOption === "All") {
+        return true;
+      } else if (selectedOption === "Pendings") {
+        return obj.status === "pending";
+      } else if (selectedOption === "Approved") {
+        return obj.status === "approve";
+      } else if (selectedOption === "Rejected") {
+        return obj.status === "reject";
+      }
+      return false;
+    });
+    // filteredData(selectedOption)
+    setFilteredArray(updatedFilteredData);
+  };
+
+  useEffect(() => {
+    selectedOption && handleDropFilter();
+    // selectedOption !== 'All' && filterChar !== '' && filteredData(filterChar)
+  }, [selectedOption]);
 
   return (
     <>
@@ -301,19 +358,24 @@ const WithdrawalManagementPage = (props) => {
                   className="dark-mode p-2 m-2 mb-0 home-height"
                   style={{ height: "64vh" }}
                 >
-                  <WithdrawalRqstFilter />
+                  <WithdrawalRqstFilter
+                    filteredData={filteredData}
+                    selectedOption={selectedOption}
+                    setSelectedOption={setSelectedOption}
+                    setFilterChar={setFilterChar}
+                  />
 
                   {isLoading ? (
                     <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                       Loading...
                     </div>
-                  ) : UpdateRequest?.length === 0 ? (
+                  ) : filteredArray?.length === 0 ? (
                     <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                       No Record Found!
                     </div>
                   ) : (
                     <>
-                      {UpdateRequest?.map((res, index) => (
+                      {filteredArray?.map((res, index) => (
                         <>
                           <MainDiv>
                             <>
@@ -400,7 +462,10 @@ const WithdrawalManagementPage = (props) => {
                 </div>
               </div>
               <div className="col-4">
-                <UserTimeLine transactionHistory={"history"} notification={notifications}/>
+                <UserTimeLine
+                  transactionHistory={"history"}
+                  notification={notifications}
+                />
               </div>
             </div>
           </div>

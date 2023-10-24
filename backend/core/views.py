@@ -2611,7 +2611,7 @@ class EditorManagement(APIView):
 
             editor_list = []
             # all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
-            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True, is_admin=False, commentator_status='active').order_by('-created')
+            commentator = User.objects.filter(user_role='commentator',is_delete=False, is_active=True, is_admin=False, commentator_status__in=['active','pending']).order_by('-created')
             for obj in commentator:
                 detail = {}
                 follow_obj = FollowCommentator.objects.filter(commentator_user=obj).count()
@@ -2639,17 +2639,17 @@ class EditorManagement(APIView):
             editor_count = User.objects.filter(user_role='commentator', created__date=today).count()
             data_list['editor_count'] = editor_count
 
-            apprentice = User.objects.filter(commentator_level='apprentice').count()
-            data_list['apprentice_count'] = apprentice
+            apprentice = User.objects.filter(commentator_level='apprentice', is_delete=False, is_active=True, is_admin=False, commentator_status__in=['active', 'pending'])
+            data_list['apprentice_count'] = len(apprentice)
 
-            journeyman = User.objects.filter(commentator_level='journeyman').count()
-            data_list['journeyman_count'] = journeyman
+            journeyman = User.objects.filter(commentator_level='journeyman', is_delete=False, is_active=True, is_admin=False, commentator_status__in=['active', 'pending'])
+            data_list['journeyman_count'] = len(journeyman)
 
-            master = User.objects.filter(commentator_level='master').count()
-            data_list['master_count'] = master
+            master = User.objects.filter(commentator_level='master', is_delete=False, is_active=True, is_admin=False, commentator_status__in=['active', 'pending'])
+            data_list['master_count'] = len(master)
 
-            grandmaster = User.objects.filter(commentator_level='grandmaster').count()
-            data_list['grandmaster_count'] = grandmaster
+            grandmaster = User.objects.filter(commentator_level='grandmaster', is_delete=False, is_active=True, is_admin=False, commentator_status__in=['active', 'pending'])
+            data_list['grandmaster_count'] = len(grandmaster)
 
 
             COMMENTATOR_PRIORITIES = {
@@ -2698,8 +2698,9 @@ class EditorManagement(APIView):
             active_editor = len(commentator)
             data_list['active_editor'] = active_editor
 
-            pending_editor = User.objects.filter(user_role='commentator', commentator_status='pending').count()
-            data_list['pending_editor'] = pending_editor
+            pending_editor = User.objects.filter(user_role='commentator', commentator_status='pending')
+            print('pending_editor: ', [i.id for i in pending_editor])
+            data_list['pending_editor'] = pending_editor.count()
 
             deactivate_editor = User.objects.filter(user_role='commentator', commentator_status='deactive').count()
             data_list['deactivate_editor'] = deactivate_editor
@@ -4510,22 +4511,7 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-def update_commentator_level(user, win_count, success_rate):
-    level_rules = {
-        'apprentice': 'journeyman',
-        'journeyman': 'master',
-        'master': 'grandmaster'
-    }
-
-    current_level = user.commentator_level
-
-    if current_level in level_rules:
-        level_obj = CommentatorLevelRule.objects.filter(commentator_level=current_level).first()
-        if level_obj and win_count >= level_obj.winning_limit and success_rate >= int(level_obj.success_rate):
-            new_level = level_rules[current_level]
-            user.commentator_level = new_level
-            user.save(update_fields=['commentator_level', 'updated'])
-
+        
 def Statistics(user_obj=None, user_id=None):
     try:
         user = User.objects.get(id=user_id) if not user_obj else user_obj
@@ -5469,7 +5455,6 @@ class BankDetailsView(APIView):
 
                     my_subcriptions = Subscription.objects.filter(standard_user=user)
                     for obj in my_subcriptions:
-                        print('obj: ', obj.duration, obj.money)
 
                         formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
                         details = {
@@ -5623,6 +5608,11 @@ class BankDetailsView(APIView):
                                                 status=False,
                                                 context=f'Your withdrawal request has been declined by Motiwy.',
                                             )
+                            if action == 'approve':
+                                query.total_balance -= query.withdrawable_balance
+                                query.pending_balance -= query.withdrawable_balance
+                                query.save(update_fields=['total_balance', 'pending_balance', 'updated'])
+
                         return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
                         return Response({'error' : 'Bank details doen not exist'}, status=status.HTTP_404_NOT_FOUND) 
