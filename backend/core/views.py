@@ -5536,6 +5536,15 @@ class BankDetailsView(APIView):
                 notifications = Notification.objects.filter(subject='Purchase Transactions').order_by('-created')
                 notifications_serializer = NotificationSerializer(notifications, many=True).data
 
+                today = date.today()
+                
+                total_approved_amount_today = Withdrawable.objects.filter(
+                    status='approve',
+                    updated__date=today
+                ).aggregate(total_approved=Sum('amount'))
+               
+                total_payment = total_approved_amount_today['total_approved'] or 0.0
+
                 data.update({
                     'bank_details': bank_details_serializer,
                     'pending': new_request.count(),
@@ -5543,6 +5552,7 @@ class BankDetailsView(APIView):
                     'new': new_request.count(),
                     'lastmonth': round(lastmonth, 2),
                     'notifications': notifications_serializer,
+                    'total_payment': total_payment,
                 })
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
