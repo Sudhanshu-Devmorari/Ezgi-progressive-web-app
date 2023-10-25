@@ -35,7 +35,7 @@ const CommentsManagementPage = (props) => {
         }
         setData(res.data);
         setMostLike(res?.data?.most_like);
-        if (props.commentData === true) {
+        if (props.commentData === true || res?.data?.new_comment?.length > 0) {
           setCommentData(res.data.new_comment);
         } else {
           setCommentData(res.data.all_comment);
