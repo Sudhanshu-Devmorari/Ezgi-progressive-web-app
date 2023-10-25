@@ -412,8 +412,7 @@ const Home = (props) => {
       validUsername == null &&
       validPhone == null &&
       validPassword == null &&
-      validGender == null  && selectedGender !== "Select" &&
-      validAge == null && selectedAge !== "Select"
+      validGender == null
     ) {
       // console.log("::::::::", addUser);
       const formData = new FormData();
