@@ -65,6 +65,7 @@ const SubscribeModal = (props) => {
           amount: money,
           id: commentatorUser?.id,
           commentator_username: commentatorUser?.username,
+          user_id: userId,
         });
         // console.log(payment_res, "==========payment_res");
 
@@ -255,12 +256,18 @@ const SubscribeModal = (props) => {
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
-          if (category === "membership renew") {
+          const ID = result?.PRODUCTS[0]?.PRODUCT_ID;
+          if (category === "membership renew" && ID == userId) {
             // console.log("IN membership re new: ");
             const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
             const startdate = result?.PAYMENT_DATE;
             handleRenewMambership(monthly_amount, startdate);
           }
+          // const url = new URL(window.location.href);
+          // const refExists = url.searchParams.has("ref");
+          // if (refExists) {
+          //   window.location.replace(window.location.origin + "/");
+          // }
         }
       } catch (error) {
         console.log(error);
@@ -280,18 +287,18 @@ const SubscribeModal = (props) => {
           start_date: startdate,
         }
       );
-      console.log("RenewMembership", RenewMembership);
+      // console.log("RenewMembership", RenewMembership);
       if (RenewMembership.status == 200) {
         window.history.pushState(null, null, window.location.origin + "/");
         window.addEventListener("popstate", () => {
           window.history.pushState(null, null, window.location.origin + "/");
         });
         // return () => {
-          // Remove event listener when component unmounts
-          window.removeEventListener("popstate", () => {
-            window.history.pushState(null, null, window.location.origin + "/");
-            window.location.replace(window.location.origin + "/");
-          });
+        // Remove event listener when component unmounts
+        window.removeEventListener("popstate", () => {
+          window.history.pushState(null, null, window.location.origin + "/");
+          window.location.replace(window.location.origin + "/");
+        });
         // };
         // console.log("window.history.length", window.history.length);
         // console.log("\n\nwindow.history\n", window.history);
@@ -739,6 +746,7 @@ export const subcriptionEntry = async (
     //   console.log(error);
     // }
   } catch (error) {
+    window.location.replace(window.location.origin + "/");
     console.log(error);
   }
 };

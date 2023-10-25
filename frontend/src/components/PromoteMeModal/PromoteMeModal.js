@@ -168,12 +168,18 @@ const PromoteMeModal = (props) => {
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
-          if (category === "highlight") {
+          const ID = result?.PRODUCTS[0]?.PRODUCT_ID
+          if (category === "highlight" && ID == userId) {
             const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
             const amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
             promoteMeEntry(amount, duration);
           }
         }
+        // const url = new URL(window.location.href);
+        //   const refExists = url.searchParams.has("ref");
+        //   if (refExists) {
+        //     window.location.replace(window.location.origin + "/");
+        //   }
       } catch (error) {
         console.log(error);
       }

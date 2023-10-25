@@ -402,7 +402,7 @@ const ContentSection = ({
                     >
                       {userId != data?.value?.commentator_user?.id ? (
                         <>
-                        <div style={{display:"flex", gap:"0.8rem"}}>
+                        <div style={{display:"flex", gap:"0.8rem", alignItems:"center"}}>
                         {data?.value?.is_highlight && <img src={currentTheme === "dark" ? darkIcon : lightIcon} alt="darkIcon" style={{height:"20px", width:"20px"}}/>}
                         <button
                           onClick={() => {

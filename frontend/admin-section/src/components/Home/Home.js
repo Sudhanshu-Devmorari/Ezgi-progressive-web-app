@@ -301,8 +301,8 @@ const Home = (props) => {
       validUsername == null &&
       validPhone == null &&
       validPassword == null &&
-      validGender == null &&
-      validAge == null
+      validGender == null && selectedGender !== "Select" &&
+      validAge == null && selectedAge !== "Select" 
     ) {
       const formData = new FormData();
       selectedImage != false && formData.append("file", selectedImage);
@@ -412,8 +412,8 @@ const Home = (props) => {
       validUsername == null &&
       validPhone == null &&
       validPassword == null &&
-      validGender == null &&
-      validAge == null
+      validGender == null  && selectedGender !== "Select" &&
+      validAge == null && selectedAge !== "Select"
     ) {
       // console.log("::::::::", addUser);
       const formData = new FormData();

@@ -34,6 +34,7 @@ const MainPage = () => {
   const [selectContent, setSelectContent] = useState(
     localStorage.getItem("currentpage") || "home"
   );
+  const userId = localStorage.getItem("user-id");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
   const [dashboardSUser, setDashboardSUser] = useState(
@@ -75,6 +76,7 @@ const MainPage = () => {
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
           // console.log("payment succesffull", result);
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
+          const ID = result?.PRODUCTS[1]?.PRODUCT_ID
 
           // window.location.reload()
           // const reloadCount = sessionStorage.getItem("reloadCount");
@@ -84,7 +86,7 @@ const MainPage = () => {
           // } else {
           //   sessionStorage.removeItem("reloadCount");
           // }
-          if (category === "subscription") {
+          if (category === "subscription" && ID == userId) {
             const commentator_user_id = result?.PRODUCTS[0]?.PRODUCT_ID;
             const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
             const amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
@@ -98,6 +100,11 @@ const MainPage = () => {
               commentator_username
             );
           }
+          // const url = new URL(window.location.href);
+          // const refExists = url.searchParams.has("ref");
+          // if (refExists) {
+          //   window.location.replace(window.location.origin + "/");
+          // }
         }
       } catch (error) {
         console.log(error);

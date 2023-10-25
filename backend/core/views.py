@@ -653,10 +653,11 @@ class SubscriptionView(APIView):
         try:
             user = User.objects.get(id=id)
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
-
+            # if Subscription.objects.filter(commentator_user=commentator, standard_user=user, duration=duration, subscription=True, start_date=start_date, end_date=end_date, status='active', money=money).exists():
+            #     return Response({'data': 'You already subscribe to this user.'}, status=status.HTTP_400_BAD_REQUEST)
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
-                return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_200_OK)
+                return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_400_BAD_REQUEST)
             
             duration = request.data.get('duration')
             start_date = datetime.now()
@@ -6019,6 +6020,7 @@ class PaymentView(APIView):
         print('ref_no: ', ref_no)
 
         id = request.data.get('id', None)
+        user_id = request.data.get('user_id', None)
         duration = request.data.get('duration', None)
         money = str(int(round(float(request.data.get('amount', None)))))
         commentator_username = request.data.get('commentator_username', None)
@@ -6120,7 +6122,53 @@ class PaymentView(APIView):
                 return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
             else:
                 return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        elif request.data.get('payment') == 'subscription':
+            data = {
+            "Config": {
+                "MERCHANT": os.environ.get('MERCHANT'),
+                "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
+                "ORDER_REF_NUMBER": ref_no,
+                "ORDER_AMOUNT": money,
+                "PRICES_CURRENCY": "TRY",
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+            },
+            "Customer": {
+                "FIRST_NAME": "Firstname",
+                "LAST_NAME": "Lastname",
+                "MAIL": "destek@esnekpos.com",
+                "PHONE": "05435434343",
+                "CITY": "İstanbul",
+                "STATE": "Kağıthane",
+                "ADDRESS": "Merkez Mahallesi, Ayazma Cd. No:37/91 Papirus Plaza Kat:5, 34406 Kağıthane / İSTANBUL"
+            },
+            "Product": [
+                {
+                    "PRODUCT_ID": id,
+                    "PRODUCT_NAME": duration if duration != None else 'Ürün Adı 1',
+                    "PRODUCT_CATEGORY": request.data['payment'],
+                    "PRODUCT_DESCRIPTION": commentator_username if commentator_username != None  else "Ürün Açıklaması",
+                    "PRODUCT_AMOUNT": money
+                },
+                {
+                    "PRODUCT_ID" : user_id,
+                    "PRODUCT_NAME" : experience,
+                    "PRODUCT_CATEGORY" : category,
+                    "PRODUCT_DESCRIPTION" : "Ürün Açıklaması",
+                    "PRODUCT_AMOUNT" : money,
+                }
+            ]
+        }
+
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            response = requests.post(url, json=data)
+            json_data = response.json()
+            if json_data['RETURN_CODE'] == '0':
+                return Response({"data": "Payment request successful", "URL_3DS": json_data['URL_3DS']}, status=status.HTTP_200_OK)
+            else:
+                return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
+
         else:
             data = {
             "Config": {

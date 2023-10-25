@@ -222,7 +222,6 @@ const FavEditor = (props) => {
                         >
                           {res?.data?.commentator_user?.commentator_level}
                         </button>
-                        {console.log("res?.data", res)}
                         {res?.is_highlight && (
                     <img
                       src={currentTheme === "dark" ? darkIcon : lightIcon}

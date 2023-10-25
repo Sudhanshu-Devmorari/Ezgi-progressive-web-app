@@ -418,7 +418,7 @@ const AddCommentModal = (props) => {
       selectedMatchDetails !== "Select" &&
       selectedPredictionType !== "Select" &&
       selectedPrediction !== "Select" &&
-      ((commentText.length > 100) & (commentText.length < 250) ||
+      ((commentText.length > 100) && (commentText.length < 250) ||
         commentText !== "")
     ) {
       setIsLoading(true);

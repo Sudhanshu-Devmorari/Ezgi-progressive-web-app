@@ -260,7 +260,8 @@ const BecomeAEditorModal = (props) => {
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
           // console.log("payment succesffull");
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
-          if (category === "membership") {
+          const ID = result?.PRODUCTS[0]?.PRODUCT_ID
+          if (category === "membership" && ID == userId) {
             const category = result?.PRODUCTS[1]?.PRODUCT_CATEGORY
             const experience = result?.PRODUCTS[1]?.PRODUCT_NAME
             const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT
@@ -268,6 +269,11 @@ const BecomeAEditorModal = (props) => {
             const startdate = result?.PAYMENT_DATE
             handleMambership(category, experience, monthly_amount, duration, startdate);
           }
+          // const url = new URL(window.location.href);
+          // const refExists = url.searchParams.has("ref");
+          // if (refExists) {
+          //   window.location.replace(window.location.origin + "/");
+          // }
         }
       } catch (error) {
         console.log(error); 
