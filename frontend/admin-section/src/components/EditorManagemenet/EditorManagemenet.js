@@ -441,7 +441,7 @@ const EditorManagemenet = (props) => {
       setValidExp(null);
     }
 
-    if (addUser.city == "" || addUser.city == "Select" || selectedCity== "Select") {
+    if (addUser.city == "" || addUser.city == "Select") {
       setValidCity("Please select City.");
     } else {
       setValidCity(null);
