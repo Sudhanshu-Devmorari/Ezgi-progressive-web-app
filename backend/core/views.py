@@ -5186,7 +5186,9 @@ class RetrievePageData():
     def get_ads(self):
         """ Return advertisment data """
         try:
-            ads = Advertisement.objects.all()
+            # ads = Advertisement.objects.all()
+            today_date = timezone.now()
+            ads = Advertisement.objects.filter(end_date__gte=today_date)
             serializer = AdvertisementSerializer(ads, many=True)
             data = serializer.data
             return data
@@ -5248,7 +5250,8 @@ class RetrievePageData():
             
             # Get all highlight user
             highligt_user_list = self.get_highlight_user()
-            highlight_users = User.objects.filter(~Q(id=user_id), id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
+            highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
+            # highlight_users = User.objects.filter(~Q(id=user_id), id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
             highlight_users_ids = highlight_users.values_list('id', flat=True)
 
             # Get data
@@ -6075,8 +6078,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",

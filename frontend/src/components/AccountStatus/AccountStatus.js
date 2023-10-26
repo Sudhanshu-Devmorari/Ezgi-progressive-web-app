@@ -21,7 +21,8 @@ import moment from "moment";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 
 const AccountStatus = (props) => {
-  const userId = localStorage.getItem("user-id");
+  const { commentator_level } = props;
+  // const userId = localStorage.getItem("user-id");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [verifyShow, setVerifyShow] = React.useState(false);
@@ -109,6 +110,7 @@ const AccountStatus = (props) => {
     }
   }
 
+  console.log(membershipData, "=======membershipData");
   const [expertLoading, setExpertLoading] = useState(false);
   const [expertData, setExpertData] = useState([]);
   useEffect(() => {
@@ -164,6 +166,7 @@ const AccountStatus = (props) => {
   const [renewLoading, setRenewLoading] = useState(false);
   const [commentatorUser, setCommentatorUser] = useState([]);
   const getUserdata = async () => {
+    console.log("----------------inside");
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
@@ -185,15 +188,13 @@ const AccountStatus = (props) => {
   const [daysLeft, setDaysLeft] = useState({});
   const [membershipEndDate, setMembershipEndDate] = useState("");
   const [totalDaysRemaining, setTotalDaysRemaining] = useState("");
-  
+
   useEffect(() => {
     const calculateDaysLeft = () => {
-
-      const tDate = moment(membershipData?.start_date, 'YYYY-MM-DDTHH:mm:ssZ');
-      const targetDate = tDate.format('YYYY-MM-DD')
+      const tDate = moment(membershipData?.start_date, "YYYY-MM-DDTHH:mm:ssZ");
+      const targetDate = tDate.format("YYYY-MM-DD");
 
       const countNumber = membershipData?.duration?.split(" ");
-
 
       if (!countNumber || countNumber.length !== 2) {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
@@ -202,7 +203,6 @@ const AccountStatus = (props) => {
       const interval = countNumber[1].toLowerCase(); // e.g., "months"
 
       const duration = parseInt(countNumber[0], 10);
-
 
       if (isNaN(duration) || !interval) {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
@@ -218,14 +218,16 @@ const AccountStatus = (props) => {
       finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
 
       // const finalEndDate = nextIntervalDate.format("YYYY-MM-DD");
-      const finalEndDate = moment(membershipData?.end_date, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD');
+      const finalEndDate = moment(
+        membershipData?.end_date,
+        "YYYY-MM-DDTHH:mm:ssZ"
+      ).format("YYYY-MM-DD");
       setMembershipEndDate(finalEndDate);
-      
+
       if (currentDate.isAfter(nextIntervalDate) && finaldaysRemaining == 0) {
         // console.log("Interval is already over");
         return { daysRemaining: 0, showRenewButton: true }; // Interval is already over, show renew button
       }
-      
 
       // Calculate the end of the current month
       const endOfMonth = currentDate.clone().endOf("month");
@@ -248,14 +250,16 @@ const AccountStatus = (props) => {
   const [renewModelData, setRenewModelData] = useState({});
   const handleRenew = async () => {
     try {
-      const res = await axios.get(`${config.apiUrl}/renew-model-data/${userId}/`);
+      const res = await axios.get(
+        `${config.apiUrl}/renew-model-data/${userId}/`
+      );
       if (res.status === 200) {
-        setRenewModelData(res.data)
+        setRenewModelData(res.data);
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <>
@@ -515,9 +519,8 @@ const AccountStatus = (props) => {
                   const ear_var = 0;
                   setEarnings(ear_var);
                   setSelectSubRangeData("master");
-                  selectSubRangeData !== "master" &&
-                    getEarnings(0, "master");
-                    // getEarnings(values, "master");
+                  selectSubRangeData !== "master" && getEarnings(0, "master");
+                  // getEarnings(values, "master");
                 }}
                 style={{
                   color:
@@ -541,7 +544,7 @@ const AccountStatus = (props) => {
                   setSelectSubRangeData("grandmaster");
                   selectSubRangeData !== "grandmaster" &&
                     getEarnings(0, "grandmaster");
-                    // getEarnings(values, "grandmaster");
+                  // getEarnings(values, "grandmaster");
                 }}
                 style={{
                   color:
@@ -696,7 +699,11 @@ const AccountStatus = (props) => {
                 {/* {commentatorUser?.commentator_level !== "apprentice" ? ( */}
                 <>
                   <div className="my-2 ms-2 d-flex flex-column">
-                    Membership Date : {moment(membershipData?.start_date, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYY-MM-DD')}
+                    Membership Date :{" "}
+                    {moment(
+                      membershipData?.start_date,
+                      "YYYY-MM-DDTHH:mm:ssZ"
+                    ).format("YYYY-MM-DD")}
                     <span>
                       {" "}
                       Active Plan :{" "}
@@ -707,7 +714,7 @@ const AccountStatus = (props) => {
                             currentTheme !== "dark" ? "#007BF6" : "#4dd5ff",
                         }}
                       >
-                        {membershipData?.commentator_level}
+                        {commentator_level && commentator_level}
                       </span>
                     </span>
                     {membershipData?.money && (
@@ -720,7 +727,7 @@ const AccountStatus = (props) => {
                     )}
                   </div>
                   <div className="d-flex justify-content-end m-2">
-                  {/* {console.log("daysLeft", daysLeft)} */}
+                    {/* {console.log("daysLeft", daysLeft)} */}
                     {daysLeft?.showRenewButton == true ? (
                       <button
                         onClick={() => {
@@ -732,7 +739,7 @@ const AccountStatus = (props) => {
                             return;
                           }
                           setModalShow(true);
-                          handleRenew()
+                          handleRenew();
                         }}
                         className="px-3"
                         style={{

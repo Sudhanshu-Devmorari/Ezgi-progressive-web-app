@@ -38,7 +38,7 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
       >
         <Link
           target="_blank"
-          to={data?.link}
+          to={data?.link ? data?.link : ""}
           onClick={() => {
             handleLinkClick(data?.id);
           }}
@@ -49,7 +49,7 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
             style={{ width: "100%", height: "100%" }}
             src={`${server_url + data?.picture}`}
             // src={resize}
-            alt=""
+            alt="Motiwy"
           />
         </Link>
       </div>

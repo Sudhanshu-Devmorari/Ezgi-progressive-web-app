@@ -38,6 +38,7 @@ const SignInModal = (props) => {
     onSubmit: async (values) => {
       setBtnLoading(true);
       try {
+        // const res = await axios.post(`http://89.252.185.145:8001/login/`, {
         const res = await axios.post(`${config.apiUrl}/login/`, {
           password: values.password,
           phone: values.phone,
