@@ -10,6 +10,7 @@ import "./Top10.css";
 import config from "../../config";
 
 const Top10 = (props) => {
+  const server_url = `${config?.apiUrl}`;
   const [data, setData] = useState([]);
   useEffect(() => {
     setData(props.userData == undefined ? [] : props.userData);
@@ -26,6 +27,7 @@ const Top10 = (props) => {
                 onClick={() => {props.setupdateProfile(2)
                   props.setAddUser(data[0]?.editor_data)
                   props.setPartialData(data[0])
+                  props.setPreveiwProfilePic(data[0]?.editor_data?.profile_pic !== null ? server_url + data[0]?.editor_data?.profile_pic : null)
                 }}
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
@@ -42,6 +44,8 @@ const Top10 = (props) => {
                 onClick={() => {props.setupdateProfile(2)
                   props.setAddUser(data[2]?.editor_data)
                   props.setPartialData(data[2])
+                  props.setPreveiwProfilePic(data[2]?.editor_data?.profile_pic !== null ? server_url + data[2]?.editor_data?.profile_pic : null)
+
                 }}
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
@@ -58,6 +62,7 @@ const Top10 = (props) => {
                 onClick={() => {props.setupdateProfile(2)
                   props.setAddUser(data[1]?.editor_data)
                   props.setPartialData(data[1])
+                  props.setPreveiwProfilePic(data[1]?.editor_data?.profile_pic !== null ? server_url + data[1]?.editor_data?.profile_pic : null)
                 }}
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
@@ -87,6 +92,7 @@ const Top10 = (props) => {
                     onClick={() => {props.setupdateProfile(2)
                       props.setAddUser(res?.editor_data)
                   props.setPartialData(res)
+                  props.setPreveiwProfilePic(res?.editor_data?.profile_pic !== null ? server_url + res?.editor_data?.profile_pic : null)
                     }}
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"

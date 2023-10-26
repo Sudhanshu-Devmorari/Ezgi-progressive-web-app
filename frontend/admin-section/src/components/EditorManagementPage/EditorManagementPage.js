@@ -24,6 +24,7 @@ const EditorManagementPage = (props) => {
 
   const [addUser, setAddUser] = useState({});
   const [partialData, setPartialData] = useState([]);
+  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
 
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [deactivationonRequests, setDeactivationonRequests] = useState([]);
@@ -125,6 +126,8 @@ const EditorManagementPage = (props) => {
                     addUser={addUser}
                     setPartialData={setPartialData}
                     partialData={partialData}
+                    setPreveiwProfilePic={setPreveiwProfilePic}
+                    preveiwProfilePic={preveiwProfilePic}
                   />
                 </div>
               </div>
@@ -139,6 +142,8 @@ const EditorManagementPage = (props) => {
                   addUser={addUser}
                   setPartialData={setPartialData}
                   partialData={partialData}
+                  setPreveiwProfilePic={setPreveiwProfilePic}
+                  preveiwProfilePic={preveiwProfilePic}
                 />
                 <EditorAccountStatus
                   active_editor={data.active_editor}

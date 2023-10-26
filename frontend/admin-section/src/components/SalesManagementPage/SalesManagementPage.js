@@ -125,16 +125,19 @@ const SalesManagementPage = (props) => {
                       border:
                         // (res.planD === "Subscription" && "1px solid #58DEAA") ||
                         // (res.planD === "Expert" && "1px solid #FF9100") ||
-                        (data?.user?.commentator_level === "apprentice" ? "1px solid #4DD5FF" : "1px solid #FF9100"), 
+                        // (data?.user?.commentator_level === "apprentice" ? "1px solid #4DD5FF" : "1px solid #FF9100"), 
+                        (data?.commentator_level === "apprentice" ? "1px solid #4DD5FF" : "1px solid #FF9100"), 
                         // (res.planD === "Highlight" && "1px solid #D2DB08"),
                       color:
                         // (res.planD === "Subscription" && "#58DEAA") ||
                         // (res.planD === "Expert" && "#FF9100") ||
-                        (data?.user?.commentator_level === "apprentice" ? "#4DD5FF" : "#FF9100") 
+                        // (data?.user?.commentator_level === "apprentice" ? "#4DD5FF" : "#FF9100") 
+                        (data?.commentator_level === "apprentice" ? "#4DD5FF" : "#FF9100") 
                         // (res.planD === "Highlight" && "#D2DB08"),
                     }}
                   >
-                    {data?.user?.commentator_level}
+                    {/* {data?.user?.commentator_level} */}
+                    {data?.commentator_level}
                   </button>
                 </div>
               </div>

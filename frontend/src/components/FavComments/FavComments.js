@@ -578,13 +578,15 @@ const FavComments = (props) => {
                             : res?.is_prediction == false
                             ? "#FF5757"
                             : "#00659D"
-                          : props.SelectComment === "resolvedComments"
-                          ? "#00DE51"
-                          : "#00659D",
+                          // : props.SelectComment === "resolvedComments"
+                          // ? "#00DE51"
+                          // : "#00659D",
+                          :"#00659D",
                         color:
-                          props.SelectComment === "resolvedComments"
-                            ? "#0D2A53"
-                            : "#FFFFFF",
+                          // props.SelectComment === "resolvedComments"
+                          //   ? "#0D2A53"
+                          //   : "#FFFFFF",
+                          "#FFFFFF",
                         fontSize: "12px",
                       }}
                     >

@@ -144,8 +144,8 @@ const BecomeAEditorModal = (props) => {
           if (payment_res.status === 200) {
             const url = payment_res?.data?.URL_3DS;
             // console.log("URL: ", url)
-            window.location.replace(url);
-            // window.location.href = url;
+            // window.location.replace(url);
+            window.location.href = url;
             // window.location.reload()
           }
         }

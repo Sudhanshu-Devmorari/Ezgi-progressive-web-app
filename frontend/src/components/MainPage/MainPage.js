@@ -531,6 +531,18 @@ const MainPage = () => {
     });
   }, []);
 
+  // window.addEventListener("popstate", (e) => {
+  //   console.log("window.history.length", window.history.length)
+  //   if(window.history.length === 2){
+  //   console.log("IFFFFFFFFFFFFF")
+  //     window.location.replace("/")
+  //   }else{
+  //   console.log("ELSEEEEEEEEEEE")
+  //     window.history.go(1);
+  //     // window.location.replace("/")
+  //   }
+  // });
+  
   // const sortMergeList = () => {
   //   console.log("mergedResult", mergedResult)
   //   const sortedList = mergedResult.slice(); 

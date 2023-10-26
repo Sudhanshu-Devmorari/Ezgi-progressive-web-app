@@ -110,7 +110,7 @@ const AccountStatus = (props) => {
     }
   }
 
-  console.log(membershipData, "=======membershipData");
+  // console.log(membershipData, "=======membershipData");
   const [expertLoading, setExpertLoading] = useState(false);
   const [expertData, setExpertData] = useState([]);
   useEffect(() => {
@@ -132,6 +132,7 @@ const AccountStatus = (props) => {
   const fetchSubscriptionData = async () => {
     setSubLoading(true);
     try {
+      console.log("selectSub", selectSub)
       const res = await axios.get(
         `${
           config?.apiUrl
@@ -166,7 +167,7 @@ const AccountStatus = (props) => {
   const [renewLoading, setRenewLoading] = useState(false);
   const [commentatorUser, setCommentatorUser] = useState([]);
   const getUserdata = async () => {
-    console.log("----------------inside");
+    // console.log("----------------inside");
     try {
       setRenewLoading(true);
       const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
@@ -329,7 +330,7 @@ const AccountStatus = (props) => {
                   className="cursor text-center"
                   onClick={() => {
                     setSelectSub("journeyman");
-                    setValues(0);
+                    setValues([0]);
                   }}
                   style={{
                     color:

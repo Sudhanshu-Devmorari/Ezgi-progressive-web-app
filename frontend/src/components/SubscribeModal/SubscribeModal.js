@@ -71,7 +71,8 @@ const SubscribeModal = (props) => {
 
         if (payment_res.status === 200) {
           const url = payment_res?.data?.URL_3DS;
-          window.location.replace(url);
+          // window.location.replace(url);
+          window.location.href = url;
         }
       } catch (error) {
         console.log(error);
@@ -211,7 +212,8 @@ const SubscribeModal = (props) => {
         if (payment_res.status === 200) {
           const url = payment_res?.data?.URL_3DS;
           // console.log("URL: ", url)
-          window.location.replace(url);
+          // window.location.replace(url);
+          window.location.href = url;
         }
         // }
       } catch (error) {

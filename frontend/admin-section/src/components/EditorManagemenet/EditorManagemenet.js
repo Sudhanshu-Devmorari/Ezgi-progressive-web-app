@@ -34,6 +34,10 @@ const EditorManagemenet = (props) => {
   const setAddUser = props?.setAddUser && props?.setAddUser
   
   // console.log(addUser.country);
+  // const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  const preveiwProfilePic = props?.preveiwProfilePic && props?.preveiwProfilePic
+  const setPreveiwProfilePic = props?.setPreveiwProfilePic && props?.setPreveiwProfilePic
+
   // const [partialData, setPartialData] = useState([]);
   const partialData = props?.partialData && props?.partialData
   const setPartialData = props?.setPartialData && props?.setPartialData
@@ -233,7 +237,7 @@ const EditorManagemenet = (props) => {
   }, [props.users, props?.deactiveRqst]);
 
   const [displaySelectedImg, setdisplaySelectedImg] = useState(false);
-  const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  // const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
   const [selectedImage, setSelectedImage] = useState(false);
 
   const [kategoriDropdown, setKategoriDropdown] = useState(false);
@@ -293,7 +297,7 @@ const EditorManagemenet = (props) => {
     }
 
     if (selectedCity == "Select") {
-      setValidCity("Please select age.");
+      setValidCity("Please select city.");
     } else {
       setValidCity(null);
     }
@@ -437,7 +441,7 @@ const EditorManagemenet = (props) => {
       setValidExp(null);
     }
 
-    if (addUser.city == "" || addUser.city == "Select") {
+    if (addUser.city == "" || addUser.city == "Select" || selectedCity== "Select") {
       setValidCity("Please select City.");
     } else {
       setValidCity(null);
@@ -1052,6 +1056,7 @@ const EditorManagemenet = (props) => {
                     props.setupdateProfile(2);
                     setPartialData(res);
                     setAddUser(res.editor_data);
+                    setPreveiwProfilePic( res?.editor_data?.profile_pic !== null ? server_url + res?.editor_data?.profile_pic : null)
                   }}
                   className="px-2 py-1 mb-2 row-fonts cursor"
                   style={{ backgroundColor: "#0B2447", fontSize: "1rem" }}
@@ -1201,7 +1206,7 @@ const EditorManagemenet = (props) => {
                   <div
                     className="my-1 cursor"
                     style={{
-                      backgroundColor: "#E6E6E6",
+                      backgroundColor: preveiwProfilePic ? "transparent" : "#E6E6E6",
                       borderRadius: "50%",
                       height: "8rem",
                       width: "8rem",
@@ -1209,11 +1214,13 @@ const EditorManagemenet = (props) => {
                   >
                     <img
                       style={{
-                        position: "absolute",
-                        top: "2.34rem",
-                        left: "2.4rem",
+                       width:"100%",
+                       height:"100%",
+                       borderRadius: "50%",
+                       padding:!preveiwProfilePic ? "20px" : null,
                       }}
-                      src={camera}
+                      src={preveiwProfilePic ? preveiwProfilePic : camera}
+                      // src={camera}
                       alt=""
                     />
                   </div>
@@ -1278,12 +1285,19 @@ const EditorManagemenet = (props) => {
                         </button>
                       </div>
                     )}
-                    <div className="d-flex justify-content-center">
+                    <div className="d-flex justify-content-center mb-2">
+                    <label
+                  htmlFor="camera"
+                  style={{
+                    display: displaySelectedImg ? "none" : "block",
+                  }}
+                >
                       <span
-                        className="py-1 mb-2 px-2"
+                        className="mb-2 px-2"
                         style={{
                           backgroundColor: "#0B2447",
                           borderRadius: "2px",
+                          padding:"5px"
                         }}
                       >
                         <img
@@ -1295,6 +1309,7 @@ const EditorManagemenet = (props) => {
                         />
                         <span className="ps-2">Upload</span>
                       </span>
+                      </label>
                     </div>
                     <input
                       type="date"
@@ -1326,7 +1341,7 @@ const EditorManagemenet = (props) => {
                 {props.updateProfile === 2 && (
                   <div className="col p-2 ps-3">
                     <div className="text-end" style={{ fontSize: "1.3rem" }}>
-                      Total Balance 12.500
+                      Total Balance {partialData?.total_transection}
                     </div>
                     <div
                       onClick={() => {
@@ -1874,6 +1889,7 @@ const EditorManagemenet = (props) => {
                                 membership_date: "",
                               });
                               clearError();
+                              setPreveiwProfilePic(null)
                             }}
                             className="px-3 py-1"
                             style={{
@@ -1907,6 +1923,7 @@ const EditorManagemenet = (props) => {
                                 about: "",
                                 membership_date: "",
                               });
+                              setPreveiwProfilePic(null)
                             }}
                             // data-bs-dismiss="modal"
                             className="px-3 py-1"
@@ -1927,6 +1944,7 @@ const EditorManagemenet = (props) => {
                                 partialData.editor_data?.id,
                                 addUser.id
                               );
+                              setPreveiwProfilePic(null)
                             }}
                             // data-bs-dismiss="modal"
                             className="px-3 py-1"
@@ -1942,7 +1960,10 @@ const EditorManagemenet = (props) => {
                         </>
                       ) : (
                         <button
-                          onClick={handleNewEditor}
+                          onClick={() => {
+                            handleNewEditor();
+                            setPreveiwProfilePic(null)
+                            }}
                           // data-bs-dismiss="modal"
                           className="px-3 py-1"
                           style={{
@@ -1983,6 +2004,7 @@ const EditorManagemenet = (props) => {
                     about: "",
                     membership_date: "",
                   });
+                  setPreveiwProfilePic(null)
                 }}
                 data-bs-dismiss="modal"
                 src={cross}

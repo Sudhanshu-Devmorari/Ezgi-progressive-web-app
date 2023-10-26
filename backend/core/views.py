@@ -2646,6 +2646,12 @@ class EditorManagement(APIView):
                 serializer = UserSerializer(obj)
                 detail['editor_data'] = serializer.data
 
+                if BankDetails.objects.filter(user = obj).exists():
+                    total_transection = BankDetails.objects.get(user = obj)
+                    detail['total_transection'] = total_transection.total_balance
+                else:
+                    detail['total_transection'] = 0.0
+
                 editor_list.append(detail)
 
             data_list['editor_list'] = editor_list
@@ -2703,6 +2709,12 @@ class EditorManagement(APIView):
 
                 serializer = UserSerializer(obj)
                 detail['editor_data'] = serializer.data
+
+                if BankDetails.objects.filter(user = obj).exists():
+                    total_transection = BankDetails.objects.get(user = obj)
+                    detail['total_transection'] = total_transection.total_balance
+                else:
+                    detail['total_transection'] = 0.0
 
                 top_ten_commentators_list.append(detail)
 
@@ -2876,6 +2888,9 @@ class EditorManagement(APIView):
         data['gender'] = request.data.get('gender')
         data['age'] = request.data.get('age')
         data['membership_date'] = request.data.get('membership_date')
+
+        if request.FILES.get('profile_pic') != None:
+            data['profile_pic'] = request.FILES.get('profile_pic')
 
         if User.objects.filter(id=data['editor_id']).exists():
             user_obj = User.objects.get(id=data['editor_id'])
@@ -6180,8 +6195,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
