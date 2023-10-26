@@ -262,6 +262,26 @@ const AccountStatus = (props) => {
     }
   };
 
+  // ----------------------
+  const [statusData, setStatusData] = useState({
+    status: "",
+    left_winning: "",
+  });
+  useEffect(() => {
+    async function getAccountstatus() {
+      try {
+        const res = await axios.get(
+          `${config.apiUrl}/account-status/${userId}`
+        );
+        setStatusData({
+          status: res?.data?.data?.commentator_status,
+          left_winning: res?.data?.data?.comments_left,
+        });
+      } catch (error) {}
+    }
+    getAccountstatus();
+  }, []);
+
   return (
     <>
       <div
@@ -286,7 +306,7 @@ const AccountStatus = (props) => {
                 <CircularProgressbarWithChildren
                   circleRatio={0.75}
                   value={45}
-                  text={`%${45}`}
+                  text={`%${statusData.left_winning || 0}`}
                   strokeWidth={6}
                   styles={buildStyles({
                     strokeLinecap: "butt",
@@ -312,7 +332,17 @@ const AccountStatus = (props) => {
                 style={{ fontSize: "13px" }}
               >
                 <span>Hesap Durumu</span>
-                <span style={{ color: "#37FF80" }}>Aktif</span>
+                <span
+                  className="text-capitalize"
+                  style={{
+                    color:
+                      statusData.status === "active"
+                        ? "#37FF80"
+                        : "rgb(255, 87, 87)",
+                  }}
+                >
+                  {statusData.status || "Aktif"}
+                </span>
               </div>
             </div>
           </div>

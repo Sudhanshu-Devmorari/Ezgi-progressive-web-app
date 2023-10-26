@@ -19,7 +19,7 @@ const EditorsPage = ({
   verifyid,
   highlights,
   handleOnlyPublicData,
-  setDashboardSUser
+  setDashboardSUser,
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +33,17 @@ const EditorsPage = ({
 
     HandleCommentator();
   }, []);
+
+  function getUnique(arr, index) {
+    const staticData = arr
+      .map((e) => e[index].user.id)
+      .map((e, i, final) => final.indexOf(e) === i && i)
+      .filter((e) => arr[e])
+      .map((e) => arr[e]);
+
+    setMergedEditorResult(staticData);
+    setFilterData(staticData);
+  }
 
   const HandleCommentator = async () => {
     try {
@@ -61,8 +72,7 @@ const EditorsPage = ({
         ];
       }
 
-      setMergedEditorResult(merged);
-      setFilterData(merged);
+      getUnique(merged, "value");
     }
   };
 

@@ -4543,6 +4543,16 @@ class OtpSend(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+def create_notification(sender, receiver, context):
+    return Notification.objects.create(
+        sender=sender,
+        receiver=receiver, 
+        subject='Level Upgrade',
+        date=datetime.now().date(), 
+        status=False,
+        context=context,
+    )
         
 def Statistics(user_obj=None, user_id=None):
     try:
@@ -4594,14 +4604,106 @@ def Statistics(user_obj=None, user_id=None):
             level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
             if win_count >= level_obj.winning_limit and Success_rate >= int(level_obj.sucess_rate):
 
+                admin_user = User.objects.get(is_admin=True)
+
                 if user.commentator_level == 'apprentice':
                     user.commentator_level = "journeyman"
+                    create_notification(admin_user, user, "Congratulations! You've reached the Journeyman level! You can now turn your followers into subscribers and generate earnings!")
+
+                    # Send notification to followers
+                    followers = FollowCommentator.objects.filter(commentator_user=user)
+                    notification = []
+                    for follower in followers:
+                        obj = Notification(
+                            sender=admin_user,
+                            receiver=follower.standard_user, 
+                            subject='Level Upgrade',
+                            date=datetime.now().date(), 
+                            status=False,
+                            context=f"The editor you're following, named {user.name}, has advanced to the Journyeman level! Stay tuned",
+                        )
+                        notification.append(obj)
+                    Notification.objects.bulk_create(notification)
 
                 elif user.commentator_level == 'journeyman':
                     user.commentator_level = "master"
+                    
+                    create_notification(admin_user, user, "Congratulations! You've reached the Master level! The rewards for your achievements will be even greater!")
+
+                    # Send notification to followers who are not subscribers
+                    followers = FollowCommentator.objects.filter(commentator_user=user)
+                    subscribers = Subscription.objects.filter(commentator_user=user)
+                    subscriber_ids = subscribers.values_list('standard_user__id', flat=True)
+                    follower_notification = []
+
+                    for follower in followers:
+                        if follower.standard_user.id not in subscriber_ids:
+                            obj = Notification(
+                                sender=admin_user,
+                                receiver=follower.standard_user, 
+                                subject='Level Upgrade',
+                                date=datetime.now().date(), 
+                                status=False,
+                                context=f"The editor you're following, named {user.name}, has advanced to the Master level! Stay tuned",
+                            )
+                            follower_notification.append(obj)
+
+                    Notification.objects.bulk_create(follower_notification)
+
+                    # Send notification to subscribers
+                    notification_to_subscribers = []
+                    for subscriber in subscribers:
+                        obj = Notification(
+                            sender=admin_user,
+                            receiver=subscriber.standard_user, 
+                            subject='Level Upgrade',
+                            date=datetime.now().date(), 
+                            status=False,
+                            context=f"The editor you've subscribed, named {user.name}, has advanced to the Master level! Stay tuned",
+                        )
+                        notification_to_subscribers.append(obj)
+
+                    Notification.objects.bulk_create(notification_to_subscribers)
 
                 elif user.commentator_level == 'master':
                     user.commentator_level = "grandmaster"
+                    create_notification(admin_user, user, "Congratulations! You've reached the Grandmaster level! You're now closer to becoming a Phenomenon in the world of analysis!")
+
+                    # Send notification to followers who are not subscribers
+                    followers = FollowCommentator.objects.filter(commentator_user=user)
+                    subscribers = Subscription.objects.filter(commentator_user=user)
+                    subscriber_ids = subscribers.values_list('standard_user__id', flat=True)
+                    follower_notification = []
+
+                    # Send notification to followers
+                    followers = FollowCommentator.objects.filter(commentator_user=user)
+                    notification = []
+                    for follower in followers:
+                        if follower.standard_user.id not in subscriber_ids:
+                            obj = Notification(
+                                sender=admin_user,
+                                receiver=follower.standard_user, 
+                                subject='Level Upgrade',
+                                date=datetime.now().date(), 
+                                status=False,
+                                context=f"The editor you're following, named {user.name}, has advanced to the Grandmaster level! Stay tuned",
+                            )
+                            follower_notification.append(obj)
+                    Notification.objects.bulk_create(notification)
+
+                    # send notification to subscribers
+                    notification_to_subcribers = []
+                    for subscriber in subscribers:
+                        obj1 = Notification(
+                            sender=admin_user,
+                            receiver=subscriber.standard_user, 
+                            subject='Level Upgrade',
+                            date=datetime.now().date(), 
+                            status=False,
+                            context=f"The editor you've subscribed, named {user.name}, has advanced to the Grandmaster level! Stay tuned",
+                        )
+                        notification_to_subcribers.append(obj1)
+                    Notification.objects.bulk_create(notification_to_subcribers)
                 
             user.save(update_fields=['commentator_level','updated'])
 
@@ -5261,17 +5363,33 @@ class RetrievePageData():
             # Validation
             user_id = user_id if User.objects.filter(id=user_id).exists() else None
             
-            user = User.objects.get(id=user_id) if id is not None else None        
+            user = User.objects.get(id=user_id) if id is not None else None       
+
+            print() 
+            print() 
+            print() 
             
             # Get all highlight user
             highligt_user_list = self.get_highlight_user()
             highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
+            # highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).annotate(random_order=F('id') * 0).order_by('random_order')[:5]
+            print('highlight_users: ', [i.id for i in highlight_users])
+            print()
+
             # highlight_users = User.objects.filter(~Q(id=user_id), id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
             highlight_users_ids = highlight_users.values_list('id', flat=True)
+            print('highlight_users_ids: ', highlight_users_ids)
+            print('highlight_users_ids___list: ', list(highlight_users_ids))
+            print()
 
             # Get data
             all_commentator_data = User.objects.filter(Q(~Q(id=user_id) & ~Q(id__in=highlight_users_ids)), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
+            print('all_commentator_data: ', [i.id for i in all_commentator_data])
             all_commentator = list(highlight_users) + list(all_commentator_data)
+
+            print()
+            print()
+            print()
 
             for obj in all_commentator:
                 detail = {}
@@ -6415,3 +6533,24 @@ class RetrieveBecomeCommentatorData(APIView):
         # serializer['money'] = (float(membership_obj.plan_price) / float((membership_obj.promotion_duration).split(" ")[0]))
         serializer['money'] = float(membership_obj.plan_price)
         return Response(data=serializer, status=status.HTTP_200_OK)
+
+class AccountStatus(APIView):
+    def get(self, request, id=None):
+        try:
+            if id != None:
+                user = User.objects.get(id=id)
+                level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+                
+                required_wins = level_obj.winning_limit
+                user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
+
+                percentage_left = ((required_wins - user_current_wins) / required_wins) * 100
+
+                data = {
+                    'comments_left' : round(percentage_left, 0),
+                    'commentator_status' : user.commentator_status,
+                }
+
+                return Response({'data': data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'data' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

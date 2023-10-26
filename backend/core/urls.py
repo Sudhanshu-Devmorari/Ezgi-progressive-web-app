@@ -7,7 +7,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                         #  GetPendingBalance, TransactionHistory, UserTransactionHistory, TestCronView,
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
-                         ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,
+                         ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,AccountStatus,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -127,6 +127,7 @@ urlpatterns = [
     path('futbol-basketbol-count/', GetFutbolAndBasketbolCountView.as_view(), name='futbol-basketbol-count'),
     path('payment/', PaymentView.as_view(), name='payment'),
     path('transcation-query/', CheckTransactionEnquiry.as_view(), name='transcation-query'),
+    path('account-status/<int:id>', AccountStatus.as_view(), name='transcation-query'),
 
     path('test-cron/', TestCronView.as_view(), name='test-cron'),
 ]
