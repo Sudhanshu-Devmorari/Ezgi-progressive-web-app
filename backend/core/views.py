@@ -6556,3 +6556,40 @@ class AccountStatus(APIView):
                 return Response({'data': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'data' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RetrieveChartData(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response("User not found.", status=status.HTTP_404_NOT_FOUND)
+
+        current_date = datetime.now()
+        months = {
+            1: 'January',
+            2: 'February',
+            3: 'March',
+            4: 'April',
+            5: 'May',
+            6: 'June',
+            7: 'July',
+            8: 'August',
+            9: 'September',
+            10: 'October',
+            11: 'November',
+            12: 'December'
+        }
+        year_month = {}
+        for i in range(1, 7):
+            months_ago = current_date - timedelta(days=30 * i)
+            # print(f"{months_ago.month}:{months_ago.year}")
+            try:
+                obj = Subscription.objects.filter(commentator_user=user, created__month=months_ago.month, created__year=months_ago.year).count()
+            except Exception as e:
+                return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            month_name = months.get(months_ago.month)
+            year_month[month_name] = obj
+
+        return Response(data=year_month, status=status.HTTP_200_OK)
