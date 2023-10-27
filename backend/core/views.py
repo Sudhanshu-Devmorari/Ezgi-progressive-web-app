@@ -5138,7 +5138,7 @@ class RetrievePageData():
 
             highlight_comments = []
             if is_highlight_user:
-                highlight_comments = Comments.objects.filter(commentator_user_id__in=highligt_user_list, status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('?').only('id')[:5]
+                highlight_comments = Comments.objects.filter(commentator_user_id__in=highligt_user_list, status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).order_by('?').only('id')
 
             highlight_comments_ids = highlight_comments.values_list('id', flat=True) if highlight_comments else []
             comments_data = Comments.objects.filter(status='approve', commentator_user__is_delete=False, is_resolve=False, category=[category]).exclude(id__in=highlight_comments_ids).order_by('-created').only('id')
@@ -5373,7 +5373,7 @@ class RetrievePageData():
             
             # Get all highlight user
             highligt_user_list = self.get_highlight_user()
-            highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
+            highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')
             # highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).annotate(random_order=F('id') * 0).order_by('random_order')[:5]
             print('highlight_users: ', [i.id for i in highlight_users])
             print()

@@ -119,7 +119,7 @@ const SignInModal = (props) => {
                 </span>
                 <input
                   id="phone"
-                  type="text"
+                  type="number"
                   className={`${
                     currentTheme === "dark"
                       ? "darkMode-input"

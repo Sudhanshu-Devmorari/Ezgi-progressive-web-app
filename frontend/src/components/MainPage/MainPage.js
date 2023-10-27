@@ -76,7 +76,7 @@ const MainPage = () => {
         if (result?.STATUS === "SUCCESS" && result?.RETURN_CODE === "0") {
           // console.log("payment succesffull", result);
           const category = result?.PRODUCTS[0]?.PRODUCT_CATEGORY;
-          const ID = result?.PRODUCTS[1]?.PRODUCT_ID
+          const ID = result?.PRODUCTS[1]?.PRODUCT_ID;
 
           // window.location.reload()
           // const reloadCount = sessionStorage.getItem("reloadCount");
@@ -106,7 +106,7 @@ const MainPage = () => {
           //   window.location.replace(window.location.origin + "/");
           // }
         }
-        if (result?.STATUS === "ERROR"){
+        if (result?.STATUS === "ERROR") {
           window.location.replace(window.location.origin + "/");
         }
       } catch (error) {
@@ -198,6 +198,17 @@ const MainPage = () => {
   }
   // console.log("highlightUserId", highlightUserId);
 
+  function getUnique(arr, index) {
+    const staticData = arr
+      .map((e) => e[index]?.user?.id)
+      .map((e, i, final) => final.indexOf(e) === i && i)
+      .filter((e) => arr[e])
+      .map((e) => arr[e]);
+
+    console.log("staticData::::::::::::", staticData);
+    // setMergedResult(staticData);
+    // setFilterData(staticData);
+  }
 
   const mergeArrays = () => {
     if (subscriptionComments.length > 0) {
@@ -236,6 +247,7 @@ const MainPage = () => {
           })),
         ];
       }
+      // getUnique(merged, "value");
       setMergedResult(merged);
       // sortMergeList()
     }
@@ -277,6 +289,8 @@ const MainPage = () => {
           })),
         ];
       }
+      console.log("merged: ", merged);
+      // getUnique(merged, "value");
       setMergedResult(merged);
       // sortMergeList()
     }
@@ -545,12 +559,11 @@ const MainPage = () => {
   //     // window.location.replace("/")
   //   }
   // });
-  
+
   // const sortMergeList = () => {
   //   console.log("mergedResult", mergedResult)
-  //   const sortedList = mergedResult.slice(); 
+  //   const sortedList = mergedResult.slice();
   //   console.log("sortedList", sortedList)
-
 
   //   sortedList.sort((a, b) => {
   //     const idA = a.value?.commentator_user?.id;
@@ -560,9 +573,9 @@ const MainPage = () => {
   //     const isBHighlighted = highlightUserId.includes(idB);
 
   //     if (isAHighlighted && !isBHighlighted) {
-  //       return -1; 
+  //       return -1;
   //     } else if (!isAHighlighted && isBHighlighted) {
-  //       return 1; 
+  //       return 1;
   //     } else {
   //       return 0;
   //     }
