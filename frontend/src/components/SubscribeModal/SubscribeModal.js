@@ -271,6 +271,9 @@ const SubscribeModal = (props) => {
           //   window.location.replace(window.location.origin + "/");
           // }
         }
+        if (result?.STATUS === "ERROR"){
+          window.location.replace(window.location.origin + "/");
+        }
       } catch (error) {
         console.log(error);
       }

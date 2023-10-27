@@ -176,6 +176,9 @@ const PromoteMeModal = (props) => {
             promoteMeEntry(amount, duration);
           }
         }
+        if (result?.STATUS === "ERROR"){
+          window.location.replace(window.location.origin + "/");
+        }
         // const url = new URL(window.location.href);
         //   const refExists = url.searchParams.has("ref");
         //   if (refExists) {
