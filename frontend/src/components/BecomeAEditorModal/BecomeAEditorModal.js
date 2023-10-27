@@ -362,6 +362,7 @@ const BecomeAEditorModal = (props) => {
                   window.history.pushState(null, null, window.location.origin + "/");
                   window.location.replace(window.location.origin + "/");
                 });
+                window.location.reload();
             }
           }
         })

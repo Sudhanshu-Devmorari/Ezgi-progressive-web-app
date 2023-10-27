@@ -304,6 +304,7 @@ const SubscribeModal = (props) => {
           window.history.pushState(null, null, window.location.origin + "/");
           window.location.replace(window.location.origin + "/");
         });
+        window.location.reload();
         // };
         // console.log("window.history.length", window.history.length);
         // console.log("\n\nwindow.history\n", window.history);
