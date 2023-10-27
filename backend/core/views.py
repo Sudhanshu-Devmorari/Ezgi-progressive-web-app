@@ -1490,7 +1490,9 @@ class HighlightPurchaseView(APIView):
         if request.query_params.get('id', None) != None:
             user = User.objects.get(id=request.query_params.get('id'))
             if Highlight.objects.filter(user=user,status='active').exists():
-                return Response({'data':'Your highlight plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
+                highlight_plan = Highlight.objects.get(user=user,status='active')
+                end_date = highlight_plan.end_date
+                return Response({'data':'Your highlight plan is already active.', 'end_date': end_date}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'data' : 'Highlight purchase request'}, status=status.HTTP_200_OK)
         return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -6544,7 +6546,7 @@ class AccountStatus(APIView):
                 required_wins = level_obj.winning_limit
                 user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
 
-                percentage_left = ((required_wins - user_current_wins) / required_wins) * 100
+                percentage_left = (user_current_wins / required_wins) * 100
 
                 data = {
                     'comments_left' : round(percentage_left, 0),

@@ -144,9 +144,9 @@ CRONJOBS = [
     ('* * * * *', 'core.cron.comment_result_check'),
     # ('* */2 * * *', 'core.cron.Userst'),
     ('* * * * *', 'core.cron.subscription_reminder_cron'),
-    ('0 0 * * 1', 'core.cron.weekly_comment_count_check'),
-    ('0 0 * * *', 'core.cron.withdrawable_balance_update'),
-    ('0 0 * * *', 'core.cron.membership_plan_check'),
+    ('* * * * *', 'core.cron.weekly_comment_count_check'),
+    ('* * * * *', 'core.cron.withdrawable_balance_update'),
+    ('* * * * *', 'core.cron.membership_plan_check'),
     # ('*/1 * * * *', 'core.cron.withdrawable_balance_update'),
 ]
 LOGGING = {

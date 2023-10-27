@@ -367,8 +367,22 @@ const ActiveComments = (props) => {
       if (res?.status === 200) {
         const bank_iban = res?.data?.data?.bank_iban;
         if (bank_iban) {
-          setBankDetails(res?.data?.data);
-          setWithdrawalModal(true);
+          const withdrawal_amount = res?.data?.data?.withdrawable_balance;
+          if (withdrawal_amount === null || withdrawal_amount === 0) {
+            Swal.fire({
+              title: "Error",
+              text: "Check your pending balance.",
+              icon: "error",
+              backdrop: false,
+              customClass:
+                currentTheme === "dark"
+                  ? "dark-mode-alert"
+                  : "light-mode-alert",
+            });
+          } else {
+            setBankDetails(res?.data?.data);
+            setWithdrawalModal(true);
+          }
         } else {
           setShowBankUpdate(true);
         }
@@ -407,8 +421,30 @@ const ActiveComments = (props) => {
         if (value === "add comment") {
           setAddCommentModalModalShow(true);
         } else if (value === "promote me") {
-          setCommentatorLevel(profileData);
-          setPromoteModalShow(true);
+          try {
+            const res = await axios.get(
+              `${config.apiUrl}/highlight-purchase/?id=${userId}`
+            );
+            if (res?.status === 200) {
+              setCommentatorLevel(profileData);
+              setPromoteModalShow(true);
+            }
+          } catch (error) {
+            console.log(error);
+            if (error?.response?.status === 400) {
+              const end_date = new Date(
+                error?.response?.data?.end_date
+              ).toLocaleDateString();
+              Swal.fire({
+                text: `Your Highlight plan will expire on ${end_date}. You can purchase it again after this date.`,
+                backdrop: false,
+                customClass:
+                  currentTheme === "dark"
+                    ? "dark-mode-alert"
+                    : "light-mode-alert",
+              });
+            }
+          }
         } else if (value === "bank update") {
           handleBankUpdate();
         } else if (value === "edit profile") {
@@ -1062,26 +1098,27 @@ const ActiveComments = (props) => {
                 Add Comment
               </button>
             )}
-            {props.content === "wallet" && profileData?.commentator_level !== "apprentice" && (
-              <button
-                onClick={() => {
-                  checkDeactivation("bank update");
-                }}
-                className="p-1 px-2"
-                style={{
-                  color: currentTheme === "dark" ? "#C66EF8" : "#00659D",
-                  border:
-                    currentTheme === "dark"
-                      ? "1px solid #C66EF8"
-                      : "1px solid #00659D",
-                  backgroundColor: "transparent",
-                  borderRadius: "4px",
-                  fontSize: "15px",
-                }}
-              >
-                Withdrawal
-              </button>
-            )}
+            {props.content === "wallet" &&
+              profileData?.commentator_level !== "apprentice" && (
+                <button
+                  onClick={() => {
+                    checkDeactivation("bank update");
+                  }}
+                  className="p-1 px-2"
+                  style={{
+                    color: currentTheme === "dark" ? "#C66EF8" : "#00659D",
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #C66EF8"
+                        : "1px solid #00659D",
+                    backgroundColor: "transparent",
+                    borderRadius: "4px",
+                    fontSize: "15px",
+                  }}
+                >
+                  Withdrawal
+                </button>
+              )}
             {(props.content === "home" ||
               props.content === "wallet" ||
               props.content === "subscribers") && (

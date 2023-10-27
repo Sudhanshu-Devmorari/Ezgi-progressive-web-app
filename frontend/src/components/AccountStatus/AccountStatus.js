@@ -305,7 +305,7 @@ const AccountStatus = (props) => {
               <div className="ms-3" style={{ width: 75, height: 75 }}>
                 <CircularProgressbarWithChildren
                   circleRatio={0.75}
-                  value={45}
+                  value={statusData.left_winning || 0}
                   text={`%${statusData.left_winning || 0}`}
                   strokeWidth={6}
                   styles={buildStyles({

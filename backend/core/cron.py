@@ -1,4 +1,4 @@
-from core.models import Subscription, Notification, CommentatorLevelRule, PendingBalanceHistory, BankDetails, BecomeCommentator
+from core.models import Subscription, Notification, CommentatorLevelRule, PendingBalanceHistory, BankDetails, BecomeCommentator, FollowCommentator
 from datetime import datetime, timedelta, timezone
 import pytz
 import requests
@@ -434,6 +434,15 @@ def withdrawable_balance_update():
 
         bank_obj.save()
 
+def create_notification(sender, receiver, context):
+    return Notification.objects.create(
+        sender=sender,
+        receiver=receiver, 
+        subject='Level Upgrade',
+        date=datetime.now().date(), 
+        status=False,
+        context=context,
+    )
 
 def comment_result_check():
     try:
@@ -559,14 +568,107 @@ def comment_result_check():
                 win_count = len(correct_prediction)
                 if win_count >= level_obj.winning_limit and Success_rate >= int(level_obj.sucess_rate):
 
+                    admin_user = User.objects.get(is_admin=True)
+
                     if user.commentator_level == 'apprentice':
                         user.commentator_level = "journeyman"
+                        create_notification(admin_user, user, "Congratulations! You've reached the Journeyman level! You can now turn your followers into subscribers and generate earnings!")
+
+                        # Send notification to followers
+                        followers = FollowCommentator.objects.filter(commentator_user=user)
+                        notification = []
+                        for follower in followers:
+                            obj = Notification(
+                                sender=admin_user,
+                                receiver=follower.standard_user, 
+                                subject='Level Upgrade',
+                                date=datetime.now().date(), 
+                                status=False,
+                                context=f"The editor you're following, named {user.name}, has advanced to the Journyeman level! Stay tuned",
+                            )
+                            notification.append(obj)
+                        Notification.objects.bulk_create(notification)
 
                     elif user.commentator_level == 'journeyman':
                         user.commentator_level = "master"
+                        
+                        create_notification(admin_user, user, "Congratulations! You've reached the Master level! The rewards for your achievements will be even greater!")
+
+                        # Send notification to followers who are not subscribers
+                        followers = FollowCommentator.objects.filter(commentator_user=user)
+                        subscribers = Subscription.objects.filter(commentator_user=user)
+                        subscriber_ids = subscribers.values_list('standard_user__id', flat=True)
+                        follower_notification = []
+
+                        for follower in followers:
+                            if follower.standard_user.id not in subscriber_ids:
+                                obj = Notification(
+                                    sender=admin_user,
+                                    receiver=follower.standard_user, 
+                                    subject='Level Upgrade',
+                                    date=datetime.now().date(), 
+                                    status=False,
+                                    context=f"The editor you're following, named {user.name}, has advanced to the Master level! Stay tuned",
+                                )
+                                follower_notification.append(obj)
+
+                        Notification.objects.bulk_create(follower_notification)
+
+                        # Send notification to subscribers
+                        notification_to_subscribers = []
+                        for subscriber in subscribers:
+                            obj = Notification(
+                                sender=admin_user,
+                                receiver=subscriber.standard_user, 
+                                subject='Level Upgrade',
+                                date=datetime.now().date(), 
+                                status=False,
+                                context=f"The editor you've subscribed, named {user.name}, has advanced to the Master level! Stay tuned",
+                            )
+                            notification_to_subscribers.append(obj)
+
+                        Notification.objects.bulk_create(notification_to_subscribers)
 
                     elif user.commentator_level == 'master':
                         user.commentator_level = "grandmaster"
+                        create_notification(admin_user, user, "Congratulations! You've reached the Grandmaster level! You're now closer to becoming a Phenomenon in the world of analysis!")
+
+                        # Send notification to followers who are not subscribers
+                        followers = FollowCommentator.objects.filter(commentator_user=user)
+                        subscribers = Subscription.objects.filter(commentator_user=user)
+                        subscriber_ids = subscribers.values_list('standard_user__id', flat=True)
+                        follower_notification = []
+
+                        # Send notification to followers
+                        followers = FollowCommentator.objects.filter(commentator_user=user)
+                        notification = []
+                        for follower in followers:
+                            if follower.standard_user.id not in subscriber_ids:
+                                obj = Notification(
+                                    sender=admin_user,
+                                    receiver=follower.standard_user, 
+                                    subject='Level Upgrade',
+                                    date=datetime.now().date(), 
+                                    status=False,
+                                    context=f"The editor you're following, named {user.name}, has advanced to the Grandmaster level! Stay tuned",
+                                )
+                                follower_notification.append(obj)
+                        Notification.objects.bulk_create(notification)
+
+                        # send notification to subscribers
+                        notification_to_subcribers = []
+                        for subscriber in subscribers:
+                            obj1 = Notification(
+                                sender=admin_user,
+                                receiver=subscriber.standard_user, 
+                                subject='Level Upgrade',
+                                date=datetime.now().date(), 
+                                status=False,
+                                context=f"The editor you've subscribed, named {user.name}, has advanced to the Grandmaster level! Stay tuned",
+                            )
+                            notification_to_subcribers.append(obj1)
+                        Notification.objects.bulk_create(notification_to_subcribers)
+                
                     
                 user.save(update_fields=['commentator_level','updated'])
 
