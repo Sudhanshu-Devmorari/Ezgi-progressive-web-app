@@ -13,11 +13,15 @@ logger = logging.getLogger('django_cron')
 def subscription_reminder_cron():
     try:
         notification_list = []
-        today_date = timezone.now().date() 
-        cutoff_date = timezone.now() + timedelta(days=3)
+        print('===>start')
+        today_date = datetime.now().date() 
+        print('today_date: ', today_date)
+        cutoff_date = datetime.now() + timedelta(days=3)
+        print('cutoff_date: ', cutoff_date)
 
         # deactive highlight plan
         active_highlights = Highlight.objects.filter(status='active', end_date__date__lt=today_date).update(status='deactive')
+        print('active_highlights: ', active_highlights)
 
         # Send notification and sms before 3 days of subscription expiration
         reminder_notification_sub_data = Subscription.objects.filter(end_date__date=cutoff_date.date(), status='active')
@@ -39,10 +43,13 @@ def subscription_reminder_cron():
         send_notification_sms(notification_list) 
 
         # Update subscription status to pending if subscription is not actived after subscription expiration
-        pending_status = Subscription.objects.filter(end_date__gt=(today_date+ timedelta(days=3)), end_date__lt=(today_date+ timedelta(days=5)), status='active').update(status='pending')
+        before_three_days = today_date + timedelta(days=3)
+        pending_status = Subscription.objects.filter(end_date__date__lte=before_three_days, end_date__date__gte=today_date, status='active')
+        # pending_status = Subscription.objects.filter(end_date__gt=(today_date+ timedelta(days=3)), end_date__lt=(today_date+ timedelta(days=5)), status='active').update(status='pending')
         
         # Deactivate subscription after 3 days of expiration if subscription not activated
-        pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
+        deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active').update(status='deactive')
+        # pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
 
 
         # Send notification expiration highlight purchase
@@ -67,7 +74,8 @@ def subscription_reminder_cron():
 
         return True
     
-    except:
+    except Exception as e:
+        print("========>>>>>", str(e))
         return False
 
 def send_notification_sms(notification_data):

@@ -138,6 +138,12 @@ SUBSCRIPTION_STATUS = (
         ('pending','Pending'),
         ('deactive','Deactive'),
     )
+LABEL_CHOICES = (
+        (1,'Active'),
+        (2,'Pending'),
+        (3,'Terminated'),
+        (4,'Cancel'),
+    )
 class Subscription(models.Model):
     commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentator')
     standard_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='standard')
@@ -148,8 +154,12 @@ class Subscription(models.Model):
     end_date = models.DateTimeField()
     status = models.CharField(max_length = 20, choices = SUBSCRIPTION_STATUS)
     is_cancelled = models.BooleanField(default=False)
+    label = models.PositiveIntegerField(choices = LABEL_CHOICES, default=1)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def get_label_display(self):
+        return dict(self.LABEL_CHOICES)[self.label]
 
 
 class GiftSubscription(models.Model):

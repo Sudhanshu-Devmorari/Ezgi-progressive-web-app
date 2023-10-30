@@ -200,13 +200,13 @@ const MainPage = () => {
 
   function getUnique(arr, index) {
     const staticData = arr
-      .map((e) => e[index]?.user?.id)
+      .map((e) => e[index]?.id)
       .map((e, i, final) => final.indexOf(e) === i && i)
       .filter((e) => arr[e])
       .map((e) => arr[e]);
 
     console.log("staticData::::::::::::", staticData);
-    // setMergedResult(staticData);
+    setMergedResult(staticData);
     // setFilterData(staticData);
   }
 
@@ -247,7 +247,7 @@ const MainPage = () => {
           })),
         ];
       }
-      // getUnique(merged, "value");
+      getUnique(merged, "value");
       setMergedResult(merged);
       // sortMergeList()
     }
@@ -290,7 +290,7 @@ const MainPage = () => {
         ];
       }
       console.log("merged: ", merged);
-      // getUnique(merged, "value");
+      getUnique(merged, "value");
       setMergedResult(merged);
       // sortMergeList()
     }

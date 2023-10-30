@@ -511,21 +511,43 @@ const ActiveComments = (props) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (!profileData || !profileData?.is_subscribe) {
+  //     return; // No need to continue if not subscribed
+  //   }
+
+  //   const currentTime = Date.now();
+  //   const subExpDate = new Date(profileData?.subscription_end_date).getTime();
+
+  //   if (currentTime >= subExpDate) {
+  //     // cancelSubcription();
+  //     // console.log("Subscription expired - cancelling");
+  //   } else {
+  //     // console.log("Subscription is active");
+  //   }
+  // }, [profileData]);
+
+  console.log(profileData?.subscription_end_date,"=============profileData?.subscription_end_date")
+
+  const expirationDate = moment(profileData?.subscription_end_date);
+  const [daysUntilExpiration, setDaysUntilExpiration] = useState(
+    expirationDate.diff(moment(), "days")
+  );
+
   useEffect(() => {
-    if (!profileData || !profileData?.is_subscribe) {
-      return; // No need to continue if not subscribed
-    }
+    const timer = setInterval(() => {
+      const newDaysUntilExpiration = expirationDate.diff(moment(), "days");
+      setDaysUntilExpiration(newDaysUntilExpiration);
+    }, 1000 * 60 * 60 * 24); // Update every day
 
-    const currentTime = Date.now();
-    const subExpDate = new Date(profileData?.subscription_end_date).getTime();
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
-    if (currentTime >= subExpDate) {
-      cancelSubcription();
-      // console.log("Subscription expired - cancelling");
-    } else {
-      // console.log("Subscription is active");
-    }
-  }, [profileData]);
+  useEffect(() => {
+    console.log("daysUntilExpiration:::::::::::::", daysUntilExpiration);
+  }, [daysUntilExpiration]);
 
   return (
     <>
@@ -1034,7 +1056,7 @@ const ActiveComments = (props) => {
               }`}
             >
               {/* {Number(userId) !== profileData?.id && */}
-              {!profileData?.subscription_end_date ? (
+              {!profileData?.is_cancelled ? (
                 <button
                   onClick={() => {
                     if (userId) {
@@ -1070,6 +1092,27 @@ const ActiveComments = (props) => {
                   </span>
                   date.
                 </span>
+              )}
+              {(daysUntilExpiration + 1) < 3 && daysUntilExpiration >= 0 && profileData?.is_subscribe && !profileData?.is_cancelled && (
+                <button
+                  onClick={() => {
+                    if (userId) {
+                      checkDeactivation("subscribe model");
+                    }
+                  }}
+                  className="ms-1 px-3 py-1"
+                  style={{
+                    border:
+                      currentTheme === "dark"
+                        ? "1px solid #37FF80"
+                        : "1px solid #00659D",
+                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                    backgroundColor: "transparent",
+                    borderRadius: "3px",
+                  }}
+                >
+                  Renew
+                </button>
               )}
             </div>
           )}

@@ -947,8 +947,9 @@ class ProfileView(APIView):
                     data['is_subscribe'] = is_subscribe
                     if is_subscribe:
                         subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
-                        if subscription.is_cancelled:
-                            data['subscription_end_date'] = subscription.end_date
+                        data['is_cancelled'] = subscription.is_cancelled
+                        # if subscription.is_cancelled:
+                        data['subscription_end_date'] = subscription.end_date
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -5160,7 +5161,8 @@ class RetrievePageData():
                 is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, commentator_user=comment.commentator_user, status='active').exists()
                 comment_data['is_subscribe'] = is_subscribe
 
-                is_highlight = Highlight.objects.filter(user=comment.commentator_user, status='active').exists()
+                compare_date = datetime.now()
+                is_highlight = Highlight.objects.filter(user=comment.commentator_user, status='active', start_date__lte=compare_date, end_date__gte=compare_date).exists()
                 comment_data['is_highlight'] = is_highlight
 
                 success_rate_score_points(comment.commentator_user.id)
