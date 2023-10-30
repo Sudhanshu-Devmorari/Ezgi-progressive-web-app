@@ -13,11 +13,13 @@ logger = logging.getLogger('django_cron')
 def subscription_reminder_cron():
     try:
         notification_list = []
-        print('===>start')
-        today_date = datetime.now().date() 
-        print('today_date: ', today_date)
+
+        # today_date = timezone.now().date() 
+        today_date = datetime.now().date()
+
+        # cutoff_date = timezone.now() + timedelta(days=3)
         cutoff_date = datetime.now() + timedelta(days=3)
-        print('cutoff_date: ', cutoff_date)
+
 
         # deactive highlight plan
         active_highlights = Highlight.objects.filter(status='active', end_date__date__lt=today_date).update(status='deactive')

@@ -289,7 +289,7 @@ const MainPage = () => {
           })),
         ];
       }
-      console.log("merged: ", merged);
+      // console.log("merged: ", merged);
       getUnique(merged, "value");
       setMergedResult(merged);
       // sortMergeList()

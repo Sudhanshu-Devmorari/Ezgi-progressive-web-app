@@ -4,7 +4,8 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           Highlight, Advertisement, CommentatorLevelRule, MembershipSetting,
                           SubscriptionSetting, HighlightSetting, BlueTick, BecomeCommentator,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner,
-                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription,
+                          WithdrawalSetting)
 from datetime import datetime
 from django.template.defaultfilters import timesince
 from django.utils import timezone
@@ -280,4 +281,10 @@ class GiftSubscriptionSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = GiftSubscription
+        fields = '__all__'
+
+        
+class WithdrawalSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WithdrawalSetting
         fields = '__all__'

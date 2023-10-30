@@ -362,6 +362,13 @@ class HighlightSetting(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
+class WithdrawalSetting(models.Model):
+    commentator_level = models.CharField(max_length = 20, choices = SUBSCRIPTION_ROLE_CHOISE, null=True, blank=True)
+    minimum_amount = models.FloatField()
+    income_blocked_days = models.FloatField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
 class OtpDetails(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     otp_secret = models.CharField(max_length=16)

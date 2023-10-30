@@ -8,7 +8,24 @@ const EditorWithdrawalSettings = () => {
 
   // Withdrawal Settings API
   const [WithdrawalSettingData, setWithdrawalSettingData] = useState();
+  const [minimum_amount, setAmount] = useState();
+  const [blocked_Days, setBlockedDays] = useState();
+
+  const retrieveData = async() => {
+    try{
+      const res = await axios.get(
+      `${config?.apiUrl}/withdrawal-setting/?level=${selectLevel}`,
+    );
+    setAmount(res?.data?.minimum_amount)
+    setBlockedDays(res?.data?.income_blocked_days)
+      }catch(error){
+        console.log("Error",error)
+        setAmount("")
+        setBlockedDays("")
+      }
+  }
   useEffect(() => {
+    retrieveData()
     async function getData() {
       try {
         const res = await axios.get(
@@ -20,6 +37,7 @@ const EditorWithdrawalSettings = () => {
         console.log(error);
       }
     }
+    
     // getData();
   }, [selectLevel]);
   return (
@@ -56,6 +74,8 @@ const EditorWithdrawalSettings = () => {
             WithdrawalSettingData={WithdrawalSettingData}
             setWithdrawalSettingData={setWithdrawalSettingData}
             selectLevel={selectLevel}
+            minimum_amount={minimum_amount}
+            blocked_Days={blocked_Days}
           />
         </div>
       </div>

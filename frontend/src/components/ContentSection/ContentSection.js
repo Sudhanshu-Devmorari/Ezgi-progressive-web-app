@@ -395,6 +395,9 @@ const ContentSection = ({
                 selectContent === "comments" ||
                 !data?.value?.commentator_user?.is_subscribed) && (
                 <>
+                <div className="d-flex justify-content-end" style={{marginRight:"1rem"}}>
+                {userId == data?.value?.commentator_user?.id ? data?.value?.is_highlight && <img src={currentTheme === "dark" ? darkIcon : lightIcon} alt="darkIcon" style={{height:"20px", width:"20px"}}/> : null}
+                </div>
                   {userId != data?.value?.commentator_user?.id && (
                     <div
                       className="d-flex justify-content-end pe-2 mt-3"

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import Modal from "react-bootstrap/Modal";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
@@ -12,6 +12,20 @@ const WithdrawalModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const { bankDetails } = props;
+
+  const [minAmount, setMinAmount] = useState(0);
+
+  const handleWithdrawalAmount = async() => {
+    const res = await axios.get(
+      `${config?.apiUrl}/get-minimum-amount/${userId}/`,
+    );
+    // console.log("RES: ", res)
+    setMinAmount(res?.data?.minimum_amount)
+  }
+
+  useEffect(() => {
+    handleWithdrawalAmount()
+  }, []);
 
   const [withdrawalLoading, setWithdrawalLoading] = useState(false);
   const handleWithdraw = async () => {
@@ -54,8 +68,10 @@ const WithdrawalModal = (props) => {
   };
 
   const handleWithdrawRequest = async () => {
-    console.log(bankDetails?.withdrawable_balance,"============>>bankDetails?.withdrawable_balance", typeof(bankDetails?.withdrawable_balance))
-    console.log(bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0,'LLLLL')
+    // console.log("withdrawable_balance: ", bankDetails?.withdrawable_balance)
+    // console.log("minAmount: ", minAmount)
+    // console.log(bankDetails?.withdrawable_balance,"============>>bankDetails?.withdrawable_balance", typeof(bankDetails?.withdrawable_balance))
+    // console.log(bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0,'LLLLL')
     if (bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0) {
       props?.onHide();
       Swal.fire({
@@ -66,7 +82,7 @@ const WithdrawalModal = (props) => {
         customClass:
           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
-    } else {
+    }else if(bankDetails?.withdrawable_balance >= minAmount){
       try {
         setWithdrawalLoading(true);
         const res = await axios.post(
@@ -108,6 +124,18 @@ const WithdrawalModal = (props) => {
           });
         }
       }
+    } 
+    else {
+      props?.onHide();
+      setWithdrawalLoading(false);
+      Swal.fire({
+        title: "Error",
+        text: `Minimum Withdrawal balance is ${minAmount}.`,
+        icon: "error",
+        backdrop: false,
+        customClass:
+          currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+      });
     }
   };
 

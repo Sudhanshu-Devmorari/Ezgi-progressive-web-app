@@ -33,7 +33,7 @@ from core.models import (User, FollowCommentator, Comments, Subscription, Notifi
                           FavEditors, TicketSupport, ResponseTicket, Highlight, Advertisement, CommentatorLevelRule,
                           MembershipSetting, SubscriptionSetting, HighlightSetting, BecomeCommentator, BlueTick, DataCount,
                           TicketHistory, BecomeEditor, BecomeEditorEarnDetails, BankDetails, EditorBanner, MatchDetail,
-                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription, Otp)
+                          PendingBalanceHistory, CommissionEarning, Withdrawable, BankUpdate, GiftSubscription, Otp, WithdrawalSetting)
 
 # Serializers
 from core.serializers import (UserSerializer, FollowCommentatorSerializer, CommentsSerializer,
@@ -42,7 +42,7 @@ from core.serializers import (UserSerializer, FollowCommentatorSerializer, Comme
                              SubscriptionSettingSerializer, CommentatorLevelRuleSerializer, BecomeCommentatorSerializer, BlueTickSerializer,
                              TicketHistorySerializer, BecomeEditorSerializer, BecomeEditorEarnDetailsSerializer, UpdateUserRoleSerializer, BankDetailsSerializer,
                              EditorBannerSerializer, PendingBalanceHistorySerializer, CommissionEarningSerializer, WithdrawableSerializer, BankUpdateSerializer,
-                             GiftSubscriptionSerializer)
+                             GiftSubscriptionSerializer, WithdrawalSettingSerializer)
 import pyotp
 from django.contrib.auth import authenticate
 
@@ -6595,3 +6595,62 @@ class RetrieveChartData(APIView):
             year_month[month_name] = obj
 
         return Response(data=year_month, status=status.HTTP_200_OK)
+    
+
+class WithdrawalSettingView(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        level = request.query_params.get('level').lower()
+        print("level", level)
+        try:
+            obj = WithdrawalSetting.objects.get(commentator_level=level)
+            serializer = WithdrawalSettingSerializer(obj).data
+            return Response(serializer, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({"error": "Withdrawal settings not found."}, status=status.HTTP_400_BAD_REQUEST)
+            
+    def post(self, request, format=None, *args, **kwargs):
+        try:
+            commentator_level = request.data.get('commentator_level', None)
+            minimum_amount = request.data.get('minimum_amount', None)
+            income_blocked_days = request.data.get('income_blocked_days', None)
+
+            if commentator_level is None:
+                return Response({"error": "Commentator level not found."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if WithdrawalSetting.objects.filter(commentator_level=commentator_level).exists():
+                obj = WithdrawalSetting.objects.get(commentator_level=commentator_level)
+                serializer = WithdrawalSettingSerializer(obj, data=request.data, partial=True)
+                if serializer.is_valid():
+                    try:
+                        serializer.save()
+                    except Exception as e:
+                        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                if minimum_amount is None:
+                    return Response({"error": "Minimum amount not found."}, status=status.HTTP_400_BAD_REQUEST)
+                if income_blocked_days is None:
+                    return Response({"error": "Income blocked days not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+                obj = WithdrawalSetting.objects.create(commentator_level=commentator_level, minimum_amount=minimum_amount, income_blocked_days=income_blocked_days)
+                serializer = WithdrawalSettingSerializer(obj).data
+                return Response(serializer, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetMinimumAmount(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+            obj = WithdrawalSetting.objects.get(commentator_level=user.commentator_level)
+            serializer = WithdrawalSettingSerializer(obj).data
+            return Response(serializer, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except WithdrawalSetting.DoesNotExist:
+            return Response({"error": "Withdrawal Setting not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
