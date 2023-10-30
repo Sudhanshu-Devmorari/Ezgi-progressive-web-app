@@ -40,8 +40,8 @@ import { formatTimeDifference } from "../FormatTime";
 import circle_check from "../../assets/circle-check.png";
 import clock_pause from "../../assets/clock-pause.svg";
 import circle_x from "../../assets/circle-x.png";
-import darkIcon from "../../assets/Dark.png"
-import lightIcon from "../../assets/Light.png"
+import darkIcon from "../../assets/Dark.png";
+import lightIcon from "../../assets/Light.png";
 
 const FavComments = (props) => {
   const {
@@ -69,6 +69,8 @@ const FavComments = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [followLabel, setFollowLabel] = useState("Follow");
+  const [modalShow, setModalShow] = React.useState(false);
+  const [commentatorUser, setcommentatorUser] = useState([]);
 
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
@@ -156,26 +158,7 @@ const FavComments = (props) => {
             (response) => response.id == data?.comment_id
           )[0].total_reactions.total_likes = data?.total_likes;
 
-          const filterData = favCommentData.filter(
-            (response) =>
-              response.total_reactions.total_favorite !== data?.total_favorite
-          );
-
-          setFavCommentData(
-            reaction == "favorite" ? filterData : favCommentData
-          );
-
-          publicComments.filter(
-            (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_clap = data?.total_clap;
-          publicComments.filter(
-            (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_favorite = data?.total_favorite;
-          publicComments.filter(
-            (response) => response.id == data?.comment_id
-          )[0].total_reactions.total_likes = data?.total_likes;
-
-          setPublicComments(publicComments);
+          setFavCommentData(favCommentData);
 
           const commentIds = cmtReact.map((data) => {
             return data.comment_id;
@@ -202,7 +185,37 @@ const FavComments = (props) => {
           }
 
           setCmtReact(cmtReact);
+
+          const publicCommentsFilter = publicComments.filter(
+            (response) => response.id == data?.comment_id
+          );
+
+          if (publicCommentsFilter.length !== 0) {
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_clap = data?.total_clap;
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_favorite = data?.total_favorite;
+            publicComments.filter(
+              (response) => response.id == data?.comment_id
+            )[0].total_reactions.total_likes = data?.total_likes;
+
+            setPublicComments(publicComments);
+          }
+
           mergeArrays();
+
+          if (reaction == "favorite") {
+            const filterData = favCommentData.filter(
+              (response) =>
+                response.total_reactions.total_favorite !== data?.total_favorite
+            );
+
+            setFavCommentData(
+              reaction == "favorite" ? filterData : favCommentData
+            );
+          }
         }
       }
       if (res.status == 204) {
@@ -222,9 +235,6 @@ const FavComments = (props) => {
       }
     }
   };
-
-  const [modalShow, setModalShow] = React.useState(false);
-  const [commentatorUser, setcommentatorUser] = useState([]);
 
   // check activation
   const checkDeactivation = async (value, is_subscribe) => {
@@ -337,35 +347,51 @@ const FavComments = (props) => {
                   <div className="d-flex justify-content-end pe-2 mt-3">
                     {userId != res?.commentator_user?.id && (
                       <>
-                      <div style={{display:"flex", gap:"0.8rem", alignItems:"center"}}>
-                        {res?.is_highlight && <img src={currentTheme === "dark" ? darkIcon : lightIcon} alt="darkIcon" style={{height:"20px", width:"20px"}}/>}
-                      <button
-                        onClick={() => {
-                          followCommentator(
-                            res?.commentator_user?.id,
-                            props?.followingid?.includes(
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "0.8rem",
+                            alignItems: "center",
+                          }}
+                        >
+                          {res?.is_highlight && (
+                            <img
+                              src={
+                                currentTheme === "dark" ? darkIcon : lightIcon
+                              }
+                              alt="darkIcon"
+                              style={{ height: "20px", width: "20px" }}
+                            />
+                          )}
+                          <button
+                            onClick={() => {
+                              followCommentator(
+                                res?.commentator_user?.id,
+                                props?.followingid?.includes(
+                                  res?.commentator_user?.id
+                                )
+                              );
+                            }}
+                            style={{
+                              border:
+                                currentTheme === "dark"
+                                  ? "1px solid #4DD5FF"
+                                  : "1px solid #007BF6",
+                              color:
+                                currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
+                              backgroundColor: "transparent",
+                              borderRadius: "18px",
+                              padding: "0.1rem 2.1rem",
+                              fontSize: "13px",
+                            }}
+                          >
+                            {props?.followingid?.includes(
                               res?.commentator_user?.id
                             )
-                          );
-                        }}
-                        style={{
-                          border:
-                            currentTheme === "dark"
-                              ? "1px solid #4DD5FF"
-                              : "1px solid #007BF6",
-                          color:
-                            currentTheme === "dark" ? "#4DD5FF" : "#007BF6",
-                          backgroundColor: "transparent",
-                          borderRadius: "18px",
-                          padding: "0.1rem 2.1rem",
-                          fontSize: "13px",
-                        }}
-                      >
-                        {props?.followingid?.includes(res?.commentator_user?.id)
-                          ? "Followed"
-                          : "Follow"}
-                      </button>
-                      </div>
+                              ? "Followed"
+                              : "Follow"}
+                          </button>
+                        </div>
                       </>
                     )}
                   </div>
@@ -521,7 +547,9 @@ const FavComments = (props) => {
                         strokeWidth={3}
                         value={100}
                         text={
-                          res?.is_resolve ? res?.match_score : res?.match_time || "00:00"
+                          res?.is_resolve
+                            ? res?.match_score
+                            : res?.match_time || "00:00"
                         }
                         styles={buildStyles({
                           rotation: 1 / 2 + 1 / 8,
@@ -534,16 +562,16 @@ const FavComments = (props) => {
                             ? currentTheme === "dark"
                               ? res.is_prediction == true
                                 ? "#37FF80"
-                                // : res.status === "yellow"
+                                : // : res.status === "yellow"
                                 // ? "#FFCC00"
-                                : res.is_prediction == false
+                                res.is_prediction == false
                                 ? "#FF5757"
                                 : "#00659D"
                               : res.is_prediction == true
                               ? "#37FF80"
-                              // : res.status === "yellow"
+                              : // : res.status === "yellow"
                               // ? res.color
-                              : res.is_prediction == false
+                              res.is_prediction == false
                               ? "#FF5757"
                               : "#00659D"
                             : currentTheme === "dark"
@@ -566,22 +594,22 @@ const FavComments = (props) => {
                           ? currentTheme === "dark"
                             ? res?.is_prediction == true
                               ? "#37FF80"
-                              // : res?.status === "yellow"
+                              : // : res?.status === "yellow"
                               // ? "#FFCC00"
-                              : res?.is_prediction == false
+                              res?.is_prediction == false
                               ? "#FF5757"
                               : "#00659D"
                             : res?.is_prediction == true
                             ? "#37FF80"
-                            // : res?.status === "yellow"
+                            : // : res?.status === "yellow"
                             // ? res?.color
-                            : res?.is_prediction == false
+                            res?.is_prediction == false
                             ? "#FF5757"
                             : "#00659D"
-                          // : props.SelectComment === "resolvedComments"
-                          // ? "#00DE51"
-                          // : "#00659D",
-                          :"#00659D",
+                          : // : props.SelectComment === "resolvedComments"
+                            // ? "#00DE51"
+                            // : "#00659D",
+                            "#00659D",
                         color:
                           // props.SelectComment === "resolvedComments"
                           //   ? "#0D2A53"
@@ -613,12 +641,11 @@ const FavComments = (props) => {
                       className="d-flex align-items-center gap-2"
                     >
                       <div>
-                        {props.cmtReact
+                        {cmtReact
                           ?.map((e) => e.comment_id)
                           ?.includes(res?.id) ? (
-                          props.cmtReact.filter(
-                            (e) => e.comment_id == res?.id
-                          )[0].like == 1 ? (
+                          cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                            .like == 1 ? (
                             <img
                               onContextMenu={(e) => e.preventDefault()}
                               src={Selected_Like}
@@ -667,12 +694,11 @@ const FavComments = (props) => {
                       }}
                     >
                       <div>
-                        {props.cmtReact
+                        {cmtReact
                           ?.map((e) => e.comment_id)
                           ?.includes(res?.id) ? (
-                          props.cmtReact.filter(
-                            (e) => e.comment_id == res?.id
-                          )[0].favorite == 1 ? (
+                          cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                            .favorite == 1 ? (
                             <img
                               onContextMenu={(e) => e.preventDefault()}
                               src={Selected_Favorite}
@@ -718,10 +744,8 @@ const FavComments = (props) => {
                         );
                       }}
                     >
-                      {props.cmtReact
-                        ?.map((e) => e.comment_id)
-                        ?.includes(res?.id) ? (
-                        props.cmtReact.filter((e) => e.comment_id == res?.id)[0]
+                      {cmtReact?.map((e) => e.comment_id)?.includes(res?.id) ? (
+                        cmtReact.filter((e) => e.comment_id == res?.id)[0]
                           .clap == 1 ? (
                           <img
                             onContextMenu={(e) => e.preventDefault()}

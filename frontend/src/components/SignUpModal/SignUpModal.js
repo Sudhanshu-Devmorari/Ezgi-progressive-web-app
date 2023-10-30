@@ -430,7 +430,7 @@ const SignUpModal = (props) => {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           id="phone"
-                          type="text"
+                          type="number"
                           className={`${
                             currentTheme === "dark"
                               ? "darkMode-input"
