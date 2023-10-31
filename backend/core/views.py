@@ -629,7 +629,8 @@ class SubscriptionView(APIView):
                 subscription_obj = Subscription.objects.get(standard_user=user, commentator_user=commentator,status='active')
                 # subscription_obj.status = 'deactive'
                 subscription_obj.is_cancelled = True
-                subscription_obj.save(update_fields=['is_cancelled', 'updated'])
+                subscription_obj.label = 4
+                subscription_obj.save(update_fields=['is_cancelled', 'label', 'updated'])
 
                 Notification.objects.create(
                         sender=user,receiver=commentator, 
@@ -5613,6 +5614,18 @@ class BankDetailsView(APIView):
                     else:
                         bank_details_serializer = {}  # Empty serializer if bank details not found
 
+                    withdrawable_rqst = Withdrawable.objects.filter(bankdetails=bank_details)
+                    for obj in withdrawable_rqst:
+
+                        formatted_date = obj.created.strftime("%d.%m.%Y - %H:%M")
+                        details = {
+                            "type":"Withdrawal Request",
+                            "duration": obj.status,
+                            "date":formatted_date,
+                            "amount": obj.amount
+                        }
+                        transactions.append(details)
+
                     subscription_obj = Subscription.objects.filter(commentator_user=user)
                     for obj in subscription_obj:
 
@@ -5797,7 +5810,16 @@ class BankDetailsView(APIView):
                             if action == 'approve':
                                 query.total_balance -= query.withdrawable_balance
                                 query.pending_balance -= query.withdrawable_balance
-                                query.save(update_fields=['total_balance', 'pending_balance', 'updated'])
+                                query.withdrawable_balance = 0
+                                notification_obj = Notification.objects.create(
+                                                sender=user,
+                                                receiver=query.user, 
+                                                subject='Withdrawal Request',
+                                                date=datetime.now().date(), 
+                                                status=False,
+                                                context=f'Your withdrawal request has been approved by Motiwy.',
+                                            )
+                                query.save(update_fields=['total_balance', 'pending_balance', 'withdrawable_balance', 'updated'])
 
                         return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
@@ -6558,13 +6580,20 @@ class AccountStatus(APIView):
                 level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
                 
                 required_wins = level_obj.winning_limit
+                required_success_rate = level_obj.sucess_rate
                 user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
+                user_success_rate = user.success_rate
+                user_current_success_rate = user_success_rate
 
                 percentage_left = (user_current_wins / required_wins) * 100
 
                 data = {
                     'comments_left' : round(percentage_left, 0),
                     'commentator_status' : user.commentator_status,
+                    'required_wins' : required_wins,
+                    'user_current_wins' : user_current_wins,
+                    'required_success_rate' : required_success_rate,
+                    'user_current_success_rate' : user_current_success_rate,
                 }
 
                 return Response({'data': data}, status=status.HTTP_200_OK)

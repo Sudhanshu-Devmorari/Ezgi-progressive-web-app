@@ -30,7 +30,7 @@ const CommentsPage = ({
 }) => {
   const [onlyPublic, setOnlyPublic] = useState("");
   const [filterCommentData, setFilterCommentData] = useState(null);
-  const [displayData, setDisplayData] = useState(mergedResult);
+  const [displayData, setDisplayData] = useState([]);
   const [publicSelected, setPublicSelected] = useState(false);
   const [adsdata, setAdsdata] = useState([]);
 
@@ -166,7 +166,7 @@ const CommentsPage = ({
       fetchBannerData();
     }
   }, [showBanner3]);
-
+  
   return (
     <>
       <SelectContentForEditorPage
@@ -207,7 +207,7 @@ const CommentsPage = ({
                   followingid={followingid}
                   verifyid={verifyid}
                   cmtReact={cmtReact}
-                  homeApiData={homeApiData}
+                  homeApiData={homeApiData}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                   setArrayMerge={setArrayMerge}
                   publicComments={publicComments}
                   setPublicComments={setPublicComments}
@@ -222,7 +222,7 @@ const CommentsPage = ({
           if (val.type == "highlight") {
             return (
               <>
-                {lastType == "comment" && <HighlightMainPage />}
+                {(lastType == "comment" || val.type == "highlight") && index == 0  && <HighlightMainPage />}
                 <SharedProfile
                   setActiveCommentsshow={setActiveCommentsshow}
                   data={val}
@@ -236,55 +236,6 @@ const CommentsPage = ({
           }
         })
       )}
-
-      {onlyPublic == "only public" &&
-        onlyPublicResult?.map((val, index) => {
-          let lastType = onlyPublicResult[index == 0 ? 0 : index - 1]?.type;
-
-          if (val.type == "comment") {
-            return (
-              <>
-                {lastType == "highlight" && (
-                  <div className="" id="banner3">
-                    <AdvertisementBanner data={adsdata} />
-                  </div>
-                )}
-                <ContentSection
-                  setActiveCommentsshow={setActiveCommentsshow}
-                  data={val}
-                  setData={setData}
-                  selectContent={selectContent}
-                  setSelectContent={setSelectContent}
-                  verifyid={verifyid}
-                  followingid={followingid}
-                  cmtReact={cmtReact}
-                  homeApiData={homeApiData}
-                  setArrayMerge={setArrayMerge}
-                  publicComments={publicComments}
-                  setPublicComments={setPublicComments}
-                  mergeArrays={mergeArrays}
-                  setCmtReact={setCmtReact}
-                  followingList={followingList}
-                  setDashboardSUser={setDashboardSUser}
-                />
-              </>
-            );
-          }
-          if (val.type == "highlight") {
-            return (
-              <>
-                {lastType == "comment" && <HighlightMainPage />}
-                <SharedProfile
-                  setActiveCommentsshow={setActiveCommentsshow}
-                  data={val}
-                  setData={setData}
-                  setSelectContent={setSelectContent}
-                  setDashboardSUser={setDashboardSUser}
-                />
-              </>
-            );
-          }
-        })}
     </>
   );
 };

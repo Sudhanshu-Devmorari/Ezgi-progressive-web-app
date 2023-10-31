@@ -45,6 +45,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     commentator_user=UserSerializer()
     standard_user = UserSerializer()
     start_date = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
     class Meta:
         model = Subscription
         fields = '__all__'
@@ -53,6 +54,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         # formatted_time = obj.start_date.strftime("%H:%M")
         # return f"{formatted_date} - {formatted_time}"
         return f"{formatted_date}"
+    
+    def get_label(self, obj):
+        label = obj.get_label_display()
+        return label
 
 # class NotificationSerializer(serializers.ModelSerializer):
 #     class Meta:

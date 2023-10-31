@@ -48,11 +48,11 @@ def subscription_reminder_cron():
 
         # Update subscription status to pending if subscription is not actived after subscription expiration
         before_three_days = today_date + timedelta(days=3)
-        pending_status = Subscription.objects.filter(end_date__date__lte=before_three_days, end_date__date__gte=today_date, status='active')
+        pending_status = Subscription.objects.filter(end_date__date__lte=before_three_days, end_date__date__gte=today_date, status='active', label=1).update(label=2)
         # pending_status = Subscription.objects.filter(end_date__gt=(today_date+ timedelta(days=3)), end_date__lt=(today_date+ timedelta(days=5)), status='active').update(status='pending')
         
         # Deactivate subscription after 3 days of expiration if subscription not activated
-        deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active').update(status='deactive')
+        deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active', label=1).update(status='deactive', label=3)
         # pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
 
 

@@ -15,16 +15,20 @@ const WithdrawalModal = (props) => {
 
   const [minAmount, setMinAmount] = useState(0);
 
-  const handleWithdrawalAmount = async() => {
-    const res = await axios.get(
-      `${config?.apiUrl}/get-minimum-amount/${userId}/`,
-    );
-    // console.log("RES: ", res)
-    setMinAmount(res?.data?.minimum_amount)
-  }
+  const handleWithdrawalAmount = async () => {
+    try {
+      const res = await axios.get(
+        `${config?.apiUrl}/get-minimum-amount/${userId}/`
+      );
+      // console.log("RES: ", res)
+      setMinAmount(res?.data?.minimum_amount);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    handleWithdrawalAmount()
+    handleWithdrawalAmount();
   }, []);
 
   const [withdrawalLoading, setWithdrawalLoading] = useState(false);
@@ -72,7 +76,10 @@ const WithdrawalModal = (props) => {
     // console.log("minAmount: ", minAmount)
     // console.log(bankDetails?.withdrawable_balance,"============>>bankDetails?.withdrawable_balance", typeof(bankDetails?.withdrawable_balance))
     // console.log(bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0,'LLLLL')
-    if (bankDetails?.withdrawable_balance === null || bankDetails?.withdrawable_balance === 0) {
+    if (
+      bankDetails?.withdrawable_balance === null ||
+      bankDetails?.withdrawable_balance === 0
+    ) {
       props?.onHide();
       Swal.fire({
         title: "Error",
@@ -82,7 +89,7 @@ const WithdrawalModal = (props) => {
         customClass:
           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
-    }else if(bankDetails?.withdrawable_balance >= minAmount){
+    } else if (bankDetails?.withdrawable_balance >= minAmount) {
       try {
         setWithdrawalLoading(true);
         const res = await axios.post(
@@ -124,8 +131,7 @@ const WithdrawalModal = (props) => {
           });
         }
       }
-    } 
-    else {
+    } else {
       props?.onHide();
       setWithdrawalLoading(false);
       Swal.fire({
@@ -210,7 +216,9 @@ const WithdrawalModal = (props) => {
               </div>
               <div className="text-center">
                 <div className="h5">Withdrawable Balance</div>
-                <div className="h5">{bankDetails?.withdrawable_balance || 0}₺</div>
+                <div className="h5">
+                  {bankDetails?.withdrawable_balance || 0}₺
+                </div>
               </div>
               <div className="d-flex justify-content-center my-4">
                 <button

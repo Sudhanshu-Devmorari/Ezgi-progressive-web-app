@@ -127,20 +127,37 @@ const MySubscribers = (props) => {
                                 style={{
                                   color:
                                     currentTheme === "dark"
-                                      ? res.status === "active"
+                                      ? res?.label === "Pending"
+                                        ? "#FFCC00"
+                                        : res?.label === "Active"
                                         ? "#37FF80"
-                                        : res.status === "pending"
+                                        : res?.label === "Cancel" ||
+                                          res?.label === "Terminated"
                                         ? "#4DD5FF"
-                                        : res.status === "deactive"
-                                        ? "#FF5757"
-                                        : "#007BFC"
-                                      : res.status === "active"
+                                        : ""
+                                      : res?.label === "Pending"
+                                      ? "#FFCC00"
+                                      : res?.label === "Cancel" ||
+                                        res?.label === "Terminated"
+                                      ? "#00659D"
+                                      : res?.label === "Active"
                                       ? "#00DE51"
-                                      : res.status === "pending"
-                                      ? "#007BFC"
-                                      : res.status === "deactive"
-                                      ? "#FF5757"
-                                      : "#007BFC",
+                                      : "",
+                                  // currentTheme === "dark"
+                                  //   ? res.status === "active"
+                                  //     ? "#37FF80"
+                                  //     : res.status === "pending"
+                                  //     ? "#4DD5FF"
+                                  //     : res.status === "deactive"
+                                  //     ? "#FF5757"
+                                  //     : "#007BFC"
+                                  //   : res.status === "active"
+                                  //   ? "#00DE51"
+                                  //   : res.status === "pending"
+                                  //   ? "#007BFC"
+                                  //   : res.status === "deactive"
+                                  //   ? "#FF5757"
+                                  //   : "#007BFC",
                                   backgroundColor:
                                     currentTheme === "dark"
                                       ? "#0D2A53"
@@ -154,9 +171,10 @@ const MySubscribers = (props) => {
                                   fontSize: "12px",
                                 }}
                               >
-                                {res?.status == "deactive"
+                                {/* {res?.status == "deactive"
                                   ? "Ended"
-                                  : res?.status}
+                                  : res?.status} */}
+                                {res?.label}
                               </button>
                             </div>
                           </div>
@@ -269,20 +287,37 @@ const MySubscribers = (props) => {
                                 style={{
                                   color:
                                     currentTheme === "dark"
-                                      ? res?.status === "pending"
+                                      ? res?.label === "Pending"
                                         ? "#FFCC00"
-                                        : res?.status === "active"
+                                        : res?.label === "Active"
                                         ? "#37FF80"
-                                        : res?.status === "deactive"
+                                        : res?.label === "Cancel" ||
+                                          res?.label === "Terminated"
                                         ? "#4DD5FF"
                                         : ""
-                                      : res?.status === "pending"
+                                      : res?.label === "Pending"
                                       ? "#FFCC00"
-                                      : res?.status === "deactive"
+                                      : res?.label === "Cancel" ||
+                                        res?.label === "Terminated"
                                       ? "#00659D"
-                                      : res?.status === "active"
+                                      : res?.label === "Active"
                                       ? "#00DE51"
                                       : "",
+                                  // currentTheme === "dark"
+                                  //   ? res?.status === "pending"
+                                  //     ? "#FFCC00"
+                                  //     : res?.status === "active"
+                                  //     ? "#37FF80"
+                                  //     : res?.status === "deactive"
+                                  //     ? "#4DD5FF"
+                                  //     : ""
+                                  //   : res?.status === "pending"
+                                  //   ? "#FFCC00"
+                                  //   : res?.status === "deactive"
+                                  //   ? "#00659D"
+                                  //   : res?.status === "active"
+                                  //   ? "#00DE51"
+                                  //   : "",
                                   backgroundColor:
                                     currentTheme === "dark"
                                       ? "#0D2A53"
@@ -296,9 +331,10 @@ const MySubscribers = (props) => {
                                   fontSize: "12px",
                                 }}
                               >
-                                {res?.status == "deactive"
+                                {/* {res?.status == "deactive"
                                   ? "Ended"
-                                  : res?.status}
+                                  : res?.status} */}
+                                {res?.label}
                               </button>
                             </div>
                           </div>

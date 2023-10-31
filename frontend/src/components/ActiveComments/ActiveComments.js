@@ -259,6 +259,8 @@ const ActiveComments = (props) => {
           );
 
           Swal.fire({
+            customClass:
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
             title: "You have Unfollowed",
             icon: "success",
           });
@@ -462,6 +464,8 @@ const ActiveComments = (props) => {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, Cancel Subscription!",
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           }).then((result) => {
             if (result.isConfirmed) {
               cancelSubcription();
@@ -527,7 +531,10 @@ const ActiveComments = (props) => {
   //   }
   // }, [profileData]);
 
-  console.log(profileData?.subscription_end_date,"=============profileData?.subscription_end_date")
+  console.log(
+    profileData?.subscription_end_date,
+    "=============profileData?.subscription_end_date"
+  );
 
   const expirationDate = moment(profileData?.subscription_end_date);
   const [daysUntilExpiration, setDaysUntilExpiration] = useState(
@@ -1093,27 +1100,30 @@ const ActiveComments = (props) => {
                   date.
                 </span>
               )}
-              {(daysUntilExpiration + 1) < 3 && daysUntilExpiration >= 0 && profileData?.is_subscribe && !profileData?.is_cancelled && (
-                <button
-                  onClick={() => {
-                    if (userId) {
-                      checkDeactivation("subscribe model");
-                    }
-                  }}
-                  className="ms-1 px-3 py-1"
-                  style={{
-                    border:
-                      currentTheme === "dark"
-                        ? "1px solid #37FF80"
-                        : "1px solid #00659D",
-                    color: currentTheme === "dark" ? "#37FF80" : "#00659D",
-                    backgroundColor: "transparent",
-                    borderRadius: "3px",
-                  }}
-                >
-                  Renew
-                </button>
-              )}
+              {daysUntilExpiration + 1 < 3 &&
+                daysUntilExpiration >= 0 &&
+                profileData?.is_subscribe &&
+                !profileData?.is_cancelled && (
+                  <button
+                    onClick={() => {
+                      if (userId) {
+                        checkDeactivation("subscribe model");
+                      }
+                    }}
+                    className="ms-1 px-3 py-1"
+                    style={{
+                      border:
+                        currentTheme === "dark"
+                          ? "1px solid #37FF80"
+                          : "1px solid #00659D",
+                      color: currentTheme === "dark" ? "#37FF80" : "#00659D",
+                      backgroundColor: "transparent",
+                      borderRadius: "3px",
+                    }}
+                  >
+                    Renew
+                  </button>
+                )}
             </div>
           )}
         {props.profile === "commentator" && (

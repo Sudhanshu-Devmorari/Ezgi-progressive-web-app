@@ -205,7 +205,6 @@ const MainPage = () => {
       .filter((e) => arr[e])
       .map((e) => arr[e]);
 
-    console.log("staticData::::::::::::", staticData);
     setMergedResult(staticData);
     // setFilterData(staticData);
   }
@@ -342,7 +341,7 @@ const MainPage = () => {
         })),
       ];
     }
-
+    console.log(merged,"=======>>merged")
     setSubscriptionResult(merged);
   };
 
@@ -414,6 +413,7 @@ const MainPage = () => {
           })),
         ];
       }
+
       setOnlyPublicResult(merged);
     } else {
       mergeArrays();
@@ -906,6 +906,9 @@ const MainPage = () => {
                           if (val.type == "highlight") {
                             return (
                               <>
+                                {/* {lastType == "comment" || val.type !== "comment"
+                                  ? index === 0 && <HighlightMainPage />
+                                  : null} */}
                                 {lastType == "comment" ? (
                                   <HighlightMainPage />
                                 ) : null}

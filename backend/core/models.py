@@ -158,10 +158,6 @@ class Subscription(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def get_label_display(self):
-        return dict(self.LABEL_CHOICES)[self.label]
-
-
 class GiftSubscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     duration = models.CharField(max_length=20, null=True, blank=True)

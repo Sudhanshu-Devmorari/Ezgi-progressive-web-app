@@ -132,7 +132,7 @@ const AccountStatus = (props) => {
   const fetchSubscriptionData = async () => {
     setSubLoading(true);
     try {
-      console.log("selectSub", selectSub)
+      console.log("selectSub", selectSub);
       const res = await axios.get(
         `${
           config?.apiUrl
@@ -268,7 +268,7 @@ const AccountStatus = (props) => {
   // ----------------------
   const [statusData, setStatusData] = useState({
     status: "",
-    left_winning: "",
+    left_winning: "", required_wins: "", user_current_wins: "", required_success_rate: "", user_current_success_rate: ""
   });
   useEffect(() => {
     async function getAccountstatus() {
@@ -279,6 +279,10 @@ const AccountStatus = (props) => {
         setStatusData({
           status: res?.data?.data?.commentator_status,
           left_winning: res?.data?.data?.comments_left,
+          required_wins: res?.data?.data?.required_wins,
+          user_current_wins: res?.data?.data?.user_current_wins,
+          required_success_rate: res?.data?.data?.required_success_rate,
+          user_current_success_rate: res?.data?.data?.user_current_success_rate,
         });
       } catch (error) {}
     }
@@ -298,14 +302,14 @@ const AccountStatus = (props) => {
         <div className="row g-0">
           <div className="col-4">
             <div
-              className="me-2 p-2"
+              className="me-2 p-1"
               style={{
                 backgroundColor:
                   currentTheme === "dark" ? "#0D2A53" : "#FFFFFF",
                 height: "100%",
               }}
             >
-              <div className="ms-3" style={{ width: 75, height: 75 }}>
+              {/* <div className="ms-3" style={{ width: 75, height: 75 }}>
                 <CircularProgressbarWithChildren
                   circleRatio={0.75}
                   value={statusData.left_winning || 0}
@@ -329,11 +333,13 @@ const AccountStatus = (props) => {
                     }}
                   />
                 </CircularProgressbarWithChildren>
-              </div>
+              </div> */}
               <div
                 className="d-flex flex-column text-center mt-2 cicular-content-section"
                 style={{ fontSize: "13px" }}
               >
+                <div style={{fontSize: "12px"}}>Win Comment {statusData?.user_current_wins                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }/{statusData?.required_wins} </div>
+                  <div style={{fontSize: "12px"}}>Success Rate {statusData?.user_current_success_rate}/{statusData?.required_success_rate}</div>
                 <span>Hesap Durumu</span>
                 <span
                   className="text-capitalize"
