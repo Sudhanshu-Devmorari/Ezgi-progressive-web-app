@@ -27,6 +27,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ParseError, APIException
 
 from collections import Counter, defaultdict
+import math
 
 # Models
 from core.models import (User, FollowCommentator, Comments, Subscription, Notification, CommentReaction,
@@ -6583,9 +6584,15 @@ class AccountStatus(APIView):
                 required_success_rate = level_obj.sucess_rate
                 user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
                 user_success_rate = user.success_rate
+                print('user.success_rate: ', user.success_rate)
                 user_current_success_rate = user_success_rate
 
                 percentage_left = (user_current_wins / required_wins) * 100
+                print()
+                print()
+                print('round(user_current_success_rate, 2): ', math.floor(user_current_success_rate))
+                print()
+                print()
 
                 data = {
                     'comments_left' : round(percentage_left, 0),
@@ -6593,7 +6600,7 @@ class AccountStatus(APIView):
                     'required_wins' : required_wins,
                     'user_current_wins' : user_current_wins,
                     'required_success_rate' : required_success_rate,
-                    'user_current_success_rate' : user_current_success_rate,
+                    'user_current_success_rate' : math.floor(user_current_success_rate),
                 }
 
                 return Response({'data': data}, status=status.HTTP_200_OK)
