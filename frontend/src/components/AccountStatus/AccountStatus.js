@@ -201,7 +201,8 @@ const AccountStatus = (props) => {
         return { daysRemaining: 0, showRenewButton: false }; // Handle invalid input gracefully
       }
 
-      const interval = countNumber[1].toLowerCase(); // e.g., "months"
+      // const interval = countNumber[1].toLowerCase(); // e.g., "months"
+      const interval = 'days'
 
       const duration = parseInt(countNumber[0], 10);
 
@@ -216,7 +217,8 @@ const AccountStatus = (props) => {
       const finaldaysRemaining = nextIntervalDate.diff(currentDate, "days");
 
       // console.log("finaldaysRemaining", finaldaysRemaining);
-      finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
+      // finaldaysRemaining >= 0 && setTotalDaysRemaining(finaldaysRemaining);
+      finaldaysRemaining > 0 && setTotalDaysRemaining(finaldaysRemaining);
 
       // const finalEndDate = nextIntervalDate.format("YYYY-MM-DD");
       const finalEndDate = moment(
@@ -240,7 +242,8 @@ const AccountStatus = (props) => {
 
       return {
         daysRemaining,
-        showRenewButton: daysRemaining <= 0 ? true : false,
+        // showRenewButton: daysRemaining <= 0 ? true : false,
+        showRenewButton: daysRemaining < 0 ? true : false,
         // showRenewButton: daysRemaining == 0 ? true : false,
       };
     };

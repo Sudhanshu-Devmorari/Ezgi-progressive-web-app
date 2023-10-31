@@ -12,6 +12,7 @@ logger = logging.getLogger('django_cron')
 
 def subscription_reminder_cron():
     try:
+        admin_user = User.objects.get(phone='5123456789', is_admin=True)
         notification_list = []
 
         # today_date = timezone.now().date() 
@@ -23,15 +24,16 @@ def subscription_reminder_cron():
 
         # deactive highlight plan
         active_highlights = Highlight.objects.filter(status='active', end_date__date__lt=today_date).update(status='deactive')
-        print('active_highlights: ', active_highlights)
 
         # Send notification and sms before 3 days of subscription expiration
         reminder_notification_sub_data = Subscription.objects.filter(end_date__date=cutoff_date.date(), status='active')
+
         for sub in reminder_notification_sub_data:
             is_exist = Notification.objects.filter(receiver=sub.standard_user, subject='Subscription Plan Expires', date=today_date).exists()
             
             if not is_exist:
                 notification_obj = Notification(
+                    sender=admin_user,
                     receiver=sub.standard_user, 
                     subject='Subscription Plan Expires',
                     date=today_date, 
@@ -62,6 +64,7 @@ def subscription_reminder_cron():
 
             if not is_highlight_notification:
                 notification = Notification(
+                    sender=admin_user,
                     receiver=highlight.user, 
                     subject='Highlight Plan Expires',
                     date=today_date, 
@@ -104,6 +107,9 @@ def membership_plan_check():
                 obj.user.is_active = False
                 obj.user.commentator_status = 'deactive'
                 obj.user.deactivate_commentator = 'deactive'
+                obj.user.save()
+            if current_date == obj.end_date.date():
+                obj.user.commentator_status = 'pending'
                 obj.user.save()
 
 # def subscriptionstatus():
@@ -401,6 +407,7 @@ def resolve_pending_comments(comments_data):
 
 def weekly_comment_count_check(): 
     # try:
+    admin_user = User.objects.get(phone='5123456789', is_admin=True)
     all_user = User.objects.filter(user_role='commentator')
 
     now = datetime.now()
@@ -416,6 +423,7 @@ def weekly_comment_count_check():
             ).count()
         if last_week_comments_count < 5:
             notification_obj = Notification.objects.create(
+                sender=admin_user,
                 receiver=user, 
                 subject='Weekly shared comment count',
                 date=datetime.now().date(), 
@@ -578,7 +586,8 @@ def comment_result_check():
                 win_count = len(correct_prediction)
                 if win_count >= level_obj.winning_limit and Success_rate >= int(level_obj.sucess_rate):
 
-                    admin_user = User.objects.get(is_admin=True)
+                    # admin_user = User.objects.get(is_admin=True)
+                    admin_user = User.objects.get(phone='5123456789', is_admin=True)
 
                     if user.commentator_level == 'apprentice':
                         user.commentator_level = "journeyman"

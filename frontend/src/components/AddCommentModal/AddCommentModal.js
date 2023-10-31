@@ -475,14 +475,14 @@ const AddCommentModal = (props) => {
           });
         } else if (error.response.status === 400) {
           // console.log("error.response.data:::::::::::", error);
-          // Swal.fire({
-          //   title: "Error",
-          //   text: `${error.response.data.data}`,
-          //   icon: "error",
-          //   backdrop: false,
-          //   customClass:
-          //     currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
-          // });
+          Swal.fire({
+            title: "Error",
+            text: `${error.response.data.data}`,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
         }
       }
     }

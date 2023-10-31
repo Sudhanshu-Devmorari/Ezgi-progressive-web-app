@@ -510,11 +510,11 @@ const FavComments = (props) => {
                             />
                           )}
 
-                          {(res?.is_prediction != true ||
+                          {(res?.is_prediction == false ||
                             res?.status === "yellow") && (
                             <img
                               src={
-                                (res?.is_prediction != true && circle_x) ||
+                                (res?.is_prediction == false && circle_x) ||
                                 (res?.status === "yellow" && clock_pause)
                               }
                               alt=""

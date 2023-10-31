@@ -468,7 +468,9 @@ class CommentView(APIView):
                 return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             if user.is_active == False:
                 return Response({'data' : "Your account has been deactivated. Contact support for assistance."}, status=status.HTTP_400_BAD_REQUEST)
-        
+            if user.commentator_status != "active":
+                return Response({'data' : f"Your editor account is currently {user.commentator_status}. Please renew your membership."}, status=status.HTTP_400_BAD_REQUEST)
+
             if user.user_role == 'commentator':
 
                 # Get the current date and time
@@ -662,14 +664,15 @@ class SubscriptionView(APIView):
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
-                if duration == "1 Months":
-                    end_date = start_date + timedelta(days=30)
-                if duration == "3 Months":
-                    end_date = start_date + timedelta(days=90)
-                if duration == "6 Months":
-                    end_date = start_date + timedelta(days=180)
-                if duration == "1 Year":
-                    end_date = start_date + timedelta(days=365)
+                # if duration == "1 Months":
+                #     end_date = start_date + timedelta(days=30)
+                # if duration == "3 Months":
+                #     end_date = start_date + timedelta(days=90)
+                # if duration == "6 Months":
+                #     end_date = start_date + timedelta(days=180)
+                # if duration == "1 Year":
+                #     end_date = start_date + timedelta(days=365)
+                end_date = start_date + timedelta(days=1)
 
                 money = request.data.get('money')
             if user.user_role == 'commentator':
@@ -780,7 +783,7 @@ class NotificationView(APIView):
         user = User.objects.get(id=id)
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
-            notification_obj = Notification.objects.filter(receiver=user).exclude(sender=user).order_by('-created')
+            notification_obj = Notification.objects.filter(receiver=user).exclude(sender=user).order_by('-created')[:30]
             serializer = NotificationSerializer(notification_obj, many=True)
             data = serializer.data
             return Response(data=data, status=status.HTTP_200_OK)
@@ -1517,12 +1520,13 @@ class HighlightPurchaseView(APIView):
                 if duration not in ["1 Week", "2 Week", "1 Month"]:
                     raise ValueError('Invalid duration.')
 
-                if duration == "1 Week":
-                    end_date = start_date + timezone.timedelta(days=7)
-                elif duration == "2 Week":
-                    end_date = start_date + timezone.timedelta(days=14)
-                else:  # duration == "1 Month"
-                    end_date = start_date + timezone.timedelta(days=30)
+                # if duration == "1 Week":
+                #     end_date = start_date + timezone.timedelta(days=7)
+                # elif duration == "2 Week":
+                #     end_date = start_date + timezone.timedelta(days=14)
+                # else:  # duration == "1 Month"
+                #     end_date = start_date + timezone.timedelta(days=30)
+                end_date = start_date + timezone.timedelta(days=1)
                 
                 user = User.objects.get(id=request.data['id'])
 
@@ -1531,8 +1535,10 @@ class HighlightPurchaseView(APIView):
 
                 highlight_obj = Highlight.objects.create(user=user, duration=duration, start_date=start_date, end_date=end_date, money=money, highlight=True, status='active')
                 if highlight_obj != None:
-                    
+                    admin_user = User.objects.get(phone='5123456789', is_admin=True)
+
                     notification_obj = Notification.objects.create(
+                            sender=admin_user,
                             receiver=user, 
                             subject='Purchase Transactions', 
                             date=datetime.today().date(), 
@@ -4991,14 +4997,16 @@ class BecomeEditorView(APIView):
                         # editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
                         startdate_str = request.data.get('startdate')
                         formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
-                        enddate = formatted_startdate + timedelta(days=30)
+                        # enddate = formatted_startdate + timedelta(days=30)
+                        enddate = formatted_startdate + timedelta(days=1)
                         # enddate = ''
                         obj = BecomeCommentator.objects.create(user=user, money=request.data.get('monthly_amount'), membership_status='new', 
                                                                commentator=True, commentator_level='apprentice', status='active', duration=request.data.get('duration'), 
                                                                start_date=formatted_startdate, end_date=enddate)
                         obj.save()
-
+                        admin_user = User.objects.get(phone='5123456789', is_admin=True)
                         notification_obj = Notification.objects.create(
+                            sender=admin_user,
                             receiver=user, 
                             subject='Purchase Transactions', 
                             date=datetime.today().date(), 
@@ -6215,8 +6223,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6271,8 +6279,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6317,8 +6325,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6461,6 +6469,8 @@ class SubscriptionReNew(APIView):
                         try:
                             serializer.save()
                             
+                            user.commentator_status = "active"
+                            user.deactivate_commentator = ""
                             user.is_active = True
                             user.save()
 
@@ -6469,8 +6479,10 @@ class SubscriptionReNew(APIView):
                                 user.save()
                         except Exception as e:
                             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+                        
+                        admin_user = User.objects.get(phone='5123456789', is_admin=True)
                         notification_obj = Notification.objects.create(
+                            sender=admin_user,
                             receiver=user, 
                             subject='Purchase Transactions', 
                             date=datetime.today().date(), 
