@@ -5397,7 +5397,7 @@ class RetrievePageData():
             print()
 
             # Get data
-            all_commentator_data = User.objects.filter(Q(~Q(id=user_id) & ~Q(id__in=highlight_users_ids)), user_role='commentator', is_admin=False, is_delete=False).order_by('-created').only('id')
+            all_commentator_data = User.objects.filter(Q(~Q(id=user_id) & ~Q(id__in=highlight_users_ids)), user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')
             print('all_commentator_data: ', [i.id for i in all_commentator_data])
             all_commentator = list(highlight_users) + list(all_commentator_data)
 
@@ -5810,7 +5810,7 @@ class BankDetailsView(APIView):
                                             )
                             if action == 'approve':
                                 query.total_balance -= query.withdrawable_balance
-                                query.pending_balance -= query.withdrawable_balance
+                                # query.pending_balance -= query.withdrawable_balance
                                 query.withdrawable_balance = 0
                                 notification_obj = Notification.objects.create(
                                                 sender=user,
@@ -6106,7 +6106,8 @@ class CreateWithdrawableRequest(APIView):
             try:
                 bankdetails = BankDetails.objects.get(user=user, bank_iban=bankiban)
                 if not Withdrawable.objects.filter(bankdetails=bankdetails, status='pending').exists():
-                    obj = Withdrawable.objects.create(bankdetails=bankdetails, amount=amount, withdrawable=True)
+                    obj = Withdrawable.objects.create(bankdetails=bankdetails, amount=amount, withdrawable=True, 
+                                                      old_total_balance=bankdetails.total_balance, new_total_balance=bankdetails.total_balance)
                     obj.save()
                     bankdetails.status = 'pending'
                     bankdetails.save(update_fields=['status','updated'])
@@ -6246,8 +6247,8 @@ class PaymentView(APIView):
                     "ORDER_REF_NUMBER": ref_no,
                     "ORDER_AMOUNT": money,
                     "PRICES_CURRENCY": "TRY",
-                    "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                    # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                    # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                    "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
                 },
                 "Customer": {
                     "FIRST_NAME": "Firstname",
@@ -6302,8 +6303,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6348,8 +6349,8 @@ class PaymentView(APIView):
                 "ORDER_REF_NUMBER": ref_no,
                 "ORDER_AMOUNT": money,
                 "PRICES_CURRENCY": "TRY",
-                "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
-                # "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
+                # "BACK_URL": f"http://localhost:3000/?ref={ref_no}"
+                "BACK_URL": f"https://motiwy.com/?ref={ref_no}"
             },
             "Customer": {
                 "FIRST_NAME": "Firstname",
@@ -6477,7 +6478,8 @@ class SubscriptionReNew(APIView):
                 formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
                 data['start_date'] = formatted_startdate
 
-                enddate = formatted_startdate + timedelta(days=30)
+                # enddate = formatted_startdate + timedelta(days=30)
+                enddate = formatted_startdate + timedelta(days=1)
                 data['end_date'] = enddate
 
                 data['status'] = 'active'

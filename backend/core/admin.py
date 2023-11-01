@@ -22,7 +22,7 @@ class CommentsAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('id','commentator_user','standard_user','subscription','duration','money','start_date','end_date','status', 'created','updated')
+    list_display = ('id','commentator_user','standard_user','subscription','duration','money','start_date','end_date','status', "label", 'created','updated')
 
 
 @admin.register(Notification)
@@ -125,7 +125,7 @@ class BankDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(Withdrawable)
 class WithdrawableAdmin(admin.ModelAdmin):
-    list_display = ('id', 'bankdetails', 'amount','status','withdrawable', 'created', 'updated')
+    list_display = ('id', 'bankdetails', 'amount','status','withdrawable', 'old_total_balance', 'new_total_balance', 'created', 'updated')
 
 
 @admin.register(BankUpdate)
