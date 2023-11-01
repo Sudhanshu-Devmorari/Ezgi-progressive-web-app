@@ -850,7 +850,7 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
-
+                    {console.log(subscriptionResult,"=============>>subscriptionResult")}
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!
@@ -861,7 +861,7 @@ const MainPage = () => {
                           let lastType =
                             subscriptionResult[index == 0 ? 0 : index - 1]
                               ?.type;
-
+console.log(lastType,"=================lastType")
                           if (val.type == "comment") {
                             return (
                               <>
