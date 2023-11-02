@@ -69,10 +69,12 @@ export const EditorBanner = (props) => {
     getBannerImg();
   }, []);
 
-  const [categoryCounts, setCategoryCounts] = useState({
-    futbol: 0,
-    basketbol: 0,
-  });
+  // const [categoryCounts, setCategoryCounts] = useState({
+  //   futbol: 0,
+  //   basketbol: 0,
+  // });
+  const categoryCounts = props?.categoryCounts
+  const setCategoryCounts = props?.setCategoryCounts
   useEffect(() => {
     async function getFutbolOrBasketbolCounts() {
       try {

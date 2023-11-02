@@ -294,17 +294,31 @@ const SubscribeModal = (props) => {
       );
       // console.log("RenewMembership", RenewMembership);
       if (RenewMembership.status == 200) {
-        window.history.pushState(null, null, window.location.origin + "/");
-        window.addEventListener("popstate", () => {
-          window.history.pushState(null, null, window.location.origin + "/");
+        const confirm = await Swal.fire({
+          title: "Success",
+          text: "User has successfully renew the membership.",
+          icon: "success",
+          backdrop: false,
+          customClass:
+            currentTheme === "dark"
+              ? "dark-mode-alert"
+              : "light-mode-alert",
         });
-        // return () => {
-        // Remove event listener when component unmounts
-        window.removeEventListener("popstate", () => {
+        if (confirm.value === true) {
+
           window.history.pushState(null, null, window.location.origin + "/");
-          window.location.replace(window.location.origin + "/");
-        });
-        window.location.reload();
+          window.addEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+          });
+          // return () => {
+          // Remove event listener when component unmounts
+          window.removeEventListener("popstate", () => {
+            window.history.pushState(null, null, window.location.origin + "/");
+            window.location.replace(window.location.origin + "/");
+          });
+
+          window.location.reload();
+        }
         // };
         // console.log("window.history.length", window.history.length);
         // console.log("\n\nwindow.history\n", window.history);

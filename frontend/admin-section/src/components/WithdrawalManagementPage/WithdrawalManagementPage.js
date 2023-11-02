@@ -454,6 +454,7 @@ const WithdrawalManagementPage = (props) => {
                               status={res?.status}
                               from={"withdrawal"}
                               id={res?.bankdetails?.id}
+                              withdrawalId={res?.id}
                               getWithdrawData={getWithdrawData}
                             />
                           )}

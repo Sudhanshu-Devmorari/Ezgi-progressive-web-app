@@ -412,11 +412,15 @@ const ActiveComments = (props) => {
   };
 
   const [commentatorLevel, setCommentatorLevel] = useState(null);
-  const currentDate = new Date()
-  const day = currentDate.getDate();
-  const month = currentDate.getMonth() + 1;
-  const year = currentDate.getFullYear();
-  const formattedCurrentDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+  // const currentDate = new Date()
+  // const day = currentDate.getDate();
+  // const month = currentDate.getMonth() + 1;
+  // const year = currentDate.getFullYear();
+  // const formattedCurrentDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+
+  const currentDate = moment();
+  const formattedCurrentDate = currentDate.format('DD/MM/YYYY');
+  
   // check activation
   const checkDeactivation = async (value) => {
     try {
@@ -441,10 +445,14 @@ const ActiveComments = (props) => {
               const end_date = new Date(
                 error?.response?.data?.end_date
               ).toLocaleDateString();
+              console.log("end_date", end_date)
+              console.log("end_date", end_date)
               Swal.fire({
-                text: end_date === formattedCurrentDate ? 
-                'Your Highlight plan has expired today. You will be able to purchase it again starting tomorrow.' :
+                text: end_date == formattedCurrentDate ? 
+                'Your Highlight plan has expired today. You will be able to purchase it again starting tomorrow.' : 
                 `Your Highlight plan will expire on ${end_date}. You can purchase it again after this date.`,
+                // text: 'Your Highlight plan has expired today. You will be able to purchase it again starting tomorrow.' ,
+                
                 backdrop: false,
                 customClass:
                   currentTheme === "dark"

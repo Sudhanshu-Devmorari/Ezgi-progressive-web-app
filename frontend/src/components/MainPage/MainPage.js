@@ -41,6 +41,11 @@ const MainPage = () => {
     dashboardShow == "true" ? true : false || false
   );
 
+  const [categoryCounts, setCategoryCounts] = useState({
+    futbol: 0,
+    basketbol: 0,
+  });
+
   const themeMode = localStorage.getItem("CurrentTheme");
   const [publicSelected, setPublicSelected] = useState(false);
 
@@ -752,6 +757,8 @@ const MainPage = () => {
                     setSelectContent={setSelectContent}
                     setContentData={setContentData}
                     setCommentsReactionsSports={setCommentsReactionsSports}
+                    categoryCounts={categoryCounts}
+                    setCategoryCounts={setCategoryCounts}
                   />
                 </>
               )}
@@ -861,7 +868,7 @@ const MainPage = () => {
                           let lastType =
                             subscriptionResult[index == 0 ? 0 : index - 1]
                               ?.type;
-console.log(lastType,"=================lastType")
+
                           if (val.type == "comment") {
                             return (
                               <>
@@ -1013,6 +1020,8 @@ console.log(lastType,"=================lastType")
                   highlights={highlights}
                   handleOnlyPublicData={handleOnlyPublicData}
                   setDashboardSUser={setDashboardSUser}
+                  categoryCounts={categoryCounts}
+                  setCategoryCounts={setCategoryCounts}
                 />
               )}
               {selectContent === "comments" && (

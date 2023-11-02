@@ -20,6 +20,8 @@ const EditorsPage = ({
   highlights,
   handleOnlyPublicData,
   setDashboardSUser,
+  categoryCounts,
+  setCategoryCounts,
 }) => {
   const [filterData, setFilterData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +32,19 @@ const EditorsPage = ({
   const [adsId, setAdsId] = useState(null);
   useEffect(() => {
     // console.log("this page called");
-
+    async function getFutbolOrBasketbolCounts() {
+      try {
+        const res = await axios.get(`${config.apiUrl}/editor-futbol-basketbol-count/`);
+        setCategoryCounts({
+          ...categoryCounts,
+          futbol: res?.data?.futbol,
+          basketbol: res?.data?.basketbol,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getFutbolOrBasketbolCounts();
     HandleCommentator();
   }, []);
 

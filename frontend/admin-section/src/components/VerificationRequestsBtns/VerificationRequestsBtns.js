@@ -11,7 +11,7 @@ const VerificationRequestsBtns = (props) => {
   const [isLoadingApprove, setIsLoadingApprove] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies();
 
-  const handleApproveOrReject = async (action) => {
+  const handleApproveOrReject = async (action, w_id) => {
     if (props?.from === "withdrawal") {
       try {
         if (action === "approve") {
@@ -23,6 +23,7 @@ const VerificationRequestsBtns = (props) => {
         const res = await axios.patch(`${config.apiUrl}/bank-details/${adminId}`, {
           bank_id: id,
           action: action,
+          w_id:w_id,
         });
         // console.log(res,"=========>>res")
         if (res.status === 200) {
@@ -112,7 +113,7 @@ const VerificationRequestsBtns = (props) => {
         <button
           onClick={() => {
             if (id) {
-              handleApproveOrReject("approve");
+              handleApproveOrReject("approve", props?.withdrawalId);
             }
           }}
           className="px-2 mx-3"
@@ -129,7 +130,7 @@ const VerificationRequestsBtns = (props) => {
         <button
           onClick={() => {
             if (id) {
-              handleApproveOrReject("reject");
+              handleApproveOrReject("reject", props?.withdrawalId);
             }
           }}
           className="px-2"

@@ -8,7 +8,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
                          ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,AccountStatus,
-                         RetrieveChartData, WithdrawalSettingView, GetMinimumAmount,
+                         RetrieveChartData, WithdrawalSettingView, GetMinimumAmount, EditorsFutbolAndBasketbolCountView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -129,6 +129,7 @@ urlpatterns = [
     path('highlight-purchase/', HighlightPurchaseView.as_view(), name='User-Data'),
     path('editor-banner/', EditorBannerView.as_view(), name='Editor-banner'),
     path('futbol-basketbol-count/', GetFutbolAndBasketbolCountView.as_view(), name='futbol-basketbol-count'),
+    path('editor-futbol-basketbol-count/', EditorsFutbolAndBasketbolCountView.as_view(), name='editor-futbol-basketbol-count'),
     path('payment/', PaymentView.as_view(), name='payment'),
     path('transcation-query/', CheckTransactionEnquiry.as_view(), name='transcation-query'),
     path('account-status/<int:id>', AccountStatus.as_view(), name='transcation-query'),

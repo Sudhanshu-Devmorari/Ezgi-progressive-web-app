@@ -5789,14 +5789,16 @@ class BankDetailsView(APIView):
             if is_admin:
                 action = request.data['action'] if 'action' in request.data else None
                 bank_id = request.data['bank_id'] if 'bank_id' in request.data else None
-                if action is not None and bank_id is not None:
+                withdrawal_id = request.data['w_id'] if 'w_id' in request.data else None
+                if action is not None and bank_id is not None and withdrawal_id is not None:
                     try:
                         query = BankDetails.objects.get(id=bank_id) 
                         query.status = action
                         query.save(update_fields=['status', 'updated'])
                         is_withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).exists()
                         if is_withdrawal_obj:
-                            withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).order_by('-created').first()
+                            # withdrawal_obj = Withdrawable.objects.filter(bankdetails=query).order_by('-created').first()
+                            withdrawal_obj = Withdrawable.objects.get(bankdetails=query, id=withdrawal_id)
                             withdrawal_obj.status = action
                             withdrawal_obj.save(update_fields=['status', 'updated'])
                             if action == 'reject':
@@ -5812,6 +5814,8 @@ class BankDetailsView(APIView):
                                 query.total_balance -= query.withdrawable_balance
                                 # query.pending_balance -= query.withdrawable_balance
                                 query.withdrawable_balance = 0
+                                withdrawal_obj.new_total_balance -= withdrawal_obj.amount
+                                withdrawal_obj.save(update_fields=['new_total_balance', 'updated'])
                                 notification_obj = Notification.objects.create(
                                                 sender=user,
                                                 receiver=query.user, 
@@ -5928,6 +5932,15 @@ class GetFutbolAndBasketbolCountView(APIView):
         try:
             futbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Futbol'], is_resolve=False, status='approve').count()
             basketbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Basketbol'], is_resolve=False, status='approve').count()
+            return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class EditorsFutbolAndBasketbolCountView(APIView):
+    def get(self, request):
+        try:
+            futbol = User.objects.filter(is_delete=False, category=['Futbol'], commentator_status='active').count()
+            basketbol = User.objects.filter(is_delete=False, category=['Basketbol'], commentator_status='active').count()
             return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
