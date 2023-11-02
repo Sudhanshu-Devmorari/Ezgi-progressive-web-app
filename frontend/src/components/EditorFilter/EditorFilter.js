@@ -5,6 +5,7 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import config from "../../config";
+import { userId } from "../GetUser";
 
 const EditorFilter = (props) => {
   const clearFilterData = () => {
@@ -16,7 +17,7 @@ const EditorFilter = (props) => {
   const handleShowButtonClick = async () => {
     try {
       const response = await axios.post(
-        `${config?.apiUrl}/filter-editors/`,
+        `${config?.apiUrl}/filter-editors/?user_id=${userId}`,
         {
           category: [selectedCountry],
           lavel: selectedLevel,
@@ -33,6 +34,8 @@ const EditorFilter = (props) => {
         value: {
           user: item.editor_data,
           subscriber_count: item.subscriber_count,
+          is_highlight: item.is_highlight,
+          is_fav_editor: item.is_fav_editor,
         },
       }));
 

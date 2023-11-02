@@ -574,10 +574,10 @@ class CommentView(APIView):
                         obj.save()
                     else:
                         obj = DataCount.objects.create(comment=1)
-                # send new Comment notification:
-                subscription_obj = Subscription.objects.filter(commentator_user=user)
-                for obj in subscription_obj:
-                    notification_obj = Notification.objects.create(sender=user,receiver=obj.standard_user,date=datetime.today().date(), status=False, context=f'{user.username} upload a new Comment.')
+                # # send new Comment notification:
+                # subscription_obj = Subscription.objects.filter(commentator_user=user)
+                # for obj in subscription_obj:
+                #     notification_obj = Notification.objects.create(sender=user,receiver=obj.standard_user,date=datetime.today().date(), status=False, context=f'{user.username} upload a new Comment.')
 
                 serializer = CommentsSerializer(comment_obj)
                 data = serializer.data
@@ -2296,6 +2296,29 @@ class CommentsManagement(APIView):
                 admin_user = User.objects.get(id=admin_id)
                 if request.data.get('status') == 'approve':
                     notification_obj = Notification.objects.create(sender=admin_user,receiver=comment.commentator_user,date=datetime.today().date(), status=False, context=f"{comment.match_detail} comment has been approved by admin and is now visible to other users.")
+                
+                    # send new Comment notification:
+                    # Send notification to followers who are not subscribers
+                    followers = FollowCommentator.objects.filter(commentator_user=comment.commentator_user)
+                    subscribers = Subscription.objects.filter(commentator_user=comment.commentator_user, standard_user__is_delete=False, status='active')
+                    subscriber_ids = subscribers.values_list('standard_user__id', flat=True)
+                    follower_notification = []
+
+                    for follower in followers:
+                        if follower.standard_user.id not in subscriber_ids:
+                            obj = Notification(sender=comment.commentator_user,receiver=follower.standard_user,date=datetime.today().date(), status=False, context=f'{comment.commentator_user.username} upload a new Comment.')
+                            follower_notification.append(obj)
+
+                    Notification.objects.bulk_create(follower_notification)
+
+                    # Send notification to subscribers
+                    notification_to_subscribers = []
+                    for subscriber in subscribers:
+                        obj = Notification(sender=comment.commentator_user,receiver=subscriber.standard_user,date=datetime.today().date(), status=False, context=f'{comment.commentator_user.username} upload a new Comment.')
+                        notification_to_subscribers.append(obj)
+
+                    Notification.objects.bulk_create(notification_to_subscribers)
+
                 else:
                     notification_obj = Notification.objects.create(sender=admin_user,receiver=comment.commentator_user,date=datetime.today().date(), status=False, context=f'{comment.match_detail} comment has been removed by admin.')
                 serializer.save()
@@ -3092,6 +3115,10 @@ class FilterEditors(APIView):
     def post(self, request, format=None, *args, **kwargs):
         data_list = {}
         try:
+            
+            user_id = request.query_params.get('user_id', None) 
+            user_id = user_id if User.objects.filter(id=user_id).exists() else None
+
             filters = {}
             if request.data:
                 if 'lavel' in request.data and request.data.get('lavel') != None and request.data.get('lavel') != "Select":
@@ -3123,12 +3150,28 @@ class FilterEditors(APIView):
                 filters['user_role'] = 'commentator'
                 query_filters = Q(**filters)
                 filtered_comments = User.objects.filter(query_filters)
+
+                retrive_data = RetrievePageData()
+
+                highlight_user_list = retrive_data.get_highlight_user()
+            
+                highlighted_users = filtered_comments.filter(id__in=highlight_user_list).order_by('?')
+                non_highlighted_users = filtered_comments.exclude(id__in=highlight_user_list)
+                filtered_comments = list(highlighted_users) + list(non_highlighted_users)
+
                 data = []
                 for obj in filtered_comments:
                     details = {}
                     count = Subscription.objects.filter(commentator_user=obj).count()
+                    is_highlight = Highlight.objects.filter(user=obj, status='active').exists()
+                    details['is_highlight'] = is_highlight
+
+                    if user_id != None:
+                        details['is_fav_editor'] = FavEditors.objects.filter(commentator_user=obj, standard_user_id=user_id, commentator_user__is_delete=False).exists()
+
                     serializer = UserSerializer(obj)
                     details['editor_data'] = serializer.data
+                
                     details['subscriber_count'] = count
                     data.append(details)
 
@@ -5379,35 +5422,22 @@ class RetrievePageData():
             
             user = User.objects.get(id=user_id) if id is not None else None       
 
-            print() 
-            print() 
-            print() 
-            
             # Get all highlight user
             highligt_user_list = self.get_highlight_user()
             highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')
             # highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).annotate(random_order=F('id') * 0).order_by('random_order')[:5]
-            print('highlight_users: ', [i.id for i in highlight_users])
-            print()
 
             # highlight_users = User.objects.filter(~Q(id=user_id), id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')[:5]
             highlight_users_ids = highlight_users.values_list('id', flat=True)
-            print('highlight_users_ids: ', highlight_users_ids)
-            print('highlight_users_ids___list: ', list(highlight_users_ids))
-            print()
 
             # Get data
             all_commentator_data = User.objects.filter(Q(~Q(id=user_id) & ~Q(id__in=highlight_users_ids)), user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')
-            print('all_commentator_data: ', [i.id for i in all_commentator_data])
             all_commentator = list(highlight_users) + list(all_commentator_data)
-
-            print()
-            print()
-            print()
 
             for obj in all_commentator:
                 detail = {}
-                count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
+                count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False, status='active').count()
+                # count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
                 user_data = UserSerializer(obj).data
                 
                 success_rate_score_points(obj.id)
