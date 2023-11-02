@@ -5436,7 +5436,7 @@ class RetrievePageData():
 
             for obj in all_commentator:
                 detail = {}
-                count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False, status='active').count()
+                count = Subscription.objects.filter(commentator_user_id=obj.id, standard_user__is_delete=False, status='active').count()
                 # count = Subscription.objects.filter(commentator_user_id=obj.id, commentator_user__is_delete=False).count()
                 user_data = UserSerializer(obj).data
                 
