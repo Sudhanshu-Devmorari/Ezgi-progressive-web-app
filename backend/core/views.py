@@ -5240,7 +5240,7 @@ class RetrievePageData():
                 comment_data['is_subscribe'] = is_subscribe
 
                 compare_date = datetime.now()
-                is_highlight = Highlight.objects.filter(user=comment.commentator_user, status='active', start_date__lte=compare_date, end_date__gte=compare_date).exists()
+                is_highlight = Highlight.objects.filter(user=comment.commentator_user, status='active').exists()
                 comment_data['is_highlight'] = is_highlight
 
                 success_rate_score_points(comment.commentator_user.id)
