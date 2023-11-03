@@ -346,7 +346,7 @@ const MainPage = () => {
         })),
       ];
     }
-    console.log(merged,"=======>>merged")
+    // console.log(merged,"=======>>merged")
     setSubscriptionResult(merged);
   };
 
@@ -857,7 +857,7 @@ const MainPage = () => {
                       publicSelected={publicSelected}
                       handleOnlyPublicData={handleOnlyPublicData}
                     />
-                    {console.log(subscriptionResult,"=============>>subscriptionResult")}
+                    {/* {console.log(subscriptionResult,"=============>>subscriptionResult")} */}
                     {subscriptionResult?.length === 0 ? (
                       <div className="d-flex gap-1 my-2 pb-2 h-75 align-items-center justify-content-center">
                         No Record Found!

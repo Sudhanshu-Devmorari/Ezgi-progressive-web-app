@@ -234,7 +234,7 @@ const WithdrawalManagementPage = (props) => {
           .includes(value.toLowerCase())
       // obj?.status?.toLowerCase().includes(status.toLowerCase())
     );
-    console.log(filteredArray1, "=>>filteredArray1");
+    // console.log(filteredArray1, "=>>filteredArray1");
     setFilteredArray(filteredArray1);
     selectedOption !== "All" && value == "" && handleDropFilter();
   };

@@ -55,10 +55,10 @@ const FAQEditor = () => {
         .then((res) => {
           // console.log(res);
           if (res.status === 200) {
-            console.log(
-              "res.data.total_earning::::::::::::",
-              res.data.total_earning
-            );
+            // console.log(
+            //   "res.data.total_earning::::::::::::",
+            //   res.data.total_earning
+            // );
             setEarnings(res.data.total_earning);
           }
         })

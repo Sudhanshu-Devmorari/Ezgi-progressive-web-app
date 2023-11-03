@@ -620,6 +620,28 @@ class CommentView(APIView):
 
 
 class SubscriptionView(APIView):
+    def get(self, request, id=None, *args, **kwargs):
+        try:
+            s_user = User.objects.get(id=id)
+            query_id = request.query_params.get('id', None)
+            if query_id is not None:
+                try:
+                    a_user = User.objects.get(id=query_id, user_role='commentator')
+                except ObjectDoesNotExist:
+                    return Response({'data': 'Editor-User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                if Subscription.objects.filter(standard_user=s_user, commentator_user=a_user, status='active').exists():
+                    subscription_plan = Subscription.objects.get(standard_user=s_user, commentator_user=a_user, status='active')
+                    end_date = subscription_plan.end_date
+                    return Response({'data': 'Your Subscription plan is already active.', 'end_date': end_date.date()}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'data': 'Subscription purchase request.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'data': 'Admin-User Id not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            return Response({'data': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'data': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
     def patch(self, request, id):
         try:
@@ -659,9 +681,12 @@ class SubscriptionView(APIView):
             commentator = User.objects.get(id=request.data.get('commentator_id')) 
             # if Subscription.objects.filter(commentator_user=commentator, standard_user=user, duration=duration, subscription=True, start_date=start_date, end_date=end_date, status='active', money=money).exists():
             #     return Response({'data': 'You already subscribe to this user.'}, status=status.HTTP_400_BAD_REQUEST)
+            # is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
+            # if is_subscription:
+            #     return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_400_BAD_REQUEST)
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
-                return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_400_BAD_REQUEST)
+                sub_obj = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').update(status='deactive')
             
             duration = request.data.get('duration')
             start_date = datetime.now()
@@ -5342,7 +5367,7 @@ class RetrievePageData():
                     is_highlight = Highlight.objects.filter(user=obj.user, status='active').exists()
                     highlighted_data['is_highlight'] = is_highlight
 
-                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False).count()
+                count = Subscription.objects.filter(commentator_user=user_data['id'], commentator_user__is_delete=False, status='active').count()
                 highlighted_data['subscriber_count'] = count
 
                 if standard_user_id:
@@ -5969,8 +5994,8 @@ class GetFutbolAndBasketbolCountView(APIView):
 class EditorsFutbolAndBasketbolCountView(APIView):
     def get(self, request):
         try:
-            futbol = User.objects.filter(is_delete=False, category=['Futbol'], commentator_status='active').count()
-            basketbol = User.objects.filter(is_delete=False, category=['Basketbol'], commentator_status='active').count()
+            futbol = User.objects.filter(user_role='commentator', is_delete=False, category=['Futbol'], commentator_status='active').count()
+            basketbol = User.objects.filter(user_role='commentator', is_delete=False, category=['Basketbol'], commentator_status='active').count()
             return Response({'futbol' : futbol, 'basketbol' : basketbol}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

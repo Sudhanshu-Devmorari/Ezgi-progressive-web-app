@@ -33,7 +33,7 @@ const UserTimeLine = (props) => {
           (obj) =>
             obj?.subject?.toLowerCase() == e?.toLowerCase()
         );
-        console.log(filteredArray)
+        // console.log(filteredArray)
         setDisplayTimelineData(e == "See All" ? props?.notification : filteredArray)
   };
 

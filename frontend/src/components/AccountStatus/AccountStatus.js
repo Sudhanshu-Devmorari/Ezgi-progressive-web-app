@@ -84,9 +84,9 @@ const AccountStatus = (props) => {
   const MIN = 0;
   const MAX = 1000;
   function getEarnings(newValues, typeData) {
-    console.log("new Values:::::::::::::", newValues);
+    // console.log("new Values:::::::::::::", newValues);
     // console.log("selectSubRangeData:::::::::::::", selectSubRangeData);
-    console.log("typeData:::::::::::::", typeData);
+    // console.log("typeData:::::::::::::", typeData);
     // const type =
     //   selectSubRangeData === "journeyman" ||
     //   selectSubRangeData === "master" ||
@@ -132,7 +132,7 @@ const AccountStatus = (props) => {
   const fetchSubscriptionData = async () => {
     setSubLoading(true);
     try {
-      console.log("selectSub", selectSub);
+      // console.log("selectSub", selectSub);
       const res = await axios.get(
         `${
           config?.apiUrl

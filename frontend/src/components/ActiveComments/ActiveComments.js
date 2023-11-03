@@ -442,11 +442,8 @@ const ActiveComments = (props) => {
           } catch (error) {
             console.log(error);
             if (error?.response?.status === 400) {
-              const end_date = new Date(
-                error?.response?.data?.end_date
-              ).toLocaleDateString();
-              console.log("end_date", end_date)
-              console.log("end_date", end_date)
+              const end_date = moment(error?.response?.data?.end_date).format('DD/MM/YYYY');
+              
               Swal.fire({
                 text: end_date == formattedCurrentDate ? 
                 'Your Highlight plan has expired today. You will be able to purchase it again starting tomorrow.' : 
@@ -469,6 +466,32 @@ const ActiveComments = (props) => {
         } else if (value === "subscribe model") {
           setCommentatorUser(profileData);
           setSubscribeModalShow(true);
+          // try{
+          //   const checkSubscriptionPlan = await axios.get(
+          //     `${config.apiUrl}/subscription/${userId}/?id=${profileData?.id}`
+          //   );
+          //   if(checkSubscriptionPlan.status === 200){
+          //     setCommentatorUser(profileData);
+          //     setSubscribeModalShow(true);
+          //   }
+          // }catch(error){
+          //   // console.log("error", error)
+          //   if (error?.response?.status === 400) {
+          //     const end_date = moment(error?.response?.data?.end_date).format('DD/MM/YYYY');
+
+          //     Swal.fire({
+          //       title: "Error",
+          //       // text: `${error?.response?.data?.data}`,
+          //       text: end_date == formattedCurrentDate ? 
+          //         'Your Subscription plan has expired today. You will be able to purchase it again starting tomorrow.' : 
+          //         `Your Subscription plan will expire on ${end_date}. You can purchase it again after this date.`,
+          //       icon: "error",
+          //       backdrop: false,
+          //       customClass:
+          //         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          //     });
+          //   }
+          // }
         } else if (value === "cancel subscription") {
           Swal.fire({
             title: "Are you sure to cancel your subscription??",
@@ -545,11 +568,6 @@ const ActiveComments = (props) => {
   //   }
   // }, [profileData]);
 
-  console.log(
-    profileData?.subscription_end_date,
-    "=============profileData?.subscription_end_date"
-  );
-
   const expirationDate = moment(profileData?.subscription_end_date);
   const [daysUntilExpiration, setDaysUntilExpiration] = useState(
     expirationDate.diff(moment(), "days")
@@ -567,7 +585,6 @@ const ActiveComments = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("daysUntilExpiration:::::::::::::", daysUntilExpiration);
   }, [daysUntilExpiration]);
 
   return (
