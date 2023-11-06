@@ -267,7 +267,7 @@ const AccountStatus = (props) => {
 
   // ----------------------
   const [statusData, setStatusData] = useState({
-    status: "",
+    status: "",account_status: "",
     left_winning: "", required_wins: "", user_current_wins: "", required_success_rate: "", user_current_success_rate: ""
   });
   useEffect(() => {
@@ -283,6 +283,7 @@ const AccountStatus = (props) => {
           user_current_wins: res?.data?.data?.user_current_wins,
           required_success_rate: res?.data?.data?.required_success_rate,
           user_current_success_rate: res?.data?.data?.user_current_success_rate,
+          account_status: res?.data?.data?.account_status,
         });
       } catch (error) {}
     }
@@ -350,7 +351,7 @@ const AccountStatus = (props) => {
                         : "rgb(255, 87, 87)",
                   }}
                 >
-                  {statusData.status || "Aktif"}
+                  {statusData.account_status ? "Aktif" : "Devre dışı bırakmak"}
                 </span>
               </div>
             </div>
@@ -771,13 +772,13 @@ const AccountStatus = (props) => {
                     {daysLeft?.showRenewButton == true ? (
                       <button
                         onClick={() => {
-                          if (
-                            JSON.parse(localStorage.getItem("user-active")) ==
-                            false
-                          ) {
-                            errorSwal();
-                            return;
-                          }
+                          // if (
+                          //   JSON.parse(localStorage.getItem("user-active")) ==
+                          //   false
+                          // ) {
+                          //   errorSwal();
+                          //   return;
+                          // }
                           setModalShow(true);
                           handleRenew();
                         }}

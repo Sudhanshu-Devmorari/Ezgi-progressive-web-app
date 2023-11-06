@@ -26,6 +26,7 @@ import moment from "moment";
 import CategoryFilter from "../CategoryFilter/CategoryFilter";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
+import Swal from "sweetalert2";
 
 const MainPage = () => {
   // CHANGE THEME
@@ -123,6 +124,43 @@ const MainPage = () => {
     }
   }, [ref_no]);
 
+
+  async function getNotifications() {
+    try {
+      const response = await axios.get(`${config.apiUrl}/notification/${userId}`);
+      const data = response.data.flash_notification;
+      console.log(data);
+  
+      if (data.length > 0) {
+        for (const item of data) {
+          async function showSwal() {
+            const confirmation = await Swal.fire({
+              text: `${item.context}.`,
+              // icon: "success",
+              backdrop: false,
+              customClass: currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+            });
+  
+            if (confirmation.value === true) {
+              try {
+                await axios.post(`${config.apiUrl}/notification/${userId}`, {
+                  "update-status": [item.id],
+                });
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          }
+  
+          // Call the async function
+          await showSwal();
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async function getProfileData() {
     const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
@@ -130,6 +168,9 @@ const MainPage = () => {
     // setMembershipDate(res.data.membership_date);
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
+    if(res.status == 200){
+      getNotifications()
+    }
   }
   useEffect(() => {
     if (userId || selectContent == "show-all-comments") {

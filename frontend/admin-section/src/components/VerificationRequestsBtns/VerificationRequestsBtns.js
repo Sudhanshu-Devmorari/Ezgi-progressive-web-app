@@ -99,6 +99,11 @@ const VerificationRequestsBtns = (props) => {
     <>
       <div className="my-2">
         <button
+        onClick={() => {
+            if (id) {
+              handleApproveOrReject("in progress", props?.withdrawalId);
+            }
+          }}
           className="px-2"
           style={{
             border: "1px solid #4DD5FF",

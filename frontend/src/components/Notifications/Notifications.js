@@ -18,11 +18,11 @@ const Notifications = () => {
       axios
         .get(`${config.apiUrl}/notification/${userId}`)
         .then((res) => {
-          const data = res?.data;
+          const data = res?.data?.notifications;
           const isRead = data.filter((res) => res?.status === false);
           const idsOfUnreadItems = isRead.map((item) => item.id);
           setUnreadNotificationsIds(idsOfUnreadItems);
-          setNotificationData(res.data);
+          setNotificationData(res?.data?.notifications);
         })
         .catch((err) => {
           console.log(err);

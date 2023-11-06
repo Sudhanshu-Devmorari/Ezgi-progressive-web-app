@@ -100,6 +100,18 @@ const SubscribeModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
           });
         }
+        if (error?.response?.status === 404) {
+          setIsLoading(false);
+          props.onHide();
+          Swal.fire({
+            title: "Error",
+            text: error?.response?.data?.data,
+            icon: "error",
+            backdrop: false,
+            customClass:
+              currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
+          });
+        }
       }
     } else {
       setValidationError("Please select a Plan or Checkbox");
@@ -734,7 +746,7 @@ export const subcriptionEntry = async (
     if (res?.status === 200) {
       await Swal.fire({
         title: "Success",
-        text: `You've subscribe to ${commentator_username}`,
+        text: res?.data?.flag ? 'Subscription renewed' : `You've subscribe to ${commentator_username}`,
         icon: "sucess",
         backdrop: false,
         customClass:

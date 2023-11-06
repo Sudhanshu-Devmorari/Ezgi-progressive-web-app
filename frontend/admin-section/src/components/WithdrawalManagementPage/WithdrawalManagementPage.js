@@ -420,9 +420,9 @@ const WithdrawalManagementPage = (props) => {
                                 <img
                                   src={
                                     (res?.status === "pending" && circle_y) ||
-                                    (res?.status === "approve" &&
-                                      circel_check) ||
-                                    (res?.status === "reject" && circle_x)
+                                    (res?.status === "approve" && circel_check) ||
+                                    (res?.status === "reject" && circle_x) ||
+                                    (res?.status === "in progress" && circle_b)
                                   }
                                   alt=""
                                   height={22}
@@ -430,6 +430,7 @@ const WithdrawalManagementPage = (props) => {
                                 />
                                 <img
                                   onClick={() => {
+                                    // if (res?.status === "pending" || res?.status === "in progress" ) {
                                     if (res?.status === "pending") {
                                       if (withdrawalIndex === index) {
                                         setRequests(!Requests);
@@ -437,6 +438,7 @@ const WithdrawalManagementPage = (props) => {
                                         setWithdrawalIndex(index);
                                       }
                                     }
+                                    
                                   }}
                                   className="cursor"
                                   src={eye}

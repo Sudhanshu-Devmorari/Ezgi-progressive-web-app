@@ -74,7 +74,7 @@ const Transactions = () => {
               <div>Total Balance</div>
               <div className="text-center">
                 <span className="total-balance" style={{ fontSize: "15px" }}>
-                  {bankDetails?.total_balance}₺
+                  {bankDetails?.total_balance?.toFixed(2)}₺
                 </span>
               </div>
               <div className="d-flex justify-content-between">
@@ -83,13 +83,13 @@ const Transactions = () => {
                   className="balance-font"
                   style={{ fontSize: "14px", color: "#37FF80" }}
                 >
-                  {bankDetails?.withdrawable_balance}₺
+                  {bankDetails?.withdrawable_balance?.toFixed(2)}₺
                 </span>
               </div>
               <div className="d-flex justify-content-between">
                 <span>Pending</span>
                 <span className="balance-font" style={{ fontSize: "14px" }}>
-                  {bankDetails?.pending_balance}₺
+                  {bankDetails?.pending_balance?.toFixed(2)}₺
                 </span>
               </div>
             </div>

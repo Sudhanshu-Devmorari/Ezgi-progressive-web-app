@@ -606,7 +606,7 @@ const SalesManagementPage = (props) => {
                       All Time Total
                     </span>
                     <span className="number">
-                      {salesData.all_time_total} <small>₺</small>
+                      {salesData.all_time_total?.toFixed(2)} <small>₺</small>
                     </span>
                   </div>
                 </div>

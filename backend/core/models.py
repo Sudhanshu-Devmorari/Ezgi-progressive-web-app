@@ -143,6 +143,7 @@ LABEL_CHOICES = (
         (2,'Pending'),
         (3,'Terminated'),
         (4,'Cancel'),
+        (5,'Renewed'),
     )
 class Subscription(models.Model):
     commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='commentator')
@@ -453,10 +454,16 @@ class BankDetails(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
+WITHDRAWABLE_UPDATE_CHOISE = (
+        ('pending','Pending'),
+        ('approve','Approve'),
+        ('reject','Reject'),
+        ('in progress','In Progress'),
+    )
 class Withdrawable(models.Model):
     bankdetails = models.ForeignKey(BankDetails, on_delete=models.CASCADE)
     amount = models.FloatField(null=True, blank=True)
-    status = models.CharField(max_length = 20, choices = BANK_UPDATE_CHOISE,default="pending", null=True, blank=True)
+    status = models.CharField(max_length = 20, choices = WITHDRAWABLE_UPDATE_CHOISE,default="pending", null=True, blank=True)
     withdrawable = models.BooleanField(null=True, blank=True)
     old_total_balance = models.FloatField(null=True, blank=True)
     new_total_balance = models.FloatField(null=True, blank=True)

@@ -659,7 +659,7 @@ class SubscriptionView(APIView):
                         sender=user,receiver=commentator, 
                         subject='Subscription Purchase', 
                         date=datetime.today().date(), 
-                        status=False, context=f'{user.username}, subscription has been terminated due to non-renewal.', 
+                        status=False, context=f'{user.username}, canceled the subscription plan.', 
                     )
                 return Response({'data':'Your subscription plan has been canceled.'}, status=status.HTTP_200_OK)
             else:
@@ -684,9 +684,11 @@ class SubscriptionView(APIView):
             # is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             # if is_subscription:
             #     return Response({'data':'Your subscription plan is already active'}, status=status.HTTP_400_BAD_REQUEST)
+            flag = False
             is_subscription = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').exists()
             if is_subscription:
-                sub_obj = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').update(status='deactive')
+                flag = True
+                sub_obj = Subscription.objects.filter(standard_user=user, commentator_user=commentator,status='active').update(subscription=False, status='deactive', label=3)
             
             duration = request.data.get('duration')
             start_date = datetime.now()
@@ -702,12 +704,18 @@ class SubscriptionView(APIView):
                 end_date = start_date + timedelta(days=1)
 
                 money = request.data.get('money')
+            
+            if flag:
+                label = 5
+            else:
+                label = 1
+
             if user.user_role == 'commentator':
                 Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=user, duration=duration, subscription=True,
-                                                            start_date=start_date, end_date=end_date, status='active', money=money)
+                                                            start_date=start_date, end_date=end_date, status='active', money=money, label=label)
             elif user.user_role == 'standard':
                 Subscription_obj = Subscription.objects.create(commentator_user=commentator, standard_user=user, duration=duration, subscription=True,
-                                                            start_date=start_date, end_date=end_date, status='active', money=money)
+                                                            start_date=start_date, end_date=end_date, status='active', money=money, label=label)
                 
             if not FollowCommentator.objects.filter(commentator_user=commentator, standard_user=user).exists():
                 follow_commentator_obj = FollowCommentator.objects.create(commentator_user=commentator, standard_user=user)
@@ -800,7 +808,7 @@ class SubscriptionView(APIView):
 
             serializer = SubscriptionSerializer(Subscription_obj)
             data = serializer.data
-            return Response(data=data, status=status.HTTP_200_OK)
+            return Response({"data":data, "flag":flag}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'data': 'User Doen not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -811,8 +819,15 @@ class NotificationView(APIView):
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
             notification_obj = Notification.objects.filter(receiver=user).exclude(sender=user).order_by('-created')[:30]
+            flash_notification_obj = Notification.objects.filter(Q(Q(subject="Level Upgrade") | Q(subject="Membership Plan Expires") | Q(subject="Membership Remainder")), receiver=user, status=False).order_by("-created")
             serializer = NotificationSerializer(notification_obj, many=True)
-            data = serializer.data
+            serializer1 = NotificationSerializer(flash_notification_obj, many=True)
+            # data = serializer.data
+            # data['flash_notification'] = serializer1.data
+            data = {
+                'notifications': serializer.data,
+                'flash_notification': serializer1.data
+            }
             return Response(data=data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist as e:
             return Response(data={'error': 'Notifications not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -1475,15 +1490,15 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
         data_list = {}
         try:
             if user.user_role == 'commentator':
-                my_subscribers = Subscription.objects.filter(commentator_user=user).order_by('-created')
+                my_subscribers = Subscription.objects.filter(commentator_user=user, subscription=True).order_by('-created')
                 serializer = SubscriptionSerializer(my_subscribers, many=True)
                 data_list['subscribers'] = serializer.data 
 
-                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
+                my_subscription = Subscription.objects.filter(standard_user=user, subscription=True).order_by('-created')
                 serializer1 = SubscriptionSerializer(my_subscription, many=True)
                 data_list['subscription'] = serializer1.data
             else:
-                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
+                my_subscription = Subscription.objects.filter(standard_user=user, subscription=True).order_by('-created')
                 serializer = SubscriptionSerializer(my_subscription, many=True)
                 data_list['subscription'] = serializer.data
                     
@@ -3178,7 +3193,9 @@ class FilterEditors(APIView):
 
                 retrive_data = RetrievePageData()
 
-                highlight_user_list = retrive_data.get_highlight_user()
+                # highlight_user_list = retrive_data.get_highlight_user()
+                highlight_user_list = Highlight.objects.filter(status="active").values_list('user_id', flat=True)
+
             
                 highlighted_users = filtered_comments.filter(id__in=highlight_user_list).order_by('?')
                 non_highlighted_users = filtered_comments.exclude(id__in=highlight_user_list)
@@ -5448,7 +5465,10 @@ class RetrievePageData():
             user = User.objects.get(id=user_id) if id is not None else None       
 
             # Get all highlight user
-            highligt_user_list = self.get_highlight_user()
+            # compare_date = datetime.now()
+            # highligth_user_list = list(Highlight.objects.filter(start_date__lte=compare_date, end_date__gte=compare_date, status="active").values_list('user_id', flat=True))
+            highligt_user_list = Highlight.objects.filter(status="active").values_list('user_id', flat=True)
+            # highligt_user_list = self.get_highlight_user()
             highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).order_by('?').only('id')
             # highlight_users = User.objects.filter(id__in=highligt_user_list, user_role='commentator', is_admin=False, is_delete=False).annotate(random_order=F('id') * 0).order_by('random_order')[:5]
 
@@ -6224,7 +6244,8 @@ class ShowWithdrawableData(APIView):
         data_list = {}
         
         try:
-            all_request = Withdrawable.objects.all()
+            # all_request = Withdrawable.objects.all()
+            all_request = Withdrawable.objects.all().order_by("-created")
             serializer = WithdrawableSerializer(all_request, many=True).data
             data_list['all_request'] = serializer
         except Exception as e:
@@ -6283,7 +6304,9 @@ class PaymentView(APIView):
                 raise ValueError('Invalid duration.')
         
         if 'subscription' in request.data['payment']:
-            pass
+            user = User.objects.get(id=id)
+            if user.is_active == False:
+                return Response({"data":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_404_NOT_FOUND)
 
         if 'withdrawal' in request.data['payment']:
             pass
@@ -6667,6 +6690,7 @@ class AccountStatus(APIView):
                 data = {
                     'comments_left' : round(percentage_left, 0),
                     'commentator_status' : user.commentator_status,
+                    'account_status' : user.is_active,
                     'required_wins' : required_wins,
                     'user_current_wins' : user_current_wins,
                     'required_success_rate' : required_success_rate,

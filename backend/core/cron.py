@@ -54,7 +54,23 @@ def subscription_reminder_cron():
         
         # Deactivate subscription after 3 days of expiration if subscription not activated
         # deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active', label=1).update(status='deactive', label=3)
-        deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active').update(status='deactive', label=3)
+        subscription_list = []
+        deactive_status_check = Subscription.objects.filter(end_date__lt=today_date, status='active')
+        for obj in deactive_status_check:
+            is_subscription_notification = Notification.objects.filter(receiver=obj.commentator_user, subject='Subscription Plan Expires', date=today_date).exists()
+            if not is_subscription_notification:
+                notification = Notification(
+                    sender=admin_user,
+                    receiver=obj.commentator_user, 
+                    subject='Subscription Plan Expires',
+                    date=today_date, 
+                    status=False,
+                    context=f'{obj.standard_user}, subscription was canceled because it did not renew the subscription plan.'
+                )
+                subscription_list.append(notification)
+        Notification.objects.bulk_create(subscription_list)
+
+        deactive_status = Subscription.objects.filter(end_date__lt=today_date, status='active').update(subscription=False, status='deactive', label=3)
         # pending_status = Subscription.objects.filter(end_date=(today_date+ timedelta(days=7)), status='pending').update(status='deactive')
 
 
@@ -109,28 +125,40 @@ def membership_plan_check():
             
             # if current_date == new_end_date.date():
             if current_date > new_end_date.date():
-                obj.user.is_active = False
-                obj.user.commentator_status = 'deactive'
-                obj.user.deactivate_commentator = 'deactive'
-                obj.user.save()
-                obj.status = 'deactive'
-                obj.save()
-                notification = Notification(
-                    sender=admin_user,
-                    receiver=obj.user, 
-                    subject='Membership Plan Expires',
-                    date=current_date, 
-                    status=False,
-                    context=f'Your account has been deactivated due to not renewing the membership.'
-                )
-                notification.save()
+                if obj.user.commentator_status == 'pending':
+                    obj.user.is_active = False
+                    obj.user.commentator_status = 'deactive'
+                    obj.user.deactivate_commentator = 'deactive'
+                    obj.user.save()
+                    obj.status = 'deactive'
+                    obj.save()
+                    notification = Notification(
+                        sender=admin_user,
+                        receiver=obj.user, 
+                        subject='Membership Plan Expires',
+                        date=current_date, 
+                        status=False,
+                        context=f'Your account has been deactivated due to not renewing the membership.'
+                    )
+                    notification.save()
             # if current_date == obj.end_date.date():
             else:
                 if current_date > obj.end_date.date():
-                    obj.user.commentator_status = 'pending'
-                    obj.user.save()
-                    obj.status = 'pending'
-                    obj.save()
+                    if obj.user.commentator_status == 'active':
+                        obj.user.commentator_status = 'pending'
+                        obj.user.save()
+                        obj.status = 'pending'
+                        obj.save()
+                        
+                        notification = Notification(
+                            sender=admin_user,
+                            receiver=obj.user, 
+                            subject='Membership Remainder',
+                            date=current_date, 
+                            status=False,
+                            context=f'You need to renew your membership within 3 days.'
+                        )
+                        notification.save()
 
 # def subscriptionstatus():
 #     today_date = datetime.now(timezone.utc)
