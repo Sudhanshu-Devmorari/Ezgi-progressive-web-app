@@ -1490,17 +1490,38 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
         data_list = {}
         try:
             if user.user_role == 'commentator':
-                my_subscribers = Subscription.objects.filter(commentator_user=user, subscription=True).order_by('-created')
+                my_subscribers = Subscription.objects.filter(commentator_user=user).order_by('-created')
                 serializer = SubscriptionSerializer(my_subscribers, many=True)
                 data_list['subscribers'] = serializer.data 
 
-                my_subscription = Subscription.objects.filter(standard_user=user, subscription=True).order_by('-created')
-                serializer1 = SubscriptionSerializer(my_subscription, many=True)
-                data_list['subscription'] = serializer1.data
+                commentator_users = []
+                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
+                for obj in my_subscription:
+                    commentator_users.append(obj.commentator_user.id)
+                
+                commentator_users_id = list(set(commentator_users))
+                details = []
+                for id in commentator_users_id:
+                    subscriptions_obj = Subscription.objects.filter(standard_user=user, commentator_user__id=id).order_by('-created').first()
+                    serializer1 = SubscriptionSerializer(subscriptions_obj).data
+                    details.append(serializer1)
+                data_list['subscription'] = details
             else:
-                my_subscription = Subscription.objects.filter(standard_user=user, subscription=True).order_by('-created')
-                serializer = SubscriptionSerializer(my_subscription, many=True)
-                data_list['subscription'] = serializer.data
+                # my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
+                # serializer = SubscriptionSerializer(my_subscription, many=True)
+                # data_list['subscription'] = serializer.data
+                commentator_users = []
+                my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
+                for obj in my_subscription:
+                    commentator_users.append(obj.commentator_user.id)
+                
+                commentator_users_id = list(set(commentator_users))
+                details = []
+                for id in commentator_users_id:
+                    subscriptions_obj = Subscription.objects.filter(standard_user=user, commentator_user__id=id).order_by('-created').first()
+                    serializer1 = SubscriptionSerializer(subscriptions_obj).data
+                    details.append(serializer1)
+                data_list['subscription'] = details
                     
             return Response(data=data_list, status=status.HTTP_200_OK) 
              

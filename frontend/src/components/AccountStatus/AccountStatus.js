@@ -346,7 +346,7 @@ const AccountStatus = (props) => {
                   className="text-capitalize"
                   style={{
                     color:
-                      statusData.status === "active"
+                    statusData.account_status
                         ? "#37FF80"
                         : "rgb(255, 87, 87)",
                   }}

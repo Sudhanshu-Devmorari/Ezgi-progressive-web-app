@@ -7,6 +7,7 @@ import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
 import { truncateString, userId } from "../GetUser";
 import config from "../../config";
+import moment from "moment"
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 
 const MySubscribers = (props) => {
@@ -24,10 +25,16 @@ const MySubscribers = (props) => {
         const res = await axios.get(
           `${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`
         );
+        console.log(res)
         if (res?.status === 200) {
           setMySubscribers(res?.data?.subscribers);
-          setMySubscriptions(res?.data?.subscription);
+          const data = res?.data?.subscription
+          data.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
+          setMySubscriptions(data);
+          // setMySubscriptions(res?.data?.subscription);
           setIsLoading(false);
+        console.log(data)
+
         }
       } catch (error) {
         console.log(error);

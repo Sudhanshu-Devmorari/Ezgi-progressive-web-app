@@ -129,7 +129,7 @@ const MainPage = () => {
     try {
       const response = await axios.get(`${config.apiUrl}/notification/${userId}`);
       const data = response.data.flash_notification;
-      console.log(data);
+      // console.log(data);
   
       if (data.length > 0) {
         for (const item of data) {
