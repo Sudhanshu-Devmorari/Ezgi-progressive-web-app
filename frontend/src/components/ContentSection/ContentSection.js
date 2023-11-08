@@ -265,10 +265,10 @@ const ContentSection = ({
 
   const [commentatorUser, setCommentatorUser] = useState([]);
   // check activation
-  const checkDeactivation = async (value) => {
+  const checkDeactivation = async (editor_id) => {
     try {
       const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}`
+        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         setCommentatorUser(data?.value?.commentator_user);
@@ -802,7 +802,7 @@ const ContentSection = ({
                           onClick={() => {
                             if (userId) {
                               if (!data?.value?.is_subscribe) {
-                                checkDeactivation();
+                                checkDeactivation(data?.value?.commentator_user?.id);
                               }
                             } else {
                               Swal.fire({

@@ -8,7 +8,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          GetPendingBalance, TransactionHistory, UserTransactionHistory, CheckTicketActionView, CheckNewSupportTicketView,
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
                          ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,AccountStatus,
-                         RetrieveChartData, WithdrawalSettingView, GetMinimumAmount, EditorsFutbolAndBasketbolCountView,
+                         RetrieveChartData, WithdrawalSettingView, GetMinimumAmount, EditorsFutbolAndBasketbolCountView, CheckEditorStatus,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -72,6 +72,7 @@ urlpatterns = [
     path('retrieve-chart-data/<int:id>/', RetrieveChartData.as_view(), name='Retrieve-Chart-Data'), 
     path('withdrawal-setting/', WithdrawalSettingView.as_view(), name='Withdrawal-Setting'), 
     path('get-minimum-amount/<int:id>/', GetMinimumAmount.as_view(), name='Get-Minimum-Amount'),
+    path('check-editor-status/<int:id>/', CheckEditorStatus.as_view(), name='Check-Editor-Status'),
 
 
     # Admin Panel's api

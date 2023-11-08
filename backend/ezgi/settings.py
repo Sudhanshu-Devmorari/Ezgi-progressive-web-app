@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'core',
+    'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
 
@@ -111,6 +112,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # 'social_core.backends.google.GoogleOAuth2',
+    # 'core.custom-backends.GoogleBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -167,6 +173,8 @@ LOGGING = {
         },
     },
 } 
+
+AUTH_USER_MODEL = 'core.User'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

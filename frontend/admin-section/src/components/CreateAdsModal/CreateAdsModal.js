@@ -7,11 +7,39 @@ import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
+import moment from "moment";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [fileSelected, setFileSelected] = useState(false);
+
+  const handleDeleteAds = async (id) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.delete(
+        `${config?.apiUrl}/ads-management/${id}/`
+      );
+      setIsLoading(false);
+      if (response.status === 200) {
+        console.log("response : ", response)
+        Swal.fire({
+          title: "Success",
+          text: `${response.data}`,
+          icon: "success",
+          backdrop: false,
+          customClass: "dark-mode-alert",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      }
+    } catch (error) {
+      console.log("Error while updating data: ", error);
+    }
+  };
 
   useEffect(() => {
     if (props?.editTrue && props?.adsEditData) {
@@ -23,6 +51,7 @@ const CreateAdsModal = (props) => {
         companyName: props.adsEditData.company_name,
         link: props.adsEditData.link,
         addBudget: props.adsEditData.ads_budget,
+        id: props.adsEditData.id,
       });
       setProfilePreview(`${config.apiUrl}${props.adsEditData.picture}`);
     }
@@ -57,7 +86,10 @@ const CreateAdsModal = (props) => {
       formData.append("company_name", values.companyName);
       formData.append("link", values.link);
       formData.append("ads_budget", values.addBudget);
-      formData.append("file", values.profile);
+      // formData.append("picture", values.profile);
+      if (fileSelected) {
+        formData.append("picture", values.profile);
+      }
       if (props?.editTrue && props?.adsEditData) {
         try {
           setIsLoading(true);
@@ -116,6 +148,11 @@ const CreateAdsModal = (props) => {
     if (allowedTypes.includes(file.type)) {
       formik.setFieldValue("profile", file);
       setProfilePreview(URL.createObjectURL(file));
+      if (e.target.files.length > 0) {
+        setFileSelected(true);
+      } else {
+        setFileSelected(false);
+      }
     } else {
       Swal.fire({
         title: "Error",
@@ -220,7 +257,9 @@ const CreateAdsModal = (props) => {
                         className="darkMode-input form-control text-center"
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        value={formik.values.startDate}
+                        value={moment(formik.values.startDate).format(
+                          "YYYY-MM-DD HH:mm"
+                        )}
                       />
                       {formik.errors.startDate && formik.touched.startDate && (
                         <div className="error-message text-danger">
@@ -236,7 +275,9 @@ const CreateAdsModal = (props) => {
                         className="darkMode-input form-control text-center"
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        value={formik.values.endDate}
+                        value={moment(formik.values.endDate).format(
+                          "YYYY-MM-DD HH:mm"
+                        )}
                       />
                       {formik.errors.endDate && formik.touched.endDate && (
                         <div className="error-message text-danger">
@@ -317,6 +358,23 @@ const CreateAdsModal = (props) => {
                         ? "Update"
                         : "Create"}
                     </button>
+                    {props?.editTrue && (
+                      <button
+                      type="button"
+                        onClick={() => {
+                          handleDeleteAds(formik.values.id);
+                        }}
+                        className="px-3 py-1"
+                        style={{
+                          color: "#D2DB08",
+                          backgroundColor: "transparent",
+                          border: "1px solid #D2DB08",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
                 </div>
               </form>

@@ -3,7 +3,7 @@ import landingPage from "../../assets/landingPage.png";
 import "./LandingPage.css";
 import CurrentTheme from "../../context/CurrentTheme";
 
-const LandingPage = () => {
+const  LandingPage = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   return (

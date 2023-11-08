@@ -50,6 +50,7 @@ const SubscribeModal = (props) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleSubscription = async () => {
+    // const checkEditor = await axios.post(`${config.apiUrl}/check-editor-status/${}`)
     if (selectCheckBox && selectedPlan) {
       setValidationError("");
       const money =
@@ -274,8 +275,9 @@ const SubscribeModal = (props) => {
           if (category === "membership renew" && ID == userId) {
             // console.log("IN membership re new: ");
             const monthly_amount = result?.PRODUCTS[0]?.PRODUCT_AMOUNT;
+            const duration = result?.PRODUCTS[0]?.PRODUCT_NAME;
             const startdate = result?.PAYMENT_DATE;
-            handleRenewMambership(monthly_amount, startdate);
+            handleRenewMambership(monthly_amount, startdate, duration);
           }
           // const url = new URL(window.location.href);
           // const refExists = url.searchParams.has("ref");
@@ -295,13 +297,14 @@ const SubscribeModal = (props) => {
     }
   }, [ref_no]);
 
-  const handleRenewMambership = async (monthly_amount, startdate) => {
+  const handleRenewMambership = async (monthly_amount, startdate, duration) => {
     try {
       const RenewMembership = await axios.patch(
         `${config.apiUrl}/subscription-reNew/${userId}/`,
         {
           money: monthly_amount,
           start_date: startdate,
+          duration: duration,
         }
       );
       // console.log("RenewMembership", RenewMembership);

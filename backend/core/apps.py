@@ -8,3 +8,5 @@ class CoreConfig(AppConfig):
     # cron_classes = [
     #     'myapp.cron.MyCronJob',  # Replace 'myapp' with the actual app name
     # ]
+    def ready(self):
+        import core.signals

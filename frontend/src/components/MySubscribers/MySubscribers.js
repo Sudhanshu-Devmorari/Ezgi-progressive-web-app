@@ -25,15 +25,18 @@ const MySubscribers = (props) => {
         const res = await axios.get(
           `${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`
         );
-        console.log(res)
+        // console.log(res)
         if (res?.status === 200) {
-          setMySubscribers(res?.data?.subscribers);
+          const data1 = res?.data?.subscribers
+          data1.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
+          setMySubscribers(data1);
+          // setMySubscribers(res?.data?.subscribers);
           const data = res?.data?.subscription
           data.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
           setMySubscriptions(data);
           // setMySubscriptions(res?.data?.subscription);
           setIsLoading(false);
-        console.log(data)
+        // console.log(data)
 
         }
       } catch (error) {

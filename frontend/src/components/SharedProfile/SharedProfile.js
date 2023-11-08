@@ -140,10 +140,10 @@ const SharedProfile = (props) => {
   };
 
   // check activation
-  const checkDeactivation = async (value) => {
+  const checkDeactivation = async (editor_id) => {
     try {
       const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}`
+        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         setCommentatorUser(data?.value?.user);
@@ -368,7 +368,7 @@ const SharedProfile = (props) => {
                     onClick={() => {
                       if (userId) {
                         if (!data?.value?.is_subscribe) {
-                          checkDeactivation();
+                          checkDeactivation(data?.value?.user?.id);
                         }
                       } else {
                         Swal.fire({

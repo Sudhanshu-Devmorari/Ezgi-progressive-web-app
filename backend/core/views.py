@@ -518,6 +518,7 @@ class CommentView(APIView):
                 match_detail = request.data.get('match_detail')
                 prediction_type = request.data.get('prediction_type')
                 prediction = request.data.get('prediction')
+                cmt_id = request.data.get('cmt_id')
                 if user.commentator_level == 'apprentice':
                     public_content = True
                 else:
@@ -564,7 +565,8 @@ class CommentView(APIView):
                     prediction=prediction,
                     public_content=public_content,
                     comment=comment,
-                    match_time=match_time_obj
+                    match_time=match_time_obj,
+                    match_id=cmt_id[0]
                 )
 
                 if comment_obj != None:
@@ -1490,9 +1492,20 @@ class RetrieveSubscriberListAndSubscriptionList(APIView):
         data_list = {}
         try:
             if user.user_role == 'commentator':
+                subscriptions = []
+                # my_subscribers = Subscription.objects.filter(commentator_user=user).order_by('-created')
+                # serializer = SubscriptionSerializer(my_subscribers, many=True)
+                # data_list['subscribers'] = serializer.data 
                 my_subscribers = Subscription.objects.filter(commentator_user=user).order_by('-created')
-                serializer = SubscriptionSerializer(my_subscribers, many=True)
-                data_list['subscribers'] = serializer.data 
+                for obj in my_subscribers:
+                    subscriptions.append(obj.standard_user.id)
+                sup_commentator_users_id = list(set(subscriptions))
+                sup_detail = []
+                for id in sup_commentator_users_id:
+                    subscriptions_obj = Subscription.objects.filter(standard_user__id=id, commentator_user=user).order_by('-created').first()
+                    serializer1 = SubscriptionSerializer(subscriptions_obj).data
+                    sup_detail.append(serializer1)
+                data_list['subscribers'] = sup_detail
 
                 commentator_users = []
                 my_subscription = Subscription.objects.filter(standard_user=user).order_by('-created')
@@ -1839,6 +1852,7 @@ class AdminMainPage(APIView):
             # Handle the exception appropriately, you can log it or return an error response.
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+from rest_framework.authtoken.models import Token
 class UserManagement(APIView):
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -1968,6 +1982,9 @@ class UserManagement(APIView):
                         )
                 user_obj.save()
 
+
+                tokenobj = Token.objects.create(user=user_obj)
+                print("\n ====>tokenobj", tokenobj)
                 gift_obj = GiftSubscription.objects.create(user=user_obj, duration=duration, editor_count=number, editor_level=editor_level)
                 gift_obj.save()
                 
@@ -1977,6 +1994,9 @@ class UserManagement(APIView):
                     password=password, gender=gender, age=age
                 )
                 user_obj.save()
+                print("Type :", type(user_obj))
+                tokenobj = Token.objects.create(user=user_obj)
+                print("\n ====>tokenobj", tokenobj)
 
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -4270,14 +4290,15 @@ class AdvertisementManagement(APIView):
     
     def post(self, request, format=None, *args, **kwargs):
         try:
+            print("request.data", request.data)
             if request.data:
                 # print('request.data:: ', request.data)
-                required_fields = ['file', 'ads_space', 'start_date', 'end_date', 'company_name', 'link', 'ads_budget']
+                required_fields = ['picture', 'ads_space', 'start_date', 'end_date', 'company_name', 'link', 'ads_budget']
                 for field in required_fields:
                     if field not in request.data:
                         return Response({'error': f'{field.replace("_", " ").title()} not found'}, status=status.HTTP_400_BAD_REQUEST)
                
-                ads_obj = Advertisement.objects.create(picture=request.data.get('file'), ads_space=request.data.get('ads_space'),
+                ads_obj = Advertisement.objects.create(picture=request.data.get('picture'), ads_space=request.data.get('ads_space'),
                                                 start_date=request.data.get('start_date'), end_date=request.data.get('end_date'),
                                                 company_name=request.data.get('company_name'), link=request.data.get('link'),
                                                 ads_budget = request.data.get('ads_budget'))
@@ -4292,6 +4313,7 @@ class AdvertisementManagement(APIView):
                 serializer = AdvertisementSerializer(ads_obj)
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
+            print(e)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def patch(self, request, pk, format=None, *args, **kwargs):
@@ -4313,7 +4335,7 @@ class AdvertisementManagement(APIView):
                 return Response({'error': 'Invalid request data.'}, status=status.HTTP_400_BAD_REQUEST)
             user.save(update_fields=['ad_views_count', 'ad_clicks_and_redirected_count', 'updated'])
             return Response({'data': success_message}, status=status.HTTP_200_OK)
-        
+
         serializer = AdvertisementSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             try:
@@ -4323,6 +4345,16 @@ class AdvertisementManagement(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def delete(self, request, pk, format=None, *args, **kwargs):
+        try:
+            ads_obj = Advertisement.objects.get(pk=pk)
+            ads_obj.delete()
+            return Response("Advertisement deleted Successfully", status= status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"Failed to delete user: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
         
 class LevelRule(APIView):
     def get(self, request, format=None, *args, **kwargs):
@@ -4586,6 +4618,7 @@ class CommentSetting(APIView):
             match_detail = request.data.get('match_detail')
             prediction_type = request.data.get('prediction_type')
             prediction = request.data.get('prediction')
+            cmt_id = request.data.get('cmt_id')
             if user.commentator_level == 'apprentice':
                 public_content = True
             else:
@@ -4609,7 +4642,8 @@ class CommentSetting(APIView):
                     prediction_type=prediction_type,
                     prediction=prediction,
                     public_content=public_content,
-                    match_time=match_time_obj
+                    match_time=match_time_obj,
+                    match_id=cmt_id[0]
                 )
 
             if DataCount.objects.filter(id=1).exists():
@@ -5239,6 +5273,8 @@ class RetrievePageData():
         try:
             if not compare_date: compare_date = datetime.now()
             highligth_user_list = list(Highlight.objects.filter(start_date__lte=compare_date, end_date__gte=compare_date, status="active").values_list('user_id', flat=True))
+            print("--------", highligth_user_list)
+            # highligth_user_list = list(Highlight.objects.filter(status="active").values_list('user_id', flat=True))
             return highligth_user_list
         except:
             return []
@@ -5709,7 +5745,7 @@ class BankDetailsView(APIView):
                     if bank_details:
                         bank_details_serializer = BankDetailsSerializer(bank_details).data
                     else:
-                        bank_details_serializer = {}  # Empty serializer if bank details not found
+                        bank_details_serializer = {}
 
                     withdrawable_rqst = Withdrawable.objects.filter(bankdetails=bank_details)
                     for obj in withdrawable_rqst:
@@ -5730,7 +5766,8 @@ class BankDetailsView(APIView):
                         calculation = (float(level_obj.commission_rate) * float(obj.money)) / 100
                         final_cal = obj.money - calculation
 
-                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        # formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        formatted_date = obj.created.strftime("%d.%m.%Y - %H:%M")
                         details = {
                             "type":"New Subscriber",
                             "duration":obj.duration,
@@ -5742,7 +5779,8 @@ class BankDetailsView(APIView):
                     my_subcriptions = Subscription.objects.filter(standard_user=user)
                     for obj in my_subcriptions:
 
-                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        # formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        formatted_date = obj.created.strftime("%d.%m.%Y - %H:%M")
                         details = {
                             "type":"New Subscription",
                             "duration":obj.duration,
@@ -5753,7 +5791,8 @@ class BankDetailsView(APIView):
 
                     highlight_obj = Highlight.objects.filter(user=user)
                     for obj in highlight_obj:
-                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        # formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        formatted_date = obj.created.strftime("%d.%m.%Y - %H:%M")
                         details = {
                             "type":"Highlight",
                             "duration":obj.duration,
@@ -5764,7 +5803,8 @@ class BankDetailsView(APIView):
 
                     become_editor = BecomeCommentator.objects.filter(user=user)
                     for obj in become_editor:
-                        formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        # formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
+                        formatted_date = obj.created.strftime("%d.%m.%Y - %H:%M")
                         details = {
                             "type":"Become Editor",
                             "duration":obj.duration,
@@ -5921,6 +5961,15 @@ class BankDetailsView(APIView):
                                                 context=f'Your withdrawal request has been approved by Motiwy.',
                                             )
                                 query.save(update_fields=['total_balance', 'pending_balance', 'withdrawable_balance', 'updated'])
+                            if action == 'in progress':
+                                notification_obj = Notification.objects.create(
+                                        sender=user,
+                                        receiver=query.user, 
+                                        subject='Withdrawal Request',
+                                        date=datetime.now().date(), 
+                                        status=False,
+                                        context=f'Withdrawal request has been processed. The transaction will be completed as soon as possible.',
+                                    )
 
                         return Response({'data' : 'Bank request successfully updated.'}, status=status.HTTP_200_OK)
                     except BankDetails.DoesNotExist:
@@ -5952,6 +6001,12 @@ class CheckDeactivatedAccount(APIView):
     def get(self, request, id):
         try:
             try:
+                if request.query_params.get('editor_id') != 'undefined':
+                    editor_id = request.query_params.get('editor_id')
+                    editor_user = User.objects.get(id=editor_id) 
+                    if editor_user.is_active == False:
+                        return Response({"error":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_400_BAD_REQUEST)
+        
                 user = User.objects.get(id=id) 
                 if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -6214,7 +6269,7 @@ class CreateWithdrawableRequest(APIView):
 
             try:
                 bankdetails = BankDetails.objects.get(user=user, bank_iban=bankiban)
-                if not Withdrawable.objects.filter(bankdetails=bankdetails, status='pending').exists():
+                if not Withdrawable.objects.filter(Q(Q(status="pending") | Q(status="in progress")), bankdetails=bankdetails).exists():
                     obj = Withdrawable.objects.create(bankdetails=bankdetails, amount=amount, withdrawable=True, 
                                                       old_total_balance=bankdetails.total_balance, new_total_balance=bankdetails.total_balance)
                     obj.save()
@@ -6325,9 +6380,10 @@ class PaymentView(APIView):
                 raise ValueError('Invalid duration.')
         
         if 'subscription' in request.data['payment']:
-            user = User.objects.get(id=id)
-            if user.is_active == False:
-                return Response({"data":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_404_NOT_FOUND)
+            # user = User.objects.get(id=id)
+            # if user.is_active == False:
+            #     return Response({"data":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_404_NOT_FOUND)
+            pass
 
         if 'withdrawal' in request.data['payment']:
             pass
@@ -6584,7 +6640,9 @@ class SubscriptionReNew(APIView):
             if user.user_role == "commentator":
                 data = {}
 
-                data['money'] = request.data.get('money')
+                # data['money'] = request.data.get('money')
+                # data['duration'] = request.data.get('duration')
+                # data['commentator'] = True
 
                 startdate_str = request.data.get('start_date')
                 formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
@@ -6592,43 +6650,76 @@ class SubscriptionReNew(APIView):
 
                 # enddate = formatted_startdate + timedelta(days=30)
                 enddate = formatted_startdate + timedelta(days=1)
-                data['end_date'] = enddate
+                # data['end_date'] = enddate
 
-                data['status'] = 'active'
-                data['membership_status'] = 'renew'
-                data['commentator_level'] = user.commentator_level
-
+                # data['user'] = UserSerializer(user).data
+                # data['status'] = 'active'
+                # data['membership_status'] = 'renew'
+                # data['commentator_level'] = user.commentator_level
+                duration = request.data.get('duration')
+                money = request.data.get('money')
                 if BecomeCommentator.objects.filter(user=user).exists():
-                    obj = BecomeCommentator.objects.get(user=user)
-
-                    serializer = BecomeCommentatorSerializer(obj, data=data, partial=True)
-                    if serializer.is_valid():
-                        try:
-                            serializer.save()
-                            
-                            user.commentator_status = "active"
-                            user.deactivate_commentator = ""
-                            user.is_active = True
-                            user.save()
-
-                            if obj.membership_status.lower() == 'new':
-                                user.remaining_monthly_count = user.remaining_monthly_count - 1
-                                user.save()
-                        except Exception as e:
-                            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    obj = BecomeCommentator.objects.filter(user=user).update(status='deactive')
+                
+                # serializer = BecomeCommentatorSerializer(data=data)
+                membership = BecomeCommentator.objects.create(user = user, duration=duration, money=money, commentator=True,
+                                                              start_date=formatted_startdate, end_date=enddate,
+                                                              status='active', membership_status='renew', commentator_level=user.commentator_level)
+                membership.save()
+                    
+                serializer = BecomeCommentatorSerializer(membership).data
                         
-                        admin_user = User.objects.get(phone='5123456789', is_admin=True)
-                        notification_obj = Notification.objects.create(
-                            sender=admin_user,
-                            receiver=user, 
-                            subject='Purchase Transactions', 
-                            date=datetime.today().date(), 
-                            status=False, context=f'Congratulations! You sucessfully renew the membership.', 
-                            admin_context=f'{user.username} renew the plan for becoming an editor.'
-                            )
-                        return Response(serializer.data)
-                else:
-                    return Response({'error':"You don't have any membership plan."},status=status.HTTP_404_NOT_FOUND)
+                user.commentator_status = "active"
+                user.deactivate_commentator = ""
+                user.is_active = True
+                user.save()
+
+                admin_user = User.objects.get(phone='5123456789', is_admin=True)
+                notification_obj = Notification.objects.create(
+                    sender=admin_user,
+                    receiver=user, 
+                    subject='Purchase Transactions', 
+                    date=datetime.today().date(), 
+                    status=False, context=f'Congratulations! You sucessfully renew the membership.', 
+                    admin_context=f'{user.username} renew the plan for becoming an editor.'
+                    )
+
+                return Response(serializer)
+
+                    # except Exception as e:
+                    #     return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    
+                
+                # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                #     serializer = BecomeCommentatorSerializer(obj, data=data, partial=True)
+                #     if serializer.is_valid():
+                #         try:
+                #             serializer.save()
+                            
+                #             user.commentator_status = "active"
+                #             user.deactivate_commentator = ""
+                #             user.is_active = True
+                #             user.save()
+
+                #             if obj.membership_status.lower() == 'new':
+                #                 user.remaining_monthly_count = user.remaining_monthly_count - 1
+                #                 user.save()
+                #         except Exception as e:
+                #             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                        
+                #         admin_user = User.objects.get(phone='5123456789', is_admin=True)
+                #         notification_obj = Notification.objects.create(
+                #             sender=admin_user,
+                #             receiver=user, 
+                #             subject='Purchase Transactions', 
+                #             date=datetime.today().date(), 
+                #             status=False, context=f'Congratulations! You sucessfully renew the membership.', 
+                #             admin_context=f'{user.username} renew the plan for becoming an editor.'
+                #             )
+                #         return Response(serializer.data)
+                # else:
+                #     return Response({'error':"You don't have any membership plan."},status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'error':"You are not Commentator user."},status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
@@ -6669,7 +6760,7 @@ class RetrieveBecomeCommentatorData(APIView):
             return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         try:
-            obj = BecomeCommentator.objects.get(user__id=id)
+            obj = BecomeCommentator.objects.filter(user__id=id).order_by("-created").first()
         except BecomeCommentator.DoesNotExist:
             return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
@@ -6817,3 +6908,10 @@ class GetMinimumAmount(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+class CheckEditorStatus(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        user = User.objects.get(id=id)
+        if user.is_active == False:
+            return Response({"data":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"data":"you can subscribe to this user."}, status=status.HTTP_200_OK)

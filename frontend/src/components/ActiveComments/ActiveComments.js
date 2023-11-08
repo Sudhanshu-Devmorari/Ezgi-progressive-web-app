@@ -422,10 +422,10 @@ const ActiveComments = (props) => {
   const formattedCurrentDate = currentDate.format('DD/MM/YYYY');
   
   // check activation
-  const checkDeactivation = async (value) => {
+  const checkDeactivation = async (value, editor_id) => {
     try {
       const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}`
+        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         if (value === "add comment") {
@@ -1099,9 +1099,9 @@ const ActiveComments = (props) => {
                   onClick={() => {
                     if (userId) {
                       if (!profileData?.is_subscribe) {
-                        checkDeactivation("subscribe model");
+                        checkDeactivation("subscribe model", profileData?.id);
                       } else {
-                        checkDeactivation("cancel subscription");
+                        checkDeactivation("cancel subscription", profileData?.id);
                       }
                     }
                   }}
@@ -1138,7 +1138,7 @@ const ActiveComments = (props) => {
                   <button
                     onClick={() => {
                       if (userId) {
-                        checkDeactivation("subscribe model");
+                        checkDeactivation("subscribe model", profileData?.id);
                       }
                     }}
                     className="ms-1 px-3 py-1"

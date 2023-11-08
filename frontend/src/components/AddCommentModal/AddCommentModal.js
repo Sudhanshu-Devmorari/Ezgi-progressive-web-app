@@ -432,6 +432,7 @@ const AddCommentModal = (props) => {
         setPredictionTypeError("");
         setPredictionError("");
         setSelectCheckboxError("");
+        // console.log("------------", matchId)
         const res = await axios.post(
           `${config?.apiUrl}/post-comment/${userId}`,
           {
@@ -444,6 +445,7 @@ const AddCommentModal = (props) => {
             prediction: selectedPrediction,
             public_content: toggleInput,
             comment: commentText,
+            cmt_id:matchId,
           }
         );
         // console.log("res", res);

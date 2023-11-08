@@ -1,9 +1,42 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from datetime import date, datetime
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import UserManager
+
 
 # Create your models here.
+class MyUserManager(BaseUserManager):
+    def create_user(self, phone, password=None):
+        """
+        Creates and saves a User with the given phone and password.
+        """
+        if not phone:
+            raise ValueError("Users must have Phone")
+
+        user = self.model(
+            phone=phone,
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        Token.objects.create(user=user)
+        return user
+
+    def create_superuser(self, phone, password=None):
+        """
+        Creates and saves a superuser with the given phone and password.
+        """
+        user = self.create_user(
+            phone=phone,
+            password=password,
+        )
+        user.is_admin = True
+        user.is_staff = True
+        user.save(using=self._db)
+        return user
+
 
 USER_ROLE_CHOISE = (
         ('standard','Standard'),
@@ -42,7 +75,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=150)
     email = models.EmailField(max_length=255, null=True, blank=True)
     logged_in_using = models.CharField(max_length=255, null=True, blank=True)
-    phone = models.CharField(max_length=15,null=True, blank=True)
+    phone = models.CharField(unique=True, max_length=15,null=True, blank=True)
     password = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=50, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
@@ -76,11 +109,15 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     description = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "%s"%(self.name)
+    
+    objects = MyUserManager()
+    # objects = UserManager()
     
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
@@ -89,6 +126,16 @@ class User(AbstractBaseUser):
         indexes = [
             models.Index(fields=['created']),
         ]
+
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
+    
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
 
 class Otp(models.Model):
     phone = models.CharField(max_length=15,null=True, blank=True) 
@@ -107,10 +154,12 @@ NEW_COMMENT_CHOISE = (
         ('pending','Pending'),
         ('approve','Approve'),
         ('reject','Reject'),
+        ('cancelled','Cancelled'),
     )
 class Comments(models.Model):
     commentator_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     category = ArrayField(models.CharField(null=True, blank=True), default=list)
+    match_id = models.IntegerField(null=True, blank=True)
     country = models.CharField(max_length=50)
     league = models.CharField(max_length=120)
     date = models.DateField(default=date.today)

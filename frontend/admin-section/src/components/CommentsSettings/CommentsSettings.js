@@ -402,6 +402,7 @@ const CommentsSettings = () => {
     } else {
       setIsLoading(true);
       try {
+        // console.log("--------", matchId)
         let data = {
           editor: selectedEditor,
           category: selectedCategory,
@@ -416,6 +417,7 @@ const CommentsSettings = () => {
           favorite: fav,
           clap: clap,
           date: selectedDate,
+          cmt_id:matchId,
         };
         const res = await axios.post(
           `${config?.apiUrl}/comment-setting/?admin=${admin_id}`,

@@ -430,8 +430,8 @@ const WithdrawalManagementPage = (props) => {
                                 />
                                 <img
                                   onClick={() => {
-                                    // if (res?.status === "pending" || res?.status === "in progress" ) {
-                                    if (res?.status === "pending") {
+                                    if (res?.status === "pending" || res?.status === "in progress" ) {
+                                    // if (res?.status === "pending") {
                                       if (withdrawalIndex === index) {
                                         setRequests(!Requests);
                                       } else {

@@ -76,6 +76,7 @@ const SupportManagementPage = (props) => {
   function getData(userId, e) {
     try {
       showAllTicketHistory(userId, e);
+      getTicketsLatestData(e)
       axios
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
