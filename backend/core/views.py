@@ -1911,7 +1911,7 @@ class UserManagement(APIView):
 
             # all_user = User.objects.filter(is_delete=False).order_by('-created')
             user_data = []
-            all_user = User.objects.filter(is_delete=False, is_active=True).exclude(user_role='sub_user').order_by('-created')
+            all_user = User.objects.filter(is_delete=False, is_active=True, is_staff=False).exclude(user_role='sub_user').order_by('-created')
             for obj in all_user:
                 serializer = UserSerializer(obj).data
                 if GiftSubscription.objects.filter(user__username=obj.username).exists():
@@ -1983,8 +1983,8 @@ class UserManagement(APIView):
                 user_obj.save()
 
 
-                tokenobj = Token.objects.create(user=user_obj)
-                print("\n ====>tokenobj", tokenobj)
+                # tokenobj = Token.objects.create(user=user_obj)
+                # print("\n ====>tokenobj", tokenobj)
                 gift_obj = GiftSubscription.objects.create(user=user_obj, duration=duration, editor_count=number, editor_level=editor_level)
                 gift_obj.save()
                 
@@ -1994,9 +1994,9 @@ class UserManagement(APIView):
                     password=password, gender=gender, age=age
                 )
                 user_obj.save()
-                print("Type :", type(user_obj))
-                tokenobj = Token.objects.create(user=user_obj)
-                print("\n ====>tokenobj", tokenobj)
+                # print("Type :", type(user_obj))
+                # tokenobj = Token.objects.create(user=user_obj)
+                # print("\n ====>tokenobj", tokenobj)
 
             if user_obj != None:
                 if DataCount.objects.filter(id=1).exists():
@@ -5272,9 +5272,9 @@ class RetrievePageData():
     def get_highlight_user(self, compare_date=None):
         try:
             if not compare_date: compare_date = datetime.now()
-            highligth_user_list = list(Highlight.objects.filter(start_date__lte=compare_date, end_date__gte=compare_date, status="active").values_list('user_id', flat=True))
-            print("--------", highligth_user_list)
-            # highligth_user_list = list(Highlight.objects.filter(status="active").values_list('user_id', flat=True))
+            # highligth_user_list = list(Highlight.objects.filter(start_date__lte=compare_date, end_date__gte=compare_date, status="active").values_list('user_id', flat=True))
+            # print("--------", highligth_user_list)
+            highligth_user_list = list(Highlight.objects.filter(status="active").values_list('user_id', flat=True))
             return highligth_user_list
         except:
             return []

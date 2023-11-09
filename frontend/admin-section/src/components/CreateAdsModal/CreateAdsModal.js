@@ -13,15 +13,16 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRLoading, setIsRLoading] = useState(false);
   const [fileSelected, setFileSelected] = useState(false);
 
   const handleDeleteAds = async (id) => {
     try {
-      setIsLoading(true);
+      setIsRLoading(true);
       const response = await axios.delete(
         `${config?.apiUrl}/ads-management/${id}/`
       );
-      setIsLoading(false);
+      setIsRLoading(false);
       if (response.status === 200) {
         console.log("response : ", response)
         Swal.fire({
@@ -372,7 +373,7 @@ const CreateAdsModal = (props) => {
                           borderRadius: "4px",
                         }}
                       >
-                        Remove
+                      {isRLoading ? "Loading..." : 'Remove'}
                       </button>
                     )}
                   </div>

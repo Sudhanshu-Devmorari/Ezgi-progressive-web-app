@@ -173,7 +173,7 @@ const Support = () => {
                       currentTheme === "dark" ? "#0B2447" : "#F6F6F6",
                   }}
                 >
-                  <div className="d-flex col-4">
+                  <div className="d-flex col-3">
                     <div
                       style={{
                         width: "7px",
@@ -201,8 +201,8 @@ const Support = () => {
                   {/* <div className="col-5 text-center">{res.created}</div>
                   <div className="text-capitalize col-3 text-end">
                     {res.status} */}
-                  <div className="col-6 text-center">{res.created}</div>
-                  <div className="text-capitalize col-2 text-end" style={{textWrap:"nowrap"}}>
+                  <div className="col-5 text-center">{res.created}</div>
+                  <div className="text-capitalize col-4 text-end" style={{textWrap:"nowrap"}}>
                     {res.user_label}
                   </div>
                 </div>
