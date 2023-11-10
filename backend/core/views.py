@@ -6462,7 +6462,7 @@ class PaymentView(APIView):
                 ]
             }
 
-            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
             print("data:", data)
             response = requests.post(url, json=data)
             json_data = response.json()
@@ -6518,7 +6518,7 @@ class PaymentView(APIView):
             ]
         }
 
-            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':
@@ -6557,7 +6557,7 @@ class PaymentView(APIView):
             ]
         }
 
-            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':
