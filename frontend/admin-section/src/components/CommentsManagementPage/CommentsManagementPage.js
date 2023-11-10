@@ -36,6 +36,7 @@ const CommentsManagementPage = (props) => {
         setData(res.data);
         setMostLike(res?.data?.most_like);
         if (props.commentData === true || res?.data?.new_comment?.length > 0) {
+          // if (props.commentData === true) {
           setCommentData(res.data.new_comment);
         } else {
           setCommentData(res.data.all_comment);
@@ -141,6 +142,8 @@ const CommentsManagementPage = (props) => {
                   selectedOption={selectedOption}
                   setSelectedOption={setSelectedOption}
                   setCommentData={setCommentData}
+                  setPendingCommentData={props?.setCommentData}
+                  pendingComments={props?.commentData}
                 />
               </div>
               <div className="col-4">

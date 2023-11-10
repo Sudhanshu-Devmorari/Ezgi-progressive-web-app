@@ -6,6 +6,8 @@ from django.db.models import Q
 # Models
 from core.models import Comments
 
+from rest_framework.authtoken.models import Token
+
 
 def create_response(stts,msg,data=None):
     if stts != 200:
@@ -102,3 +104,14 @@ def get_league_data(match_type, league, date, match_detail):
     
 #     return wrapped_view
 
+
+def generate_auth_token(user_obj, created=True):
+    # print("********", user_obj)
+    if created:
+        obj = Token.objects.create(user=user_obj)
+    else:
+        old_token = Token.objects.filter(user=user_obj).last()
+        if old_token:
+            old_token.delete()
+        obj = Token.objects.create(user=user_obj)
+    return obj.key

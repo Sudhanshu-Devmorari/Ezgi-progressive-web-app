@@ -9,13 +9,22 @@ import startFooter from "../../assets/Favorite Page (1).svg";
 import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
 import logout from "../../assets/logout icon (1).svg";
 import { userId } from "../GetUser";
+import axios from "axios";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import CurrentTheme from "../../context/CurrentTheme";
+import config from "../../config";
 
 export const Footer = (props) => {
   const { homeApiData } = props;
   const [showSignup, setShowSignup] = useState(false);
   const { setShowModal } = useContext(CurrentTheme);
+  // const handleLogout = async (id) => {
+  //   try{
+  //     const response = await axios.get(`${config.apiUrl}/clear-token/${id}/`);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   return (
     <>
       <nav
@@ -116,6 +125,7 @@ export const Footer = (props) => {
                 height={38}
                 width={38}
                 onClick={() => {
+                  // handleLogout(userId)
                   localStorage.clear();
                   window.location.reload();
                 }}

@@ -9,6 +9,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
                          ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,AccountStatus,
                          RetrieveChartData, WithdrawalSettingView, GetMinimumAmount, EditorsFutbolAndBasketbolCountView, CheckEditorStatus,
+                         ClearTokenView,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -73,6 +74,7 @@ urlpatterns = [
     path('withdrawal-setting/', WithdrawalSettingView.as_view(), name='Withdrawal-Setting'), 
     path('get-minimum-amount/<int:id>/', GetMinimumAmount.as_view(), name='Get-Minimum-Amount'),
     path('check-editor-status/<int:id>/', CheckEditorStatus.as_view(), name='Check-Editor-Status'),
+    path('clear-token/<int:id>/', ClearTokenView.as_view(), name='Clear-Token'),
 
 
     # Admin Panel's api

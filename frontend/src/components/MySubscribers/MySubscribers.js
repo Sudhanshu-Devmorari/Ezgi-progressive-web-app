@@ -28,11 +28,11 @@ const MySubscribers = (props) => {
         // console.log(res)
         if (res?.status === 200) {
           const data1 = res?.data?.subscribers
-          data1.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
+          data1?.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
           setMySubscribers(data1);
           // setMySubscribers(res?.data?.subscribers);
           const data = res?.data?.subscription
-          data.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
+          data?.sort((a, b) => moment(b.created, "YYYY-MM-DDTHH:mm:ss").unix() - moment(a.created, "YYYY-MM-DDTHH:mm:ss").unix());
           setMySubscriptions(data);
           // setMySubscriptions(res?.data?.subscription);
           setIsLoading(false);
@@ -494,11 +494,11 @@ const MySubscribers = (props) => {
           </>
         )}
       </div>
-      <SubscribeModal
+      {props.user === "commentator" && <SubscribeModal
         show={RenewModalShow}
         onHide={() => setRenewModalShow(false)}
         text="renew"
-      />
+      />}
       {/* <SubscribeRenewModal
         show={RenewModalShow}
         onHide={() => setRenewModalShow(false)}

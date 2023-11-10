@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from datetime import date, datetime
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, AbstractUser
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import UserManager
 
@@ -116,7 +116,7 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "%s"%(self.name)
     
-    objects = MyUserManager()
+    # objects = MyUserManager()
     # objects = UserManager()
     
     USERNAME_FIELD = 'phone'

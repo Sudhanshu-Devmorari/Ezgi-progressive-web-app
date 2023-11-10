@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from core.utils import create_response, sms_send, get_league_data
+from core.utils import create_response, sms_send, get_league_data, generate_auth_token
 from datetime import datetime, timedelta, date, time
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
@@ -25,6 +25,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ParseError, APIException
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from collections import Counter, defaultdict
 import math
@@ -186,7 +188,11 @@ class LoginView(APIView):
                 })
 
             if user_phone.password == password:
+                # token = generate_auth_token(user_phone)
+                # return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK, "Token":token})
+                
                 return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
+            
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
         except:
@@ -207,11 +213,13 @@ class GoogleLoginview(APIView):
                 username=request.data.get('username'),
                 logged_in_using='google',
             )
+        # token = generate_auth_token(user)
         return Response({
             'data' : "Login successfull!", 
             'userRole' : user.user_role, 
             'userId' : user.id, 
-            'status' : status.HTTP_200_OK
+            'status' : status.HTTP_200_OK,
+            # 'Token':token
             }) 
         
 class FacebookLoginview(APIView):
@@ -226,11 +234,13 @@ class FacebookLoginview(APIView):
                 username=request.data.get('username'),
                 logged_in_using='facebook',
             )
+        # token = generate_auth_token(user)
         return Response({
             'data' : "Login successfull!", 
             'userRole' : user.user_role, 
             'userId' : user.id, 
-            'status' : status.HTTP_200_OK
+            'status' : status.HTTP_200_OK,
+            # 'Token':token
             }) 
 
 
@@ -695,15 +705,15 @@ class SubscriptionView(APIView):
             duration = request.data.get('duration')
             start_date = datetime.now()
             if (duration != "" and duration != None):
-                # if duration == "1 Months":
-                #     end_date = start_date + timedelta(days=30)
-                # if duration == "3 Months":
-                #     end_date = start_date + timedelta(days=90)
-                # if duration == "6 Months":
-                #     end_date = start_date + timedelta(days=180)
-                # if duration == "1 Year":
-                #     end_date = start_date + timedelta(days=365)
-                end_date = start_date + timedelta(days=1)
+                if duration == "1 Months":
+                    end_date = start_date + timedelta(days=30)
+                if duration == "3 Months":
+                    end_date = start_date + timedelta(days=90)
+                if duration == "6 Months":
+                    end_date = start_date + timedelta(days=180)
+                if duration == "1 Year":
+                    end_date = start_date + timedelta(days=365)
+                # end_date = start_date + timedelta(days=1)
 
                 money = request.data.get('money')
             
@@ -1596,13 +1606,13 @@ class HighlightPurchaseView(APIView):
                 if duration not in ["1 Week", "2 Week", "1 Month"]:
                     raise ValueError('Invalid duration.')
 
-                # if duration == "1 Week":
-                #     end_date = start_date + timezone.timedelta(days=7)
-                # elif duration == "2 Week":
-                #     end_date = start_date + timezone.timedelta(days=14)
-                # else:  # duration == "1 Month"
-                #     end_date = start_date + timezone.timedelta(days=30)
-                end_date = start_date + timezone.timedelta(days=1)
+                if duration == "1 Week":
+                    end_date = start_date + timezone.timedelta(days=7)
+                elif duration == "2 Week":
+                    end_date = start_date + timezone.timedelta(days=14)
+                else:  # duration == "1 Month"
+                    end_date = start_date + timezone.timedelta(days=30)
+                # end_date = start_date + timezone.timedelta(days=1)
                 
                 user = User.objects.get(id=request.data['id'])
 
@@ -1994,7 +2004,11 @@ class UserManagement(APIView):
                     password=password, gender=gender, age=age
                 )
                 user_obj.save()
+                # print("here")
+                # token_user = User.objects.get(id=user_obj.id)
+                # print(user_obj.id, token_user.id,token_user)
                 # print("Type :", type(user_obj))
+
                 # tokenobj = Token.objects.create(user=user_obj)
                 # print("\n ====>tokenobj", tokenobj)
 
@@ -5139,13 +5153,14 @@ class BecomeEditorView(APIView):
                         # editor_obj = BecomeEditor.objects.get(question = 'Become Editor price')
                         startdate_str = request.data.get('startdate')
                         formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
-                        # enddate = formatted_startdate + timedelta(days=30)
-                        enddate = formatted_startdate + timedelta(days=1)
+                        enddate = formatted_startdate + timedelta(days=30)
+                        # enddate = formatted_startdate + timedelta(days=1)
                         # enddate = ''
                         obj = BecomeCommentator.objects.create(user=user, money=request.data.get('monthly_amount'), membership_status='new', 
                                                                commentator=True, commentator_level='apprentice', status='active', duration=request.data.get('duration'), 
                                                                start_date=formatted_startdate, end_date=enddate)
                         obj.save()
+                        bank_obj = BankDetails.objects.create(user=user, total_balance=0, pending_balance=0, withdrawable_balance=0)
                         admin_user = User.objects.get(phone='5123456789', is_admin=True)
                         notification_obj = Notification.objects.create(
                             sender=admin_user,
@@ -5564,6 +5579,8 @@ class RetrievePageData():
         return user_detail
 
 class RetrieveHomeView(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     """
     for Home page:
     """
@@ -5822,7 +5839,7 @@ class BankDetailsView(APIView):
                     for obj in subscription_obj:
                         formatted_date = obj.start_date.strftime("%d.%m.%Y - %H:%M")
                         details = {
-                            "type":"New Subscriber",
+                            "type":"New Subscription",
                             "duration":obj.duration,
                             "date":formatted_date,
                             "amount":obj.money
@@ -6648,8 +6665,9 @@ class SubscriptionReNew(APIView):
                 formatted_startdate = datetime.strptime(startdate_str, '%d.%m.%Y %H:%M:%S')
                 data['start_date'] = formatted_startdate
 
-                # enddate = formatted_startdate + timedelta(days=30)
-                enddate = formatted_startdate + timedelta(days=1)
+                enddate = formatted_startdate + timedelta(days=30)
+                # enddate = formatted_startdate + timedelta(days=1)
+
                 # data['end_date'] = enddate
 
                 # data['user'] = UserSerializer(user).data
@@ -6755,21 +6773,21 @@ class RetrieveBecomeCommentatorData(APIView):
         try:
             user = User.objects.get(id=id)
         except User.DoesNotExist:
-            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"message": "User Object not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         try:
             obj = BecomeCommentator.objects.filter(user__id=id).order_by("-created").first()
         except BecomeCommentator.DoesNotExist:
-            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"message": "Commentator Object not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
         except MembershipSetting.DoesNotExist:
-            return Response(data={"message": "Object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"message": "Membership Object not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(data={"message": f"An error occurred.{e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -6915,3 +6933,18 @@ class CheckEditorStatus(APIView):
         if user.is_active == False:
             return Response({"data":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"data":"you can subscribe to this user."}, status=status.HTTP_200_OK)
+
+
+class ClearTokenView(APIView):
+    def get(self, request, id, format=None, *args, **kwargs):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response(data="User not found", status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            auth_token = Token.objects.get(user=user)
+            auth_token.delete()
+            return Response(data="Token deleted successfully.")
+        except Token.DoesNotExist:
+            return Response(data="Token not found for the user", status=status.HTTP_404_NOT_FOUND)

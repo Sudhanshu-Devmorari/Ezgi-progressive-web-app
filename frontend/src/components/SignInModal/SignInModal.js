@@ -9,9 +9,12 @@ import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
+// import { useCookies } from "react-cookie";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignInModal = (props) => {
+  // const [cookies, setCookie, removeCookie] = useCookies();
+  
   const [showPassword, setShowPassword] = useState(false);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
@@ -66,6 +69,11 @@ const SignInModal = (props) => {
               currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
             timer: 2000,
           });
+          
+          // setCookie("access-token", res.data.Token, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // });
+
           window.location.reload();
         } else if (res.data.status === 400 || res.data.status === 404) {
           setBtnLoading(false);
