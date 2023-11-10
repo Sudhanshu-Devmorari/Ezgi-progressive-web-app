@@ -2471,7 +2471,12 @@ class FilterComments(APIView):
                 
                 # filters['public_content'] = request.data.get('public_content')
                 if filter_type == "public_content":
-                    all_comments = Comments.objects.filter(status='approve', public_content=True,**filters).order_by('-created')
+
+                    if request.data.get("mobile") == 'True':
+                        all_comments = Comments.objects.filter(public_content=True,**filters).order_by('-created')
+                    else:
+                        all_comments = Comments.objects.filter(status='approve', public_content=True,**filters).order_by('-created')
+
                     # data_list['Public_Comments'] = []
 
                     for comment in all_comments:
@@ -2526,7 +2531,10 @@ class FilterComments(APIView):
                         data_list.append(comment_data)
 
                 if filter_type == "published":
-                    all_comments = Comments.objects.filter(status='approve',**filters).order_by('-created')
+                    if request.data.get("mobile") == 'True':
+                        all_comments = Comments.objects.filter(**filters).order_by('-created')
+                    else:
+                        all_comments = Comments.objects.filter(status='approve',**filters).order_by('-created')
                     for comment in all_comments:
                         comment_data = CommentsSerializer(comment).data
                         date_obj = datetime.strptime(comment_data['date'], "%Y-%m-%d")
