@@ -173,7 +173,7 @@ const MainPage = () => {
     setProfileData(res.data);
     // setMembershipDate(res.data.membership_date);
     setIsLoading(false);
-    localStorage.setItem("user-active", res.data.is_active);
+    // localStorage.setItem("user-active", res.data.is_active);
     cookies.set("user-active", res?.data?.is_active, {
       expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
     });

@@ -57,7 +57,7 @@ const CreateNewTicket = (props) => {
         });
         setShowModal(1);
       } else {
-        const res = await AxiosInstance.post(`${config?.apiUrl}/support/${userId}`, {
+        const res = await AxiosInstance.post(`${config?.apiUrl}/support/`, {
           department: selectedMatchDetails,
           subject: subject,
           message: message,

@@ -49,9 +49,9 @@ const SignInModal = (props) => {
 
         if (res.data.status === 200) {
           setBtnLoading(false);
-          localStorage.setItem("user-role", res.data.userRole);
-          localStorage.setItem("user-id", res.data.userId);
-          localStorage.setItem("username", res.data.username);
+          // localStorage.setItem("user-role", res.data.userRole);
+          // localStorage.setItem("user-id", res.data.userId);
+          // localStorage.setItem("username", res.data.username);
           localStorage.setItem("priviouspage", "home");
           localStorage.setItem("currentpage", "home");
           localStorage.setItem("dashboardShow", false);

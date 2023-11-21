@@ -40,7 +40,7 @@ const Support = () => {
   const [ticketsData, setTicketsData] = useState([]);
   useEffect(() => {
     async function getTicketsData() {
-      const res = await AxiosInstance.get(`${config?.apiUrl}/support/${userId}`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/support/`);
       setTicketsData(res.data);
     }
     getTicketsData();

@@ -46,8 +46,8 @@ const GoogleLogin = () => {
         })
         .then((response) => {
           // console.log(response.data);
-          localStorage.setItem("user-role", response.data.userRole);
-          localStorage.setItem("user-id", response.data.userId);
+          // localStorage.setItem("user-role", response.data.userRole);
+          // localStorage.setItem("user-id", response.data.userId);
 
           setCookie("user-role", response.data.userRole, {
             expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),

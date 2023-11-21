@@ -1241,9 +1241,10 @@ class SupportView(APIView):
     permission_classes = [IsAuthenticated]
     
     # for retrieve login user all tickets:
-    def get(self, request, id, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            # user = User.objects.get(id=id)
+            user = request.user
             if user.is_delete == True:
                 return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             support_obj = TicketSupport.objects.filter(user=user).order_by('-created')
@@ -1254,7 +1255,7 @@ class SupportView(APIView):
             return Response(data={"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # for create new ticket:
-    def post(self, request, id, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
                 if 'department' not in request.data:
@@ -1263,8 +1264,8 @@ class SupportView(APIView):
                         return Response({'error': 'Subject not found.', 'status' : status.HTTP_400_BAD_REQUEST})
                 if 'message' not in request.data:
                         return Response({'error': 'Message not found.', 'status' : status.HTTP_400_BAD_REQUEST})
-                # user = request.user
-                user = User.objects.get(id=id)
+                user = request.user
+                # user = User.objects.get(id=id)
                 if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
@@ -1781,8 +1782,8 @@ class VerifyUserView(APIView):
 
 
 class AdminMainPage(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -1921,8 +1922,8 @@ class AdminMainPage(APIView):
     
 from rest_framework.authtoken.models import Token
 class UserManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -2318,8 +2319,8 @@ class FilterUserManagement(APIView):
 
 
 class CommentsManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         management = {}
@@ -2806,8 +2807,8 @@ class FilterComments(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class EditorManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -3747,8 +3748,8 @@ class FilterSalesManagement(APIView):
         
 
 class SupportManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         all_data = {}
@@ -3881,8 +3882,8 @@ class SupportManagement(APIView):
 
 
 class SubUserShowTicketData(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, ticket_id, format=None, *args, **kwargs):
         try:
@@ -3904,8 +3905,8 @@ class SubUserShowTicketData(APIView):
 
 
 class RetrieveSubUserView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     # Retrieve the sub user as per department.
     def post(self, request, format=None, *args, **kwargs):
@@ -3926,8 +3927,8 @@ class RetrieveSubUserView(APIView):
         
 
 class TicketRedirectView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def post(self, request, id, ticket_id, format=None, *args, **kwargs):
         """
@@ -4052,8 +4053,8 @@ class RedirectAnswerView(APIView):
         
 
 class NotificationManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4162,8 +4163,8 @@ class NotificationManagement(APIView):
 
 class SubUserManagement(APIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -4350,8 +4351,8 @@ class SubUserManagement(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
 class FilterSubUserManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def post(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -4380,8 +4381,8 @@ class FilterSubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
 class AdvertisementManagement(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -4495,8 +4496,8 @@ class AdvertisementManagement(APIView):
         
         
 class LevelRule(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4560,8 +4561,8 @@ class LevelRule(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class MembershipSettingView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4638,8 +4639,8 @@ class MembershipSettingView(APIView):
     
 
 class SubscriptionSettingView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4689,8 +4690,8 @@ class SubscriptionSettingView(APIView):
 
 
 class HighlightSettingView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4743,8 +4744,8 @@ class HighlightSettingView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CommentSetting(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     try:
         
@@ -5380,8 +5381,8 @@ class FootbalAndBasketballContentView(APIView):
         except Exception as e:
             return Response({'error': f'Error while fetching data. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class GetALLUsers(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request):
         try:
@@ -5797,8 +5798,8 @@ class RetrieveEditorView(APIView):
     """
     Editor list view
     """
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
@@ -5815,8 +5816,8 @@ class RetrieveEditorView(APIView):
     
 class BecomeEditorFAQView(APIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, id=None):
         adminuser_id = request.query_params.get('admin', None)
@@ -5915,7 +5916,7 @@ class BankDetailsView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request, id,*args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin', None)
             if adminuser_id is not None:
@@ -7112,8 +7113,8 @@ class RetrieveChartData(APIView):
     
 
 class WithdrawalSettingView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         level = request.query_params.get('level').lower()

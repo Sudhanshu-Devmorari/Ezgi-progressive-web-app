@@ -298,7 +298,7 @@ const BecomeAEditorModal = (props) => {
   const getUserdata = async () => {
     try {
       setRenewLoading(true);
-      const res = await AxiosInstance.get(`${config.apiUrl}/user-data/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/user-data/`);
       setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
         setRenewLoading(false);

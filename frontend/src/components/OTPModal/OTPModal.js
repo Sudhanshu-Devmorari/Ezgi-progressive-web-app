@@ -67,9 +67,9 @@ const OTPModal = (props) => {
         props?.setSelectedCity("Select");
         props?.setSelectedGender("Select");
         props?.setSelectedAge("Select");
-        localStorage.setItem("username", res?.data?.user?.username);
-        localStorage.setItem("user-role", res?.data?.user?.user_role);
-        localStorage.setItem("user-id", res?.data?.user?.id);
+        // localStorage.setItem("username", res?.data?.user?.username);
+        // localStorage.setItem("user-role", res?.data?.user?.user_role);
+        // localStorage.setItem("user-id", res?.data?.user?.id);
         localStorage.setItem("priviouspage", "home");
         localStorage.setItem("currentpage", "home");
         localStorage.setItem("dashboardShow", false);
