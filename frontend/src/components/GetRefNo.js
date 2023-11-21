@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "../config";
+import AxiosInstance from "./AxiosInstance";
 
 export const ref = () => {
   const location = window.location;
@@ -11,7 +12,7 @@ export const ref = () => {
 
 export const transcationQueryAPI = async (ref_no) => {
   try {
-    const res = await axios.post(`${config.apiUrl}/transcation-query/`, {
+    const res = await AxiosInstance.post(`${config.apiUrl}/transcation-query/`, {
       ref_no: ref_no,
     });
     const data = res?.data?.data;

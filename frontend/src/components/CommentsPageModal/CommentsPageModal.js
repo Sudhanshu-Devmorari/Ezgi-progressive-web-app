@@ -16,6 +16,8 @@ import DarkradioYellowSelected from "../../assets/Group 505 (1).svg";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const CommentsPageModal = (props) => {
   const handleClearData = () => {
@@ -29,10 +31,13 @@ const CommentsPageModal = (props) => {
     setBlueSelect("");
     setYellowSelect("");
   };
+
+  const cookies = new Cookies();
+
   const handleShowButtonClick = async () => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     try {
-      const response = await axios.post(
+      const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-comments/${user_id}/`,
         {
           category: categoryData,

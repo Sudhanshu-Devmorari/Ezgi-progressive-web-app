@@ -18,6 +18,7 @@ import axios from "axios";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
+import AxiosInstance from "../AxiosInstance";
 
 const MainPage = (props) => {
   const [data, setData] = useState([]);
@@ -30,13 +31,14 @@ const MainPage = (props) => {
 
   const adminHomeApiData = async (user_id) => {
     const id = localStorage.getItem("admin-user-id");
-    const res = await axios
+    const res = await AxiosInstance
       .get(`${config?.apiUrl}/home/?id=${id}`)
       .then((res) => {
         // console.log(res, "=====>>>>res.data");
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         setData(res?.data);

@@ -19,6 +19,7 @@ import CreateAdsModal from "../CreateAdsModal/CreateAdsModal";
 import config from "../../config";
 import Export from "../Export/Export";
 import EditorBanner from "../EditorBanner/EditorBanner";
+import AxiosInstance from "../AxiosInstance";
 
 const AdsManagementPage = (props) => {
   const [editTrue, setEditTrue] = useState(false);
@@ -55,7 +56,7 @@ const AdsManagementPage = (props) => {
     async function getAdsData() {
       try {
         setIsLoading(true);
-        const res = await axios.get(`${config?.apiUrl}/ads-management/`);
+        const res = await AxiosInstance.get(`${config?.apiUrl}/ads-management/`);
         // console.log(res.data, "==========>>>res sub users");
         const data = res.data;
         setBanners(data.Banners);

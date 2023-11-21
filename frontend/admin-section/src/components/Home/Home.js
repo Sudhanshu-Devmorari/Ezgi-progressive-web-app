@@ -26,6 +26,7 @@ import { useCookies } from "react-cookie";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
+import AxiosInstance from "../AxiosInstance";
 
 const Home = (props) => {
   const [isLoadingActions, setIsLoadingActions] = useState(false);
@@ -35,7 +36,7 @@ const Home = (props) => {
   const handleDeactive = async (id, action) => {
     try {
       setIsLoadingActions(true);
-      const res = await axios.delete(
+      const res = await AxiosInstance.delete(
         `${config?.apiUrl}/user-management/${id}/?action=${action}&admin=${admin_id}`
       );
       if (res.status === 200) {
@@ -65,6 +66,7 @@ const Home = (props) => {
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
     } catch (error) {
@@ -195,7 +197,7 @@ const Home = (props) => {
   const handleShow = async () => {
     setIsFilterLoading(true);
     try {
-      const response = await axios.post(
+      const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-user-management/`,
         {
           user_type: selectedUserTypeFilter,
@@ -220,7 +222,7 @@ const Home = (props) => {
     // console.log("IDDD: ", id);
     try {
       // setIsLoadingDeactive(true);
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/user-transaction-history/${id}/`
       );
       if (res.status === 200) {
@@ -318,7 +320,7 @@ const Home = (props) => {
       formData.append("number", addUser.month);
       formData.append("level", addUser.level);
       try {
-        const response = await axios.post(
+        const response = await AxiosInstance.post(
           `${config?.apiUrl}/user-management/?admin=${admin_id}`,
           formData
         );
@@ -335,6 +337,7 @@ const Home = (props) => {
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         window.location.reload();
@@ -430,7 +433,7 @@ const Home = (props) => {
       formData.append("level", addUser.level);
       formData.append("user_id", user_id);
       try {
-        const response = await axios.patch(
+        const response = await AxiosInstance.patch(
           `${config?.apiUrl}/user-management/${id}/?admin=${admin_id}`,
           formData
         );
@@ -475,6 +478,7 @@ const Home = (props) => {
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
       } catch (error) {

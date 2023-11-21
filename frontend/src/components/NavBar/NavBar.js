@@ -12,8 +12,10 @@ import { userId } from "../GetUser";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/esm/Spinner";
+import { Cookies, useCookies } from "react-cookie";
 
 const NavBar = (props) => {
+  const cookies = new Cookies();
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
@@ -90,13 +92,13 @@ const NavBar = (props) => {
               }}
             />
           </span>
-          {userId !== null ? (
+          {userId || userId != undefined ? (
             <>
               <span
                 onClick={() => {
                   props.setDashboardSUser(true);
                   const currentPage = localStorage.getItem("currentpage");
-                  const currentuser = localStorage.getItem("user-role");
+                  const currentuser = cookies.get("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&

@@ -29,7 +29,8 @@ import moment from "moment";
 import axios from "axios";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const CommentsManagement = (props) => {
   const [fData, setFdata] = useState({});
@@ -37,7 +38,7 @@ const CommentsManagement = (props) => {
   const [secondStatus, setSecondStatus] = useState("");
   const [thirdStatus, setThirdStatus] = useState("");
   const [fourthStatus, setFourthStatus] = useState("");
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
   const [currentData, setCurrentData] = useState([]);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState("Select");
   const [matchDetailsDropdown, setMatchDetailsDropdown] = useState(false);
@@ -72,9 +73,12 @@ const CommentsManagement = (props) => {
     setSecondStatus("");
   };
 
+  const cookies = new Cookies();
+  
   const updateCommentApiData = async () => {
-    const user_id = localStorage.getItem("admin-user-id");
-    await axios
+    const user_id = cookies.get("admin-user-id");
+    // const user_id = localStorage.getItem("admin-user-id");
+    await AxiosInstance
       .post(`${config?.apiUrl}/filter-comments/${user_id}/`, {
         category: selectedCategory,
         country: selectedCountry,
@@ -91,7 +95,8 @@ const CommentsManagement = (props) => {
         // console.log(res.data,"=====>>filter");
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
+          removeCookie("admin-user-id")
+          removeCookie("access-token")
           window.location.reload();
         }
         setFdata(res.data);
@@ -133,15 +138,18 @@ const CommentsManagement = (props) => {
     setCountryDropDown(!countryDropDown);
   };
   const handleStatus = async (id, status) => {
-    const user_id = localStorage.getItem("admin-user-id");
+    // const user_id = localStorage.getItem("admin-user-id");
+    const user_id = cookies.get("admin-user-id");
+
     try {
-      const res = await axios.patch(
+      const res = await AxiosInstance.patch(
         `${config?.apiUrl}/comments-management/${id}/?admin_id=${user_id}`,
         { status: `${status}` }
       );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token")
         // window.location.reload();
       }
       // props.setCommentData(props?.commentData)

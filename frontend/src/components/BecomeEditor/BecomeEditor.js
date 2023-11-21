@@ -5,6 +5,7 @@ import landingPage from "../../assets/landingPage.png";
 import FAQEditor from "../FAQEditor/FAQEditor";
 import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
 import Swal from "sweetalert2";
+import { Cookies, useCookies } from "react-cookie";
 
 const BecomeEditor = ({
   profileData,
@@ -14,7 +15,10 @@ const BecomeEditor = ({
 }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
-  const user_role = localStorage.getItem("user-role");
+
+  const cookies = new Cookies();
+
+  const user_role = cookies.get("user-role");
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -71,7 +75,7 @@ const BecomeEditor = ({
         >
           <button
             onClick={() => {
-              if (JSON.parse(localStorage.getItem("user-active")) == false) {
+              if (JSON.parse(cookies.get("user-active")) == false) {
                 errorSwal();
                 return;
               }

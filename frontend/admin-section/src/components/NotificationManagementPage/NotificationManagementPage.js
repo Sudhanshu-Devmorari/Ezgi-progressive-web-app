@@ -17,6 +17,7 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import moment from "moment";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const NotificationManagementPage = (props) => {
   const [cookies, setCookie, removeCookie] = useCookies();
@@ -79,12 +80,13 @@ const NotificationManagementPage = (props) => {
     async function getNotificationsData() {
       const user_id = localStorage.getItem("admin-user-id");
       try {
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${config?.apiUrl}/notification-management/?admin_id=${user_id}`
         );
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         // console.log(res.data, "==========>>>res sub users");

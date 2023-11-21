@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const SalesManagementFilter = (props) => {
   const DateOptions = ["option 1", "option 2"];
@@ -85,13 +86,14 @@ const SalesManagementFilter = (props) => {
     };
     try {
       const adminId = localStorage.getItem('admin-user-id')
-      const res = await axios.post(
+      const res = await AxiosInstance.post(
         `${config?.apiUrl}/sales-management/?admin=${adminId}`,
         payload
       );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
       // console.log("@@@@@@@@@@@@: ", res.data);

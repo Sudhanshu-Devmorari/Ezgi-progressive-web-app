@@ -9,6 +9,7 @@ import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal
 import config from "../../config";
 import Swal from "sweetalert2";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const Support = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -39,7 +40,7 @@ const Support = () => {
   const [ticketsData, setTicketsData] = useState([]);
   useEffect(() => {
     async function getTicketsData() {
-      const res = await axios.get(`${config?.apiUrl}/support/${userId}`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/support/${userId}`);
       setTicketsData(res.data);
     }
     getTicketsData();
@@ -56,7 +57,7 @@ const Support = () => {
   const handleCheckTicketAction = async(ticket_id) => {
     // console.log("ticket_id", ticket_id)
     try {
-      const res = await axios.get(`${config?.apiUrl}/check-ticket-action/${ticket_id}/`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/check-ticket-action/${ticket_id}/`);
       // console.log("res: ", res)
     }
     catch (error) {
@@ -80,7 +81,7 @@ const Support = () => {
   const [ticketAllData, setTicketAllData] = useState([]);
   async function getData(e) {
     try {
-      const res = await axios.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${e}/`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${e}/`);
       // console.log("All res: ", res)
       // const data = res.data
       // data.sort((a, b) => moment(a.created, 'YYYY-MM-DDTHH:mm:ss').unix() - moment(b.created, 'YYYY-MM-DDTHH:mm:ss').unix());
@@ -89,7 +90,7 @@ const Support = () => {
       setTicketAllData(res.data)
     }catch (e) {}
     try {
-      axios
+      AxiosInstance
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
           // const data = res.data

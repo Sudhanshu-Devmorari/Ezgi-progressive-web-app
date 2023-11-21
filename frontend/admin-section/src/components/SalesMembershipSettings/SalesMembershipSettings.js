@@ -6,6 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCookies } from "react-cookie";
 import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForCommentsCreatetion";
+import AxiosInstance from "../AxiosInstance";
 
 const SalesMembershipSettings = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +37,7 @@ const SalesMembershipSettings = (props) => {
   useEffect(() => {
     async function getData() {
       try {
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/membership-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}&admin=${admin_id}`
@@ -46,6 +47,7 @@ const SalesMembershipSettings = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
           setIsDataLoading(false);
         }
@@ -82,7 +84,7 @@ const SalesMembershipSettings = (props) => {
         };
         // console.log(data,"====================data")
         setIsLoading(true);
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${
             config?.apiUrl
           }/membership-setting/?commentator_level=${props?.selectLevel.toLowerCase()}&admin=${admin_id}`,
@@ -91,6 +93,7 @@ const SalesMembershipSettings = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         // console.log(res,"=res")

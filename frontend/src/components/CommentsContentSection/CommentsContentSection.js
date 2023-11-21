@@ -30,7 +30,7 @@ import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
-
+import AxiosInstance from "../AxiosInstance";
 import Selected_Clap from "../../assets/Selected Clap.svg";
 import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
 import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
@@ -45,6 +45,7 @@ import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.
 import Swal from "sweetalert2";
 import { truncateString, userId } from "../GetUser";
 import { formatTimeDifference } from "../FormatTime";
+import { Cookies, useCookies } from "react-cookie";
 
 const CommentsContentSection = (props) => {
   const {
@@ -74,7 +75,11 @@ const CommentsContentSection = (props) => {
     setResolve,
     commentLoading,
   } = props;
-  const userId = localStorage.getItem("user-id");
+
+  const cookies = new Cookies();
+
+  const userId = cookies.get("user-id");
+  const [setCookie, removeCookie] = useCookies();
 
   // const [active, setActive] = useState([]);
   // const [resolve, setResolve] = useState([]);
@@ -100,10 +105,10 @@ const CommentsContentSection = (props) => {
   //     }, []);
   // };
   const handleCommentReaction = async (id, reaction, is_public) => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     // console.log("publicComments:::::::::::", publicComments);
     try {
-      const res = await axios.post(
+      const res = await AxiosInstance.post(
         `${config?.apiUrl}/comment-reaction/${id}/${user_id}`,
         {
           reaction_type: `${reaction}`,
@@ -193,6 +198,7 @@ const CommentsContentSection = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       // activeResolved(user_id);
@@ -210,9 +216,9 @@ const CommentsContentSection = (props) => {
       }
     }
   };
-  const user_id = localStorage.getItem("user-id");
+  const user_id = cookies.get("user-id");
   useEffect(() => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     // userProfileId
     activeResolved(props.dashboardSUser ? user_id : userProfileId);
   }, [userProfileId, user_id]);

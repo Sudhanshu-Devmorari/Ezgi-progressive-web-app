@@ -23,6 +23,7 @@ import { MatchDetailsAPI } from "../GetMatchDetailsAPI";
 import Swal from "sweetalert2";
 import config from "../../config";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const AddCommentModal = (props) => {
   const { activeResolved, profileData } = props;
@@ -433,7 +434,7 @@ const AddCommentModal = (props) => {
         setPredictionError("");
         setSelectCheckboxError("");
         // console.log("------------", matchId)
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${config?.apiUrl}/post-comment/${userId}`,
           {
             category: selectedCategory,

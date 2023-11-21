@@ -9,6 +9,8 @@ import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const Transactions = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -33,12 +35,12 @@ const Transactions = () => {
         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
     });
   };
-
+  const cookies = new Cookies();
   const [bankDetails, setBankDetails] = useState([]);
   const [transactionHistory, setTransactionHistory] = useState([]);
   async function getBankIban() {
     try {
-      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/bank-details/${userId}`);
       // console.log("Data: ", res.data)
       if (res?.status === 200) {
         setBankDetails(res?.data?.data);
@@ -158,7 +160,7 @@ const Transactions = () => {
           {/* <span>TR00 2151 2532 0000 3315 1200 58</span> */}
           <button
             onClick={() => {
-              if (JSON.parse(localStorage.getItem("user-active")) == false) {
+              if (JSON.parse(cookies.get("user-active")) == false) {
                 errorSwal();
                 return;
               }

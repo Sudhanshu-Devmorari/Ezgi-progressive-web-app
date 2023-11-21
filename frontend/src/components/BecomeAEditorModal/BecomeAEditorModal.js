@@ -16,9 +16,15 @@ import axios from "axios";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { useEffect } from "react";
 import { ref, transcationQueryAPI } from "../GetRefNo";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const BecomeAEditorModal = (props) => {
-  const userId = localStorage.getItem("user-id");
+  const [setCookie, removeCookie] = useCookies();
+
+  const cookies = new Cookies();
+
+  const userId = cookies.get("user-id");
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -121,7 +127,7 @@ const BecomeAEditorModal = (props) => {
       try {
         setIsLoading(true);
 
-        const checkMembership = await axios.get(
+        const checkMembership = await AxiosInstance.get(
           `${config.apiUrl}/become-editor/?id=${userId}`
         );
 
@@ -137,7 +143,7 @@ const BecomeAEditorModal = (props) => {
           formData.append("profile_pic", preveiwProfilePic);
           file && formData.append("profile_file", file);
 
-          const payment_res = await axios.post(`${config.apiUrl}/payment/`, 
+          const payment_res = await AxiosInstance.post(`${config.apiUrl}/payment/`, 
           formData);
           // console.log(payment_res, "==========payment_res");
 
@@ -292,7 +298,7 @@ const BecomeAEditorModal = (props) => {
   const getUserdata = async () => {
     try {
       setRenewLoading(true);
-      const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/user-data/${userId}`);
       setCommentatorUser(res?.data?.data);
       if (res.status === 200) {
         setRenewLoading(false);
@@ -319,13 +325,16 @@ const BecomeAEditorModal = (props) => {
       // formData.append("promotion_duration", promotion);
       // formData.append("plan_price", plan_price);
 
-      await axios
+      await AxiosInstance
         .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
         .then(async (res) => {
           if (res.status === 200) {
 
             // setShowPaymentModal(true);
             localStorage.setItem("user-role", res.data.user_role);
+            setCookie("user-role", res.data.user_role, {
+              expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+            });
             props.onHide();
             setShowPaymentModal(false);
             const confirm = await Swal.fire({

@@ -6,8 +6,11 @@ import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
 import OtpInput from "react18-input-otp";
+import { useCookies } from "react-cookie";
 
 const OTPModal = (props) => {
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
@@ -74,6 +77,17 @@ const OTPModal = (props) => {
           "subcurrentpage",
           res.data.userRole == "standard" ? "subscribers" : "home"
         );
+
+        setCookie("username", res?.data?.user?.username, {
+          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        });
+        setCookie("user-role", res?.data?.user?.user_role, {
+          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        });
+        setCookie("user-id", res?.data?.user?.id, {
+          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        });
+
         props.hide();
         await Swal.fire({
           title: "Success",

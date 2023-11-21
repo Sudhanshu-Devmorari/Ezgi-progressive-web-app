@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import config from "../../config";
 import axios from "axios";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
 
 const Item = ({ id, color: backgroundColor, removeInputFields, formik }) => {
   const admin_id = localStorage.getItem("admin-user-id")
@@ -108,7 +109,7 @@ const FaqSettingSection = () => {
     onSubmit: async (values) => {
         // console.log(values)
       try {
-        const response = await axios.post(
+        const response = await AxiosInstance.post(
           `${config.apiUrl}/become-editor-faq/?admin=${admin_id}`,
           {
             faq_data: values,
@@ -117,6 +118,7 @@ const FaqSettingSection = () => {
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         if (response.status == 200) {
@@ -159,7 +161,7 @@ const FaqSettingSection = () => {
   // Remove Input box on Delete Icon click
   const removeInputFields = async (index, deleteId) => {
     try {
-      const response = await axios.delete(
+      const response = await AxiosInstance.delete(
         `${config.apiUrl}/become-editor-faq/${deleteId}?admin=${admin_id}`
       );
       if (response.status == 200) {
@@ -177,6 +179,7 @@ const FaqSettingSection = () => {
       if (response.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token")
         window.location.reload();
       }
       const rows = [...formik.values];
@@ -211,10 +214,11 @@ const FaqSettingSection = () => {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        const response = await axios.get(`${config.apiUrl}/become-editor-faq/?admin=${admin_id}`);
+        const response = await AxiosInstance.get(`${config.apiUrl}/become-editor-faq/?admin=${admin_id}`);
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         formik.setValues(response.data);

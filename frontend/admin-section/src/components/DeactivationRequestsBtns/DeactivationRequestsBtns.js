@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
 
 const DeactivationRequestsBtns = (props) => {
   const [time, setTime] = useState(false);
@@ -18,7 +19,7 @@ const DeactivationRequestsBtns = (props) => {
       } else {
         setIsLoading(true);
       }
-      const res = await axios.post(
+      const res = await AxiosInstance.post(
         `${config?.apiUrl}/deactivate-commentator/${id}/`,
         { status: action }
       );

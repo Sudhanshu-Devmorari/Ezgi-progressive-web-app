@@ -7,12 +7,14 @@ import darkGrp from "../../assets/Public Content Radio Button Unselected.svg";
 import publicSelectedIcon from "../../assets/Public Content Radio Button Selected.svg";
 import lighGrpSelected from "../../assets/Group 312.png";
 import lighGrp from "../../assets/Group 721.png";
+import { Cookies, useCookies } from "react-cookie";
 
 export const SelectContent = (props) => {
+  const cookies = new Cookies();
   const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const userPhone = localStorage.getItem("userPhone");
-  const userId = localStorage.getItem("user-id");
+  const userPhone = cookies.get("userPhone");
+  const userId = cookies.get("user-id");
   return (
     <>
       {userId ? (

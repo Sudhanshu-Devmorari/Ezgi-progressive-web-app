@@ -29,6 +29,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const SideBar = (props) => {
   // console.log("props?.supportIcon", props?.supportIcon)
@@ -38,18 +39,18 @@ const SideBar = (props) => {
 
   const [supportIcon, setSupportIcon] = useState(false);
   const handleSupportIcon = async () => {
-    const res = await axios.get(`${config?.apiUrl}/check-new-support-ticket/`);
+    const res = await AxiosInstance.get(`${config?.apiUrl}/check-new-support-ticket/`);
     setSupportIcon(res.data)
   }
   // console.log(supportIcon, "===========>>>data");
 
   const handleChangeSupportIcon = async () => {
-    const res = await axios.get(`${config?.apiUrl}/check-change-support-ticket/`);
+    const res = await AxiosInstance.get(`${config?.apiUrl}/check-change-support-ticket/`);
     setSupportIcon(false)
   }
 
   const handleCheckTicketAction = async () => {
-    const res = await axios.get(`${config?.apiUrl}/check-all-ticket-action/`);
+    const res = await AxiosInstance.get(`${config?.apiUrl}/check-all-ticket-action/`);
   }
 
   const location = useLocation();
@@ -58,6 +59,16 @@ const SideBar = (props) => {
     handleSupportIcon()
     setshowDetails(path);
   }, [path]);
+
+  const user_id = localStorage.getItem("admin-user-id");
+
+  const handleLogout = async (id) => {
+    try{
+      const response = await AxiosInstance.get(`${config.apiUrl}/clear-token/${id}/`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <>
@@ -223,8 +234,10 @@ const SideBar = (props) => {
         <div className="">
           <img
             onClick={() => {
+              handleLogout(user_id)
               localStorage.clear();
               removeCookie("admin-user-id")
+              removeCookie("access-token")
               navigate('/')
               window.location.reload();
             }}

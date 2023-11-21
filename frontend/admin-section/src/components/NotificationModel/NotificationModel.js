@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import UserTagList from "../UserTagList/UserTagList";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const NotificationModel = () => {
   const [selectedOption, setSelectedOption] = useState("");
@@ -56,7 +57,7 @@ const NotificationModel = () => {
         userType = "sub_user";
       }
       if (selectedUserType !== "Select") {
-        axios
+        AxiosInstance
           .get(`${config.apiUrl}/all-users/?userType=${userType.toLowerCase()}`)
           .then((res) => {
             // console.log(res.data);
@@ -94,13 +95,14 @@ const NotificationModel = () => {
     onSubmit: async (values,{resetForm}) => {
       try {
         values.data = userList;
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${config?.apiUrl}/notification-management/?sender=${adminUserId}`,
           values
         );
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         // console.log(res,"========================MMMM");

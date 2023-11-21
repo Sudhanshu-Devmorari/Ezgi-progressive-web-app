@@ -6,6 +6,8 @@ import { userId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -21,7 +23,7 @@ const AnsweredTicketView = (props) => {
   }, [props?.ticketData]);
 
   const handleResolvedTicket = () => {
-    axios
+    AxiosInstance
       .post(`${config.apiUrl}/resolved-ticket/${userId}`, {
         ticket_id: ticketData[0]?.ticket_support?.id,
       })
@@ -34,10 +36,12 @@ const AnsweredTicketView = (props) => {
         console.log(error);
       });
   };
-  const userId = localStorage.getItem("user-id");
+  const cookies = new Cookies();
+
+  const userId = cookies.get("user-id");
   const showAllTicketHistory = async(ticket_id) => {
     try {
-      const res = await axios.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`);
       // console.log("All res: ", res)
       setDisplayAllTicketsData(res.data)
     }

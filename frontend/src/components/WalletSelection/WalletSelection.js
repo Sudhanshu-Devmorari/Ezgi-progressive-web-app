@@ -2,13 +2,16 @@ import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const WalletSelection = (props) => {
+  const cookies = new Cookies();
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const pendingBalanceHistory = async () => {
-    const userId = localStorage.getItem("user-id");
+    const userId = cookies.get("user-id");
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/pending-balance/${userId}/`
       );
       if(res.status == 200){

@@ -4,6 +4,7 @@ import config from "../../config";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import resize from "../../assets/resize-16957191194402187617e45f878782891a9fbe48c5fbaa7a2d.jpg";
+import AxiosInstance from "../AxiosInstance";
 
 export const AdvertisementBanner = ({ data, setAdsId }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -12,7 +13,7 @@ export const AdvertisementBanner = ({ data, setAdsId }) => {
   // Redirected & click count
   const handleLinkClick = (ads_id) => {
     try {
-      axios
+      AxiosInstance
         .patch(`${config.apiUrl}/ads-management/${ads_id}/`, {
           count: "count",
           data: "redirected_to_ad",

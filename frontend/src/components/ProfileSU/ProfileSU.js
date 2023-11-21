@@ -11,6 +11,8 @@ import initialProfile from "../../assets/profile.png";
 import config from "../../config";
 import Spinner from "react-bootstrap/esm/Spinner";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -20,7 +22,7 @@ const ProfileSU = (props) => {
   // PROFILE API
   const [progileData, setProgileData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
+  const cookies = new Cookies();
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -35,7 +37,7 @@ const ProfileSU = (props) => {
   };
 
   async function getProfileData() {
-    const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    const res = await AxiosInstance.get(`${config.apiUrl}/profile/`);
     // console.log(res.data, "===============?>>");
     setProgileData(res.data);
     setIsLoading(false);
@@ -58,8 +60,8 @@ const ProfileSU = (props) => {
           const formData = new FormData();
           formData.append("file", e.target.files[0]);
           formData.append("update", "profile");
-          const res = await axios.post(
-            `${config?.apiUrl}/profile/${userId}`,
+          const res = await AxiosInstance.post(
+            `${config?.apiUrl}/profile/`,
             formData
           );
           // console.log("res: ", res);
@@ -254,7 +256,7 @@ const ProfileSU = (props) => {
               <button
                 onClick={() => {
                   if (
-                    JSON.parse(localStorage.getItem("user-active")) == false
+                    JSON.parse(cookies.get("user-active")) == false
                   ) {
                     errorSwal();
                     return;

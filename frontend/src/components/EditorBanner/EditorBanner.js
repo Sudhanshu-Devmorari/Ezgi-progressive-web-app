@@ -9,16 +9,22 @@ import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
 import bannerimg from "../../assets/ree.jpg";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 export const EditorBanner = (props) => {
+  const cookies = new Cookies();
+
+  const [ setCookie, removeCookie] = useCookies();
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const userId = localStorage.getItem("user-id");
+  const userId = cookies.get("user-id");
   const [selectCategory, setSelectCategory] = useState("");
   // const [contentData, setContentData] = useState([]);
   useEffect(() => {
     try {
       if (selectCategory !== "") {
-        axios
+        AxiosInstance
           .get(
             `${config.apiUrl}/football-basketball-content/?category=${selectCategory}&userId=${userId}`
           )
@@ -31,6 +37,7 @@ export const EditorBanner = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
+              removeCookie("access-token");
               // window.location.reload();
             }
           })
@@ -60,7 +67,7 @@ export const EditorBanner = (props) => {
   useEffect(() => {
     async function getBannerImg() {
       try {
-        const res = await axios.get(`${config.apiUrl}/editor-banner/`);
+        const res = await AxiosInstance.get(`${config.apiUrl}/editor-banner/`);
         setEditorBannerImg(res?.data?.data[0]?.editor_banner);
       } catch (error) {
         console.log(error);
@@ -78,7 +85,7 @@ export const EditorBanner = (props) => {
   useEffect(() => {
     async function getFutbolOrBasketbolCounts() {
       try {
-        const res = await axios.get(`${config.apiUrl}/futbol-basketbol-count/`);
+        const res = await AxiosInstance.get(`${config.apiUrl}/futbol-basketbol-count/`);
         setCategoryCounts({
           ...categoryCounts,
           futbol: res?.data?.futbol,
@@ -166,7 +173,7 @@ export const EditorBanner = (props) => {
           onClick={() => {
             if (userId) {
               const currentPage = localStorage.getItem("currentpage");
-              const currentuser = localStorage.getItem("user-role");
+              const currentuser = cookies.get("user-role");
               localStorage.setItem("dashboardShow", false);
               (currentPage !== "show-all-comments" ||
                 currentPage !== "notifications") &&

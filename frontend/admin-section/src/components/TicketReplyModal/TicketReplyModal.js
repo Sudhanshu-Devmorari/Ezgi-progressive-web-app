@@ -9,6 +9,7 @@ import config from "../../config";
 import { useCookies } from "react-cookie";
 import moment from "moment";
 import initialProfile from "../../assets/profile.png";
+import AxiosInstance from "../AxiosInstance";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
@@ -32,7 +33,7 @@ const TicketReplyModal = (props) => {
 
   const toggleSubUserDropDown = () => {
     // Get all subusers
-    axios
+    AxiosInstance
       .post(`${config?.apiUrl}/retrieve-redirect-user/`, {
         department: tickeview?.department,
       })
@@ -104,7 +105,7 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else if (ticketRepltOrRedirect.reply !== "") {
-        axios
+        AxiosInstance
           .post(`${config?.apiUrl}/support-management/${adminUserId}/`, {
             message: ticketRepltOrRedirect.reply,
             ticket_id: tickeview?.id,
@@ -126,6 +127,7 @@ const TicketReplyModal = (props) => {
             if (res.status == 204) {
               localStorage.clear();
               removeCookie("admin-user-id");
+              removeCookie("access-token");
               window.location.reload();
             }
           })
@@ -161,7 +163,7 @@ const TicketReplyModal = (props) => {
         });
       } else {
         const adminId = localStorage.getItem("admin-user-id");
-        axios
+        AxiosInstance
           .post(
             `${config?.apiUrl}/redirect-ticket/${adminId}/${tickeview?.id}`,
             {
@@ -183,6 +185,7 @@ const TicketReplyModal = (props) => {
             if (res.status == 204) {
               localStorage.clear();
               removeCookie("admin-user-id");
+              removeCookie("access-token");
               window.location.reload();
             }
           });

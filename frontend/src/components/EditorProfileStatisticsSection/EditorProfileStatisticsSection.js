@@ -13,8 +13,11 @@ import config from "../../config";
 import { userId } from "../GetUser";
 import { country_code } from "./_data";
 import Spinner from "react-bootstrap/esm/Spinner";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const EditorProfileStatisticsSection = (props) => {
+  const cookies = new Cookies();
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [SelectSport, setSelectSport] = useState("Futbol");
@@ -63,7 +66,7 @@ const EditorProfileStatisticsSection = (props) => {
     } else if (props?.from === "dashboard" && userId) {
       setUserUid(userId);
     } else {
-      setUserUid(localStorage.getItem("user-id"));
+      setUserUid(cookies.get("user-id"));
       // Handle the case where neither condition is met
     }
   }, [props?.from, props?.activeCommentsshow, userId]);
@@ -73,7 +76,7 @@ const EditorProfileStatisticsSection = (props) => {
     if (user && categoty) {
       setIsLoading(true);
       try {
-        axios
+        AxiosInstance
           .get(
             `${config.apiUrl}/sports-statistics/${user}/?category=${categoty}`
           )

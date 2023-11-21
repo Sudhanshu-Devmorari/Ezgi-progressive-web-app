@@ -9,8 +9,11 @@ import { truncateString, userId } from "../GetUser";
 import config from "../../config";
 import moment from "moment"
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const MySubscribers = (props) => {
+  const cookies = new Cookies();
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [RenewModalShow, setRenewModalShow] = useState(false);
 
@@ -22,7 +25,7 @@ const MySubscribers = (props) => {
     async function getSubscriptions() {
       setIsLoading(true);
       try {
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${config?.apiUrl}/retrieve-subscribers-subscription/${userId}`
         );
         // console.log(res)
@@ -83,7 +86,7 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                  localStorage.getItem("user-role");
+                                  cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
                                   currentPage !== "notifications") &&
@@ -221,7 +224,7 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                  localStorage.getItem("user-role");
+                                  cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
                                   currentPage !== "notifications") &&
@@ -384,7 +387,7 @@ const MySubscribers = (props) => {
                             const currentPage =
                               localStorage.getItem("currentpage");
                             const currentuser =
-                              localStorage.getItem("user-role");
+                              cookies.get("user-role");
                             localStorage.setItem("dashboardShow", true);
                             (currentPage !== "show-all-comments" ||
                               currentPage !== "notifications") &&

@@ -9,11 +9,11 @@ import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
-// import { useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignInModal = (props) => {
-  // const [cookies, setCookie, removeCookie] = useCookies();
+  const [cookies, setCookie, removeCookie] = useCookies();
   
   const [showPassword, setShowPassword] = useState(false);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
@@ -59,6 +59,17 @@ const SignInModal = (props) => {
             "subcurrentpage",
             res.data.userRole == "standard" ? "subscribers" : "home"
           );
+
+          setCookie("user-role", res.data.userRole, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          }, { path: '/', httpOnly: true });
+          setCookie("user-id", res.data.userId, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          }, { path: '/', httpOnly: true });
+          setCookie("username", res.data.username, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          }, { path: '/', httpOnly: true });
+
           props?.hide();
           await Swal.fire({
             title: "Success",
@@ -70,9 +81,18 @@ const SignInModal = (props) => {
             timer: 2000,
           });
           
-          // setCookie("access-token", res.data.Token, {
-          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          // });
+          setCookie("access-token", res.data.Token, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          });
+          setCookie("user-role", res.data.userRole, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          });
+          setCookie("user-id", res.data.userId, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          });
+          setCookie("username", res.data.username, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          });
 
           window.location.reload();
         } else if (res.data.status === 400 || res.data.status === 404) {

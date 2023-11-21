@@ -22,15 +22,18 @@ import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
-
+import AxiosInstance from "../AxiosInstance";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Spinner from "react-bootstrap/esm/Spinner";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import moment from "moment";
+import { Cookies, useCookies } from "react-cookie";
 
 const ActiveComments = (props) => {
+  const [setCookie, removeCookie] = useCookies();
+
   const { activeResolved, profileData, profileLoading, setActiveCommentsshow } =
     props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
@@ -54,13 +57,15 @@ const ActiveComments = (props) => {
 
   const [commentatorUser, setCommentatorUser] = useState([]);
 
+  const cookies = new Cookies();
+
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
       setUser(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
       setUser(userId);
     } else {
-      const user = localStorage.getItem("user-id");
+      const user = cookies.get("user-id");
       setUser(user);
     }
   }, []);
@@ -87,8 +92,8 @@ const ActiveComments = (props) => {
             formData.append("file", e.target.files[0]);
             formData.append("update", "profile");
 
-            const res = await axios.post(
-              `${config.apiUrl}/profile/${user}`,
+            const res = await AxiosInstance.post(
+              `${config.apiUrl}/profile/`,
               formData
             );
             if (res.status === 200) {
@@ -144,7 +149,7 @@ const ActiveComments = (props) => {
       }
     }
   }
-  const userPhone = localStorage.getItem("user-id");
+  const userPhone = cookies.get("user-id");
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -168,10 +173,10 @@ const ActiveComments = (props) => {
   });
 
   const favEditor = async (id) => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/fav-editor/${user_id}/`,
+      const response = await AxiosInstance.post(
+        `${config.apiUrl}/fav-editor/`,
         {
           id: id,
         }
@@ -181,6 +186,7 @@ const ActiveComments = (props) => {
       props?.homeApiData(user_id);
       if (response.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
     } catch (error) {
@@ -201,7 +207,7 @@ const ActiveComments = (props) => {
   useEffect(() => {
     if (user)
       try {
-        axios
+        AxiosInstance
           .get(`${config.apiUrl}/user-statistics/${user}/`)
           .then((res) => {
             setUserPoints({
@@ -250,8 +256,8 @@ const ActiveComments = (props) => {
         });
         // console.log(confirmation.value);
         if (confirmation.value === true) {
-          const res = await axios.get(
-            `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+          const res = await AxiosInstance.get(
+            `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
           );
           // console.log("On Unfollow",res)
           setFollowLabel(() =>
@@ -265,15 +271,15 @@ const ActiveComments = (props) => {
             icon: "success",
           });
           profileData.Follower_Count = profileData?.Follower_Count - 1;
-          const user_id = localStorage.getItem("user-id");
+          const user_id = cookies.get("user-id");
           props?.homeApiData(user_id);
         }
       } else {
-        const res = await axios.get(
-          `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+        const res = await AxiosInstance.get(
+          `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
         // console.log("On Follow",res)
-        const user_id = localStorage.getItem("user-id");
+        const user_id = cookies.get("user-id");
         props?.homeApiData(user_id);
         profileData.Follower_Count = profileData?.Follower_Count + 1;
       }
@@ -293,7 +299,7 @@ const ActiveComments = (props) => {
 
   const handleSavedata = async () => {
     try {
-      const res = await axios.post(`${config.apiUrl}/profile/${userId}`, {
+      const res = await AxiosInstance.post(`${config.apiUrl}/profile/`, {
         description: textareaValue,
         update: "comment",
       });
@@ -329,8 +335,8 @@ const ActiveComments = (props) => {
   const handleDeactivation = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.patch(
-        `${config.apiUrl}/deactivate-commentator/${userId}/`
+      const res = await AxiosInstance.patch(
+        `${config.apiUrl}/deactivate-commentator/`
       );
       if (res.status === 200) {
         setIsLoading(false);
@@ -365,7 +371,7 @@ const ActiveComments = (props) => {
   const [bankDetails, setBankDetails] = useState([]);
   const handleBankUpdate = async () => {
     try {
-      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/bank-details/${userId}`);
       if (res?.status === 200) {
         const bank_iban = res?.data?.data?.bank_iban;
         if (bank_iban) {
@@ -424,16 +430,16 @@ const ActiveComments = (props) => {
   // check activation
   const checkDeactivation = async (value, editor_id) => {
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/check-deactivated-account/?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         if (value === "add comment") {
           setAddCommentModalModalShow(true);
         } else if (value === "promote me") {
           try {
-            const res = await axios.get(
-              `${config.apiUrl}/highlight-purchase/?id=${userId}`
+            const res = await AxiosInstance.get(
+              `${config.apiUrl}/highlight-purchase/`
             );
             if (res?.status === 200) {
               setCommentatorLevel(profileData);
@@ -530,7 +536,7 @@ const ActiveComments = (props) => {
       // const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
       //   commentator_id: profileData?.id,
       // });
-      const res = await axios.patch(
+      const res = await AxiosInstance.patch(
         `${config.apiUrl}/subscription/${userId}/?commentator_id=${profileData?.id}`
       );
       if (res?.status === 200) {

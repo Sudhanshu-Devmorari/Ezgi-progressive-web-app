@@ -20,6 +20,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import { ref, transcationQueryAPI } from "../GetRefNo";
+import AxiosInstance from "../AxiosInstance";
 
 const PromoteMeModal = (props) => {
   const [commentsModalShow, setCommentsModalShow] = useState(false);
@@ -45,7 +46,7 @@ const PromoteMeModal = (props) => {
     async function getData() {
       try {
         setIsHighlightLoading(true);
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/highlight-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
@@ -73,12 +74,12 @@ const PromoteMeModal = (props) => {
       try {
         setIsLoading(true);
 
-        const checkHighlightPlan = await axios.get(
-          `${config.apiUrl}/highlight-purchase/?id=${userId}`
+        const checkHighlightPlan = await AxiosInstance.get(
+          `${config.apiUrl}/highlight-purchase/`
         );
 
         if (checkHighlightPlan?.status === 200) {
-          const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+          const payment_res = await AxiosInstance.post(`${config.apiUrl}/payment/`, {
             payment: "highlight",
             duration: selectedPlan,
             amount: money,
@@ -127,10 +128,10 @@ const PromoteMeModal = (props) => {
   // Save the highlight entry to DB when successful payment is received
   const promoteMeEntry = async (amount, duration) => {
     try {
-      const res = await axios.post(`${config.apiUrl}/highlight-purchase/`, {
+      const res = await AxiosInstance.post(`${config.apiUrl}/highlight-purchase/`, {
         duration: duration,
         amount: amount,
-        id: userId,
+        // id: userId,
       });
       if (res?.status === 200) {
         Swal.fire({

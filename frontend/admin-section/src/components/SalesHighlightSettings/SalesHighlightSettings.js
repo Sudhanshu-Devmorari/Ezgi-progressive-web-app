@@ -5,6 +5,7 @@ import upload from "../../assets/upload.svg";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import AxiosInstance from "../AxiosInstance";
 
 const SalesHighlightSettings = (props) => {
   const [previewIcon, setPreviewIcon] = useState(null);
@@ -40,7 +41,7 @@ const SalesHighlightSettings = (props) => {
     async function getData() {
       // setIsLoading(true);
       try {
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/highlight-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`
@@ -81,7 +82,7 @@ const SalesHighlightSettings = (props) => {
           }
         }
         setIsLoading(true);
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${
             config?.apiUrl
           }/highlight-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`,

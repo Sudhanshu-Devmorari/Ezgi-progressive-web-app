@@ -6,6 +6,7 @@ import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorFilter = (props) => {
   const clearFilterData = () => {
@@ -16,7 +17,7 @@ const EditorFilter = (props) => {
   }
   const handleShowButtonClick = async () => {
     try {
-      const response = await axios.post(
+      const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-editors/?user_id=${userId}`,
         {
           category: [selectedCountry],

@@ -7,7 +7,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const CommentsSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,11 +60,14 @@ const CommentsSettings = () => {
   const [alluserData, setAlluserData] = useState([]);
   const [userCategory, setUserCategory] = useState([]);
 
-  const admin_id = localStorage.getItem("admin-user-id")
-  const [cookies, setCookie, removeCookie] = useCookies();
+  // const admin_id = localStorage.getItem("admin-user-id")
+  const cookies = new Cookies();
+  const admin_id = cookies.get("admin-user-id");
+  
+  const [setCookie, removeCookie] = useCookies();
   useEffect(() => {
     try {
-      axios
+      AxiosInstance
         .get(`${config.apiUrl}/all-users/?userType=commentator`)
         .then((res) => {
           const data = res?.data?.data;
@@ -419,13 +423,14 @@ const CommentsSettings = () => {
           date: selectedDate,
           cmt_id:matchId,
         };
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${config?.apiUrl}/comment-setting/?admin=${admin_id}`,
           data
         );
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         if (res.status === 201) {

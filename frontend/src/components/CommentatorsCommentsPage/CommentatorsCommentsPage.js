@@ -21,8 +21,12 @@ import { userId } from "../GetUser";
 import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
+import { useCookies } from "react-cookie";
 
 const CommentatorsCommentsPage = (props) => {
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const [SelectComment, setSelectComment] = useState("activeComments");
   const subcurrentpage = localStorage.getItem("subcurrentpage");
   const [content, setContent] = useState(subcurrentpage || "home");
@@ -50,12 +54,13 @@ const CommentatorsCommentsPage = (props) => {
   const [favCommentData, setFavCommentData] = useState([]);
   async function getFavData() {
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/fav-editor-comment/${userId}`
       );
       // console.log("=>>>", res.data);
       if (res.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       setFavEditorData(res.data.favEditors);
@@ -78,7 +83,7 @@ const CommentatorsCommentsPage = (props) => {
   const [profileData, setProfileData] = useState();
   useEffect(() => {
     async function getProfileData() {
-      const res = await axios.get(`${config?.apiUrl}/profile/${userId}`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/profile/`);
       // console.log(res.data,"========>>>");
       setProfileData(res.data);
       if (res?.data?.commentator_level == "apprentice") {
@@ -98,13 +103,14 @@ const CommentatorsCommentsPage = (props) => {
   const activeResolved = async (user_id) => {
     setCommentLoading(true);
     try {
-      const res = await axios
+      const res = await AxiosInstance
         .get(
           `${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`
         )
         .then((res) => {
           if (res.status == 204) {
             localStorage.clear();
+            removeCookie("access-token");
             window.location.reload();
           }
           setActive(res.data?.active_comments);

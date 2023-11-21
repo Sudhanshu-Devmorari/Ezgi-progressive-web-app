@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorBanner = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
@@ -20,10 +21,11 @@ const EditorBanner = () => {
   useEffect(() => {
     async function getBannerImg() {
       try {
-        const res = await axios.get(`${config.apiUrl}/editor-banner/?admin=${admin_id}`);
+        const res = await AxiosInstance.get(`${config.apiUrl}/editor-banner/?admin=${admin_id}`);
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         const img = res?.data?.data[0]?.editor_banner;
@@ -56,13 +58,14 @@ const EditorBanner = () => {
         formData.append("bannerId", bannerId);
       }
       try {
-        const res = await axios.patch(
+        const res = await AxiosInstance.patch(
           `${config.apiUrl}/editor-banner/?admin=${admin_id}`,
           formData
         );
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         // console.log(res);

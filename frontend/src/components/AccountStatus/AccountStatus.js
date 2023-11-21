@@ -19,6 +19,8 @@ import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { Range, getTrackBackground } from "react-range";
 import moment from "moment";
 import { ref, transcationQueryAPI } from "../GetRefNo";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies } from "react-cookie";
 
 const AccountStatus = (props) => {
   const { commentator_level } = props;
@@ -42,13 +44,15 @@ const AccountStatus = (props) => {
         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
     });
   };
+
+  const cookies = new Cookies();
   const handleVerification = () => {
-    if (JSON.parse(localStorage.getItem("user-active")) == false) {
+    if (JSON.parse(cookies.get("user-active")) == false) {
       errorSwal();
       return;
     }
-    axios
-      .get(`${config?.apiUrl}/verify/${userId}`)
+    AxiosInstance
+      .get(`${config?.apiUrl}/verify/`)
       .then((res) => {
         // console.log(res, "===>>>>res");
       })
@@ -94,7 +98,7 @@ const AccountStatus = (props) => {
 
     // console.log("selectSubRangeData:::::::::::", type);
     if (typeData && newValues) {
-      axios
+      AxiosInstance
         .get(
           `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${typeData}`
         )
@@ -117,7 +121,7 @@ const AccountStatus = (props) => {
     async function getExpertData() {
       try {
         setExpertLoading(true);
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${config?.apiUrl}/subscription-setting/?commentator_level=master`
         );
         setExpertData(res?.data[0]);
@@ -133,12 +137,12 @@ const AccountStatus = (props) => {
     setSubLoading(true);
     try {
       // console.log("selectSub", selectSub);
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${
           config?.apiUrl
         }/subscription-setting/?commentator_level=${selectSub?.toLowerCase()}`
       );
-      const commisionData = await axios.get(
+      const commisionData = await AxiosInstance.get(
         `${
           config?.apiUrl
         }/membership-setting/?commentator_level=${selectSub?.toLowerCase()}`
@@ -170,7 +174,7 @@ const AccountStatus = (props) => {
     // console.log("----------------inside");
     try {
       setRenewLoading(true);
-      const res = await axios.get(`${config.apiUrl}/user-data/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/user-data/`);
       if (res.status === 200) {
         setCommentatorUser(res?.data?.data);
         setRenewLoading(false);
@@ -254,8 +258,8 @@ const AccountStatus = (props) => {
   const [renewModelData, setRenewModelData] = useState({});
   const handleRenew = async () => {
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/renew-model-data/${userId}/`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/renew-model-data/`
       );
       if (res.status === 200) {
         setRenewModelData(res.data);
@@ -273,8 +277,8 @@ const AccountStatus = (props) => {
   useEffect(() => {
     async function getAccountstatus() {
       try {
-        const res = await axios.get(
-          `${config.apiUrl}/account-status/${userId}`
+        const res = await AxiosInstance.get(
+          `${config.apiUrl}/account-status/`
         );
         setStatusData({
           status: res?.data?.data?.commentator_status,

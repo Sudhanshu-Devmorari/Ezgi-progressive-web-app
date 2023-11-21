@@ -20,7 +20,7 @@ import axios from "axios";
 import { truncateString, userId } from "../GetUser";
 import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
-
+import AxiosInstance from "../AxiosInstance";
 import Selected_Clap from "../../assets/Selected Clap.svg";
 import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
 import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
@@ -42,6 +42,7 @@ import clock_pause from "../../assets/clock-pause.svg";
 import circle_x from "../../assets/circle-x.png";
 import darkIcon from "../../assets/Dark.png";
 import lightIcon from "../../assets/Light.png";
+import { Cookies, useCookies } from "react-cookie";
 
 const FavComments = (props) => {
   const {
@@ -72,6 +73,8 @@ const FavComments = (props) => {
   const [modalShow, setModalShow] = React.useState(false);
   const [commentatorUser, setcommentatorUser] = useState([]);
 
+  const [setCookie, removeCookie] = useCookies();
+
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -84,7 +87,7 @@ const FavComments = (props) => {
         currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
     });
   };
-
+  const cookies = new Cookies();
   const followCommentator = async (commentator_id, isFollowing) => {
     try {
       if (isFollowing) {
@@ -99,8 +102,8 @@ const FavComments = (props) => {
           cancelButtonText: "Cancel",
         });
         if (confirmation.value === true) {
-          const res = await axios.get(
-            `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+          const res = await AxiosInstance.get(
+            `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
           );
           setFollowLabel(() =>
             followLabel === "Follow" ? "Followed" : "Follow"
@@ -110,14 +113,14 @@ const FavComments = (props) => {
             title: "You have Unfollowed",
             icon: "success",
           });
-          const user_id = localStorage.getItem("user-id");
+          const user_id = cookies.get("user-id");
           props.homeApiData(user_id);
         }
       } else {
-        const res = await axios.get(
-          `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+        const res = await AxiosInstance.get(
+          `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
-        const user_id = localStorage.getItem("user-id");
+        const user_id = cookies.get("user-id");
         props.homeApiData(user_id);
       }
     } catch (error) {
@@ -138,7 +141,7 @@ const FavComments = (props) => {
   const handleCommentReaction = async (id, reaction, count) => {
     localStorage.setItem(`${id}_${reaction}`, count);
     try {
-      const res = await axios.post(
+      const res = await AxiosInstance.post(
         `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
         {
           reaction_type: `${reaction}`,
@@ -220,6 +223,7 @@ const FavComments = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
     } catch (error) {
@@ -239,8 +243,8 @@ const FavComments = (props) => {
   // check activation
   const checkDeactivation = async (value, is_subscribe) => {
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/check-deactivated-account/`
       );
       if (res.status === 200) {
         if (!is_subscribe) {
@@ -283,7 +287,7 @@ const FavComments = (props) => {
                   className="position-relative col p-0"
                   onClick={() => {
                     const currentPage = localStorage.getItem("currentpage");
-                    const currentuser = localStorage.getItem("user-role");
+                    const currentuser = cookies.get("user-role");
                     localStorage.setItem("dashboardShow", true);
                     (currentPage !== "show-all-comments" ||
                       currentPage !== "notifications") &&

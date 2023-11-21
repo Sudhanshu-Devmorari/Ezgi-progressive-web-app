@@ -20,7 +20,8 @@ import "./CreateSubUser.css";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const CreateSubUser = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,7 @@ const CreateSubUser = (props) => {
     "Ads Manager",
     "Director Manager",
   ];
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
 
   // const [authTypeDropDown, setAuthTypeDropDown] = useState(false);
   const [departmentDropDown, setDepartmentDropDown] = useState(false);
@@ -98,8 +99,9 @@ const CreateSubUser = (props) => {
       }
     } catch (error) {}
   }
-
-  const adminId = localStorage.getItem('admin-user-id')
+  const cookies = new Cookies();
+  const adminId = cookies.get("admin-user-id");
+  // const adminId = localStorage.getItem('admin-user-id')
 
   // // Edit Sub User Profile
   const [userProfile, setuserProfile] = useState(null);
@@ -210,7 +212,7 @@ const CreateSubUser = (props) => {
       if (props?.editProfileModal === 2 && props?.editUser) {
         try {
           setIsLoading(true);
-          const res = await axios.patch(
+          const res = await AxiosInstance.patch(
             `${config?.apiUrl}/subuser-management/${props.editUser?.id}/?admin=${adminId}`,
             formData
           );
@@ -232,6 +234,7 @@ const CreateSubUser = (props) => {
           if (res.status == 204) {
             localStorage.clear();
             removeCookie("admin-user-id");
+            removeCookie("access-token")
             window.location.reload();
           }
         } catch (error) {
@@ -250,7 +253,7 @@ const CreateSubUser = (props) => {
       } else {
         setIsLoading(true);
         try {
-          const res = await axios.post(
+          const res = await AxiosInstance.post(
             `${config?.apiUrl}/subuser-management/?admin=${adminId}`,
             formData
           );
@@ -273,6 +276,7 @@ const CreateSubUser = (props) => {
           if (res.status == 204) {
             localStorage.clear();
             removeCookie("admin-user-id");
+            removeCookie("access-token")
             window.location.reload();
           }
         } catch (error) {

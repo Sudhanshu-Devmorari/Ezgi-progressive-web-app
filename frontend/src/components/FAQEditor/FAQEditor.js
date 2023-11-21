@@ -7,8 +7,12 @@ import { useState } from "react";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const FAQEditor = () => {
+  const [setCookie, removeCookie] = useCookies();
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [allFAQs, setAllFAQs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +52,7 @@ const FAQEditor = () => {
       (typeData === "USTA" && "master") ||
       (typeData === "büyük usta" && "grandmaster");
     if (type && newValues) {
-      axios
+      AxiosInstance
         .get(
           `${config.apiUrl}/become-editor-earn-details/${newValues}/?type=${type}`
         )
@@ -79,15 +83,16 @@ const FAQEditor = () => {
         });
     }
   }
-
+  const cookies = new Cookies();
   const fetchFaqs = async () => {
     try {
-      const userId = localStorage.getItem("user-id");
-      const response = await axios.get(
+      const userId = cookies.get("user-id");
+      const response = await AxiosInstance.get(
         `${config.apiUrl}/become-editor-faq/?id=${userId}`
       );
       if (response.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       if (response.data.length > 2) {

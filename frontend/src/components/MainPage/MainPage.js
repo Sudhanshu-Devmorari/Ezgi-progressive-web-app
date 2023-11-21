@@ -17,7 +17,6 @@ import CommentatorsCommentsPage from "../CommentatorsCommentsPage/CommentatorsCo
 import DashboardSU from "../DashboardSU/DashboardSU";
 import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
-// import {AxiosInstance} from '../AxiosInstance';
 import config from "../../config";
 import BecomeEditor from "../BecomeEditor/BecomeEditor";
 import { userId } from "../GetUser";
@@ -28,15 +27,19 @@ import CategoryFilter from "../CategoryFilter/CategoryFilter";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const MainPage = () => {
+  const cookies = new Cookies();
+  const [setCookie, removeCookie] = useCookies();
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // Select Content
   const [selectContent, setSelectContent] = useState(
     localStorage.getItem("currentpage") || "home"
   );
-  const userId = localStorage.getItem("user-id");
+  const userId = cookies.get("user-id");
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
   const [dashboardSUser, setDashboardSUser] = useState(
@@ -71,7 +74,9 @@ const MainPage = () => {
   const highlightCount = 5;
   const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const user_id = localStorage.getItem("user-id");
+  // const user_id = localStorage.getItem("user-id");
+
+  const user_id = cookies.get("user-id");
 
   // check the successful payment request
   const ref_no = ref();
@@ -128,7 +133,7 @@ const MainPage = () => {
 
   async function getNotifications() {
     try {
-      const response = await axios.get(`${config.apiUrl}/notification/${userId}`);
+      const response = await AxiosInstance.get(`${config.apiUrl}/notification/`);
       const data = response.data.flash_notification;
       // console.log(data);
   
@@ -144,7 +149,7 @@ const MainPage = () => {
   
             if (confirmation.value === true) {
               try {
-                await axios.post(`${config.apiUrl}/notification/${userId}`, {
+                await AxiosInstance.post(`${config.apiUrl}/notification/`, {
                   "update-status": [item.id],
                 });
               } catch (error) {
@@ -163,12 +168,15 @@ const MainPage = () => {
   }
 
   async function getProfileData() {
-    const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    const res = await AxiosInstance.get(`${config.apiUrl}/profile/`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data);
     // setMembershipDate(res.data.membership_date);
     setIsLoading(false);
     localStorage.setItem("user-active", res.data.is_active);
+    cookies.set("user-active", res?.data?.is_active, {
+      expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    });
     if(res.status == 200){
       getNotifications()
     }
@@ -186,7 +194,9 @@ const MainPage = () => {
   // const [highlightUserId, setHighlightUserId] = useState([]);
 
   function homeApiData(user_id) {
-    axios
+    // console.log("instance", instance)
+    AxiosInstance
+    // axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
       .get(
         `${config?.apiUrl}/retrieve-dashboard/?id=${user_id}&category=${category}`
@@ -513,7 +523,7 @@ const MainPage = () => {
     }
   };
 
-  const user = localStorage.getItem("user-role");
+  const user = cookies.get("user-role");
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();

@@ -27,6 +27,7 @@ import initialProfile from "../../assets/profile.png";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import { CustomDropdownEditor } from "../CustomDropdownEditor";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorManagemenet = (props) => {
   // const [addUser, setAddUser] = useState({});
@@ -85,7 +86,7 @@ const EditorManagemenet = (props) => {
   const handleDeactive = async (id, action) => {
     try {
       // setIsLoadingDeactive(true);
-      const res = await axios.delete(
+      const res = await AxiosInstance.delete(
         `${config?.apiUrl}/editor-management/${id}/?action=${action}&admin=${admin_id}`
       );
       if (res.status === 200) {
@@ -113,6 +114,7 @@ const EditorManagemenet = (props) => {
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token")
         window.location.reload();
       }
     } catch (error) {
@@ -358,13 +360,14 @@ const EditorManagemenet = (props) => {
       formData.append("membership_date", addUser.membership_date);
       const id = 1; // temp
       try {
-        const response = await axios.post(
+        const response = await AxiosInstance.post(
           `${config?.apiUrl}/editor-management/?admin=${admin_id}`,
           formData
         );
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         const modalElement = document.getElementById("exampleModal");
@@ -503,13 +506,14 @@ const EditorManagemenet = (props) => {
       formData.append("editor_id", editor_id);
       formData.append("membership_date", addUser.membership_date);
       try {
-        const response = await axios.patch(
+        const response = await AxiosInstance.patch(
           `${config?.apiUrl}/editor-management/${id}/?admin=${admin_id}`,
           formData
         );
         if (response.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         if (response.status === 200) {
@@ -579,7 +583,7 @@ const EditorManagemenet = (props) => {
   const handleEditorFiltor = async () => {
     setIsFilterLoading(true);
     try {
-      const response = await axios.post(`${config?.apiUrl}/filter-editors/`, {
+      const response = await AxiosInstance.post(`${config?.apiUrl}/filter-editors/`, {
         lavel: selectedLevelFilter,
         success_rate: selectedSuccessRateFilter,
         score_point: selectedScorePointFilter,
@@ -765,7 +769,7 @@ const EditorManagemenet = (props) => {
     // console.log("IDDD: ", id)
     try {
       // setIsLoadingDeactive(true);
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/transaction-history/${id}/`
       );
       if (res.status === 200) {

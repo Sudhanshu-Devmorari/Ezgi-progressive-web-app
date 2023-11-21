@@ -3,8 +3,11 @@ import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import google from "../assets/googleLogo.png";
 import config from "../config";
+import { useCookies } from "react-cookie";
 
 const GoogleLogin = () => {
+  const [cookies, setCookie, removeCookie] = useCookies();
+
   const [user, setUser] = useState([]);
 
   const login = useGoogleLogin({
@@ -45,6 +48,14 @@ const GoogleLogin = () => {
           // console.log(response.data);
           localStorage.setItem("user-role", response.data.userRole);
           localStorage.setItem("user-id", response.data.userId);
+
+          setCookie("user-role", response.data.userRole, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          });
+          setCookie("user-id", response.data.userId, {
+            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          })
+
           window.location.reload();
         })
         .catch((error) => {});

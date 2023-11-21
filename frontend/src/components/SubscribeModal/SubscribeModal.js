@@ -21,6 +21,7 @@ import moment from "moment";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import { currentTheme } from "../GetCurrentTheme";
 import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../AxiosInstance";
 
 const SubscribeModal = (props) => {
   const {
@@ -60,7 +61,7 @@ const SubscribeModal = (props) => {
         (selectedPlan === "6 Months" && subscriptionPlan?.month_6);
       try {
         setIsLoading(true);
-        const payment_res = await axios.post(`${config.apiUrl}/payment/`, {
+        const payment_res = await AxiosInstance.post(`${config.apiUrl}/payment/`, {
           payment: "subscription",
           duration: selectedPlan,
           amount: money,
@@ -126,7 +127,7 @@ const SubscribeModal = (props) => {
     async function getData() {
       try {
         setIsSubscriptionLoading(true);
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/subscription-setting/?commentator_level=${commentatorUser?.commentator_level?.toLowerCase()}`
@@ -147,7 +148,7 @@ const SubscribeModal = (props) => {
           : commentatorUser?.commentator_level;
       try {
         setIsSubscriptionLoading(true);
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/membership-setting/?commentator_level=${level?.toLowerCase()}`
@@ -157,7 +158,7 @@ const SubscribeModal = (props) => {
           setRenewPlan(data);
           setIsSubscriptionLoading(false);
           try {
-            const ress = await axios.get(
+            const ress = await AxiosInstance.get(
               `${config?.apiUrl}/retrieve-become-commentator-data/${userId}/`
             );
             if (ress.status === 200) {
@@ -216,7 +217,7 @@ const SubscribeModal = (props) => {
         formData.append("amount", totalValue);
         formData.append("id", userId);
 
-        const payment_res = await axios.post(
+        const payment_res = await AxiosInstance.post(
           `${config.apiUrl}/payment/`,
           formData
         );
@@ -299,7 +300,7 @@ const SubscribeModal = (props) => {
 
   const handleRenewMambership = async (monthly_amount, startdate, duration) => {
     try {
-      const RenewMembership = await axios.patch(
+      const RenewMembership = await AxiosInstance.patch(
         `${config.apiUrl}/subscription-reNew/${userId}/`,
         {
           money: monthly_amount,
@@ -728,7 +729,7 @@ export const subcriptionEntry = async (
   commentator_username
 ) => {
   try {
-    const res = await axios.post(`${config.apiUrl}/subscription/${userId}/`, {
+    const res = await AxiosInstance.post(`${config.apiUrl}/subscription/${userId}/`, {
       duration: duration,
       money: amount,
       commentator_id: commentator_user_id,

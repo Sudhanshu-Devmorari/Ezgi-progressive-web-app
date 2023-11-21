@@ -8,6 +8,7 @@ import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
 
 const BankUpdateModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -31,7 +32,7 @@ const BankUpdateModal = (props) => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${config.apiUrl}/bank-details/${userId}`,
           { bank_iban: values.iban }
         );

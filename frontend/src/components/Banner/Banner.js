@@ -9,6 +9,7 @@ import axios from "axios";
 import { useState } from "react";
 import { countsAdsAPI } from "../CountsAdViewAPI";
 import { useEffect } from "react";
+import AxiosInstance from "../AxiosInstance";
 
 const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -61,7 +62,7 @@ const Banner = ({ leftCornerAds, rightCornerAds, ads }) => {
   // Redirected & click count
   const handleLinkClick = (ads_id) => {
     try {
-      axios
+      AxiosInstance
         .patch(`${config.apiUrl}/ads-management/${ads_id}/`, {
           count: "count",
           data: "redirected_to_ad",

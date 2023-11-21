@@ -5,6 +5,7 @@ import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForCommentsCreatetion";
+import AxiosInstance from "../AxiosInstance";
 
 const SalesSubscriptionSettings = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +54,7 @@ const SalesSubscriptionSettings = (props) => {
       };
       try {
         setIsLoading(true);
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${
             config?.apiUrl
           }/subscription-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`,
@@ -78,7 +79,7 @@ const SalesSubscriptionSettings = (props) => {
 
   async function getData() {
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${
           config?.apiUrl
         }/subscription-setting/?commentator_level=${props?.selectLevel?.toLowerCase()}`

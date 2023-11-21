@@ -9,6 +9,7 @@ import config from "../../config";
 import Spinner from "react-bootstrap/esm/Spinner";
 import { userId } from "../GetUser";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorProfileActiveComments = (props) => {
   // console.log("props::::::::::::::", props);
@@ -20,9 +21,10 @@ const EditorProfileActiveComments = (props) => {
   const [profileData, setProfileData] = useState([]);
   useEffect(() => {
     async function getProfileData() {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
-        `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
+        // `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
+        `${config.apiUrl}/profile/?id=${props?.activeCommentsshow}`
       );
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);
@@ -37,7 +39,7 @@ const EditorProfileActiveComments = (props) => {
   const activeResolved = async (user_id) => {
     try {
       setCommentLoading(true);
-      const res = await axios
+      const res = await AxiosInstance
         .get(`${config?.apiUrl}/active-resolved-comment/${user_id}?logged_in_user=${userId}`)
         .then((res) => {
           const userIds = res?.data?.active_comments?.map(

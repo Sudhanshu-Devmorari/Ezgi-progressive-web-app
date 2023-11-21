@@ -18,12 +18,15 @@ import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { BsStar, BsStarFill } from "react-icons/bs";
 import darkIcon from "../../assets/Dark.png"
 import lightIcon from "../../assets/Light.png"
-
+import AxiosInstance from "../AxiosInstance";
 import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
+import { Cookies, useCookies } from "react-cookie";
 
 const SharedProfile = (props) => {
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   const {
     data,
     setSelectContent,
@@ -51,7 +54,7 @@ const SharedProfile = (props) => {
   ];
 
   function getfav(e) {
-    axios
+    AxiosInstance
       .get(`${config.apiUrl}/fav-editor/${userId}/?commentator=${e}`)
       .then((res) => {
         if (res.status === 200) {
@@ -82,10 +85,10 @@ const SharedProfile = (props) => {
   }, []);
 
   const favEditor = async (id) => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/fav-editor/${user_id}/`,
+      const response = await AxiosInstance.post(
+        `${config.apiUrl}/fav-editor/`,
         {
           id: id,
         }
@@ -93,6 +96,7 @@ const SharedProfile = (props) => {
       // console.log("API Response:", response.data);
       if (response.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       if (mergedEditorResult) {
@@ -142,8 +146,8 @@ const SharedProfile = (props) => {
   // check activation
   const checkDeactivation = async (editor_id) => {
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/check-deactivated-account/?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         setCommentatorUser(data?.value?.user);
@@ -225,7 +229,7 @@ const SharedProfile = (props) => {
                   userId == data?.value?.user?.id ? true : false
                 );
                 const currentPage = localStorage.getItem("currentpage");
-                const currentuser = localStorage.getItem("user-role");
+                const currentuser = cookies.get("user-role");
                 localStorage.setItem("dashboardShow", true);
                 (currentPage !== "show-all-comments" ||
                   currentPage !== "notifications") &&

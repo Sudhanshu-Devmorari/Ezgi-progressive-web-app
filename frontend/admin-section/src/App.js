@@ -29,6 +29,10 @@ function App() {
         expires: new Date(new Date().getTime() + 7200000),
       });
     }
+    else {
+      removeCookie("access-token")
+      navigate('/')
+    }
   }, [isAuthenticated, navigate]);
   return (
     <>

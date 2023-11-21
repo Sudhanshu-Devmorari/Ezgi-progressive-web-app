@@ -9,6 +9,7 @@ from django.contrib.auth.models import UserManager
 # Create your models here.
 class MyUserManager(BaseUserManager):
     def create_user(self, phone, password=None):
+        print("***^^^^^^^***")
         """
         Creates and saves a User with the given phone and password.
         """
@@ -25,6 +26,7 @@ class MyUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, phone, password=None):
+        print("***********")
         """
         Creates and saves a superuser with the given phone and password.
         """
@@ -116,7 +118,7 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "%s"%(self.name)
     
-    # objects = MyUserManager()
+    objects = MyUserManager()
     # objects = UserManager()
     
     USERNAME_FIELD = 'phone'

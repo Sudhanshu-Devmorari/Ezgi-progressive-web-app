@@ -23,7 +23,6 @@ from django.http import HttpResponseServerError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, ParseError, APIException
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -64,8 +63,7 @@ class SignupUserExistsView(APIView):
             else:
                 return Response({'data': 'User can create', 'status': status.HTTP_200_OK})           
         except Exception as e:
-            return Response(data=e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response({'error': 'Something went wrong', "status":status.HTTP_500_INTERNAL_SERVER_ERROR})
 
 
 def generate_otp():
@@ -188,16 +186,16 @@ class LoginView(APIView):
                 })
 
             if user_phone.password == password:
-                # token = generate_auth_token(user_phone)
-                # return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK, "Token":token})
+                token = generate_auth_token(user_phone)
+                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK, "Token":token})
                 
-                return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
+                # return Response({'data' : "Login successfull!", 'userRole' : user_phone.user_role, 'userId' : user_phone.id, 'username' : user_phone.username, 'status' : status.HTTP_200_OK})
             
             else:
                 return Response({'data' : 'Please enter your correct password.', 'status' : status.HTTP_400_BAD_REQUEST})
-        except:
+        except Exception as e:
             return Response({
-                'data':"Something went wrong!",
+                'data':f"Something went wrong!{e}.",
                 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR
             })
 
@@ -213,13 +211,13 @@ class GoogleLoginview(APIView):
                 username=request.data.get('username'),
                 logged_in_using='google',
             )
-        # token = generate_auth_token(user)
+        token = generate_auth_token(user)
         return Response({
             'data' : "Login successfull!", 
             'userRole' : user.user_role, 
             'userId' : user.id, 
             'status' : status.HTTP_200_OK,
-            # 'Token':token
+            'Token':token
             }) 
         
 class FacebookLoginview(APIView):
@@ -234,13 +232,13 @@ class FacebookLoginview(APIView):
                 username=request.data.get('username'),
                 logged_in_using='facebook',
             )
-        # token = generate_auth_token(user)
+        token = generate_auth_token(user)
         return Response({
             'data' : "Login successfull!", 
             'userRole' : user.user_role, 
             'userId' : user.id, 
             'status' : status.HTTP_200_OK,
-            # 'Token':token
+            'Token':token
             }) 
 
 
@@ -428,8 +426,11 @@ class RetrieveCommentatorView(APIView):
     
 class FollowCommentatorView(APIView):
 
-    def get(self, request, id, format=None, *args, **kwargs):
-        user = User.objects.get(id=id)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None, *args, **kwargs):
+        user = request.user
 
         try:
             if user.is_delete == True:
@@ -472,6 +473,9 @@ class FollowCommentatorView(APIView):
             )   
 
 class CommentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -632,6 +636,9 @@ class CommentView(APIView):
 
 
 class SubscriptionView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id=None, *args, **kwargs):
         try:
             s_user = User.objects.get(id=id)
@@ -826,8 +833,12 @@ class SubscriptionView(APIView):
 
 
 class NotificationView(APIView):
-    def get(self, request, id, format=None, *args, **kwargs):
-        user = User.objects.get(id=id)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None, *args, **kwargs):
+        # user = User.objects.get(id=id)
+        user = request.user
         try:
             ten_days_ago = timezone.now() - timedelta(days=10)
             notification_obj = Notification.objects.filter(receiver=user).exclude(sender=user).order_by('-created')[:30]
@@ -866,7 +877,9 @@ class NotificationView(APIView):
 
 
 class CommentReactionView(APIView):
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, comment_id, id, format=None, *args, **kwargs):
         
         comment = Comments.objects.filter(id=comment_id).exists()
@@ -973,11 +986,21 @@ class CommentReactionView(APIView):
                              'status': status.HTTP_200_OK, 'data': data})
    
 class ProfileView(APIView):
-    def get(self, request, id, format=None, *args, **kwargs):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            user_obj = User.objects.get(id=id)
-            if user_obj.is_delete == True:
-                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
+            if standard_user_id != None:
+                user_obj = User.objects.get(id=standard_user_id)
+            else:
+                user_obj = request.user
+            
+                # user_obj = User.objects.get(id=id)
+                # user_obj = request.user
+                if user_obj.is_delete == True:
+                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
@@ -1028,9 +1051,10 @@ class ProfileView(APIView):
             
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)        
 
-    def post(self, request, id, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            # user = User.objects.get(id=id)
+            user = request.user
         except User.DoesNotExist:
             return Response({'error': 'User not found', 'status' : status.HTTP_404_NOT_FOUND})
 
@@ -1062,12 +1086,14 @@ class ProfileView(APIView):
         
 
 class FavEditorsCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         data = []
         try:
             user = get_object_or_404(User, id=id)
             editor = request.query_params.get('commentator')
-
             commentator = get_object_or_404(User, id=editor)
             faveditor_obj = FavEditors.objects.filter(commentator_user=commentator, standard_user=user).exists()
             details = {
@@ -1079,10 +1105,10 @@ class FavEditorsCreateView(APIView):
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
 
-    def post(self, request, id, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         try:
             if request.data:
-                user = User.objects.get(id=id)
+                user = request.user
 
                 if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -1127,6 +1153,9 @@ class FavEditorsCreateView(APIView):
         
 
 class RetrieveFavEditorsAndFavComment(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         data_list = {}
 
@@ -1208,6 +1237,9 @@ class RetrieveFavEditorsAndFavComment(APIView):
         
 
 class SupportView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     # for retrieve login user all tickets:
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -1261,7 +1293,10 @@ class SupportView(APIView):
         
 
 class ShowTicketData(APIView):
-     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, id, ticket_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
         except User.DoesNotExist:
@@ -1294,6 +1329,9 @@ class ShowTicketData(APIView):
 
 
 class ReplyTicketView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id, ticket_id, format=None, *args, **kwargs):
         try:
             user = get_object_or_404(User, id=id)
@@ -1374,6 +1412,9 @@ class UpdateTicketMessageView(APIView):
 
 
 class ResolvedTicket(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id, format=None, *args, **kwargs):
         try:
             # user = request.user
@@ -1421,6 +1462,9 @@ class ResolvedTicket(APIView):
 
 
 class ActiveResolvedCommentRetrieveView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         is_user_exist = User.objects.filter(id=id).exists()
         if not is_user_exist:
@@ -1495,6 +1539,9 @@ class ActiveResolvedCommentRetrieveView(APIView):
 
 
 class RetrieveSubscriberListAndSubscriptionList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         user = User.objects.get(id=id)
         if user.is_delete == True:
@@ -1573,18 +1620,21 @@ class DeactivateProfile(APIView):
 
 
 class HighlightPurchaseView(APIView):
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, *args, **kwargs):
         
-        print("request.query_param.get('id', None): ", request.query_params.get('id', None))
-        if request.query_params.get('id', None) != None:
-            user = User.objects.get(id=request.query_params.get('id'))
+        # print("request.query_param.get('id', None): ", request.query_params.get('id', None))
+        # if request.query_params.get('id', None) != None:
+            # user = User.objects.get(id=request.query_params.get('id'))
+            user = request.user
             if Highlight.objects.filter(user=user,status='active').exists():
                 highlight_plan = Highlight.objects.get(user=user,status='active')
                 end_date = highlight_plan.end_date
                 return Response({'data':'Your highlight plan is already active.', 'end_date': end_date}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'data' : 'Highlight purchase request'}, status=status.HTTP_200_OK)
-        return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
+        # return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
     
     def post(self, request, format=None, *args, **kwargs):
         """
@@ -1592,8 +1642,8 @@ class HighlightPurchaseView(APIView):
         """
         if request.data:
             try:
-                if 'id' not in request.data:
-                    raise KeyError('Commentator Id not found.')
+                # if 'id' not in request.data:
+                #     raise KeyError('Commentator Id not found.')
                 if 'duration' not in request.data:
                     raise KeyError('Duration not found.')
                 if 'amount' not in request.data:
@@ -1614,7 +1664,8 @@ class HighlightPurchaseView(APIView):
                     end_date = start_date + timezone.timedelta(days=30)
                 # end_date = start_date + timezone.timedelta(days=1)
                 
-                user = User.objects.get(id=request.data['id'])
+                # user = User.objects.get(id=request.data['id'])
+                user = request.user
 
                 if Highlight.objects.filter(user=user,status='active').exists():
                     return Response({'data':'Your highlight plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1697,8 +1748,11 @@ class CommentFilterView(APIView):
 
 
 class VerifyUserView(APIView):
-    def get(self, request, id, format=None, *args, **kwargs):
-        user = User.objects.get(id=id)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None, *args, **kwargs):
+        user = request.user
         try:
             subscribers = Subscription.objects.filter(commentator_user=user)
 
@@ -1727,6 +1781,9 @@ class VerifyUserView(APIView):
 
 
 class AdminMainPage(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         previous_24_hours = timezone.now() - timedelta(hours=24)
@@ -1864,6 +1921,9 @@ class AdminMainPage(APIView):
     
 from rest_framework.authtoken.models import Token
 class UserManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         now = timezone.now()
@@ -2215,6 +2275,9 @@ class UserManagement(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class FilterUserManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, format=None, *args, **kwargs):
         data_list = {}
         try:
@@ -2255,6 +2318,8 @@ class FilterUserManagement(APIView):
 
 
 class CommentsManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         management = {}
@@ -2426,6 +2491,9 @@ class CommentsManagement(APIView):
         
 
 class FilterComments(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request,id, format=None, *args, **kwargs):
         data_list = []
         filters = {}
@@ -2738,6 +2806,9 @@ class FilterComments(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class EditorManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         now = timezone.now()
@@ -3140,6 +3211,9 @@ class EditorManagement(APIView):
         
 
 class UpdateStatusForVerifyRequest(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None):
         data_list = {'verification_requests': []}
 
@@ -3215,6 +3289,9 @@ class EditorSubscriptionDetails(APIView):
         
 
 class FilterEditors(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, format=None, *args, **kwargs):
         data_list = {}
         try:
@@ -3289,6 +3366,9 @@ class FilterEditors(APIView):
         
 
 class DeactivateCommentator(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             user = User.objects.filter(deactivate_commentator='pending')
@@ -3328,9 +3408,9 @@ class DeactivateCommentator(APIView):
         except Exception as e:
             return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def patch(self, request, id, format=None, *args, **kwargs):
+    def patch(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(pk=id)
+            user = request.user
             if user.deactivate_commentator == 'pending':
                 return Response({'data' : 'You have already sent the request.'}, status=status.HTTP_400_BAD_REQUEST)
             user.deactivate_commentator = 'pending'
@@ -3341,6 +3421,9 @@ class DeactivateCommentator(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
 class SalesManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         """
@@ -3612,6 +3695,9 @@ class SalesManagement(APIView):
         
 
 class FilterSalesManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, format=None, *args, **kwargs):
         data_list = []
         try:
@@ -3661,6 +3747,9 @@ class FilterSalesManagement(APIView):
         
 
 class SupportManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         all_data = {}
         now = timezone.now()
@@ -3792,6 +3881,9 @@ class SupportManagement(APIView):
 
 
 class SubUserShowTicketData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, ticket_id, format=None, *args, **kwargs):
         try:
             ticket_obj = TicketSupport.objects.get(id=ticket_id)
@@ -3812,6 +3904,9 @@ class SubUserShowTicketData(APIView):
 
 
 class RetrieveSubUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     # Retrieve the sub user as per department.
     def post(self, request, format=None, *args, **kwargs):
         try:
@@ -3831,6 +3926,9 @@ class RetrieveSubUserView(APIView):
         
 
 class TicketRedirectView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id, ticket_id, format=None, *args, **kwargs):
         """
         store history for which admin user assign the ticket to sub user.
@@ -3872,6 +3970,9 @@ class TicketRedirectView(APIView):
 
 
 class SubUserSupportTicket(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+    
     """show Sub user's assign tickets."""
     def get(self, request, id, format=None, *args, **kwargs):
         try:
@@ -3895,6 +3996,9 @@ class SubUserSupportTicket(APIView):
 
 
 class RedirectAnswerView(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+    
     """Sub user open perticular ticket."""
     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
         details = {}
@@ -3948,6 +4052,9 @@ class RedirectAnswerView(APIView):
         
 
 class NotificationManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin_id')
@@ -4055,6 +4162,9 @@ class NotificationManagement(APIView):
 
 class SubUserManagement(APIView):
 
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
 
@@ -4240,6 +4350,9 @@ class SubUserManagement(APIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
         
 class FilterSubUserManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, format=None, *args, **kwargs):
         data_list = {}
         try:
@@ -4267,6 +4380,9 @@ class FilterSubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
 class AdvertisementManagement(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
 
@@ -4379,6 +4495,9 @@ class AdvertisementManagement(APIView):
         
         
 class LevelRule(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin')
@@ -4441,6 +4560,9 @@ class LevelRule(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class MembershipSettingView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin', None)
@@ -4516,6 +4638,9 @@ class MembershipSettingView(APIView):
     
 
 class SubscriptionSettingView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             level = request.query_params.get('commentator_level')
@@ -4564,6 +4689,9 @@ class SubscriptionSettingView(APIView):
 
 
 class HighlightSettingView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             level = request.query_params.get('commentator_level')
@@ -4615,6 +4743,9 @@ class HighlightSettingView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CommentSetting(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     try:
         
         def post(self, request, format=None, *args, **kwargs):
@@ -4728,6 +4859,9 @@ def create_notification(sender, receiver, context):
     )
         
 def Statistics(user_obj=None, user_id=None):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     try:
         user = User.objects.get(id=user_id) if not user_obj else user_obj
         
@@ -4907,6 +5041,9 @@ def Statistics(user_obj=None, user_id=None):
 
 class UserStatistics(APIView):
    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = get_object_or_404(User, id=id)
@@ -5039,6 +5176,9 @@ def get_comment_types(user_id, category, top_prediction_types):
     return prediction_data
 
 class SportsStatisticsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         datalist = []
 
@@ -5088,6 +5228,9 @@ class SportsStatisticsView(APIView):
             return Response(data=datalist, status=status.HTTP_200_OK)
 
 class BecomeEditorEarnDetailsview(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, subscriber, format=None, *args, **kwargs): 
         try:
             commentator_level = request.query_params.get('type')
@@ -5109,6 +5252,9 @@ class BecomeEditorEarnDetailsview(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class BecomeEditorView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, *args, **kwargs):
         if request.query_params.get('id', None) != None:
             user = User.objects.get(id=request.query_params.get('id'))
@@ -5191,6 +5337,9 @@ class BecomeEditorView(APIView):
             
 
 class FootbalAndBasketballContentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, *args, **kwargs):
         try:
 
@@ -5231,6 +5380,9 @@ class FootbalAndBasketballContentView(APIView):
         except Exception as e:
             return Response({'error': f'Error while fetching data. {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class GetALLUsers(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         try:
             userType =  request.query_params.get('userType')
@@ -5587,12 +5739,15 @@ class RetrievePageData():
         return user_detail
 
 class RetrieveHomeView(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
     """
     for Home page:
     """
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None, *args, **kwargs):
+        # print("________\n\n\n________\n", request.user)
+        # print("________\n\n\n________", request.query_params.get('id', None))
         data_list = {
             "Public_Comments": [],
             "Subscription_Comments": [],
@@ -5604,6 +5759,10 @@ class RetrieveHomeView(APIView):
         } # data_list to return in response
         
         # Instantiate RetrievePageData object
+        if request.query_params.get('id', None) == 'undefined':
+            uid = None
+        else:
+            uid = request.query_params.get('id', None)
 
         category = request.query_params.get('category', None)
      
@@ -5611,25 +5770,25 @@ class RetrieveHomeView(APIView):
         highligt_user_list = retrieve_data.get_highlight_user()
 
         # Get public comments data
-        data_list['Public_Comments']  = retrieve_data.get_public_comments(request.query_params.get('id', None), category, highligt_user_list)
+        data_list['Public_Comments']  = retrieve_data.get_public_comments(uid, category, highligt_user_list)
 
         # Get subscription comments data
-        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(request.query_params.get('id', None), category, highligt_user_list)
+        data_list['Subscription_Comments'] = retrieve_data.get_subscription_comments(uid, category, highligt_user_list)
       
         # Get highlights data
-        data_list['highlights'] = retrieve_data.get_highlights(request.query_params.get('id', None), category)
+        data_list['highlights'] = retrieve_data.get_highlights(uid, category)
         
         # Get advertisment data
         data_list['ads'] = retrieve_data.get_ads()
 
         # Get following user data
-        data_list['following_user'] = retrieve_data.get_following_user(request.query_params.get('id', None))
+        data_list['following_user'] = retrieve_data.get_following_user(uid)
         
         # Get verify ids data
         data_list['verify_ids'] = retrieve_data.get_verify_ids()
 
         # Get comment reactions data
-        data_list['comment_reactions'] = retrieve_data.get_comment_reactions(request.query_params.get('id', None))
+        data_list['comment_reactions'] = retrieve_data.get_comment_reactions(uid)
         
         return Response(data=data_list, status=status.HTTP_200_OK)
     
@@ -5638,6 +5797,9 @@ class RetrieveEditorView(APIView):
     """
     Editor list view
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
             "Commentator": [],
@@ -5653,6 +5815,9 @@ class RetrieveEditorView(APIView):
     
 class BecomeEditorFAQView(APIView):
 
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id=None):
         adminuser_id = request.query_params.get('admin', None)
         if adminuser_id is not None:
@@ -5747,7 +5912,10 @@ def create_reminder_notification():
         False
 
 class BankDetailsView(APIView):
-    def get(self, request, id=None, *args, **kwargs):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin', None)
             if adminuser_id is not None:
@@ -5914,9 +6082,9 @@ class BankDetailsView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         
-    def post(self, request, id):
+    def post(self, request):
         try:
-            user = User.objects.get(id=id)
+            user = request.user
             
             if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
@@ -6023,7 +6191,10 @@ class BankDetailsView(APIView):
             return Response({'error' : 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)     
 
 class CheckDeactivatedAccount(APIView):
-    def get(self, request, id):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
         try:
             try:
                 if request.query_params.get('editor_id') != 'undefined':
@@ -6032,7 +6203,7 @@ class CheckDeactivatedAccount(APIView):
                     if editor_user.is_active == False:
                         return Response({"error":"Due to deactivated editor profile, you cannot subscribe to this user."}, status=status.HTTP_400_BAD_REQUEST)
         
-                user = User.objects.get(id=id) 
+                user = request.user
                 if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
                 if not user.is_active:
@@ -6045,10 +6216,13 @@ class CheckDeactivatedAccount(APIView):
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
           
 class GetUserdata(APIView):
-    def get(self, request, id):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
         try:
             try:
-                user = User.objects.get(id=id) 
+                user = request.user
                 data = Comments.objects.filter(commentator_user=user).only('id','is_prediction')
                 win_count = data.filter(is_prediction=True).count()
                 lose_count = data.filter(is_prediction=False).count()
@@ -6063,6 +6237,9 @@ class GetUserdata(APIView):
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)   
 
 class EditorBannerView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         try:
             adminuser_id = request.query_params.get('admin', None)
@@ -6104,6 +6281,9 @@ class EditorBannerView(APIView):
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
             
 class GetFutbolAndBasketbolCountView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         try:
             futbol = Comments.objects.filter(commentator_user__is_delete=False, category=['Futbol'], is_resolve=False, status='approve').count()
@@ -6113,6 +6293,9 @@ class GetFutbolAndBasketbolCountView(APIView):
             return Response({'error' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class EditorsFutbolAndBasketbolCountView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         try:
             futbol = User.objects.filter(user_role='commentator', is_delete=False, category=['Futbol'], commentator_status='active').count()
@@ -6123,6 +6306,9 @@ class EditorsFutbolAndBasketbolCountView(APIView):
 
 
 class GetPendingBalance(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id=None, format=None, *args, **kwargs):
         try:
             if id is not None:
@@ -6169,6 +6355,9 @@ class GetPendingBalance(APIView):
         
 
 class TransactionHistory(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id=None, format=None, *args, **kwargs):
         try:
             if id is not None:
@@ -6203,6 +6392,9 @@ class TransactionHistory(APIView):
             return Response(data={"message": "An error occurred: {}".format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserTransactionHistory(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id=None, format=None, *args, **kwargs):
         try:
             user = get_object_or_404(User, id=id)
@@ -6233,6 +6425,9 @@ class TestCronView(APIView):
         return Response(data={"message": "Cron run successfully"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CheckTicketActionView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, ticket_id=None, format=None, *args, **kwargs):
         try:
             current_time = datetime.now(timezone.utc)
@@ -6264,6 +6459,9 @@ class CheckTicketActionView(APIView):
 
 
 class CheckNewSupportTicketView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, ticket_id=None, format=None, *args, **kwargs):
         if TicketSupport.objects.filter(watched=False).exists():
             return Response(data=True, status=status.HTTP_200_OK)
@@ -6271,6 +6469,9 @@ class CheckNewSupportTicketView(APIView):
             return Response(data=False, status=status.HTTP_200_OK)
 
 class CheckChangeSupportTicket(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, ticket_id=None, format=None, *args, **kwargs):
         if TicketSupport.objects.filter(watched=False).exists():
             Ticket_obj = updated_count = TicketSupport.objects.filter(watched=False).update(watched=True)
@@ -6280,6 +6481,9 @@ class CheckChangeSupportTicket(APIView):
 
 
 class CreateWithdrawableRequest(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, id=None, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -6341,6 +6545,9 @@ class CreateBankUpdateRequest(APIView):
         
 
 class ShowWithdrawableData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
         
@@ -6373,6 +6580,9 @@ def random_num():
     random_string = uppercase_letters + lowercase_letters + digits    
     return random_string
 class PaymentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
 
         ref_no = random_num()
@@ -6574,13 +6784,17 @@ class PaymentView(APIView):
                 return Response({"data": "Payment Request Failed, Try again later.", 'response': json_data}, status=status.HTTP_400_BAD_REQUEST)
 
 class CheckTransactionEnquiry(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         print()
         print()
         ref_no = request.data.get('ref_no', None)
         print('ref_no: ', ref_no)
         if ref_no != None:
-            url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
+            # url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
+            url = "https://posservice.esnekpos.com/api/services/ProcessQuery"
             data = {
                     "MERCHANT": os.environ.get('MERCHANT'),
                     "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),
@@ -6597,6 +6811,9 @@ class CheckTransactionEnquiry(APIView):
             return Response({'data' : 'Ref number not found!'}, status=status.HTTP_404_NOT_FOUND)
 
 class ViewAllTicketHistory(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, ticket_id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -6616,10 +6833,13 @@ class ViewAllTicketHistory(APIView):
             return Response(data={"error": f"An error occurred while retrieving the ticket history: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RenewModelData(APIView):
-    def get(self, request, id, *args, **kwargs):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
         data = {}
         try:
-            user = User.objects.get(id=id)
+            user = request.user
             if user.remaining_monthly_count != 0:
                 data['plan_duration'] = "1 Months"
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
@@ -6642,6 +6862,9 @@ class RenewModelData(APIView):
 
 
 class SubscriptionReNew(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, *args, **kwargs):
         user = User.objects.get(id=id)
         if BecomeCommentator.objects.filter(user=user,status='active').exists():
@@ -6753,6 +6976,9 @@ class SubscriptionReNew(APIView):
         
 
 class CheckAllTicketActionView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         try:
             current_time = datetime.now(timezone.utc)
@@ -6777,6 +7003,9 @@ class CheckAllTicketActionView(APIView):
 
 
 class RetrieveBecomeCommentatorData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -6805,42 +7034,47 @@ class RetrieveBecomeCommentatorData(APIView):
         return Response(data=serializer, status=status.HTTP_200_OK)
 
 class AccountStatus(APIView):
-    def get(self, request, id=None):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
         try:
-            if id != None:
-                user = User.objects.get(id=id)
-                level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
-                
-                required_wins = level_obj.winning_limit
-                required_success_rate = level_obj.sucess_rate
-                user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
-                user_success_rate = user.success_rate
-                print('user.success_rate: ', user.success_rate)
-                user_current_success_rate = user_success_rate
+            user = request.user
+            level_obj = CommentatorLevelRule.objects.get(commentator_level=user.commentator_level)
+            
+            required_wins = level_obj.winning_limit
+            required_success_rate = level_obj.sucess_rate
+            user_current_wins = len(Comments.objects.filter(commentator_user=user, is_resolve=True, is_prediction=True))
+            user_success_rate = user.success_rate
+            print('user.success_rate: ', user.success_rate)
+            user_current_success_rate = user_success_rate
 
-                percentage_left = (user_current_wins / required_wins) * 100
-                print()
-                print()
-                print('round(user_current_success_rate, 2): ', math.floor(user_current_success_rate))
-                print()
-                print()
+            percentage_left = (user_current_wins / required_wins) * 100
+            print()
+            print()
+            print('round(user_current_success_rate, 2): ', math.floor(user_current_success_rate))
+            print()
+            print()
 
-                data = {
-                    'comments_left' : round(percentage_left, 0),
-                    'commentator_status' : user.commentator_status,
-                    'account_status' : user.is_active,
-                    'required_wins' : required_wins,
-                    'user_current_wins' : user_current_wins,
-                    'required_success_rate' : required_success_rate,
-                    'user_current_success_rate' : math.floor(user_current_success_rate),
-                }
+            data = {
+                'comments_left' : round(percentage_left, 0),
+                'commentator_status' : user.commentator_status,
+                'account_status' : user.is_active,
+                'required_wins' : required_wins,
+                'user_current_wins' : user_current_wins,
+                'required_success_rate' : required_success_rate,
+                'user_current_success_rate' : math.floor(user_current_success_rate),
+            }
 
-                return Response({'data': data}, status=status.HTTP_200_OK)
+            return Response({'data': data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'data' : str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RetrieveChartData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -6878,6 +7112,9 @@ class RetrieveChartData(APIView):
     
 
 class WithdrawalSettingView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None, *args, **kwargs):
         level = request.query_params.get('level').lower()
         print("level", level)
@@ -6921,6 +7158,9 @@ class WithdrawalSettingView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetMinimumAmount(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
@@ -6944,15 +7184,18 @@ class CheckEditorStatus(APIView):
 
 
 class ClearTokenView(APIView):
-    def get(self, request, id, format=None, *args, **kwargs):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None, *args, **kwargs):
         try:
-            user = User.objects.get(id=id)
+            user = request.user
         except User.DoesNotExist:
             return Response(data="User not found", status=status.HTTP_404_NOT_FOUND)
 
         try:
-            auth_token = Token.objects.get(user=user)
+            auth_token = Token.objects.get(user=user.id)
             auth_token.delete()
-            return Response(data="Token deleted successfully.")
+            return Response(data="Token deleted successfully.", status=status.HTTP_200_OK)
         except Token.DoesNotExist:
             return Response(data="Token not found for the user", status=status.HTTP_404_NOT_FOUND)

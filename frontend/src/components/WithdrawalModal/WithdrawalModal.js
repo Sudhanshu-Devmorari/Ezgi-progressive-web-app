@@ -7,6 +7,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import Swal from "sweetalert2";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const WithdrawalModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -17,7 +18,7 @@ const WithdrawalModal = (props) => {
 
   const handleWithdrawalAmount = async () => {
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/get-minimum-amount/${userId}/`
       );
       // console.log("RES: ", res)
@@ -92,7 +93,7 @@ const WithdrawalModal = (props) => {
     } else if (bankDetails?.withdrawable_balance >= minAmount) {
       try {
         setWithdrawalLoading(true);
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${config.apiUrl}/create-withdrawable-request/${userId}/`,
           {
             bank_iban: bankDetails?.bank_iban,

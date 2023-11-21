@@ -28,7 +28,7 @@ import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import Swal from "sweetalert2";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
-
+import AxiosInstance from "../AxiosInstance";
 import Selected_Clap from "../../assets/Selected Clap.svg";
 import Light_Unselected_Clap from "../../assets/Light - Unselected Clap.svg";
 import Dark_Unselected_Clap from "../../assets/Dark - Unselected Clap.svg";
@@ -43,6 +43,8 @@ import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.
 import { formatTimeDifference } from "../FormatTime";
 import darkIcon from "../../assets/Dark.png"
 import lightIcon from "../../assets/Light.png"
+import { Cookies, useCookies } from "react-cookie";
+
 const ContentSection = ({
   data,
   setSelectContent,
@@ -68,9 +70,12 @@ const ContentSection = ({
   setSubscriptionResult,
   setDashboardSUser,
 }) => {
+
+  const cookies = new Cookies();
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
-  const userPhone = localStorage.getItem("user-id");
+  const userPhone = cookies.get("user-id");
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
 
@@ -100,8 +105,8 @@ const ContentSection = ({
         });
         // console.log(confirmation.value);
         if (confirmation.value === true) {
-          const res = await axios.get(
-            `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+          const res = await AxiosInstance.get(
+            `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
           );
           // console.log("On Unfollow",res)
           setFollowLabel(() =>
@@ -112,15 +117,15 @@ const ContentSection = ({
             title: "You have Unfollowed",
             icon: "success",
           });
-          const user_id = localStorage.getItem("user-id");
+          const user_id = cookies.get("user-id");
           homeApiData(user_id);
         }
       } else {
-        const res = await axios.get(
-          `${config.apiUrl}/follow-commentator/${userId}?id=${commentator_id}`
+        const res = await AxiosInstance.get(
+          `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
         // console.log("On Follow",res)
-        const user_id = localStorage.getItem("user-id");
+        const user_id = cookies.get("user-id");
         homeApiData(user_id);
       }
     } catch (error) {
@@ -135,6 +140,8 @@ const ContentSection = ({
     }
   };
   // console.log("first: ", data)
+  const [ setCookie, removeCookie] = useCookies();
+
   const [likeCount, setLikeCount] = useState("");
   const [favoriteCount, setFavoriteCount] = useState("");
   const [clapCount, setClapCount] = useState("");
@@ -151,7 +158,7 @@ const ContentSection = ({
   };
   const handleCommentReaction = async (id, reaction, count) => {
     try {
-      const res = await axios.post(
+      const res = await AxiosInstance.post(
         `${config?.apiUrl}/comment-reaction/${id}/${userId}`,
         {
           reaction_type: `${reaction}`,
@@ -243,6 +250,7 @@ const ContentSection = ({
       }
       if (res.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       localStorage.setItem(`${id}_${reaction}`, count);
@@ -267,8 +275,8 @@ const ContentSection = ({
   // check activation
   const checkDeactivation = async (editor_id) => {
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}?editor_id=${editor_id}`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/check-deactivated-account/?editor_id=${editor_id}`
       );
       if (res.status === 200) {
         setCommentatorUser(data?.value?.commentator_user);
@@ -303,7 +311,7 @@ const ContentSection = ({
               onClick={() => {
                 if (userId) {
                   const currentPage = localStorage.getItem("currentpage");
-                  const currentuser = localStorage.getItem("user-role");
+                  const currentuser = cookies.get("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&

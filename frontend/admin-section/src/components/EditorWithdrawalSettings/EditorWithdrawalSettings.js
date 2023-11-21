@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import WithdrawalSettings from "../WithdrawalSettings/WithdrawalSettings";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorWithdrawalSettings = () => {
   const [selectLevel, setSelectLevel] = useState("Journeyman");
@@ -13,7 +14,7 @@ const EditorWithdrawalSettings = () => {
 
   const retrieveData = async() => {
     try{
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
       `${config?.apiUrl}/withdrawal-setting/?level=${selectLevel}`,
     );
     setAmount(res?.data?.minimum_amount)
@@ -28,7 +29,7 @@ const EditorWithdrawalSettings = () => {
     retrieveData()
     async function getData() {
       try {
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${config?.apiUrl}/highlight-setting/?commentator_level=${selectLevel.toLowerCase()}`
         );
         // console.log("res==>>", res.data[0]);

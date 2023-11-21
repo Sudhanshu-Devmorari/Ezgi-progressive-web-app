@@ -6,6 +6,7 @@ import { userId } from "../GetUser";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { formatTimeDifference } from "../FormatTime";
+import AxiosInstance from "../AxiosInstance";
 
 const Notifications = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -15,8 +16,8 @@ const Notifications = () => {
   const [notificationData, setNotificationData] = useState([]);
   useEffect(() => {
     function getNotifications() {
-      axios
-        .get(`${config.apiUrl}/notification/${userId}`)
+      AxiosInstance
+        .get(`${config.apiUrl}/notification/`)
         .then((res) => {
           const data = res?.data?.notifications;
           const isRead = data.filter((res) => res?.status === false);
@@ -34,8 +35,8 @@ const Notifications = () => {
   useEffect(() => {
     if (unreadNotificationsIds.length !== 0 && userId) {
       try {
-        axios
-          .post(`${config.apiUrl}/notification/${userId}`, {
+        AxiosInstance
+          .post(`${config.apiUrl}/notification/`, {
             "update-status": unreadNotificationsIds,
           })
           .then((res) => {

@@ -2,14 +2,15 @@ import axios from "axios";
 import React, { useState } from "react";
 import config from "../../config";
 import Swal from "sweetalert2";
-import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const VerificationRequestsBtns = (props) => {
   const id = props?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingApprove, setIsLoadingApprove] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
 
   const handleApproveOrReject = async (action, w_id) => {
     if (props?.from === "withdrawal") {
@@ -19,8 +20,10 @@ const VerificationRequestsBtns = (props) => {
         } else {
           setIsLoading(true);
         }
-        const adminId = localStorage.getItem('admin-user-id')
-        const res = await axios.patch(`${config.apiUrl}/bank-details/${adminId}`, {
+        // const adminId = localStorage.getItem('admin-user-id')
+        const cookies = new Cookies();
+        const adminId = cookies.get('admin-user-id')
+        const res = await AxiosInstance.patch(`${config.apiUrl}/bank-details/${adminId}`, {
           bank_id: id,
           action: action,
           w_id:w_id,
@@ -48,6 +51,7 @@ const VerificationRequestsBtns = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
       } catch (error) {
@@ -61,7 +65,7 @@ const VerificationRequestsBtns = (props) => {
           setIsLoading(true);
         }
         const adminId = localStorage.getItem('admin-user-id')
-        const res = await axios.post(`${config.apiUrl}/verify-user/${id}/?admin=${adminId}`, {
+        const res = await AxiosInstance.post(`${config.apiUrl}/verify-user/${id}/?admin=${adminId}`, {
           status: action,
         });
         if (res.status === 200) {
@@ -87,6 +91,7 @@ const VerificationRequestsBtns = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
       } catch (error) {

@@ -14,6 +14,7 @@ import user1 from "../../assets/user1.png";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const UserManagementPage = (props) => {
   const [data, setData] = useState([]);
@@ -25,12 +26,13 @@ const UserManagementPage = (props) => {
 
   async function userManagementApiData() {
     // console.log("test");
-    const res = await axios
+    const res = await AxiosInstance
       .get(`${config?.apiUrl}/user-management/?admin=${admin_id}`)
       .then((res) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         // console.log(res.data);

@@ -13,18 +13,33 @@ import axios from "axios";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 export const Footer = (props) => {
+  const [setCookie, removeCookie] = useCookies();
+
   const { homeApiData } = props;
   const [showSignup, setShowSignup] = useState(false);
   const { setShowModal } = useContext(CurrentTheme);
-  // const handleLogout = async (id) => {
-  //   try{
-  //     const response = await axios.get(`${config.apiUrl}/clear-token/${id}/`);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+  const handleLogout = async (id) => {
+    try{
+      const response = await AxiosInstance.get(`${config.apiUrl}/clear-token/${id}/`);
+      if (response.status == 200){
+        const cookies = new Cookies();
+        cookies.remove('access-token');
+        cookies.remove('user-id');
+        cookies.remove('username');
+        cookies.remove('user-role');
+        cookies.remove('user-active');
+
+        localStorage.clear();
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <nav
@@ -125,9 +140,11 @@ export const Footer = (props) => {
                 height={38}
                 width={38}
                 onClick={() => {
-                  // handleLogout(userId)
-                  localStorage.clear();
-                  window.location.reload();
+                  handleLogout(userId)
+                  // removeCookie("access-token")
+                  // removeCookie("user-id")
+                  // localStorage.clear();
+                  // window.location.reload();
                 }}
               />
             </div>

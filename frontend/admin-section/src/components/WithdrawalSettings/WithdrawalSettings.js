@@ -4,6 +4,7 @@ import config from "../../config";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
+import AxiosInstance from "../AxiosInstance";
 
 const WithdrawalSettings = (props) => {
   const WithdrawalSettingData = props?.WithdrawalSettingData || {};
@@ -81,7 +82,7 @@ const WithdrawalSettings = (props) => {
     },
 validationSchema: SignupSchema,
     onSubmit: async (values) => {
-      const res = await axios.post(`${config?.apiUrl}/withdrawal-setting/`, {
+      const res = await AxiosInstance.post(`${config?.apiUrl}/withdrawal-setting/`, {
         commentator_level: props.selectLevel.toLowerCase(),
         minimum_amount: values.minAmount,
         income_blocked_days: values.blockdays,

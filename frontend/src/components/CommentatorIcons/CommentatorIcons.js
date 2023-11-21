@@ -22,15 +22,19 @@ import { userId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import moment from "moment";
+import { Cookies, useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const CommentatorIcons = (props) => {
+  const cookies = new Cookies();
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const user = localStorage.getItem("user-role");
+  const user = cookies.get("user-role");
   const homepage = localStorage.getItem("currentpage");
 
   async function getBankIban() {
     try {
-      const res = await axios.get(`${config.apiUrl}/bank-details/${userId}`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/bank-details/${userId}`);
       if (res?.status === 200) {
         // console.log("res: ", res)
         const data = res?.data;

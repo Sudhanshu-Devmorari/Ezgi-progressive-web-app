@@ -19,6 +19,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import config from "../../config";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const SubUserManagementPage = (props) => {
   const users = [
@@ -42,12 +43,13 @@ const SubUserManagementPage = (props) => {
   async function getSubUsers() {
     try {
       setIsLoading(true);
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/subuser-management/?admin=${adminId}`
       );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
       // console.log(res.data, "==========>>>res sub users");
@@ -87,7 +89,7 @@ const SubUserManagementPage = (props) => {
   const handleDeleteUser = async (e, action, event) => {
     event.preventDefault();
     try {
-      const res = await axios.delete(
+      const res = await AxiosInstance.delete(
         `${config?.apiUrl}/subuser-management/${e}/?action=${action}&admin=${adminId}`
       );
       if (res.status === 200) {
@@ -106,6 +108,7 @@ const SubUserManagementPage = (props) => {
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
     } catch (error) {

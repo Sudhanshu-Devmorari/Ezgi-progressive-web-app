@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import moment from "moment";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
+import AxiosInstance from "../AxiosInstance";
 
 const CreateAdsModal = (props) => {
   const [profilePreview, setProfilePreview] = useState(null);
@@ -19,7 +20,7 @@ const CreateAdsModal = (props) => {
   const handleDeleteAds = async (id) => {
     try {
       setIsRLoading(true);
-      const response = await axios.delete(
+      const response = await AxiosInstance.delete(
         `${config?.apiUrl}/ads-management/${id}/`
       );
       setIsRLoading(false);
@@ -94,7 +95,7 @@ const CreateAdsModal = (props) => {
       if (props?.editTrue && props?.adsEditData) {
         try {
           setIsLoading(true);
-          const response = await axios.patch(
+          const response = await AxiosInstance.patch(
             `${config?.apiUrl}/ads-management/${props?.adsEditData?.id}/`,
             formData
           );
@@ -118,7 +119,7 @@ const CreateAdsModal = (props) => {
       } else {
         try {
           setIsLoading(true);
-          const response = await axios.post(
+          const response = await AxiosInstance.post(
             `${config?.apiUrl}/ads-management/`,
             formData
           );

@@ -26,6 +26,7 @@ import config from "../../config";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const WithdrawalManagementPage = (props) => {
   const users = [
@@ -144,7 +145,7 @@ const WithdrawalManagementPage = (props) => {
   async function getWithdrawData() {
     try {
       setIsLoading(true);
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config.apiUrl}/bank-details/?admin=${admin_id}`
       );
       if (res?.status === 200) {
@@ -165,6 +166,7 @@ const WithdrawalManagementPage = (props) => {
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
     } catch (error) {
@@ -175,7 +177,7 @@ const WithdrawalManagementPage = (props) => {
   async function WithdrawDataRetrieve() {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${config.apiUrl}/show-withdrawable-data/`);
+      const res = await AxiosInstance.get(`${config.apiUrl}/show-withdrawable-data/`);
       if (res?.status === 200) {
         // console.log("resData: ", res)
         if (props.withdrawableData === true) {

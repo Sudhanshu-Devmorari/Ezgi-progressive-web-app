@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import config from "../../config";
 import { userId } from "../GetUser";
+import AxiosInstance from "../AxiosInstance";
 
 const TicketReplyModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -25,7 +26,7 @@ const TicketReplyModal = (props) => {
           currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
       });
     } else if (replyMessage !== "") {
-      axios
+      AxiosInstance
         .post(
           `${config?.apiUrl}/reply-ticket/${userId}/${ticketData[0]?.ticket_support?.id}/`,
           {

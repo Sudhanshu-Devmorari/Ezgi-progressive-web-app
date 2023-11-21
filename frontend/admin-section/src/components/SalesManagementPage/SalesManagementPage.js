@@ -19,6 +19,7 @@ import Export from "../Export/Export";
 import config from "../../config";
 import moment from "moment";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const SalesManagementPage = (props) => {
   const [salesData, setSalesData] = useState({});
@@ -396,12 +397,13 @@ const SalesManagementPage = (props) => {
   async function getSalesData() {
     try {
       const adminId = localStorage.getItem("admin-user-id");
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/sales-management?admin=${adminId}`
       );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
       updateRecordsDisplay(res?.data);

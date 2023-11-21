@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import config from "../../config";
 import { userId } from "../GetUser";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorsPage = ({
   data,
@@ -34,7 +35,7 @@ const EditorsPage = ({
     // console.log("this page called");
     async function getFutbolOrBasketbolCounts() {
       try {
-        const res = await axios.get(`${config.apiUrl}/editor-futbol-basketbol-count/`);
+        const res = await AxiosInstance.get(`${config.apiUrl}/editor-futbol-basketbol-count/`);
         setCategoryCounts({
           ...categoryCounts,
           futbol: res?.data?.futbol,
@@ -61,7 +62,7 @@ const EditorsPage = ({
 
   const HandleCommentator = async () => {
     try {
-      const response = await axios.get(
+      const response = await AxiosInstance.get(
         `${config?.apiUrl}/retrieve-commentator-list/?id=${userId}`
       );
 

@@ -7,6 +7,7 @@ import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const LevelRules = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +19,7 @@ const LevelRules = (props) => {
     async function getData() {
       try {
         setIsLoading(true);
-        const res = await axios.get(
+        const res = await AxiosInstance.get(
           `${
             config?.apiUrl
           }/level-rule/?commentator_level=${props?.selectLevel?.toLowerCase()}&admin=${admin_id}`
@@ -27,6 +28,7 @@ const LevelRules = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         if (res.status === 200) {
@@ -92,7 +94,7 @@ const LevelRules = (props) => {
           }
         }
         setIsLoading(true);
-        const res = await axios.post(
+        const res = await AxiosInstance.post(
           `${
             config?.apiUrl
           }/level-rule/?commentator_level=${props?.selectLevel.toLowerCase()}&admin=${admin_id}`,
@@ -102,6 +104,7 @@ const LevelRules = (props) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token");
           window.location.reload();
         }
         if (res.status === 201) {

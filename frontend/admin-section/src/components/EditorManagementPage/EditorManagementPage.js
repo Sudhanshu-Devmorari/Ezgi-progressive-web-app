@@ -13,6 +13,7 @@ import LevelCount from "../LevelCount/LevelCount";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const EditorManagementPage = (props) => {
   const [data, setData] = useState({});
@@ -30,12 +31,13 @@ const EditorManagementPage = (props) => {
   const [deactivationonRequests, setDeactivationonRequests] = useState([]);
   function editorManagementApiData() {
     const id = localStorage.getItem("admin-user-id")
-    axios
+    AxiosInstance
       .get(`${config?.apiUrl}/editor-management/?id=${id}`)
       .then((res) => {
         if (res.status == 204) {
           localStorage.clear();
           removeCookie("admin-user-id");
+          removeCookie("access-token")
           window.location.reload();
         }
         // console.log("%%%%%%%%%", res.data);

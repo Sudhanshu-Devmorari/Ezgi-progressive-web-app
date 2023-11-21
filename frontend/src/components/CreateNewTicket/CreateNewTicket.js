@@ -6,6 +6,7 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import Form from "react-bootstrap/Form";
 import config from "../../config";
 import Swal from "sweetalert2";
+import AxiosInstance from "../AxiosInstance";
 
 const CreateNewTicket = (props) => {
   const { setShowModal, ticketsData } = props;
@@ -56,7 +57,7 @@ const CreateNewTicket = (props) => {
         });
         setShowModal(1);
       } else {
-        const res = await axios.post(`${config?.apiUrl}/support/${userId}`, {
+        const res = await AxiosInstance.post(`${config?.apiUrl}/support/${userId}`, {
           department: selectedMatchDetails,
           subject: subject,
           message: message,

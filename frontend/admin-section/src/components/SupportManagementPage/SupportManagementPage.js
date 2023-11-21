@@ -21,6 +21,7 @@ import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 import config from "../../config";
 import { useCookies } from "react-cookie";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const SupportManagementPage = (props) => {
   // Support management API
@@ -42,7 +43,7 @@ const SupportManagementPage = (props) => {
   const [tickeview, setTickeview] = useState([]);
 
   function getTicketsLatestData(e) {
-    axios
+    AxiosInstance
       .get(`${config.apiUrl}/show-ticket-data/${e}/`)
       .then((res) => {
         // console.log("-------",res.data);
@@ -56,7 +57,7 @@ const SupportManagementPage = (props) => {
   // console.log("displayAllticketHistory", displayAllticketHistory)
   const showAllTicketHistory = async (userId, ticket_id) => {
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`
       );
       // console.log("All res: ", res)
@@ -77,7 +78,7 @@ const SupportManagementPage = (props) => {
     try {
       showAllTicketHistory(userId, e);
       getTicketsLatestData(e)
-      axios
+      AxiosInstance
         .get(`${config?.apiUrl}/subuser-answer-ticket/${userId}/${e}/`)
         .then((res) => {
           // console.log("RESSS: ", res)
@@ -95,7 +96,7 @@ const SupportManagementPage = (props) => {
     } catch (e) {}
   }
   const handleCheckTicketAction = async () => {
-    const res = await axios.get(`${config?.apiUrl}/check-all-ticket-action/`);
+    const res = await AxiosInstance.get(`${config?.apiUrl}/check-all-ticket-action/`);
   };
   useEffect(() => {
     handleCheckTicketAction();
@@ -113,12 +114,13 @@ const SupportManagementPage = (props) => {
     try {
       const adminId = localStorage.getItem("admin-user-id");
 
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/support-management?admin=${adminId}`
       );
       if (res.status == 204) {
         localStorage.clear();
         removeCookie("admin-user-id");
+        removeCookie("access-token");
         window.location.reload();
       }
       const formattedPercentage = Math.round(res?.data?.new_tickets_percentage);

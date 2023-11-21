@@ -18,6 +18,7 @@ import axios from "axios";
 import CreateSubUser from "../CreateSubUser/CreateSubUser";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import config from "../../config";
+import AxiosInstance from "../AxiosInstance";
 
 const SubUserManagementFilter = (props) => {
   const transactions = [
@@ -80,7 +81,7 @@ const SubUserManagementFilter = (props) => {
   const handleShow = async () => {
     // setIsFilterLoading(true);
     try {
-      const response = await axios.post(
+      const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-sub-user-management/`,
         {
           users: selectedUserFilter,

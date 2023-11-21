@@ -17,6 +17,7 @@ import axios from "axios";
 import { userId } from "../GetUser";
 import config from "../../config";
 import moment from "moment";
+import AxiosInstance from "../AxiosInstance";
 
 const DashboardSU = (props) => {
   const subcurrentpage = localStorage.getItem("subcurrentpage");
@@ -46,7 +47,7 @@ const DashboardSU = (props) => {
   const [favCommentData, setFavCommentData] = useState([]);
   async function getFavData() {
     try {
-      const res = await axios.get(
+      const res = await AxiosInstance.get(
         `${config?.apiUrl}/fav-editor-comment/${userId}`
       );
       // console.log("=>>>", res.data);

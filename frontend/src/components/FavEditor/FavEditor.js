@@ -14,8 +14,14 @@ import initialProfile from "../../assets/profile.png";
 import Swal from "sweetalert2";
 import darkIcon from "../../assets/Dark.png"
 import lightIcon from "../../assets/Light.png"
+import AxiosInstance from "../AxiosInstance";
+import { Cookies, useCookies } from "react-cookie";
 
 const FavEditor = (props) => {
+  const cookies = new Cookies();
+
+  const [setCookie, removeCookie] = useCookies();
+
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -42,10 +48,10 @@ const FavEditor = (props) => {
   };
 
   const onFavEditorSelect = async (id) => {
-    const user_id = localStorage.getItem("user-id");
+    const user_id = cookies.get("user-id");
     try {
-      const response = await axios.post(
-        `${config.apiUrl}/fav-editor/${user_id}/`,
+      const response = await AxiosInstance.post(
+        `${config.apiUrl}/fav-editor/`,
         {
           id: id,
         }
@@ -53,6 +59,7 @@ const FavEditor = (props) => {
 
       if (response.status == 204) {
         localStorage.clear();
+        removeCookie("access-token");
         window.location.reload();
       }
       const favEditorData = favEditorCommentsLike.filter(
@@ -79,8 +86,8 @@ const FavEditor = (props) => {
   const checkDeactivation = async (value, is_subscribe) => {
     // console.log(value,"===>>value")
     try {
-      const res = await axios.get(
-        `${config.apiUrl}/check-deactivated-account/${userId}`
+      const res = await AxiosInstance.get(
+        `${config.apiUrl}/check-deactivated-account/`
       );
       if (res.status === 200) {
         if (!is_subscribe) {
@@ -159,7 +166,7 @@ const FavEditor = (props) => {
                     className="col pe-0 d-flex position-relative"
                     onClick={() => {
                       const currentPage = localStorage.getItem("currentpage");
-                      const currentuser = localStorage.getItem("user-role");
+                      const currentuser = cookies.get("user-role");
                       localStorage.setItem("dashboardShow", true);
                       (currentPage !== "show-all-comments" ||
                         currentPage !== "notifications") &&

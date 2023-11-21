@@ -9,7 +9,8 @@ import winner from "../../assets/Group 73.svg";
 import lose from "../../assets/Group 74.svg";
 import axios from "axios";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
+import AxiosInstance from "../AxiosInstance";
 
 const CommentsManagementPage = (props) => {
   const [data, setData] = useState({});
@@ -19,17 +20,22 @@ const CommentsManagementPage = (props) => {
   const [commentData, setCommentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState("All");
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const admin_id = localStorage.getItem("admin-user-id");
+  const [setCookie, removeCookie] = useCookies();
+
+  const cookies = new Cookies();
+  const admin_id = cookies.get("admin-user-id");
+
+  // const admin_id = localStorage.getItem("admin-user-id");
 
   const commentManagementApiData = async () => {
     // console.log(data)
-    await axios
+    await AxiosInstance
       .get(`${config?.apiUrl}/comments-management/?admin=${admin_id}`)
       .then((res) => {
         // console.log("=-=-=-=-=-=-=> ", res.data);
         if (res.status == 204) {
           localStorage.clear();
+          removeCookie("access-token")
           removeCookie("admin-user-id");
           window.location.reload();
         }
