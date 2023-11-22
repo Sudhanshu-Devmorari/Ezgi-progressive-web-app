@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import world_check from "../../assets/world-check.svg";
 import world_check_light from "../../assets/world-check.png";
 import darkGrp from "../../assets/Public Content Radio Button Unselected.svg";
@@ -9,6 +9,7 @@ import lighGrpSelected from "../../assets/Group 312.png";
 import lighGrp from "../../assets/Group 721.png";
 
 const CategoryFilter = (props) => {
+  const userId = UserId()
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   return (
     <>

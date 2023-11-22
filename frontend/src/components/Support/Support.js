@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import lifebuoy from "../../assets/lifebuoy.png";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import CreateNewTicket from "../CreateNewTicket/CreateNewTicket";
 import AnsweredTicketView from "../AnsweredTicketView/AnsweredTicketView";
 import TicketReplyModal from "../../components/TicketReplyModal/TicketReplyModal";
@@ -12,6 +12,7 @@ import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
 
 const Support = () => {
+  const userId = UserId()
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(1);
 

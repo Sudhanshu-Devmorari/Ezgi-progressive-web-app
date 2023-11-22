@@ -10,13 +10,16 @@ import "./EditorProfileStatisticsSection.css";
 import londonFlag from "../../assets/London_flag.png";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import { country_code } from "./_data";
 import Spinner from "react-bootstrap/esm/Spinner";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const EditorProfileStatisticsSection = (props) => {
+  const userId = UserId()
   const cookies = new Cookies();
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -54,7 +57,7 @@ const EditorProfileStatisticsSection = (props) => {
         );
       });
   }, [profileData]);
-
+  const userData = useSelector(selectUser);
   useEffect(() => {
     // console.log(
     //   "props?.activeCommentsshow::::::::::::::",
@@ -66,7 +69,8 @@ const EditorProfileStatisticsSection = (props) => {
     } else if (props?.from === "dashboard" && userId) {
       setUserUid(userId);
     } else {
-      setUserUid(cookies.get("user-id"));
+      // setUserUid(cookies.get("user-id"));
+      setUserUid(userData.user.id);
       // Handle the case where neither condition is met
     }
   }, [props?.from, props?.activeCommentsshow, userId]);

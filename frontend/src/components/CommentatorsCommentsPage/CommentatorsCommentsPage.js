@@ -17,7 +17,7 @@ import NotificationsAndSupportSelection from "../NotificationsAndSupportSelectio
 import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import config from "../../config";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
@@ -26,7 +26,7 @@ import { useCookies } from "react-cookie";
 
 const CommentatorsCommentsPage = (props) => {
   const [cookies, setCookie, removeCookie] = useCookies();
-
+  const userId = UserId()
   const [SelectComment, setSelectComment] = useState("activeComments");
   const subcurrentpage = localStorage.getItem("subcurrentpage");
   const [content, setContent] = useState(subcurrentpage || "home");

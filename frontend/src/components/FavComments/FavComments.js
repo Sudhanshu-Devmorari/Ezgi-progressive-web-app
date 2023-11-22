@@ -17,7 +17,7 @@ import "react-circular-progressbar/dist/styles.css";
 import world_check_light from "../../assets/world-check.png";
 import world_check from "../../assets/world-check.svg";
 import axios from "axios";
-import { truncateString, userId } from "../GetUser";
+import { truncateString, UserId } from "../GetUser";
 import config from "../../config";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import AxiosInstance from "../AxiosInstance";
@@ -43,6 +43,8 @@ import circle_x from "../../assets/circle-x.png";
 import darkIcon from "../../assets/Dark.png";
 import lightIcon from "../../assets/Light.png";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const FavComments = (props) => {
   const {
@@ -68,11 +70,11 @@ const FavComments = (props) => {
     getFavData,
   } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
+  const userData = useSelector(selectUser);
   const [followLabel, setFollowLabel] = useState("Follow");
   const [modalShow, setModalShow] = React.useState(false);
   const [commentatorUser, setcommentatorUser] = useState([]);
-
+  const userId = UserId()
   const [setCookie, removeCookie] = useCookies();
 
   const errorSwal = () => {
@@ -113,14 +115,16 @@ const FavComments = (props) => {
             title: "You have Unfollowed",
             icon: "success",
           });
-          const user_id = cookies.get("user-id");
+          // const user_id = cookies.get("user-id");
+          const user_id = userData.user.id;
           props.homeApiData(user_id);
         }
       } else {
         const res = await AxiosInstance.get(
           `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
-        const user_id = cookies.get("user-id");
+        // const user_id = cookies.get("user-id");
+        const user_id = userData.user.id;
         props.homeApiData(user_id);
       }
     } catch (error) {
@@ -287,7 +291,8 @@ const FavComments = (props) => {
                   className="position-relative col p-0"
                   onClick={() => {
                     const currentPage = localStorage.getItem("currentpage");
-                    const currentuser = cookies.get("user-role");
+                    // const currentuser = cookies.get("user-role");
+                    const currentuser = userData.user.user_role;
                     localStorage.setItem("dashboardShow", true);
                     (currentPage !== "show-all-comments" ||
                       currentPage !== "notifications") &&

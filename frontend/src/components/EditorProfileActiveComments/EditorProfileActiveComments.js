@@ -7,11 +7,12 @@ import EditorProfileStatisticsSection from "../EditorProfileStatisticsSection/Ed
 import axios from "axios";
 import config from "../../config";
 import Spinner from "react-bootstrap/esm/Spinner";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
 
 const EditorProfileActiveComments = (props) => {
+  const userId = UserId()
   // console.log("props::::::::::::::", props);
   const [SelectComment, setSelectComment] = useState("activeComments");
   const [isLoading, setIsLoading] = useState(true);

@@ -18,6 +18,8 @@ import axios from "axios";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const CommentsPageModal = (props) => {
   const handleClearData = () => {
@@ -33,9 +35,10 @@ const CommentsPageModal = (props) => {
   };
 
   const cookies = new Cookies();
-
+  const userData = useSelector(selectUser);
   const handleShowButtonClick = async () => {
-    const user_id = cookies.get("user-id");
+    // const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
     try {
       const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-comments/${user_id}/`,

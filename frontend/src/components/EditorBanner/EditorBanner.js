@@ -4,21 +4,24 @@ import "./EditorBanner.css";
 import football from "../../assets/Profile Card Football.svg";
 import basketball from "../../assets/Profile Card Basketball.svg";
 import { useNavigate } from "react-router-dom";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
 import bannerimg from "../../assets/ree.jpg";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 export const EditorBanner = (props) => {
   const cookies = new Cookies();
-
+  const userData = useSelector(selectUser);
   const [ setCookie, removeCookie] = useCookies();
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const userId = cookies.get("user-id");
+  // const userId = cookies.get("user-id");
+  const userId = userData.user.id;
   const [selectCategory, setSelectCategory] = useState("");
   // const [contentData, setContentData] = useState([]);
   useEffect(() => {
@@ -96,7 +99,7 @@ export const EditorBanner = (props) => {
       }
     }
     getFutbolOrBasketbolCounts();
-  }, []);
+  }, [props?.selectContent]);
 
   return (
     <>
@@ -173,7 +176,8 @@ export const EditorBanner = (props) => {
           onClick={() => {
             if (userId) {
               const currentPage = localStorage.getItem("currentpage");
-              const currentuser = cookies.get("user-role");
+              // const currentuser = cookies.get("user-role");
+              const currentuser = userData.user.user_role;
               localStorage.setItem("dashboardShow", false);
               (currentPage !== "show-all-comments" ||
                 currentPage !== "notifications") &&

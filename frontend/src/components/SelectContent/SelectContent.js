@@ -8,13 +8,17 @@ import publicSelectedIcon from "../../assets/Public Content Radio Button Selecte
 import lighGrpSelected from "../../assets/Group 312.png";
 import lighGrp from "../../assets/Group 721.png";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 export const SelectContent = (props) => {
   const cookies = new Cookies();
+  const userData = useSelector(selectUser);
   const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const userPhone = cookies.get("userPhone");
-  const userId = cookies.get("user-id");
+  const userId = userData.user.id;
+  // const userId = cookies.get("user-id");
   return (
     <>
       {userId ? (
@@ -54,7 +58,7 @@ export const SelectContent = (props) => {
           ) : null}
           <div
             className={`${
-              userPhone ? "text-end ms-auto py-1 px-2" : "ms-auto py-1 px-2"
+              userId ? "text-end ms-auto py-1 px-2" : "ms-auto py-1 px-2"
             }`}
           >
             <div className="d-flex align-items-center">

@@ -11,7 +11,7 @@ import "./AccountStatus.css";
 import buletick from "../../assets/blueTick.png";
 import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import VerificationModal from "../VerificationModal/VerificationModal";
 import config from "../../config";
@@ -23,6 +23,7 @@ import AxiosInstance from "../AxiosInstance";
 import { Cookies } from "react-cookie";
 
 const AccountStatus = (props) => {
+  const userId = UserId()
   const { commentator_level } = props;
   // const userId = localStorage.getItem("user-id");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);

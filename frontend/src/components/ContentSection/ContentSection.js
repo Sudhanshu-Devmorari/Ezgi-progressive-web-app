@@ -23,7 +23,7 @@ import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
-import { truncateString, userId } from "../GetUser";
+import { truncateString, UserId } from "../GetUser";
 import { PiHeartStraight, PiHeartStraightFill } from "react-icons/pi";
 import { GoStar, GoStarFill } from "react-icons/go";
 import Swal from "sweetalert2";
@@ -44,6 +44,8 @@ import { formatTimeDifference } from "../FormatTime";
 import darkIcon from "../../assets/Dark.png"
 import lightIcon from "../../assets/Light.png"
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const ContentSection = ({
   data,
@@ -70,12 +72,13 @@ const ContentSection = ({
   setSubscriptionResult,
   setDashboardSUser,
 }) => {
-
+  const userData = useSelector(selectUser);
   const cookies = new Cookies();
-
+  const userId = UserId()
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
-  const userPhone = cookies.get("user-id");
+  // const userPhone = cookies.get("user-id");
+  const userPhone = userData.user.id;
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
 
@@ -117,7 +120,8 @@ const ContentSection = ({
             title: "You have Unfollowed",
             icon: "success",
           });
-          const user_id = cookies.get("user-id");
+          // const user_id = cookies.get("user-id");
+          const user_id = userData.user.id;
           homeApiData(user_id);
         }
       } else {
@@ -125,7 +129,8 @@ const ContentSection = ({
           `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
         // console.log("On Follow",res)
-        const user_id = cookies.get("user-id");
+        // const user_id = cookies.get("user-id");
+        const user_id = userData.user.id;
         homeApiData(user_id);
       }
     } catch (error) {
@@ -311,7 +316,8 @@ const ContentSection = ({
               onClick={() => {
                 if (userId) {
                   const currentPage = localStorage.getItem("currentpage");
-                  const currentuser = cookies.get("user-role");
+                  // const currentuser = cookies.get("user-role");
+                  const currentuser = userData.user.user_role;
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&

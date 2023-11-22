@@ -9,10 +9,12 @@ import config from "../../config";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const FAQEditor = () => {
   const [setCookie, removeCookie] = useCookies();
-
+  const userData = useSelector(selectUser);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [allFAQs, setAllFAQs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,10 +85,12 @@ const FAQEditor = () => {
         });
     }
   }
+  
   const cookies = new Cookies();
   const fetchFaqs = async () => {
     try {
-      const userId = cookies.get("user-id");
+      // const userId = cookies.get("user-id");
+      const userId = userData.user.id;
       const response = await AxiosInstance.get(
         `${config.apiUrl}/become-editor-faq/?id=${userId}`
       );

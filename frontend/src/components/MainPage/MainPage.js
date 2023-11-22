@@ -19,7 +19,7 @@ import LandingPage from "../LandingPage/LandingPage";
 import axios from "axios";
 import config from "../../config";
 import BecomeEditor from "../BecomeEditor/BecomeEditor";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
@@ -29,9 +29,12 @@ import { subcriptionEntry } from "../SubscribeModal/SubscribeModal";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const MainPage = () => {
   const cookies = new Cookies();
+  const userData = useSelector(selectUser);
   const [setCookie, removeCookie] = useCookies();
   // CHANGE THEME
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -39,7 +42,8 @@ const MainPage = () => {
   const [selectContent, setSelectContent] = useState(
     localStorage.getItem("currentpage") || "home"
   );
-  const userId = cookies.get("user-id");
+  // const userId = cookies.get("user-id");
+  const userId = userData.user.id;
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
   const [dashboardSUser, setDashboardSUser] = useState(
@@ -76,7 +80,8 @@ const MainPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   // const user_id = localStorage.getItem("user-id");
 
-  const user_id = cookies.get("user-id");
+  // const user_id = cookies.get("user-id");
+  const user_id = userData.user.id;
 
   // check the successful payment request
   const ref_no = ref();
@@ -190,11 +195,14 @@ const MainPage = () => {
   const [leftCornerAds, setLeftCornerAds] = useState([]);
   const [rightCornerAds, setRightCornerAds] = useState([]);
   const [category, setCategory] = useState("Futbol");
-
+  
   // const [highlightUserId, setHighlightUserId] = useState([]);
 
   function homeApiData(user_id) {
     // console.log("instance", instance)
+    // debugger;
+    console.log("User data", userData);
+    console.log("User data", userData?.user?.id);
     AxiosInstance
     // axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
@@ -523,7 +531,8 @@ const MainPage = () => {
     }
   };
 
-  const user = cookies.get("user-role");
+  // const user = cookies.get("user-role");
+  const user = userData.user.user_role;
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();
@@ -806,6 +815,7 @@ const MainPage = () => {
                     homeApiData={homeApiData}
                     category={category}
                     setCategory={setCategory}
+                    selectContent={selectContent}
                     setSelectContent={setSelectContent}
                     setContentData={setContentData}
                     setCommentsReactionsSports={setCommentsReactionsSports}

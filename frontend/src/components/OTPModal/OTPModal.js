@@ -77,16 +77,19 @@ const OTPModal = (props) => {
           "subcurrentpage",
           res.data.userRole == "standard" ? "subscribers" : "home"
         );
-
+        
+        setCookie("access-token", res?.data?.Token, {
+          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        });
         setCookie("username", res?.data?.user?.username, {
           expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
         });
-        setCookie("user-role", res?.data?.user?.user_role, {
-          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-        });
-        setCookie("user-id", res?.data?.user?.id, {
-          expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-        });
+        // setCookie("user-role", res?.data?.user?.user_role, {
+        //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        // });
+        // setCookie("user-id", res?.data?.user?.id, {
+        //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+        // });
 
         props.hide();
         await Swal.fire({

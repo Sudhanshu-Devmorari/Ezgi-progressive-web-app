@@ -17,7 +17,7 @@ import edit from "../../assets/edit.png";
 import editLight from "../../assets/edit.svg";
 import WithdrawalModal from "../WithdrawalModal/WithdrawalModal";
 import axios from "axios";
-import { truncateString, userId } from "../GetUser";
+import { truncateString, UserId } from "../GetUser";
 import Form from "react-bootstrap/Form";
 import Swal from "sweetalert2";
 import config from "../../config";
@@ -30,10 +30,12 @@ import Spinner from "react-bootstrap/esm/Spinner";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import moment from "moment";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const ActiveComments = (props) => {
   const [setCookie, removeCookie] = useCookies();
-
+  const userId = UserId()
   const { activeResolved, profileData, profileLoading, setActiveCommentsshow } =
     props;
   const [showBankUpdate, setShowBankUpdate] = useState(false);
@@ -58,14 +60,15 @@ const ActiveComments = (props) => {
   const [commentatorUser, setCommentatorUser] = useState([]);
 
   const cookies = new Cookies();
-
+  const userData = useSelector(selectUser);
   useEffect(() => {
     if (props?.from === "editor" && props?.activeCommentsshow) {
       setUser(props.activeCommentsshow);
     } else if (props?.from === "dashboard" && userId) {
       setUser(userId);
     } else {
-      const user = cookies.get("user-id");
+      // const user = cookies.get("user-id");
+      const user = userData.user.id;
       setUser(user);
     }
   }, []);
@@ -149,7 +152,8 @@ const ActiveComments = (props) => {
       }
     }
   }
-  const userPhone = cookies.get("user-id");
+  // const userPhone = cookies.get("user-id");
+  const userPhone = userData.user.id;
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -173,7 +177,8 @@ const ActiveComments = (props) => {
   });
 
   const favEditor = async (id) => {
-    const user_id = cookies.get("user-id");
+    // const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
     try {
       const response = await AxiosInstance.post(
         `${config.apiUrl}/fav-editor/`,
@@ -271,7 +276,8 @@ const ActiveComments = (props) => {
             icon: "success",
           });
           profileData.Follower_Count = profileData?.Follower_Count - 1;
-          const user_id = cookies.get("user-id");
+          // const user_id = cookies.get("user-id");
+          const user_id = userData.user.id;
           props?.homeApiData(user_id);
         }
       } else {
@@ -279,7 +285,8 @@ const ActiveComments = (props) => {
           `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
         // console.log("On Follow",res)
-        const user_id = cookies.get("user-id");
+        // const user_id = cookies.get("user-id");
+        const user_id = userData.user.id;
         props?.homeApiData(user_id);
         profileData.Follower_Count = profileData?.Follower_Count + 1;
       }

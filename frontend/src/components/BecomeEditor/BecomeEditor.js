@@ -6,6 +6,8 @@ import FAQEditor from "../FAQEditor/FAQEditor";
 import BecomeAEditorModal from "../BecomeAEditorModal/BecomeAEditorModal";
 import Swal from "sweetalert2";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const BecomeEditor = ({
   profileData,
@@ -17,8 +19,9 @@ const BecomeEditor = ({
   const [modalShow, setModalShow] = React.useState(false);
 
   const cookies = new Cookies();
-
-  const user_role = cookies.get("user-role");
+  const userData = useSelector(selectUser);
+  // const user_role = cookies.get("user-role");
+  const user_role = userData.user.user_role;
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 

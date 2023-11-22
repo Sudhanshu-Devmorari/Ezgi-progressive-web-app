@@ -9,7 +9,7 @@ from core.views import (RetrieveCommentatorView, FollowCommentatorView, CommentV
                          CheckChangeSupportTicket, TestCronView,CreateWithdrawableRequest,CreateBankUpdateRequest,ShowWithdrawableData,
                          ViewAllTicketHistory, SubscriptionReNew, CheckAllTicketActionView, RenewModelData, RetrieveBecomeCommentatorData,AccountStatus,
                          RetrieveChartData, WithdrawalSettingView, GetMinimumAmount, EditorsFutbolAndBasketbolCountView, CheckEditorStatus,
-                         ClearTokenView,
+                         ClearTokenView, RetrieveUserUsingToken,
         
                          RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, SignupView, OtpVerify, OtpReSend, LoginView, PasswordResetView, RetrieveSubscriberListAndSubscriptionList, DeactivateProfile, OtpSend,
                          GoogleLoginview, FacebookLoginview, VerifyUserView, SignupUserExistsView, FootbalAndBasketballContentView, CheckDeactivatedAccount, GetUserdata, HighlightPurchaseView, EditorBannerView, GetFutbolAndBasketbolCountView)
@@ -136,6 +136,7 @@ urlpatterns = [
     path('payment/', PaymentView.as_view(), name='payment'),
     path('transcation-query/', CheckTransactionEnquiry.as_view(), name='transcation-query'),
     path('account-status/', AccountStatus.as_view(), name='transcation-query'),
+    path('retrieve-user-using-token/', RetrieveUserUsingToken.as_view(), name='Retrieve-User-Using-Token'),
 
     path('test-cron/', TestCronView.as_view(), name='test-cron'),
 ]

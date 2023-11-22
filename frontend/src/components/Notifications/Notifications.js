@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import profile from "../../assets/profile.png";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { formatTimeDifference } from "../FormatTime";
@@ -11,7 +11,7 @@ import AxiosInstance from "../AxiosInstance";
 const Notifications = () => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [unreadNotificationsIds, setUnreadNotificationsIds] = useState([]);
-
+  const userId = UserId()
   // Notification API
   const [notificationData, setNotificationData] = useState([]);
   useEffect(() => {

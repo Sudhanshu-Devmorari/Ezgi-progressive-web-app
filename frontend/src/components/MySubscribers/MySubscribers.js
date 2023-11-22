@@ -5,18 +5,21 @@ import crown from "../../assets/crown.png";
 import "./MySubscribers.css";
 import SubscribeRenewModal from "../SubscribeRenewModal/SubscribeRenewModal";
 import axios from "axios";
-import { truncateString, userId } from "../GetUser";
+import { truncateString, UserId } from "../GetUser";
 import config from "../../config";
 import moment from "moment"
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const MySubscribers = (props) => {
+  const userId = UserId()
   const cookies = new Cookies();
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [RenewModalShow, setRenewModalShow] = useState(false);
-
+  const userData = useSelector(selectUser);
   // Subscription API
   const [mySubscribers, setMySubscribers] = useState([]);
   const [mySubscriptions, setMySubscriptions] = useState([]);
@@ -86,7 +89,8 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                  cookies.get("user-role");
+                                    userData.user.user_role;
+                                  // cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
                                   currentPage !== "notifications") &&
@@ -224,7 +228,8 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                  cookies.get("user-role");
+                                    userData.user.user_role;
+                                  // cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
                                   currentPage !== "notifications") &&
@@ -387,7 +392,8 @@ const MySubscribers = (props) => {
                             const currentPage =
                               localStorage.getItem("currentpage");
                             const currentuser =
-                              cookies.get("user-role");
+                            userData.user.user_role;
+                              // cookies.get("user-role");
                             localStorage.setItem("dashboardShow", true);
                             (currentPage !== "show-all-comments" ||
                               currentPage !== "notifications") &&

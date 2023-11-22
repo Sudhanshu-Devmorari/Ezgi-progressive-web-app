@@ -14,12 +14,13 @@ import NotificationsAndSupportSelection from "../NotificationsAndSupportSelectio
 import Notifications from "../Notifications/Notifications";
 import Support from "../Support/Support";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import config from "../../config";
 import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
 
 const DashboardSU = (props) => {
+  const userId = UserId()
   const subcurrentpage = localStorage.getItem("subcurrentpage");
   const [content, setContent] = useState(subcurrentpage || "subscribers");
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);

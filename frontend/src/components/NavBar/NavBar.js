@@ -8,17 +8,20 @@ import bell from "../../assets/Header Notification.svg";
 import bellLight from "../../assets/Header Notification (1).svg";
 import darkmode from "../../assets/brightness-up.png";
 import moon from "../../assets/Header Dark Mode.svg";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import Spinner from "react-bootstrap/esm/Spinner";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const NavBar = (props) => {
+  const userId = UserId()
   const cookies = new Cookies();
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
-
+    const userData = useSelector(selectUser);
   const [signUpModalShow, setSignUpModalShow] = useState(false);
   const [addCommentShow, setAddCommentShow] = useState(false);
 
@@ -98,7 +101,8 @@ const NavBar = (props) => {
                 onClick={() => {
                   props.setDashboardSUser(true);
                   const currentPage = localStorage.getItem("currentpage");
-                  const currentuser = cookies.get("user-role");
+                  const currentuser = userData.user.user_role;
+                  // const currentuser = cookies.get("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&

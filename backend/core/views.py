@@ -119,7 +119,9 @@ class OtpVerify(APIView):
                 if serializer.is_valid():
                     data = serializer.save()
                     otp_obj.delete()
-                    return Response({'success': 'OTP successfully verified.', 'user': serializer.data, 'status': status.HTTP_200_OK})
+
+                    token_key = Token.objects.get(user__id=serializer.data['id'])
+                    return Response({'success': 'OTP successfully verified.', 'user': serializer.data, 'status': status.HTTP_200_OK, "Token":token_key.key})
                 else:
                     return Response({'error': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST})
 
@@ -5798,8 +5800,8 @@ class RetrieveEditorView(APIView):
     """
     Editor list view
     """
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {
@@ -5807,10 +5809,10 @@ class RetrieveEditorView(APIView):
         } # data_list to return in response
 
         # Instantiate RetrievePageData object
+        
         retrieve_data = RetrievePageData()
-
         # Get commentator data
-        data_list['Commentator'] = retrieve_data.get_commentator(request.query_params.get('id'))
+        data_list['Commentator'] = retrieve_data.get_commentator(request.user.id)
         
         return Response(data=data_list, status=status.HTTP_200_OK)
     
@@ -7200,3 +7202,16 @@ class ClearTokenView(APIView):
             return Response(data="Token deleted successfully.", status=status.HTTP_200_OK)
         except Token.DoesNotExist:
             return Response(data="Token not found for the user", status=status.HTTP_404_NOT_FOUND)
+
+
+class RetrieveUserUsingToken(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None, *args, **kwargs):
+        try:
+            user = request.user
+            serializer = UserSerializer(user)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(data="User not found", status=status.HTTP_404_NOT_FOUND)

@@ -2,17 +2,19 @@ import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const AnsweredTicketView = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const { ticketResponse } = props;
-
+  // const userId = UserId()
   const ticketData = props?.ticketData || {};
   const ticketAllData = props?.ticketAllData
 
@@ -37,8 +39,9 @@ const AnsweredTicketView = (props) => {
       });
   };
   const cookies = new Cookies();
-
-  const userId = cookies.get("user-id");
+  const userData = useSelector(selectUser);
+  // const userId = cookies.get("user-id");
+  const userId = userData.user.id;
   const showAllTicketHistory = async(ticket_id) => {
     try {
       const res = await AxiosInstance.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`);

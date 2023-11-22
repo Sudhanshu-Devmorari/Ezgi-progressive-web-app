@@ -6,13 +6,13 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
 
 const BankUpdateModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
+  const userId = UserId()
   const validationSchema = Yup.object({
     iban: Yup.string()
       .matches(/^\d{24}$/, "IBAN must be exactly 24 numeric characters")

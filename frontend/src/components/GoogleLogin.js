@@ -49,12 +49,12 @@ const GoogleLogin = () => {
           // localStorage.setItem("user-role", response.data.userRole);
           // localStorage.setItem("user-id", response.data.userId);
 
-          setCookie("user-role", response.data.userRole, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          });
-          setCookie("user-id", response.data.userId, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          })
+          // setCookie("user-role", response.data.userRole, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // });
+          // setCookie("user-id", response.data.userId, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // })
 
           window.location.reload();
         })

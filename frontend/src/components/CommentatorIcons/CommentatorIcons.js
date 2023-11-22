@@ -18,18 +18,22 @@ import bell_1 from "../../assets/Header Notification (2).svg";
 import lifebuoydark from "../../assets/Support.svg";
 import lifebuoy from "../../assets/support unselected.svg";
 import lifebuoySelected from "../../assets/support selected.svg";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import config from "../../config";
 import moment from "moment";
 import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const CommentatorIcons = (props) => {
+  const userId = UserId()
   const cookies = new Cookies();
-
+  const userData = useSelector(selectUser);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-  const user = cookies.get("user-role");
+  // const user = cookies.get("user-role");
+  const user = userData.user.id;
   const homepage = localStorage.getItem("currentpage");
 
   async function getBankIban() {

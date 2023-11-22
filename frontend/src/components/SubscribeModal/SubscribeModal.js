@@ -15,7 +15,7 @@ import PlanSelection from "../PlanSelection/PlanSelection";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import moment from "moment";
 import { ref, transcationQueryAPI } from "../GetRefNo";
@@ -35,12 +35,12 @@ const SubscribeModal = (props) => {
   } = props;
 
   // const history = useHistory()
+  const userId = UserId()
 
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   useEffect(() => {
     isRenewTerms && setSelectCheckBox(isRenewTerms);
   }, [isRenewTerms]);
-
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =
     useContext(CurrentTheme);
 
@@ -720,14 +720,14 @@ const SubscribeModal = (props) => {
 };
 
 export default SubscribeModal;
-
 // Save the subscription entry to DB when successful payment is received
 export const subcriptionEntry = async (
   amount,
   duration,
   commentator_user_id,
   commentator_username
-) => {
+  ) => {
+  const userId = UserId()
   try {
     const res = await AxiosInstance.post(`${config.apiUrl}/subscription/${userId}/`, {
       duration: duration,

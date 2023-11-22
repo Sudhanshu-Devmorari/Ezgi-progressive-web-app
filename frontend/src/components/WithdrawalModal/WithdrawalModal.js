@@ -4,14 +4,14 @@ import Modal from "react-bootstrap/Modal";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
 
 const WithdrawalModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
+  const userId = UserId()
   const { bankDetails } = props;
 
   const [minAmount, setMinAmount] = useState(0);

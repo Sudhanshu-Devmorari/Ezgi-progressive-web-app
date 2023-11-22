@@ -8,7 +8,7 @@ import { countsAdsAPI } from "../CountsAdViewAPI";
 import { useEffect } from "react";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import AxiosInstance from "../AxiosInstance";
 
 const EditorsPage = ({
@@ -63,7 +63,7 @@ const EditorsPage = ({
   const HandleCommentator = async () => {
     try {
       const response = await AxiosInstance.get(
-        `${config?.apiUrl}/retrieve-commentator-list/?id=${userId}`
+        `${config?.apiUrl}/retrieve-commentator-list/`
       );
 
       setDisplayData(response?.data?.Commentator);

@@ -8,7 +8,7 @@ import SelectedBow from "../../assets/Menu Icon (1).svg";
 import startFooter from "../../assets/Favorite Page (1).svg";
 import selectedFav from "../../assets/Sub Header Favorite Selected.svg";
 import logout from "../../assets/logout icon (1).svg";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import SignUpModal from "../SignUpModal/SignUpModal";
 import CurrentTheme from "../../context/CurrentTheme";
@@ -18,7 +18,7 @@ import { Cookies, useCookies } from "react-cookie";
 
 export const Footer = (props) => {
   const [setCookie, removeCookie] = useCookies();
-
+  const userId = UserId()
   const { homeApiData } = props;
   const [showSignup, setShowSignup] = useState(false);
   const { setShowModal } = useContext(CurrentTheme);

@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import CurrentTheme from "../../context/CurrentTheme";
 import "./TransactionArray.css";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import config from "../../config";
 
 const TransactionArray = (props) => {
+  const userId = UserId()
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const transactionsHistory = [
     {

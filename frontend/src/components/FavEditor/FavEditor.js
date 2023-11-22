@@ -8,7 +8,7 @@ import yellowStarIcon from "../../assets/star-1 (1).svg";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import config from "../../config";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import { useEffect } from "react";
 import initialProfile from "../../assets/profile.png";
 import Swal from "sweetalert2";
@@ -16,10 +16,13 @@ import darkIcon from "../../assets/Dark.png"
 import lightIcon from "../../assets/Light.png"
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const FavEditor = (props) => {
+  const userId = UserId()
   const cookies = new Cookies();
-
+  const userData = useSelector(selectUser);
   const [setCookie, removeCookie] = useCookies();
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
@@ -48,7 +51,8 @@ const FavEditor = (props) => {
   };
 
   const onFavEditorSelect = async (id) => {
-    const user_id = cookies.get("user-id");
+    // const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
     try {
       const response = await AxiosInstance.post(
         `${config.apiUrl}/fav-editor/`,
@@ -166,7 +170,8 @@ const FavEditor = (props) => {
                     className="col pe-0 d-flex position-relative"
                     onClick={() => {
                       const currentPage = localStorage.getItem("currentpage");
-                      const currentuser = cookies.get("user-role");
+                      // const currentuser = cookies.get("user-role");
+                      const currentuser = userData.user.user_role;
                       localStorage.setItem("dashboardShow", true);
                       (currentPage !== "show-all-comments" ||
                         currentPage !== "notifications") &&

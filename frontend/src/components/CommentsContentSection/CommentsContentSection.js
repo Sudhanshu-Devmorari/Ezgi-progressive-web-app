@@ -43,9 +43,11 @@ import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import Swal from "sweetalert2";
-import { truncateString, userId } from "../GetUser";
+import { truncateString, UserId } from "../GetUser";
 import { formatTimeDifference } from "../FormatTime";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const CommentsContentSection = (props) => {
   const {
@@ -77,8 +79,9 @@ const CommentsContentSection = (props) => {
   } = props;
 
   const cookies = new Cookies();
-
-  const userId = cookies.get("user-id");
+  const userData = useSelector(selectUser);
+  // const userId = cookies.get("user-id");
+  const userId = userData.user.id;
   const [setCookie, removeCookie] = useCookies();
 
   // const [active, setActive] = useState([]);
@@ -105,7 +108,8 @@ const CommentsContentSection = (props) => {
   //     }, []);
   // };
   const handleCommentReaction = async (id, reaction, is_public) => {
-    const user_id = cookies.get("user-id");
+    // const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
     // console.log("publicComments:::::::::::", publicComments);
     try {
       const res = await AxiosInstance.post(
@@ -216,9 +220,11 @@ const CommentsContentSection = (props) => {
       }
     }
   };
-  const user_id = cookies.get("user-id");
+  // const user_id = cookies.get("user-id");
+  const user_id = userData.user.id;
   useEffect(() => {
-    const user_id = cookies.get("user-id");
+    // const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
     // userProfileId
     activeResolved(props.dashboardSUser ? user_id : userProfileId);
   }, [userProfileId, user_id]);

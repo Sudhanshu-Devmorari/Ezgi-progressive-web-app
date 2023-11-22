@@ -12,7 +12,7 @@ import startDarkIcon from "../../assets/star.svg";
 import axios from "axios";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { BsStar, BsStarFill } from "react-icons/bs";
@@ -23,6 +23,8 @@ import Selected_Favorite from "../../assets/Selected Favorite.svg";
 import Dark_Unselected_Favorite from "../../assets/Dark - Unselected Favorite.svg";
 import Light_Unselected_Favorite from "../../assets/Light - Unselected Favorite.svg";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const SharedProfile = (props) => {
   const [setCookie, removeCookie] = useCookies();
@@ -43,9 +45,10 @@ const SharedProfile = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [showModal, setShowModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false); // Initialize with the API data
-
+  const userData = useSelector(selectUser);
   const server_url = `${config.apiUrl}`;
   const [commentatorUser, setCommentatorUser] = useState([]);
+  const userId = UserId()
 
   const editorProfile = [
     { name: "adnankeser", rate: "%67.5" },
@@ -85,7 +88,8 @@ const SharedProfile = (props) => {
   }, []);
 
   const favEditor = async (id) => {
-    const user_id = cookies.get("user-id");
+    const user_id = userData.user.id;
+    // const user_id = cookies.get("user-id");
     try {
       const response = await AxiosInstance.post(
         `${config.apiUrl}/fav-editor/`,
@@ -229,7 +233,8 @@ const SharedProfile = (props) => {
                   userId == data?.value?.user?.id ? true : false
                 );
                 const currentPage = localStorage.getItem("currentpage");
-                const currentuser = cookies.get("user-role");
+                // const currentuser = cookies.get("user-role");
+                const currentuser = userData.user.user_role;
                 localStorage.setItem("dashboardShow", true);
                 (currentPage !== "show-all-comments" ||
                   currentPage !== "notifications") &&

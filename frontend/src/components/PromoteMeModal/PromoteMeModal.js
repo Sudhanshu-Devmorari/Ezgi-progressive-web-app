@@ -17,12 +17,13 @@ import PromoteMeSubScription from "./PromoteMeSubScription";
 import TermsOfUse from "../TermsOfUse/TermsOfUse";
 import config from "../../config";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import AxiosInstance from "../AxiosInstance";
 
 const PromoteMeModal = (props) => {
+  const userId = UserId()
   const [commentsModalShow, setCommentsModalShow] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme, ShowModal, setShowModal } =

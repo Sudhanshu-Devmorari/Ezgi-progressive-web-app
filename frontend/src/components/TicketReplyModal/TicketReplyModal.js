@@ -5,12 +5,12 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import moment from "moment";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import AxiosInstance from "../AxiosInstance";
 
 const TicketReplyModal = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
+  const userId = UserId()
   const ticketData = props?.ticketData || [];
 
   const [replyMessage, setReplyMessage] = useState("");

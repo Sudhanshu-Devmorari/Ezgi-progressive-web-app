@@ -11,20 +11,23 @@ import CheckBoxSelectLight from "../../assets/CheckSelectLight.svg";
 import CheckBoxSelectDark from "../../assets/Checkbox Selected.svg";
 import CheckBoxDark from "../../assets/Checkbox Unselected.svg";
 import Swal from "sweetalert2";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import SubscribeModal from "../SubscribeModal/SubscribeModal";
 import { useEffect } from "react";
 import { ref, transcationQueryAPI } from "../GetRefNo";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const BecomeAEditorModal = (props) => {
   const [setCookie, removeCookie] = useCookies();
-
+  const userData = useSelector(selectUser);
   const cookies = new Cookies();
 
-  const userId = cookies.get("user-id");
+  // const userId = cookies.get("user-id");
+  const userId = userData.user.id;
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -331,10 +334,10 @@ const BecomeAEditorModal = (props) => {
           if (res.status === 200) {
 
             // setShowPaymentModal(true);
-            localStorage.setItem("user-role", res.data.user_role);
-            setCookie("user-role", res.data.user_role, {
-              expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-            });
+            // localStorage.setItem("user-role", res.data.user_role);
+            // setCookie("user-role", res.data.user_role, {
+            //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+            // });
             props.onHide();
             setShowPaymentModal(false);
             const confirm = await Swal.fire({

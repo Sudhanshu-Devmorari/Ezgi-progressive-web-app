@@ -6,13 +6,14 @@ import bankLogo from "../../assets/Akbank-Logo-PNG.png";
 import BankUpdateModal from "../BankUpdateModal/BankUpdateModal";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
 
 const Transactions = () => {
+  const userId = UserId()
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   const chart = [

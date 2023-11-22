@@ -4,12 +4,16 @@ import axios from "axios";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const WalletSelection = (props) => {
   const cookies = new Cookies();
+  const userData = useSelector(selectUser);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const pendingBalanceHistory = async () => {
-    const userId = cookies.get("user-id");
+    // const userId = cookies.get("user-id");
+    const userId = userData.user.id;
     try {
       const res = await AxiosInstance.get(
         `${config?.apiUrl}/pending-balance/${userId}/`

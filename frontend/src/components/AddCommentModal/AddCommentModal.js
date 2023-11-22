@@ -14,7 +14,7 @@ import SelecttoggleinputDark from "../../assets/Group 711.png";
 import toggleinputDark from "../../assets/Group 711.svg";
 import toggleinputLight from "../../assets/Group 720.png";
 import toggleinputLightSelected from "../../assets/Group 720_selected.png";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import axios from "axios";
 import { headers } from "../AuthorizationBearer";
 import { LeagueAPI } from "../GetLeagueAPI";
@@ -29,6 +29,7 @@ const AddCommentModal = (props) => {
   const { activeResolved, profileData } = props;
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
+  const userId = UserId()
   // const matchDetailsOptions = [
   //   "Match Details 1",
   //   "Match Details 2",

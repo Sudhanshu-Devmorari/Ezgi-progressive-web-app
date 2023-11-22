@@ -5,7 +5,7 @@ import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import CurrentTheme from "../../context/CurrentTheme";
 import axios from "axios";
 import config from "../../config";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import AxiosInstance from "../AxiosInstance";
 
 const EditorFilter = (props) => {
@@ -15,6 +15,7 @@ const EditorFilter = (props) => {
     setSelectedScorePoint(null)
     setSelectedSuccessRate(null)
   }
+  const userId = UserId()
   const handleShowButtonClick = async () => {
     try {
       const response = await AxiosInstance.post(

@@ -60,15 +60,15 @@ const SignInModal = (props) => {
             res.data.userRole == "standard" ? "subscribers" : "home"
           );
 
-          setCookie("user-role", res.data.userRole, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          }, { path: '/', httpOnly: true });
-          setCookie("user-id", res.data.userId, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          }, { path: '/', httpOnly: true });
-          setCookie("username", res.data.username, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          }, { path: '/', httpOnly: true });
+          // setCookie("user-role", res.data.userRole, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // }, { path: '/', httpOnly: true });
+          // setCookie("user-id", res.data.userId, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // }, { path: '/', httpOnly: true });
+          // setCookie("username", res.data.username, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // }, { path: '/', httpOnly: true });
 
           props?.hide();
           await Swal.fire({
@@ -84,12 +84,12 @@ const SignInModal = (props) => {
           setCookie("access-token", res.data.Token, {
             expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
           });
-          setCookie("user-role", res.data.userRole, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          });
-          setCookie("user-id", res.data.userId, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          });
+          // setCookie("user-role", res.data.userRole, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // });
+          // setCookie("user-id", res.data.userId, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // });
           setCookie("username", res.data.username, {
             expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
           });

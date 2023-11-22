@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import CurrentTheme from "../../context/CurrentTheme";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import Form from "react-bootstrap/Form";

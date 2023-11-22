@@ -5,7 +5,7 @@ import camera from "../../assets/camera-plus.svg";
 import { BsArrowLeft } from "react-icons/bs";
 import "./ProfileSU.css";
 import axios from "axios";
-import { userId } from "../GetUser";
+import { UserId } from "../GetUser";
 import Swal from "sweetalert2";
 import initialProfile from "../../assets/profile.png";
 import config from "../../config";
@@ -16,7 +16,7 @@ import { Cookies, useCookies } from "react-cookie";
 
 const ProfileSU = (props) => {
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
-
+  const userId = UserId()
   const [editProfile, setEditProfile] = useState(false);
 
   // PROFILE API
