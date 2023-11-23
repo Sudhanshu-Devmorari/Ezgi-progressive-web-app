@@ -78,7 +78,7 @@ const ContentSection = ({
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [modalShow, setModalShow] = React.useState(false);
   // const userPhone = cookies.get("user-id");
-  const userPhone = userData.user.id;
+  const userPhone = userData?.user?.id;
   const server_url = `${config.apiUrl}`;
   const [followLabel, setFollowLabel] = useState("Follow");
 
@@ -121,7 +121,7 @@ const ContentSection = ({
             icon: "success",
           });
           // const user_id = cookies.get("user-id");
-          const user_id = userData.user.id;
+          const user_id = userData?.user?.id;
           homeApiData(user_id);
         }
       } else {
@@ -130,7 +130,7 @@ const ContentSection = ({
         );
         // console.log("On Follow",res)
         // const user_id = cookies.get("user-id");
-        const user_id = userData.user.id;
+        const user_id = userData?.user?.id;
         homeApiData(user_id);
       }
     } catch (error) {
@@ -317,7 +317,7 @@ const ContentSection = ({
                 if (userId) {
                   const currentPage = localStorage.getItem("currentpage");
                   // const currentuser = cookies.get("user-role");
-                  const currentuser = userData.user.user_role;
+                  const currentuser = userData?.user?.user_role;
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||
                     currentPage !== "notifications") &&

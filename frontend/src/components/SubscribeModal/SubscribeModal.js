@@ -35,7 +35,7 @@ const SubscribeModal = (props) => {
   } = props;
 
   // const history = useHistory()
-  const userId = UserId()
+  const userId = UserId();
 
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   useEffect(() => {
@@ -61,17 +61,21 @@ const SubscribeModal = (props) => {
         (selectedPlan === "6 Months" && subscriptionPlan?.month_6);
       try {
         setIsLoading(true);
-        const payment_res = await AxiosInstance.post(`${config.apiUrl}/payment/`, {
-          payment: "subscription",
-          duration: selectedPlan,
-          amount: money,
-          id: commentatorUser?.id,
-          commentator_username: commentatorUser?.username,
-          user_id: userId,
-        });
+        const payment_res = await AxiosInstance.post(
+          `${config.apiUrl}/payment/`,
+          {
+            payment: "subscription",
+            duration: selectedPlan,
+            amount: money,
+            id: commentatorUser?.id,
+            commentator_username: commentatorUser?.username,
+            user_id: userId,
+          }
+        );
         // console.log(payment_res, "==========payment_res");
 
         if (payment_res.status === 200) {
+          // debugger;
           const url = payment_res?.data?.URL_3DS;
           // window.location.replace(url);
           window.location.href = url;
@@ -224,6 +228,7 @@ const SubscribeModal = (props) => {
         // console.log(payment_res, "==========payment_res");
 
         if (payment_res.status === 200) {
+          // debugger;
           const url = payment_res?.data?.URL_3DS;
           // console.log("URL: ", url)
           // window.location.replace(url);
@@ -286,7 +291,7 @@ const SubscribeModal = (props) => {
           //   window.location.replace(window.location.origin + "/");
           // }
         }
-        if (result?.STATUS === "ERROR"){
+        if (result?.STATUS === "ERROR") {
           window.location.replace(window.location.origin + "/");
         }
       } catch (error) {
@@ -316,12 +321,9 @@ const SubscribeModal = (props) => {
           icon: "success",
           backdrop: false,
           customClass:
-            currentTheme === "dark"
-              ? "dark-mode-alert"
-              : "light-mode-alert",
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert",
         });
         if (confirm.value === true) {
-
           window.history.pushState(null, null, window.location.origin + "/");
           window.addEventListener("popstate", () => {
             window.history.pushState(null, null, window.location.origin + "/");
@@ -725,9 +727,10 @@ export const subcriptionEntry = async (
   amount,
   duration,
   commentator_user_id,
-  commentator_username
+  commentator_username,
+  userId
   ) => {
-  const userId = UserId()
+  // const userId = UserId()
   try {
     const res = await AxiosInstance.post(`${config.apiUrl}/subscription/${userId}/`, {
       duration: duration,

@@ -101,7 +101,7 @@ const NavBar = (props) => {
                 onClick={() => {
                   props.setDashboardSUser(true);
                   const currentPage = localStorage.getItem("currentpage");
-                  const currentuser = userData.user.user_role;
+                  const currentuser = userData?.user?.user_role;
                   // const currentuser = cookies.get("user-role");
                   localStorage.setItem("dashboardShow", true);
                   (currentPage !== "show-all-comments" ||

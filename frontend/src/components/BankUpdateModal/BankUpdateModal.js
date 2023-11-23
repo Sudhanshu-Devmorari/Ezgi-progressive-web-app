@@ -33,7 +33,7 @@ const BankUpdateModal = (props) => {
     onSubmit: async (values) => {
       try {
         const res = await AxiosInstance.post(
-          `${config.apiUrl}/bank-details/${userId}`,
+          `${config.apiUrl}/bank-details/`,
           { bank_iban: values.iban }
         );
         // console.log(res);

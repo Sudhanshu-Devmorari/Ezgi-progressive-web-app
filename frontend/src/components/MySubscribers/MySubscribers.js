@@ -89,7 +89,7 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                    userData.user.user_role;
+                                    userData?.user?.user_role;
                                   // cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
@@ -228,7 +228,7 @@ const MySubscribers = (props) => {
                                 const currentPage =
                                   localStorage.getItem("currentpage");
                                 const currentuser =
-                                    userData.user.user_role;
+                                    userData?.user?.user_role;
                                   // cookies.get("user-role");
                                 localStorage.setItem("dashboardShow", true);
                                 (currentPage !== "show-all-comments" ||
@@ -392,7 +392,7 @@ const MySubscribers = (props) => {
                             const currentPage =
                               localStorage.getItem("currentpage");
                             const currentuser =
-                            userData.user.user_role;
+                            userData?.user?.user_role;
                               // cookies.get("user-role");
                             localStorage.setItem("dashboardShow", true);
                             (currentPage !== "show-all-comments" ||

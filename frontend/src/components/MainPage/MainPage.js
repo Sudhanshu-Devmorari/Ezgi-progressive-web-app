@@ -43,7 +43,7 @@ const MainPage = () => {
     localStorage.getItem("currentpage") || "home"
   );
   // const userId = cookies.get("user-id");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   const [selectPublicorForYou, setSelectPublicorForYou] = useState("for you");
   const dashboardShow = localStorage.getItem("dashboardShow");
   const [dashboardSUser, setDashboardSUser] = useState(
@@ -81,7 +81,7 @@ const MainPage = () => {
   // const user_id = localStorage.getItem("user-id");
 
   // const user_id = cookies.get("user-id");
-  const user_id = userData.user.id;
+  const user_id = userData?.user?.id;
 
   // check the successful payment request
   const ref_no = ref();
@@ -114,7 +114,8 @@ const MainPage = () => {
               amount,
               duration,
               commentator_user_id,
-              commentator_username
+              commentator_username,
+              userId
             );
           }
           // const url = new URL(window.location.href);
@@ -199,10 +200,6 @@ const MainPage = () => {
   // const [highlightUserId, setHighlightUserId] = useState([]);
 
   function homeApiData(user_id) {
-    // console.log("instance", instance)
-    // debugger;
-    console.log("User data", userData);
-    console.log("User data", userData?.user?.id);
     AxiosInstance
     // axios
       // .get(`${config?.apiUrl}/retrieve-dashboard/?id=${user_id}`)
@@ -532,7 +529,7 @@ const MainPage = () => {
   };
 
   // const user = cookies.get("user-role");
-  const user = userData.user.user_role;
+  const user = userData?.user?.user_role;
   useEffect(() => {
     mergeArrays();
     subscriptionArrays();

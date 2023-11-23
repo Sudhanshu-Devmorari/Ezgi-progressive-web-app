@@ -5246,7 +5246,7 @@ class BecomeEditorEarnDetailsview(APIView):
                 total_earning = (float(value_with_commision_calc) * int(subscriber)) / int(data.threshold_subscriber)
                 return Response({"total_earning": round(total_earning, 2)})
             except ObjectDoesNotExist:
-                data = BecomeEditorEarnDetails.objects.create(subscription_type=type, threshold_subscriber=1, earn_amount=value.month_1)
+                data = BecomeEditorEarnDetails.objects.create(subscription_type=commentator_level.lower(), threshold_subscriber=1, earn_amount=value.month_1)
                 total_earning = (float(value.month_1) * int(subscriber)) / int(data.threshold_subscriber)
             return Response({"total_earning": round(total_earning, 2)})
         except SubscriptionSetting.DoesNotExist:
@@ -6684,7 +6684,8 @@ class PaymentView(APIView):
             }
 
             url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
-            print("data:", data)
+            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':
@@ -6740,6 +6741,8 @@ class PaymentView(APIView):
         }
 
             url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
+            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':
@@ -6779,6 +6782,8 @@ class PaymentView(APIView):
         }
 
             url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
+            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+
             response = requests.post(url, json=data)
             json_data = response.json()
             if json_data['RETURN_CODE'] == '0':

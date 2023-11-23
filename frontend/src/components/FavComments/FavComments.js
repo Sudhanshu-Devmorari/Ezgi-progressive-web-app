@@ -116,7 +116,7 @@ const FavComments = (props) => {
             icon: "success",
           });
           // const user_id = cookies.get("user-id");
-          const user_id = userData.user.id;
+          const user_id = userData?.user?.id;
           props.homeApiData(user_id);
         }
       } else {
@@ -124,7 +124,7 @@ const FavComments = (props) => {
           `${config.apiUrl}/follow-commentator/?id=${commentator_id}`
         );
         // const user_id = cookies.get("user-id");
-        const user_id = userData.user.id;
+        const user_id = userData?.user?.id;
         props.homeApiData(user_id);
       }
     } catch (error) {
@@ -292,7 +292,7 @@ const FavComments = (props) => {
                   onClick={() => {
                     const currentPage = localStorage.getItem("currentpage");
                     // const currentuser = cookies.get("user-role");
-                    const currentuser = userData.user.user_role;
+                    const currentuser = userData?.user?.user_role;
                     localStorage.setItem("dashboardShow", true);
                     (currentPage !== "show-all-comments" ||
                       currentPage !== "notifications") &&

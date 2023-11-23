@@ -70,7 +70,7 @@ const EditorProfileStatisticsSection = (props) => {
       setUserUid(userId);
     } else {
       // setUserUid(cookies.get("user-id"));
-      setUserUid(userData.user.id);
+      setUserUid(userData?.user?.id);
       // Handle the case where neither condition is met
     }
   }, [props?.from, props?.activeCommentsshow, userId]);

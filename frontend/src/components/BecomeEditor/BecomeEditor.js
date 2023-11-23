@@ -21,7 +21,7 @@ const BecomeEditor = ({
   const cookies = new Cookies();
   const userData = useSelector(selectUser);
   // const user_role = cookies.get("user-role");
-  const user_role = userData.user.user_role;
+  const user_role = userData?.user?.user_role;
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 

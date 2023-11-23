@@ -89,6 +89,7 @@ const PromoteMeModal = (props) => {
           // console.log(payment_res, "==========payment_res");
 
           if (payment_res.status === 200) {
+            // debugger;
             const url = payment_res?.data?.URL_3DS;
             // window.location.replace(url);
             window.location.href = url;

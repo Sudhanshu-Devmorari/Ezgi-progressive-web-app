@@ -90,7 +90,7 @@ const FAQEditor = () => {
   const fetchFaqs = async () => {
     try {
       // const userId = cookies.get("user-id");
-      const userId = userData.user.id;
+      const userId = userData?.user?.id;
       const response = await AxiosInstance.get(
         `${config.apiUrl}/become-editor-faq/?id=${userId}`
       );

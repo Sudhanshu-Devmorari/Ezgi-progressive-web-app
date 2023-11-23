@@ -33,7 +33,7 @@ const CommentatorIcons = (props) => {
   const userData = useSelector(selectUser);
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // const user = cookies.get("user-role");
-  const user = userData.user.id;
+  const user = userData?.user?.user_role;
   const homepage = localStorage.getItem("currentpage");
 
   async function getBankIban() {

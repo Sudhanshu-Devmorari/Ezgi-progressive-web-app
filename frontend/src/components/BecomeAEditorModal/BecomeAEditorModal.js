@@ -27,7 +27,7 @@ const BecomeAEditorModal = (props) => {
   const cookies = new Cookies();
 
   // const userId = cookies.get("user-id");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   const { profileData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -151,6 +151,7 @@ const BecomeAEditorModal = (props) => {
           // console.log(payment_res, "==========payment_res");
 
           if (payment_res.status === 200) {
+            // debugger;
             const url = payment_res?.data?.URL_3DS;
             // console.log("URL: ", url)
             // window.location.replace(url);
@@ -691,7 +692,6 @@ const BecomeAEditorModal = (props) => {
         onHide={() => setShowPaymentModal(false)}
         commentatorUser={commentatorUser}
         text="renew"
-        handleMambership={handleMambership}
         isRenewLoading={isLoading}
         isRenewTerms={selectCheckBox}
         preveiwProfilePic={preveiwProfilePic}

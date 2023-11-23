@@ -38,7 +38,7 @@ const CommentsPageModal = (props) => {
   const userData = useSelector(selectUser);
   const handleShowButtonClick = async () => {
     // const user_id = cookies.get("user-id");
-    const user_id = userData.user.id;
+    const user_id = userData?.user?.id;
     try {
       const response = await AxiosInstance.post(
         `${config?.apiUrl}/filter-comments/${user_id}/`,

@@ -41,7 +41,7 @@ const AnsweredTicketView = (props) => {
   const cookies = new Cookies();
   const userData = useSelector(selectUser);
   // const userId = cookies.get("user-id");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   const showAllTicketHistory = async(ticket_id) => {
     try {
       const res = await AxiosInstance.get(`${config?.apiUrl}/view-all-ticket-history/${userId}/${ticket_id}/`);

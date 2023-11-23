@@ -81,7 +81,7 @@ const CommentsContentSection = (props) => {
   const cookies = new Cookies();
   const userData = useSelector(selectUser);
   // const userId = cookies.get("user-id");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   const [setCookie, removeCookie] = useCookies();
 
   // const [active, setActive] = useState([]);
@@ -109,7 +109,7 @@ const CommentsContentSection = (props) => {
   // };
   const handleCommentReaction = async (id, reaction, is_public) => {
     // const user_id = cookies.get("user-id");
-    const user_id = userData.user.id;
+    const user_id = userData?.user?.id;
     // console.log("publicComments:::::::::::", publicComments);
     try {
       const res = await AxiosInstance.post(
@@ -221,10 +221,10 @@ const CommentsContentSection = (props) => {
     }
   };
   // const user_id = cookies.get("user-id");
-  const user_id = userData.user.id;
+  const user_id = userData?.user?.id;
   useEffect(() => {
     // const user_id = cookies.get("user-id");
-    const user_id = userData.user.id;
+    const user_id = userData?.user?.id;
     // userProfileId
     activeResolved(props.dashboardSUser ? user_id : userProfileId);
   }, [userProfileId, user_id]);

@@ -17,7 +17,7 @@ export const SelectContent = (props) => {
   const { handleOnlyPublicData } = props;
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   const userPhone = cookies.get("userPhone");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   // const userId = cookies.get("user-id");
   return (
     <>

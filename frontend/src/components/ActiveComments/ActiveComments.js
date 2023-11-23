@@ -68,7 +68,7 @@ const ActiveComments = (props) => {
       setUser(userId);
     } else {
       // const user = cookies.get("user-id");
-      const user = userData.user.id;
+      const user = userData?.user?.id;
       setUser(user);
     }
   }, []);
@@ -153,7 +153,7 @@ const ActiveComments = (props) => {
     }
   }
   // const userPhone = cookies.get("user-id");
-  const userPhone = userData.user.id;
+  const userPhone = userData?.user?.id;
   const errorSwal = () => {
     // console.log(localStorage.getItem("user-active"))
 
@@ -178,7 +178,7 @@ const ActiveComments = (props) => {
 
   const favEditor = async (id) => {
     // const user_id = cookies.get("user-id");
-    const user_id = userData.user.id;
+    const user_id = userData?.user?.id;
     try {
       const response = await AxiosInstance.post(
         `${config.apiUrl}/fav-editor/`,
@@ -277,7 +277,7 @@ const ActiveComments = (props) => {
           });
           profileData.Follower_Count = profileData?.Follower_Count - 1;
           // const user_id = cookies.get("user-id");
-          const user_id = userData.user.id;
+          const user_id = userData?.user?.id;
           props?.homeApiData(user_id);
         }
       } else {
@@ -286,7 +286,7 @@ const ActiveComments = (props) => {
         );
         // console.log("On Follow",res)
         // const user_id = cookies.get("user-id");
-        const user_id = userData.user.id;
+        const user_id = userData?.user?.id;
         props?.homeApiData(user_id);
         profileData.Follower_Count = profileData?.Follower_Count + 1;
       }

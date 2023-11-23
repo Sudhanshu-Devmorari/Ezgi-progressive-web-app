@@ -21,7 +21,7 @@ export const EditorBanner = (props) => {
 
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
   // const userId = cookies.get("user-id");
-  const userId = userData.user.id;
+  const userId = userData?.user?.id;
   const [selectCategory, setSelectCategory] = useState("");
   // const [contentData, setContentData] = useState([]);
   useEffect(() => {
@@ -177,7 +177,7 @@ export const EditorBanner = (props) => {
             if (userId) {
               const currentPage = localStorage.getItem("currentpage");
               // const currentuser = cookies.get("user-role");
-              const currentuser = userData.user.user_role;
+              const currentuser = userData?.user?.user_role;
               localStorage.setItem("dashboardShow", false);
               (currentPage !== "show-all-comments" ||
                 currentPage !== "notifications") &&

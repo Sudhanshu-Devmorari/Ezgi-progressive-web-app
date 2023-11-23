@@ -88,7 +88,7 @@ const SharedProfile = (props) => {
   }, []);
 
   const favEditor = async (id) => {
-    const user_id = userData.user.id;
+    const user_id = userData?.user?.id;
     // const user_id = cookies.get("user-id");
     try {
       const response = await AxiosInstance.post(
@@ -234,7 +234,7 @@ const SharedProfile = (props) => {
                 );
                 const currentPage = localStorage.getItem("currentpage");
                 // const currentuser = cookies.get("user-role");
-                const currentuser = userData.user.user_role;
+                const currentuser = userData?.user?.user_role;
                 localStorage.setItem("dashboardShow", true);
                 (currentPage !== "show-all-comments" ||
                   currentPage !== "notifications") &&
