@@ -74,7 +74,7 @@ urlpatterns = [
     path('withdrawal-setting/', WithdrawalSettingView.as_view(), name='Withdrawal-Setting'), 
     path('get-minimum-amount/<int:id>/', GetMinimumAmount.as_view(), name='Get-Minimum-Amount'),
     path('check-editor-status/<int:id>/', CheckEditorStatus.as_view(), name='Check-Editor-Status'),
-    path('clear-token/<int:id>/', ClearTokenView.as_view(), name='Clear-Token'),
+    path('clear-token/', ClearTokenView.as_view(), name='Clear-Token'),
 
 
     # Admin Panel's api

@@ -47,6 +47,7 @@ const SignUpModal = (props) => {
 
   // SIGN UP API --------------------------------------------------
 
+  const [passResetOtp, setPassResetOtp] = useState(null);
   const [phone, setPhone] = useState("");
   const [nameError, setNamerror] = useState("");
   const [usernameError, setUsernamerror] = useState("");
@@ -760,11 +761,14 @@ const SignUpModal = (props) => {
               setSelectedCity={setSelectedCity}
               setSelectedGender={setSelectedGender}
               setSelectedAge={setSelectedAge}
+              setPassResetOtp={setPassResetOtp}
             />
           )}
 
           {ShowModal === 7 && (
-            <PasswordReset hide={props.onHide} forgotPsPhone={forgotPsPhone} />
+            <>
+            <PasswordReset hide={props.onHide} forgotPsPhone={forgotPsPhone} passResetOtp={passResetOtp} />
+            </>
           )}
         </Modal.Body>
       </Modal>

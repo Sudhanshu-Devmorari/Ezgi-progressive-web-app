@@ -118,14 +118,14 @@ class OtpVerify(APIView):
                 serializer = UserSerializer(data=request.data)
                 if serializer.is_valid():
                     data = serializer.save()
-                    otp_obj.delete()
+                    # otp_obj.delete()
 
                     token_key = Token.objects.get(user__id=serializer.data['id'])
                     return Response({'success': 'OTP successfully verified.', 'user': serializer.data, 'status': status.HTTP_200_OK, "Token":token_key.key})
                 else:
                     return Response({'error': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST})
 
-            otp_obj.delete()
+            # otp_obj.delete()
             return Response({'success': 'OTP successfully verified.', 'status': status.HTTP_200_OK})
 
         except Otp.DoesNotExist:
@@ -145,7 +145,7 @@ class OtpReSend(APIView):
 
                 res = sms_send(phone, otp)  
                 if res == 'Success':
-                    return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+                    return Response(data={'success': 'Otp successfully sent.', 'status' : status.HTTP_200_OK})
                 else:
                     return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
             else:
@@ -160,7 +160,7 @@ class OtpReSend(APIView):
             otp = send_otp(phone)
             res = sms_send(phone, otp)  
             if res == 'Success':
-                return Response(data={'success': 'Otp successfully sent.', 'otp' : otp ,'status' : status.HTTP_200_OK})
+                return Response(data={'success': 'Otp successfully sent.', 'status' : status.HTTP_200_OK})
             else:
                 return Response(data={'error': 'Otp not sent. Try again.', 'status' : status.HTTP_500_INTERNAL_SERVER_ERROR})
         except:
@@ -245,13 +245,42 @@ class FacebookLoginview(APIView):
 
 
 class PasswordResetView(APIView):
-    def post(self, request, format=None):   
-        phone = request.data['phone']
-        new_ps = request.data['new_ps']
-        user = User.objects.get(phone=phone, is_delete=False)
-        user.password = new_ps
-        user.save()
-        return Response({"data" : "Password reset successfully!", "status" : status.HTTP_200_OK})
+    def post(self, request, format=None):
+        try:
+            if 'phone' not in request.data or 'new_ps' not in request.data or 'otp' not in request.data:
+                return Response(data={'error': 'Missing required fields in request data.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            phone = request.data['phone']
+            new_ps = request.data['new_ps']
+            otp = request.data['otp']
+
+            try:
+                otp_object = Otp.objects.get(phone=phone, otp=otp)
+            except ObjectDoesNotExist as e:
+                return Response(data={'error': 'Invalid OTP.'}, status=status.HTTP_404_NOT_FOUND)
+
+            time_difference = timezone.now() - otp_object.updated
+            thirty_minutes = timedelta(minutes=3)
+
+            if time_difference > thirty_minutes:
+                return Response(data={'error': 'Invalid OTP.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            try:
+                user = User.objects.get(phone=phone, is_delete=False)
+            except ObjectDoesNotExist as e:
+                return Response(data={'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            user.password = new_ps
+            user.save()
+
+            return Response({"data": "Password reset successfully!", "status": status.HTTP_200_OK})
+
+        # except ObjectDoesNotExist as e:
+        #     return Response(data={'error': 'Object not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response(data={'error': 'Something went wrong. Try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # return Response(data={'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RetrieveCommentatorView(APIView): 
@@ -1270,6 +1299,11 @@ class SupportView(APIView):
                 # user = User.objects.get(id=id)
                 if user.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+
+
+                if TicketSupport.objects.filter(user=user, department=request.data.get('department')).exclude(status='resolved'):
+                    return Response({'error': 'You must wait until the previous ticket for the same department is resolved before creating another one.', 'status' : status.HTTP_400_BAD_REQUEST})
+                
                 support_obj = TicketSupport.objects.create(user=user, department=request.data.get('department'), 
                                                         subject=request.data.get('subject'), message=request.data.get('message'))
                 if support_obj != None:
@@ -1292,7 +1326,7 @@ class SupportView(APIView):
             else:
                 return Response({'error': 'Request Data not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response(data={'error': 'Error retrieving favorite comments'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data={'error': f'{e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 class ShowTicketData(APIView):
@@ -1345,6 +1379,9 @@ class ReplyTicketView(APIView):
             if 'admin_id' not in request.data:
                 return Response({'error': 'Admin id not found.'}, status=status.HTTP_400_BAD_REQUEST)
             
+            if ticket_obj.status == 'resolved':
+                return Response({'error': 'You cannot reply to this ticket because it has been resolved.'}, status=status.HTTP_400_BAD_REQUEST)
+
             admin_id = request.data.get('admin_id')
             admin_obj = get_object_or_404(User, id=admin_id)
             
@@ -1632,6 +1669,8 @@ class HighlightPurchaseView(APIView):
         # if request.query_params.get('id', None) != None:
             # user = User.objects.get(id=request.query_params.get('id'))
             user = request.user
+            if user.user_role != 'commentator':
+                return Response({'data':'Your are not commentator user.'}, status=status.HTTP_404_NOT_FOUND)
             if Highlight.objects.filter(user=user,status='active').exists():
                 highlight_plan = Highlight.objects.get(user=user,status='active')
                 end_date = highlight_plan.end_date
@@ -1669,6 +1708,8 @@ class HighlightPurchaseView(APIView):
                 
                 # user = User.objects.get(id=request.data['id'])
                 user = request.user
+                if user.user_role != 'commentator':
+                    return Response({'data':'Your are not commentator user.'}, status=status.HTTP_404_NOT_FOUND)
 
                 if Highlight.objects.filter(user=user,status='active').exists():
                     return Response({'data':'Your highlight plan is already active.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -5276,14 +5317,15 @@ class BecomeEditorView(APIView):
                     return Response({'data':'Membership setting not found.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'data': 'User id not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    def patch(self, request, id, format=None, *args, **kwargs):
+    def patch(self, request, format=None, *args, **kwargs):
         """
         Payment gateway code here.
         After sucessfully payment below code execute.
         """
         try:
 
-            user = User.objects.filter(id=id).first()
+            # user = User.objects.filter(id=id).first()
+            user = request.user
             if not user:
                 return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
             
@@ -6848,6 +6890,8 @@ class RenewModelData(APIView):
         data = {}
         try:
             user = request.user
+            if user.user_role != 'commentator':
+                return Response({'data':'Your are not commentator user.'}, status=status.HTTP_404_NOT_FOUND)
             if user.remaining_monthly_count != 0:
                 data['plan_duration'] = "1 Months"
                 membership_obj = MembershipSetting.objects.get(commentator_level=user.commentator_level)
@@ -7172,6 +7216,8 @@ class GetMinimumAmount(APIView):
     def get(self, request, id, format=None, *args, **kwargs):
         try:
             user = User.objects.get(id=id)
+            if user.commentator_level == 'apprentice':
+                return Response({"error": "Minimum Amount not found for apprentice role."}, status=status.HTTP_404_NOT_FOUND)
             obj = WithdrawalSetting.objects.get(commentator_level=user.commentator_level)
             serializer = WithdrawalSettingSerializer(obj).data
             return Response(serializer, status=status.HTTP_200_OK)

@@ -13,19 +13,50 @@ import AdsManagementPage from "./components/AdsManagementPage/AdsManagementPage"
 import SettingsPage from "./components/SettingsPage/SettingsPage";
 import EditorSettingsPage from "./components/EditorSettingsPage/EditorSettingsPage";
 import LoginModal from "./components/LoginModal/LoginModal";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { setUserDetails } from "./Redux/user";
+import config from "./config";
+import { selectUser } from "./Redux/selector";
+import AxiosInstance from "./components/AxiosInstance";
 
 function App() {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const [userData, setUserData] = useState(true);
+
+  const cookies = new Cookies();
+  const token = cookies.get("access-token");
+
+  useEffect(() => {
+    (async () => {
+      if(token){
+        try {
+          const response = await AxiosInstance.get(`${config.apiUrl}/retrieve-user-using-token/`);
+          dispatch(setUserDetails(response.data));
+          setUserData(false)
+        } catch (error) {
+          setUserData(false)
+          console.log("Somehting went wrong!")
+          // error handling logic
+        }
+      }
+      else{
+        setUserData(false)
+      }
+    })()
+  }, [])
+
   const [commentData, setCommentData] = useState(false);
   const [withdrawableData, setWithdrawableData] = useState(false);
 
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const isAuthenticated = cookies["admin-user-id"]
+  const [setCookie, removeCookie] = useCookies();
+  const isAuthenticated = cookies.get("admin-user-id")
   const navigate = useNavigate()
   useEffect(() => {
     // Update the cookie when the route changes
     if (isAuthenticated) {
-      setCookie("admin-user-id", isAuthenticated, {
+      cookies.set("admin-user-id", isAuthenticated, {
         expires: new Date(new Date().getTime() + 7200000),
       });
     }

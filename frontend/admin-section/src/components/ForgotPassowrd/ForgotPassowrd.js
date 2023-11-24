@@ -115,8 +115,8 @@ const ForgotPassowrd = () => {
                   </div>
                 </form>
               )}
-              {showModal === 2 && <OtpModal setShowModal={setShowModal} phone={phone}/>}
-              {showModal === 3 && <NewPassword phone={phone}/>}
+              {showModal === 2 && <OtpModal setShowModal={setShowModal} phone={phone} setPhone={setPhone} showModal={showModal} />}
+              {showModal === 3 && <NewPassword setPhone={setPhone} phone={phone} setShowModal={setShowModal} showModal={showModal} />}
             </div>
             <img
               onClick={()=>setShowModal(1)}

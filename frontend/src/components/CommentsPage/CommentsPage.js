@@ -222,7 +222,8 @@ const CommentsPage = ({
           if (val.type == "highlight") {
             return (
               <>
-                {(lastType == "comment" || val.type == "highlight") && index == 0  && <HighlightMainPage />}
+                {(lastType == "comment" || (lastType == "highlight" && index == 0))  && <HighlightMainPage />}
+                {/* {(lastType == "comment") && <HighlightMainPage />} */}
                 <SharedProfile
                   setActiveCommentsshow={setActiveCommentsshow}
                   data={val}

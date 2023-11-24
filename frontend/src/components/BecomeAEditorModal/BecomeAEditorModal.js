@@ -330,7 +330,7 @@ const BecomeAEditorModal = (props) => {
       // formData.append("plan_price", plan_price);
 
       await AxiosInstance
-        .patch(`${config.apiUrl}/become-editor/${userId}/`, formData)
+        .patch(`${config.apiUrl}/become-editor/`, formData)
         .then(async (res) => {
           if (res.status === 200) {
 

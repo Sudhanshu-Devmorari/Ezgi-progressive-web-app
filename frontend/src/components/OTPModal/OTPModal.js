@@ -118,6 +118,7 @@ const OTPModal = (props) => {
       if (res.data.status === 200) {
         setOtpLoading(false);
         setShowModal(7);
+        props?.setPassResetOtp && props?.setPassResetOtp(otp)
       }
       if (res.data.status === 400) {
         setOtpLoading(false);

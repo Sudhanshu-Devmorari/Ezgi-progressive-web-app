@@ -24,7 +24,7 @@ export const Footer = (props) => {
   const { setShowModal } = useContext(CurrentTheme);
   const handleLogout = async (id) => {
     try{
-      const response = await AxiosInstance.get(`${config.apiUrl}/clear-token/${id}/`);
+      const response = await AxiosInstance.get(`${config.apiUrl}/clear-token/`);
       if (response.status == 200){
         const cookies = new Cookies();
         cookies.remove('access-token');

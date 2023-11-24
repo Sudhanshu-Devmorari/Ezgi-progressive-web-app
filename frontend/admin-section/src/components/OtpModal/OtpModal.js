@@ -40,6 +40,8 @@ const OtpModal = (props) => {
       }
     } catch (error) {
       console.log("error", error);
+      props?.setShowModal && props?.setShowModal(1)
+      props?.setPhone && props?.setPhone('')
     }
   };
   const handleResendClick = () => {
@@ -57,7 +59,7 @@ const OtpModal = (props) => {
     axios
       .post(`${config?.apiUrl}/otp-verify/`, { otp: otp, phone: props?.phone })
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         if (res.data.status === 200) {
           props?.setShowModal(3);
         } else if (res.data.status === 400 || res.data.status === 500) {
@@ -73,6 +75,8 @@ const OtpModal = (props) => {
       })
       .catch((error) => {
         console.log(error);
+        props?.setShowModal && props?.setShowModal(1)
+        props?.setPhone && props?.setPhone('')
       });
   }
 

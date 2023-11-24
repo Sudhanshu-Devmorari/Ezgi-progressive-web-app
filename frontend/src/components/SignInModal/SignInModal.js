@@ -90,9 +90,9 @@ const SignInModal = (props) => {
           // setCookie("user-id", res.data.userId, {
           //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
           // });
-          setCookie("username", res.data.username, {
-            expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-          });
+          // setCookie("username", res.data.username, {
+          //   expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+          // });
 
           window.location.reload();
         } else if (res.data.status === 400 || res.data.status === 404) {

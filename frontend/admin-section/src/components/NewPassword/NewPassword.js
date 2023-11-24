@@ -37,6 +37,8 @@ const NewPassword = (props) => {
         })
         .catch((error) => {
           console.log(error);
+          props?.setShowModal && props?.setShowModal(1)
+          props?.setPhone && props?.setPhone('')
         });
     },
   });

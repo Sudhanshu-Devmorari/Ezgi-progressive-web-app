@@ -9,6 +9,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 const PasswordReset = (props) => {
+  // console.log("------>>>>", props?.passResetOtp)
   const { currentTheme, setCurrentTheme } = useContext(CurrentTheme);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +37,7 @@ const PasswordReset = (props) => {
         const res = await axios.post(`${config?.apiUrl}/password-reset/`, {
           new_ps: values.password,
           phone: props.forgotPsPhone,
+          otp:props?.passResetOtp
         });
         if (res.data.status === 200) {
           setIsLoading(false);
@@ -54,7 +56,20 @@ const PasswordReset = (props) => {
           });
         }
       } catch (error) {
-        console.log(error);
+        console.log(error.response);
+        Swal.fire({
+          title: "Error",
+          text: error.response.data.error,
+          icon: "error",
+          backdrop: false,
+          customClass: `${
+            currentTheme === "dark" ? "dark-mode-alert" : "light-mode-alert"
+          }`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            props.hide();
+          }
+        });
       }
     },
   });

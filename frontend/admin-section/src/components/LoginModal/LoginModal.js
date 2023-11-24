@@ -55,7 +55,7 @@ const LoginModal = () => {
             });
           } else if (res.data.status === 200) {
             const userId = res.data.userId;
-            localStorage.setItem("admin-user-id", userId);
+            // localStorage.setItem("admin-user-id", userId);
             setCookie("admin-user-id", userId,{expires:new Date(new Date().getTime()+7200000)})
 
             setCookie("access-token", res.data.Token, {

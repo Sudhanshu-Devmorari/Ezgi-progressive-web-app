@@ -19,6 +19,8 @@ import config from "../../config";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const MainPage = (props) => {
   const [data, setData] = useState([]);
@@ -29,8 +31,11 @@ const MainPage = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [cookies, setCookie, removeCookie] = useCookies();
 
+  const userData = useSelector(selectUser);
+
   const adminHomeApiData = async (user_id) => {
-    const id = localStorage.getItem("admin-user-id");
+    // const id = localStorage.getItem("admin-user-id");
+    const id = userData?.user?.id;
     const res = await AxiosInstance
       .get(`${config?.apiUrl}/home/?id=${id}`)
       .then((res) => {
