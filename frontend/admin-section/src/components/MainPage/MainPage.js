@@ -16,7 +16,7 @@ import DailySalesArray from "../DailySalesArray/DailySalesArray";
 import NewWithdrawalRqst from "../NewWithdrawalRqst/NewWithdrawalRqst";
 import axios from "axios";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
 import AxiosInstance from "../AxiosInstance";
 import { selectUser } from "../../Redux/selector";
@@ -29,8 +29,8 @@ const MainPage = (props) => {
   const [dailyPersentage, setDailyPersentage] = useState();
   const [withdrawable, setWithdrawable] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const [cookies, setCookie, removeCookie] = useCookies();
-
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   const userData = useSelector(selectUser);
 
   const adminHomeApiData = async (user_id) => {
@@ -42,8 +42,8 @@ const MainPage = (props) => {
         // console.log(res, "=====>>>>res.data");
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         setData(res?.data);

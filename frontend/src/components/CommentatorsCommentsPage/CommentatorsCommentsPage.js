@@ -83,7 +83,7 @@ const CommentatorsCommentsPage = (props) => {
   const [profileData, setProfileData] = useState();
   useEffect(() => {
     async function getProfileData() {
-      const res = await AxiosInstance.get(`${config?.apiUrl}/profile/`);
+      const res = await AxiosInstance.get(`${config?.apiUrl}/profile/${userId}/`);
       // console.log(res.data,"========>>>");
       setProfileData(res.data);
       if (res?.data?.commentator_level == "apprentice") {

@@ -24,8 +24,8 @@ const EditorProfileActiveComments = (props) => {
     async function getProfileData() {
       const res = await AxiosInstance.get(
         // `${config.apiUrl}/profile/${props?.activeCommentsshow}`
-        // `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
-        `${config.apiUrl}/profile/?id=${props?.activeCommentsshow}`
+        `${config.apiUrl}/profile/${props?.activeCommentsshow}?id=${userId}`
+        // `${config.apiUrl}/profile/?id=${props?.activeCommentsshow}`
       );
       setProfileData(res.data);
       setIsFavorite(res?.data?.is_fav_editor);

@@ -35,8 +35,8 @@ const CommentsManagementPage = (props) => {
         // console.log("=-=-=-=-=-=-=> ", res.data);
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("access-token")
-          removeCookie("admin-user-id");
+          cookies.remove("access-token")
+          cookies.remove("admin-user-id");
           window.location.reload();
         }
         setData(res.data);

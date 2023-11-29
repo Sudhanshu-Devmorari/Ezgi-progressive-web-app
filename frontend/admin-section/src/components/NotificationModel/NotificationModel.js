@@ -6,13 +6,17 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import config from "../../config";
 import UserTagList from "../UserTagList/UserTagList";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const NotificationModel = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [userList, setUserList] = useState([]);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userData = useSelector(selectUser);
 
 
   const handleClearData = () => {
@@ -81,7 +85,8 @@ const NotificationModel = () => {
     getUsers();
   }, [selectedUserType]);
 
-  const adminUserId = localStorage.getItem("admin-user-id");
+  const adminUserId = userData?.user?.id;
+  // const adminUserId = localStorage.getItem("admin-user-id");
   const formik = useFormik({
     initialValues: {
       subject: "",
@@ -101,8 +106,8 @@ const NotificationModel = () => {
         );
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         // console.log(res,"========================MMMM");

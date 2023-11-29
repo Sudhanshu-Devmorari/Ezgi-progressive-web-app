@@ -26,7 +26,7 @@ import home from "../../assets/home.svg";
 import logout from "../../assets/logout.svg";
 import "./SideBar.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import axios from "axios";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
@@ -35,8 +35,8 @@ const SideBar = (props) => {
   // console.log("props?.supportIcon", props?.supportIcon)
   const navigate = useNavigate();
   const [showDetails, setshowDetails] = useState("home");
-  const [cookies, setCookie, removeCookie] = useCookies();
-
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   const [supportIcon, setSupportIcon] = useState(false);
   const handleSupportIcon = async () => {
     const res = await AxiosInstance.get(`${config?.apiUrl}/check-new-support-ticket/`);
@@ -236,8 +236,8 @@ const SideBar = (props) => {
             onClick={() => {
               handleLogout(user_id)
               localStorage.clear();
-              removeCookie("admin-user-id")
-              removeCookie("access-token")
+              cookies.remove("admin-user-id")
+              cookies.remove("access-token")
               navigate('/')
               window.location.reload();
             }}

@@ -6,8 +6,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const SalesManagementFilter = (props) => {
   const DateOptions = ["option 1", "option 2"];
@@ -33,7 +35,8 @@ const SalesManagementFilter = (props) => {
   const [statusDropDown, setStatusDropDown] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState("Select");
   const [durationDropDown, setDurationDropDown] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
 
   const handleTypeSelection = (selectedType) => {
     setSelectedType(selectedType);
@@ -73,6 +76,7 @@ const SalesManagementFilter = (props) => {
     setSelectedDuration("Select")
     setDate("")
   }
+  const userDatas = useSelector(selectUser);
 
   // Filter API
   const [date, setDate] = useState("");
@@ -85,15 +89,17 @@ const SalesManagementFilter = (props) => {
       ...(selectedDuration !== "Select" && { duration: selectedDuration }),
     };
     try {
-      const adminId = localStorage.getItem('admin-user-id')
+      // const adminId = localStorage.getItem('admin-user-id')
+      const adminId = userDatas?.user?.id;
+
       const res = await AxiosInstance.post(
         `${config?.apiUrl}/sales-management/?admin=${adminId}`,
         payload
       );
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
       // console.log("@@@@@@@@@@@@: ", res.data);

@@ -22,17 +22,23 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const Home = (props) => {
   const [isLoadingActions, setIsLoadingActions] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userDatas = useSelector(selectUser);
 
-  const admin_id = localStorage.getItem("admin-user-id");
+
+  // const admin_id = localStorage.getItem("admin-user-id");
+  const admin_id = userDatas?.user?.id;
   const handleDeactive = async (id, action) => {
     try {
       setIsLoadingActions(true);
@@ -65,8 +71,8 @@ const Home = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
     } catch (error) {
@@ -336,8 +342,8 @@ const Home = (props) => {
         }
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         window.location.reload();
@@ -477,8 +483,8 @@ const Home = (props) => {
         }
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
       } catch (error) {

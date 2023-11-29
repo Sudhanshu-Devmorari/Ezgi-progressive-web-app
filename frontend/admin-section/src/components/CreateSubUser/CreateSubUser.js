@@ -22,6 +22,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const CreateSubUser = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,8 @@ const CreateSubUser = (props) => {
     "Ads Manager",
     "Director Manager",
   ];
+  const userData = useSelector(selectUser);
+
   const [setCookie, removeCookie] = useCookies();
 
   // const [authTypeDropDown, setAuthTypeDropDown] = useState(false);
@@ -100,7 +104,7 @@ const CreateSubUser = (props) => {
     } catch (error) {}
   }
   const cookies = new Cookies();
-  const adminId = cookies.get("admin-user-id");
+  const adminId = userData?.user?.id;
   // const adminId = localStorage.getItem('admin-user-id')
 
   // // Edit Sub User Profile
@@ -120,12 +124,14 @@ const CreateSubUser = (props) => {
 
   useEffect(() => {
     if (props?.editProfileModal === 2 && props?.editUser) {
+      // console.log("props?.editUser", props?.editUser)
       formik.setValues({
         profile: props?.editUser?.profile_pic,
         Name: props?.editUser?.name,
         Phone: props?.editUser?.phone,
         password: props?.editUser?.password,
         AuthorizationType: props?.editUser?.authorization_type,
+        // AuthorizationType: props?.editUser?.department,
       });
       if (props?.editUser?.is_transaction) {
         if (props?.editUser?.is_all_permission) {
@@ -233,8 +239,8 @@ const CreateSubUser = (props) => {
           }
           if (res.status == 204) {
             localStorage.clear();
-            removeCookie("admin-user-id");
-            removeCookie("access-token")
+            cookies.remove("admin-user-id");
+            cookies.remove("access-token")
             window.location.reload();
           }
         } catch (error) {
@@ -275,8 +281,8 @@ const CreateSubUser = (props) => {
           }
           if (res.status == 204) {
             localStorage.clear();
-            removeCookie("admin-user-id");
-            removeCookie("access-token")
+            cookies.remove("admin-user-id");
+            cookies.remove("access-token")
             window.location.reload();
           }
         } catch (error) {

@@ -16,11 +16,15 @@ import axios from "axios";
 import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import moment from "moment";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const NotificationManagementPage = (props) => {
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userData = useSelector(selectUser);
 
   const [notifications, setNotifications] = useState([]);
   const [notificationsCount, setNotificationsCount] = useState({
@@ -78,15 +82,16 @@ const NotificationManagementPage = (props) => {
   // Get Notification API
   useEffect(() => {
     async function getNotificationsData() {
-      const user_id = localStorage.getItem("admin-user-id");
+      // const user_id = localStorage.getItem("admin-user-id");
+      const user_id = userData?.user?.id;
       try {
         const res = await AxiosInstance.get(
           `${config?.apiUrl}/notification-management/?admin_id=${user_id}`
         );
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         // console.log(res.data, "==========>>>res sub users");

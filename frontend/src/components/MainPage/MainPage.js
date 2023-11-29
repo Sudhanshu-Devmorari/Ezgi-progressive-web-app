@@ -174,7 +174,8 @@ const MainPage = () => {
   }
 
   async function getProfileData() {
-    const res = await AxiosInstance.get(`${config.apiUrl}/profile/`);
+    // const res = await axios.get(`${config.apiUrl}/profile/${userId}`);
+    const res = await AxiosInstance.get(`${config.apiUrl}/profile/${userId}`);
     // console.log(res.data,"===============?>>");
     setProfileData(res.data);
     // setMembershipDate(res.data.membership_date);

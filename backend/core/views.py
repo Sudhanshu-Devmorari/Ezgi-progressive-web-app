@@ -1020,18 +1020,18 @@ class ProfileView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None, *args, **kwargs):
+    def get(self, request, id, format=None, *args, **kwargs):
         try:
-            standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
-            if standard_user_id != None:
-                user_obj = User.objects.get(id=standard_user_id)
-            else:
-                user_obj = request.user
+            # standard_user_id = request.query_params.get('id') if request.query_params.get('id') != 'null' else None
+            # if standard_user_id != None:
+            #     user_obj = User.objects.get(id=standard_user_id)
+            # else:
+            #     user_obj = request.user
             
-                # user_obj = User.objects.get(id=id)
-                # user_obj = request.user
-                if user_obj.is_delete == True:
-                    return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
+            user_obj = User.objects.get(id=id)
+            # user_obj = request.user
+            if user_obj.is_delete == True:
+                return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             serializer = UserSerializer(user_obj)
             data = serializer.data
 
@@ -1055,12 +1055,15 @@ class ProfileView(APIView):
                 if standard_user_id:
                     logged_in_user = User.objects.get(id=standard_user_id)
                     is_subscribe = Subscription.objects.filter(standard_user=logged_in_user, status='active', commentator_user=user_obj).exists()
+                    # is_subscribe = Subscription.objects.filter(standard_user=user_obj, status='active', commentator_user=logged_in_user).exists()
                     data['is_subscribe'] = is_subscribe
                     if is_subscribe:
                         subscription = Subscription.objects.get(standard_user=logged_in_user, status='active', commentator_user=user_obj)
+                        # subscription = Subscription.objects.get(standard_user=user_obj, status='active', commentator_user=logged_in_user)
                         data['is_cancelled'] = subscription.is_cancelled
                         # if subscription.is_cancelled:
                         data['subscription_end_date'] = subscription.end_date
+                    
 
             else:
                 subscription_obj = Subscription.objects.filter(standard_user=user_obj).count()
@@ -2362,8 +2365,8 @@ class FilterUserManagement(APIView):
 
 
 class CommentsManagement(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         management = {}
@@ -3274,7 +3277,6 @@ class UpdateStatusForVerifyRequest(APIView):
         try:
             adminuser_id = request.query_params.get('admin')
             adminuser = User.objects.get(id=adminuser_id)
-            
             if adminuser.is_delete == True:
                     return Response("Your account has been deleted", status=status.HTTP_204_NO_CONTENT)
             # Validations
@@ -3287,7 +3289,9 @@ class UpdateStatusForVerifyRequest(APIView):
 
             # Update status
             user = User.objects.get(id=id)
-            obj = BlueTick.objects.get(user=user)
+
+            obj = BlueTick.objects.get(user__id=id)
+
             obj.status = verify_status
             obj.save(update_fields=['status','updated'])
 
@@ -4184,7 +4188,7 @@ class NotificationManagement(APIView):
             notification_list = []
             for user in user_list:
                 try:
-                    receiver = User.objects.get(username=user)
+                    receiver = User.objects.filter(username=user).last()
                     notification_obj = Notification(
                         receiver=receiver,
                         subject=subject,
@@ -4424,8 +4428,8 @@ class FilterSubUserManagement(APIView):
             return Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
 class AdvertisementManagement(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         data_list = {}
@@ -4733,8 +4737,8 @@ class SubscriptionSettingView(APIView):
 
 
 class HighlightSettingView(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     
     def get(self, request, format=None, *args, **kwargs):
         try:
@@ -4742,7 +4746,7 @@ class HighlightSettingView(APIView):
             
             if not level:
                 return Response(data={'error': 'commentator_level parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
-            if level.lower() == 'expert':
+            if level.lower() == 'expert' or level.lower() == 'master':
                 level = 'master'
             level_obj = HighlightSetting.objects.filter(commentator_level=level)
             
@@ -4750,7 +4754,7 @@ class HighlightSettingView(APIView):
                 return Response(data={'error': 'No rule found for the given level'}, status=status.HTTP_404_NOT_FOUND)
             
             serializer = HighlightSettingSerializer(level_obj, many=True)
-            if level.lower() == 'expert':
+            if level.lower() == 'expert' or level.lower() == 'master':
                 for data in serializer.data:
                     if data['commentator_level'].lower() == 'master':
                         data['commentator_level'] = 'expert'
@@ -4763,8 +4767,8 @@ class HighlightSettingView(APIView):
         commentator_level = request.query_params.get('commentator_level')
         data = request.data.copy()
         if commentator_level.lower() == 'master':
-            # data["commentator_level"] = 'master'
-            commentator_level = 'master' 
+            data["commentator_level"] = 'master'
+            # commentator_level = 'master' 
         else:
             data["commentator_level"] = commentator_level
         existing_record = HighlightSetting.objects.filter(commentator_level=commentator_level).first()
@@ -5171,7 +5175,9 @@ def get_translation_data(user_id, category):
             i['country'] = translation_cache[country_to_translate]
         else:
             # using googletras
-            translated_country = translator.translate(country_to_translate)
+            translated_country = translator.translate(country_to_translate, dest='en')
+            # print("***translated_country****", translated_country)
+
             translation_cache[country_to_translate] = translated_country.text
             i['country'] = translated_country.text
 
@@ -5960,7 +5966,7 @@ class BankDetailsView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def get(self, request, id,*args, **kwargs):
+    def get(self, request, id=None,*args, **kwargs):
         try:
             adminuser_id = request.query_params.get('admin', None)
             if adminuser_id is not None:
@@ -6725,8 +6731,8 @@ class PaymentView(APIView):
                 ]
             }
 
-            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
-            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            # url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
             
             response = requests.post(url, json=data)
             json_data = response.json()
@@ -6782,8 +6788,8 @@ class PaymentView(APIView):
             ]
         }
 
-            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
-            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            # url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
 
             response = requests.post(url, json=data)
             json_data = response.json()
@@ -6823,8 +6829,8 @@ class PaymentView(APIView):
             ]
         }
 
-            url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
-            # url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
+            # url = "https://posservice.esnekpos.com/api/pay/CommonPaymentDealer"
+            url = "https://posservicetest.esnekpos.com/api/pay/CommonPaymentDealer"
 
             response = requests.post(url, json=data)
             json_data = response.json()
@@ -6843,8 +6849,8 @@ class CheckTransactionEnquiry(APIView):
         ref_no = request.data.get('ref_no', None)
         print('ref_no: ', ref_no)
         if ref_no != None:
-            # url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
-            url = "https://posservice.esnekpos.com/api/services/ProcessQuery"
+            url = "https://posservicetest.esnekpos.com/api/services/ProcessQuery"
+            # url = "https://posservice.esnekpos.com/api/services/ProcessQuery"
             data = {
                     "MERCHANT": os.environ.get('MERCHANT'),
                     "MERCHANT_KEY": os.environ.get('MERCHANT_KEY'),

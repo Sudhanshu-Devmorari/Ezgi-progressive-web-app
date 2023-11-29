@@ -4,15 +4,21 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { CustomDropDownForCommentsCreatetion } from "../CustomDropDownForCommentsCreatetion";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const SalesMembershipSettings = (props) => {
+  const userData = useSelector(selectUser);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const admin_id = localStorage.getItem("admin-user-id");
-  const [cookies, setCookie, removeCookie] = useCookies();
+  // const admin_id = localStorage.getItem("admin-user-id");
+  const admin_id = userData?.user?.id;
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   const durationOptions = ["1 Months", "3 Months", "6 Months"];
   const [editorDropDown, setEditorDropDown] = useState(false);
   const [selectedEditors, setSelectedEditors] = useState(durationOptions[0]);
@@ -46,8 +52,8 @@ const SalesMembershipSettings = (props) => {
         
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
           setIsDataLoading(false);
         }
@@ -92,8 +98,8 @@ const SalesMembershipSettings = (props) => {
         );
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         // console.log(res,"=res")

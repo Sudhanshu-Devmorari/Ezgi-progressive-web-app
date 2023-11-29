@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import { MdDelete, MdDragIndicator } from "react-icons/md";
 import { BiPlus } from "react-icons/bi";
 import { Container, Draggable } from "react-smooth-dnd";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import config from "../../config";
 import axios from "axios";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const Item = ({ id, color: backgroundColor, removeInputFields, formik }) => {
   const admin_id = localStorage.getItem("admin-user-id")
-
+  const userData = useSelector(selectUser);
   return (
     <div className="item">
       <div className="d-flex align-items-center">
@@ -86,15 +88,17 @@ const DraggableItem = ({ index, item, removeInputFields, formik }) => {
 };
 
 const FaqSettingSection = () => {
-  const [cookies, setCookie, removeCookie] = useCookies();
-
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userData = useSelector(selectUser);
   const [isLoading, setIsLoading] = useState(true);
 
   const validationSchema = Yup.object().shape({
     question: Yup.mixed().required("Question is required"),
     answer: Yup.string().required("Answer is required"),
   });
-  const admin_id = localStorage.getItem("admin-user-id")
+  // const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = userData?.user?.id;
 
   const ArrayOfCarsSchema = Yup.array().of(validationSchema);
 
@@ -109,6 +113,8 @@ const FaqSettingSection = () => {
     onSubmit: async (values) => {
         // console.log(values)
       try {
+        const admin_id = userData?.user?.id;
+
         const response = await AxiosInstance.post(
           `${config.apiUrl}/become-editor-faq/?admin=${admin_id}`,
           {
@@ -117,8 +123,8 @@ const FaqSettingSection = () => {
         );
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         if (response.status == 200) {
@@ -160,6 +166,8 @@ const FaqSettingSection = () => {
 
   // Remove Input box on Delete Icon click
   const removeInputFields = async (index, deleteId) => {
+    const admin_id = userData?.user?.id;
+
     try {
       const response = await AxiosInstance.delete(
         `${config.apiUrl}/become-editor-faq/${deleteId}?admin=${admin_id}`
@@ -178,8 +186,8 @@ const FaqSettingSection = () => {
       }
       if (response.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token")
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token")
         window.location.reload();
       }
       const rows = [...formik.values];
@@ -214,11 +222,13 @@ const FaqSettingSection = () => {
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
+        const admin_id = userData?.user?.id;
+
         const response = await AxiosInstance.get(`${config.apiUrl}/become-editor-faq/?admin=${admin_id}`);
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         formik.setValues(response.data);

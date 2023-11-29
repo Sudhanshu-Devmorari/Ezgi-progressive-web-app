@@ -4,9 +4,12 @@ import config from "../../config";
 import Swal from "sweetalert2";
 import AxiosInstance from "../AxiosInstance";
 import { Cookies, useCookies } from "react-cookie";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const VerificationRequestsBtns = (props) => {
   const id = props?.id;
+  const userDatas = useSelector(selectUser);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingApprove, setIsLoadingApprove] = useState(false);
@@ -20,9 +23,12 @@ const VerificationRequestsBtns = (props) => {
         } else {
           setIsLoading(true);
         }
+        
         // const adminId = localStorage.getItem('admin-user-id')
         const cookies = new Cookies();
-        const adminId = cookies.get('admin-user-id')
+        // const adminId = cookies.get('admin-user-id')
+        const adminId = userDatas?.user?.id;
+
         const res = await AxiosInstance.patch(`${config.apiUrl}/bank-details/${adminId}`, {
           bank_id: id,
           action: action,
@@ -50,8 +56,8 @@ const VerificationRequestsBtns = (props) => {
         }
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
       } catch (error) {
@@ -64,7 +70,8 @@ const VerificationRequestsBtns = (props) => {
         } else {
           setIsLoading(true);
         }
-        const adminId = localStorage.getItem('admin-user-id')
+        // const adminId = localStorage.getItem('admin-user-id')
+        const adminId = userDatas?.user?.id;
         const res = await AxiosInstance.post(`${config.apiUrl}/verify-user/${id}/?admin=${adminId}`, {
           status: action,
         });
@@ -90,8 +97,8 @@ const VerificationRequestsBtns = (props) => {
         }
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
       } catch (error) {

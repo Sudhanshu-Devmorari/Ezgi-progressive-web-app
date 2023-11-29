@@ -24,11 +24,15 @@ import "./WithdrawalManagementPage.css";
 import axios from "axios";
 import config from "../../config";
 import { useEffect } from "react";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const WithdrawalManagementPage = (props) => {
+  const userDatas = useSelector(selectUser);
+
   const users = [
     {
       sr: "#0001",
@@ -126,8 +130,11 @@ const WithdrawalManagementPage = (props) => {
       status: "10 min ago",
     },
   ];
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const admin_id = localStorage.getItem("admin-user-id");
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  // const admin_id = localStorage.getItem("admin-user-id");
+  const admin_id = userDatas?.user?.id;
+
   const [countsRequest, setCountsRequest] = useState({
     bank_request: 0,
     pending: 0,
@@ -165,8 +172,8 @@ const WithdrawalManagementPage = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
     } catch (error) {

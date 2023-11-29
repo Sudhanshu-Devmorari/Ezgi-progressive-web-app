@@ -6,17 +6,23 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const EditorBanner = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+
+  const cookies = new Cookies();
 
   const [bannerId, setbannerId] = useState(null);
+  const userData = useSelector(selectUser);
 
   const formData = new FormData();
-  const admin_id = localStorage.getItem("admin-user-id")
+  // const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = userData?.user?.id;
 
   useEffect(() => {
     async function getBannerImg() {
@@ -24,8 +30,8 @@ const EditorBanner = () => {
         const res = await AxiosInstance.get(`${config.apiUrl}/editor-banner/?admin=${admin_id}`);
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         const img = res?.data?.data[0]?.editor_banner;
@@ -64,8 +70,8 @@ const EditorBanner = () => {
         );
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         // console.log(res);

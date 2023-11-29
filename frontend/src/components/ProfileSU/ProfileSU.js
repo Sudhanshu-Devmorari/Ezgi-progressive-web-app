@@ -37,7 +37,7 @@ const ProfileSU = (props) => {
   };
 
   async function getProfileData() {
-    const res = await AxiosInstance.get(`${config.apiUrl}/profile/`);
+    const res = await AxiosInstance.get(`${config.apiUrl}/profile/${userId}/`);
     // console.log(res.data, "===============?>>");
     setProgileData(res.data);
     setIsLoading(false);
@@ -61,7 +61,7 @@ const ProfileSU = (props) => {
           formData.append("file", e.target.files[0]);
           formData.append("update", "profile");
           const res = await AxiosInstance.post(
-            `${config?.apiUrl}/profile/`,
+            `${config?.apiUrl}/profile/${userId}/`,
             formData
           );
           // console.log("res: ", res);

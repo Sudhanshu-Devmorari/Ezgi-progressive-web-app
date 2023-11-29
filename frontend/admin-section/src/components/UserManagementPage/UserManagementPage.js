@@ -12,17 +12,24 @@ import gender_male from "../../assets/gender-male.png";
 import profile from "../../assets/profile.png";
 import user1 from "../../assets/user1.png";
 import axios from "axios";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const UserManagementPage = (props) => {
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
   const [userTimeLine, setUserTimeLine] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const admin_id = localStorage.getItem("admin-user-id")
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userDatas = useSelector(selectUser);
+
+  // const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = userDatas?.user?.id;
+
 
   async function userManagementApiData() {
     // console.log("test");
@@ -31,8 +38,8 @@ const UserManagementPage = (props) => {
       .then((res) => {
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         // console.log(res.data);

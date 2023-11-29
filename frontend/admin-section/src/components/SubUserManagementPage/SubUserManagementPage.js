@@ -18,8 +18,10 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const SubUserManagementPage = (props) => {
   const users = [
@@ -36,10 +38,11 @@ const SubUserManagementPage = (props) => {
   const [subuserList, setSubuserList] = useState([]);
   const [userTimeline, setUserTimeline] = useState([]);
   const [filteredSubuserList, setFilteredSubuserList] = useState([]);
-  const adminId = localStorage.getItem("admin-user-id");
+  const userData = useSelector(selectUser);
+  const adminId = userData?.user?.id;
   const [isLoading, setIsLoading] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies();
-
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   async function getSubUsers() {
     try {
       setIsLoading(true);
@@ -48,8 +51,8 @@ const SubUserManagementPage = (props) => {
       );
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
       // console.log(res.data, "==========>>>res sub users");
@@ -107,8 +110,8 @@ const SubUserManagementPage = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
     } catch (error) {

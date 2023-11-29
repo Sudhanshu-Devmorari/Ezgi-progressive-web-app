@@ -11,9 +11,11 @@ import Top10 from "../Top10/Top10";
 import EditorAccountStatus from "../EditorAccountStatus/EditorAccountStatus";
 import LevelCount from "../LevelCount/LevelCount";
 import axios from "axios";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import config from "../../config";
 import AxiosInstance from "../AxiosInstance";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const EditorManagementPage = (props) => {
   const [data, setData] = useState({});
@@ -21,23 +23,25 @@ const EditorManagementPage = (props) => {
   const [verifyUser, setverifyUsererifyUser] = useState([]);
   const [deactivateUser, setDeactivateUser] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
 
   const [addUser, setAddUser] = useState({});
   const [partialData, setPartialData] = useState([]);
   const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
+  const userData = useSelector(selectUser);
 
   const [verificationRequests, setVerificationRequests] = useState([]);
   const [deactivationonRequests, setDeactivationonRequests] = useState([]);
   function editorManagementApiData() {
-    const id = localStorage.getItem("admin-user-id")
+    const id = userData?.user?.id;
     AxiosInstance
       .get(`${config?.apiUrl}/editor-management/?id=${id}`)
       .then((res) => {
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         // console.log("%%%%%%%%%", res.data);

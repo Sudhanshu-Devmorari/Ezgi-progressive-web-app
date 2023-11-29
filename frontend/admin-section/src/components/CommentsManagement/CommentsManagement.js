@@ -95,8 +95,8 @@ const CommentsManagement = (props) => {
         // console.log(res.data,"=====>>filter");
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id")
-          removeCookie("access-token")
+          cookies.remove("admin-user-id")
+          cookies.remove("access-token")
           window.location.reload();
         }
         setFdata(res.data);
@@ -148,8 +148,8 @@ const CommentsManagement = (props) => {
       );
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token")
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token")
         // window.location.reload();
       }
       // props.setCommentData(props?.commentData)

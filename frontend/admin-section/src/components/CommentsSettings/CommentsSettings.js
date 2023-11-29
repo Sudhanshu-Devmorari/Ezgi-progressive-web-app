@@ -429,8 +429,8 @@ const CommentsSettings = () => {
         );
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         if (res.status === 201) {

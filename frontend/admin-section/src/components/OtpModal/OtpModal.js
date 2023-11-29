@@ -37,11 +37,16 @@ const OtpModal = (props) => {
       });
       if (res.data.status === 500) {
         setErrorMessage(res.data.error);
+        props?.handlePasswordReset()
       }
+      props?.handlePasswordReset()
+
     } catch (error) {
       console.log("error", error);
       props?.setShowModal && props?.setShowModal(1)
       props?.setPhone && props?.setPhone('')
+      props?.handlePasswordReset()
+
     }
   };
   const handleResendClick = () => {
@@ -62,6 +67,7 @@ const OtpModal = (props) => {
         console.log(res);
         if (res.data.status === 200) {
           props?.setShowModal(3);
+          props?.setPassResetOtp && props?.setPassResetOtp(otp)
         } else if (res.data.status === 400 || res.data.status === 500) {
           // Swal.fire({
           //   title: "Error",
@@ -72,11 +78,13 @@ const OtpModal = (props) => {
           // });
           setErrorMessage(res.data.error);
         }
+        props?.handlePasswordReset()
       })
       .catch((error) => {
         console.log(error);
         props?.setShowModal && props?.setShowModal(1)
         props?.setPhone && props?.setPhone('')
+        props?.handlePasswordReset()
       });
   }
 

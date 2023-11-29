@@ -22,6 +22,7 @@ const NewPassword = (props) => {
         .post(`${config?.apiUrl}/password-reset/`, {
           new_ps: values.password,
           phone: props?.phone,
+          otp: props?.passResetOtp
         })
         .then((res) => {
           //   console.log(res);
@@ -33,12 +34,14 @@ const NewPassword = (props) => {
               backdrop: false,
               customClass: "dark-mode-alert",
             });
+            props?.handlePasswordReset()
           }
         })
         .catch((error) => {
           console.log(error);
           props?.setShowModal && props?.setShowModal(1)
           props?.setPhone && props?.setPhone('')
+          props?.handlePasswordReset()
         });
     },
   });

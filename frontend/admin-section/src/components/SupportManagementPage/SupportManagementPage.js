@@ -19,14 +19,16 @@ import axios from "axios";
 import Export from "../Export/Export";
 import TicketReplyModal from "../TicketReplyModal/TicketReplyModal";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import moment from "moment";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const SupportManagementPage = (props) => {
   // Support management API
-  const [cookies, setCookie, removeCookie] = useCookies();
-
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   const [NewRequest, setNewRequest] = useState("");
   const [PendingRequest, setPendingRequest] = useState("");
   const [ResolvedRequest, setResolvedRequest] = useState("");
@@ -37,6 +39,7 @@ const SupportManagementPage = (props) => {
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [perNewRequest, setPerNewRequest] = useState(0);
   const [TotalRequest, setTotalRequest] = useState(0);
+  const userData = useSelector(selectUser);
 
   const [selectedOption, setSelectedOption] = useState("All");
 
@@ -112,15 +115,16 @@ const SupportManagementPage = (props) => {
 
   async function getSupportData() {
     try {
-      const adminId = localStorage.getItem("admin-user-id");
+      // const adminId = localStorage.getItem("admin-user-id");
+      const adminId = userData?.user?.id;
 
       const res = await AxiosInstance.get(
         `${config?.apiUrl}/support-management?admin=${adminId}`
       );
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token");
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token");
         window.location.reload();
       }
       const formattedPercentage = Math.round(res?.data?.new_tickets_percentage);

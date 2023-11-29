@@ -6,15 +6,20 @@ import Swal from "sweetalert2";
 import config from "../../config";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const LevelRules = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewIcon, setPreviewIcon] = useState(null);
-  const admin_id = localStorage.getItem("admin-user-id")
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const userData = useSelector(selectUser);
 
+  // const admin_id = localStorage.getItem("admin-user-id")
+  const admin_id = userData?.user?.id;
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   useEffect(() => {
     async function getData() {
       try {
@@ -27,8 +32,8 @@ const LevelRules = (props) => {
         setIsLoading(false);
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         if (res.status === 200) {
@@ -103,8 +108,8 @@ const LevelRules = (props) => {
         setIsLoading(false);
         if (res.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token");
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token");
           window.location.reload();
         }
         if (res.status === 201) {

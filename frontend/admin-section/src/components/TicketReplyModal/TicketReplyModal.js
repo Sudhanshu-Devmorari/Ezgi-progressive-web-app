@@ -6,19 +6,23 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { CustomDropdown } from "../CustomDropdown/CustomDropdown";
 import config from "../../config";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import moment from "moment";
 import initialProfile from "../../assets/profile.png";
 import AxiosInstance from "../AxiosInstance";
+import { selectUser } from "../../Redux/selector";
+import { Provider, useDispatch, useSelector} from "react-redux";
 
 const TicketReplyModal = (props) => {
   const [selecteReply, setSelecteReply] = useState("reply");
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const userId = localStorage.getItem("admin-user-id");
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
+  const userData = useSelector(selectUser);
+  // const userId = localStorage.getItem("admin-user-id");
+  const userId = userData?.user?.id;
   const tickeview = props?.tickeview;
   const setTickeview = props?.setTickeview;
   const ticketData = props?.ticketData;
-
   const [subUsersOptions, setSubUsersOptions] = useState([]);
 
   const [selectedSubUser, setSelectedSubUser] = useState({
@@ -92,7 +96,8 @@ const TicketReplyModal = (props) => {
       name: selectedOption,
     });
   };
-  const adminUserId = localStorage.getItem("admin-user-id");
+  // const adminUserId = localStorage.getItem("admin-user-id");
+  const adminUserId = userData?.user?.id;
 
   const handleTicket = async (e) => {
     if (selecteReply === "reply") {
@@ -111,7 +116,7 @@ const TicketReplyModal = (props) => {
             ticket_id: tickeview?.id,
           })
           .then(async (res) => {
-            // console.log(res);
+            console.log(res.status);
             if (res.status === 200) {
               const confirm = await Swal.fire({
                 title: "Success",
@@ -126,8 +131,8 @@ const TicketReplyModal = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
-              removeCookie("admin-user-id");
-              removeCookie("access-token");
+              cookies.remove("admin-user-id");
+              cookies.remove("access-token");
               window.location.reload();
             }
           })
@@ -162,13 +167,13 @@ const TicketReplyModal = (props) => {
           customClass: "dark-mode-alert",
         });
       } else {
-        const adminId = localStorage.getItem("admin-user-id");
+        const adminId = userData?.user?.id;
         AxiosInstance
           .post(
             `${config?.apiUrl}/redirect-ticket/${adminId}/${tickeview?.id}`,
             {
-              note: ticketRepltOrRedirect.redirect,
-              id: tickeview?.id, // sub user id
+              note: ticketRepltOrRedirect.note,
+              id: subUsersOptions[0].id, // sub user id
             }
           )
           .then((res) => {
@@ -184,8 +189,8 @@ const TicketReplyModal = (props) => {
             }
             if (res.status == 204) {
               localStorage.clear();
-              removeCookie("admin-user-id");
-              removeCookie("access-token");
+              cookies.remove("admin-user-id");
+              cookies.remove("access-token");
               window.location.reload();
             }
           });

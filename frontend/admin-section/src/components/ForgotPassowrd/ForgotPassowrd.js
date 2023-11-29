@@ -9,6 +9,8 @@ import Swal from "sweetalert2";
 import config from "../../config";
 
 const ForgotPassowrd = () => {
+  const [passResetOtp, setPassResetOtp] = useState(null);
+
   const [showModal, setShowModal] = useState(1);
   const [errorMessage, setErrorMessage] = useState('');
   const [phone, setPhone] = useState('');
@@ -56,6 +58,16 @@ const ForgotPassowrd = () => {
         });
     },
   });
+
+  const handlePasswordReset = async () => {
+    try {
+      formik.resetForm();
+    } catch (error) {
+      console.error('Password reset failed:', error);
+    }
+  };
+
+
   return (
     <>
       <div
@@ -115,11 +127,11 @@ const ForgotPassowrd = () => {
                   </div>
                 </form>
               )}
-              {showModal === 2 && <OtpModal setShowModal={setShowModal} phone={phone} setPhone={setPhone} showModal={showModal} />}
-              {showModal === 3 && <NewPassword setPhone={setPhone} phone={phone} setShowModal={setShowModal} showModal={showModal} />}
+              {showModal === 2 && <OtpModal setPassResetOtp={setPassResetOtp} setShowModal={setShowModal} phone={phone} handlePasswordReset={handlePasswordReset} setPhone={setPhone} showModal={showModal} />}
+              {showModal === 3 && <NewPassword passResetOtp={passResetOtp} setPhone={setPhone} phone={phone} handlePasswordReset={handlePasswordReset} setShowModal={setShowModal} showModal={showModal} />}
             </div>
             <img
-              onClick={()=>setShowModal(1)}
+              onClick={()=>{setShowModal(1); handlePasswordReset(); setErrorMessage('')}}
               data-bs-dismiss="modal"
               src={cross}
               alt=""

@@ -96,7 +96,7 @@ const ActiveComments = (props) => {
             formData.append("update", "profile");
 
             const res = await AxiosInstance.post(
-              `${config.apiUrl}/profile/`,
+              `${config.apiUrl}/profile/${user}/`,
               formData
             );
             if (res.status === 200) {
@@ -306,7 +306,7 @@ const ActiveComments = (props) => {
 
   const handleSavedata = async () => {
     try {
-      const res = await AxiosInstance.post(`${config.apiUrl}/profile/`, {
+      const res = await AxiosInstance.post(`${config.apiUrl}/profile/${userId}/`, {
         description: textareaValue,
         update: "comment",
       });

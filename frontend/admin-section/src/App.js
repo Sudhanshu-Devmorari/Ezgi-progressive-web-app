@@ -61,7 +61,7 @@ function App() {
       });
     }
     else {
-      removeCookie("access-token")
+      cookies.remove('access-token');
       navigate('/')
     }
   }, [isAuthenticated, navigate]);
@@ -69,7 +69,8 @@ function App() {
     <>
     
       <Routes>
-        {!isAuthenticated ? (
+      {userData === false &&
+        (!isAuthenticated ? (
           <Route path="/" element={<LoginModal />} />
         ) : (
           <>
@@ -86,7 +87,8 @@ function App() {
             <Route path="settings" element={<SettingsPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
             <Route path="editorSettings" element={<EditorSettingsPage setWithdrawableData={setWithdrawableData} setCommentData={setCommentData}/>} />
           </>
-        )}
+        ))
+      }
       </Routes>
     </>
   );

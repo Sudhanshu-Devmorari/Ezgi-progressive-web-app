@@ -26,13 +26,16 @@ import config from "../../config";
 import initialProfile from "../../assets/profile.png";
 import { CustomDropdownHome } from "../CustomDropdownHome/CustomDropdownHome";
 import { CustomDropdownEditor } from "../CustomDropdownEditor";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import AxiosInstance from "../AxiosInstance";
+import { Provider, useDispatch, useSelector} from "react-redux";
+import { selectUser } from "../../Redux/selector";
 
 const EditorManagemenet = (props) => {
   // const [addUser, setAddUser] = useState({});
   const addUser = props?.addUser && props?.addUser
   const setAddUser = props?.setAddUser && props?.setAddUser
+  const userData = useSelector(selectUser);
   
   // console.log(addUser.country);
   // const [preveiwProfilePic, setPreveiwProfilePic] = useState(null);
@@ -79,9 +82,10 @@ const EditorManagemenet = (props) => {
     setSelectedDeneyim("Select");
     setSelectedGender("Select");
   };
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const [setCookie, removeCookie] = useCookies();
+  const cookies = new Cookies();
   // const [isLoadingDeactive, setIsLoadingDeactive] = useState(false);
-  const admin_id = localStorage.getItem("admin-user-id");
+  const admin_id = userData?.user?.id;
 
   const handleDeactive = async (id, action) => {
     try {
@@ -113,8 +117,8 @@ const EditorManagemenet = (props) => {
       }
       if (res.status == 204) {
         localStorage.clear();
-        removeCookie("admin-user-id");
-        removeCookie("access-token")
+        cookies.remove("admin-user-id");
+        cookies.remove("access-token")
         window.location.reload();
       }
     } catch (error) {
@@ -366,8 +370,8 @@ const EditorManagemenet = (props) => {
         );
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         const modalElement = document.getElementById("exampleModal");
@@ -512,8 +516,8 @@ const EditorManagemenet = (props) => {
         );
         if (response.status == 204) {
           localStorage.clear();
-          removeCookie("admin-user-id");
-          removeCookie("access-token")
+          cookies.remove("admin-user-id");
+          cookies.remove("access-token")
           window.location.reload();
         }
         if (response.status === 200) {
@@ -1938,9 +1942,10 @@ const EditorManagemenet = (props) => {
                               borderRadius: "4px",
                             }}
                           >
-                            {partialData.editor_data?.commentator_status == 'active'
+                            {/* {partialData.editor_data?.commentator_status == 'active'
                               ? "Active"
-                              : "Deactive"} 
+                              : "Deactive"}  */}
+                              Deactive
                           </button>
                           <button
                             onClick={() => {
